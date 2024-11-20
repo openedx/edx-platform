@@ -28,16 +28,18 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
     def field_dictionary(self, **kwargs):
         """ add course if provided otherwise add courses in which the user is enrolled in """
         field_dictionary = super().field_dictionary(**kwargs)
+        course_id = kwargs.get('course_id')
         if not kwargs.get('user'):
             field_dictionary['course'] = []
-        elif not kwargs.get('course_id'):
+        elif not course_id:
             user_enrollments = self._enrollments_for_user(kwargs['user'])
             field_dictionary['course'] = [str(enrollment.course_id) for enrollment in user_enrollments]
 
-        # if we have an org filter, only include results for this org filter
-        course_org_filter = configuration_helpers.get_current_site_orgs()
-        if course_org_filter:
-            field_dictionary['org'] = course_org_filter
+        # if we have no specific course and an org filter, only include results for this org filter
+        if not course_id:
+            course_org_filter = configuration_helpers.get_current_site_orgs()
+            if course_org_filter:
+                field_dictionary['org'] = course_org_filter
 
         return field_dictionary
 
@@ -46,6 +48,11 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             Exclude any courses defined outside the current org.
         """
         exclude_dictionary = super().exclude_dictionary(**kwargs)
+        # If we are already filtering to a single course, we do not need
+        # the further course filters below.
+        if kwargs.get('course_id'):
+            return exclude_dictionary
+
         course_org_filter = configuration_helpers.get_current_site_orgs()
         # If we have a course filter we are ensuring that we only get those courses above
         if not course_org_filter:

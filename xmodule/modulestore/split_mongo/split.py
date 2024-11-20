@@ -81,7 +81,7 @@ from xmodule.assetstore import AssetMetadata
 from xmodule.course_block import CourseSummary
 from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import null_error_tracker
-from xmodule.library_content_block import LibrarySummary
+from xmodule.library_content_block import LegacyLibrarySummary
 from xmodule.modulestore import (
     BlockData,
     BulkOperationsMixin,
@@ -99,11 +99,12 @@ from xmodule.modulestore.exceptions import (
     MultipleLibraryBlocksFound,
     VersionConflictError
 )
-from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
+from xmodule.modulestore.split_mongo import CourseEnvelope
 from xmodule.modulestore.split_mongo.mongo_connection import DuplicateKeyError, DjangoFlexPersistenceBackend
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES, derived_key
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.util.misc import get_library_or_course_attribute
+from xmodule.util.keys import BlockKey, derive_key
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
@@ -1028,7 +1029,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     @autoretry_read()
     def get_library_summaries(self, **kwargs):
         """
-        Returns a list of `LibrarySummary` objects.
+        Returns a list of `LegacyLibrarySummary` objects.
         kwargs can be valid db fields to match against active_versions
         collection e.g org='example_org'.
         """
@@ -1056,7 +1057,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 display_name = library_block_fields['display_name']
 
             libraries_summaries.append(
-                LibrarySummary(library_locator, display_name)
+                LegacyLibrarySummary(library_locator, display_name)
             )
 
         return libraries_summaries
@@ -2452,7 +2453,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 raise ItemNotFoundError(usage_key)
             source_block_info = source_structure['blocks'][block_key]
 
-            new_block_key = derived_key(src_course_key, block_key, new_parent_block_key)
+            new_block_key = derive_key(usage_key, new_parent_block_key)
 
             # Now clone block_key to new_block_key:
             new_block_info = copy.deepcopy(source_block_info)

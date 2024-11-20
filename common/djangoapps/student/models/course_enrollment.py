@@ -129,10 +129,72 @@ class UnenrollmentNotAllowed(CourseEnrollmentException):
     pass
 
 
+class CourseEnrollmentQuerySet(models.QuerySet):
+    """
+    Custom queryset for CourseEnrollment with Table-level filter methods.
+    """
+
+    def active(self):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that are currently active.
+        """
+        return self.filter(is_active=True)
+
+    def without_certificates(self, username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that do not have a certificate.
+        """
+        return self.exclude(course_id__in=self.get_user_course_ids_with_certificates(username))
+
+    def with_certificates(self, username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have a certificate.
+        """
+        return self.filter(course_id__in=self.get_user_course_ids_with_certificates(username))
+
+    def in_progress(self, username, time_zone=UTC):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that are currently in progress.
+        """
+        now = datetime.now(time_zone)
+        return self.active().without_certificates(username).filter(
+            Q(course__start__lte=now, course__end__gte=now)
+            | Q(course__start__isnull=True, course__end__isnull=True)
+            | Q(course__start__isnull=True, course__end__gte=now)
+            | Q(course__start__lte=now, course__end__isnull=True),
+        )
+
+    def completed(self, username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have been completed.
+        """
+        return self.active().with_certificates(username)
+
+    def expired(self, username, time_zone=UTC):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have expired.
+        """
+        now = datetime.now(time_zone)
+        return self.active().without_certificates(username).filter(course__end__lt=now)
+
+    def get_user_course_ids_with_certificates(self, username):
+        """
+        Gets user's course ids with certificates.
+        """
+        from lms.djangoapps.certificates.models import GeneratedCertificate  # pylint: disable=import-outside-toplevel
+        course_ids_with_certificates = GeneratedCertificate.objects.filter(
+            user__username=username
+        ).values_list('course_id', flat=True)
+        return course_ids_with_certificates
+
+
 class CourseEnrollmentManager(models.Manager):
     """
     Custom manager for CourseEnrollment with Table-level filter methods.
     """
+
+    def get_queryset(self):
+        return CourseEnrollmentQuerySet(self.model, using=self._db)
 
     def is_small_course(self, course_id):
         """
@@ -225,12 +287,6 @@ class CourseEnrollmentManager(models.Manager):
         enroll_dict['total'] = total
         return enroll_dict
 
-    def enrolled_and_dropped_out_users(self, course_id):
-        """Return a queryset of Users in the course."""
-        return User.objects.filter(
-            courseenrollment__course_id=course_id
-        )
-
 
 # Named tuple for fields pertaining to the state of
 # CourseEnrollment for a user in a course.  This type
@@ -287,7 +343,7 @@ class CourseEnrollment(models.Model):
     objects = CourseEnrollmentManager()
 
     # cache key format e.g enrollment.<username>.<course_key>.mode = 'honor'
-    COURSE_ENROLLMENT_CACHE_KEY = "enrollment.{}.{}.mode"  # TODO Can this be removed?  It doesn't seem to be used.
+    COURSE_ENROLLMENT_CACHE_KEY = "enrollment.{}.{}.mode"
 
     MODE_CACHE_NAMESPACE = 'CourseEnrollment.mode_and_active'
 
@@ -330,7 +386,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_key` must be a opaque_keys CourseKey object.
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
@@ -449,7 +505,7 @@ class CourseEnrollment(models.Model):
 
         if activation_changed or mode_changed:
             self.save()
-            self._update_enrollment_in_request_cache(
+            self._update_enrollment_state_in_request_cache(
                 self.user,
                 self.course_id,
                 CourseEnrollmentState(self.mode, self.is_active),
@@ -689,9 +745,10 @@ class CourseEnrollment(models.Model):
         if check_access:
             if cls.is_enrollment_closed(user, course) and not can_upgrade:
                 log.warning(
-                    "User %s failed to enroll in course %s because enrollment is closed",
+                    "User %s failed to enroll in course %s because enrollment is closed (can_upgrade=%s).",
                     user.username,
-                    str(course_key)
+                    str(course_key),
+                    can_upgrade,
                 )
                 raise EnrollmentClosedError
 
@@ -1021,18 +1078,22 @@ class CourseEnrollment(models.Model):
             self.course_id
         )
         if certificate and not CertificateStatuses.is_refundable_status(certificate.status):
+            log.info(f"{self.user} has already been given a certificate therefore cannot be refunded.")
             return False
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
         # `refund_cuttoff_date` will be `None` if there is no order. If there is no order return `False`.
         if refund_cutoff_date is None:
+            log.info("Refund cutoff date is null")
             return False
         if datetime.now(UTC) > refund_cutoff_date:
+            log.info(f"Refund cutoff date: {refund_cutoff_date} has passed")
             return False
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified', include_expired=True)
         if course_mode is None:
+            log.info(f"Course mode for {self.course_id} doesn't exist.")
             return False
         else:
             return True
@@ -1042,14 +1103,17 @@ class CourseEnrollment(models.Model):
         # NOTE: This is here to avoid circular references
         from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
         date_placed = self.get_order_attribute_value('date_placed')
+        log.info(f"Successfully retrieved date_placed: {date_placed} from order")
 
         if not date_placed:
             order_number = self.get_order_attribute_value('order_number')
             if not order_number:
+                log.info("Failed to get order number")
                 return None
 
             date_placed = self.get_order_attribute_from_ecommerce('date_placed')
             if not date_placed:
+                log.info("Failed to get date_placed attribute")
                 return None
 
             # also save the attribute so that we don't need to call ecommerce again.
@@ -1337,7 +1401,7 @@ class CourseEnrollment(models.Model):
                 enrollment_state = CourseEnrollmentState(record.mode, record.is_active)
             except cls.DoesNotExist:
                 enrollment_state = CourseEnrollmentState(None, None)
-            cls._update_enrollment_in_request_cache(user, course_key, enrollment_state)
+            cls._update_enrollment_state_in_request_cache(user, course_key, enrollment_state)
         return enrollment_state
 
     @classmethod
@@ -1354,7 +1418,7 @@ class CourseEnrollment(models.Model):
         cache = cls._get_mode_active_request_cache()  # lint-amnesty, pylint: disable=redefined-outer-name
         for record in records:
             enrollment_state = CourseEnrollmentState(record.mode, record.is_active)
-            cls._update_enrollment(cache, record.user.id, course_key, enrollment_state)
+            cls._update_enrollment_state_in_cache(cache, record.user.id, course_key, enrollment_state)
 
     @classmethod
     def _get_mode_active_request_cache(cls):
@@ -1372,15 +1436,16 @@ class CourseEnrollment(models.Model):
         return cls._get_mode_active_request_cache().get((user.id, course_key))
 
     @classmethod
-    def _update_enrollment_in_request_cache(cls, user, course_key, enrollment_state):
+    def _update_enrollment_state_in_request_cache(cls, user, course_key, enrollment_state):
         """
         Updates the cached value for the user's enrollment in the
         request cache.
         """
-        cls._update_enrollment(cls._get_mode_active_request_cache(), user.id, course_key, enrollment_state)
+        cls._update_enrollment_state_in_cache(cls._get_mode_active_request_cache(),
+                                              user.id, course_key, enrollment_state)
 
     @classmethod
-    def _update_enrollment(cls, cache, user_id, course_key, enrollment_state):  # lint-amnesty, pylint: disable=redefined-outer-name
+    def _update_enrollment_state_in_cache(cls, cache, user_id, course_key, enrollment_state):  # lint-amnesty, pylint: disable=redefined-outer-name
         """
         Updates the cached value for the user's enrollment in the
         given cache.
@@ -1685,7 +1750,7 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
 
 class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
     """
-
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
@@ -1698,6 +1763,8 @@ class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: di
 class BulkChangeEnrollmentConfiguration(ConfigurationModel):
     """
     config model for the bulk_change_enrollment_csv command
+
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],

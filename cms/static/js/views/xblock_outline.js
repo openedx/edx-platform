@@ -112,8 +112,11 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 includesChildren: this.shouldRenderChildren(),
                 hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                 staffOnlyMessage: this.model.get('staff_only_message'),
+                hideFromTOCMessage: this.model.get('hide_from_toc_message'),
+                enableHideFromTOC: this.model.get('hide_from_toc'),
                 course: course,
-                enableCopyPasteUnits: this.model.get("enable_copy_paste_units"), // ENABLE_COPY_PASTE_UNITS waffle flag
+                enableCopyPasteUnits: this.model.get('enable_copy_paste_units'), // ENABLE_COPY_PASTE_UNITS waffle flag
+                isTaggingFeatureDisabled: this.model.get('is_tagging_feature_disabled'), // DISABLE_TAGGING_FEATURE waffle flag
             };
         },
 

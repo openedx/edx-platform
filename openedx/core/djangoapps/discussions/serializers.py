@@ -7,12 +7,12 @@ from lti_consumer.models import LtiConfiguration
 from rest_framework import serializers
 from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings
 from openedx.core.lib.courses import get_course_by_id
 from .models import DiscussionsConfiguration, Provider
 from .utils import available_division_schemes, get_divided_discussions
+from ..content.course_overviews.models import CourseOverviewTab
 
 
 class LtiSerializer(serializers.ModelSerializer):
@@ -259,6 +259,12 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
         # have already been set
         instance = self._update_lti(instance, validated_data)
         instance.save()
+        # find the discussion tab and update its visibility as per discussions configurations
+        # It can go out of sync due to unknown reasons
+        CourseOverviewTab.objects.filter(
+            course_overview_id=instance.context_key,
+            type='discussion'
+        ).update(is_hidden=not instance.enabled)
         update_discussions_settings_from_course_task.delay(str(instance.context_key))
         return instance
 
@@ -416,8 +422,6 @@ class DiscussionSettingsSerializer(serializers.Serializer):
             'division_scheme': instance.division_scheme,
             'available_division_schemes': available_division_schemes(course_key),
             'reported_content_email_notifications': instance.reported_content_email_notifications,
-            'reported_content_email_notifications_flag':
-                ENABLE_REPORTED_CONTENT_EMAIL_NOTIFICATIONS.is_enabled(course_key),
         }
         return payload
 

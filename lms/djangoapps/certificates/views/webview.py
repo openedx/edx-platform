@@ -15,7 +15,6 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.utils import translation
 from django.utils.encoding import smart_str
-from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import CertificateRenderStarted
@@ -27,8 +26,6 @@ from common.djangoapps.edxmako.template import Template
 from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
 from common.djangoapps.util.date_utils import strftime_localized
 from common.djangoapps.util.views import handle_500
-from lms.djangoapps.badges.events.course_complete import get_completion_badge
-from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.certificates.api import (
     certificates_viewable_for_course,
     display_date_for_certificate,
@@ -356,28 +353,22 @@ def _get_user_certificate(request, user, course_key, course_overview, preview_mo
     if preview_mode:
         # certificate is being previewed from studio
         if request.user.has_perm(PREVIEW_CERTIFICATES, course_overview):
-            if not settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
-                if course_overview.certificate_available_date and not course_overview.self_paced:
-                    modified_date = course_overview.certificate_available_date
-                else:
-                    modified_date = datetime.now().date()
+            if (
+                course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
+                and course_overview.certificate_available_date
+                and not course_overview.self_paced
+            ):
+                modified_date = course_overview.certificate_available_date
+            elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END:
+                modified_date = course_overview.end
             else:
-                if (
-                    course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END_WITH_DATE
-                    and course_overview.certificate_available_date
-                    and not course_overview.self_paced
-                ):
-                    modified_date = course_overview.certificate_available_date
-                elif course_overview.certificates_display_behavior == CertificatesDisplayBehaviors.END:
-                    modified_date = course_overview.end
-                else:
-                    modified_date = datetime.now().date()
-            user_certificate = GeneratedCertificate(
-                mode=preview_mode,
-                verify_uuid=str(uuid4().hex),
-                modified_date=modified_date,
-                created_date=datetime.now().date(),
-            )
+                modified_date = datetime.now().date()
+        user_certificate = GeneratedCertificate(
+            mode=preview_mode,
+            verify_uuid=str(uuid4().hex),
+            modified_date=modified_date,
+            created_date=datetime.now().date(),
+        )
     elif certificates_viewable_for_course(course_overview):
         # certificate is being viewed by learner or public
         try:
@@ -396,42 +387,6 @@ def _track_certificate_events(request, course, user, user_certificate):
     """
     Tracks web certificate view related events.
     """
-    # Badge Request Event Tracking Logic
-    course_key = course.location.course_key
-
-    if 'evidence_visit' in request.GET:
-        badge_class = get_completion_badge(course_key, user)
-        if not badge_class:
-            log.warning('Visit to evidence URL for badge, but badges not configured for course "%s"', course_key)
-            badges = []
-        else:
-            badges = badge_class.get_for_user(user)
-        if badges:
-            # There should only ever be one of these.
-            badge = badges[0]
-            tracker.emit(
-                'edx.badge.assertion.evidence_visited',
-                {
-                    'badge_name': badge.badge_class.display_name,
-                    'badge_slug': badge.badge_class.slug,
-                    'badge_generator': badge.backend,
-                    'issuing_component': badge.badge_class.issuing_component,
-                    'user_id': user.id,
-                    'course_id': str(course_key),
-                    'enrollment_mode': badge.badge_class.mode,
-                    'assertion_id': badge.id,
-                    'assertion_image_url': badge.image_url,
-                    'assertion_json_url': badge.assertion_url,
-                    'issuer': badge.data.get('issuer'),
-                }
-            )
-        else:
-            log.warning(
-                "Could not find badge for %s on course %s.",
-                user.id,
-                course_key,
-            )
-
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
         emit_certificate_event('evidence_visited', user, str(course.id), event_data={
@@ -441,31 +396,20 @@ def _track_certificate_events(request, course, user, user_certificate):
         })
 
 
-def _update_badge_context(context, course, user):
-    """
-    Updates context with badge info.
-    """
-    badge = None
-    if badges_enabled() and course.issue_badges:
-        badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
-        if badges:
-            badge = badges[0]
-    context['badge'] = badge
-
-
 def _update_organization_context(context, course):
     """
     Updates context with organization related info.
     """
     partner_long_name, organization_logo = None, None
-    partner_short_name = course.display_organization if course.display_organization else course.org
+    course_org_display = course.display_organization
     organizations = organizations_api.get_course_organizations(course_key=course.id)
     if organizations:
         # TODO Need to add support for multiple organizations, Currently we are interested in the first one.
         organization = organizations[0]
         partner_long_name = organization.get('name', partner_long_name)
-        partner_short_name = organization.get('short_name', partner_short_name)
+        course_org_display = course_org_display or organization.get('short_name')
         organization_logo = organization.get('logo', None)
+    partner_short_name = course_org_display or course.org
 
     context['organization_long_name'] = partner_long_name
     context['organization_short_name'] = partner_short_name
@@ -629,9 +573,6 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
 
         # Append/Override the existing view context values with certificate specific values
         _update_certificate_context(context, course, course_overview, user_certificate, platform_name)
-
-        # Append badge info
-        _update_badge_context(context, course, user)
 
         # Add certificate header/footer data to current context
         context.update(get_certificate_header_context(is_secure=request.is_secure()))

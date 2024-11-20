@@ -183,11 +183,9 @@ def create_financial_assistance_application(form_data):
     {
         "lms_user_id": <user_id>,
         "course_id": <course_run_id>,
-        "income": <income_from_range>,
-        "learner_reasons": <TEST_LONG_STRING>,
-        "learner_goals": <TEST_LONG_STRING>,
-        "learner_plans": <TEST_LONG_STRING>,
-        "allow_for_marketing": <Boolean>
+        "certify_economic_hardship": <Boolean>,
+        "certify_complete_certificate": <Boolean>,
+        "certify_honor_code": <Boolean>,
     }
     """
     response = _request_financial_assistance(

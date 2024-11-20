@@ -7,6 +7,8 @@ var hasPartitionGroups = xblockInfo.get('has_partition_group_components');
 var userPartitionInfo = xblockInfo.get('user_partition_info');
 var selectedGroupsLabel = userPartitionInfo['selected_groups_label'];
 var selectedPartitionIndex = userPartitionInfo['selected_partition_index'];
+var xblockId = xblockInfo.get('id')
+var tagsCount = (xblockInfo.get('tag_counts_by_block') || {})[xblockId] || 0;
 
 var statusMessages = [];
 var messageType;
@@ -20,7 +22,13 @@ var addStatusMessage = function (statusType, message) {
         statusIconClass = 'fa-warning';
     } else if (statusType === 'staff-only' || statusType === 'gated') {
         statusIconClass = 'fa-lock';
-    } else if (statusType === 'partition-groups') {
+    } else if(statusType === 'hide-from-toc-chapter') {
+        statusIconClass = 'fa-eye-slash';
+    }
+    else if(statusType === 'hide-from-toc-sequence') {
+        statusIconClass = 'fa-ban';
+    }
+    else if (statusType === 'partition-groups') {
         statusIconClass = 'fa-eye';
     }
 
@@ -46,6 +54,15 @@ if (prereq) {
 if (staffOnlyMessage) {
     messageType = 'staff-only';
     messageText = gettext('Contains staff only content');
+    addStatusMessage(messageType, messageText);
+} else if (hideFromTOCMessage && !xblockInfo.isVertical()){
+    if (xblockInfo.isChapter()) {
+        messageText = gettext('Hidden in the course outline, but sections are accessible for your learners through their separate link.');
+        messageType = 'hide-from-toc-chapter';
+    } else {
+        messageText = gettext('Subsections are not navigable between each other, they can only be accessed through their link.');
+        messageType = 'hide-from-toc-sequence';
+    }
     addStatusMessage(messageType, messageText);
 } else {
     if (visibilityState === 'needs_attention' && xblockInfo.isVertical()) {
@@ -169,6 +186,11 @@ if (is_proctored_exam) {
                         </a>
                     </li>
                 <% } %>
+
+                <% if (!isTaggingFeatureDisabled) { %>
+                    <li class="action-item tag-count" data-locator="<%- xblockId %>"></li>
+                <% } %>
+
                 <% if (typeof enableCopyPasteUnits !== "undefined" && enableCopyPasteUnits) { %>
                     <!--
                         If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, all these actions (besides "Publish")
@@ -186,6 +208,11 @@ if (is_proctored_exam) {
                                     <% if (xblockInfo.isEditableOnCourseOutline()) { %>
                                         <li class="nav-item">
                                             <a class="configure-button" href="#" role="button"><%- gettext('Configure') %></a>
+                                        </li>
+                                    <% } %>
+                                    <% if (!isTaggingFeatureDisabled) { %>
+                                        <li class="nav-item">
+                                            <a class="manage-tags-button" href="#" role="button"><%- gettext('Manage Tags') %></a>
                                         </li>
                                     <% } %>
                                     <% if (xblockInfo.isVertical()) { %>
@@ -392,8 +419,15 @@ if (is_proctored_exam) {
             <div class="status-messages">
             <% for (var i=0; i<statusMessages.length; i++) { %>
                 <div class="status-message">
-                    <span class="icon fa <%- statusMessages[i].iconClass %>" aria-hidden="true"></span>
-                    <p class="status-message-copy"><%- statusMessages[i].text %></p>
+                    <div>
+                        <span class="icon fa <%- statusMessages[i].iconClass %>" aria-hidden="true"></span>
+                        <p class="status-message-copy"><%- statusMessages[i].text %></p>
+                    </div>
+                    <% if (enableHideFromTOC && xblockInfo.isSequential()) { %>
+                        <button type="button" class="button btn-primary subsection-share-link-button">
+                            <span class="icon fa fa-link icon-share-link"></span><%- gettext('Share') %>
+                        </button>
+                    <% } %>
                 </div>
             <% } %>
             </div>

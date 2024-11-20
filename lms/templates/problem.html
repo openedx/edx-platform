@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import ngettext, gettext as _
-from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%namespace name='static' file='static_content.html'/>
@@ -40,7 +40,7 @@ from openedx.core.djangolib.markup import HTML
           </button>
       </span>
       % endif
-      % if reset_button:
+      % if attempts_used and reset_button:
       <span class="problem-action-button-wrapper">
           <button type="button" class="reset problem-action-btn btn-link btn-small" data-value="${_('Reset')}"><span aria-hidden="true">${_('Reset')}</span><span class="sr">${_("Reset your answer")}</span></button>
       </span>
@@ -68,7 +68,8 @@ from openedx.core.djangolib.markup import HTML
           </span>
           <span class="sr">(${submit_disabled_cta['description']})</span>
         % else:
-            <form class="submit-cta" method="post" action="${submit_disabled_cta['link']}">
+          <form class="submit-cta" method="post" action="${submit_disabled_cta.get('link')}">
+            % if submit_disabled_cta.get('link'):
               <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
               % for form_name, form_value in submit_disabled_cta['form_values'].items():
                   <input type="hidden" name="${form_name}" value="${form_value}">
@@ -76,19 +77,23 @@ from openedx.core.djangolib.markup import HTML
               <button class="submit-cta-link-button btn-link btn-small">
                 ${submit_disabled_cta['link_name']}
               </button>
-              <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
-                <span data-tooltip="${submit_disabled_cta['description']}" data-tooltip-show-on-click="true"
-                  class="fa fa-info-circle fa-lg" aria-hidden="true">
-                </span>
+            % endif
+            <span class="submit-cta-description" tabindex="0" role="note" aria-label="description">
+              <span data-tooltip="${submit_disabled_cta['description']}" data-tooltip-show-on-click="true"
+                class="fa fa-info-circle fa-lg" aria-hidden="true">
               </span>
-              <span class="sr">(${submit_disabled_cta['description']})</span>
-            </form>
+            </span>
+            <span class="sr">(${submit_disabled_cta['description']})</span>
+          </form>
         % endif
       % endif
       <div class="submission-feedback ${'cta-enabled' if submit_disabled_cta else ''}" id="submission_feedback_${short_id}">
         ## When attempts are not 0, the CTA above will contain a message about the number of used attempts
         % if attempts_allowed and (not submit_disabled_cta or attempts_used == 0):
           ${ngettext("You have used {num_used} of {num_total} attempt", "You have used {num_used} of {num_total} attempts", attempts_allowed).format(num_used=attempts_used, num_total=attempts_allowed)}
+        % endif
+        % if grading_method:
+          <div>${Text(_("Grading method: {grading_method}")).format(grading_method=grading_method)}</div>
         % endif
         <span class="sr">${_("Some problems have options such as save, reset, hints, or show answer. These options follow the Submit button.")}</span>
       </div>

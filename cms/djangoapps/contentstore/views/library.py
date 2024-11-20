@@ -10,7 +10,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import Http404, HttpResponseNotAllowed
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
@@ -41,8 +41,8 @@ from common.djangoapps.student.roles import (
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 
-from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
 from ..utils import add_instructor, reverse_library_url
+from ..toggles import libraries_v1_enabled
 from .component import CONTAINER_TEMPLATES, get_component_templates
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import create_xblock_info
 from .user import user_with_role
@@ -51,40 +51,45 @@ __all__ = ['library_handler', 'manage_library_users']
 
 log = logging.getLogger(__name__)
 
-LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
-ENABLE_LIBRARY_AUTHORING_MICROFRONTEND = settings.FEATURES.get('ENABLE_LIBRARY_AUTHORING_MICROFRONTEND', False)
-LIBRARY_AUTHORING_MICROFRONTEND_URL = settings.LIBRARY_AUTHORING_MICROFRONTEND_URL
 
-
-def should_redirect_to_library_authoring_mfe():
-    """
-    Boolean helper method, returns whether or not to redirect to the Library
-    Authoring MFE based on settings and flags.
-    """
-
-    return (
-        ENABLE_LIBRARY_AUTHORING_MICROFRONTEND and
-        LIBRARY_AUTHORING_MICROFRONTEND_URL and
-        REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND.is_enabled()
-    )
-
-
-def user_can_create_library(user, org=None):
+def _user_can_create_library_for_org(user, org=None):
     """
     Helper method for returning the library creation status for a particular user,
-    taking into account the value LIBRARIES_ENABLED.
-    """
+    taking into account the libraries_v1_enabled toggle.
 
-    if not LIBRARIES_ENABLED:
+    if the ENABLE_CREATOR_GROUP value is False, then any user can create a library (in any org),
+    if library creation is enabled.
+
+    if the ENABLE_CREATOR_GROUP value is true, then what a user can do varies by thier role.
+
+    Global Staff: can make libraries in any org.
+    Course Creator Group Members: can make libraries in any org.
+    Organization Staff: Can make libraries in the organization for which they are staff.
+    Course Staff: Can make libraries in the organization which has courses of which they are staff.
+    Course Admin: Can make libraries in the organization which has courses of which they are Admin.
+    """
+    if not libraries_v1_enabled():
         return False
     elif user.is_staff:
         return True
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        org_filter_params = {}
+        if org:
+            org_filter_params['org'] = org
         is_course_creator = get_course_creator_status(user) == 'granted'
-        has_org_staff_role = OrgStaffRole().get_orgs_for_user(user).exists()
-        has_course_staff_role = UserBasedRole(user=user, role=CourseStaffRole.ROLE).courses_with_role().exists()
-        has_course_admin_role = UserBasedRole(user=user, role=CourseInstructorRole.ROLE).courses_with_role().exists()
-
+        has_org_staff_role = OrgStaffRole().get_orgs_for_user(user).filter(**org_filter_params).exists()
+        has_course_staff_role = (
+            UserBasedRole(user=user, role=CourseStaffRole.ROLE)
+            .courses_with_role()
+            .filter(**org_filter_params)
+            .exists()
+        )
+        has_course_admin_role = (
+            UserBasedRole(user=user, role=CourseInstructorRole.ROLE)
+            .courses_with_role()
+            .filter(**org_filter_params)
+            .exists()
+        )
         return is_course_creator or has_org_staff_role or has_course_staff_role or has_course_admin_role
     else:
         # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
@@ -96,6 +101,22 @@ def user_can_create_library(user, org=None):
             return not disable_course_creation
 
 
+def user_can_view_create_library_button(user):
+    """
+    Helper method for displaying the visibilty of the create_library_button.
+    """
+    return _user_can_create_library_for_org(user)
+
+
+def user_can_create_library(user, org):
+    """
+    Helper method for to check if user can create library for given org.
+    """
+    if org is None:
+        return False
+    return _user_can_create_library_for_org(user, org)
+
+
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(('GET', 'POST'))
@@ -103,17 +124,13 @@ def library_handler(request, library_key_string=None):
     """
     RESTful interface to most content library related functionality.
     """
-    if not LIBRARIES_ENABLED:
+    if not libraries_v1_enabled():
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
 
     if request.method == 'POST':
-        if not user_can_create_library(request.user):
-            return HttpResponseForbidden()
-
         if library_key_string is not None:
             return HttpResponseNotAllowed(("POST",))
-
         return _create_library(request)
 
     else:

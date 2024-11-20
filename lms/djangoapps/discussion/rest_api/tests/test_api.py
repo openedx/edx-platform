@@ -13,7 +13,6 @@ import ddt
 import httpretty
 import pytest
 from django.test import override_settings
-from edx_toggles.toggles.testutils import override_waffle_flag
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
@@ -38,7 +37,6 @@ from common.djangoapps.student.tests.factories import (
 from common.djangoapps.util.testing import UrlResetMixin
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
-from lms.djangoapps.discussion.toggles import ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.api import (
     create_comment,
@@ -191,6 +189,10 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         with pytest.raises(DiscussionDisabledError):
             get_course(self.request, _discussion_disabled_course_for(self.user).id)
 
+    def test_discussions_disabled_v2(self):
+        data = get_course(self.request, _discussion_disabled_course_for(self.user).id, False)
+        assert data['show_discussions'] is False
+
     def test_basic(self):
         assert get_course(self.request, self.course.id) == {
             'id': str(self.course.id),
@@ -211,10 +213,9 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'is_group_ta': False,
             'is_user_admin': False,
             'user_roles': {'Student'},
-            'learners_tab_enabled': False,
-            'reason_codes_enabled': False,
             'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
             'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
+            'show_discussions': True,
         }
 
     @ddt.data(
@@ -230,15 +231,6 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
         course_meta = get_course(self.request, self.course.id)
         assert course_meta["has_moderation_privileges"]
         assert course_meta["user_roles"] == {FORUM_ROLE_STUDENT} | {role}
-
-    @ddt.data(True, False)
-    def test_learner_tab_enabled_flag(self, learners_tab_enabled):
-        """
-        Test the 'learners_tab_enabled' flag.
-        """
-        with override_waffle_flag(ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE, learners_tab_enabled):
-            course_meta = get_course(self.request, self.course.id)
-            assert course_meta['learners_tab_enabled'] == learners_tab_enabled
 
 
 @ddt.ddt
@@ -1273,13 +1265,15 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         overrides.setdefault("course_id", str(self.course.id))
         return make_minimal_cs_thread(overrides)
 
-    def get_comment_list(self, thread, endorsed=None, page=1, page_size=1):
+    def get_comment_list(self, thread, endorsed=None, page=1, page_size=1,
+                         merge_question_type_responses=False):
         """
         Register the appropriate comments service response, then call
         get_comment_list and return the result.
         """
         self.register_get_thread_response(thread)
-        return get_comment_list(self.request, thread["id"], endorsed, page, page_size)
+        return get_comment_list(self.request, thread["id"], endorsed, page, page_size,
+                                merge_question_type_responses=merge_question_type_responses)
 
     def test_nonexistent_thread(self):
         thread_id = "nonexistent_thread"
@@ -1411,10 +1405,14 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "resp_limit": ["14"],
                 "with_responses": ["True"],
                 "reverse_order": ["False"],
+                "merge_question_type_responses": ["False"],
             }
         )
 
-    def test_discussion_content(self):
+    def get_source_and_expected_comments(self):
+        """
+        Returns the source comments and expected comments for testing purposes.
+        """
         source_comments = [
             {
                 "type": "comment",
@@ -1427,7 +1425,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "created_at": "2015-05-11T00:00:00Z",
                 "updated_at": "2015-05-11T11:11:11Z",
                 "body": "Test body",
-                "endorsed": False,
+                "endorsed": True,
                 "abuse_flaggers": [],
                 "votes": {"up_count": 4},
                 "child_count": 0,
@@ -1462,7 +1460,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "updated_at": "2015-05-11T11:11:11Z",
                 "raw_body": "Test body",
                 "rendered_body": "<p>Test body</p>",
-                "endorsed": False,
+                "endorsed": True,
                 "endorsed_by": None,
                 "endorsed_by_label": None,
                 "endorsed_at": None,
@@ -1478,6 +1476,13 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous_to_peers": False,
                 "last_edit": None,
                 "edit_by_label": None,
+                "profile_image": {
+                    "has_image": False,
+                    "image_url_full": "http://testserver/static/default_500.png",
+                    "image_url_large": "http://testserver/static/default_120.png",
+                    "image_url_medium": "http://testserver/static/default_50.png",
+                    "image_url_small": "http://testserver/static/default_30.png",
+                },
             },
             {
                 "id": "test_comment_2",
@@ -1505,14 +1510,35 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous_to_peers": False,
                 "last_edit": None,
                 "edit_by_label": None,
+                "profile_image": {
+                    "has_image": False,
+                    "image_url_full": "http://testserver/static/default_500.png",
+                    "image_url_large": "http://testserver/static/default_120.png",
+                    "image_url_medium": "http://testserver/static/default_50.png",
+                    "image_url_small": "http://testserver/static/default_30.png",
+                },
             },
         ]
+        return source_comments, expected_comments
+
+    def test_discussion_content(self):
+        source_comments, expected_comments = self.get_source_and_expected_comments()
         actual_comments = self.get_comment_list(
             self.make_minimal_cs_thread({"children": source_comments})
         ).data["results"]
         assert actual_comments == expected_comments
 
-    def test_question_content(self):
+    def test_question_content_with_merge_question_type_responses(self):
+        source_comments, expected_comments = self.get_source_and_expected_comments()
+        actual_comments = self.get_comment_list(
+            self.make_minimal_cs_thread({
+                "thread_type": "question",
+                "children": source_comments,
+                "resp_total": len(source_comments)
+            }), merge_question_type_responses=True).data["results"]
+        assert actual_comments == expected_comments
+
+    def test_question_content_(self):
         thread = self.make_minimal_cs_thread({
             "thread_type": "question",
             "endorsed_responses": [make_minimal_cs_comment({"id": "endorsed_comment", "username": self.user.username})],
@@ -1546,11 +1572,13 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         assert actual_comments[0]['endorsed_by'] is None
 
     @ddt.data(
-        ("discussion", None, "children", "resp_total"),
-        ("question", False, "non_endorsed_responses", "non_endorsed_resp_total"),
+        ("discussion", None, "children", "resp_total", False),
+        ("question", False, "non_endorsed_responses", "non_endorsed_resp_total", False),
+        ("question", None, "children", "resp_total", True),
     )
     @ddt.unpack
-    def test_cs_pagination(self, thread_type, endorsed_arg, response_field, response_total_field):
+    def test_cs_pagination(self, thread_type, endorsed_arg, response_field,
+                           response_total_field, merge_question_type_responses):
         """
         Test cases in which pagination is done by the comments service.
 
@@ -1570,22 +1598,26 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         })
 
         # Only page
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=5).data
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=5,
+                                       merge_question_type_responses=merge_question_type_responses).data
         assert actual['pagination']['next'] is None
         assert actual['pagination']['previous'] is None
 
         # First page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=2).data
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=1, page_size=2,
+                                       merge_question_type_responses=merge_question_type_responses).data
         assert actual['pagination']['next'] == 'http://testserver/test_path?page=2'
         assert actual['pagination']['previous'] is None
 
         # Middle page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=2).data
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=2,
+                                       merge_question_type_responses=merge_question_type_responses).data
         assert actual['pagination']['next'] == 'http://testserver/test_path?page=3'
         assert actual['pagination']['previous'] == 'http://testserver/test_path?page=1'
 
         # Last page of many
-        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=3, page_size=2).data
+        actual = self.get_comment_list(thread, endorsed=endorsed_arg, page=3, page_size=2,
+                                       merge_question_type_responses=merge_question_type_responses).data
         assert actual['pagination']['next'] is None
         assert actual['pagination']['previous'] == 'http://testserver/test_path?page=2'
 
@@ -1596,7 +1628,8 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
             response_total_field: 5
         })
         with pytest.raises(PageNotFoundError):
-            self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=5)
+            self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=5,
+                                  merge_question_type_responses=merge_question_type_responses)
 
     def test_question_endorsed_pagination(self):
         thread = self.make_minimal_cs_thread({
@@ -1929,7 +1962,7 @@ class CreateThreadTest(
         with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data({
-            "author_label": "Staff",
+            "author_label": "Moderator",
             "id": "test_id",
             "course_id": str(self.course.id),
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
@@ -2095,19 +2128,6 @@ class CreateThreadTest(
         assert cs_request.method == 'POST'
         assert parsed_body(cs_request) == {'source_type': ['thread'], 'source_id': ['test_id']}
 
-    def test_voted(self):
-        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
-        self.register_thread_votes_response("test_id")
-        data = self.minimal_data.copy()
-        data["voted"] = "True"
-        with self.assert_signal_sent(api, 'thread_voted', sender=None, user=self.user, exclude_args=('post',)):
-            result = create_thread(self.request, data)
-        assert result['voted'] is True
-        cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/votes'  # lint-amnesty, pylint: disable=no-member
-        assert cs_request.method == 'PUT'
-        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)], 'value': ['up']}
-
     def test_abuse_flagged(self):
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         self.register_thread_flag_response("test_id")
@@ -2245,13 +2265,20 @@ class CreateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
             "child_count": 0,
             "can_delete": True,
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         assert actual == expected
         expected_url = (
@@ -2314,7 +2341,7 @@ class CreateCommentTest(
             "abuse_flagged",
             "anonymous",
             "raw_body",
-            "voted",
+            "voted"
         ]
         if parent_id:
             data["parent_id"] = parent_id
@@ -2331,7 +2358,7 @@ class CreateCommentTest(
             "thread_id": "test_thread",
             "parent_id": parent_id,
             "author": self.user.username,
-            "author_label": "Staff",
+            "author_label": "Moderator",
             "created_at": "2015-05-27T00:00:00Z",
             "updated_at": "2015-05-27T00:00:00Z",
             "raw_body": "Test body",
@@ -2352,6 +2379,13 @@ class CreateCommentTest(
             "anonymous_to_peers": False,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         assert actual == expected
         expected_url = (
@@ -2437,19 +2471,6 @@ class CreateCommentTest(
             assert not expected_error
         except ValidationError:
             assert expected_error
-
-    def test_voted(self):
-        self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
-        self.register_comment_votes_response("test_comment")
-        data = self.minimal_data.copy()
-        data["voted"] = "True"
-        with self.assert_signal_sent(api, 'comment_voted', sender=None, user=self.user, exclude_args=('post',)):
-            result = create_comment(self.request, data)
-        assert result['voted'] is True
-        cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/votes'  # lint-amnesty, pylint: disable=no-member
-        assert cs_request.method == 'PUT'
-        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)], 'value': ['up']}
 
     def test_abuse_flagged(self):
         self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
@@ -2595,6 +2616,17 @@ class UpdateThreadTest(
         self.register_get_thread_response(cs_data)
         self.register_put_thread_response(cs_data)
 
+    def create_user_with_request(self):
+        """
+        Create a user and an associated request for a specific course enrollment.
+        """
+        user = UserFactory.create()
+        self.register_get_user_response(user)
+        request = RequestFactory().get("/test_path")
+        request.user = user
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+        return user, request
+
     def test_empty(self):
         """Check that an empty update does not make any modifying requests."""
         # Ensure that the default following value of False is not applied implicitly
@@ -2709,7 +2741,8 @@ class UpdateThreadTest(
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
-    def test_following(self, old_following, new_following):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_following(self, old_following, new_following, mock_emit):
         """
         Test attempts to edit the "following" field.
 
@@ -2724,7 +2757,12 @@ class UpdateThreadTest(
         self.register_subscription_response(self.user)
         self.register_thread()
         data = {"following": new_following}
-        result = update_thread(self.request, "test_thread", data)
+        signal_name = "thread_followed" if new_following else "thread_unfollowed"
+        mock_path = f"openedx.core.djangoapps.django_comment_common.signals.{signal_name}.send"
+        with mock.patch(mock_path) as signal_patch:
+            result = update_thread(self.request, "test_thread", data)
+            if old_following != new_following:
+                self.assertEqual(signal_patch.call_count, 1)
         assert result['following'] == new_following
         last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         subscription_url = f"/api/v1/users/{self.user.id}/subscriptions"
@@ -2739,6 +2777,13 @@ class UpdateThreadTest(
             )
             request_data.pop("request_id", None)
             assert request_data == {'source_type': ['thread'], 'source_id': ['test_thread']}
+            event_name, event_data = mock_emit.call_args[0]
+            expected_event_action = 'followed' if new_following else 'unfollowed'
+            assert event_name == f'edx.forum.thread.{expected_event_action}'
+            assert event_data['commentable_id'] == 'original_topic'
+            assert event_data['id'] == 'test_thread'
+            assert event_data['followed'] == new_following
+            assert event_data['user_forums_roles'] == ['Student']
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
@@ -2753,12 +2798,15 @@ class UpdateThreadTest(
         are the same, no update should be made. Otherwise, a vote should be PUT
         or DELETEd according to the new_vote_status value.
         """
+        #setup
+        user1, request1 = self.create_user_with_request()
+
         if current_vote_status:
-            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
         self.register_thread_votes_response("test_thread")
         self.register_thread()
         data = {"voted": new_vote_status}
-        result = update_thread(self.request, "test_thread", data)
+        result = update_thread(request1, "test_thread", data)
         assert result['voted'] == new_vote_status
         last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
         votes_url = "/api/v1/threads/test_thread/votes"
@@ -2772,7 +2820,7 @@ class UpdateThreadTest(
                 parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             actual_request_data.pop("request_id", None)
-            expected_request_data = {"user_id": [str(self.user.id)]}
+            expected_request_data = {"user_id": [str(user1.id)]}
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             assert actual_request_data == expected_request_data
@@ -2798,21 +2846,22 @@ class UpdateThreadTest(
         """
         #setup
         starting_vote_count = 0
+        user, request = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            self.register_get_user_response(user, upvoted_ids=["test_thread"])
             starting_vote_count = 1
         self.register_thread_votes_response("test_thread")
         self.register_thread(overrides={"votes": {"up_count": starting_vote_count}})
 
         #first vote
         data = {"voted": first_vote}
-        result = update_thread(self.request, "test_thread", data)
+        result = update_thread(request, "test_thread", data)
         self.register_thread(overrides={"voted": first_vote})
         assert result['vote_count'] == (1 if first_vote else 0)
 
         #second vote
         data = {"voted": second_vote}
-        result = update_thread(self.request, "test_thread", data)
+        result = update_thread(request, "test_thread", data)
         assert result['vote_count'] == (1 if second_vote else 0)
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
@@ -2828,22 +2877,19 @@ class UpdateThreadTest(
         Tests vote_count increases and decreases correctly from different users
         """
         #setup
-        user2 = UserFactory.create()
-        self.register_get_user_response(user2)
-        request2 = RequestFactory().get("/test_path")
-        request2.user = user2
-        CourseEnrollmentFactory.create(user=user2, course_id=self.course.id)
+        user1, request1 = self.create_user_with_request()
+        user2, request2 = self.create_user_with_request()
 
         vote_count = 0
         if current_user1_vote:
-            self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
             vote_count += 1
         if current_user2_vote:
             self.register_get_user_response(user2, upvoted_ids=["test_thread"])
             vote_count += 1
 
         for (current_vote, user_vote, request) in \
-                [(current_user1_vote, user1_vote, self.request),
+                [(current_user1_vote, user1_vote, request1),
                  (current_user2_vote, user2_vote, request2)]:
 
             self.register_thread_votes_response("test_thread")
@@ -3142,6 +3188,17 @@ class UpdateCommentTest(
         self.register_get_comment_response(cs_comment_data)
         self.register_put_comment_response(cs_comment_data)
 
+    def create_user_with_request(self):
+        """
+        Create a user and an associated request for a specific course enrollment.
+        """
+        user = UserFactory.create()
+        self.register_get_user_response(user)
+        request = RequestFactory().get("/test_path")
+        request.user = user
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+        return user, request
+
     def test_empty(self):
         """Check that an empty update does not make any modifying requests."""
         self.register_comment()
@@ -3175,11 +3232,18 @@ class UpdateCommentTest(
             "voted": False,
             "vote_count": 0,
             "children": [],
-            "editable_fields": ["abuse_flagged", "anonymous", "raw_body", "voted"],
+            "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
             "child_count": 0,
             "can_delete": True,
             "last_edit": None,
             "edit_by_label": None,
+            "profile_image": {
+                "has_image": False,
+                "image_url_full": "http://testserver/static/default_500.png",
+                "image_url_large": "http://testserver/static/default_120.png",
+                "image_url_medium": "http://testserver/static/default_50.png",
+                "image_url_small": "http://testserver/static/default_30.png",
+            },
         }
         assert actual == expected
         assert parsed_body(httpretty.last_request()) == {
@@ -3291,7 +3355,8 @@ class UpdateCommentTest(
         [True, False],
     ))
     @ddt.unpack
-    def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author):
+    @mock.patch('openedx.core.djangoapps.django_comment_common.signals.comment_endorsed.send')
+    def test_endorsed_access(self, role_name, is_thread_author, thread_type, is_comment_author, endorsed_mock):
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=role_name)
         self.register_comment(
             {"user_id": str(self.user.id if is_comment_author else (self.user.id + 1))},
@@ -3306,6 +3371,7 @@ class UpdateCommentTest(
         )
         try:
             update_comment(self.request, "test_comment", {"endorsed": True})
+            self.assertEqual(endorsed_mock.call_count, 1)
             assert not expected_error
         except ValidationError as err:
             assert expected_error
@@ -3325,13 +3391,14 @@ class UpdateCommentTest(
         or DELETEd according to the new_vote_status value.
         """
         vote_count = 0
+        user1, request1 = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
             vote_count = 1
         self.register_comment_votes_response("test_comment")
         self.register_comment(overrides={"votes": {"up_count": vote_count}})
         data = {"voted": new_vote_status}
-        result = update_comment(self.request, "test_comment", data)
+        result = update_comment(request1, "test_comment", data)
         assert result['vote_count'] == (1 if new_vote_status else 0)
         assert result['voted'] == new_vote_status
         last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
@@ -3346,7 +3413,7 @@ class UpdateCommentTest(
                 parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
             )
             actual_request_data.pop("request_id", None)
-            expected_request_data = {"user_id": [str(self.user.id)]}
+            expected_request_data = {"user_id": [str(user1.id)]}
             if new_vote_status:
                 expected_request_data["value"] = ["up"]
             assert actual_request_data == expected_request_data
@@ -3373,21 +3440,22 @@ class UpdateCommentTest(
         """
         #setup
         starting_vote_count = 0
+        user1, request1 = self.create_user_with_request()
         if current_vote_status:
-            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
             starting_vote_count = 1
         self.register_comment_votes_response("test_comment")
         self.register_comment(overrides={"votes": {"up_count": starting_vote_count}})
 
         #first vote
         data = {"voted": first_vote}
-        result = update_comment(self.request, "test_comment", data)
+        result = update_comment(request1, "test_comment", data)
         self.register_comment(overrides={"voted": first_vote})
         assert result['vote_count'] == (1 if first_vote else 0)
 
         #second vote
         data = {"voted": second_vote}
-        result = update_comment(self.request, "test_comment", data)
+        result = update_comment(request1, "test_comment", data)
         assert result['vote_count'] == (1 if second_vote else 0)
 
     @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
@@ -3402,22 +3470,19 @@ class UpdateCommentTest(
         """
         Tests vote_count increases and decreases correctly from different users
         """
-        user2 = UserFactory.create()
-        self.register_get_user_response(user2)
-        request2 = RequestFactory().get("/test_path")
-        request2.user = user2
-        CourseEnrollmentFactory.create(user=user2, course_id=self.course.id)
+        user1, request1 = self.create_user_with_request()
+        user2, request2 = self.create_user_with_request()
 
         vote_count = 0
         if current_user1_vote:
-            self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
             vote_count += 1
         if current_user2_vote:
             self.register_get_user_response(user2, upvoted_ids=["test_comment"])
             vote_count += 1
 
         for (current_vote, user_vote, request) in \
-                [(current_user1_vote, user1_vote, self.request),
+                [(current_user1_vote, user1_vote, request1),
                  (current_user2_vote, user2_vote, request2)]:
 
             self.register_comment_votes_response("test_comment")
@@ -4041,6 +4106,7 @@ class CourseTopicsV2Test(ModuleStoreTestCase):
     """
     Tests for discussions topic API v2 code.
     """
+
     def setUp(self) -> None:
         super().setUp()
         self.course = CourseFactory.create(

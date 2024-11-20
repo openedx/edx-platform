@@ -59,7 +59,6 @@ and for all environments to use __init__.py to load their settings.
 The following files should be obviated by this change:
 
 * bok_choy_docker.py
-* bok_choy.py
 * devstack_docker.py
 * devstack_optimized.py
 * devstack.py

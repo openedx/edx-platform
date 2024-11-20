@@ -31,6 +31,7 @@ AUTH_PASSWORD_VALIDATORS:
 -   NAME: common.djangoapps.util.password_policy_validators.MaximumLengthValidator
     OPTIONS:
         max_length: 75
+AUTHORING_API_URL: https://example.com
 AWS_ACCESS_KEY_ID: null
 AWS_QUERYSTRING_AUTH: false
 AWS_S3_CUSTOM_DOMAIN: SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)
@@ -39,8 +40,6 @@ AWS_SES_REGION_ENDPOINT: email.us-east-1.amazonaws.com
 AWS_SES_REGION_NAME: us-east-1
 AWS_STORAGE_BUCKET_NAME: SET-ME-PLEASE (ex. bucket-name)
 BASE_COOKIE_DOMAIN: localhost
-BLOCKSTORE_API_URL: http://localhost:18250/api/v1
-BLOCKSTORE_PUBLIC_URL_ROOT: http://localhost:18250
 BLOCK_STRUCTURES_SETTINGS:
     COURSE_PUBLISH_TASK_DELAY: 30
     TASK_DEFAULT_RETRY_DELAY: 30
@@ -57,6 +56,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: celery
         LOCATION:
@@ -68,6 +68,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce
         LOCATION:
@@ -78,17 +79,19 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: course_structure
         LOCATION:
         - edx.devstack.memcached:11211
-        TIMEOUT: '7200'
+        TIMEOUT: '604800'
     default:
         BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         OPTIONS:
             ignore_exc: true
             no_delay: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: default
         LOCATION:
@@ -100,6 +103,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: general
         LOCATION:
@@ -110,6 +114,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: mongo_metadata_inheritance
         LOCATION:
@@ -121,6 +126,7 @@ CACHES:
             no_delay: true
             ignore_exc: true
             use_pooling: true
+            connect_timeout: 0.5
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce_general
         LOCATION:

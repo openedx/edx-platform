@@ -65,6 +65,7 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
     active_only = ExtendedNullBooleanField(required=False)
     permissions = MultiValueField(required=False)
     course_keys = MultiValueField(required=False)
+    mobile_search = ExtendedNullBooleanField(required=False)
 
     def clean(self):
         """

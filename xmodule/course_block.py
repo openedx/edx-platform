@@ -108,6 +108,7 @@ class EmailString(String):
     """
     Parse String with email validation
     """
+
     def from_json(self, value):
         if value:
             validate_email(value)
@@ -226,7 +227,8 @@ class ProctoringProvider(String):
     ProctoringProvider field, which includes validation of the provider
     and default that pulls from edx platform settings.
     """
-    def from_json(self, value):
+
+    def from_json(self, value, validate_providers=False):
         """
         Return ProctoringProvider as full featured Python type. Perform validation on the provider
         and include any inherited values from the platform default.
@@ -235,7 +237,8 @@ class ProctoringProvider(String):
         if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
             # Only validate the provider value if ProctoredExams are enabled on the environment
             # Otherwise, the passed in provider does not matter. We should always return default
-            self._validate_proctoring_provider(value)
+            if validate_providers:
+                self._validate_proctoring_provider(value)
             value = self._get_proctoring_value(value)
             return value
         else:
@@ -618,14 +621,6 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
-    )
-    issue_badges = Boolean(
-        display_name=_("Issue Open Badges"),
-        help=_(
-            "Issue Open Badges badges for this course. Badges are generated when certificates are created."
-        ),
-        scope=Scope.settings,
-        default=True
     )
     ## Course level Certificate Name overrides.
     cert_name_short = String(
@@ -1120,9 +1115,6 @@ class CourseBlock(
         except InvalidTabsException as err:
             raise type(err)(f'{str(err)} For course: {str(self.id)}')  # lint-amnesty, pylint: disable=line-too-long
 
-        if not settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
-            self.set_default_certificate_available_date()
-
     def set_grading_policy(self, course_policy):
         """
         The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
@@ -1174,8 +1166,8 @@ class CourseBlock(
         return policy_str
 
     @classmethod
-    def parse_xml(cls, node, runtime, keys, id_generator):
-        instance = super().parse_xml(node, runtime, keys, id_generator)
+    def parse_xml(cls, node, runtime, keys):
+        instance = super().parse_xml(node, runtime, keys)
 
         policy_dir = None
         url_name = node.get('url_name')
@@ -1465,15 +1457,18 @@ class CourseBlock(
     @property
     def forum_posts_allowed(self):
         """
-        Return whether forum posts are allowed by the discussion_blackouts
-        setting
+        Return whether forum posts are allowed by the discussion_blackouts setting
+        Checks if posting restrictions are enabled or if there's a currently ongoing blackout period.
         """
+
         blackouts = self.get_discussion_blackout_datetimes()
+        posting_restrictions = self.discussions_settings.get('posting_restrictions', 'disabled')
         now = datetime.now(utc)
-        for blackout in blackouts:
-            if blackout["start"] <= now <= blackout["end"]:
-                return False
-        return True
+
+        if posting_restrictions == 'enabled':
+            return False
+
+        return all(not (blackout["start"] <= now <= blackout["end"]) for blackout in blackouts)
 
     @property
     def number(self):

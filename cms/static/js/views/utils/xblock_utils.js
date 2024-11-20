@@ -8,7 +8,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
 
     var addXBlock, duplicateXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
         getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields, getXBlockType, findXBlockInfo,
-        moveXBlock;
+        moveXBlock, pasteXBlock;
 
     /**
          * Represents the possible visibility states for an xblock:
@@ -29,6 +29,8 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
          *
          *   staffOnly - all of the block's content is to be shown to staff only
          *     Note: staff only items do not affect their parent's state.
+         *
+         *   hideFromTOC - all of the block's content is to be hidden from the table of contents.
          */
     VisibilityState = {
         live: 'live',
@@ -36,7 +38,8 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         unscheduled: 'unscheduled',
         needsAttention: 'needs_attention',
         staffOnly: 'staff_only',
-        gated: 'gated'
+        gated: 'gated',
+        hideFromTOC: 'hide_from_toc'
     };
 
     /**
@@ -67,6 +70,85 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
                     });
                 return addOperation.promise();
             });
+    };
+
+    pasteXBlock = function(target) {
+        var parentLocator = target.data('parent'),
+            displayName = target.data('default-name');
+
+        return ViewUtils.runOperationShowingMessage(gettext('Pasting'), () => {
+            return $.postJSON(ModuleUtils.getUpdateUrl(), {
+                parent_locator: parentLocator,
+                staged_content: "clipboard",
+            }).then((data) => {
+                return data;
+            });
+        }).done((data) => {
+            const {
+                conflicting_files: conflictingFiles,
+                error_files: errorFiles,
+                new_files: newFiles,
+            } = data.static_file_notices;
+
+            const notices = [];
+            if (errorFiles.length) {
+                notices.push((next) => new PromptView.Error({
+                    title: gettext("Some errors occurred"),
+                    message: (
+                        gettext("The following required files could not be added to the course:") +
+                        " " + errorFiles.join(", ")
+                    ),
+                    actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                }));
+            }
+            if (conflictingFiles.length) {
+                notices.push((next) => new PromptView.Warning({
+                    title: gettext("You may need to update a file(s) manually"),
+                    message: (
+                        gettext(
+                            "The following files already exist in this course but don't match the " +
+                            "version used by the component you pasted:"
+                        ) + " " + conflictingFiles.join(", ")
+                    ),
+                    actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                }));
+            }
+            if (newFiles.length) {
+                notices.push(() => new NotificationView.Info({
+                    title: gettext("New file(s) added to Files & Uploads."),
+                    message: (
+                        gettext("The following required files were imported to this course:") +
+                        " "  + newFiles.join(", ")
+                    ),
+                    actions: {
+                        primary: {
+                            text: gettext('View files'),
+                            click: function(notification) {
+                                const article = document.querySelector('[data-course-assets]');
+                                const assetsUrl = $(article).attr('data-course-assets');
+                                window.location.href = assetsUrl;
+                                return;
+                            }
+                        },
+                        secondary: {
+                            text: gettext('Dismiss'),
+                            click: function(notification) {
+                                return notification.hide();
+                            }
+                        }
+                    }
+                }));
+            }
+            if (notices.length) {
+                // Show the notices, one at a time:
+                const showNext = () => {
+                    const view = notices.shift()(showNext);
+                    view.show();
+                }
+                // Delay to avoid conflict with the "Pasting..." notification.
+                setTimeout(showNext, 1250);
+            }
+        });
     };
 
     /**
@@ -231,6 +313,9 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         if (visibilityState === VisibilityState.staffOnly) {
             return 'is-staff-only';
         }
+        if (visibilityState === VisibilityState.hideFromTOC) {
+            return 'is-hidden-from-toc';
+        }
         if (visibilityState === VisibilityState.gated) {
             return 'is-gated';
         }
@@ -308,6 +393,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         getXBlockListTypeClass: getXBlockListTypeClass,
         updateXBlockFields: updateXBlockFields,
         getXBlockType: getXBlockType,
-        findXBlockInfo: findXBlockInfo
+        findXBlockInfo: findXBlockInfo,
+        pasteXBlock: pasteXBlock
     };
 });

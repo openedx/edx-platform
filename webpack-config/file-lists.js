@@ -99,9 +99,6 @@ module.exports = {
             '../openedx/features/course_search/static/course_search/js/views/dashboard_search_results_view.js'
         ),
         path.resolve(__dirname, '../openedx/features/course_search/static/course_search/js/views/search_results_view.js'),
-        path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js'),
-        path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/badge_list_view.js'),
-        path.resolve(__dirname, '../openedx/features/learner_profile/static/learner_profile/js/views/badge_view.js'),
         path.resolve(
             __dirname,
             '../openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js'

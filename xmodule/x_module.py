@@ -56,9 +56,6 @@ XMODULE_METRIC_NAME = 'edxapp.xmodule'
 XMODULE_DURATION_METRIC_NAME = XMODULE_METRIC_NAME + '.duration'
 XMODULE_METRIC_SAMPLE_RATE = 0.1
 
-# Stats event sent to DataDog in order to determine if old XML parsing can be deprecated.
-DEPRECATION_VSCOMPAT_EVENT = 'deprecation.vscompat'
-
 # xblock view names
 
 # This is the view that will be rendered to display the XBlock in the LMS.
@@ -1532,18 +1529,16 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
         super().__init__(**kwargs)
         self.process_xml = process_xml
 
-    def _usage_id_from_node(self, node, parent_id, id_generator=None):
+    def _usage_id_from_node(self, node, parent_id):
         """Create a new usage id from an XML dom node.
 
         Args:
             node (lxml.etree.Element): The DOM node to interpret.
             parent_id: The usage ID of the parent block
-            id_generator (IdGenerator): The :class:`.IdGenerator` to use
-                for creating ids
         Returns:
             UsageKey: the usage key for the new xblock
         """
-        return self.xblock_from_node(node, parent_id, id_generator).scope_ids.usage_id
+        return self.xblock_from_node(node, parent_id, self.id_generator).scope_ids.usage_id
 
     def xblock_from_node(self, node, parent_id, id_generator=None):
         """
@@ -1578,7 +1573,7 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
         aside_children = self.parse_asides(node, def_id, usage_id, id_generator)
         asides_tags = [x.tag for x in aside_children]
 
-        block = block_class.parse_xml(node, self, keys, id_generator)
+        block = block_class.parse_xml(node, self, keys)
         self._convert_reference_fields_to_keys(block)  # difference from XBlock.runtime
         block.parent = parent_id
         block.save()
@@ -1602,7 +1597,7 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
                     aside_children.append(child)
         # now process them & remove them from the xml payload
         for child in aside_children:
-            self._aside_from_xml(child, def_id, usage_id, id_generator)
+            self._aside_from_xml(child, def_id, usage_id)
             node.remove(child)
         return aside_children
 

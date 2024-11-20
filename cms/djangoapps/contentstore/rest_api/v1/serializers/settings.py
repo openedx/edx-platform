@@ -4,7 +4,7 @@ API Serializers for course settings
 
 from rest_framework import serializers
 
-from .common import CourseCommonSerializer
+from cms.djangoapps.contentstore.rest_api.serializers.common import CourseCommonSerializer
 
 
 class CourseSettingsSerializer(serializers.Serializer):
@@ -31,4 +31,3 @@ class CourseSettingsSerializer(serializers.Serializer):
     show_min_grade_warning = serializers.BooleanField()
     sidebar_html_enabled = serializers.BooleanField()
     upgrade_deadline = serializers.DateTimeField(allow_null=True)
-    use_v2_cert_display_settings = serializers.BooleanField()

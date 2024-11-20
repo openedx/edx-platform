@@ -1,45 +1,45 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:36+0000\n"
-"PO-Revision-Date: 2023-10-08 20:36:26.861016\n"
+"POT-Creation-Date: 2024-01-21 20:36+0000\n"
+"PO-Revision-Date: 2024-01-21 20:36:14.373996\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -242,6 +242,7 @@ msgstr ""
 "¢σηѕє¢тєтυя#"
 
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
+#: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 #: lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
@@ -2320,90 +2321,6 @@ msgid "This value must be all lowercase."
 msgstr ""
 "Thïs välüé müst ßé äll löwérçäsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
-#: lms/djangoapps/badges/models.py
-msgid "The course mode for this badge image. For example, \"verified\" or \"honor\"."
-msgstr ""
-"Thé çöürsé mödé för thïs ßädgé ïmägé. För éxämplé, \"vérïfïéd\" ör "
-"\"hönör\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Badge images must be square PNG files. The file size should be under 250KB."
-msgstr ""
-"Bädgé ïmägés müst ßé sqüäré PNG fïlés. Thé fïlé sïzé shöüld ßé ündér 250KB. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Set this value to True if you want this image to be the default image for "
-"any course modes that do not have a specified badge image. You can have only"
-" one default image."
-msgstr ""
-"Sét thïs välüé tö Trüé ïf ýöü wänt thïs ïmägé tö ßé thé défäült ïmägé för "
-"äný çöürsé mödés thät dö nöt hävé ä spéçïfïéd ßädgé ïmägé. Ýöü çän hävé önlý"
-" öné défäült ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
-"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
-"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
-"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
-"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒ#"
-
-#: lms/djangoapps/badges/models.py
-msgid "There can be only one default image."
-msgstr ""
-"Théré çän ßé önlý öné défäült ïmägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of completed courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Ön éäçh lïné, püt thé nümßér öf çömplétéd çöürsés tö äwärd ä ßädgé för, ä "
-"çömmä, änd thé slüg öf ä ßädgé çläss ýöü hävé çréätéd thät häs thé ïssüïng "
-"çömpönént 'öpénédx__çöürsé'. För éxämplé: 3,énrölléd_3_çöürsés Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρт#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"On each line, put the number of enrolled courses to award a badge for, a "
-"comma, and the slug of a badge class you have created that has the issuing "
-"component 'openedx__course'. For example: 3,enrolled_3_courses"
-msgstr ""
-"Ön éäçh lïné, püt thé nümßér öf énrölléd çöürsés tö äwärd ä ßädgé för, ä "
-"çömmä, änd thé slüg öf ä ßädgé çläss ýöü hävé çréätéd thät häs thé ïssüïng "
-"çömpönént 'öpénédx__çöürsé'. För éxämplé: 3,énrölléd_3_çöürsés Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтє#"
-
-#: lms/djangoapps/badges/models.py
-msgid ""
-"Each line is a comma-separated list. The first item in each line is the slug"
-" of a badge class you have created that has an issuing component of "
-"'openedx__course'. The remaining items in each line are the course keys the "
-"learner needs to complete to be awarded the badge. For example: "
-"slug_for_compsci_courses_group_badge,course-v1:CompSci+Course+First,course-v1:CompsSci+Course+Second"
-msgstr ""
-"Éäçh lïné ïs ä çömmä-sépärätéd lïst. Thé fïrst ïtém ïn éäçh lïné ïs thé slüg"
-" öf ä ßädgé çläss ýöü hävé çréätéd thät häs än ïssüïng çömpönént öf "
-"'öpénédx__çöürsé'. Thé rémäïnïng ïtéms ïn éäçh lïné äré thé çöürsé kéýs thé "
-"léärnér nééds tö çömplété tö ßé äwärdéd thé ßädgé. För éxämplé: "
-"slüg_för_çömpsçï_çöürsés_gröüp_ßädgé,çöürsé-v1:ÇömpSçï+Çöürsé+Fïrst,çöürsé-v1:ÇömpsSçï+Çöürsé+Séçönd#"
-
-#: lms/djangoapps/badges/models.py
-msgid "Please check the syntax of your entry."
-msgstr ""
-"Pléäsé çhéçk thé sýntäx öf ýöür éntrý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
 #. Translators: This string is used across Open edX installations
 #. as a callback to edX. Please do not translate `edX.org`
 #: lms/djangoapps/branding/api.py
@@ -3956,6 +3873,7 @@ msgstr "{sign_in_link} ör {register_link}. Ⱡ'σяєм ιρѕυм ∂σłσя 
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/core/djangoapps/user_authn/templates/user_authn/edx_ace/passwordresetsuccess/email/body.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/lti_provider/user-auth-error.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 msgid "Sign in"
 msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
@@ -4020,48 +3938,22 @@ msgid "Certificate is being created."
 msgstr "Çértïfïçäté ïs ßéïng çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/djangoapps/courseware/views/views.py
-#, python-brace-format
 msgid ""
-"{platform_name} now offers financial assistance for learners who want to earn Verified Certificates but who may not be able to pay the Verified Certificate fee. Eligible learners may receive up to 90{percent_sign} off the Verified Certificate fee for a course.\n"
-"To apply for financial assistance, enroll in the audit track for a course that offers Verified Certificates, and then complete this application. Note that you must complete a separate application for each course you take.\n"
-" We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program."
+"We plan to use this information to evaluate your application for financial assistance and to further develop our financial assistance program. Please note that while \n"
+"assistance is available in most courses that offer verified certificates, a few courses and programs are not eligible. You must complete a separate application \n"
+"for each course you take. You may be approved for financial assistance five (5) times each year (based on 12-month period from you first approval). \n"
+"To apply for financial assistance: \n"
+"1. Enroll in the audit track for an eligible course that offers Verified Certificates \n"
+"2. Complete this  application \n"
+"3. Check your email, your application will be reviewed in 3-4 business days"
 msgstr ""
-"{platform_name} nöw öfférs fïnänçïäl ässïstänçé för léärnérs whö wänt tö éärn Vérïfïéd Çértïfïçätés ßüt whö mäý nöt ßé äßlé tö päý thé Vérïfïéd Çértïfïçäté féé. Élïgïßlé léärnérs mäý réçéïvé üp tö 90{percent_sign} öff thé Vérïfïéd Çértïfïçäté féé för ä çöürsé.\n"
-"Tö äpplý för fïnänçïäl ässïstänçé, énröll ïn thé äüdït träçk för ä çöürsé thät öfférs Vérïfïéd Çértïfïçätés, änd thén çömplété thïs äpplïçätïön. Nöté thät ýöü müst çömplété ä sépäräté äpplïçätïön för éäçh çöürsé ýöü täké.\n"
-" Wé plän tö üsé thïs ïnförmätïön tö évälüäté ýöür äpplïçätïön för fïnänçïäl ässïstänçé änd tö fürthér dévélöp öür fïnänçïäl ässïstänçé prögräm.#"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Annual Household Income"
-msgstr "Ànnüäl Höüséhöld Ìnçömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your current financial situation. Why do you need assistance?"
-msgstr ""
-"Téll üs äßöüt ýöür çürrént fïnänçïäl sïtüätïön. Whý dö ýöü nééd ässïstänçé? "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your learning or professional goals. How will a Verified "
-"Certificate in this course help you achieve these goals?"
-msgstr ""
-"Téll üs äßöüt ýöür léärnïng ör pröféssïönäl göäls. Höw wïll ä Vérïfïéd "
-"Çértïfïçäté ïn thïs çöürsé hélp ýöü äçhïévé thésé göäls? Ⱡ'σяє#"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid ""
-"Tell us about your plans for this course. What steps will you take to help "
-"you complete the course work and receive a certificate?"
-msgstr ""
-"Téll üs äßöüt ýöür pläns för thïs çöürsé. Whät stéps wïll ýöü täké tö hélp "
-"ýöü çömplété thé çöürsé wörk änd réçéïvé ä çértïfïçäté? Ⱡ'#"
-
-#: lms/djangoapps/courseware/views/views.py
-msgid "Use between 1250 and 2500 characters or so in your response."
-msgstr ""
-"Ûsé ßétwéén 1250 änd 2500 çhäräçtérs ör sö ïn ýöür réspönsé. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Wé plän tö üsé thïs ïnförmätïön tö évälüäté ýöür äpplïçätïön för fïnänçïäl ässïstänçé änd tö fürthér dévélöp öür fïnänçïäl ässïstänçé prögräm. Pléäsé nöté thät whïlé \n"
+"ässïstänçé ïs äväïläßlé ïn möst çöürsés thät öffér vérïfïéd çértïfïçätés, ä féw çöürsés änd prögräms äré nöt élïgïßlé. Ýöü müst çömplété ä sépäräté äpplïçätïön \n"
+"för éäçh çöürsé ýöü täké. Ýöü mäý ßé äpprövéd för fïnänçïäl ässïstänçé fïvé (5) tïmés éäçh ýéär (ßäséd ön 12-mönth pérïöd fröm ýöü fïrst äppröväl). \n"
+"Tö äpplý för fïnänçïäl ässïstänçé: \n"
+"1. Énröll ïn thé äüdït träçk för än élïgïßlé çöürsé thät öfférs Vérïfïéd Çértïfïçätés \n"
+"2. Çömplété thïs  äpplïçätïön \n"
+"3. Çhéçk ýöür émäïl, ýöür äpplïçätïön wïll ßé révïéwéd ïn 3-4 ßüsïnéss däýs#"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
@@ -4079,20 +3971,32 @@ msgstr ""
 "ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ι#"
 
 #: lms/djangoapps/courseware/views/views.py
-msgid "Specify your annual household income in US Dollars."
+msgid "I certify that: "
+msgstr "Ì çértïfý thät:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"Paying the verified certificate fee for the above course would cause me "
+"economic hardship"
 msgstr ""
-"Spéçïfý ýöür ännüäl höüséhöld ïnçömé ïn ÛS Döllärs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"Päýïng thé vérïfïéd çértïfïçäté féé för thé äßövé çöürsé wöüld çäüsé mé "
+"éçönömïç härdshïp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"I will work diligently to complete the course work and receive a certificate"
+msgstr ""
+"Ì wïll wörk dïlïgéntlý tö çömplété thé çöürsé wörk änd réçéïvé ä çértïfïçäté"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/djangoapps/courseware/views/views.py
 #, python-brace-format
 msgid ""
-"I allow {platform_name} to use the information provided in this application "
-"(except for financial information) for {platform_name} marketing purposes."
+"I have read, understand, and will abide by the {honor_code_link} for the edX"
+" Site"
 msgstr ""
-"Ì ällöw {platform_name} tö üsé thé ïnförmätïön prövïdéd ïn thïs äpplïçätïön "
-"(éxçépt för fïnänçïäl ïnförmätïön) för {platform_name} märkétïng pürpösés. "
-"Ⱡ'σяєм#"
+"Ì hävé réäd, ündérständ, änd wïll äßïdé ßý thé {honor_code_link} för thé édX"
+" Sïté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Title can't be empty"
@@ -4122,12 +4026,12 @@ msgid "Good"
 msgstr "Gööd Ⱡ'σяєм ι#"
 
 #. Translators: Replier commented on "your" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "your"
 msgstr "ýöür Ⱡ'σяєм ι#"
 
 #. Translators: Replier commented on "their" response to your post
-#: lms/djangoapps/discussion/rest_api/utils.py
+#: lms/djangoapps/discussion/rest_api/discussions_notifications.py
 msgid "their"
 msgstr "théïr Ⱡ'σяєм ιρѕ#"
 
@@ -5713,6 +5617,22 @@ msgid ""
 msgstr ""
 "Thé lïst öf gröüp çönfïgürätïöns för pärtïtïönïng stüdénts ïn çöntént "
 "éxpérïménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/djangoapps/lti_provider/models.py
+msgid ""
+"When checked, the LTI content will load only for learners who have an "
+"account in this instance. This is required only for linking learner accounts"
+" with the LTI consumer. See the Open edX LTI Provider documentation for more"
+" details."
+msgstr ""
+"Whén çhéçkéd, thé LTÌ çöntént wïll löäd önlý för léärnérs whö hävé än "
+"äççöünt ïn thïs ïnstänçé. Thïs ïs réqüïréd önlý för lïnkïng léärnér äççöünts"
+" wïth thé LTÌ çönsümér. Séé thé Öpén édX LTÌ Prövïdér döçüméntätïön för möré"
+" détäïls. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσя#"
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
@@ -8714,6 +8634,26 @@ msgstr ""
 "¢σηѕє¢т#"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re "
+"following: <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> réspöndéd tö ä pöst ýöü’ré "
+"föllöwïng: <{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on {author_name}'s "
+"response in a post you’re following <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> çömméntéd ön {author_name}'s "
+"réspönsé ïn ä pöst ýöü’ré föllöwïng <{strong}>{post_title}</{strong}></{p}> "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
 msgid ""
 "Notifications for responses and comments on your posts, and the ones you’re "
 "following, including endorsements to your responses and on your posts."
@@ -9494,6 +9434,12 @@ msgstr ""
 "¢σηѕє¢тє#"
 
 #: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "Full name can't be longer than 255 symbols"
+msgstr ""
+"Füll nämé çän't ßé löngér thän 255 sýmßöls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Enter a valid name"
 msgstr "Éntér ä välïd nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -9606,6 +9552,13 @@ msgstr "Pröféssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
 msgid "Specialty"
 msgstr "Spéçïältý Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#. Translators: This label appears above a dropdown menu to select
+#. the user's work experience
+#: openedx/core/djangoapps/user_api/accounts/settings_views.py
+#: openedx/core/djangoapps/user_authn/api/form_fields.py
+msgid "Work experience"
+msgstr "Wörk éxpérïénçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: openedx/core/djangoapps/user_api/accounts/utils.py
 #, python-brace-format
@@ -12445,18 +12398,6 @@ msgstr ""
 "thümßnäïl ïmägé ön thé Séttïngs & Détäïls pägé. Ⱡ'σяєм ιρѕυм #"
 
 #: xmodule/course_block.py
-msgid "Issue Open Badges"
-msgstr "Ìssüé Öpén Bädgés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: xmodule/course_block.py
-msgid ""
-"Issue Open Badges badges for this course. Badges are generated when "
-"certificates are created."
-msgstr ""
-"Ìssüé Öpén Bädgés ßädgés för thïs çöürsé. Bädgés äré générätéd whén "
-"çértïfïçätés äré çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: xmodule/course_block.py
 msgid ""
 "Use this setting only when generating PDF certificates. Between quotation "
 "marks, enter the short name of the type of certificate that students receive"
@@ -13328,6 +13269,25 @@ msgstr ""
 "théïr änswérs änd réshüfflé séléçtéd ïtéms. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: xmodule/library_content_block.py
+msgid "Source content library has not been specified."
+msgstr ""
+"Söürçé çöntént lïßrärý häs nöt ßéén spéçïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: xmodule/library_content_block.py
+msgid "Content libraries are not available in the current runtime."
+msgstr ""
+"Çöntént lïßrärïés äré nöt äväïläßlé ïn thé çürrént rüntïmé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: xmodule/library_content_block.py
+#, python-brace-format
+msgid "Source content library does not exist: {source_library_id}"
+msgstr ""
+"Söürçé çöntént lïßrärý döés nöt éxïst: {source_library_id} Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: xmodule/library_content_block.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 "Thïs çömpönént ïs öüt öf däté. Thé lïßrärý häs néw çöntént. Ⱡ'σяєм ιρѕυм "
@@ -13369,10 +13329,11 @@ msgid "Select a Library."
 msgstr "Séléçt ä Lïßrärý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: xmodule/library_content_block.py
-msgid "There are no matching problem types in the specified libraries."
+#, python-brace-format
+msgid "There are no problems in the specified library of type {capa_type}."
 msgstr ""
-"Théré äré nö mätçhïng prößlém týpés ïn thé spéçïfïéd lïßrärïés. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Théré äré nö prößléms ïn thé spéçïfïéd lïßrärý öf týpé {capa_type}. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: xmodule/library_content_block.py
 msgid "Select another problem type."
@@ -15152,13 +15113,11 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group} Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Düplïçäté öf {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -15166,6 +15125,10 @@ msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #: cms/djangoapps/contentstore/utils.py
 msgid "Invalid prerequisite course key"
 msgstr "Ìnvälïd préréqüïsïté çöürsé kéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Set Date"
+msgstr "Sét Däté Ⱡ'σяєм ιρѕυм ∂#"
 
 #. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 #. Translators: This is the status of an active video upload
@@ -15400,10 +15363,6 @@ msgid "Course has been successfully reindexed."
 msgstr ""
 "Çöürsé häs ßéén süççéssfüllý réïndéxéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Set Date"
-msgstr "Sét Däté Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -15987,14 +15946,6 @@ msgstr "Réqüïréménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Details"
 msgstr "Détäïls Ⱡ'σяєм ιρѕυм #"
 
-#. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-#: wiki/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Vïéw Ⱡ'σяєм ι#"
-
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
 msgid "Save"
@@ -16489,12 +16440,12 @@ msgid "Welcome to {platform_name}"
 msgstr "Wélçömé tö {platform_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: 'Open edX' is a registered trademark, please keep this
-#. untranslated. See https://open.edx.org for more information.
+#. untranslated. See https://openedx.org for more information.
 #: lms/templates/index_overlay.html
-msgid "It works! Powered by Open edX{registered_trademark}"
+msgid "It works! Powered by the Open edX{registered_trademark} Platform"
 msgstr ""
-"Ìt wörks! Pöwéréd ßý Öpén édX{registered_trademark} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тє#"
+"Ìt wörks! Pöwéréd ßý thé Öpén édX{registered_trademark} Plätförm Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -16843,6 +16794,14 @@ msgstr "Séqüénçé Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/seq_block.html lms/templates/vert_module.html
 msgid "Completed"
 msgstr "Çömplétéd Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/seq_block.html
+msgid "New Unit"
+msgstr "Néw Ûnït Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/seq_block.html
+msgid "Paste as new unit"
+msgstr "Pästé äs néw ünït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
@@ -17237,6 +17196,10 @@ msgstr "Händöüts Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/video.html
 msgid "Download Handout"
 msgstr "Döwnlöäd Händöüt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/video.html
+msgid "How is the transcript quality ?"
+msgstr "Höw ïs thé tränsçrïpt qüälïtý ? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/word_cloud.html
 msgid "{num} of {total}"
@@ -20912,22 +20875,6 @@ msgstr ""
 #. Translators: This string will not be used in Open edX installations.
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid ""
-"In order to be eligible for edX Financial Assistance, you must demonstrate "
-"that paying the Verified Certificate fee would cause you economic hardship. "
-"To apply, you will be asked to answer a few questions about why you are "
-"applying and how the Verified Certificate will benefit you."
-msgstr ""
-"Ìn ördér tö ßé élïgïßlé för édX Fïnänçïäl Àssïstänçé, ýöü müst démönsträté "
-"thät päýïng thé Vérïfïéd Çértïfïçäté féé wöüld çäüsé ýöü éçönömïç härdshïp. "
-"Tö äpplý, ýöü wïll ßé äskéd tö änswér ä féw qüéstïöns äßöüt whý ýöü äré "
-"äpplýïng änd höw thé Vérïfïéd Çértïfïçäté wïll ßénéfït ýöü. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ є#"
-
-#. Translators: This string will not be used in Open edX installations.
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid ""
 "If your application is approved, we'll give you instructions for verifying "
 "your identity on edx.org so you can start working toward completing your edX"
 " course."
@@ -20962,10 +20909,6 @@ msgstr ""
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Sincerely, Anant"
 msgstr "Sïnçérélý, Ànänt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/financial-assistance/financial-assistance.html
-msgid "Back to Student FAQs"
-msgstr "Bäçk tö Stüdént FÀQs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/financial-assistance/financial-assistance.html
 msgid "Apply for Financial Assistance"
@@ -22889,6 +22832,31 @@ msgstr ""
 msgid "My Courses"
 msgstr "Mý Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "There was an error when loading this module!"
+msgstr ""
+"Théré wäs än érrör whén löädïng thïs mödülé! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"This module is available only for users who are signed into {platform}. "
+"Kindly sign in and refresh this page to load the content."
+msgstr ""
+"Thïs mödülé ïs äväïläßlé önlý för üsérs whö äré sïgnéd ïntö {platform}. "
+"Kïndlý sïgn ïn änd réfrésh thïs pägé tö löäd thé çöntént. Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid "NOTE:"
+msgstr "NÖTÉ: Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/lti_provider/user-auth-error.html
+msgid ""
+"The email used to sign into this platform and {platform} should be the same."
+msgstr ""
+"Thé émäïl üséd tö sïgn ïntö thïs plätförm änd {platform} shöüld ßé thé sämé."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
 #: lms/templates/modal/_modal-settings-language.html
 msgid "Change Preferred Language"
 msgstr "Çhängé Préférréd Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
@@ -23540,6 +23508,11 @@ msgid "Learn more"
 msgstr "Léärn möré Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/wiki/includes/article_menu.html
+#: wiki/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Vïéw Ⱡ'σяєм ι#"
+
+#: lms/templates/wiki/includes/article_menu.html
 msgid "{span_start}(active){span_end}"
 msgstr "{span_start}(äçtïvé){span_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -24182,8 +24155,8 @@ msgid "Studio Accessibility Policy"
 msgstr "Stüdïö Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
-msgid "Files & Uploads"
-msgstr "Fïlés & Ûplöäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Files"
+msgstr "Fïlés Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/certificates.html
 msgid "Course Certificates"
@@ -24364,6 +24337,10 @@ msgstr "Vïéw Lïvé Vérsïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 msgid "Preview the courseware in the LMS"
 msgstr ""
 "Prévïéw thé çöürséwäré ïn thé LMS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: cms/templates/container.html
+msgid "Collapse All"
+msgstr "Çölläpsé Àll Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/container.html
 msgid "Adding components"
@@ -26497,6 +26474,10 @@ msgid "Libraries"
 msgstr "Lïßrärïés Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/index.html
+msgid "Taxonomies"
+msgstr "Täxönömïés Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/templates/index.html
 msgid "Are you staff on an existing {studio_name} course?"
 msgstr ""
 "Àré ýöü stäff ön än éxïstïng {studio_name} çöürsé? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -27932,16 +27913,28 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Importing components"
+msgstr "Ìmpörtïng çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "Éxpänd ör Çölläpsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy to Clipboard"
-msgstr "Çöpý tö Çlïpßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+msgid "Select this problem"
+msgstr "Séléçt thïs prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Tags"
+msgstr "Mänägé Tägs Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
 msgstr "Mänägé Àççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy to Clipboard"
+msgstr "Çöpý tö Çlïpßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -28352,6 +28345,10 @@ msgstr "Çöürsé Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Öütlïné Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/widgets/header.html
+msgid "Videos"
+msgstr "Vïdéös Ⱡ'σяєм ιρѕυ#"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

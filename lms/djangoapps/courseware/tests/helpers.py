@@ -4,6 +4,7 @@ Helpers for courseware tests.
 
 
 import ast
+import re
 import json
 from collections import OrderedDict
 from datetime import timedelta
@@ -128,7 +129,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.clients = {user.username: Client() for user in self.users}
         self.login_statuses = [
             self.clients[user.username].login(
-                username=user.username, password='test')
+                username=user.username, password=self.TEST_PASSWORD)
             for user in self.users
         ]
 
@@ -173,7 +174,7 @@ class LoginEnrollmentTestCase(TestCase):
         Create a user account, activate, and log in.
         """
         self.email = 'foo@test.com'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
-        self.password = 'bar'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+        self.password = 'Password1234'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.username = 'test'  # lint-amnesty, pylint: disable=attribute-defined-outside-init
         self.user = self.create_account(
             self.username,
@@ -450,11 +451,15 @@ def get_context_dict_from_string(data):
     Retrieve dictionary from string.
     """
     # Replace tuple and un-necessary info from inside string and get the dictionary.
-    cleaned_data = ast.literal_eval(data.split('((\'video.html\',')[1].replace("),\n {})", '').strip())
-    cleaned_data['metadata'] = OrderedDict(
-        sorted(json.loads(cleaned_data['metadata']).items(), key=lambda t: t[0])
+    cleaned_data = data.split('((\'video.html\',')[1].replace("),\n {})", '').strip()
+    # Omit user_id validation
+    cleaned_data_without_user = re.sub(".*user_id.*\n?", '', cleaned_data)
+
+    validated_data = ast.literal_eval(cleaned_data_without_user)
+    validated_data['metadata'] = OrderedDict(
+        sorted(json.loads(validated_data['metadata']).items(), key=lambda t: t[0])
     )
-    return cleaned_data
+    return validated_data
 
 
 def set_preview_mode(preview_mode: bool):

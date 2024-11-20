@@ -13,6 +13,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from lms.djangoapps.gating import api as lms_gating_api
+import openedx.core.djangoapps.content.block_structure.api as bs_api
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from openedx.core.lib.gating import api as gating_api
@@ -166,7 +167,11 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         self.course.enable_subsection_gating = True
         self.setup_gated_section(self.blocks[gated_block_ref], self.blocks[gating_block_ref])
 
-        with self.assertNumQueries(5):
+        # Cache the course blocks so that they don't need to be generated when we're trying to
+        # get data back.  This would happen as a part of publishing in a production system.
+        bs_api.update_course_in_cache(self.course.id)
+
+        with self.assertNumQueries(4):
             self.get_blocks_and_check_against_expected(self.user, expected_blocks_before_completion)
 
         # clear the request cache to simulate a new request
@@ -179,7 +184,7 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             self.user,
         )
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(4):
             self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
 
     def test_staff_access(self):

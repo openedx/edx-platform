@@ -2,6 +2,7 @@
 CMS feature toggles.
 """
 from edx_toggles.toggles import SettingDictToggle, WaffleFlag
+from openedx.core.djangoapps.content.search import api as search_api
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
@@ -159,6 +160,18 @@ def use_new_problem_editor():
     return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
 
 
+# .. toggle_name: new_core_editors.use_advanced_problem_editor
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new core problem xblock advanced editor as the default
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-07-25
+# .. toggle_target_removal_date: 2024-08-31
+# .. toggle_tickets: TNL-11694
+# .. toggle_warning:
+ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_advanced_problem_editor', __name__)
+
+
 # .. toggle_name: new_editors.add_game_block_button
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -196,22 +209,6 @@ def individualize_anonymous_user_id(course_id):
     Returns a boolean if individualized anonymous_user_id is enabled on the course
     """
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
-
-
-# .. toggle_name: contentstore.enable_copy_paste_units
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Moves most unit-level actions into a submenu and adds new "Copy Unit" and "Paste
-#   Unit" actions which can be used to copy units within or among courses.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-08-01
-# .. toggle_target_removal_date: 2023-10-01
-# .. toggle_tickets: https://github.com/openedx/modular-learning/issues/11 https://github.com/openedx/modular-learning/issues/50
-ENABLE_COPY_PASTE_UNITS = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.enable_copy_paste_units',
-    __name__,
-    CONTENTSTORE_LOG_PREFIX,
-)
 
 
 # .. toggle_name: contentstore.enable_studio_content_api
@@ -497,6 +494,66 @@ def use_new_course_team_page(course_key):
     return ENABLE_NEW_STUDIO_COURSE_TEAM_PAGE.is_enabled(course_key)
 
 
+# .. toggle_name: contentstore.new_studio_mfe.use_new_certificates_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio course certificates page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-1-18
+# .. toggle_target_removal_date: 2023-4-31
+# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/317
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_CERTIFICATES_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_certificates_page', __name__)
+
+
+def use_new_certificates_page(course_key):
+    """
+    Returns a boolean if new studio certificates mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_CERTIFICATES_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: contentstore.new_studio_mfe.use_new_textbooks_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio course textbooks page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-1-18
+# .. toggle_target_removal_date: 2023-4-31
+# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/319
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_TEXTBOOKS_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_textbooks_page', __name__)
+
+
+def use_new_textbooks_page(course_key):
+    """
+    Returns a boolean if new studio textbooks mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_TEXTBOOKS_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: contentstore.new_studio_mfe.use_new_group_configurations_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio course group configurations page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2024-1-18
+# .. toggle_target_removal_date: 2023-4-31
+# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/318
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_GROUP_CONFIGURATIONS_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_group_configurations_page', __name__)
+
+
+def use_new_group_configurations_page(course_key):
+    """
+    Returns a boolean if new studio group configurations mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_GROUP_CONFIGURATIONS_PAGE.is_enabled(course_key)
+
+
 # .. toggle_name: contentstore.mock_video_uploads
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -537,3 +594,76 @@ def default_enable_flexible_peer_openassessments(course_key):
     level to opt in/out of rolling forward this feature.
     """
     return DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS.is_enabled(course_key)
+
+
+# .. toggle_name: FEATURES['ENABLE_CONTENT_LIBRARIES']
+# .. toggle_implementation: SettingDictToggle
+# .. toggle_default: True
+# .. toggle_description: Enables use of the legacy and v2 libraries waffle flags.
+#    Note that legacy content libraries are only supported in courses using split mongo.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2015-03-06
+# .. toggle_target_removal_date: 2025-04-09
+# .. toggle_warning: This flag is deprecated in Sumac, and will be removed in favor of the disable_legacy_libraries and
+#    disable_new_libraries waffle flags.
+ENABLE_CONTENT_LIBRARIES = SettingDictToggle(
+    "FEATURES", "ENABLE_CONTENT_LIBRARIES", default=True, module_name=__name__
+)
+
+# .. toggle_name: contentstore.new_studio_mfe.disable_legacy_libraries
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Hides legacy (v1) Libraries tab in Authoring MFE.
+#    This toggle interacts with ENABLE_CONTENT_LIBRARIES toggle: if this is disabled, then legacy libraries are also
+#    disabled.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-10-02
+# .. toggle_target_removal_date: 2025-04-09
+# .. toggle_tickets: https://github.com/openedx/frontend-app-authoring/issues/1334
+# .. toggle_warning: Legacy libraries are deprecated in Sumac, cf https://github.com/openedx/edx-platform/issues/32457
+DISABLE_LEGACY_LIBRARIES = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.disable_legacy_libraries',
+    __name__,
+    CONTENTSTORE_LOG_PREFIX,
+)
+
+
+def libraries_v1_enabled():
+    """
+    Returns a boolean if Libraries V2 is enabled in the new Studio Home.
+    """
+    return (
+        ENABLE_CONTENT_LIBRARIES.is_enabled() and
+        not DISABLE_LEGACY_LIBRARIES.is_enabled()
+    )
+
+
+# .. toggle_name: contentstore.new_studio_mfe.disable_new_libraries
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Hides new Libraries v2 tab in Authoring MFE.
+#    This toggle interacts with settings.MEILISEARCH_ENABLED and ENABLE_CONTENT_LIBRARIES toggle: if these flags are
+#    False, then v2 libraries are also disabled.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-10-02
+# .. toggle_target_removal_date: 2025-04-09
+# .. toggle_tickets: https://github.com/openedx/frontend-app-authoring/issues/1334
+# .. toggle_warning: Libraries v2 are in beta for Sumac, will be fully supported in Teak.
+DISABLE_NEW_LIBRARIES = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.disable_new_libraries',
+    __name__,
+    CONTENTSTORE_LOG_PREFIX,
+)
+
+
+def libraries_v2_enabled():
+    """
+    Returns a boolean if Libraries V2 is enabled in the new Studio Home.
+
+    Requires the ENABLE_CONTENT_LIBRARIES feature flag to be enabled, plus Meilisearch.
+    """
+    return (
+        ENABLE_CONTENT_LIBRARIES.is_enabled() and
+        search_api.is_meilisearch_enabled() and
+        not DISABLE_NEW_LIBRARIES.is_enabled()
+    )

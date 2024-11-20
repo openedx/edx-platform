@@ -1,13 +1,13 @@
 """
-Test the Blockstore-based XBlock runtime and content libraries together.
+Test the Learning-Core-based XBlock runtime and content libraries together.
 """
 import json
-from gettext import GNUTranslations
 
 from completion.test_utils import CompletionWaffleTestMixin
 from django.db import connections, transaction
-from django.test import LiveServerTestCase, TestCase
+from django.test import TestCase, override_settings
 from django.utils.text import slugify
+import django.utils.translation
 from organizations.models import Organization
 from rest_framework.test import APIClient
 from xblock.core import XBlock
@@ -15,22 +15,18 @@ from xblock.core import XBlock
 from lms.djangoapps.courseware.model_data import get_score
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangoapps.content_libraries.tests.base import (
-    BlockstoreAppTestMixin,
-    requires_blockstore,
-    requires_blockstore_app,
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_GET_HANDLER_URL,
     URL_BLOCK_METADATA_URL,
     URL_BLOCK_FIELDS_URL,
 )
 from openedx.core.djangoapps.content_libraries.tests.user_state_block import UserStateTestBlock
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED, CC_4_BY
+from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_lms, skip_unless_cms
-from openedx.core.lib import blockstore_api
+from openedx.core.lib.xblock_serializer import api as serializer_api
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.unit_block import UnitBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class ContentLibraryContentTestMixin:
@@ -46,9 +42,6 @@ class ContentLibraryContentTestMixin:
         # staff user
         self.staff_user = UserFactory(password="edx", is_staff=True)
 
-        # Create a collection using Blockstore API directly only because there
-        # is not yet any Studio REST API for doing so:
-        self.collection = blockstore_api.create_collection("Content Library Test Collection")
         # Create an organization
         self.organization = Organization.objects.create(
             name="Content Libraries Tachyon Exploration & Survey Team",
@@ -57,8 +50,6 @@ class ContentLibraryContentTestMixin:
         _, slug = self.id().rsplit('.', 1)
         with transaction.atomic():
             self.library = library_api.create_library(
-                collection_uuid=self.collection.uuid,
-                library_type=COMPLEX,
                 org=self.organization,
                 slug=slugify(slug),
                 title=(f"{slug} Test Lib"),
@@ -69,69 +60,107 @@ class ContentLibraryContentTestMixin:
             )
 
 
-class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
+@skip_unless_cms
+class ContentLibraryOlxTests(ContentLibraryContentTestMixin, TestCase):
     """
-    Basic tests of the Blockstore-based XBlock runtime using XBlocks in a
+    Basic test of the Learning-Core-based XBlock serialization-deserialization, using XBlocks in a content library.
+    """
+
+    def test_html_round_trip(self):
+        """
+        Test that if we deserialize and serialize an HTMLBlock repeatedly, two things hold true:
+
+        1. Even if the OLX changes format, the inner content does not change format.
+        2. The OLX settles into a stable state after 1 round trip.
+
+        (We are particularly testing HTML, but it would be good to confirm that these principles hold true for
+         XBlocks in general.)
+        """
+        usage_key = library_api.create_library_block(self.library.key, "html", "roundtrip").usage_key
+
+        # The block's actual HTML has some extraneous spaces and newlines, as well as comment.
+        # We expect this to be preserved through the round-trips.
+        block_content = '''\
+<div class="i-like-double-quotes">
+    <div class='i-like-single-quotes'>
+        <p> There is a space on either side of this sentence. </p>
+        <p>\tThere is a tab on either side of this sentence.\t<p>
+        <p>🙃There is an emoji on either side of this sentence.🙂</p>
+        <p>There is nothing on either side of this sentence.</p>
+    </div>
+    <p><![CDATA[ This is an inner CDATA 🤯 Technically illegal in HTML, but let's test it anyway. ?!&<>\t ]]&gt;</p>
+    <!-- This is a comment within the HTML. -->
+</div>'''
+
+        # The OLX containing the HTML also has some extraneous stuff, which do *not* expect to survive the round-trip.
+        olx_1 = f'''\
+
+            <html
+                display_name="Round Trip Test HTML Block"
+                some_fake_field="some fake value"
+            ><![CDATA[{block_content}]]><!--
+                I am an OLX comment.
+            --></html>'''
+
+        # Here is what we expect the OLX to settle down to. Notable changes:
+        #  * url_name is added.
+        #  * some_fake_field is gone.
+        #  * The OLX comment is gone.
+        #  * A trailing newline is added at the end of the export.
+        # DEVS: If you are purposefully tweaking the formatting of the xblock serializer, then it's fine to
+        # update the value of this variable, as long as:
+        #  1. the {block_content} remains unchanged, and
+        #  2. the canonical_olx remains stable through the 2nd round trip.
+        canonical_olx = (
+            f'<html url_name="roundtrip" display_name="Round Trip Test HTML Block"><![CDATA[{block_content}]]></html>\n'
+        )
+
+        # Save the block to LC, and re-load it.
+        library_api.set_library_block_olx(usage_key, olx_1)
+        library_api.publish_changes(self.library.key)
+        block_saved_1 = xblock_api.load_block(usage_key, self.staff_user)
+
+        # Content should be preserved...
+        assert block_saved_1.data == block_content
+
+        # ...but the serialized OLX will have changed to match the 'canonical' OLX.
+        olx_2 = serializer_api.serialize_xblock_to_olx(block_saved_1).olx_str
+        assert olx_2 == canonical_olx
+
+        # Now, save that OLX back to LC, and re-load it again.
+        library_api.set_library_block_olx(usage_key, olx_2)
+        library_api.publish_changes(self.library.key)
+        block_saved_2 = xblock_api.load_block(usage_key, self.staff_user)
+
+        # Again, content should be preserved...
+        assert block_saved_2.data == block_saved_1.data == block_content
+
+        # ...and this time, the OLX should have settled too.
+        olx_3 = serializer_api.serialize_xblock_to_olx(block_saved_2).olx_str
+        assert olx_3 == olx_2 == canonical_olx
+
+
+class ContentLibraryRuntimeTests(ContentLibraryContentTestMixin, TestCase):
+    """
+    Basic tests of the Learning-Core-based XBlock runtime using XBlocks in a
     content library.
     """
-
-    @skip_unless_cms  # creating child blocks only works properly in Studio
-    def test_identical_olx(self):
-        """
-        Test library blocks with children that also have identical OLX. Since
-        the blockstore runtime caches authored field data based on the hash of
-        the OLX, this can catch some potential bugs, especially given that the
-        "children" field stores usage IDs, not definition IDs.
-        """
-        # Create a unit containing a <problem>
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "u1").usage_key
-        library_api.create_library_block_child(unit_block_key, "problem", "p1")
-        library_api.publish_changes(self.library.key)
-        # Now do the same in a different library:
-        with transaction.atomic():
-            library2 = library_api.create_library(
-                collection_uuid=self.collection.uuid,
-                org=self.organization,
-                slug="idolx",
-                title=("Identical OLX Test Lib 2"),
-                description="",
-                library_type=COMPLEX,
-                allow_public_learning=True,
-                allow_public_read=False,
-                library_license=CC_4_BY,
-            )
-        unit_block2_key = library_api.create_library_block(library2.key, "unit", "u1").usage_key
-        library_api.create_library_block_child(unit_block2_key, "problem", "p1")
-        library_api.publish_changes(library2.key)
-        # Load both blocks:
-        unit_block = xblock_api.load_block(unit_block_key, self.student_a)
-        unit_block2 = xblock_api.load_block(unit_block2_key, self.student_a)
-        assert library_api.get_library_block_olx(unit_block_key) == library_api.get_library_block_olx(unit_block2_key)
-        assert unit_block.children != unit_block2.children
-
     def test_dndv2_sets_translator(self):
         dnd_block_key = library_api.create_library_block(self.library.key, "drag-and-drop-v2", "dnd1").usage_key
         library_api.publish_changes(self.library.key)
         dnd_block = xblock_api.load_block(dnd_block_key, self.student_a)
         i18n_service = dnd_block.runtime.service(dnd_block, 'i18n')
-        assert isinstance(i18n_service.translator, GNUTranslations)
+        assert i18n_service.translator is django.utils.translation
 
     def test_has_score(self):
         """
         Test that the LMS-specific 'has_score' attribute is getting added to
         blocks.
         """
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "score-unit1").usage_key
         problem_block_key = library_api.create_library_block(self.library.key, "problem", "score-prob1").usage_key
         library_api.publish_changes(self.library.key)
-        unit_block = xblock_api.load_block(unit_block_key, self.student_a)
         problem_block = xblock_api.load_block(problem_block_key, self.student_a)
-
-        assert not hasattr(UnitBlock, 'has_score')
-        # The block class doesn't declare 'has_score'
-        assert unit_block.has_score is False
-        # But it gets added by the runtime and defaults to False
-        # And problems do have has_score True:
+        # problems do have has_score True:
         assert problem_block.has_score is True
 
     @skip_unless_cms  # creating child blocks only works properly in Studio
@@ -139,13 +168,12 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         """
         Test the XBlock metadata API
         """
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "metadata-u1").usage_key
-        problem_key = library_api.create_library_block_child(unit_block_key, "problem", "metadata-p1").usage_key
+        problem_key = library_api.create_library_block(self.library.key, "problem", "metadata-p1").usage_key
         new_olx = """
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
                 <p>This is a normal capa problem. It has "maximum attempts" set to **5**.</p>
-                <label>Blockstore is designed to store.</label>
+                <label>Learning Core is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>
                     <choice correct="true">XBlock data/metadata and associated static asset files</choice>
@@ -161,14 +189,6 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         # Now view the problem as Alice:
         client = APIClient()
         client.login(username=self.student_a.username, password='edx')
-
-        # Check the metadata API for the unit:
-        metadata_view_result = client.get(
-            URL_BLOCK_METADATA_URL.format(block_key=unit_block_key),
-            {"include": "children,editable_children"},
-        )
-        assert metadata_view_result.data['children'] == [str(problem_key)]
-        assert metadata_view_result.data['editable_children'] == [str(problem_key)]
 
         # Check the metadata API for the problem:
         metadata_view_result = client.get(
@@ -196,8 +216,7 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         client.login(username=self.staff_user.username, password='edx')
 
         # create/save a block using the library APIs first
-        unit_block_key = library_api.create_library_block(self.library.key, "unit", "fields-u1").usage_key
-        block_key = library_api.create_library_block_child(unit_block_key, "html", "fields-p1").usage_key
+        block_key = library_api.create_library_block(self.library.key, "html", "fields-p1").usage_key
         new_olx = """
         <html display_name="New Text Block">
             <p>This is some <strong>HTML</strong>.</p>
@@ -213,37 +232,31 @@ class ContentLibraryRuntimeTestMixin(ContentLibraryContentTestMixin):
         assert fields_get_result.data['metadata']['display_name'] == 'New Text Block'
 
         # Check the POST API for the block:
-        fields_post_result = client.post(URL_BLOCK_FIELDS_URL.format(block_key=block_key), data={
+        client.post(URL_BLOCK_FIELDS_URL.format(block_key=block_key), data={
             'data': '<p>test</p>',
             'metadata': {
                 'display_name': 'New Display Name',
             }
         }, format='json')
         block_saved = xblock_api.load_block(block_key, self.staff_user)
-        assert block_saved.data == '\n<p>test</p>\n'
-        assert xblock_api.get_block_display_name(block_saved) == 'New Display Name'
+        assert block_saved.data == '<p>test</p>'
+        assert block_saved.display_name == 'New Display Name'
 
 
-@requires_blockstore
-class ContentLibraryRuntimeBServiceTest(ContentLibraryRuntimeTestMixin, TestCase):
-    """
-    Tests XBlock runtime using XBlocks in a content library using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
-class ContentLibraryRuntimeTest(ContentLibraryRuntimeTestMixin, BlockstoreAppTestMixin, LiveServerTestCase):
-    """
-    Tests XBlock runtime using XBlocks in a content library using the installed Blockstore app.
-
-    We run this test with a live server, so that the blockstore asset files can be served.
-    """
-
-
+# EphemeralKeyValueStore requires a working cache, and the default test cache is a dummy cache.
+@override_settings(
+    XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE='default',
+    CACHES={
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'edx_loc_mem_cache',
+        },
+    },
+)
 # We can remove the line below to enable this in Studio once we implement a session-backed
 # field data store which we can use for both studio users and anonymous users
 @skip_unless_lms
-class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
+class ContentLibraryXBlockUserStateTest(ContentLibraryContentTestMixin, TestCase):
     """
     Test that the Blockstore-based XBlock runtime can store and retrieve student
     state for XBlocks when learners access blocks directly in a library context,
@@ -447,7 +460,7 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
                 <p>This is a normal capa problem. It has "maximum attempts" set to **5**.</p>
-                <label>Blockstore is designed to store.</label>
+                <label>Learning Core is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>
                     <choice correct="true">XBlock data/metadata and associated static asset files</choice>
@@ -511,7 +524,7 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
         <problem display_name="New Multi Choice Question" max_attempts="5">
             <multiplechoiceresponse>
                 <p>This is a normal capa problem. It has "maximum attempts" set to **5**.</p>
-                <label>Blockstore is designed to store.</label>
+                <label>Learning Core is designed to store.</label>
                 <choicegroup type="MultipleChoice">
                     <choice correct="false">XBlock metadata only</choice>
                     <choice correct="true">XBlock data/metadata and associated static asset files</choice>
@@ -545,28 +558,8 @@ class ContentLibraryXBlockUserStateTestMixin(ContentLibraryContentTestMixin):
         assert 'Submit' not in dummy_public_view.data['content']
 
 
-@requires_blockstore
-class ContentLibraryXBlockUserStateBServiceTest(ContentLibraryXBlockUserStateTestMixin, TestCase):
-    """
-    Tests XBlock user state for XBlocks in a content library using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
-class ContentLibraryXBlockUserStateTest(
-    ContentLibraryXBlockUserStateTestMixin,
-    BlockstoreAppTestMixin,
-    LiveServerTestCase,
-):
-    """
-    Tests XBlock user state for XBlocks in a content library using the installed Blockstore app.
-
-    We run this test with a live server, so that the blockstore asset files can be served.
-    """
-
-
 @skip_unless_lms  # No completion tracking in Studio
-class ContentLibraryXBlockCompletionTestMixin(ContentLibraryContentTestMixin, CompletionWaffleTestMixin):
+class ContentLibraryXBlockCompletionTest(ContentLibraryContentTestMixin, CompletionWaffleTestMixin, TestCase):
     """
     Test that the Blockstore-based XBlocks can track their completion status
     using the completion library.
@@ -617,30 +610,3 @@ class ContentLibraryXBlockCompletionTestMixin(ContentLibraryContentTestMixin, Co
 
         # Now the block is completed
         assert get_block_completion_status() == 1
-
-
-@requires_blockstore
-class ContentLibraryXBlockCompletionBServiceTest(
-    ContentLibraryXBlockCompletionTestMixin,
-    CompletionWaffleTestMixin,
-    TestCase,
-):
-    """
-    Test that the Blockstore-based XBlocks can track their completion status
-    using the standalone Blockstore service.
-    """
-
-
-@requires_blockstore_app
-class ContentLibraryXBlockCompletionTest(
-    ContentLibraryXBlockCompletionTestMixin,
-    CompletionWaffleTestMixin,
-    BlockstoreAppTestMixin,
-    LiveServerTestCase,
-):
-    """
-    Test that the Blockstore-based XBlocks can track their completion status
-    using the installed Blockstore app.
-
-    We run this test with a live server, so that the blockstore asset files can be served.
-    """

@@ -71,6 +71,8 @@ def register_exams(course_key):
             timed_exam.is_onboarding_exam
         )
 
+        due_date = timed_exam.due.isoformat() if timed_exam.due else (course.end.isoformat() if course.end else None)
+
         exams_list.append({
             'course_id': str(course_key),
             'content_id': str(timed_exam.location),
@@ -83,7 +85,7 @@ def register_exams(course_key):
             # exam service. Also note that we no longer consider the pacing type of the course - this applies to both
             # self-paced and indstructor-paced courses. Therefore, this effectively opts out exams powered by edx-exams
             # from personalized learner schedules/relative dates.
-            'due_date': timed_exam.due.isoformat() if timed_exam.due else course.end.isoformat(),
+            'due_date': due_date,
             'exam_type': exam_type,
             'is_active': True,
             'hide_after_due': timed_exam.hide_after_due,
@@ -109,7 +111,7 @@ def get_exam_type(is_proctored, is_practice, is_onboarding):
         if is_onboarding:
             exam_type = 'onboarding'
         elif is_practice:
-            exam_type = 'practice_proctored'
+            exam_type = 'practice'
         else:
             exam_type = 'proctored'
     else:

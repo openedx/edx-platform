@@ -36,7 +36,8 @@ from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.views import require_global_staff
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
-from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email
+from lms.djangoapps.verify_student.api import send_approval_email
+from lms.djangoapps.verify_student.emails import send_verification_confirmation_email
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
@@ -502,7 +503,8 @@ class PayAndVerifyView(View):
             if ecommerce_service.is_enabled(user):
                 url = ecommerce_service.get_checkout_page_url(
                     sku,
-                    catalog=self.request.GET.get('catalog')
+                    catalog=self.request.GET.get('catalog'),
+                    course_run_keys=[str(course_key)]
                 )
 
         # Redirect if necessary, otherwise implicitly return None
@@ -1072,6 +1074,18 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
     reason = body_dict.get("Reason", "")
     error_code = body_dict.get("MessageType", "")
 
+    # TODO: These logs must be removed once the investigation in COSMO-184 is complete.
+    #       COSMO-196 was created to track the cleanup of these logs.
+    log.info(
+        "[COSMO-184] Software Secure review received for receipt_id={receipt_id}, "
+        "with result={result} and reason={reason}."
+        .format(
+            receipt_id=receipt_id,
+            result=result,
+            reason=reason,
+        )
+    )
+
     try:
         attempt = SoftwareSecurePhotoVerification.objects.get(receipt_id=receipt_id)
     except SoftwareSecurePhotoVerification.DoesNotExist:
@@ -1099,28 +1113,20 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
                 SoftwareSecurePhotoVerification.objects.filter(pk=previous_verification.pk
                                                                ).update(expiry_email_date=None)
         log.debug(f'Approving verification for {receipt_id}')
+
+        # TODO: These logs must be removed once the investigation in COSMO-184 is complete.
+        #       COSMO-196 was created to track the cleanup of these logs.
+        log.info("[COSMO-184] Approved verification for receipt_id={receipt_id}.".format(receipt_id=receipt_id))
         attempt.approve()
 
-        expiration_datetime = attempt.expiration_datetime.date()
-        if settings.VERIFY_STUDENT.get('USE_DJANGO_MAIL'):
-            verification_status_email_vars['expiration_datetime'] = expiration_datetime.strftime("%m/%d/%Y")
-            verification_status_email_vars['full_name'] = user.profile.name
-            subject = _("Your {platform_name} ID verification was approved!").format(
-                platform_name=settings.PLATFORM_NAME
-            )
-            context = {
-                'subject': subject,
-                'template': 'emails/passed_verification_email.txt',
-                'email': user.email,
-                'email_vars': verification_status_email_vars
-            }
-            send_verification_status_email.delay(context)
-        else:
-            email_context = {'user': user, 'expiration_datetime': expiration_datetime.strftime("%m/%d/%Y")}
-            send_verification_approved_email(context=email_context)
-
+        send_approval_email(attempt)
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
+
+        # TODO: These logs must be removed once the investigation in COSMO-184 is complete.
+        #       COSMO-196 was created to track the cleanup of these logs.
+        log.info("[COSMO-184] Denied verification for receipt_id={receipt_id}.".format(receipt_id=receipt_id))
+
         attempt.deny(json.dumps(reason), error_code=error_code)
         reverify_url = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         verification_status_email_vars['reasons'] = reason

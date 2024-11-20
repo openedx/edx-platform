@@ -2,6 +2,7 @@
 Mixin to support editing in Studio.
 """
 from xblock.core import XBlock, XBlockMixin
+
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
@@ -12,6 +13,7 @@ class StudioEditableBlock(XBlockMixin):
 
     This class is only intended to be used with an XBlock!
     """
+
     has_author_view = True
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):

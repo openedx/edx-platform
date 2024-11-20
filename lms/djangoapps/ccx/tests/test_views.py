@@ -129,13 +129,14 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ccx = self.make_ccx()
         ccx_key = CCXLocator.from_course_locator(self.course.id, ccx.id)
         self.url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_key})
+        self.TEST_PASSWORD = 'Password1234'
 
     def test_staff_access_coach_dashboard(self):
         """
         User is staff, should access coach dashboard.
         """
         staff = self.make_staff()
-        self.client.login(username=staff.username, password="test")
+        self.client.login(username=staff.username, password=self.TEST_PASSWORD)
 
         response = self.client.get(self.url)
         assert response.status_code == 200
@@ -145,7 +146,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         User is instructor, should access coach dashboard.
         """
         instructor = self.make_instructor()
-        self.client.login(username=instructor.username, password="test")
+        self.client.login(username=instructor.username, password=self.TEST_PASSWORD)
 
         # Now access URL
         response = self.client.get(self.url)
@@ -155,8 +156,8 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         Assert user with no access must not see dashboard.
         """
-        user = UserFactory.create(password="test")
-        self.client.login(username=user.username, password="test")
+        user = UserFactory.create(password=self.TEST_PASSWORD)
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         assert response.status_code == 403
 
@@ -211,12 +212,12 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         """
         assert signal and schedule update.
         """
-        student = UserFactory.create(is_staff=False, password="test")
+        student = UserFactory.create(is_staff=False, password=self.TEST_PASSWORD)
         CourseEnrollment.enroll(student, ccx_course_key)
         assert CourseEnrollment.objects.filter(course_id=ccx_course_key, user=student).exists()
 
         # login as student
-        self.client.login(username=student.username, password="test")
+        self.client.login(username=student.username, password=self.TEST_PASSWORD)
         progress_page_response = self.client.get(
             reverse('progress', kwargs={'course_id': ccx_course_key})
         )
@@ -236,7 +237,7 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         self.make_coach()
         ccx = self.make_ccx()
         ccx_course_key = CCXLocator.from_course_locator(self.course.id, str(ccx.id))
-        self.client.login(username=self.coach.username, password="test")
+        self.client.login(username=self.coach.username, password=self.TEST_PASSWORD)
 
         url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_course_key})
         response = self.client.get(url)
@@ -295,7 +296,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         super().setUp()
         # Login with the instructor account
-        self.client.login(username=self.coach.username, password="test")
+        self.client.login(username=self.coach.username, password=self.TEST_PASSWORD)
 
         # adding staff to master course.
         staff = UserFactory()
@@ -315,8 +316,8 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         ccx = self.make_ccx()
 
         # create session of non-coach user
-        user = UserFactory.create(password="test")
-        self.client.login(username=user.username, password="test")
+        user = UserFactory.create(password=self.TEST_PASSWORD)
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         url = reverse(
             'ccx_coach_dashboard',
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
@@ -841,7 +842,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         self.mstore = modulestore()
 
         # Login with the instructor account
-        self.client.login(username=self.coach.username, password="test")
+        self.client.login(username=self.coach.username, password=self.TEST_PASSWORD)
 
         # adding staff to master course.
         staff = UserFactory()
@@ -981,7 +982,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
 
         # Create instructor account
         self.coach = coach = AdminFactory.create()
-        self.client.login(username=coach.username, password="test")
+        self.client.login(username=coach.username, password=self.TEST_PASSWORD)
 
         # Create CCX
         role = CourseCcxCoachRole(self._course.id)
@@ -1009,7 +1010,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.course = get_course_by_id(self.ccx_key, depth=None)
         CourseOverview.load_from_module_store(self.course.id)
         setup_students_and_grades(self)
-        self.client.login(username=coach.username, password="test")
+        self.client.login(username=coach.username, password=self.TEST_PASSWORD)
         self.addCleanup(RequestCache.clear_all_namespaces)
         from xmodule.modulestore.django import SignalHandler
 
@@ -1068,7 +1069,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         get_course.return_value = self.course
         self.addCleanup(patch_context.stop)
 
-        self.client.login(username=self.student.username, password="test")  # lint-amnesty, pylint: disable=no-member
+        self.client.login(username=self.student.username, password=self.TEST_PASSWORD)  # lint-amnesty, pylint: disable=no-member
         url = reverse(
             'progress',
             kwargs={'course_id': self.ccx_key}
@@ -1194,7 +1195,7 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
 
         # Create a Split Mongo course and enroll a student user in it.
         self.student_password = "foobar"
-        self.student = UserFactory.create(username="test", password=self.student_password, is_staff=False)
+        self.student = UserFactory.create(username=self.TEST_PASSWORD, password=self.student_password, is_staff=False)
         self.split_course = SampleCourseFactory.create(default_store=ModuleStoreEnum.Type.split)
         CourseEnrollment.enroll(self.student, self.split_course.id)
 

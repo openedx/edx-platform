@@ -1,0 +1,32 @@
+<%page expression_filter="h" />
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import gettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%inherit file="../main.html" />
+
+<section class="outside-app">
+  <h1>
+    ${Text(_("There was an error when loading this module!"))}
+  </h1>
+  <p>
+    ${Text(_("This module is available only for users who are signed into {platform}. "
+        "Kindly sign in and refresh this page to load the content."
+      )).format(
+        platform=HTML("<em>{}</em>").format(static.get_platform_name())
+      )}
+  </p>
+  <p class="my-3">
+    <strong>${_("NOTE:")}</strong>
+    ${Text(_(
+      "The email used to sign into this platform and {platform} should be the same."
+    )).format(
+      platform=HTML("<em>{}</em>").format(static.get_platform_name())
+    )}
+  </p>
+
+  <p class="mt-3">
+    <a class="btn btn-primary" href="${login_link}" target="_blank">${_("Sign in")}</a>
+  </p>
+</section>

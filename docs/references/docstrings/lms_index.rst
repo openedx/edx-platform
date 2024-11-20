@@ -9,7 +9,6 @@ Studio.
     :maxdepth: 2
 
     lms/modules
-    lms/djangoapps/badges/modules
     lms/djangoapps/branding/modules
     lms/djangoapps/bulk_email/modules
     lms/djangoapps/courseware/modules

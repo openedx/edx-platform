@@ -45,6 +45,11 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
                 validate_password(password, user)
             assert msg in ' '.join(cm.value.messages)
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 4}
+        )
+    ])
     def test_unicode_password(self):
         """ Tests that validate_password enforces unicode """
         unicode_str = '𤭮'
@@ -55,12 +60,17 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         assert len(unicode_str) == 1
 
         # Test length check
-        self.validation_errors_checker(byte_str, 'This password is too short. It must contain at least 2 characters.')
-        self.validation_errors_checker(byte_str + byte_str, None)
+        self.validation_errors_checker(byte_str, 'This password is too short. It must contain at least 4 characters.')
+        self.validation_errors_checker(byte_str * 4, None)
 
         # Test badly encoded password
         self.validation_errors_checker(b'\xff\xff', 'Invalid password.')
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        create_validator_config(
+            'common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 4}
+        )
+    ])
     def test_password_unicode_normalization(self):
         """ Tests that validate_password normalizes passwords """
         # s ̣ ̇ (s with combining dot below and combining dot above)
@@ -70,7 +80,7 @@ class PasswordPolicyValidatorsTestCase(unittest.TestCase):
         # When we normalize we expect the not_normalized password to fail
         # because it should be normalized to '\u1E69' -> ṩ
         self.validation_errors_checker(not_normalized_password,
-                                       'This password is too short. It must contain at least 2 characters.')
+                                       'This password is too short. It must contain at least 4 characters.')
 
     @data(
         ([create_validator_config('common.djangoapps.util.password_policy_validators.MinimumLengthValidator', {'min_length': 2})],  # lint-amnesty, pylint: disable=line-too-long

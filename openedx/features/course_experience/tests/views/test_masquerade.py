@@ -17,7 +17,7 @@ from xmodule.partitions.partitions_service import PartitionService  # lint-amnes
 from .helpers import add_course_mode
 from .test_course_sock import TEST_VERIFICATION_SOCK_LOCATOR
 
-TEST_PASSWORD = 'test'
+TEST_PASSWORD = 'Password1234'
 
 
 class MasqueradeTestBase(SharedModuleStoreTestCase, MasqueradeMixin):

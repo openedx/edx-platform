@@ -82,7 +82,7 @@ def course_detail(request, username, course_key):
     return overview
 
 
-def _filter_by_search(course_queryset, search_term):
+def _filter_by_search(course_queryset, search_term, mobile_search=False):
     """
     Filters a course queryset by the specified search term.
     """
@@ -101,6 +101,13 @@ def _filter_by_search(course_queryset, search_term):
 
     search_courses_ids = {course['data']['id'] for course in search_courses['results']}
 
+    if mobile_search is True:
+        course_limit = getattr(settings, 'MOBILE_SEARCH_COURSE_LIMIT', 100)
+        courses = [course for course in course_queryset[:course_limit] if str(course.id) in search_courses_ids]
+        return LazySequence(
+            iter(courses),
+            est_len=len(courses)
+        )
     return LazySequence(
         (
             course for course in course_queryset
@@ -117,7 +124,8 @@ def list_courses(request,
                  search_term=None,
                  permissions=None,
                  active_only=False,
-                 course_keys=None):
+                 course_keys=None,
+                 mobile_search=False):
     """
     Yield all available courses.
 
@@ -150,6 +158,9 @@ def list_courses(request,
         course_keys (list[str]):
             If specified, it filters visible `CourseOverview` objects by
             the course keys (ids) provided
+        mobile_search (bool):
+            Optional parameter that limits the number of returned courses
+            to MOBILE_SEARCH_COURSE_LIMIT.
 
     Return value:
         Yield `CourseOverview` objects representing the collection of courses.
@@ -158,7 +169,7 @@ def list_courses(request,
     course_qs = get_courses(
         user, org=org, filter_=filter_, permissions=permissions, active_only=active_only, course_keys=course_keys
     )
-    course_qs = _filter_by_search(course_qs, search_term)
+    course_qs = _filter_by_search(course_qs, search_term, mobile_search)
     return course_qs
 
 

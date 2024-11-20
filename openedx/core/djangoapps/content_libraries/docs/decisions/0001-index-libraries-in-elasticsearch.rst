@@ -1,13 +1,36 @@
 1. Index libraries in elasticsearch
------------------------------------
+###################################
 
 Status
-------
+******
 
-Accepted
+**Revoked**
+
+In Dec 2023, we decided to remove the code supporting this decision, because:
+
+* The index is disabled on edx.org, which will initially be the only user
+  of Content Libraries V2.
+* As we migrate libraries from Modulestore to Blockstore and then from
+  Blockstore to Learning Core, the unused indexing code increases complexity
+  and decreases certainty.
+* With the decision to migrate from Blockstore-the-service to an in-process
+  storage backend (that is: Blockstore-the-app or Learning Core), it seems
+  that we will be able to simply use Django ORM in order to filter/sort/search
+  Content Library V2 metadata for the library listing page.
+* Searching Content Library V2 *block* content would still require indexing,
+  but we would rather implement that in Learning Core than use the current
+  implementation in the content_libraries app, which is untested, library-
+  specific, and doesn't take into account library versioning. It always uses
+  the latest draft, which is good for Library Authoring purposes, but not good for
+  Course Authoring purposes.
+
+It is possible that we will end up re-instating a modified version of this ADR
+future. If that happens, we may re-use and adapt the original library index
+code.
+
 
 Context
--------
+*******
 
 The new content libraries reside in blockstore instead of edx-platform's models,
 which means that we are no longer able to query databases to get complete
@@ -23,7 +46,7 @@ This is a very inefficient way to fetch metadata for a list of
 libraries/xblocks, and makes it even harder to filter/query them.
 
 Decision
---------
+********
 
 Index the libraries and xblocks in elasticsearch to make them queryable. These
 indexes are updated whenever a library or XBlock is updated through the studio.
@@ -35,7 +58,7 @@ fallbacks have been implemented in case elastic is down or hasn't been enabled
 yet.
 
 Consequences
-------------
+************
 
 List APIs are significantly faster and are able to support filtering and
 searching now that the metadata can be queried using elasticsearch. This also

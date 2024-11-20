@@ -95,7 +95,7 @@ class AuthTestCase(ContentStoreTestCase):
         super().setUp()
 
         self.email = 'a@b.com'
-        self.pw = 'xyz'
+        self.pw = 'password1234'
         self.username = 'testuser'
         self.client = AjaxEnabledTestClient()
         # clear the cache so ratelimiting won't affect these tests

@@ -10,7 +10,7 @@ from completion.test_utils import CompletionWaffleTestMixin
 from django.conf import settings
 from django.test import override_settings
 from opaque_keys.edx.keys import CourseKey
-from xmodule.library_tools import LibraryToolsService
+from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory
 from xmodule.tests import prepare_block_runtime
@@ -122,7 +122,7 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         Bind a block (part of self.course) so we can access student-specific data.
         """
         prepare_block_runtime(block.runtime, course_id=block.location.course_key)
-        block.runtime._services.update({'library_tools': LibraryToolsService(self.store, self.user.id)})  # lint-amnesty, pylint: disable=protected-access
+        block.runtime._services.update({'library_tools': LegacyLibraryToolsService(self.store, self.user.id)})  # lint-amnesty, pylint: disable=protected-access
 
         def get_block(descriptor):
             """Mocks module_system get_block_for_descriptor function"""
@@ -217,8 +217,15 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         # Library Content Block needs its children to be completed.
         self.assertFalse(self.completion_service.can_mark_block_complete_on_view(library_content_block))
 
-        library_content_block.refresh_children()
-        lib_vertical = self.store.get_item(lib_vertical.location)
+        # Dirty hack:
+        # sync_from_library isn't *supposed* to work inside LMS, but this test case was written
+        # before we made that rule. So, we need to trick this part of  test case into thinking that it's
+        # running inside CMS instead of LMS. Please don't copy-paste this trick to any other LMS tests :)
+        # Long-term solution: https://github.com/openedx/edx-platform/issues/33545
+        with override_settings(ROOT_URLCONF="cms.urls"):
+            library_content_block.sync_from_library()
+            lib_vertical = self.store.get_item(lib_vertical.location)
+
         self._bind_course_block(lib_vertical)
         # We need to refetch the library_content_block to retrieve the
         # fresh version from the call to get_item for lib_vertical

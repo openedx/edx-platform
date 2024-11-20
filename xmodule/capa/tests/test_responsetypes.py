@@ -9,10 +9,10 @@ import textwrap
 import unittest
 import zipfile
 from datetime import datetime
+from unittest import mock
 
 import pytest
 import calc
-import mock
 import pyparsing
 import random2 as random
 import requests
@@ -1533,6 +1533,20 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
             [3141592653589793238., ["3141592653589793115."], [""]],
             [0.1234567, ["0.123456", "0.1234561"], ["0.123451"]],
             [1e-5, ["1e-5", "1.0e-5"], ["-1e-5", "2*1e-5"]],
+        ]
+        for given_answer, correct_responses, incorrect_responses in problem_setup:
+            problem = self.build_problem(answer=given_answer)
+            self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+    def test_percentage(self):
+        """
+        Test percentage
+        """
+        problem_setup = [
+            # [given_answer, [list of correct responses], [list of incorrect responses]]
+            ["1%", ["1%", "1.0%", "1.00%", "0.01"], [""]],
+            ["2.0%", ["2%", "2.0%", "2.00%", "0.02"], [""]],
+            ["4.00%", ["4%", "4.0%", "4.00%", "0.04"], [""]],
         ]
         for given_answer, correct_responses, incorrect_responses in problem_setup:
             problem = self.build_problem(answer=given_answer)

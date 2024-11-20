@@ -10,13 +10,14 @@ import os
 import random
 import textwrap
 import unittest
-from unittest.mock import DEFAULT, Mock, patch
+from unittest.mock import DEFAULT, Mock, PropertyMock, patch
 
 import pytest
 import ddt
 import requests
 import webob
 from codejail.safe_exec import SafeExecException
+from django.conf import settings
 from django.test import override_settings
 from django.utils.encoding import smart_str
 from lms.djangoapps.courseware.user_state_client import XBlockUserState
@@ -29,6 +30,7 @@ from xblock.fields import ScopeIds
 from xblock.scorable import Score
 
 import xmodule
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa import responsetypes
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
@@ -38,6 +40,10 @@ from xmodule.tests import DATA_DIR
 
 from ..capa_block import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
+
+
+FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS = settings.FEATURES.copy()
+FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS['ENABLE_GRADING_METHOD_IN_PROBLEMS'] = True
 
 
 class CapaFactory:
@@ -182,6 +188,7 @@ if submission[0] == '':
 
 
 @ddt.ddt
+@skip_unless_lms
 class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
     def setUp(self):
@@ -648,6 +655,37 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                                    due=self.yesterday_str)
         assert block.closed()
 
+    @patch.object(ProblemBlock, 'course_end_date', new_callable=PropertyMock)
+    def test_closed_for_archive(self, mock_course_end_date):
+
+        # Utility to create a datetime object in the past
+        def past_datetime(days):
+            return (datetime.datetime.now(UTC) - datetime.timedelta(days=days))
+
+        # Utility to create a datetime object in the future
+        def future_datetime(days):
+            return (datetime.datetime.now(UTC) + datetime.timedelta(days=days))
+
+        block = CapaFactory.create(max_attempts="1", attempts="0")
+
+        # For active courses without graceperiod
+        mock_course_end_date.return_value = future_datetime(10)
+        assert not block.closed()
+
+        # For archive courses without graceperiod
+        mock_course_end_date.return_value = past_datetime(10)
+        assert block.closed()
+
+        # For active courses with graceperiod
+        mock_course_end_date.return_value = future_datetime(10)
+        block.graceperiod = datetime.timedelta(days=2)
+        assert not block.closed()
+
+        # For archive courses with graceperiod
+        mock_course_end_date.return_value = past_datetime(2)
+        block.graceperiod = datetime.timedelta(days=3)
+        assert not block.closed()
+
     def test_parse_get_params(self):
 
         # Valid GET param dict
@@ -722,6 +760,364 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert block.attempts == 2
         # and that this was considered attempt number 2 for grading purposes
         assert block.lcp.context['attempt'] == 2
+
+    @patch('xmodule.capa_block.ProblemBlock.get_score_with_grading_method')
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_with_grading_method_disable(
+        self, mock_html: Mock, mock_is_correct: Mock, mock_get_score: Mock
+    ):
+        """
+        Test that the grading method is disabled by default. Then, the
+        `get_score_with_grading_method` method should not be called, and
+        always the last attempt as the final score.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=3)
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = True
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+        mock_get_score.assert_not_called()
+
+        # Second Attempt
+        mock_is_correct.return_value = False
+        get_request_dict = {CapaFactory.input_key(): '3.50'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+        mock_get_score.assert_not_called()
+
+        # Third Attempt
+        mock_is_correct.return_value = True
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 3
+        assert block.lcp.context['attempt'] == 3
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+        mock_get_score.assert_not_called()
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_with_grading_method_enable(
+        self, mock_html: Mock, mock_is_correct: Mock
+    ):
+        """
+        Test that the grading method is enabled when submit a problem.
+        Then, the `get_score_with_grading_method` method should be called.
+        """
+        block = CapaFactory.create(attempts=0)
+        mock_html.return_value = "Test HTML"
+        mock_is_correct.return_value = True
+
+        with patch.object(
+            ProblemBlock, 'get_score_with_grading_method', wraps=block.get_score_with_grading_method
+        ) as mock_get_score:
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 1
+            assert block.lcp.context['attempt'] == 1
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+            mock_get_score.assert_called()
+
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_grading_method_disable_to_enable(
+        self, mock_html: Mock, mock_is_correct: Mock
+    ):
+        """
+        Test when the grading method is disabled and then enabled.
+
+        When the grading method is disabled, the final score is always the last attempt.
+        When the grading method is enabled, the final score is calculated according to the grading method.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=4)
+        mock_html.return_value = "Test HTML"
+
+        # Disabled grading method
+        with patch(
+            'xmodule.capa_block.ProblemBlock.is_grading_method_enabled',
+            new_callable=PropertyMock,
+            return_value=False
+        ):
+            # First Attempt
+            mock_is_correct.return_value = True
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 1
+            assert block.lcp.context['attempt'] == 1
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+
+            # Second Attempt
+            mock_is_correct.return_value = False
+            get_request_dict = {CapaFactory.input_key(): '3.50'}
+
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 2
+            assert block.lcp.context['attempt'] == 2
+            assert block.score == Score(raw_earned=0, raw_possible=1)
+
+        # Enabled grading method
+        with patch(
+            'xmodule.capa_block.ProblemBlock.is_grading_method_enabled',
+            new_callable=PropertyMock,
+            return_value=True
+        ):
+            # Third Attempt
+            mock_is_correct.return_value = False
+            get_request_dict = {CapaFactory.input_key(): '3.96'}
+
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 3
+            assert block.lcp.context['attempt'] == 3
+            assert block.score == Score(raw_earned=0, raw_possible=1)
+
+            # Fourth Attempt
+            block.grading_method = 'highest_score'
+            mock_is_correct.return_value = False
+            get_request_dict = {CapaFactory.input_key(): '3.99'}
+
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 4
+            assert block.lcp.context['attempt'] == 4
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_grading_method_enable_to_disable(
+        self, mock_html: Mock, mock_is_correct: Mock
+    ):
+        """
+        Test when the grading method is enabled and then disabled.
+
+        When the grading method is enabled, the final score is calculated according to the grading method.
+        When the grading method is disabled, the final score is always the last attempt.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=4, grading_method='highest_score')
+        mock_html.return_value = "Test HTML"
+
+        # Enabled grading method
+        with patch(
+            'xmodule.capa_block.ProblemBlock.is_grading_method_enabled',
+            new_callable=PropertyMock,
+            return_value=True
+        ):
+            # First Attempt
+            mock_is_correct.return_value = True
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 1
+            assert block.lcp.context['attempt'] == 1
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+
+            # Second Attempt
+            mock_is_correct.return_value = False
+            get_request_dict = {CapaFactory.input_key(): '3.50'}
+
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 2
+            assert block.lcp.context['attempt'] == 2
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+
+        # Disabled grading method
+        with patch(
+            'xmodule.capa_block.ProblemBlock.is_grading_method_enabled',
+            new_callable=PropertyMock,
+            return_value=False
+        ):
+            # Third Attempt
+            mock_is_correct.return_value = False
+            get_request_dict = {CapaFactory.input_key(): '3.96'}
+
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 3
+            assert block.lcp.context['attempt'] == 3
+            assert block.score == Score(raw_earned=0, raw_possible=1)
+
+            # Fourth Attempt
+            mock_is_correct.return_value = True
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+
+            block.submit_problem(get_request_dict)
+
+            assert block.attempts == 4
+            assert block.lcp.context['attempt'] == 4
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_correct_last_score(self, mock_html: Mock, mock_is_correct: Mock):
+        """
+        Test the `last_score` grading method.
+
+        When the grading method is `last_score`,
+        the final score is always the last attempt.
+        """
+        # default grading method is last_score
+        block = CapaFactory.create(attempts=0, max_attempts=2)
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = True
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+        # Second Attempt
+        mock_is_correct.return_value = False
+        get_request_dict = {CapaFactory.input_key(): '3.54'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_correct_highest_score(self, mock_html: Mock, mock_is_correct: Mock):
+        """
+        Test the `highest_score` grading method.
+
+        When the grading method is `highest_score`,
+        the final score is the highest score among all attempts.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=2, grading_method='highest_score')
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = True
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+        # Second Attempt
+        mock_is_correct.return_value = False
+        get_request_dict = {CapaFactory.input_key(): '3.54'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_correct_first_score(self, mock_html: Mock, mock_is_correct: Mock):
+        """
+        Test the `first_score` grading method.
+
+        When the grading method is `first_score`,
+        the final score is the first score among all attempts.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=2, grading_method='first_score')
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = False
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+        # Second Attempt
+        mock_is_correct.return_value = True
+        get_request_dict = {CapaFactory.input_key(): '3.54'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @patch('xmodule.capa.correctmap.CorrectMap.is_correct')
+    @patch('xmodule.capa_block.ProblemBlock.get_problem_html')
+    def test_submit_problem_correct_average_score(self, mock_html: Mock, mock_is_correct: Mock):
+        """
+        Test the `average_score` grading method.
+
+        When the grading method is `average_score`,
+        the final score is the average score among all attempts.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=4, grading_method='average_score')
+        mock_html.return_value = "Test HTML"
+
+        # First Attempt
+        mock_is_correct.return_value = False
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
+        assert block.score == Score(raw_earned=0, raw_possible=1)
+
+        # Second Attempt
+        mock_is_correct.return_value = True
+        get_request_dict = {CapaFactory.input_key(): '3.54'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 2
+        assert block.lcp.context['attempt'] == 2
+        assert block.score == Score(raw_earned=0.5, raw_possible=1)
+
+        # Third Attempt
+        mock_is_correct.return_value = False
+        get_request_dict = {CapaFactory.input_key(): '3.45'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 3
+        assert block.lcp.context['attempt'] == 3
+        assert block.score == Score(raw_earned=0.33, raw_possible=1)
+
+        # Fourth Attempt
+        mock_is_correct.return_value = False
+        get_request_dict = {CapaFactory.input_key(): '41.3'}
+
+        block.submit_problem(get_request_dict)
+
+        assert block.attempts == 4
+        assert block.lcp.context['attempt'] == 4
+        assert block.score == Score(raw_earned=0.25, raw_possible=1)
 
     def test_submit_problem_incorrect(self):
 
@@ -1216,6 +1612,224 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # and that this is treated as the first attempt for grading purposes
         assert block.lcp.context['attempt'] == 1
 
+    @patch('xmodule.capa_block.ProblemBlock.get_rescore_with_grading_method')
+    def test_rescore_problem_with_grading_method_disable(self, mock_get_rescore: Mock):
+        """
+        Test the rescore method with grading method disabled.
+        In this case, the rescore method should not call `get_rescore_with_grading_method` method.
+        """
+        block = CapaFactory.create(attempts=0, done=True)
+
+        block.rescore(only_if_higher=False)
+
+        assert block.attempts == 0
+        assert block.lcp.context['attempt'] == 1
+        mock_get_rescore.assert_not_called()
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    def test_rescore_problem_with_grading_method_enable(self):
+        """
+        Test the rescore method with grading method enabled.
+        In this case, the rescore method should call `get_rescore_with_grading_method` method.
+        """
+        block = CapaFactory.create(attempts=0, done=True)
+
+        with patch.object(
+            ProblemBlock, 'get_rescore_with_grading_method', wraps=block.get_rescore_with_grading_method
+        ) as mock_get_rescore:
+
+            block.rescore(only_if_higher=False)
+
+            assert block.attempts == 0
+            assert block.lcp.context['attempt'] == 1
+            mock_get_rescore.assert_called()
+
+    @patch('xmodule.capa_block.ProblemBlock.publish_grade')
+    def test_rescore_problem_grading_method_disable_to_enable(self, mock_publish_grade: Mock):
+        """
+        Test the rescore method the grading method is disabled and then enabled.
+
+        When the grading method is disabled, the final score is always the last score.
+        When the grading method is enabled, the final score is the score based on the grading method.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=3)
+
+        get_request_dict = {CapaFactory.input_key(): '3.21'}
+        block.submit_problem(get_request_dict)
+
+        get_request_dict = {CapaFactory.input_key(): '3.45'}
+        block.submit_problem(get_request_dict)
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        # Disabled grading method
+        with patch(
+            'xmodule.capa_block.ProblemBlock.is_grading_method_enabled',
+            new_callable=PropertyMock,
+            return_value=False
+        ):
+            # Score is the last score
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+
+            block.rescore(only_if_higher=False)
+
+            # Still Score is the last score
+            mock_publish_grade.assert_called_with(
+                score=Score(raw_earned=1, raw_possible=1), only_if_higher=False
+            )
+
+        # Enabled grading method
+        with patch(
+            'xmodule.capa_block.ProblemBlock.is_grading_method_enabled',
+            new_callable=PropertyMock,
+            return_value=True
+        ):
+            with patch(
+                'xmodule.capa.capa_problem.LoncapaProblem.is_grading_method_enabled',
+                new_callable=PropertyMock,
+                return_value=True
+            ):
+                # Change grading method to 'first_score'
+                block.grading_method = 'first_score'
+                block.rescore(only_if_higher=False)
+
+                mock_publish_grade.assert_called_with(
+                    score=Score(raw_earned=0, raw_possible=1), only_if_higher=False
+                )
+
+                # Change grading method to 'highest_score'
+                block.grading_method = 'highest_score'
+                block.rescore(only_if_higher=False)
+
+                mock_publish_grade.assert_called_with(
+                    score=Score(raw_earned=1, raw_possible=1), only_if_higher=False
+                )
+
+                # Change grading method to 'average_score'
+                block.grading_method = 'average_score'
+                block.rescore(only_if_higher=False)
+
+                mock_publish_grade.assert_called_with(
+                    score=Score(raw_earned=0.33, raw_possible=1), only_if_higher=False
+                )
+
+    @patch('xmodule.capa_block.ProblemBlock.publish_grade')
+    def test_rescore_problem_grading_method_enable_to_disable(self, mock_publish_grade: Mock):
+        """
+        Test the rescore method the grading method is enabled and then disabled.
+
+        When the grading method is enabled, the final score is the score based on the grading method.
+        When the grading method is disabled, the final score is always the last score.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=3)
+
+        get_request_dict = {CapaFactory.input_key(): '3.21'}
+        block.submit_problem(get_request_dict)
+
+        get_request_dict = {CapaFactory.input_key(): '3.45'}
+        block.submit_problem(get_request_dict)
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        # Enabled grading method
+        with patch(
+            'xmodule.capa_block.ProblemBlock.is_grading_method_enabled',
+            new_callable=PropertyMock,
+            return_value=True
+        ):
+            with patch(
+                'xmodule.capa.capa_problem.LoncapaProblem.is_grading_method_enabled',
+                new_callable=PropertyMock,
+                return_value=True
+            ):
+                # Grading method is 'last_score'
+                assert block.grading_method == 'last_score'
+                assert block.score == Score(raw_earned=1, raw_possible=1)
+
+                # Change grading method to 'first_score'
+                block.grading_method = 'first_score'
+                block.rescore(only_if_higher=False)
+
+                mock_publish_grade.assert_called_with(
+                    score=Score(raw_earned=0, raw_possible=1), only_if_higher=False
+                )
+
+                # Change grading method to 'highest_score'
+                block.grading_method = 'highest_score'
+                block.rescore(only_if_higher=False)
+
+                mock_publish_grade.assert_called_with(
+                    score=Score(raw_earned=1, raw_possible=1), only_if_higher=False
+                )
+
+                # Change grading method to 'average_score'
+                block.grading_method = 'average_score'
+                block.rescore(only_if_higher=False)
+
+                mock_publish_grade.assert_called_with(
+                    score=Score(raw_earned=0.33, raw_possible=1), only_if_higher=False
+                )
+
+        # Disabled grading method
+        with patch(
+            'xmodule.capa_block.ProblemBlock.is_grading_method_enabled',
+            new_callable=PropertyMock,
+            return_value=False
+        ):
+            block.rescore(only_if_higher=False)
+            # The score is the last score
+            assert block.score == Score(raw_earned=1, raw_possible=1)
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    @patch('xmodule.capa_block.ProblemBlock.publish_grade')
+    def test_rescore_problem_update_grading_method(self, mock_publish_grade: Mock):
+        """
+        Test the rescore method when the grading method is updated.
+
+        When the grading method is updated, the final
+        score is the score based on the new grading method.
+        """
+        block = CapaFactory.create(attempts=0, max_attempts=3)
+
+        get_request_dict = {CapaFactory.input_key(): '3.21'}
+        block.submit_problem(get_request_dict)
+
+        get_request_dict = {CapaFactory.input_key(): '3.45'}
+        block.submit_problem(get_request_dict)
+
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        # Grading method is 'last_score'
+        assert block.grading_method == 'last_score'
+        assert block.score == Score(raw_earned=1, raw_possible=1)
+
+        # Change grading method to 'first_score'
+        block.grading_method = 'first_score'
+        block.rescore(only_if_higher=False)
+
+        mock_publish_grade.assert_called_with(
+            score=Score(raw_earned=0, raw_possible=1), only_if_higher=False
+        )
+
+        # Change grading method to 'highest_score'
+        block.grading_method = 'highest_score'
+        block.rescore(only_if_higher=False)
+
+        mock_publish_grade.assert_called_with(
+            score=Score(raw_earned=1, raw_possible=1), only_if_higher=False
+        )
+
+        # Change grading method to 'average_score'
+        block.grading_method = 'average_score'
+        block.rescore(only_if_higher=False)
+
+        mock_publish_grade.assert_called_with(
+            score=Score(raw_earned=0.33, raw_possible=1), only_if_higher=False
+        )
+
     def test_rescore_problem_not_done(self):
         # Simulate that the problem is NOT done
         block = CapaFactory.create(done=False)
@@ -1232,6 +1846,144 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             mock_supports_rescoring.return_value = False
             with pytest.raises(NotImplementedError):
                 block.rescore(only_if_higher=False)
+
+    def test_calculate_score_list(self):
+        """
+        Test that the `calculate_score_list` method returns the correct list of scores.
+        """
+        block = CapaFactory.create(correct=True)
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        block.lcp.correct_map_history = [correct_map, correct_map]
+
+        with patch.object(block.lcp, 'calculate_score', return_value={'score': 1, 'total': 2}):
+            result = block.calculate_score_list()
+            expected_result = [Score(raw_earned=1, raw_possible=2), Score(raw_earned=1, raw_possible=2)]
+            self.assertEqual(result, expected_result)
+
+    def test_calculate_score_list_empty(self):
+        """
+        Test that the `calculate_score_list` method returns an
+        empty list when the `correct_map_history` is empty.
+
+        The `calculate_score` method should not be called.
+        """
+        block = CapaFactory.create(correct=True)
+        block.lcp.correct_map_history = []
+
+        with patch.object(block.lcp, 'calculate_score', return_value=Mock()):
+            result = block.calculate_score_list()
+            self.assertEqual(result, [])
+            block.lcp.calculate_score.assert_not_called()
+
+    def test_update_correctness_list_updates_attempt(self):
+        """
+        Test that the `update_correctness_list` method updates the attempt number.
+        """
+        block = CapaFactory.create(correct=True, attempts=0)
+
+        block.update_correctness_list()
+
+        self.assertEqual(block.lcp.context['attempt'], 1)
+
+    def test_update_correctness_list_with_history(self):
+        """
+        Test that the `update_correctness_list` method updates the correct map history.
+        """
+        block = CapaFactory.create(correct=True, attempts=2)
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=1)
+        student_answers = {'1_2_1': 'abcd'}
+        block.correct_map_history = [correct_map]
+        block.student_answers_history = [student_answers]
+
+        with patch.object(block.lcp, 'get_grade_from_current_answers', return_value=correct_map):
+            block.update_correctness_list()
+            self.assertEqual(block.lcp.context['attempt'], 2)
+            block.lcp.get_grade_from_current_answers.assert_called_once_with(student_answers, correct_map)
+            self.assertEqual(block.lcp.correct_map_history, [correct_map])
+            self.assertEqual(block.lcp.correct_map.get_dict(), correct_map.get_dict())
+
+    def test_update_correctness_list_without_history(self):
+        """
+        Test that the `update_correctness_list` method does not
+        update the correct map history because the history is empty.
+
+        The `get_grade_from_current_answers` method should not be called.
+        """
+        block = CapaFactory.create(correct=True, attempts=1)
+        block.correct_map_history = []
+        block.student_answers_history = []
+
+        with patch.object(block.lcp, 'get_grade_from_current_answers', return_value=Mock()):
+            block.update_correctness_list()
+            self.assertEqual(block.lcp.context['attempt'], 1)
+            block.lcp.get_grade_from_current_answers.assert_not_called()
+
+    @override_settings(FEATURES=FEATURES_WITH_GRADING_METHOD_IN_PROBLEMS)
+    def test_get_rescore_with_grading_method(self):
+        """
+        Test that the `get_rescore_with_grading_method` method returns the correct score.
+        """
+        block = CapaFactory.create(done=True, attempts=0, max_attempts=2)
+        get_request_dict = {CapaFactory.input_key(): '3.21'}
+        block.submit_problem(get_request_dict)
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+
+        result = block.get_rescore_with_grading_method()
+
+        self.assertEqual(result, Score(raw_earned=1, raw_possible=1))
+
+    def test_get_score_with_grading_method(self):
+        """
+        Test that the `get_score_with_grading_method` method
+        returns the correct score based on the grading method.
+        """
+        block = CapaFactory.create(done=True, attempts=0, max_attempts=2)
+        get_request_dict = {CapaFactory.input_key(): '3.21'}
+        block.submit_problem(get_request_dict)
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        block.submit_problem(get_request_dict)
+        expected_score = Score(raw_earned=1, raw_possible=1)
+
+        score = block.get_score_with_grading_method(block.score_from_lcp(block.lcp))
+
+        self.assertEqual(score, expected_score)
+        self.assertEqual(block.score, expected_score)
+
+    @patch('xmodule.capa_block.ProblemBlock.score_from_lcp')
+    def test_get_score_with_grading_method_updates_score(self, mock_score_from_lcp: Mock):
+        """
+        Test that the `get_score_with_grading_method` method returns the correct score.
+
+        Check that the score is returned with the correct score and the score
+        history is updated including that score.
+        """
+        block = CapaFactory.create(attempts=1)
+        current_score = Score(raw_earned=1, raw_possible=1)
+        mock_score_from_lcp.return_value = current_score
+
+        score = block.get_score_with_grading_method(current_score)
+
+        self.assertEqual(score, current_score)
+        self.assertEqual(block.score_history, [current_score])
+
+    def test_get_score_with_grading_method_calls_grading_method_handler(self):
+        """
+        Test that the `get_score_with_grading_method` method calls
+        the grading method handler with the appropriate arguments.
+        """
+        block = CapaFactory.create(attempts=1)
+        current_score = Score(raw_earned=0, raw_possible=1)
+
+        with patch('xmodule.capa_block.GradingMethodHandler') as mock_handler:
+            mock_handler.return_value.get_score.return_value = current_score
+            block.get_score_with_grading_method(current_score)
+            mock_handler.assert_called_once_with(
+                Score(raw_earned=0, raw_possible=1),
+                "last_score",
+                block.score_history,
+                current_score.raw_possible,
+            )
 
     def capa_factory_for_problem_xml(self, xml):  # lint-amnesty, pylint: disable=missing-function-docstring
         class CustomCapaFactory(CapaFactory):
@@ -1261,7 +2013,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     def _rescore_problem_error_helper(self, exception_class):
         """Helper to allow testing all errors that rescoring might return."""
         # Create the block
-        block = CapaFactory.create(attempts=1, done=True)
+        block = CapaFactory.create(attempts=0)
+        CapaFactory.answer_key()
+
+        # Check the problem
+        get_request_dict = {CapaFactory.input_key(): '1'}
+        block.submit_problem(get_request_dict)
 
         # Simulate answering a problem that raises the exception
         with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
@@ -2533,7 +3290,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': ' Label Some comment Apple Banana Chocolate Donut '}}
+                'content': {'display_name': name, 'capa_content': 'Label Some comment Apple Banana Chocolate Donut'}}
 
     def test_response_types_multiple_tags(self):
         xml = textwrap.dedent("""
@@ -2571,7 +3328,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
                 'problem_types': {"optionresponse", "multiplechoiceresponse"},
                 'content': {
                     'display_name': name,
-                    'capa_content': " Label Some comment Donut Buggy '1','2' "
+                    'capa_content': "Label Some comment Donut Buggy '1','2'"
                 },
             }
         )
@@ -2612,7 +3369,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': [],
-                'content': {'display_name': name, 'capa_content': ' '}}
+                'content': {'display_name': name, 'capa_content': ''}}
 
     def test_indexing_checkboxes(self):
         name = "Checkboxes"
@@ -2633,7 +3390,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['choiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_dropdown(self):
         name = "Dropdown"
@@ -2648,7 +3405,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['optionresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_multiple_choice(self):
         name = "Multiple Choice"
@@ -2667,7 +3424,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_numerical_input(self):
         name = "Numerical Input"
@@ -2689,7 +3446,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['numericalresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_text_input(self):
         name = "Text Input"
@@ -2708,7 +3465,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['stringresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_non_latin_problem(self):
         sample_text_input_problem_xml = textwrap.dedent("""
@@ -2719,7 +3476,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         name = "Non latin Input"
         block = self._create_block(sample_text_input_problem_xml, name=name)
-        capa_content = " Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
+        capa_content = "Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL"
 
         block_dict = block.index_dictionary()
         assert block_dict['content']['capa_content'] == smart_str(capa_content)
@@ -2746,7 +3503,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['choiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_dropdown_with_hints_and_feedback(self):
         name = "Dropdown with Hints and Feedback"
@@ -2766,7 +3523,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['optionresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_multiple_choice_with_hints_and_feedback(self):
         name = "Multiple Choice with Hints and Feedback"
@@ -2786,7 +3543,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_numerical_input_with_hints_and_feedback(self):
         name = "Numerical Input with Hints and Feedback"
@@ -2804,7 +3561,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['numericalresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_text_input_with_hints_and_feedback(self):
         name = "Text Input with Hints and Feedback"
@@ -2822,7 +3579,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['stringresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_problem_with_html_tags(self):
         sample_problem_xml = textwrap.dedent("""
@@ -2841,14 +3598,33 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         name = "Mixed business"
         block = self._create_block(sample_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
-            This has HTML comment in it.
-            HTML end.
-        """)
+        capa_content = "This has HTML comment in it. HTML end."
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': [],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content}}
+
+    def test_indexing_problem_with_no_whitespace_between_tags(self):
+        """
+        The new (MFE) visual editor for capa problems renders the OLX without spaces between the tags.
+        We want to make sure the index description is still readable and has whitespace.
+        """
+        sample_problem_xml = (
+            "<problem display_name=\"No spaces\">"
+            "<choiceresponse><div>Question text here.</div><checkboxgroup>"
+            "<choice correct=\"true\"><div>Option A</div></choice>"
+            "<choice correct=\"false\"><div>Option B</div></choice>"
+            "</checkboxgroup></choiceresponse>"
+            "</problem>"
+        )
+        name = "No spaces"
+        block = self._create_block(sample_problem_xml, name=name)
+        capa_content = "Question text here. Option A Option B"
+        assert block.index_dictionary() == {
+            'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+            'problem_types': ['choiceresponse'],
+            'content': {'display_name': name, 'capa_content': capa_content},
+        }
 
     def test_invalid_xml_handling(self):
         """
@@ -2898,6 +3674,7 @@ class ComplexEncoderTest(unittest.TestCase):  # lint-amnesty, pylint: disable=mi
         # ignore quotes
 
 
+@skip_unless_lms
 class ProblemCheckTrackingTest(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.

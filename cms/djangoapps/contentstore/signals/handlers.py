@@ -13,13 +13,7 @@ from django.dispatch import receiver
 from edx_toggles.toggles import SettingToggle
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.content_authoring.data import CourseCatalogData, CourseScheduleData
-from openedx_events.content_authoring.signals import (
-    COURSE_CATALOG_INFO_CHANGED,
-    XBLOCK_DELETED,
-    XBLOCK_DUPLICATED,
-    XBLOCK_PUBLISHED,
-)
-from openedx_events.event_bus import get_producer
+from openedx_events.content_authoring.signals import COURSE_CATALOG_INFO_CHANGED
 from pytz import UTC
 
 from cms.djangoapps.contentstore.courseware_index import (
@@ -129,9 +123,17 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         update_search_index,
         update_special_exams_and_publish
     )
-    from cms.djangoapps.coursegraph.tasks import (
-        dump_course_to_neo4j
-    )
+
+    # DEVELOPER README: probably all tasks here should use transaction.on_commit
+    # to avoid stale data, but the tasks are owned by many teams and are often
+    # working well enough. Several instead use a waiting strategy.
+    # If you are in here trying to figure out why your task is not working correctly,
+    # consider whether it is getting stale data and if so choose to wait for the transaction
+    # like exams or put your task to sleep for a while like discussions.
+    # You will not be able to replicate these errors in an environment where celery runs
+    # in process because it will be inside the transaction. Use the settings from
+    # devstack_with_worker.py, and consider adding a time.sleep into send_bulk_published_signal
+    # if you really want to make sure that the task happens before the data is ready.
 
     # register special exams asynchronously after the data is ready
     course_key_str = str(course_key)
@@ -141,14 +143,9 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         # Push the course outline to learning_sequences asynchronously.
         update_outline_from_modulestore_task.delay(course_key_str)
 
-    if settings.COURSEGRAPH_DUMP_COURSE_ON_PUBLISH:
-        # Push the course out to CourseGraph asynchronously.
-        dump_course_to_neo4j.delay(course_key_str)
-
-    # Finally, call into the course search subsystem
-    # to kick off an indexing action
+    # Kick off a courseware indexing action after the data is ready
     if CoursewareSearchIndexer.indexing_is_enabled() and CourseAboutSearchIndexer.indexing_is_enabled():
-        update_search_index.delay(course_key_str, datetime.now(UTC).isoformat())
+        transaction.on_commit(lambda: update_search_index.delay(course_key_str, datetime.now(UTC).isoformat()))
 
     update_discussions_settings_from_course_task.apply_async(
         args=[course_key_str],
@@ -157,60 +154,6 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # Send to a signal for catalog info changes as well, but only once we know the transaction is committed.
     transaction.on_commit(lambda: emit_catalog_info_changed_signal(course_key))
-
-
-@receiver(COURSE_CATALOG_INFO_CHANGED)
-def listen_for_course_catalog_info_changed(sender, signal, **kwargs):
-    """
-    Publish COURSE_CATALOG_INFO_CHANGED signals onto the event bus.
-    """
-    get_producer().send(
-        signal=COURSE_CATALOG_INFO_CHANGED, topic='course-catalog-info-changed',
-        event_key_field='catalog_info.course_key', event_data={'catalog_info': kwargs['catalog_info']},
-        event_metadata=kwargs['metadata'],
-    )
-
-
-@receiver(XBLOCK_PUBLISHED)
-def listen_for_xblock_published(sender, signal, **kwargs):
-    """
-    Publish XBLOCK_PUBLISHED signals onto the event bus.
-    """
-    if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
-        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
-        get_producer().send(
-            signal=XBLOCK_PUBLISHED, topic=topic,
-            event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
-            event_metadata=kwargs['metadata'],
-        )
-
-
-@receiver(XBLOCK_DELETED)
-def listen_for_xblock_deleted(sender, signal, **kwargs):
-    """
-    Publish XBLOCK_DELETED signals onto the event bus.
-    """
-    if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
-        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
-        get_producer().send(
-            signal=XBLOCK_DELETED, topic=topic,
-            event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
-            event_metadata=kwargs['metadata'],
-        )
-
-
-@receiver(XBLOCK_DUPLICATED)
-def listen_for_xblock_duplicated(sender, signal, **kwargs):
-    """
-    Publish XBLOCK_DUPLICATED signals onto the event bus.
-    """
-    if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
-        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
-        get_producer().send(
-            signal=XBLOCK_DUPLICATED, topic=topic,
-            event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
-            event_metadata=kwargs['metadata'],
-        )
 
 
 @receiver(SignalHandler.course_deleted)

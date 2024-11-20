@@ -34,6 +34,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 $('#course_grade_cutoff-tpl').text()
             );
             this.setupCutoffs();
+            this.setupGradeDesignations(options.gradeDesignations);
 
             this.listenTo(this.model, 'invalid', this.handleValidationError);
             this.listenTo(this.model, 'change', this.showNotificationBar);
@@ -268,7 +269,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             var cutoffs = this.descendingCutoffs;
             this.$el.find('.range').each(function(i) {
                 var min = (i < cutoffs.length ? cutoffs[i].cutoff : 0);
-                var max = (i > 0 ? cutoffs[i - 1].cutoff : 100);
+                var max = (i > 0 ? cutoffs[i - 1].cutoff - 1 : 100);
                 $(this).text(min + '-' + max);
             });
         },
@@ -318,7 +319,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         addNewGrade: function(e) {
             e.preventDefault();
             var gradeLength = this.descendingCutoffs.length; // cutoffs doesn't include fail/f so this is only the passing grades
-            if (gradeLength > 3) {
+            if (gradeLength > this.GRADES.length - 1) {
             // TODO shouldn't we disable the button
                 return;
             }
@@ -398,6 +399,9 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             }
             this.descendingCutoffs = _.sortBy(this.descendingCutoffs,
                 function(gradeEle) { return -gradeEle.cutoff; });
+        },
+        setupGradeDesignations: function(gradeDesignations) {
+            if (Array.isArray(gradeDesignations) && gradeDesignations.length > 1) { this.GRADES = gradeDesignations.slice(0, 11); }
         },
         revertView: function() {
             var self = this;

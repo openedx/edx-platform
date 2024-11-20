@@ -10,6 +10,7 @@ NOTIFICATION_READ = 'edx.notifications.read'
 NOTIFICATION_APP_ALL_READ = 'edx.notifications.app_all_read'
 NOTIFICATION_PREFERENCES_UPDATED = 'edx.notifications.preferences.updated'
 NOTIFICATION_TRAY_OPENED = 'edx.notifications.tray_opened'
+NOTIFICATION_PREFERENCE_UNSUBSCRIBE = 'edx.notifications.preferences.one_click_unsubscribe'
 
 
 def get_user_forums_roles(user, course_id):
@@ -62,7 +63,8 @@ def notification_preferences_viewed_event(request, course_id):
         )
 
 
-def notification_generated_event(user_ids, app_name, notification_type, course_key, content_url, content):
+def notification_generated_event(user_ids, app_name, notification_type, course_key,
+                                 content_url, content, sender_id=None):
     """
     Emit an event when a notification is generated.
     """
@@ -78,6 +80,7 @@ def notification_generated_event(user_ids, app_name, notification_type, course_k
         'notification_app': app_name,
         'content_url': content_url,
         'notification_content': content,
+        'sender_id': sender_id,
     }
     with tracker.get_tracker().context(NOTIFICATION_GENERATED, context):
         tracker.emit(
@@ -124,6 +127,9 @@ def notification_preference_update_event(user, course_id, updated_preference):
     """
     context = contexts.course_context_from_course_id(course_id)
     with tracker.get_tracker().context(NOTIFICATION_PREFERENCES_UPDATED, context):
+        value = updated_preference.get('value', '')
+        if updated_preference.get('notification_channel', '') == 'email_cadence':
+            value = updated_preference.get('email_cadence', '')
         tracker.emit(
             NOTIFICATION_PREFERENCES_UPDATED,
             {
@@ -134,7 +140,7 @@ def notification_preference_update_event(user, course_id, updated_preference):
                 'notification_app': updated_preference.get('notification_app', ''),
                 'notification_type': updated_preference.get('notification_type', ''),
                 'notification_channel': updated_preference.get('notification_channel', ''),
-                'value': updated_preference.get('value', ''),
+                'value': value
             }
         )
 
@@ -150,3 +156,16 @@ def notification_tray_opened_event(user, unseen_notifications_count):
             'unseen_notifications_count': unseen_notifications_count,
         }
     )
+
+
+def notification_preference_unsubscribe_event(user):
+    """
+    Emits an event when user clicks on one-click-unsubscribe url
+    """
+    event_data = {
+        'user_id': user.id,
+        'username': user.username,
+        'event_type': 'email_digest_unsubscribe'
+    }
+    tracker.emit(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
+    segment.track(user.id, NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)

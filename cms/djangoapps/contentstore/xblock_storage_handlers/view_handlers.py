@@ -8,22 +8,18 @@ We extracted all the logic from the `xblock_handler` endpoint that lives in
 contentstore/views/block.py to this file, because the logic is reused in another view now.
 Along with it, we moved the business logic of the other views in that file, since that is related.
 """
-
 import logging
 from datetime import datetime
-from uuid import uuid4
 
 from attrs import asdict
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import (User)  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.utils.timezone import timezone
 from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
-from openedx_events.content_authoring.data import DuplicatedXBlockData
-from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
+from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
@@ -31,17 +27,16 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
-from cms.djangoapps.contentstore.toggles import ENABLE_COPY_PASTE_UNITS
+from cms.djangoapps.contentstore.toggles import ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
-from common.djangoapps.edxmako.services import MakoService
+from cms.lib.xblock.upstream_sync import BadUpstream, sync_from_upstream
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,
@@ -49,43 +44,21 @@ from common.djangoapps.student.auth import (
 )
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
+from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.xblock_utils import get_icon
 from openedx.core.toggles import ENTRANCE_EXAMS
-from xmodule.course_block import (
-    DEFAULT_START_DATE,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.library_tools import (
-    LibraryToolsService,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import (
-    EdxJSONEncoder,
-    ModuleStoreEnum,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import (
-    modulestore,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.draft_and_published import (
-    DIRECT_ONLY_CATEGORIES,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import (
-    InvalidLocationError,
-    ItemNotFoundError,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.inheritance import (
-    own_metadata,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.services import (
-    ConfigurationService,
-    SettingsService,
-    TeamsConfigurationService,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tabs import (
-    CourseTabList,
-)  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.course_block import DEFAULT_START_DATE
+from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.tabs import CourseTabList
 
 from ..utils import (
     ancestor_has_staff_lock,
@@ -97,6 +70,9 @@ from ..utils import (
     has_children_visible_to_specific_partition_groups,
     is_currently_visible_to_students,
     is_self_paced,
+    get_taxonomy_tags_widget_url,
+    load_services_for_studio,
+    duplicate_block,
 )
 
 from .create_xblock import create_xblock
@@ -105,6 +81,8 @@ from ..helpers import (
     get_parent_xblock,
     import_staged_content_from_user_clipboard,
     is_unit,
+    xblock_embed_lms_url,
+    xblock_lms_url,
     xblock_primary_child_category,
     xblock_studio_url,
     xblock_type_display_name,
@@ -178,6 +156,7 @@ def handle_xblock(request, usage_key_string=None):
     the public CMS API.
     """
     if usage_key_string:
+
         usage_key = usage_key_with_run(usage_key_string)
 
         access_check = (
@@ -207,6 +186,11 @@ def handle_xblock(request, usage_key_string=None):
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = get_block_info(get_xblock(usage_key, request.user))
+                    # TODO: remove after beta testing for the new problem editor parser
+                    if response["category"] == "problem":
+                        response["metadata"]["default_to_advanced"] = (
+                            ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG.is_enabled()
+                        )
                     if "customReadToken" in fields:
                         parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
                         response.update(parent_children)
@@ -218,7 +202,8 @@ def handle_xblock(request, usage_key_string=None):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            return modify_xblock(usage_key, request)
+            modified_xblock = modify_xblock(usage_key, request)
+            return modified_xblock
 
     elif request.method in ("PUT", "POST"):
         if "duplicate_source_locator" in request.json:
@@ -226,7 +211,6 @@ def handle_xblock(request, usage_key_string=None):
             duplicate_source_usage_key = usage_key_with_run(
                 request.json["duplicate_source_locator"]
             )
-
             source_course = duplicate_source_usage_key.course_key
             dest_course = parent_usage_key.course_key
             if not has_studio_write_access(
@@ -247,12 +231,13 @@ def handle_xblock(request, usage_key_string=None):
                     status=400,
                 )
 
-            dest_usage_key = _duplicate_block(
+            dest_usage_key = duplicate_block(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
-                request.json.get("display_name"),
+                display_name=request.json.get('display_name'),
             )
+
             return JsonResponse(
                 {
                     "locator": str(dest_usage_key),
@@ -296,7 +281,6 @@ def handle_xblock(request, usage_key_string=None):
 
 def modify_xblock(usage_key, request):
     request_data = request.json
-    print(f'In modify_xblock with data = {request_data.get("data")}, fields = {request_data.get("fields")}')
     return _save_xblock(
         request.user,
         get_xblock(usage_key, request.user),
@@ -315,64 +299,27 @@ def modify_xblock(usage_key, request):
     )
 
 
-class StudioPermissionsService:
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentBlock (and library_tools.py).
-    """
-
-    def __init__(self, user):
-        self._user = user
-
-    def can_read(self, course_key):
-        """Does the user have read access to the given course/library?"""
-        return has_studio_read_access(self._user, course_key)
-
-    def can_write(self, course_key):
-        """Does the user have read access to the given course/library?"""
-        return has_studio_write_access(self._user, course_key)
-
-
-def load_services_for_studio(runtime, user):
-    """
-    Function to set some required services used for XBlock edits and studio_view.
-    (i.e. whenever we're not loading _prepare_runtime_for_preview.) This is required to make information
-    about the current user (especially permissions) available via services as needed.
-    """
-    services = {
-        "user": DjangoXBlockUserService(user),
-        "studio_user_permissions": StudioPermissionsService(user),
-        "mako": MakoService(),
-        "settings": SettingsService(),
-        "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
-        "teams_configuration": TeamsConfigurationService(),
-        "library_tools": LibraryToolsService(modulestore(), user.id),
-    }
-
-    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
-
-
 def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
     """
     Updates the xblock in the modulestore.
-    But before doing so, it calls the xblock's editor_saved callback function.
+    But before doing so, it calls the xblock's editor_saved callback function,
+    and after doing so, it calls the xblock's post_editor_saved callback function.
+
+    TODO: Remove getattrs from this function.
+          See https://github.com/openedx/edx-platform/issues/33715
     """
-    if callable(getattr(xblock, "editor_saved", None)):
-        if old_metadata is None:
-            old_metadata = own_metadata(xblock)
-        if old_content is None:
-            old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
-        load_services_for_studio(xblock.runtime, user)
-        xblock.editor_saved(user, old_metadata, old_content)
+    if old_metadata is None:
+        old_metadata = own_metadata(xblock)
+    if old_content is None:
+        old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+    load_services_for_studio(xblock.runtime, user)
+    xblock.editor_saved(user, old_metadata, old_content)
+    xblock_updated = modulestore().update_item(xblock, user.id)
+    xblock_updated.post_editor_saved(user, old_metadata, old_content)
+    return xblock_updated
 
-    # Update after the callback so any changes made in the callback will get persisted.
-    return modulestore().update_item(xblock, user.id)
 
-
-def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
+def _save_xblock(
     user,
     xblock,
     data=None,
@@ -387,12 +334,11 @@ def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
     publish=None,
     fields=None,
     summary_configuration_enabled=None,
-):
+):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
     nullout means to truly set the field to None whereas nones in metadata mean to unset them (so they revert
     to default).
-
     """
     store = modulestore()
     # Perform all xblock changes within a (single-versioned) transaction
@@ -559,7 +505,6 @@ def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
                 publish = "make_public"
 
         # Make public after updating the xblock, in case the caller asked for both an update and a publish.
-        # Used by Bok Choy tests and by republishing of staff locks.
         if publish == "make_public":
             modulestore().publish(xblock.location, user.id)
 
@@ -595,7 +540,8 @@ def _create_block(request):
         # Paste from the user's clipboard (content_staging app clipboard, not browser clipboard) into 'usage_key':
         try:
             created_xblock, notices = import_staged_content_from_user_clipboard(
-                parent_key=usage_key, request=request
+                parent_key=usage_key,
+                request=request,
             )
         except Exception:  # pylint: disable=broad-except
             log.exception(
@@ -612,6 +558,7 @@ def _create_block(request):
             "locator": str(created_xblock.location),
             "courseKey": str(created_xblock.location.course_key),
             "static_file_notices": asdict(notices),
+            "upstreamRef": str(created_xblock.upstream),
         })
 
     category = request.json["category"]
@@ -641,12 +588,28 @@ def _create_block(request):
         boilerplate=request.json.get("boilerplate"),
     )
 
-    return JsonResponse(
-        {
-            "locator": str(created_block.location),
-            "courseKey": str(created_block.location.course_key),
-        }
-    )
+    response = {
+        "locator": str(created_block.location),
+        "courseKey": str(created_block.location.course_key),
+    }
+    # If it contains library_content_key, the block is being imported from a v2 library
+    # so it needs to be synced with upstream block.
+    if upstream_ref := request.json.get("library_content_key"):
+        try:
+            # Set `created_block.upstream` and then sync this with the upstream (library) version.
+            created_block.upstream = upstream_ref
+            sync_from_upstream(downstream=created_block, user=request.user)
+        except BadUpstream as exc:
+            _delete_item(created_block.location, request.user)
+            log.exception(
+                f"Could not sync to new block at '{created_block.usage_key}' "
+                f"using provided library_content_key='{upstream_ref}'"
+            )
+            return JsonResponse({"error": str(exc)}, status=400)
+        modulestore().update_item(created_block, request.user.id)
+        response['upstreamRef'] = upstream_ref
+
+    return JsonResponse(response)
 
 
 def _get_source_index(source_usage_key, source_parent):
@@ -798,127 +761,6 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
             "source_index": target_index if target_index is not None else source_index,
         }
         return JsonResponse(context)
-
-
-def _duplicate_block(
-    parent_usage_key,
-    duplicate_source_usage_key,
-    user,
-    display_name=None,
-    is_child=False,
-):
-    """
-    Duplicate an existing xblock as a child of the supplied parent_usage_key.
-    """
-    store = modulestore()
-    with store.bulk_operations(duplicate_source_usage_key.course_key):
-        source_item = store.get_item(duplicate_source_usage_key)
-        # Change the blockID to be unique.
-        dest_usage_key = source_item.location.replace(name=uuid4().hex)
-        category = dest_usage_key.block_type
-
-        # Update the display name to indicate this is a duplicate (unless display name provided).
-        # Can't use own_metadata(), b/c it converts data for JSON serialization -
-        # not suitable for setting metadata of the new block
-        duplicate_metadata = {}
-        for field in source_item.fields.values():
-            if field.scope == Scope.settings and field.is_set_on(source_item):
-                duplicate_metadata[field.name] = field.read_from(source_item)
-
-        if is_child:
-            display_name = (
-                display_name or source_item.display_name or source_item.category
-            )
-
-        if display_name is not None:
-            duplicate_metadata["display_name"] = display_name
-        else:
-            if source_item.display_name is None:
-                duplicate_metadata["display_name"] = _("Duplicate of {0}").format(
-                    source_item.category
-                )
-            else:
-                duplicate_metadata["display_name"] = _("Duplicate of '{0}'").format(
-                    source_item.display_name
-                )
-
-        asides_to_create = []
-        for aside in source_item.runtime.get_asides(source_item):
-            for field in aside.fields.values():
-                if field.scope in (
-                    Scope.settings,
-                    Scope.content,
-                ) and field.is_set_on(aside):
-                    asides_to_create.append(aside)
-                    break
-
-        for aside in asides_to_create:
-            for field in aside.fields.values():
-                if field.scope not in (
-                    Scope.settings,
-                    Scope.content,
-                ):
-                    field.delete_from(aside)
-
-        dest_block = store.create_item(
-            user.id,
-            dest_usage_key.course_key,
-            dest_usage_key.block_type,
-            block_id=dest_usage_key.block_id,
-            definition_data=source_item.get_explicitly_set_fields_by_scope(
-                Scope.content
-            ),
-            metadata=duplicate_metadata,
-            runtime=source_item.runtime,
-            asides=asides_to_create,
-        )
-
-        children_handled = False
-
-        if hasattr(dest_block, "studio_post_duplicate"):
-            # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
-            # These blocks may handle their own children or parenting if needed. Let them return booleans to
-            # let us know if we need to handle these or not.
-            load_services_for_studio(dest_block.runtime, user)
-            children_handled = dest_block.studio_post_duplicate(store, source_item)
-
-        # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
-        # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-        if source_item.has_children and not children_handled:
-            dest_block.children = dest_block.children or []
-            for child in source_item.children:
-                dupe = _duplicate_block(
-                    dest_block.location, child, user=user, is_child=True
-                )
-                if (
-                    dupe not in dest_block.children
-                ):  # _duplicate_block may add the child for us.
-                    dest_block.children.append(dupe)
-            store.update_item(dest_block, user.id)
-
-        # pylint: disable=protected-access
-        if "detached" not in source_item.runtime.load_block_type(category)._class_tags:
-            parent = store.get_item(parent_usage_key)
-            # If source was already a child of the parent, add duplicate immediately afterward.
-            # Otherwise, add child to end.
-            if source_item.location in parent.children:
-                source_index = parent.children.index(source_item.location)
-                parent.children.insert(source_index + 1, dest_block.location)
-            else:
-                parent.children.append(dest_block.location)
-            store.update_item(parent, user.id)
-
-        # .. event_implemented_name: XBLOCK_DUPLICATED
-        XBLOCK_DUPLICATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=DuplicatedXBlockData(
-                usage_key=dest_block.location,
-                block_type=dest_block.location.block_type,
-                source_usage_key=duplicate_source_usage_key,
-            ),
-        )
-
-        return dest_block.location
 
 
 @login_required
@@ -1091,6 +933,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     course=None,
     is_concise=False,
     summary_configuration=None,
+    tags=None,
 ):
     """
     Creates the information needed for client-side XBlockInfo.
@@ -1252,6 +1095,8 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "published": published,
                 "published_on": published_on,
                 "studio_url": xblock_studio_url(xblock, parent_xblock),
+                "lms_url": xblock_lms_url(xblock),
+                "embed_lms_url": xblock_embed_lms_url(xblock),
                 "released_to_students": datetime.now(UTC) > xblock.start,
                 "release_date": release_date,
                 "visibility_state": visibility_state,
@@ -1271,6 +1116,9 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 "group_access": xblock.group_access,
                 "user_partitions": user_partitions,
                 "show_correctness": xblock.show_correctness,
+                "hide_from_toc": xblock.hide_from_toc,
+                "enable_hide_from_toc_ui": settings.FEATURES.get("ENABLE_HIDE_FROM_TOC_UI", False),
+                "xblock_type": get_icon(xblock),
             }
         )
 
@@ -1319,17 +1167,30 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                 rules_url = settings.PROCTORING_SETTINGS.get("LINK_URLS", {}).get(
                     "online_proctoring_rules", ""
                 )
-                supports_onboarding = does_backend_support_onboarding(
-                    course.proctoring_provider
-                )
+
+                # Only call does_backend_support_onboarding if not using an LTI proctoring provider
+                if course.proctoring_provider != 'lti_external':
+                    supports_onboarding = does_backend_support_onboarding(
+                        course.proctoring_provider
+                    )
+                # NOTE: LTI proctoring doesn't support onboarding. If that changes, this value should change to True.
+                else:
+                    supports_onboarding = False
 
                 proctoring_exam_configuration_link = None
-                if xblock.is_proctored_exam:
-                    proctoring_exam_configuration_link = (
-                        get_exam_configuration_dashboard_url(
-                            course.id, xblock_info["id"]
+
+                # only call get_exam_configuration_dashboard_url if not using an LTI proctoring provider
+                if xblock.is_proctored_exam and (course.proctoring_provider != 'lti_external'):
+                    try:
+                        proctoring_exam_configuration_link = (
+                            get_exam_configuration_dashboard_url(
+                                course.id, xblock_info["id"]
+                            )
                         )
-                    )
+                    except Exception as e:  # pylint: disable=broad-except
+                        log.error(
+                            f"Error while getting proctoring exam configuration link: {e}"
+                        )
 
                 if course.proctoring_provider == "proctortrack":
                     show_review_rules = SHOW_REVIEW_RULES_FLAG.is_enabled(
@@ -1383,6 +1244,14 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             )
         else:
             xblock_info["ancestor_has_staff_lock"] = False
+        if tags is not None:
+            xblock_info["tags"] = tags
+
+        # Don't show the "Manage Tags" option and tag counts if the DISABLE_TAGGING_FEATURE waffle is true
+        xblock_info["is_tagging_feature_disabled"] = is_tagging_feature_disabled()
+        if not is_tagging_feature_disabled():
+            xblock_info["taxonomy_tags_widget_url"] = get_taxonomy_tags_widget_url()
+            xblock_info["course_authoring_url"] = settings.COURSE_AUTHORING_MICROFRONTEND_URL
 
         if course_outline:
             if xblock_info["has_explicit_staff_lock"]:
@@ -1394,8 +1263,18 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             else:
                 xblock_info["staff_only_message"] = False
 
-            # If the ENABLE_COPY_PASTE_UNITS feature flag is enabled, we show the newer menu that allows copying/pasting
-            xblock_info["enable_copy_paste_units"] = ENABLE_COPY_PASTE_UNITS.is_enabled()
+            if xblock_info["hide_from_toc"]:
+                xblock_info["hide_from_toc_message"] = True
+            elif child_info and child_info["children"]:
+                xblock_info["hide_from_toc_message"] = all(
+                    child["hide_from_toc_message"] for child in child_info["children"]
+                )
+            else:
+                xblock_info["hide_from_toc_message"] = False
+
+            if not is_tagging_feature_disabled():
+                xblock_info["course_tags_count"] = _get_course_tags_count(course.id)
+                xblock_info["tag_counts_by_block"] = _get_course_block_tags(xblock.location.context_key)
 
             xblock_info[
                 "has_partition_group_components"
@@ -1404,10 +1283,40 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
             xblock, course=course
         )
 
+        if course_outline or is_xblock_unit:
+            # Previously, ENABLE_COPY_PASTE_UNITS was a feature flag; now it's always on.
+            xblock_info["enable_copy_paste_units"] = True
+
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
 
     return xblock_info
+
+
+@request_cached()
+def _get_course_tags_count(course_key) -> dict:
+    """
+    Get the count of tags that are applied to the course as a dict: {course_key: tags_count}
+    """
+    if not course_key.is_course:
+        return {}  # Unsupported key type
+
+    return get_object_tag_counts(str(course_key), count_implicit=True)
+
+
+@request_cached()
+def _get_course_block_tags(course_key) -> dict:
+    """
+    Get the count of tags that are applied to each block in this course, as a dict.
+    """
+    if not course_key.is_course:
+        return {}  # Unsupported key type, e.g. a library
+
+    # Create a pattern to match the IDs of all blocks, e.g. "block-v1:org+course+run+type@*"
+    catch_all_key = course_key.make_usage_key("*", "x")
+    catch_all_key_pattern = str(catch_all_key).rsplit("@*", 1)[0] + "@*"
+
+    return get_object_tag_counts(catch_all_key_pattern, count_implicit=True)
 
 
 def _was_xblock_ever_exam_linked_with_external(course, xblock):
@@ -1503,6 +1412,7 @@ class VisibilityState:
     needs_attention = "needs_attention"
     staff_only = "staff_only"
     gated = "gated"
+    hide_from_toc = "hide_from_toc"
 
 
 def _compute_visibility_state(
@@ -1513,6 +1423,8 @@ def _compute_visibility_state(
     """
     if xblock.visible_to_staff_only:
         return VisibilityState.staff_only
+    elif xblock.hide_from_toc:
+        return VisibilityState.hide_from_toc
     elif is_unit_with_changes:
         # Note that a unit that has never been published will fall into this category,
         # as well as previously published units with draft content.
@@ -1520,22 +1432,27 @@ def _compute_visibility_state(
 
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = is_course_self_paced or datetime.now(UTC) > xblock.start
-    if child_info and child_info.get("children", []):
+    if child_info and child_info.get("children", []):  # pylint: disable=too-many-nested-blocks
         all_staff_only = True
         all_unscheduled = True
         all_live = True
+        all_hide_from_toc = True
         for child in child_info["children"]:
             child_state = child["visibility_state"]
             if child_state == VisibilityState.needs_attention:
                 return child_state
             elif not child_state == VisibilityState.staff_only:
                 all_staff_only = False
-                if not child_state == VisibilityState.unscheduled:
-                    all_unscheduled = False
-                    if not child_state == VisibilityState.live:
-                        all_live = False
+                if not child_state == VisibilityState.hide_from_toc:
+                    all_hide_from_toc = False
+                    if not child_state == VisibilityState.unscheduled:
+                        all_unscheduled = False
+                        if not child_state == VisibilityState.live:
+                            all_live = False
         if all_staff_only:
             return VisibilityState.staff_only
+        elif all_hide_from_toc:
+            return VisibilityState.hide_from_toc
         elif all_unscheduled:
             return (
                 VisibilityState.unscheduled

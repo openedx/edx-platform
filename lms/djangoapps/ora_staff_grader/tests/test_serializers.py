@@ -2,8 +2,10 @@
 Tests for ESG Serializers
 """
 from unittest.mock import Mock, MagicMock, patch
+from urllib.parse import urljoin
 
 import ddt
+from django.conf import settings
 from django.test import TestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
@@ -239,6 +241,8 @@ class TestSubmissionMetadataSerializer(TestCase):
             "submissionUuid": "a",
             "username": "foo",
             "teamName": "",
+            'email': "jondoes@example.com",
+            'fullname': "",
             "dateSubmitted": "1969-07-16 13:32:00",
             "dateGraded": "None",
             "gradedBy": "",
@@ -249,6 +253,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         "b": {
             "submissionUuid": "b",
             "username": "",
+            'email': "jondoes@example.com",
+            'fullname': "Jhon Does",
             "teamName": "bar",
             "dateSubmitted": "1969-07-20 20:17:40",
             "dateGraded": "None",
@@ -260,6 +266,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         "c": {
             "submissionUuid": "c",
             "username": "baz",
+            'email': "jondoes@example.com",
+            'fullname': "Jhon Does",
             "teamName": "",
             "dateSubmitted": "1969-07-21 21:35:00",
             "dateGraded": "1969-07-24 16:44:00",
@@ -291,6 +299,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         submission = {
             "submissionUuid": "empty-score",
             "username": "WOPR",
+            'email': "jhondoes@example.com",
+            'fullname': "",
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
             "gradedBy": None,
@@ -302,6 +312,8 @@ class TestSubmissionMetadataSerializer(TestCase):
         expected_output = {
             "submissionUUID": "empty-score",
             "username": "WOPR",
+            'email': "jhondoes@example.com",
+            'fullname': "",
             "teamName": None,
             "dateSubmitted": "1983-06-03 00:00:00",
             "dateGraded": None,
@@ -457,14 +469,55 @@ class TestUploadedFileSerializer(TestCase):
 
     def test_uploaded_file_serializer(self):
         """Base serialization behavior"""
-        input_data = MagicMock(size=89794)
+        input_data = {
+            "download_url": "/test.txt",
+            "description": "Test description",
+            "name": "Test name",
+            "size": 89111,
+        }
         data = UploadedFileSerializer(input_data).data
 
         expected_value = {
-            "downloadUrl": str(input_data.download_url),
-            "description": str(input_data.description),
-            "name": str(input_data.name),
-            "size": input_data.size,
+            "downloadUrl": f'{settings.LMS_ROOT_URL}{input_data["download_url"]}',
+            "description": input_data["description"],
+            "name": input_data["name"],
+            "size": input_data["size"],
+        }
+        assert data == expected_value
+
+    def test_uploaded_file_serializer_with_full_url(self):
+        """Test UploadedFileSerializer with a full download URL"""
+        input_data = {
+            "download_url": f"{settings.LMS_ROOT_URL}/test.txt",
+            "description": "Test description",
+            "name": "Test name",
+            "size": 78222,
+        }
+        data = UploadedFileSerializer(input_data).data
+
+        expected_value = {
+            "downloadUrl": input_data["download_url"],
+            "description": input_data["description"],
+            "name": input_data["name"],
+            "size": input_data["size"],
+        }
+        assert data == expected_value
+
+    def test_no_download_url(self):
+        """Test UploadedFileSerializer in the case where a URL was not found"""
+        input_data = {
+            "download_url": "",
+            "description": "Test description",
+            "name": "Test name",
+            "size": 78222,
+        }
+
+        data = UploadedFileSerializer(input_data).data
+        expected_value = {
+            "downloadUrl": "",
+            "description": input_data["description"],
+            "name": input_data["name"],
+            "size": input_data["size"],
         }
         assert data == expected_value
 
@@ -484,7 +537,11 @@ class TestResponseSerializer(TestCase):
         """Base serialization behavior"""
         input_data = MagicMock()
         if has_files:
-            input_data.files = [Mock(size=111), Mock(size=222), Mock(size=333)]
+            input_data.files = [
+                {"size": 111, "download_url": "/file1.txt", "description": Mock(), "name": Mock()},
+                {"size": 222, "download_url": "/file2.txt", "description": Mock(), "name": Mock()},
+                {"size": 333, "download_url": "/file3.txt", "description": Mock(), "name": Mock()},
+            ]
         if has_text:
             input_data.text = [Mock(), Mock(), Mock()]
 
@@ -520,12 +577,12 @@ class TestFileListSerializer(TestCase):
             "files": [{
                 "name": Mock(),
                 "description": Mock(),
-                "download_url": Mock(),
+                "download_url": f"{settings.LMS_ROOT_URL}/test-1.png",
                 "size": 12345,
             }, {
                 "name": Mock(),
                 "description": Mock(),
-                "download_url": Mock(),
+                "download_url": "/test-2.png",
                 "size": 54321,
             }],
             "text": "",
@@ -540,7 +597,7 @@ class TestFileListSerializer(TestCase):
 
             assert output_file["name"] == str(input_file["name"])
             assert output_file["description"] == str(input_file["description"])
-            assert output_file["downloadUrl"] == str(input_file["download_url"])
+            assert output_file["downloadUrl"] == urljoin(settings.LMS_ROOT_URL, str(input_file["download_url"]))
             assert output_file["size"] == input_file["size"]
 
 

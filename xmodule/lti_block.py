@@ -63,7 +63,7 @@ from xml.sax.saxutils import escape
 from unittest import mock
 from urllib import parse
 
-import bleach
+import nh3
 import oauthlib.oauth1
 from django.conf import settings
 from lxml import etree
@@ -84,7 +84,7 @@ from common.djangoapps.xblock_django.constants import (
 )
 from xmodule.lti_2_util import LTI20BlockMixin, LTIError
 from xmodule.raw_block import EmptyDataRawMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     ResourceTemplates,
@@ -458,17 +458,43 @@ class LTIBlock(
         """
         Returns a context.
         """
-        # use bleach defaults. see https://github.com/jsocol/bleach/blob/master/bleach/__init__.py
+        # nh3 defaults for
         # ALLOWED_TAGS are
-        # ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol',  'strong', 'ul']
+        # {
+        #   'a', 'abbr', 'acronym', 'area', 'article', 'aside', 'b', 'bdi', 'bdo',
+        #   'blockquote', 'br', 'caption', 'center', 'cite', 'code', 'col', 'colgroup',
+        #   'data', 'dd', 'del', 'details', 'dfn', 'div', 'dl', 'dt', 'em', 'figcaption',
+        #   'figure', 'footer', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup',
+        #   'hr', 'i', 'img', 'ins', 'kbd', 'li', 'map', 'mark', 'nav', 'ol', 'p', 'pre',
+        #   'q', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'small', 'span', 'strike',
+        #   'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'th', 'thead',
+        #   'time', 'tr', 'tt', 'u', 'ul', 'var', 'wbr'
+        # }
         #
         # ALLOWED_ATTRIBUTES are
-        #     'a': ['href', 'title'],
-        #     'abbr': ['title'],
-        #     'acronym': ['title'],
+        # {
+        #   'a': {'href', 'hreflang'},
+        #   'bdo': {'dir'},
+        #   'blockquote': {'cite'},
+        #   'col': {'charoff', 'char', 'align', 'span'},
+        #   'colgroup': {'align', 'char', 'charoff', 'span'},
+        #   'del': {'datetime', 'cite'},
+        #   'hr': {'width', 'align', 'size'},
+        #   'img': {'height', 'src', 'width', 'alt', 'align'},
+        #   'ins': {'datetime', 'cite'},
+        #   'ol': {'start'},
+        #   'q': {'cite'},
+        #   'table': {'align', 'char', 'charoff', 'summary'},
+        #   'tbody': {'align', 'char', 'charoff'},
+        #   'td': {'rowspan', 'headers', 'charoff', 'colspan', 'char', 'align'},
+        #   'tfoot': {'align', 'char', 'charoff'},
+        #   'th': {'rowspan', 'headers', 'charoff', 'colspan', 'scope', 'char', 'align'},
+        #   'thead': {'charoff', 'char', 'align'},
+        #   'tr': {'align', 'char', 'charoff'}
+        # }
         #
         # This lets all plaintext through.
-        sanitized_comment = bleach.clean(self.score_comment)
+        sanitized_comment = nh3.clean(self.score_comment)
 
         return {
             'input_fields': self.get_input_fields(),
@@ -498,7 +524,7 @@ class LTIBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('lti.html', self.get_context()))
-        add_sass_to_fragment(fragment, 'LTIBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'LTIBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'LTIBlockDisplay')
         shim_xmodule_js(fragment, 'LTI')
         return fragment

@@ -288,6 +288,11 @@ $seq-nav-height: 40px;
   ol {
     display: flex;
 
+    .custom-dropdown {
+      position: relative;
+      display: inline-flex;
+    }
+
     li {
       box-sizing: border-box;
       min-width: 40px;
@@ -298,6 +303,47 @@ $seq-nav-height: 40px;
 
       &:not(:last-child) {
         @include border-right-style(solid);
+      }
+
+      .dropdown-main-button {
+        border-right: 1px solid #e7e7e7 !important;
+      }
+
+      .dropdown-toggle-button {
+        width: 15% !important;
+
+        &:hover {
+          border-bottom: 1px solid #e7e7e7 !important;
+        }
+      }
+
+      .dropdown-options {
+        position: absolute;
+        top: 100%;
+        z-index: 1000;
+        background-color: #ffffff;
+        min-width: 265px;
+        right: 0;
+
+        li {
+          padding: 0.5em 1em;
+          cursor: pointer;
+
+          a {
+            display: block;
+            width: 100%;
+            color: black;
+          }
+
+          .checkmark {
+            float: right;
+            margin-left: 10px;
+          }
+        }
+      }
+
+      .dropdown-options li:hover {
+        background-color: #f1f1f1;
       }
 
       button {

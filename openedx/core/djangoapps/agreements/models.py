@@ -24,9 +24,11 @@ class IntegritySignature(TimeStampedModel):
         unique_together = ('user', 'course_key')
 
 
-class LTIPIITool(models.Model):
+class LTIPIITool(TimeStampedModel):
     """
     This model stores the relationship between a course and the LTI tools in the course that share PII.
+
+    .. no_pii:
     """
     course_key = CourseKeyField(max_length=255, unique=True, db_index=True)
     lti_tools = models.JSONField()
@@ -36,9 +38,11 @@ class LTIPIITool(models.Model):
         app_label = 'agreements'
 
 
-class LTIPIISignature(models.Model):
+class LTIPIISignature(TimeStampedModel):
     """
     This model stores a user's acknowledgement to share PII via LTI tools in a particular course.
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
@@ -54,9 +58,11 @@ class LTIPIISignature(models.Model):
         app_label = 'agreements'
 
 
-class ProctoringPIISignature(models.Model):
+class ProctoringPIISignature(TimeStampedModel):
     """
     This model stores a user's acknowledgment to share PII via proctoring in a particular course.
+
+    .. no_pii:
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)

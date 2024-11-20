@@ -85,7 +85,7 @@
                     HtmlUtils.HTML('<p>'),
                     _.escape(message),
                     HtmlUtils.HTML('</p>')
-                ))
+                ).toString())
                     .focus();
                 $(this.message_div).fadeOut(6000, 'linear');
             },

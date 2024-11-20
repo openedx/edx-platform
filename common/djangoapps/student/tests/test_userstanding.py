@@ -43,7 +43,7 @@ class UserStandingTest(TestCase):
             (self.non_staff, self.non_staff_client),
             (self.admin, self.admin_client),
         ]:
-            client.login(username=user.username, password='test')
+            client.login(username=user.username, password='Password1234')
 
         UserStandingFactory.create(
             user=self.bad_user,

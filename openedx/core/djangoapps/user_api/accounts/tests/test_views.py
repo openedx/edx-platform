@@ -232,7 +232,7 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
         Test that a client (logged in) can get her own username.
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        self._verify_get_own_username(16)
+        self._verify_get_own_username(18)
 
     def test_get_username_inactive(self):
         """
@@ -242,7 +242,7 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self.user.is_active = False
         self.user.save()
-        self._verify_get_own_username(16)
+        self._verify_get_own_username(18)
 
     def test_get_username_not_logged_in(self):
         """
@@ -251,7 +251,7 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
         """
 
         # verify that the endpoint is inaccessible when not logged in
-        self._verify_get_own_username(12, expected_status=401)
+        self._verify_get_own_username(11, expected_status=401)
 
 
 @skip_unless_lms
@@ -358,8 +358,8 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
     """
 
     ENABLED_CACHES = ['default']
-    TOTAL_QUERY_COUNT = 24
-    FULL_RESPONSE_FIELD_COUNT = 30
+    TOTAL_QUERY_COUNT = 26
+    FULL_RESPONSE_FIELD_COUNT = 29
 
     def setUp(self):
         super().setUp()
@@ -379,12 +379,12 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         legacy_profile.save()
         return year_of_birth
 
-    def _verify_full_shareable_account_response(self, response, account_privacy=None, badges_enabled=False):
+    def _verify_full_shareable_account_response(self, response, account_privacy=None):
         """
         Verify that the shareable fields from the account are returned
         """
         data = response.data
-        assert 12 == len(data)
+        assert 11 == len(data)
 
         # public fields (3)
         assert account_privacy == data['account_privacy']
@@ -399,7 +399,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert 'm' == data['level_of_education']
         assert data['social_links'] is not None
         assert data['time_zone'] is None
-        assert badges_enabled == data['accomplishments_shared']
 
     def _verify_private_account_response(self, response, requires_parental_consent=False):
         """
@@ -436,7 +435,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert 'm' == data['level_of_education']
         assert data['social_links'] is not None
         assert UserPreference.get_value(self.user, 'time_zone') == data['time_zone']
-        assert data['accomplishments_shared'] is not None
         assert ((self.user.first_name + ' ') + self.user.last_name) == data['name']
 
         # additional admin fields (13)
@@ -669,7 +667,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
 
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_OPENBADGES': True})
     @ddt.data(
         ("client", "user", PRIVATE_VISIBILITY),
         ("different_client", "different_user", PRIVATE_VISIBILITY),
@@ -691,7 +688,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             if preference_visibility == PRIVATE_VISIBILITY:
                 self._verify_private_account_response(response)
             else:
-                self._verify_full_shareable_account_response(response, ALL_USERS_VISIBILITY, badges_enabled=True)
+                self._verify_full_shareable_account_response(response, ALL_USERS_VISIBILITY)
 
         client = self.login_client(api_client, requesting_username)
 
@@ -812,11 +809,9 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             assert [] == data['language_proficiencies']
             assert PRIVATE_VISIBILITY == data['account_privacy']
             assert data['time_zone'] is None
-            # Badges aren't on by default, so should not be present.
-            assert data['accomplishments_shared'] is False
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        verify_get_own_information(self._get_num_queries(22))
+        verify_get_own_information(self._get_num_queries(24))
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
@@ -836,7 +831,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         legacy_profile.save()
 
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
-        with self.assertNumQueries(self._get_num_queries(22), table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(self._get_num_queries(24), table_ignorelist=WAFFLE_TABLES):
             response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country", "state", "bio",):
             assert response.data[empty_field] is None

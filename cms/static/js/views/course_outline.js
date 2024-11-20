@@ -11,10 +11,12 @@
 define(['jquery', 'underscore', 'js/views/xblock_outline', 'edx-ui-toolkit/js/utils/string-utils',
     'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
     'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop',
-    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',],
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+    'js/views/utils/tagging_drawer_utils', 'js/views/tag_count', 'js/models/tag_count'],
 function(
     $, _, XBlockOutlineView, StringUtils, ViewUtils, XBlockViewUtils,
-    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView
+    XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger, NotificationView, PromptView,
+    TaggingDrawerUtils, TagCountView, TagCountModel
 ) {
     var CourseOutlineView = XBlockOutlineView.extend({
         // takes XBlockOutlineInfo as a model
@@ -26,7 +28,34 @@ function(
             this.makeContentDraggable(this.el);
             // Show/hide the paste button
             this.initializePasteButton(this.el);
+            this.renderTagCount();
             return renderResult;
+        },
+
+        renderTagCount: function() {
+            if (this.model.get('is_tagging_feature_disabled')) {
+                return; // Tagging feature is disabled; don't initialize the tag count view.
+            }
+            const contentId = this.model.get('id');
+            // Skip the course block since that is handled elsewhere in course_manage_tags
+            if (contentId.includes('@course')) {
+                return;
+            }
+            const tagCountsByBlock = this.model.get('tag_counts_by_block');
+            const tagsCount = tagCountsByBlock !== undefined ? tagCountsByBlock[contentId] : 0;
+            const tagCountElem = this.$(`.tag-count[data-locator="${contentId}"]`);
+            var countModel = new TagCountModel({
+                content_id: contentId,
+                tags_count: tagsCount,
+                course_authoring_url: this.model.get('course_authoring_url'),
+            }, {parse: true});
+            var tagCountView = new TagCountView({el: tagCountElem, model: countModel});
+            tagCountView.setupMessageListener();
+            tagCountView.render();
+            tagCountElem.click((event) => {
+                event.preventDefault();
+                this.openManageTagsDrawer();
+            });
         },
 
         shouldExpandChildren: function() {
@@ -432,6 +461,19 @@ function(
             }
         },
 
+        subsectionShareLinkXBlock: function() {
+            var modal = CourseOutlineModalsFactory.getModal('subsection_share_link', this.model, {
+                onSave: this.refresh.bind(this),
+                xblockType: XBlockViewUtils.getXBlockType(
+                    this.model.get('category'), this.parentView.model, true
+                )
+            });
+
+            if (modal) {
+                modal.show();
+            }
+        },
+
         /**
          * If the new "Actions" menu is enabled, most actions like Configure,
          * Duplicate, Move, Delete, etc. are moved into this menu. For this
@@ -458,6 +500,12 @@ function(
             event.stopPropagation();
         },
 
+        openManageTagsDrawer() {
+            const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
+            const contentId = this.model.get('id');
+            TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
+        },
+
         addButtonActions: function(element) {
             XBlockOutlineView.prototype.addButtonActions.apply(this, arguments);
             element.find('.configure-button').click(function(event) {
@@ -474,9 +522,17 @@ function(
                     this.highlightsXBlock();
                 }
             }.bind(this));
+            element.find('.subsection-share-link-button').click(function(event) {
+                event.preventDefault();
+                this.subsectionShareLinkXBlock();
+            }.bind(this));
             element.find('.copy-button').click((event) => {
                 event.preventDefault();
                 this.copyXBlock();
+            });
+            element.find('.manage-tags-button').click((event) => {
+                event.preventDefault();
+                this.openManageTagsDrawer();
             });
             element.find('.paste-component-button').click((event) => {
                 event.preventDefault();

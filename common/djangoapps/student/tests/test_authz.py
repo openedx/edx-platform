@@ -8,7 +8,7 @@ import pytest
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.student.auth import (
@@ -285,9 +285,20 @@ class CourseGroupTest(TestCase):
         with pytest.raises(PermissionDenied):
             remove_users(self.staff, CourseStaffRole(self.course_key), another_staff)
 
-    def test_no_limited_staff_read_or_write_access(self):
+    @override_settings(SERVICE_VARIANT='lms')
+    def test_limited_staff_no_studio_read_access_lms(self):
         """
-        Test that course limited staff have no read or write access.
+        Verifies that course limited staff have no read, but have write access when SERVICE_VARIANT is 'lms'.
+        """
+        add_users(self.global_admin, CourseLimitedStaffRole(self.course_key), self.limited_staff)
+
+        assert not has_studio_read_access(self.limited_staff, self.course_key)
+        assert has_studio_write_access(self.limited_staff, self.course_key)
+
+    @override_settings(SERVICE_VARIANT='cms')
+    def test_limited_staff_no_studio_access_cms(self):
+        """
+        Verifies that course limited staff have no read and no write access when SERVICE_VARIANT is not 'lms'.
         """
         add_users(self.global_admin, CourseLimitedStaffRole(self.course_key), self.limited_staff)
 

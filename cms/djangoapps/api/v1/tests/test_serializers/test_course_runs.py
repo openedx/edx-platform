@@ -2,7 +2,6 @@
 
 
 import datetime
-
 import ddt
 import pytz
 from django.test import RequestFactory

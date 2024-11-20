@@ -13,7 +13,7 @@ from openedx.core.djangoapps.theming.models import SiteTheme
 
 THEMING_ADMIN_URL = '/theming/admin'
 TEST_THEME_NAME = 'test-theme'
-TEST_PASSWORD = 'test'
+TEST_PASSWORD = 'Password1234'
 
 
 class TestThemingViews(TestCase):

@@ -25,6 +25,7 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx_filters.course_authoring.filters import LMSPageURLRequested
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -43,6 +44,7 @@ REQUEST_DEFAULTS = {
     'direction': '',
     'asset_type': '',
     'text_search': '',
+    'display_name': '',
 }
 
 
@@ -61,7 +63,9 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
             sort: the asset field to sort by (defaults to 'date_added')
             direction: the sort direction (defaults to 'descending')
             asset_type: the file type to filter items to (defaults to All)
-            text_search: string to filter results by file name (defaults to '')
+            text_search: string to perform a search on filenames (defaults to '')
+            display_name: string to filter results by exact display name (defaults to '').
+                Use the display_name parameter multiple times to filter by multiple filenames.
     POST
         json: create or update an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -88,7 +92,7 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
     return HttpResponseNotFound()
 
 
-def get_asset_usage_path(request, course_key, asset_key_string):
+def get_asset_usage_path_json(request, course_key, asset_key_string):
     """
     Get a list of units with ancestors that use given asset.
     """
@@ -96,9 +100,16 @@ def get_asset_usage_path(request, course_key, asset_key_string):
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
     asset_location = AssetKey.from_string(asset_key_string) if asset_key_string else None
+    usage_locations = _get_asset_usage_path(course_key, [{'asset_key': asset_location}])
+    return JsonResponse({'usage_locations': usage_locations})
+
+
+def _get_asset_usage_path(course_key, assets):
+    """
+    Get a list of units with ancestors that use given asset.
+    """
     store = modulestore()
-    usage_locations = []
-    static_path = StaticContent.get_static_path_from_location(asset_location)
+    usage_locations = {str(asset['asset_key']): [] for asset in assets}
     verticals = store.get_items(
         course_key,
         qualifiers={
@@ -111,26 +122,47 @@ def get_asset_usage_path(request, course_key, asset_key_string):
         blocks.extend(vertical.get_children())
 
     for block in blocks:
-        is_video_block = getattr(block, 'category', '') == 'video'
-        if is_video_block:
-            handout = getattr(block, 'handout', '')
-            if handout and str(asset_location) in handout:
-                unit = block.get_parent()
-                subsection = unit.get_parent()
-                subsection_display_name = getattr(subsection, 'display_name', '')
-                unit_display_name = getattr(unit, 'display_name', '')
-                xblock_display_name = getattr(block, 'display_name', '')
-                usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
-        else:
-            data = getattr(block, 'data', '')
-            if static_path in data or str(asset_location) in data:
-                unit = block.get_parent()
-                subsection = unit.get_parent()
-                subsection_display_name = getattr(subsection, 'display_name', '')
-                unit_display_name = getattr(unit, 'display_name', '')
-                xblock_display_name = getattr(block, 'display_name', '')
-                usage_locations.append(f'{subsection_display_name} - {unit_display_name} / {xblock_display_name}')
-    return JsonResponse({'usage_locations': usage_locations})
+        for asset in assets:
+            asset_key = asset['asset_key']
+            asset_key_string = str(asset_key)
+            static_path = StaticContent.get_static_path_from_location(asset_key)
+            is_video_block = getattr(block, 'category', '') == 'video'
+            try:
+                if is_video_block:
+                    handout = getattr(block, 'handout', '')
+                    if handout and asset_key_string in handout:
+                        usage_dict = {'display_location': '', 'url': ''}
+                        xblock_display_name = getattr(block, 'display_name', '')
+                        xblock_location = str(block.location)
+                        unit = block.get_parent()
+                        unit_location = str(block.parent)
+                        unit_display_name = getattr(unit, 'display_name', '')
+                        subsection = unit.get_parent()
+                        subsection_display_name = getattr(subsection, 'display_name', '')
+                        current_locations = usage_locations[asset_key_string]
+                        usage_dict['display_location'] = (f'{subsection_display_name} - '
+                                                          f'{unit_display_name} / {xblock_display_name}')
+                        usage_dict['url'] = f'/container/{unit_location}#{xblock_location}'
+                        usage_locations[asset_key_string] = [*current_locations, usage_dict]
+                else:
+                    data = getattr(block, 'data', '')
+                    if static_path in data or asset_key_string in data:
+                        usage_dict = {'display_location': '', 'url': ''}
+                        xblock_display_name = getattr(block, 'display_name', '')
+                        xblock_location = str(block.location)
+                        unit = block.get_parent()
+                        unit_location = str(block.parent)
+                        unit_display_name = getattr(unit, 'display_name', '')
+                        subsection = unit.get_parent()
+                        subsection_display_name = getattr(subsection, 'display_name', '')
+                        current_locations = usage_locations[asset_key_string]
+                        usage_dict['display_location'] = (f'{subsection_display_name} - '
+                                                          f'{unit_display_name} / {xblock_display_name}')
+                        usage_dict['url'] = f'/container/{unit_location}#{xblock_location}'
+                        usage_locations[asset_key_string] = [*current_locations, usage_dict]
+            except AttributeError:
+                continue
+    return usage_locations
 
 
 def _asset_index(request, course_key):
@@ -172,6 +204,9 @@ def _assets_json(request, course_key):
 
         filter_parameters.update(_get_content_type_filter_for_mongo(request_options['requested_asset_type']))
 
+    if request_options['requested_display_names']:
+        filter_parameters.update(_get_displayname_filter_for_mongo(request_options['requested_display_names']))
+
     if request_options['requested_text_search']:
         filter_parameters.update(_get_displayname_search_filter_for_mongo(request_options['requested_text_search']))
 
@@ -190,6 +225,8 @@ def _assets_json(request, course_key):
 
     assets, total_count = _get_assets_for_page(course_key, query_options)
 
+    assets_usage_locations_map = _get_asset_usage_path(course_key, assets)
+
     if request_options['requested_page'] > 0 and first_asset_to_display_index >= total_count and total_count > 0:  # lint-amnesty, pylint: disable=chained-comparison
         _update_options_to_requery_final_page(query_options, total_count)
         current_page = query_options['current_page']
@@ -197,7 +234,7 @@ def _assets_json(request, course_key):
         assets, total_count = _get_assets_for_page(course_key, query_options)
 
     last_asset_to_display_index = first_asset_to_display_index + len(assets)
-    assets_in_json_format = _get_assets_in_json_format(assets, course_key)
+    assets_in_json_format = _get_assets_in_json_format(assets, course_key, assets_usage_locations_map)
 
     response_payload = {
         'start': first_asset_to_display_index,
@@ -223,11 +260,16 @@ def _parse_request_to_dictionary(request):
         'requested_sort_direction': _get_requested_attribute(request, 'direction'),
         'requested_asset_type': _get_requested_attribute(request, 'asset_type'),
         'requested_text_search': _get_requested_attribute(request, 'text_search'),
+        'requested_display_names': _get_requested_attribute_list(request, 'display_name'),
     }
 
 
 def _get_requested_attribute(request, attribute):
     return request.GET.get(attribute, REQUEST_DEFAULTS.get(attribute))
+
+
+def _get_requested_attribute_list(request, attribute):
+    return request.GET.getlist(attribute, REQUEST_DEFAULTS.get(attribute))
 
 
 def _get_error_if_invalid_parameters(requested_filter):
@@ -300,6 +342,24 @@ def _get_mongo_expression_for_type_filter(requested_file_types):
         'contentType': {
             '$in': content_types
         }
+    }
+
+
+def _get_displayname_filter_for_mongo(displaynames):
+    """
+    Construct and return pymongo query dict, filtering for the given list of displaynames.
+    """
+    filters = []
+
+    for displayname in displaynames:
+        filters.append({
+            'displayname': {
+                '$eq': displayname,
+            },
+        })
+
+    return {
+        '$or': filters,
     }
 
 
@@ -383,23 +443,31 @@ def _update_options_to_requery_final_page(query_options, total_asset_count):
     query_options['current_page'] = int(math.floor((total_asset_count - 1) / query_options['page_size']))
 
 
-def _get_assets_in_json_format(assets, course_key):
+def _get_assets_in_json_format(assets, course_key, assets_usage_locations_map):
     """returns assets information in JSON Format"""
     assets_in_json_format = []
     for asset in assets:
+        asset_key = asset['asset_key']
+        asset_key_string = str(asset_key)
         thumbnail_asset_key = _get_thumbnail_asset_key(asset, course_key)
         asset_is_locked = asset.get('locked', False)
         asset_file_size = asset.get('length', None)
+
+        try:
+            usage_locations = assets_usage_locations_map[asset_key_string]
+        except KeyError:
+            usage_locations = []
 
         asset_in_json = get_asset_json(
             asset['displayname'],
             asset['contentType'],
             asset['uploadDate'],
-            asset['asset_key'],
+            asset_key,
             thumbnail_asset_key,
             asset_is_locked,
             course_key,
             asset_file_size,
+            usage_locations,
         )
 
         assets_in_json_format.append(asset_in_json)
@@ -641,13 +709,23 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key, file_size=None):
+def get_asset_json(display_name, content_type, date, location, thumbnail_location,
+                   locked, course_key, file_size=None, usage=None):
     '''
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
-    external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
+
+    ## .. filter_implemented_name: LMSPageURLRequested
+    ## .. filter_type: org.openedx.course_authoring.lms.page.url.requested.v1
+    lms_root, _ = LMSPageURLRequested.run_filter(
+        url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        org=location.org,
+    )
+
+    external_url = urljoin(lms_root, asset_url)
     portable_url = StaticContent.get_static_path_from_location(location)
+    usage_locations = [] if usage is None else usage
     return {
         'display_name': display_name,
         'content_type': content_type,
@@ -661,4 +739,5 @@ def get_asset_json(display_name, content_type, date, location, thumbnail_locatio
         # needed for Backbone delete/update.
         'id': str(location),
         'file_size': file_size,
+        'usage_locations': usage_locations,
     }

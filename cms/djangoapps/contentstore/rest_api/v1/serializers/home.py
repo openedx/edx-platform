@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from openedx.core.lib.api.serializers import CourseKeyField
 
-from .common import CourseCommonSerializer
+from cms.djangoapps.contentstore.rest_api.serializers.common import CourseCommonSerializer
 
 
 class UnsucceededCourseSerializer(serializers.Serializer):
@@ -31,8 +31,18 @@ class LibraryViewSerializer(serializers.Serializer):
     can_edit = serializers.BooleanField()
 
 
-class CourseHomeSerializer(serializers.Serializer):
-    """Serializer for course home"""
+class CourseHomeTabSerializer(serializers.Serializer):
+    archived_courses = CourseCommonSerializer(required=False, many=True)
+    courses = CourseCommonSerializer(required=False, many=True)
+    in_process_course_actions = UnsucceededCourseSerializer(many=True, required=False, allow_null=True)
+
+
+class LibraryTabSerializer(serializers.Serializer):
+    libraries = LibraryViewSerializer(many=True, required=False, allow_null=True)
+
+
+class StudioHomeSerializer(serializers.Serializer):
+    """Serializer for Studio home"""
     allow_course_reruns = serializers.BooleanField()
     allow_to_create_new_org = serializers.BooleanField()
     allow_unicode_course_id = serializers.BooleanField()
@@ -41,15 +51,18 @@ class CourseHomeSerializer(serializers.Serializer):
         allow_empty=True
     )
     archived_courses = CourseCommonSerializer(required=False, many=True)
+    can_access_advanced_settings = serializers.BooleanField()
     can_create_organizations = serializers.BooleanField()
     course_creator_status = serializers.CharField()
     courses = CourseCommonSerializer(required=False, many=True)
     in_process_course_actions = UnsucceededCourseSerializer(many=True, required=False, allow_null=True)
     libraries = LibraryViewSerializer(many=True, required=False, allow_null=True)
     libraries_enabled = serializers.BooleanField()
-    library_authoring_mfe_url = serializers.CharField()
+    libraries_v1_enabled = serializers.BooleanField()
+    libraries_v2_enabled = serializers.BooleanField()
+    taxonomies_enabled = serializers.BooleanField()
+    taxonomy_list_mfe_url = serializers.CharField()
     optimization_enabled = serializers.BooleanField()
-    redirect_to_library_authoring_mfe = serializers.BooleanField()
     request_course_creator_url = serializers.CharField()
     rerun_creator_status = serializers.BooleanField()
     show_new_library_button = serializers.BooleanField()

@@ -7,6 +7,7 @@ from unittest import mock
 
 import ddt
 from django.conf import settings
+from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
@@ -16,15 +17,28 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
+from openedx.core.djangoapps.django_comment_common.models import (
+    FORUM_ROLE_ADMINISTRATOR,
+    FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR
+)
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.models import (
+    CourseNotificationPreference,
+    Notification,
+    get_course_notification_preference_config_version
+)
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
+from openedx.core.djangoapps.notifications.email.utils import encrypt_object, encrypt_string
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager
+from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager
+from ..utils import get_notification_types_with_visibility_settings
 
 
 @ddt.ddt
@@ -67,26 +81,23 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
         )
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
-    @ddt.data((False,), (True,))
     @ddt.unpack
-    def test_course_enrollment_list_view(self, show_notifications_tray):
+    def test_course_enrollment_list_view(self):
         """
         Test the CourseEnrollmentListView.
         """
-        self.client.login(username=self.user.username, password='test')
-        # Enable or disable the waffle flag based on the test case data
-        with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray):
-            url = reverse('enrollment-list')
-            response = self.client.get(url)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+        url = reverse('enrollment-list')
+        response = self.client.get(url)
 
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
-            data = response.data['results']
-            enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
-            expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data['results']
+        enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
+        expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
 
-            self.assertEqual(len(data), 1)
-            self.assertEqual(data, expected_data)
-            self.assertEqual(response.data['show_preferences'], show_notifications_tray)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data, expected_data)
+        self.assertEqual(response.data['show_preferences'], True)
 
     def test_course_enrollment_api_permission(self):
         """
@@ -206,11 +217,13 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             enrollment=enrollment_data
         )
 
-    def _expected_api_response(self):
+    def _expected_api_response(self, course=None):
         """
         Helper method to return expected API response.
         """
-        return {
+        if course is None:
+            course = self.course
+        response = {
             'id': 1,
             'course_name': 'course-v1:testorg+testcourse+testrun Course',
             'course_id': 'course-v1:testorg+testcourse+testrun',
@@ -222,25 +235,97 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'new_comment',
                         'new_response',
                         'response_on_followed_post',
-                        'comment_on_followed_post'
+                        'comment_on_followed_post',
+                        'response_endorsed_on_thread',
+                        'response_endorsed'
                     ],
                     'notification_types': {
+                        'new_discussion_post': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'new_question_post': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
                         'core': {
                             'web': True,
                             'email': True,
                             'push': True,
+                            'email_cadence': 'Daily',
                             'info': 'Notifications for responses and comments on your posts, and the ones you’re '
                                     'following, including endorsements to your responses and on your posts.'
                         },
-                        'new_discussion_post': {'web': False, 'email': False, 'push': False, 'info': ''},
-                        'new_question_post': {'web': False, 'email': False, 'push': False, 'info': ''},
+                        'content_reported': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'info': '',
+                            'email_cadence': 'Daily',
+                        },
                     },
                     'non_editable': {
                         'core': ['web']
                     }
+                },
+                'updates': {
+                    'enabled': True,
+                    'core_notification_types': [],
+                    'notification_types': {
+                        'course_updates': {
+                            'web': True,
+                            'email': False,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for new announcements and updates from the course team.'
+                        }
+                    },
+                    'non_editable': {}
+                },
+                'grading': {
+                    'enabled': True,
+                    'core_notification_types': [],
+                    'notification_types': {
+                        'ora_staff_notification': {
+                            'web': False,
+                            'email': False,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                        'core': {
+                            'web': True,
+                            'email': True,
+                            'push': True,
+                            'email_cadence': 'Daily',
+                            'info': 'Notifications for submission grading.'
+                        },
+                        'ora_grade_assigned': {
+                            'web': True,
+                            'email': True,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+                    },
+                    'non_editable': {}
                 }
             }
         }
+        return response
 
     def test_get_user_notification_preference_without_login(self):
         """
@@ -254,12 +339,57 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         """
         Test get user notification preference.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, self._expected_api_response())
+        expected_response = self._expected_api_response()
+        expected_response = remove_notifications_with_visibility_settings(expected_response)
+        self.assertEqual(response.data, expected_response)
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
+
+    @mock.patch("eventtracking.tracker.emit")
+    @mock.patch.dict(COURSE_NOTIFICATION_TYPES, {
+        **COURSE_NOTIFICATION_TYPES,
+        **{
+            'content_reported': {
+                'name': 'content_reported',
+                'visible_to': [FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADMINISTRATOR]
+            }
+        }
+    })
+    @ddt.data(
+        FORUM_ROLE_MODERATOR,
+        FORUM_ROLE_COMMUNITY_TA,
+        FORUM_ROLE_ADMINISTRATOR,
+        None
+    )
+    def test_get_user_notification_preference_with_visibility_settings(self, role, mock_emit):
+        """
+        Test get user notification preference.
+        """
+        if role:
+            CourseStaffRole(self.course.id).add_users(self.user)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+
+        role_instance = None
+        if role:
+            role_instance = RoleFactory(name=role, course_id=self.course.id)
+            role_instance.users.add(self.user)
+
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        expected_response = self._expected_api_response()
+
+        if not role:
+            expected_response = remove_notifications_with_visibility_settings(expected_response)
+
+        self.assertEqual(response.data, expected_response)
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
+        if role_instance:
+            role_instance.users.clear()
 
     @ddt.data(
         ('discussion', None, None, True, status.HTTP_200_OK, 'app_update'),
@@ -268,6 +398,14 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
 
         ('discussion', 'core', 'email', True, status.HTTP_200_OK, 'type_update'),
         ('discussion', 'core', 'email', False, status.HTTP_200_OK, 'type_update'),
+
+        # Test for email cadence update
+        ('discussion', 'core', 'email_cadence', 'Daily', status.HTTP_200_OK, 'type_update'),
+        ('discussion', 'core', 'email_cadence', 'Weekly', status.HTTP_200_OK, 'type_update'),
+
+        # Test for app-wide channel update
+        ('discussion', None, 'email', True, status.HTTP_200_OK, 'app-wide-channel-update'),
+        ('discussion', None, 'email', False, status.HTTP_200_OK, 'app-wide-channel-update'),
 
         ('discussion', 'invalid_notification_type', 'email', True, status.HTTP_400_BAD_REQUEST, None),
         ('discussion', 'new_comment', 'invalid_notification_channel', False, status.HTTP_400_BAD_REQUEST, None),
@@ -280,7 +418,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         """
         Test update of user notification preference.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         payload = {
             'notification_app': notification_app,
             'value': value,
@@ -292,16 +430,28 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
 
         response = self.client.patch(self.path, json.dumps(payload), content_type='application/json')
         self.assertEqual(response.status_code, expected_status)
+        expected_data = self._expected_api_response()
 
         if update_type == 'app_update':
             expected_data = self._expected_api_response()
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
             expected_data['notification_preference_config'][notification_app]['enabled'] = value
             self.assertEqual(response.data, expected_data)
 
         elif update_type == 'type_update':
             expected_data = self._expected_api_response()
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
             expected_data['notification_preference_config'][notification_app][
                 'notification_types'][notification_type][notification_channel] = value
+            self.assertEqual(response.data, expected_data)
+
+        elif update_type == 'app-wide-channel-update':
+            expected_data = remove_notifications_with_visibility_settings(expected_data)
+            app_prefs = expected_data['notification_preference_config'][notification_app]
+            for notification_type_name, notification_type_preferences in app_prefs['notification_types'].items():
+                non_editable_channels = app_prefs['non_editable'].get(notification_type_name, [])
+                if notification_channel not in non_editable_channels:
+                    app_prefs['notification_types'][notification_type_name][notification_channel] = value
             self.assertEqual(response.data, expected_data)
 
         if expected_status == status.HTTP_200_OK:
@@ -319,13 +469,15 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                 assert 'info' not in type_prefs.keys()
 
 
+@ddt.ddt
 class NotificationListAPIViewTest(APITestCase):
     """
     Tests suit for the NotificationListAPIView.
     """
 
     def setUp(self):
-        self.user = UserFactory()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         self.url = reverse('notifications-list')
 
     def test_list_notifications(self):
@@ -342,7 +494,7 @@ class NotificationListAPIViewTest(APITestCase):
                 'post_title': 'This is a test post.',
             }
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view.
         response = self.client.get(self.url)
@@ -379,7 +531,7 @@ class NotificationListAPIViewTest(APITestCase):
             app_name='app2',
             notification_type='info',
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view with the app_name query parameter set to 'app1'.
         response = self.client.get(self.url + "?app_name=discussion")
@@ -397,12 +549,49 @@ class NotificationListAPIViewTest(APITestCase):
             '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
         )
 
+    @ddt.data(
+        ([], 0),
+        (['web'], 1),
+        (['email'], 0),
+        (['web', 'email'], 1),
+        (['web', 'email', 'push'], 1),
+    )
+    @ddt.unpack
+    def test_list_notifications_with_channels(self, channels, expected_count):
+        """
+        Test that the view can filter notifications by app name and channels.
+        """
+
+        Notification.objects.create(
+            user=self.user,
+            app_name='discussion',
+            notification_type='new_response',
+            content_context={
+                'replier_name': 'test_user',
+                'post_title': 'This is a test post.',
+            },
+            web='web' in channels,
+            email='email' in channels
+        )
+
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+
+        # Make a request to the view with the app_name query parameter set to 'app1'.
+        response = self.client.get(self.url + "?app_name=discussion")
+
+        # Assert that the response is successful.
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains expected results i.e. channels contains web or is null.
+        data = response.data['results']
+        self.assertEqual(len(data), expected_count)
+
     @mock.patch("eventtracking.tracker.emit")
     def test_list_notifications_with_tray_opened_param(self, mock_emit):
         """
         Test event emission with tray_opened param is provided.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view with the tray_opened query parameter set to True.
         response = self.client.get(self.url + "?tray_opened=True")
@@ -442,7 +631,7 @@ class NotificationListAPIViewTest(APITestCase):
             notification_type='info',
             created=today - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view
         response = self.client.get(self.url)
@@ -469,7 +658,7 @@ class NotificationListAPIViewTest(APITestCase):
             user=self.user,
             notification_type='info',
         )
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Make a request to the view
         response = self.client.get(self.url)
@@ -517,25 +706,21 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
 
-    @ddt.data((False,), (True,))
+    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.unpack
-    def test_get_unseen_notifications_count_with_show_notifications_tray(self, show_notifications_tray_enabled):
+    def test_get_unseen_notifications_count_with_show_notifications_tray(self):
         """
         Test that the endpoint returns the correct count of unseen notifications and show_notifications_tray value.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+        # Make a request to the view
+        response = self.client.get(self.url)
 
-        # Enable or disable the waffle flag based on the test case data
-        with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray_enabled):
-
-            # Make a request to the view
-            response = self.client.get(self.url)
-
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.data['count'], 4)
-            self.assertEqual(response.data['count_by_app_name'], {
-                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0})
-            self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 4)
+        self.assertEqual(response.data['count_by_app_name'], {
+            'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0, 'grading': 0})
+        self.assertEqual(response.data['show_notifications_tray'], True)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
         """
@@ -550,19 +735,19 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         """
         # Create a user with no notifications.
         user = UserFactory()
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
-        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0})
+        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0, 'updates': 0, 'grading': 0})
 
     def test_get_expiry_days_in_count_view(self):
         """
         Tests if "notification_expiry_days" exists in API response
         """
         user = UserFactory()
-        self.client.login(username=user.username, password='test')
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['notification_expiry_days'], 60)
@@ -574,7 +759,8 @@ class MarkNotificationsSeenAPIViewTestCase(APITestCase):
     """
 
     def setUp(self):
-        self.user = UserFactory()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory(password=self.TEST_PASSWORD)
 
         # Create some sample notifications for the user
         Notification.objects.create(user=self.user, app_name='App Name 1', notification_type='Type A')
@@ -586,7 +772,7 @@ class MarkNotificationsSeenAPIViewTestCase(APITestCase):
         # Create a POST request to mark notifications as seen for 'App Name 1'
         app_name = 'App Name 1'
         url = reverse('mark-notifications-seen', kwargs={'app_name': app_name})
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         response = self.client.put(url)
         # Assert the response status code is 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -606,9 +792,10 @@ class NotificationReadAPIViewTestCase(APITestCase):
     """
 
     def setUp(self):
-        self.user = UserFactory()
+        self.TEST_PASSWORD = 'Password1234'
+        self.user = UserFactory(password=self.TEST_PASSWORD)
         self.url = reverse('notifications-read')
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         # Create some sample notifications for the user with already existing apps and with invalid app name
         Notification.objects.create(user=self.user, app_name='app_name_2', notification_type='Type A')
@@ -665,7 +852,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         # Create a PATCH request to mark notification as read for notification_id: 2 through a different user
         self.client.logout()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         notification_id = 2
         data = {'notification_id': notification_id}
@@ -709,3 +896,75 @@ class NotificationReadAPIViewTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
+
+
+@ddt.ddt
+class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
+    """
+    Tests if preference is updated when encrypted url is hit
+    """
+    def setUp(self):
+        """
+        Setup test case
+        """
+        super().setUp()
+        password = 'password'
+        self.user = UserFactory(password=password)
+        self.client.login(username=self.user.username, password=password)
+        self.course = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
+        CourseNotificationPreference(course_id=self.course.id, user=self.user).save()
+
+    @override_settings(LMS_BASE="")
+    @ddt.data('get', 'post')
+    def test_if_preference_is_updated(self, request_type):
+        """
+        Tests if preference is updated when url is hit
+        """
+        user_hash = encrypt_string(self.user.username)
+        patch_hash = encrypt_object({'channel': 'email', 'value': False})
+        url_params = {
+            "username": user_hash,
+            "patch": patch_hash
+        }
+        url = reverse("preference_update_from_encrypted_username_view", kwargs=url_params)
+        func = getattr(self.client, request_type)
+        response = func(url)
+        assert response.status_code == status.HTTP_200_OK
+        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
+        config = preference.notification_preference_config
+        for app_name, app_prefs in config.items():
+            for type_prefs in app_prefs['notification_types'].values():
+                assert type_prefs['email'] is False
+
+    def test_if_config_version_is_updated(self):
+        """
+        Tests if preference version is updated before applying patch data
+        """
+        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
+        preference.config_version -= 1
+        preference.save()
+        user_hash = encrypt_string(self.user.username)
+        patch_hash = encrypt_object({'channel': 'email', 'value': False})
+        url_params = {
+            "username": user_hash,
+            "patch": patch_hash
+        }
+        url = reverse("preference_update_from_encrypted_username_view", kwargs=url_params)
+        self.client.get(url)
+        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
+        assert preference.config_version == get_course_notification_preference_config_version()
+
+
+def remove_notifications_with_visibility_settings(expected_response):
+    """
+    Remove notifications with visibility settings from the expected response.
+    """
+    not_visible = get_notification_types_with_visibility_settings()
+    for expected_response_app in expected_response['notification_preference_config']:
+        for notification_type, visibility_settings in not_visible.items():
+            types = expected_response['notification_preference_config'][expected_response_app]['notification_types']
+            if notification_type in types:
+                expected_response['notification_preference_config'][expected_response_app]['notification_types'].pop(
+                    notification_type
+                )
+    return expected_response

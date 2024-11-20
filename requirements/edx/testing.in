@@ -18,11 +18,9 @@
 -r coverage.txt           # Utilities for calculating test coverage
 
 beautifulsoup4            # Library for extracting data from HTML and XML files
-bok-choy                  # Framework for browser automation tests, based on selenium
 code-annotations          # Perform code annotation checking, such as for PII annotations
 cssselect                 # Used to extract HTML fragments via CSS selectors in 2 test cases and pyquery
 ddt                       # Run a test case multiple times with different input; used in many, many of our tests
-edx-i18n-tools>=0.4.6     # Commands for developers and translators to extract, compile and validate translations
 edx-lint                  # pylint extensions for Open edX repositories
 factory-boy               # Library for creating test fixtures, used in many tests
 # Pinning the freezegun version because 0.3.13 is causing failures which have also been reported on the git repo by public.
@@ -41,11 +39,10 @@ pytest-json-report        # Output json formatted warnings after running pytest
 pytest-metadata==1.8.0     # To prevent 'make upgrade' failure, dependency of pytest-json-report
 pytest-randomly           # pytest plugin to randomly order tests
 pytest-xdist[psutil]      # Parallel execution of tests on multiple CPU cores or hosts
-selenium                  # Browser automation library, used for acceptance tests
 singledispatch            # Backport of functools.singledispatch from Python 3.4+, used in tests of XBlock rendering
 testfixtures              # Provides a LogCapture utility used by several tests
 tox                       # virtualenv management for tests
-tox-battery               # Makes tox aware of requirements file changes
 unidiff                   # Required by coverage_pytest_plugin
 pylint-pytest==0.3.0      # A Pylint plugin to suppress pytest-related false positives.
 pact-python               # Library for contract testing
+py                        # Needed for pytest configurations, was previously been fetched through tox

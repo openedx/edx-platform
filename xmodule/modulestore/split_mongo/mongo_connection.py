@@ -246,9 +246,10 @@ class CourseStructureCache:
             data_size = len(compressed_pickled_data)
             tagger.measure('compressed_size', data_size)
 
-            # Structures are immutable, so we set a timeout of "never"
+            # We rely on the course structure cache default timeout, which should be
+            # high by default (~ a few days).
             try:
-                self.cache.set(key, compressed_pickled_data, None)
+                self.cache.set(key, compressed_pickled_data)
             except Exception:  # pylint: disable=broad-except
                 total_bytes_in_one_mb = 1024 * 1024
                 chunk_size_in_mbs = round(data_size / total_bytes_in_one_mb, 2)
@@ -278,19 +279,29 @@ class MongoPersistenceBackend:
         #make sure the course index cache is fresh.
         RequestCache(namespace="course_index_cache").clear()
 
-        self.database = connect_to_mongodb(
-            db, host,
-            port=port, tz_aware=tz_aware, user=user, password=password,
-            retry_wait_time=retry_wait_time, **kwargs
-        )
+        self.collection = collection
+        self.connection_params = {
+            'db': db,
+            'host': host,
+            'port': port,
+            'tz_aware': tz_aware,
+            'user': user,
+            'password': password,
+            'retry_wait_time': retry_wait_time,
+            **kwargs
+        }
 
-        self.course_index = self.database[collection + '.active_versions']
-        self.structures = self.database[collection + '.structures']
-        self.definitions = self.database[collection + '.definitions']
+        self.do_connection()
 
         # Is the MySQL subclass in use, passing through some reads/writes to us? If so this will be True.
         # If this MongoPersistenceBackend is being used directly (only MongoDB is involved), this is False.
         self.with_mysql_subclass = with_mysql_subclass
+
+    def do_connection(self):
+        self.database = connect_to_mongodb(**self.connection_params)
+        self.course_index = self.database[self.collection + '.active_versions']
+        self.structures = self.database[self.collection + '.structures']
+        self.definitions = self.database[self.collection + '.definitions']
 
     def heartbeat(self):
         """
@@ -302,6 +313,24 @@ class MongoPersistenceBackend:
             return True
         except pymongo.errors.ConnectionFailure:
             raise HeartbeatFailure(f"Can't connect to {self.database.name}", 'mongo')  # lint-amnesty, pylint: disable=raise-missing-from
+
+    def check_connection(self):
+        """
+        Check if mongodb connection is open or not.
+        """
+        try:
+            self.database.client.admin.command("ping")
+            return True
+        except pymongo.errors.InvalidOperation:
+            return False
+
+    def ensure_connection(self):
+        """
+        Ensure that mongodb connection is open.
+        """
+        if self.check_connection():
+            return
+        self.do_connection()
 
     def get_structure(self, key, course_context=None):
         """
@@ -501,12 +530,13 @@ class MongoPersistenceBackend:
         """
         Delete the course_index from the persistence mechanism whose id is the given course_index
         """
+        self.ensure_connection()
         with TIMER.timer("delete_course_index", course_key):
             query = {
                 key_attr: getattr(course_key, key_attr)
                 for key_attr in ('org', 'course', 'run')
             }
-            return self.course_index.remove(query)
+            return self.course_index.delete_one(query)
 
     def get_definition(self, key, course_context=None):
         """
@@ -560,7 +590,8 @@ class MongoPersistenceBackend:
         Closes any open connections to the underlying databases
         """
         RequestCache(namespace="course_index_cache").clear()
-        self.database.client.close()
+        if self.check_connection():
+            self.database.client.close()
 
     def _drop_database(self, database=True, collections=True, connections=True):
         """
@@ -575,6 +606,8 @@ class MongoPersistenceBackend:
         If connections is True, then close the connection to the database as well.
         """
         RequestCache(namespace="course_index_cache").clear()
+
+        self.ensure_connection()
         connection = self.database.client
 
         if database:
@@ -700,7 +733,9 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         new_index = SplitModulestoreCourseIndex(**SplitModulestoreCourseIndex.fields_from_v1_schema(course_index))
         new_index.save()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().insert_course_index(course_index, course_context)
 
     def update_course_index(self, course_index, from_index=None, course_context=None):  # pylint: disable=arguments-differ
@@ -754,7 +789,10 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
 
         # Save the course index entry and create a historical record:
         index_obj.save()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().update_course_index(course_index, from_index, course_context)
 
     def delete_course_index(self, course_key):
@@ -763,7 +801,9 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
         """
         RequestCache(namespace="course_index_cache").clear()
         SplitModulestoreCourseIndex.objects.filter(course_id=course_key).delete()
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super().delete_course_index(course_key)
 
     def _drop_database(self, database=True, collections=True, connections=True):
@@ -781,5 +821,7 @@ class DjangoFlexPersistenceBackend(MongoPersistenceBackend):
                 "post-test cleanup failed with TransactionManagementError. "
                 "Use 'with self.allow_transaction_exception():' from ModuleStoreTestCase/...IsolationMixin to fix it."
             ) from err
-        # TEMP: Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well:
+        # Also write to MongoDB, so we can switch back to using it if this new MySQL version doesn't work well.
+        # NOTE: This is REQUIRED for pruning (structures.py) to run safely. Don't remove this write until
+        # pruning is modified to read from SplitModulestoreCourseIndex to get active versions.
         super()._drop_database(database, collections, connections)

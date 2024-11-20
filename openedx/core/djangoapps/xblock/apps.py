@@ -5,7 +5,7 @@ from django.apps import AppConfig, apps
 from django.conf import settings
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from .data import StudentDataMode
+from .data import StudentDataMode, AuthoredDataMode
 
 
 class XBlockAppConfig(AppConfig):
@@ -16,9 +16,9 @@ class XBlockAppConfig(AppConfig):
     verbose_name = 'New XBlock Runtime'
     label = 'xblock_new'  # The name 'xblock' is already taken by ORA2's 'openassessment.xblock' app :/
 
-    def get_runtime_system_params(self):
+    def get_runtime_params(self):
         """
-        Get the XBlockRuntimeSystem parameters appropriate for viewing and/or
+        Get the LearningCoreXBlockRuntime parameters appropriate for viewing and/or
         editing XBlock content.
         """
         raise NotImplementedError
@@ -33,10 +33,7 @@ class XBlockAppConfig(AppConfig):
     def get_learning_context_params(self):
         """
         Get additional kwargs that are passed to learning context implementations
-        (LearningContext subclass constructors). For example, this can be used to
-        specify that the course learning context should load the course's list of
-        blocks from the _draft_ version of the course in studio, but from the
-        published version of the course in the LMS.
+        (LearningContext subclass constructors).
         """
         return {}
 
@@ -46,13 +43,14 @@ class LmsXBlockAppConfig(XBlockAppConfig):
     LMS-specific configuration of the XBlock Runtime django app.
     """
 
-    def get_runtime_system_params(self):
+    def get_runtime_params(self):
         """
-        Get the XBlockRuntimeSystem parameters appropriate for viewing and/or
+        Get the LearningCoreXBlockRuntime parameters appropriate for viewing and/or
         editing XBlock content in the LMS
         """
         return dict(
             student_data_mode=StudentDataMode.Persisted,
+            authored_data_mode=AuthoredDataMode.STRICTLY_PUBLISHED,
         )
 
     def get_site_root_url(self):
@@ -68,15 +66,14 @@ class StudioXBlockAppConfig(XBlockAppConfig):
     Studio-specific configuration of the XBlock Runtime django app.
     """
 
-    BLOCKSTORE_DRAFT_NAME = "studio_draft"
-
-    def get_runtime_system_params(self):
+    def get_runtime_params(self):
         """
-        Get the XBlockRuntimeSystem parameters appropriate for viewing and/or
+        Get the LearningCoreXBlockRuntime parameters appropriate for viewing and/or
         editing XBlock content in Studio
         """
         return dict(
             student_data_mode=StudentDataMode.Ephemeral,
+            authored_data_mode=AuthoredDataMode.DEFAULT_DRAFT,
         )
 
     def get_site_root_url(self):
@@ -91,14 +88,9 @@ class StudioXBlockAppConfig(XBlockAppConfig):
     def get_learning_context_params(self):
         """
         Get additional kwargs that are passed to learning context implementations
-        (LearningContext subclass constructors). For example, this can be used to
-        specify that the course learning context should load the course's list of
-        blocks from the _draft_ version of the course in studio, but from the
-        published version of the course in the LMS.
+        (LearningContext subclass constructors).
         """
-        return {
-            "use_draft": self.BLOCKSTORE_DRAFT_NAME,
-        }
+        return {}
 
 
 def get_xblock_app_config():

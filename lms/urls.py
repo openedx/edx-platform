@@ -111,6 +111,9 @@ urlpatterns = [
 
     path('i18n/', include('django.conf.urls.i18n')),
 
+    # Course assets
+    path('', include('openedx.core.djangoapps.contentserver.urls')),
+
     # Enrollment API RESTful endpoints
     path('api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
@@ -125,9 +128,6 @@ urlpatterns = [
             namespace='entitlements_api',
         ),
     ),
-
-    # Demographics API RESTful endpoints
-    path('api/demographics/', include('openedx.core.djangoapps.demographics.rest_api.urls')),
 
     # Courseware search endpoints
     path('search/', include('search.urls')),
@@ -199,12 +199,6 @@ urlpatterns = [
     # Learner Home
     path('api/learner_home/', include('lms.djangoapps.learner_home.urls', namespace='learner_home')),
 
-    # Learner Recommendations
-    path(
-        'api/learner_recommendations/',
-        include('lms.djangoapps.learner_recommendations.urls', namespace='learner_recommendations')
-    ),
-
     path(
         'api/experiments/',
         include(
@@ -224,12 +218,7 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
-        re_path(r'^api/mobile/(?P<api_version>v(2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
-    ]
-
-if settings.FEATURES.get('ENABLE_OPENBADGES'):
-    urlpatterns += [
-        path('api/badges/v1/', include(('lms.djangoapps.badges.api.urls', 'badges'), namespace='badges_api')),
+        re_path(r'^api/mobile/(?P<api_version>v(4|3|2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
     ]
 
 urlpatterns += [
@@ -347,7 +336,7 @@ urlpatterns += [
         name='xblock_resource_url',
     ),
 
-    # New (Blockstore-based) XBlock REST API
+    # New (Learning-Core-based) XBlock REST API
     path('', include(('openedx.core.djangoapps.xblock.rest_api.urls', 'openedx.core.djangoapps.xblock'),
                      namespace='xblock_api')),
 
@@ -759,6 +748,11 @@ urlpatterns += [
         ),
         courseware_views.courseware_mfe_search_enabled,
         name='courseware_search_enabled_view',
+    ),
+    re_path(
+        fr'^courses/{settings.COURSE_ID_PATTERN}/courseware-navigation-sidebar/toggles/$',
+        courseware_views.courseware_mfe_navigation_sidebar_toggles,
+        name='courseware_navigation_sidebar_toggles_view',
     ),
 ]
 

@@ -15,16 +15,16 @@
 # Note: Changes to this file will automatically be used by other repos, referencing
 #  this file from Github directly. It does not require packaging in edx-lint.
 
-
 # using LTS django version
-Django<4.0
+Django<5.0
 
 # elasticsearch>=7.14.0 includes breaking changes in it which caused issues in discovery upgrade process.
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
+# See https://github.com/openedx/edx-platform/issues/35126 for more info
 elasticsearch<7.14.0
 
 # django-simple-history>3.0.0 adds indexing and causes a lot of migrations to be affected
 
-# tox>4.0.0 isn't yet compatible with many tox plugins, causing CI failures in almost all repos.
-# Details can be found in this discussion: https://github.com/tox-dev/tox/discussions/1810
-tox<4.0.0
+# Cause: https://github.com/openedx/edx-lint/issues/458
+# This can be unpinned once https://github.com/openedx/edx-lint/issues/459 has been resolved.
+pip<24.3

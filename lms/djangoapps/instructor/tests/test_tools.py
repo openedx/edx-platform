@@ -7,6 +7,7 @@ import datetime
 import json
 import unittest
 from unittest import mock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -14,7 +15,6 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.test import TestCase
 from edx_when.api import get_dates_for_course, set_dates_for_course
 from edx_when.field_data import DateLookupFieldData
-from mock.mock import MagicMock, patch
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from xmodule.fields import Date

@@ -35,7 +35,7 @@ from common.djangoapps.student.roles import OrgStaffRole
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
-TEST_PASSWORD = 'test'
+TEST_PASSWORD = 'Password1234'
 
 
 class GroupFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -81,7 +81,7 @@ class UserFactory(DjangoModelFactory):  # lint-amnesty, pylint: disable=missing-
         model = User
         django_get_or_create = ('email', 'username')
 
-    _DEFAULT_PASSWORD = 'test'
+    _DEFAULT_PASSWORD = 'Password1234'
 
     username = factory.Sequence('robot{}'.format)
     email = factory.Sequence('robot+test+{}@edx.org'.format)

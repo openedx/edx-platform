@@ -302,7 +302,7 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
             + [
                 {
                     'category': 'Homework',
-                    'detail': 'Homework Average = 0%',
+                    'detail': 'Homework Average = 0.00%',
                     'label': 'HW Avg', 'percent': 0.0,
                     'prominent': True
                 }
@@ -332,21 +332,21 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
                 },
                 {
                     'category': 'Lab',
-                    'detail': 'Lab Average = 0%',
+                    'detail': 'Lab Average = 0.00%',
                     'label': 'Lab Avg',
                     'percent': 0.0,
                     'prominent': True
                 },
                 {
                     'category': 'Midterm Exam',
-                    'detail': 'Midterm Exam = 0%',
+                    'detail': 'Midterm Exam = 0.00%',
                     'label': 'Midterm',
                     'percent': 0.0,
                     'prominent': True
                 },
                 {
                     'category': 'Final Exam',
-                    'detail': 'Final Exam = 0%',
+                    'detail': 'Final Exam = 0.00%',
                     'label': 'Final',
                     'percent': 0.0,
                     'prominent': True
@@ -548,7 +548,7 @@ class CourseSubmissionHistoryWithDataTest(TestSubmittingProblems):
     def setUp(self):
         super().setUp()
         self.namespaced_url = 'grades_api:v1:submission_history'
-        self.password = 'test'
+        self.password = self.TEST_PASSWORD
         self.basic_setup()
         self.global_staff = GlobalStaffFactory.create()
 

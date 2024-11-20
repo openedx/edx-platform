@@ -23,7 +23,7 @@ from common.djangoapps.student.roles import (
     OrgContentCreatorRole,
     OrgInstructorRole,
     OrgLibraryUserRole,
-    OrgStaffRole
+    OrgStaffRole,
 )
 
 # Studio permissions:
@@ -93,12 +93,25 @@ def get_user_permissions(user, course_key, org=None):
         return all_perms
     if course_key and user_has_role(user, CourseInstructorRole(course_key)):
         return all_perms
-    # Limited Course Staff does not have access to Studio.
+    # HACK: Limited Staff should not have studio read access. However, since many LMS views depend on the
+    #  `has_course_author_access` check and `course_author_access_required` decorator, we have to allow write access
+    #  by returning STUDIO_EDIT_CONTENT, if the request is made from LMS, until the permissions become more granular.
+    #  For example, there could be STUDIO_VIEW_COHORTS and STUDIO_EDIT_COHORTS specifically for the cohorts endpoint,
+    #  which is used to display the "Cohorts" tab of the Instructor Dashboard. If the request is made from the CMS,
+    #  then STUDIO_NO_PERMISSIONS is returned instead.
+    #  The permissions matrix from the RBAC project (https://github.com/openedx/platform-roadmap/issues/246) shows that
+    #  the LMS and Studio permissions will be separated as a part of this project. Once this is done (and this code is
+    #  not removed during its implementation), we can replace the Limited Staff permissions with more granular ones.
     if course_key and user_has_role(user, CourseLimitedStaffRole(course_key)):
-        return STUDIO_NO_PERMISSIONS
+        if settings.SERVICE_VARIANT == 'lms':
+            return STUDIO_EDIT_CONTENT
+        else:
+            return STUDIO_NO_PERMISSIONS
+
     # Staff have all permissions except EDIT_ROLES:
     if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
+
     # Otherwise, for libraries, users can view only:
     if course_key and isinstance(course_key, LibraryLocator):
         if OrgLibraryUserRole(org=org).has_user(user) or user_has_role(user, LibraryUserRole(course_key)):

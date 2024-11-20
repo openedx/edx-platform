@@ -10,11 +10,13 @@ from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import generics, status
+from rest_framework.decorators import api_view
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     get_course_notification_preference_config_version
@@ -27,16 +29,17 @@ from .events import (
     notification_preference_update_event,
     notification_preferences_viewed_event,
     notification_read_event,
-    notifications_app_all_read_event, notification_tray_opened_event,
+    notification_tray_opened_event,
+    notifications_app_all_read_event
 )
 from .models import Notification
 from .serializers import (
     NotificationCourseEnrollmentSerializer,
     NotificationSerializer,
     UserCourseNotificationPreferenceSerializer,
-    UserNotificationPreferenceUpdateSerializer
+    UserNotificationPreferenceUpdateSerializer,
 )
-from .utils import get_show_notifications_tray
+from .utils import get_show_notifications_tray, get_is_new_notification_view_enabled
 
 
 @allow_any_authenticated_user()
@@ -181,7 +184,11 @@ class UserNotificationPreferenceView(APIView):
          """
         course_id = CourseKey.from_string(course_key_string)
         user_preference = CourseNotificationPreference.get_updated_user_course_preferences(request.user, course_id)
-        serializer = UserCourseNotificationPreferenceSerializer(user_preference)
+        serializer_context = {
+            'course_id': course_id,
+            'user': request.user
+        }
+        serializer = UserCourseNotificationPreferenceSerializer(user_preference, context=serializer_context)
         notification_preferences_viewed_event(request, course_id)
         return Response(serializer.data)
 
@@ -211,13 +218,23 @@ class UserNotificationPreferenceView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
+        if request.data.get('notification_channel', '') == 'email_cadence':
+            request.data['email_cadence'] = request.data['value']
+            del request.data['value']
+
         preference_update = UserNotificationPreferenceUpdateSerializer(
             user_course_notification_preference, data=request.data, partial=True
         )
         preference_update.is_valid(raise_exception=True)
         updated_notification_preferences = preference_update.save()
         notification_preference_update_event(request.user, course_id, preference_update.validated_data)
-        serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences)
+
+        serializer_context = {
+            'course_id': course_id,
+            'user': request.user
+        }
+        serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences,
+                                                                context=serializer_context)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -266,18 +283,15 @@ class NotificationListAPIView(generics.ListAPIView):
         if self.request.query_params.get('tray_opened'):
             unseen_count = Notification.objects.filter(user_id=self.request.user, last_seen__isnull=True).count()
             notification_tray_opened_event(self.request.user, unseen_count)
+        params = {
+            'user': self.request.user,
+            'created__gte': expiry_date,
+            'web': True
+        }
 
         if app_name:
-            return Notification.objects.filter(
-                user=self.request.user,
-                app_name=app_name,
-                created__gte=expiry_date,
-            ).order_by('-id')
-        else:
-            return Notification.objects.filter(
-                user=self.request.user,
-                created__gte=expiry_date,
-            ).order_by('-id')
+            params['app_name'] = app_name
+        return Notification.objects.filter(**params).order_by('-created')
 
 
 @allow_any_authenticated_user()
@@ -314,7 +328,8 @@ class NotificationCountView(APIView):
             .annotate(count=Count('*'))
         )
         count_total = 0
-        show_notifications_tray = get_show_notifications_tray(request.user)
+        show_notifications_tray = get_show_notifications_tray(self.request.user)
+        is_new_notification_view_enabled = get_is_new_notification_view_enabled()
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS
@@ -330,7 +345,8 @@ class NotificationCountView(APIView):
             "show_notifications_tray": show_notifications_tray,
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
-            "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY
+            "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY,
+            "is_new_notification_view_enabled": is_new_notification_view_enabled
         })
 
 
@@ -418,3 +434,13 @@ class NotificationReadAPIView(APIView):
             return Response({'message': _('Notifications marked read.')}, status=status.HTTP_200_OK)
 
         return Response({'error': _('Invalid app_name or notification_id.')}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST'])
+def preference_update_from_encrypted_username_view(request, username, patch):
+    """
+    View to update user preferences from encrypted username and patch.
+    username and patch must be string
+    """
+    update_user_preferences_from_patch(username, patch)
+    return Response({"result": "success"}, status=status.HTTP_200_OK)

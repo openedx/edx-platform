@@ -110,21 +110,24 @@ class TranscriptsUtilsTest(TestCase):
     """
 
     @mock.patch('requests.get')
-    @ddt.data("en", "en-US", "en-GB")
+    @ddt.data("en", "en-US", "en-GB", 'fr')
     def test_get_transcript_link_from_youtube(self, language_code, mock_get):
         """
-        Happy path test: english caption link returned when video page HTML has one english caption
+        Happy path test: dict of caption links returned when video page HTML has at least one caption
         """
         mock_get.return_value = YoutubeVideoHTMLResponse.with_caption_track(language_code)
 
         language_specific_caption_link = get_transcript_link_from_youtube(YOUTUBE_VIDEO_ID)
-        self.assertEqual(language_specific_caption_link, CAPTION_URL_UTF8_DECODED_TEMPLATE.format(language_code))
+        self.assertEqual(
+            language_specific_caption_link,
+            {language_code: CAPTION_URL_UTF8_DECODED_TEMPLATE.format(language_code)}
+        )
 
     @ mock.patch('requests.get')
-    @ddt.data("fr", None)
-    def test_get_caption_no_english_caption(self, language_code, mock_get):
+    @ddt.data(None)
+    def test_get_caption_no_caption(self, language_code, mock_get):
         """
-        No caption link returned when video page HTML contains no caption in English
+        No caption link returned when video page HTML contains no caption
         """
         mock_get.return_value = YoutubeVideoHTMLResponse.with_caption_track(language_code)
 

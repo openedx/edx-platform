@@ -366,7 +366,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         """
         Tests that course block api returns student_view_data for discussion xblock
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         url = reverse('blocks_in_block_tree', kwargs={'usage_key_string': str(self.course_usage_key)})
         query_params = {
             'depth': 'all',

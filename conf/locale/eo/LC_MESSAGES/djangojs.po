@@ -1,39 +1,39 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2023 EdX
+# Copyright (C) 2024 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2023 edX
+# Copyright (C) 2024 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2023.
+# EdX Team <info@edx.org>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-10-08 20:36+0000\n"
-"PO-Revision-Date: 2023-10-08 20:36:26.755103\n"
+"POT-Creation-Date: 2024-01-21 20:36+0000\n"
+"PO-Revision-Date: 2024-01-21 20:36:14.438254\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -132,7 +132,6 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/js/course-video-settings.underscore
 #: common/static/common/templates/discussion/templates.underscore
 #: common/static/common/templates/image-modal.underscore
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
@@ -159,7 +158,8 @@ msgstr "Çhöösé Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
-#: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
+#: cms/static/js/views/utils/xblock_utils.js lms/static/js/Markdown.Editor.js
+#: xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
 msgid "OK"
@@ -853,6 +853,7 @@ msgid "Select a category"
 msgstr "Séléçt ä çätégörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
+#: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Àççöünt Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
@@ -2256,6 +2257,7 @@ msgstr "Séärçh Résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "[no tags]"
 msgstr "[nö tägs] Ⱡ'σяєм ιρѕυм ∂σł#"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Tags' is the name of the view (noun) within the Student Notes
 #. page that shows all
 #. notes organized by the tags the student has associated with them (if any).
@@ -2264,6 +2266,7 @@ msgstr "[nö tägs] Ⱡ'σяєм ιρѕυм ∂σł#"
 #. with the note
 #. in order to group similar notes together and help with search.
 #: lms/static/js/edxnotes/views/tabs/tags.js
+#: cms/templates/js/tag-list.underscore
 msgid "Tags"
 msgstr "Tägs Ⱡ'σяєм ι#"
 
@@ -3383,26 +3386,6 @@ msgstr ""
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid "Go to dashboard"
 msgstr "Gö tö däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Recommendations for you"
-msgstr "Réçömméndätïöns för ýöü Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "loading"
-msgstr "löädïng Ⱡ'σяєм ιρѕυм #"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid ""
-"Browse recently launched courses and see what's new in your favorite "
-"subjects."
-msgstr ""
-"Bröwsé réçéntlý läünçhéd çöürsés änd séé whät's néw ïn ýöür fävörïté "
-"süßjéçts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/static/js/learner_dashboard/RecommendationsPanel.jsx
-msgid "Explore courses"
-msgstr "Éxplöré çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/static/js/learner_dashboard/Static2UCallouts.jsx
 msgid "More opportunities for you"
@@ -4634,10 +4617,6 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łα#"
 
-#: openedx/features/learner_profile/static/learner_profile/js/views/badge_list_container.js
-msgid "Accomplishments Pagination"
-msgstr "Àççömplïshménts Pägïnätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_fields.js
 msgid "Account Settings page."
 msgstr "Àççöünt Séttïngs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
@@ -4671,10 +4650,6 @@ msgstr "Pröfïlé ïmägé för {username} Ⱡ'σяєм ιρѕυм ∂σłσя 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "About Me"
 msgstr "Àßöüt Mé Ⱡ'σяєм ιρѕυм ∂#"
-
-#: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
-msgid "Accomplishments"
-msgstr "Àççömplïshménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: openedx/features/learner_profile/static/learner_profile/js/views/learner_profile_view.js
 msgid "Profile"
@@ -7043,6 +7018,7 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/pages/container_subviews.js
 msgid "Copying"
 msgstr "Çöpýïng Ⱡ'σяєм ιρѕυм #"
 
@@ -7052,16 +7028,19 @@ msgstr "Çöpý öf '{componentDisplayName}' Ⱡ'σяєм ιρѕυм ∂σłσя
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Pasting"
 msgstr "Pästïng Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Some errors occurred"
 msgstr "Sömé érrörs öççürréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files could not be added to the course:"
 msgstr ""
 "Thé föllöwïng réqüïréd fïlés çöüld nöt ßé äddéd tö thé çöürsé: Ⱡ'σяєм ιρѕυм "
@@ -7069,6 +7048,7 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "You may need to update a file(s) manually"
 msgstr ""
 "Ýöü mäý nééd tö üpdäté ä fïlé(s) mänüällý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -7076,6 +7056,7 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid ""
 "The following files already exist in this course but don't match the version"
 " used by the component you pasted:"
@@ -7085,6 +7066,7 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "New file(s) added to Files & Uploads."
 msgstr ""
 "Néw fïlé(s) äddéd tö Fïlés & Ûplöäds. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -7092,6 +7074,7 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "The following required files were imported to this course:"
 msgstr ""
 "Thé föllöwïng réqüïréd fïlés wéré ïmpörtéd tö thïs çöürsé: Ⱡ'σяєм ιρѕυм "
@@ -7099,11 +7082,13 @@ msgstr ""
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "View files"
 msgstr "Vïéw fïlés Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/static/js/views/course_outline.js
 #: cms/static/js/views/pages/container.js
+#: cms/static/js/views/utils/xblock_utils.js
 msgid "Dismiss"
 msgstr "Dïsmïss Ⱡ'σяєм ιρѕυм #"
 
@@ -9186,16 +9171,16 @@ msgstr ""
 "Fïnänçïäl Àssïstänçé Àpplïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "About You"
-msgstr "Àßöüt Ýöü Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid "Profile Information"
+msgstr "Pröfïlé Ìnförmätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
-"The following information is already a part of your {platform} profile. "
-"We've included it here for your application."
+"The following information is already a part of your {platform} profile and "
+"is required for your application. To edit this information go to "
 msgstr ""
-"Thé föllöwïng ïnförmätïön ïs älréädý ä pärt öf ýöür {platform} pröfïlé. "
-"Wé'vé ïnçlüdéd ït héré för ýöür äpplïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+"Thé föllöwïng ïnförmätïön ïs älréädý ä pärt öf ýöür {platform} pröfïlé änd "
+"ïs réqüïréd för ýöür äpplïçätïön. Tö édït thïs ïnförmätïön gö tö #"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
@@ -9210,8 +9195,8 @@ msgid "Country of residence"
 msgstr "Çöüntrý öf résïdénçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Back to {platform} FAQs"
-msgstr "Bäçk tö {platform} FÀQs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Application Details"
+msgstr "Àpplïçätïön Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
@@ -11066,35 +11051,6 @@ msgstr[1] "Löäd néxt {num_items} résülts Ⱡ'σяєм ιρѕυм ∂σłσ�
 msgid "Sorry, no results were found."
 msgstr "Sörrý, nö résülts wéré föünd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Share your \"%(display_name)s\" award"
-msgstr "Shäré ýöür \"%(display_name)s\" äwärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-msgid "Share"
-msgstr "Shäré Ⱡ'σяєм ιρѕ#"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge.underscore
-#, python-format
-msgid "Earned %(created)s."
-msgstr "Éärnéd %(created)s. Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "What's Your Next Accomplishment?"
-msgstr ""
-"Whät's Ýöür Néxt Àççömplïshmént? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Start working toward your next learning goal."
-msgstr ""
-"Stärt wörkïng töwärd ýöür néxt léärnïng göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/badge_placeholder.underscore
-msgid "Find a course"
-msgstr "Fïnd ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
 #: openedx/features/learner_profile/static/learner_profile/templates/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr ""
@@ -11106,43 +11062,6 @@ msgid "This learner is currently sharing a limited profile."
 msgstr ""
 "Thïs léärnér ïs çürréntlý shärïng ä lïmïtéd pröfïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid "Share on Mozilla Backpack"
-msgstr "Shäré ön Mözïllä Bäçkpäçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"To share your certificate on Mozilla Backpack, you must first have a "
-"Backpack account. Complete the following steps to add your certificate to "
-"Backpack."
-msgstr ""
-"Tö shäré ýöür çértïfïçäté ön Mözïllä Bäçkpäçk, ýöü müst fïrst hävé ä "
-"Bäçkpäçk äççöünt. Çömplété thé föllöwïng stéps tö ädd ýöür çértïfïçäté tö "
-"Bäçkpäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт#"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"Create a {link_start}Mozilla Backpack{link_end} account, or log in to your "
-"existing account"
-msgstr ""
-"Çréäté ä {link_start}Mözïllä Bäçkpäçk{link_end} äççöünt, ör lög ïn tö ýöür "
-"éxïstïng äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: openedx/features/learner_profile/static/learner_profile/templates/share_modal.underscore
-msgid ""
-"{download_link_start}Download this image (right-click or option-click, save "
-"as){link_end} and then {upload_link_start}upload{link_end} it to your "
-"backpack."
-msgstr ""
-"{download_link_start}Döwnlöäd thïs ïmägé (rïght-çlïçk ör öptïön-çlïçk, sävé "
-"äs){link_end} änd thén {upload_link_start}üplöäd{link_end} ït tö ýöür "
-"ßäçkpäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -11711,6 +11630,10 @@ msgstr "Dïsçüssïöns énäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
 msgstr "Pröçtörïng Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Manage Tags"
+msgstr "Mänägé Tägs Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Configure"
@@ -12477,6 +12400,10 @@ msgstr ""
 "Nöté: Dö nöt hïdé grädéd ässïgnménts äftér théý hävé ßéén réléäséd. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
+#: cms/templates/js/publish-xblock.underscore
+msgid "Copy Unit"
+msgstr "Çöpý Ûnït Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
 msgstr "Réléäsé Däté änd Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -12704,6 +12631,10 @@ msgstr "Xpért ünït sümmärïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт �
 #: cms/templates/js/summary-configuration-editor.underscore
 msgid "Enable summaries"
 msgstr "Énäßlé sümmärïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/js/tag-list.underscore
+msgid "Manage tags"
+msgstr "Mänägé tägs Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"

@@ -34,3 +34,10 @@ class TestWikiAccessMiddleware(ModuleStoreTestCase):
         response = self.client.get('/courses/course-v1:edx+math101+2014/wiki/math101/')
         self.assertContains(response, '/courses/course-v1:edx+math101+2014/wiki/math101/_edit/')
         self.assertContains(response, '/courses/course-v1:edx+math101+2014/wiki/math101/_settings/')
+
+    def test_finds_course_by_wiki_slug(self):
+        """Test that finds course by wiki slug, if course id is not present in the url."""
+        response = self.client.get('/wiki/math101/')
+        request = response.wsgi_request
+        self.assertTrue(hasattr(request, 'course'))
+        self.assertEqual(request.course.id, self.course_math101.id)

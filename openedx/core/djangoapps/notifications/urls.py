@@ -11,7 +11,8 @@ from .views import (
     NotificationCountView,
     NotificationListAPIView,
     NotificationReadAPIView,
-    UserNotificationPreferenceView
+    UserNotificationPreferenceView,
+    preference_update_from_encrypted_username_view,
 )
 
 router = routers.DefaultRouter()
@@ -32,7 +33,8 @@ urlpatterns = [
         name='mark-notifications-seen'
     ),
     path('read/', NotificationReadAPIView.as_view(), name='notifications-read'),
-
+    path('preferences/update/<str:username>/<str:patch>/', preference_update_from_encrypted_username_view,
+         name='preference_update_from_encrypted_username_view'),
 ]
 
 urlpatterns += router.urls

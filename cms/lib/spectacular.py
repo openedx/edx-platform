@@ -10,10 +10,13 @@ def cms_api_filter(endpoints):
     for (path, path_regex, method, callback) in endpoints:
         # Add only paths to the list that are part of the CMS API
         if (
-            path.startswith("/api/contentstore/v1/xblock") or
-            path.startswith("/api/contentstore/v1/videos") or
-            path.startswith("/api/contentstore/v1/video_transcripts") or
-            path.startswith("/api/contentstore/v1/file_assets")
+            # Don't just replace this with /v1 when switching to a later version of the CMS API.
+            # That would include some unintended endpoints.
+            path.startswith("/api/contentstore/v0/xblock") or
+            path.startswith("/api/contentstore/v0/videos") or
+            path.startswith("/api/contentstore/v0/video_transcripts") or
+            path.startswith("/api/contentstore/v0/file_assets") or
+            path.startswith("/api/contentstore/v0/youtube_transcripts")
         ):
             filtered.append((path, path_regex, method, callback))
     return filtered

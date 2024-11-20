@@ -81,7 +81,7 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         """
         Logs in the test user.
         """
-        self.client.login(username=self.user.username, password='test')
+        self.client.login(username=self.user.username, password='Password1234')
 
     def course_options(self):
         """

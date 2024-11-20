@@ -67,11 +67,15 @@ urlpatterns = oauth2_urlpatterns + [
     path('not_found', contentstore_views.not_found, name='not_found'),
     path('server_error', contentstore_views.server_error, name='server_error'),
     path('organizations', OrganizationListView.as_view(), name='organizations'),
+    path('api/toggles/', include('openedx.core.djangoapps.waffle_utils.urls')),
 
     # noop to squelch ajax errors
     path('event', contentstore_views.event, name='event'),
     path('heartbeat', include('openedx.core.djangoapps.heartbeat.urls')),
     path('i18n/', include('django.conf.urls.i18n')),
+
+    # Course assets
+    path('', include('openedx.core.djangoapps.contentserver.urls')),
 
     # User API endpoints
     path('api/user/', include('openedx.core.djangoapps.user_api.urls')),
@@ -119,6 +123,8 @@ urlpatterns = oauth2_urlpatterns + [
             name='course_rerun_handler'),
     re_path(fr'^container/{settings.USAGE_KEY_PATTERN}$', contentstore_views.container_handler,
             name='container_handler'),
+    re_path(fr'^container_embed/{settings.USAGE_KEY_PATTERN}$', contentstore_views.container_embed_handler,
+            name='container_embed_handler'),
     re_path(fr'^orphan/{settings.COURSE_KEY_PATTERN}$', contentstore_views.orphan_handler,
             name='orphan_handler'),
     re_path(fr'^assets/{settings.COURSE_KEY_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
@@ -190,6 +196,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
+    re_path(fr'api/youtube/courses/{COURSELIKE_KEY_PATTERN}/edx-video-ids$',
+            contentstore_views.get_course_youtube_edx_videos_ids, name='youtube_edx_video_ids'),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
@@ -214,7 +222,7 @@ urlpatterns += [
     path('openassessment/fileupload/', include('openassessment.fileupload.urls')),
 ]
 
-if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
+if toggles.ENABLE_CONTENT_LIBRARIES:
     urlpatterns += [
         re_path(fr'^library/{LIBRARY_KEY_PATTERN}?$',
                 contentstore_views.library_handler, name='library_handler'),
@@ -306,6 +314,10 @@ urlpatterns.append(
     ),
 )
 
+urlpatterns.append(
+    path('', include(('openedx.core.djangoapps.content.search.urls', 'content_search'), namespace='content_search')),
+)
+
 # display error page templates, for testing purposes
 urlpatterns += [
     path('404', handler404),
@@ -339,11 +351,14 @@ urlpatterns += [
 
 # Content tagging
 urlpatterns += [
-    path('api/content_tagging/', include(('openedx.core.djangoapps.content_tagging.urls'))),
+    path('api/content_tagging/', include(('openedx.core.djangoapps.content_tagging.urls', 'content_tagging'))),
 ]
 
-# studio-content-api specific API docs (using drf-spectacular and openapi-v3)
+# Authoring-api specific API docs (using drf-spectacular and openapi-v3).
+# This is separate from and in addition to the full studio swagger documentation already existing at /api-docs.
+# Custom settings are provided in SPECTACULAR_SETTINGS as environment variables
+# Filter function in cms/lib/spectacular.py determines paths that are swagger-documented.
 urlpatterns += [
-    re_path('^cms-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    re_path('^cms-api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    re_path('^authoring-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    re_path('^authoring-api/schema/', SpectacularAPIView.as_view(), name='schema'),
 ]

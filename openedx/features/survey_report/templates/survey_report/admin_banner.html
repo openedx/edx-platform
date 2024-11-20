@@ -1,0 +1,37 @@
+{% block survey_report_banner %}
+{% load static %}
+{% if show_survey_report_banner %}
+<div id="originalContent" style="border: 3px solid #06405d; margin-bottom: 50px; rgb(0 0 0 / 18%) 0px 3px 5px; display: none;">
+  <div  style="background-color: #06405d;padding: 17px 37px;">
+    <h1 style="margin: 0; color: #FFFF; font-weight: 600;">Join the Open edX Data Sharing Initiative and shape the future of learning</h1>
+</div>
+<div style="padding: 17px 37px;">
+    <p>The Open edX Project relies on the collective strength of its community to be a thriving platform for online education.</p> 
+    <p>Open edX is a dynamic ecosystem and it is used in diverse learning environments. By sharing anonymized reports of aggregated data, you can contribute to the collective knowledge of the community. This data can help us all understand the reach of our project, make better decisions and ultimately support innovation in lifelong learning and advance next generation learning experience platforms.</p>
+    <p>We invite you to join the Open edX Data Sharing Initiative by sharing an anonymized reports of aggregated data from your institution's usage of the platform. The report data will be sent to Axim Collaborative, the non-profit behind the Open edX project.</p>
+    <p>If you agree and want to send a report you can click the button below. You can always send reports and see the status of reports you have sent in the past at <a href="/admin/survey_report/surveyreport/">admin/survey_report/surveyreport/</a> .</p>
+</div>
+<div style="display: flex; justify-content: flex-end; padding: 0 37px 17px;">
+   <button id="dismissButton" type="button" style="background-color:var(--close-button-bg); color: var(--button-fg); border: none; border-radius: 4px; padding: 10px 20px; margin-right: 10px; cursor: pointer;">Dismiss</button>
+    <form id='survey_report_form' method="POST" action="/survey_report/generate_report" style="margin: 0; padding: 0;">
+        {% csrf_token %}
+        <input type="hidden" id="userIdSurvey" value="{{ user.id }}">
+        <button type="submit" style="background-color: #377D4D; color: var(--button-fg); border: none; border-radius: 4px; padding: 10px 20px; cursor: pointer;">Send Report</button>
+    </form>
+</div>
+</div>
+<div id="thankYouMessage" style="display: none; background-color: var(--darkened-bg); padding: 20px 40px; margin-bottom: 30px;box-shadow: rgb(0 0 0 / 18%) 0px 3px 5px;">
+    <div style="display: flex; align-items: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+            <g fill="#377D4D"><path d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10Z"></path>
+                <path d="M16.03 8.97a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 0 1-1.06 0l-2-2a.75.75 0 1 1 1.06-1.06l1.47 1.47l2.235-2.236L14.97 8.97a.75.75 0 0 1 1.06 0Z" fill="#FFF"></path>
+            </g>
+        </svg>
+        <span style="font-size: 16px; margin-left: 15px;">Thank you for your collaboration and support! Your contribution is greatly appreciated and will help us continue to improve.</span>
+    </div>
+</div>
+{% endif %}
+
+<script src="{% static 'survey_report/js/admin_banner.js' %}"></script>
+
+{% endblock %}

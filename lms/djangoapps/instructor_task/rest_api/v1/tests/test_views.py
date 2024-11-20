@@ -128,7 +128,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
         Test case that verifies the permissions of the ListScheduledBulkEmailInstructorTasks view. A user without staff,
         instructor, or GlobalStaff access should not be able to retrieve the bulk email schedules for a course.
         """
-        self.client.login(username=username, password="test")
+        self.client.login(username=username, password=self.TEST_PASSWORD)
         response = self.client.get(self._build_api_url(self.course1.id))
         assert response.status_code == expected_status
 
@@ -143,7 +143,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
         # add a "In Progress" task which shouldn't be returned in our results
         self._create_scheduled_course_emails_for_course(self.course1.id, self.instructor_course1, PROGRESS, 1)
 
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.get(self._build_api_url(self.course1.id))
         results = response.data.get("results")
 
@@ -169,7 +169,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
         expected_task_output_msg = "Task revoked before running"
 
         self._create_scheduled_course_emails_for_course(self.course1.id, self.instructor_course1, SCHEDULED, 3)
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.get(self._build_api_url(self.course1.id))
         results = response.data.get("results")
 
@@ -199,7 +199,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
 
         This test verifies the response received when we try to delete a task schedule that does not exist.
         """
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.delete(f"{self._build_api_url(self.course1.id)}123456789")
         assert response.status_code == 404
 
@@ -214,7 +214,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
         task = InstructorTask.objects.get(course_id=self.course1.id)
         schedule = InstructorTaskSchedule.objects.get(task=task)
 
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.delete(f"{self._build_api_url(self.course1.id)}{schedule.id}")
         assert response.status_code == 400
 
@@ -232,7 +232,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
             "schedule": schedule_datetime.strftime('%Y-%m-%dT%H:%M:%SZ'),
             "browser_timezone": "UTC"
         }
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.patch(
             f"{self._build_api_url(self.course1.id)}{task_schedule.id}",
             data=json.dumps(data),
@@ -262,7 +262,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
             }
         }
 
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.patch(
             f"{self._build_api_url(self.course1.id)}{task_schedule.id}",
             data=json.dumps(data),
@@ -296,7 +296,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
             f"Cannot update instructor task schedule '{task_schedule.id}', the updated schedule occurs in the past"
         )
 
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.patch(
             f"{self._build_api_url(self.course1.id)}{task_schedule.id}",
             data=json.dumps(data),
@@ -328,7 +328,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
             f"Subject{email_id}'"
         )
 
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.patch(
             f"{self._build_api_url(self.course1.id)}{task_schedule.id}",
             data=json.dumps(data),
@@ -359,7 +359,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
             "specified in the request does not match the email id associated with the task"
         )
 
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.patch(
             f"{self._build_api_url(self.course1.id)}{task_schedule.id}",
             data=json.dumps(data),
@@ -379,7 +379,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
             "browser_timezone": "UTC"
         }
 
-        self.client.login(username=self.instructor_course1.username, password="test")
+        self.client.login(username=self.instructor_course1.username, password=self.TEST_PASSWORD)
         response = self.client.patch(
             f"{self._build_api_url(self.course1.id)}8675309",
             data=json.dumps(data),

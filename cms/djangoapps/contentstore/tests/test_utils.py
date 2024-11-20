@@ -9,6 +9,7 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
@@ -19,7 +20,11 @@ from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from cms.djangoapps.contentstore import utils
 from cms.djangoapps.contentstore.tasks import ALL_ALLOWED_XBLOCKS, validate_course_olx
 from cms.djangoapps.contentstore.tests.utils import TEST_DATA_DIR, CourseTestCase
+from cms.djangoapps.contentstore.utils import send_course_update_notification
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -862,3 +867,125 @@ class AuthorizeStaffTestCase():
         response = self.make_request()
         assert response.status_code == expect_status
         return response
+
+
+class UpdateCourseDetailsTests(ModuleStoreTestCase):
+    """
+    Unit tests for the `update_course_details` utility function.
+    """
+
+    class Request:
+        """
+        Basic Python class that mocks the required structural components of a WSGIRequest object instance, used in the
+        functions under test.
+        """
+        def __init__(self):
+            self.user = UserFactory.create(username="course_staff", password="password")
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+
+    @patch.dict("django.conf.settings.FEATURES", {
+        "ENABLE_PREREQUISITE_COURSES": False,
+        "ENTRANCE_EXAMS": False,
+    })
+    @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
+    def test_update_course_details_self_paced(self, mock_update):
+        """
+        This test ensures that expected updates and validation occur on a course update before the settings payload
+        is commit to Mongo. This tests checks that we're removing bad certificates display behavior and availability
+        settings before we process the settings updates.
+        """
+        mock_request = self.Request()
+        payload = {
+            "certificate_available_date": "2024-08-01T00:00:00Z",
+            "certificates_display_behavior": "end_with_date",
+            "self_paced": True,
+        }
+        expected_payload = {
+            "certificate_available_date": None,
+            "certificates_display_behavior": "early_no_info",
+            "self_paced": True,
+        }
+
+        utils.update_course_details(mock_request, self.course.id, payload, None)
+        mock_update.assert_called_once_with(self.course.id, expected_payload, mock_request.user)
+
+    @patch.dict("django.conf.settings.FEATURES", {
+        "ENABLE_PREREQUISITE_COURSES": False,
+        "ENTRANCE_EXAMS": False,
+    })
+    @patch("cms.djangoapps.contentstore.utils.CourseDetails.update_from_json")
+    def test_update_course_details_instructor_paced(self, mock_update):
+        """
+        This test ensures that expected updates and validation occur on a course update before the settings payload
+        is commit to Mongo. This test checks that we don't modify any of the incoming settings when a course is
+        instructor-paced.
+        """
+        mock_request = self.Request()
+        payload = {
+            "certificate_available_date": "2024-08-01T00:00:00Z",
+            "certificates_display_behavior": "end_with_date",
+            "self_paced": False,
+        }
+
+        utils.update_course_details(mock_request, self.course.id, payload, None)
+        mock_update.assert_called_once_with(self.course.id, payload, mock_request.user)
+
+
+@override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+class CourseUpdateNotificationTests(ModuleStoreTestCase):
+    """
+    Unit tests for the course_update notification.
+    """
+
+    def setUp(self):
+        """
+        Setup the test environment.
+        """
+        super().setUp()
+        self.user = UserFactory()
+        self.course = CourseFactory.create(org='testorg', number='testcourse', run='testrun')
+        CourseNotificationPreference.objects.create(user_id=self.user.id, course_id=self.course.id)
+
+    def test_course_update_notification_sent(self):
+        """
+        Test that the course_update notification is sent.
+        """
+        user = UserFactory()
+        CourseEnrollment.enroll(user=user, course_key=self.course.id)
+        assert Notification.objects.all().count() == 0
+        content = "<p>content</p><img src='' />"
+        send_course_update_notification(self.course.id, content, self.user)
+        assert Notification.objects.all().count() == 1
+        notification = Notification.objects.first()
+        assert notification.content == "<p><strong>content</strong></p>"
+
+    def test_if_content_is_plain_text(self):
+        """
+        Test that the course_update notification is sent.
+        """
+        user = UserFactory()
+        CourseEnrollment.enroll(user=user, course_key=self.course.id)
+        assert Notification.objects.all().count() == 0
+        content = "<p>content<p>Sub content</p><h1>heading</h1></p><img src='' />"
+        send_course_update_notification(self.course.id, content, self.user)
+        assert Notification.objects.all().count() == 1
+        notification = Notification.objects.first()
+        assert notification.content == "<p><strong>content Sub content heading</strong></p>"
+
+    def test_if_html_unescapes(self):
+        """
+        Tests if html unescapes when creating content of course update notification
+        """
+        user = UserFactory()
+        CourseEnrollment.enroll(user=user, course_key=self.course.id)
+        assert Notification.objects.all().count() == 0
+        content = "<p>&lt;p&gt; &amp;nbsp;&lt;/p&gt;<br />"\
+                  "&lt;p&gt;abcd&lt;/p&gt;<br />"\
+                  "&lt;p&gt;&amp;nbsp;&lt;/p&gt;<br /></p>"
+        send_course_update_notification(self.course.id, content, self.user)
+        assert Notification.objects.all().count() == 1
+        notification = Notification.objects.first()
+        assert notification.content == "<p><strong>abcd</strong></p>"

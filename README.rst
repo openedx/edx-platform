@@ -33,39 +33,158 @@ Documentation can be found at https://docs.openedx.org/projects/edx-platform.
 Getting Started
 ***************
 
+For Production
+==============
+
 Installing and running an Open edX instance is not simple.  We strongly
 recommend that you use a service provider to run the software for you.  They
 have free trials that make it easy to get started:
 https://openedx.org/get-started/
 
-If you will be modifying edx-platform code, the `Open edX Developer Stack`_ (Devstack) is
-a Docker-based development environment.
+However, if you have the time and expertise, then it is is possible to
+self-manage a production Open edX instance. To help you build, customize,
+upgrade, and scale your instance, we recommend using `Tutor`_, the
+community-supported, Docker-based Open edX distribution.
 
-If you want to run your own Open edX server and have the technical skills to do
-so, `Open edX Installation Options`_ explains your options.
+You can read more about getting up and running with a Tutor deployment
+at the `Site Ops home on docs.openedx.org`_.
 
-.. _Open edX Developer Stack: https://github.com/openedx/devstack
-.. _Open edX Installation Options:  https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/60227779/Open+edX+Installation+Options
+For Development
+===============
 
-Dependencies
-============
+Tutor also features a `development mode`_ which will also help you modify,
+test, and extend edx-platform. We recommend this method for all Open edX
+developers.
 
-In order to build and run this code you'll need the following available on your
-system:
+Bare Metal (Advanced)
+=====================
+
+It is also possible to spin up an Open edX platform directly on a Linux host.
+This method is less common and mostly undocumented. The Open edX community will
+only be able to provided limited support for it.
+
+Running "bare metal" is only advisable for (a) developers seeking an
+adventure and (b) experienced system administrators who are willing to take the
+complexity of Open edX configuration and deployment into their own hands.
+
+System Dependencies
+-------------------
+
+OS:
+* Ubuntu 20.04
+
+* Ubuntu 22.04
 
 Interperters/Tools:
 
-* Python 3.8
+* Python 3.11
 
-* Node 16
+* Node 18
 
 Services:
 
-* MySQL 5.7
+* MySQL 8.0
 
-* Mongo 4.x
+* Mongo 7.x
 
 * Memcached
+
+Language Packages:
+
+* Frontend:
+
+  - ``npm clean-install`` (production)
+  - ``npm clean-install --dev`` (development)
+
+* Backend build:
+
+  - ``pip install -r requirements/edx/assets.txt``
+
+* Backend application:
+
+  - ``pip install -r requirements/edx/base.txt`` (production)
+  - ``pip install -r requirements/edx/dev.txt`` (development)
+
+  Some Python packages have system dependencies. For example, installing these packages on Debian or Ubuntu will require first running ``sudo apt install python3-dev default-libmysqlclient-dev build-essential pkg-config`` to satisfy the requirements of the ``mysqlclient`` Python package.
+
+Build Steps
+-----------
+
+Create two MySQL databases and a MySQL user with write permissions to both, and configure
+Django to use them by updating the ``DATABASES`` setting.
+
+Then, run migrations::
+
+  ./manage.py lms migrate
+  ./manage.py lms migrate --database=student_module_history
+  ./manage.py cms migrate
+
+Build static assets (for more details, see `building static
+assets`_)::
+
+  npm run build  # or, 'build-dev'
+
+Download locales and collect static assets (can be skipped for development
+sites)::
+
+  make pull_translations
+  ./manage.py lms collectstatic
+  ./manage.py cms collectstatic
+
+Set up CMS SSO (for Development)::
+
+  ./manage.py lms manage_user studio_worker example@example.com --unusable-password
+  # DO NOT DO THIS IN PRODUCTION. It will make your auth insecure.
+  ./manage.py lms create_dot_application studio-sso-id studio_worker \
+      --grant-type authorization-code \
+      --skip-authorization \
+      --redirect-uris 'http://localhost:18010/complete/edx-oauth2/' \
+      --scopes user_id  \
+      --client-id 'studio-sso-id' \
+      --client-secret 'studio-sso-secret'
+
+Set up CMS SSO (for Production):
+
+* Create the CMS user and the OAuth application::
+
+    ./manage.py lms manage_user studio_worker <email@yourcompany.com> --unusable-password
+    ./manage.py lms create_dot_application studio-sso-id studio_worker \
+        --grant-type authorization-code \
+        --skip-authorization \
+        --redirect-uris 'http://localhost:18010/complete/edx-oauth2/' \
+        --scopes user_id
+
+* Log into Django admin (eg. http://localhost:18000/admin/oauth2_provider/application/),
+  click into the application you created above (``studio-sso-id``), and copy its "Client secret".
+* In your private LMS_CFG yaml file or your private Django settings module:
+
+ * Set ``SOCIAL_AUTH_EDX_OAUTH2_KEY`` to the client ID (``studio-sso-id``).
+ * Set ``SOCIAL_AUTH_EDX_OAUTH2_SECRET`` to the client secret (which you copied).
+Run the Platform
+----------------
+
+First, ensure MySQL, Mongo, and Memcached are running.
+
+Start the LMS::
+
+  ./manage.py lms runserver 18000
+
+Start the CMS::
+
+  ./manage.py cms runserver 18010
+
+This will give you a mostly-headless Open edX platform. Most frontends have
+been migrated to "Micro-Frontends (MFEs)" which need to be installed and run
+separately. At a bare minimum, you will need to run the `Authentication MFE`_,
+`Learner Home MFE`_, and `Learning MFE`_ in order meaningfully navigate the UI.
+
+.. _Tutor: https://github.com/overhangio/tutor
+.. _Site Ops home on docs.openedx.org: https://docs.openedx.org/en/latest/site_ops/index.html
+.. _development mode: https://docs.tutor.edly.io/dev.html
+.. _building static assets: ./docs/references/static-assets.rst
+.. _Authentication MFE: https://github.com/openedx/frontend-app-authn/
+.. _Learner Home MFE: https://github.com/openedx/frontend-app-learner-dashboard
+.. _Learning MFE: https://github.com/openedx/frontend-app-learning/
 
 License
 *******
@@ -134,7 +253,7 @@ Reporting Security Issues
 *************************
 
 Please do not report security issues in public. Please email
-security@edx.org.
+security@openedx.org.
 
 .. _individual contributor agreement: https://openedx.org/cla
 .. _CONTRIBUTING: https://github.com/openedx/.github/blob/master/CONTRIBUTING.md

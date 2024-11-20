@@ -24,3 +24,13 @@
         }
     }
 }
+
+@media only screen and (max-width: 767px) {
+    .survey-table .survey-option .visible-mobile-only {
+        width: calc(100% - 21px) !important;
+    }
+
+    .survey-percentage .percentage {
+        width: 54px !important;
+    }
+}

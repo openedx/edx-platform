@@ -23,6 +23,7 @@ root = Path('..').abspath()
 sys.path.insert(0, root)
 sys.path.append(root / "docs")
 
+from repository_docs import RepositoryDocs
 
 # Use a settings module that allows all LMS and Studio code to be imported
 # without errors.  If running sphinx-apidoc, we already set a different
@@ -54,9 +55,9 @@ release = ''
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
+    'sphinx.ext.graphviz',
     'sphinx.ext.ifconfig',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
@@ -66,6 +67,18 @@ extensions = [
     'sphinx_design',
     'code_annotations.contrib.sphinx.extensions.featuretoggles',
     'code_annotations.contrib.sphinx.extensions.settings',
+    'autoapi.extension',
+]
+
+autoapi_type = 'python'
+autoapi_dirs = ['../lms', '../openedx']
+
+autoapi_ignore = [
+    '*/migrations/*',
+    '*/tests/*',
+    '*.pyc',
+    '__init__.py',
+    '**/xblock_serializer/data.py',
 ]
 
 # Rediraffe related settings.
@@ -81,11 +94,11 @@ try:
 except git.InvalidGitRepositoryError:
     edx_platform_version = "master"
 
-featuretoggles_source_path = edxplatform_source_path
+featuretoggles_source_path = str(edxplatform_source_path)
 featuretoggles_repo_url = edxplatform_repo_url
 featuretoggles_repo_version = edx_platform_version
 
-settings_source_path = edxplatform_source_path
+settings_source_path = str(edxplatform_source_path)
 settings_repo_url = edxplatform_repo_url
 settings_repo_version = edx_platform_version
 
@@ -106,7 +119,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -168,7 +181,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -256,22 +269,24 @@ epub_title = project
 epub_exclude_files = ['search.html']
 
 
+# -- Read the Docs Specific Configuration
+# Define the canonical URL if you are using a custom domain on Read the Docs
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    html_context["READTHEDOCS"] = True
+
 # -- Extension configuration -------------------------------------------------
 
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'https://docs.python.org/2.7': None,
     'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
 }
-
-# Mock out these external modules during code import to avoid errors
-autodoc_mock_imports = [
-    'MySQLdb',
-    'django_mysql',
-    'pymongo',
-]
 
 # Start building a map of the directories relative to the repository root to
 # run sphinx-apidoc against and the directories under "docs" in which to store
@@ -307,6 +322,9 @@ def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-
     Read the Docs won't run tox or custom shell commands, so we need this to
     avoid checking in the generated reStructuredText files.
     """
+    repo_docs_build_path = f'{root}/docs/references/docs'
+    RepositoryDocs(root, repo_docs_build_path).build_rst_docs()
+
     docs_path = root / 'docs'
     apidoc_path = 'sphinx-apidoc'
     if hasattr(sys, 'real_prefix'):  # Check to see if we are in a virtualenv

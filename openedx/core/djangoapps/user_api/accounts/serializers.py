@@ -21,7 +21,6 @@ from common.djangoapps.student.models import (
     UserPasswordToggleHistory,
     UserProfile
 )
-from lms.djangoapps.badges.utils import badges_enabled
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import errors
 from openedx.core.djangoapps.user_api.accounts.utils import is_secondary_email_feature_enabled
@@ -48,12 +47,24 @@ LOGGER = logging.getLogger(__name__)
 
 class PhoneNumberSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint: disable=abstract-method
     """
-    Class to serialize phone number into a digit only representation
+    Class to serialize phone number into a digit only representation.
+
+    This serializer removes all non-numeric characters from the phone number,
+    allowing '+' only at the beginning of the number.
     """
 
     def to_internal_value(self, data):
-        """Remove all non numeric characters in phone number"""
-        return re.sub("[^0-9]", "", data) or None
+        """
+        Remove all non-numeric characters from the phone number.
+
+        Args:
+            data (str): The input phone number string.
+
+        Returns:
+            str or None: The cleaned phone number string containing only digits,
+                with an optional '+' at the beginning.
+        """
+        return re.sub(r'(?!^)\+|[^0-9+]', "", data) or None
 
 
 class LanguageProficiencySerializer(serializers.ModelSerializer):
@@ -136,7 +147,6 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
         except ObjectDoesNotExist:
             activation_key = None
 
-        accomplishments_shared = badges_enabled()
         data = {
             "username": user.username,
             "url": self.context.get('request').build_absolute_uri(
@@ -164,7 +174,6 @@ class UserReadOnlySerializer(serializers.Serializer):  # lint-amnesty, pylint: d
             "level_of_education": None,
             "mailing_address": None,
             "requires_parental_consent": None,
-            "accomplishments_shared": accomplishments_shared,
             "account_privacy": self.configuration.get('default_visibility'),
             "social_links": None,
             "extended_profile_fields": None,

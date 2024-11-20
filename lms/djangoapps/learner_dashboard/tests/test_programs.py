@@ -55,7 +55,6 @@ def load_serialized_data(response, key):
 class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program listing page."""
     maxDiff = None
-    password = 'test'
     url = reverse_lazy('program_listing_view')
 
     @classmethod
@@ -75,7 +74,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         super().setUp()
 
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     @classmethod
     def program_sort_key(cls, program):
@@ -87,15 +86,9 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     def assert_dict_contains_subset(self, superset, subset):
         """
         Verify that the dict superset contains the dict subset.
-
-        Works like assertDictContainsSubset, deprecated since Python 3.2.
-        See: https://docs.python.org/2.7/library/unittest.html#unittest.TestCase.assertDictContainsSubset.
         """
-        superset_keys = set(superset.keys())
-        subset_keys = set(subset.keys())
-        intersection = {key: superset[key] for key in superset_keys & subset_keys}
-
-        assert subset == intersection
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
 
     def test_login_required(self, mock_get_programs):
         """
@@ -112,7 +105,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
             '{}?next={}'.format(reverse('signin_user'), self.url)
         )
 
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         response = self.client.get(self.url)
         assert response.status_code == 200
@@ -224,7 +217,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
         super().setUp()
 
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
     def assert_program_data_present(self, response):
         """Verify that program data is present."""
@@ -277,7 +270,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, Shared
             '{}?next={}'.format(reverse('signin_user'), self.url)
         )
 
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
 
         with mock.patch('lms.djangoapps.learner_dashboard.programs.get_certificates') as certs:
             certs.return_value = [{'type': 'program', 'url': '/'}]
@@ -324,7 +317,7 @@ class TestProgramDetailsFragmentView(SharedModuleStoreTestCase, ProgramCacheMixi
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
         self.set_program_in_catalog_cache(self.program_uuid, self.program)
         self.create_programs_config()
 

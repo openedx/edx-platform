@@ -20,12 +20,6 @@ from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.track.tests import EventTrackingTestCase
 from common.djangoapps.util.date_utils import strftime_localized
-from lms.djangoapps.badges.events.course_complete import get_completion_badge
-from lms.djangoapps.badges.tests.factories import (
-    BadgeAssertionFactory,
-    BadgeClassFactory,
-    CourseCompleteImageConfigurationFactory
-)
 from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.certificates.models import (
     CertificateGenerationCourseSetting,
@@ -58,8 +52,6 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
-FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
-FEATURES_WITH_BADGES_ENABLED['ENABLE_OPENBADGES'] = True
 
 FEATURES_WITH_CERTS_DISABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
@@ -118,7 +110,6 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
         )
         CertificateHtmlViewConfigurationFactory.create()
         LinkedInAddToProfileConfigurationFactory.create()
-        CourseCompleteImageConfigurationFactory.create()
 
     def _add_course_certificates(self, count=1, signatory_count=0, is_active=True):
         """
@@ -533,32 +524,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         self.assertContains(response, f'<title>test_organization {self.course.number} Certificate |')
         self.assertContains(response, 'logo_test1.png')
 
-    @ddt.data(True, False)
-    @patch('lms.djangoapps.certificates.views.webview.get_completion_badge')
-    def test_fetch_badge_info(self, issue_badges, mock_get_completion_badge):
-        """
-        Test: Fetch badge class info if badges are enabled.
-        """
-        if issue_badges:
-            features = FEATURES_WITH_BADGES_ENABLED
-        else:
-            features = FEATURES_WITH_CERTS_ENABLED
-        with override_settings(FEATURES=features):
-            badge_class = BadgeClassFactory(course_id=self.course_id, mode=self.cert.mode)
-            mock_get_completion_badge.return_value = badge_class
-
-            self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-            test_url = get_certificate_url(user_id=self.user.id, course_id=self.cert.course_id,
-                                           uuid=self.cert.verify_uuid)
-            response = self.client.get(test_url)
-            assert response.status_code == 200
-
-        if issue_badges:
-            mock_get_completion_badge.assert_called()
-        else:
-            mock_get_completion_badge.assert_not_called()
-
-    @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
         "CERTIFICATE_TWITTER": True,
         "CERTIFICATE_FACEBOOK": True,
@@ -589,10 +555,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         test_org = organizations_api.add_organization(organization_data=test_organization_data)
         organizations_api.add_organization_course(organization_data=test_org, course_key=str(self.course.id))
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
-        badge_class = get_completion_badge(course_id=self.course_id, user=self.user)
-        BadgeAssertionFactory.create(
-            user=self.user, badge_class=badge_class,
-        )
         self.course.cert_html_view_overrides = {
             "logo_src": "/static/certificates/images/course_override_logo.png"
         }
@@ -629,8 +591,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                 partner_long_name=long_org_name,
             ),
         )
-        # Test item from badge info
-        self.assertContains(response, "Add to Mozilla Backpack")
         # Test item from site configuration
         self.assertContains(response, "https://www.test-site.org/about-us")
         # Test course overrides
@@ -1783,54 +1743,4 @@ class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
                 'social_network': CertificateSocialNetworks.linkedin
             },
             actual_event['data']
-        )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_evidence_event_sent(self):
-        self._add_course_certificates(count=1, signatory_count=2)
-
-        cert_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=self.course_id,
-            uuid=self.cert.verify_uuid
-        )
-        test_url = f'{cert_url}?evidence_visit=1'
-        self.recreate_tracker()
-        badge_class = get_completion_badge(self.course_id, self.user)
-        assertion = BadgeAssertionFactory.create(
-            user=self.user, badge_class=badge_class,
-            backend='DummyBackend',
-            image_url='https://www.example.com/image.png',
-            assertion_url='https://www.example.com/assertion.json',
-            data={
-                'issuer': 'https://www.example.com/issuer.json',
-            }
-        )
-        response = self.client.get(test_url)
-
-        # There are two events being emitted in this flow.
-        # One for page hit (due to the tracker in the middleware) and
-        # one due to the certificate being visited.
-        # We are interested in the second one.
-        actual_event = self.get_event(1)
-
-        assert response.status_code == 200
-        assert_event_matches(
-            {
-                'name': 'edx.badge.assertion.evidence_visited',
-                'data': {
-                    'course_id': 'course-v1:testorg+run1+refundable_course',
-                    'assertion_id': assertion.id,
-                    'badge_generator': 'DummyBackend',
-                    'badge_name': 'refundable course',
-                    'issuing_component': '',
-                    'badge_slug': 'course-v1testorgrun1refundable_course_honor_927f3ad',
-                    'assertion_json_url': 'https://www.example.com/assertion.json',
-                    'assertion_image_url': 'https://www.example.com/image.png',
-                    'user_id': self.user.id,
-                    'issuer': 'https://www.example.com/issuer.json',
-                    'enrollment_mode': 'honor',
-                },
-            },
-            actual_event
         )

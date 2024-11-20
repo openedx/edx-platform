@@ -27,6 +27,7 @@ from edx_django_utils.monitoring import set_custom_attributes_for_course_key, se
 from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.permissions import JwtRestrictedApplication
 from edx_when.field_data import DateLookupFieldData
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
@@ -40,13 +41,11 @@ from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 from xblock.runtime import KvsFieldData
 
-from lms.djangoapps.badges.service import BadgingService
-from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.teams.services import TeamsService
 from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.library_tools import LibraryToolsService
+from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.modulestore.django import XBlockI18nService, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.partitions.partitions_service import PartitionService
@@ -72,6 +71,7 @@ from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.api import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
+from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -626,15 +626,15 @@ def prepare_runtime_for_user(
         ),
         'completion': CompletionService(user=user, context_key=course_id) if user and user.is_authenticated else None,
         'i18n': XBlockI18nService,
-        'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
+        'library_tools': LegacyLibraryToolsService(store, user_id=user.id if user else None),
         'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
         'settings': SettingsService(),
         'user_tags': UserTagsService(user=user, course_id=course_id),
-        'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
         'teams': TeamsService(),
         'teams_configuration': TeamsConfigurationService(),
         'call_to_action': CallToActionService(),
         'publish': EventPublishingService(user, course_id, track_function),
+        'enrollments': EnrollmentsService(),
     }
 
     runtime.get_block_for_descriptor = inner_get_block
@@ -774,12 +774,19 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
                 )
             else:
                 if user_auth_tuple is not None:
-                    request.user, _ = user_auth_tuple
+                    # When using JWT authentication, the second element contains the JWT token. We need it to determine
+                    # whether the application that issued the token is restricted.
+                    request.user, request.auth = user_auth_tuple
+                    # This is verified by the `JwtRestrictedApplication` before it decodes the token.
+                    request.successful_authenticator = authenticator
                     break
 
     # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
     # the XBlocks to use `handle_xblock_callback_noauth`, which is practically identical to this view.
-    if request.method != 'GET' and not (request.user and request.user.is_authenticated):
+    # Block all request types coming from restricted applications.
+    if (
+        request.method != 'GET' and not (request.user and request.user.is_authenticated)
+    ) or JwtRestrictedApplication().has_permission(request, None):  # type: ignore
         return HttpResponseForbidden('Unauthenticated')
 
     request.user.known = request.user.is_authenticated

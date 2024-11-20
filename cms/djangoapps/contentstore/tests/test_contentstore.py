@@ -45,7 +45,11 @@ from xmodule.video_block import VideoBlock
 
 from cms.djangoapps.contentstore.config import waffle
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
-from cms.djangoapps.contentstore.utils import delete_course, reverse_course_url, reverse_url
+from cms.djangoapps.contentstore.utils import (
+    delete_course,
+    reverse_course_url,
+    reverse_url,
+)
 from cms.djangoapps.contentstore.views.component import ADVANCED_COMPONENT_TYPES
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
@@ -1410,9 +1414,10 @@ class ContentStoreTest(ContentStoreTestCase):
             'assets_handler',
             course.location.course_key
         )
+
         self.assertContains(
             resp,
-            '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}" data-course-assets="{assets_url}">'.format(  # lint-amnesty, pylint: disable=line-too-long
+            '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}" data-course-assets="{assets_url}" >'.format(  # lint-amnesty, pylint: disable=line-too-long
                 locator=str(course.location),
                 course_key=str(course.id),
                 assets_url=assets_url,
@@ -1439,6 +1444,23 @@ class ContentStoreTest(ContentStoreTestCase):
             str(course.id.make_usage_key('chapter', 'REPLACE'))
         ).replace('REPLACE', r'([0-9]|[a-f]){3,}')
         self.assertRegex(data['locator'], retarget)
+
+    @ddt.data(True, False)
+    def test_hide_xblock_from_toc_via_handler(self, hide_from_toc):
+        """Test that the hide_from_toc field can be set via the xblock_handler."""
+        course = CourseFactory.create()
+        sequential = BlockFactory.create(parent_location=course.location)
+        data = {
+            "metadata": {
+                "hide_from_toc": hide_from_toc
+            }
+        }
+
+        response = self.client.ajax_post(get_url("xblock_handler", sequential.location), data)
+        sequential = self.store.get_item(sequential.location)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(hide_from_toc, sequential.hide_from_toc)
 
     def test_capa_block(self):
         """Test that a problem treats markdown specially."""
@@ -2133,7 +2155,7 @@ class EntryPageTestCase(TestCase):
 
     @override_waffle_switch(waffle.ENABLE_ACCESSIBILITY_POLICY_PAGE, active=True)
     def test_accessibility(self):
-        self._test_page('/accessibility')
+        self._test_page('/accessibility', 302)
 
 
 def _create_course(test, course_key, course_data):

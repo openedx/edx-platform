@@ -9,7 +9,7 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from edx_rest_api_client import exceptions
+from requests import exceptions
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.commerce.models import CommerceConfiguration
@@ -20,6 +20,7 @@ from openedx.core.djangoapps.lang_pref.tests.test_api import EN, LT_LT
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts.settings_views import account_settings_context, get_user_orders
 from openedx.core.djangoapps.user_api.accounts.toggles import REDIRECT_TO_ACCOUNT_MICROFRONTEND
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
@@ -108,6 +109,21 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             expected_beta_language = {'code': 'lt-lt', 'name': settings.LANGUAGE_DICT.get('lt-lt')}
             assert context['beta_language'] == expected_beta_language
 
+    @with_site_configuration(
+        configuration={
+            'extended_profile_fields': ['work_experience']
+        }
+    )
+    def test_context_extended_profile(self):
+        """
+        Test that if the field is available in extended_profile configuration then the field
+        will be sent in response.
+        """
+        context = account_settings_context(self.request)
+        extended_pofile_field = context['extended_profile_fields'][0]
+        assert extended_pofile_field['field_name'] == 'work_experience'
+        assert extended_pofile_field['field_label'] == 'Work experience'
+
     @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     @mock.patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_context_for_enterprise_learner(
@@ -194,7 +210,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             assert order_detail[i] == expected
 
     def test_commerce_order_detail_exception(self):
-        with mock_get_orders(exception=exceptions.HttpNotFoundError):
+        with mock_get_orders(exception=exceptions.HTTPError):
             order_detail = get_user_orders(self.user)
 
         assert not order_detail

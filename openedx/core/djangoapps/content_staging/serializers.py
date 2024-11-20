@@ -3,7 +3,6 @@ Serializers for the content libraries REST API
 """
 from rest_framework import serializers
 
-from cms.djangoapps.contentstore.helpers import xblock_studio_url, xblock_type_display_name
 from common.djangoapps.student.auth import has_studio_read_access
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -34,22 +33,26 @@ class StagedContentSerializer(serializers.ModelSerializer):
 
     def get_block_type_display(self, obj):
         """ Get the friendly name for this XBlock/component type """
+        from cms.djangoapps.contentstore.helpers import xblock_type_display_name
+
         return xblock_type_display_name(obj.block_type)
 
 
 class UserClipboardSerializer(serializers.Serializer):
     """
-    Serializer for the status of the user's clipboard
+    Serializer for the status of the user's clipboard (a UserClipboardData instance)
     """
     content = StagedContentSerializer(allow_null=True)
     source_usage_key = serializers.CharField(allow_blank=True)
     # The title of the course that the content came from originally, if relevant
-    source_context_title = serializers.CharField(allow_blank=True, source="get_source_context_title")
+    source_context_title = serializers.CharField(allow_blank=True)
     # The URL where the original content can be seen, if it still exists and the current user can view it
     source_edit_url = serializers.SerializerMethodField(source="get_source_edit_url")
 
     def get_source_edit_url(self, obj) -> str:
         """ Get the URL where the user can edit the given XBlock, if it exists """
+        from cms.djangoapps.contentstore.helpers import xblock_studio_url
+
         request = self.context.get("request", None)
         user = request.user if request else None
         if not user:
