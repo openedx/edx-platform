@@ -4,47 +4,32 @@ courses
 """
 
 
-import base64
 import json
 import logging
 import os
-import re
-import requests
-import shutil
 from wsgiref.util import FileWrapper
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.core.files import File
-from django.core.files.storage import FileSystemStorage
 from django.db import transaction
-from django.http import Http404, HttpResponse, HttpResponseNotFound, StreamingHttpResponse
-from django.shortcuts import redirect
+from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.utils.translation import gettext as _
-from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
-from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from opaque_keys.edx.keys import CourseKey
-from path import Path as path
-from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
-from common.djangoapps.util.monitoring import monitor_import_failure
 from common.djangoapps.util.views import ensure_valid_course_key
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..storage import course_import_export_storage
 from ..tasks import CourseLinkCheckTask, check_broken_links
-from ..utils import reverse_course_url, reverse_usage_url
+from ..utils import reverse_course_url
 
 __all__ = [
     'link_check_handler',
@@ -54,17 +39,6 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 STATUS_FILTERS = user_tasks_settings.USER_TASKS_STATUS_FILTERS
-
-
-def send_tarball(tarball, size):
-    """
-    Renders a tarball to response, for use when sending a tar.gz file to the user.
-    """
-    wrapper = FileWrapper(tarball, settings.COURSE_EXPORT_DOWNLOAD_CHUNK_SIZE)
-    response = StreamingHttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tarball.name)
-    response['Content-Length'] = size
-    return response
 
 
 @transaction.non_atomic_requests
@@ -82,7 +56,7 @@ def link_check_handler(request, course_key_string):
     POST
         Start a Celery task to check broken links in the course
 
-    The Studio UI uses a POST request to start the export asynchronously, with
+    The Studio UI uses a POST request to start the link check asynchronously, with
     a link appearing on the page once it's ready.
     """
     course_key = CourseKey.from_string(course_key_string)
@@ -95,7 +69,7 @@ def link_check_handler(request, course_key_string):
         'context_course': courselike_block,
         'courselike_home_url': reverse_course_url("course_handler", course_key),
     }
-    context['status_url'] = reverse_course_url('export_status_handler', course_key)
+    context['status_url'] = reverse_course_url('link_check_status_handler', course_key)
 
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
@@ -168,8 +142,6 @@ def link_check_status_handler(request, course_key_string):
     }
     if broken_links_dto:
         response["LinkCheckOutput"] = broken_links_dto
-    # if json_content:
-    #     response['debug'] = json_content
     if error:
         response['LinkCheckError'] = error
     return JsonResponse(response)

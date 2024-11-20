@@ -55,13 +55,7 @@ from cms.djangoapps.contentstore.utils import (
     translation_language,
     delete_course
 )
-from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
-    handle_xblock,
-    create_xblock_info,
-    get_block_info,
-    get_xblock,
-    delete_orphans,
-)
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_block_info
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.static_replace import replace_static_urls
@@ -1086,7 +1080,7 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
     @staticmethod
     def calculate_total_steps(arguments_dict):
         """
-        Get the number of in-progress steps in the export process, as shown in the UI.
+        Get the number of in-progress steps in the link check process, as shown in the UI.
 
         For reference, these are:
         1. Scanning
@@ -1158,11 +1152,8 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
     """
     name = course_block.url_name
     links_file = NamedTemporaryFile(prefix=name + '.', suffix='.json')
-    root_dir = path(mkdtemp())
 
     try:
-        export_course_to_xml(modulestore(), contentstore(), course_block.id, root_dir, name)
-
         if status:
             status.set_state('Verifying')
             status.increment_completed_steps()
@@ -1177,13 +1168,7 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
             blocks.extend(vertical.get_children())
         data = []
         for block in blocks:
-            # TODO cleanup unused stuff below
-            # location = block.location
-            # block_id = block.location.block_id
             usage_key = block.usage_key
-            # display_name = block.display_name
-            # category = getattr(block, 'category', '')
-            # data = getattr(block, 'data', '') # do we want this? it has /static -> /asset
             block_info = get_block_info(block)
             block_data = block_info['data']
             urls = _get_urls(block_data)
@@ -1191,7 +1176,7 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
             for url in urls:
                 if url == '#':
                     break
-                processed_url = _process_url(url)
+                processed_url = _process_url(url, course_key)
                 if not _verify_url(processed_url):
                     data.append([str(usage_key), url])
 
@@ -1199,7 +1184,7 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
             json.dump(data, file, indent=4)
 
     except SerializationError as exc:
-        LOGGER.exception('There was an error exporting %s', course_key, exc_info=True)
+        LOGGER.exception('There was an error link checking %s', course_key, exc_info=True)
         parent = None
         try:
             failed_item = modulestore().get_item(exc.location)
@@ -1221,7 +1206,7 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
                                     'edit_unit_url': context['edit_unit_url']}))
         raise
     except Exception as exc:
-        LOGGER.exception('There was an error exporting %s', course_key, exc_info=True)
+        LOGGER.exception('There was an error link checking %s', course_key, exc_info=True)
         context.update({
             'in_err': True,
             'edit_unit_url': None,
@@ -1229,9 +1214,6 @@ def _create_broken_link_json(course_block, course_key, context, status=None):
         if status:
             status.fail(json.dumps({'raw_error_msg': context['raw_err_msg']}))
         raise
-    finally:
-        if os.path.exists(root_dir / name):
-            shutil.rmtree(root_dir / name)
 
     return links_file
 
@@ -1244,7 +1226,7 @@ def _get_urls(content):
     return urls
 
 
-def _process_url(url):
+def _process_url(url, course_key):
     """
     Returns processed url
     Some example urls that refer to places in studio:
@@ -1254,8 +1236,8 @@ def _process_url(url):
     """
     if not url.startswith('http://') and not url.startswith('https://'):
         if url.startswith('/static/'):
-            processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)
-            return 'http://' + settings.CMS_BASE + processed_url[1:-1]
+            processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
+            return 'http://' + settings.CMS_BASE + processed_url
         elif url.startswith('/'):
             return 'http://' + settings.CMS_BASE + url
         else:
