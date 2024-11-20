@@ -36,6 +36,8 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         "use_new_group_configurations_page",
     ]
 
+    other_expected_waffle_flags = ["enable_course_optimizer"]
+
     def setUp(self):
         """
         Set up test data and state before each test method.
@@ -46,10 +48,17 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         super().setUp()
         self.url = reverse("cms.djangoapps.contentstore:v1:course_waffle_flags")
         self.create_waffle_flags(self.course_waffle_flags)
+        self.create_custom_waffle_flags()
+
+    def create_custom_waffle_flags(self, enabled=True):
+        """
+        Helper method to create waffle flags that are not part of `course_waffle_flags` and have
+        a different format.
+        """
         WaffleFlagCourseOverrideModel.objects.create(
-            waffle_flag=f"contentstore.enable_course_optimizer",
+            waffle_flag="contentstore.enable_course_optimizer",
             course_id=self.course.id,
-            enabled=True,
+            enabled=enabled,
         )
 
     def create_waffle_flags(self, flags, enabled=True):
@@ -78,7 +87,8 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
             dict: A dictionary with each flag set to the value of `enabled`.
         """
         res = {flag: enabled for flag in self.course_waffle_flags}
-        res["enable_course_optimizer"] = enabled
+        for flag in self.other_expected_waffle_flags:
+            res[flag] = enabled
         return res
 
     def test_get_course_waffle_flags_with_course_id(self):
