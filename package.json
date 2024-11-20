@@ -68,7 +68,7 @@
     "requirejs": "2.3.7",
     "rtlcss": "4.3.0",
     "sass": "^1.54.8",
-    "sass-loader": "^14.1.1",
+    "sass-loader": "^16.0.0",
     "scriptjs": "2.5.9",
     "style-loader": "4.0.0",
     "svg-inline-loader": "0.8.2",
