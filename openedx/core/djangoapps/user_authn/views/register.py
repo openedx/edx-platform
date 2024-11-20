@@ -359,7 +359,7 @@ def _link_user_to_third_party_provider(
 def _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable, request=None):
     """ Track the user's registration. """
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
-        anonymous_id = request.COOKIES.get('ajs_anonymous_id')
+        anonymous_id = request.COOKIES.get('ajs_anonymous_id') if request else None
         traits = {
             'email': user.email,
             'username': user.username,
