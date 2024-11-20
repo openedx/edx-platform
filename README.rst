@@ -71,8 +71,6 @@ System Dependencies
 -------------------
 
 OS:
-* Ubuntu 20.04
-
 * Ubuntu 22.04
 
 * Ubuntu 24.04
