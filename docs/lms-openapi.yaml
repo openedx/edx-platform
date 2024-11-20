@@ -13,8 +13,44 @@ produces:
 securityDefinitions:
   Basic:
     type: basic
+    description: Obtain with a `POST` request to `/user/v1/account/login_session/`.  If
+      needed, copy the cookies from the response to your new call.
+  jwt:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: |2
+
+      Obtain by making a `POST` request to `/oauth2/v1/access_token`.
+
+      You will need to be logged in and have a client ID and secret already created.
+
+      Your request should have the headers
+
+      ```
+      'Content-Type': 'application/x-www-form-urlencoded'
+      ```
+
+      Your request should have the data payload
+
+      ```
+      'grant_type': 'client_credentials'
+      'client_id': [your client ID]
+      'client_secret':  [your client secret]
+      'token_type': 'jwt'
+      ```
+
+      Your JWT will be returned in the response as `access_token`. Prefix with `JWT ` in your header.
+  csrf:
+    type: apiKey
+    name: X-CSRFToken
+    in: header
+    description: Obtain by making a `GET` request to `/csrf/api/v1/token`. The token
+      will be in the response cookie `csrftoken`.
 security:
 - Basic: []
+- csrf: []
+- jwt: []
 paths:
   /agreements/v1/integrity_signature/{course_id}:
     get:
@@ -3975,6 +4011,7 @@ paths:
             "profile_name": "Jon Doe"
             "verification_attempt_id": (Optional)
             "proctored_exam_attempt_id": (Optional)
+            "platform_verification_attempt_id": (Optional)
             "status": (Optional)
         }
       parameters:
@@ -4130,6 +4167,7 @@ paths:
             "profile_name": "Jon Doe"
             "verification_attempt_id": (Optional)
             "proctored_exam_attempt_id": (Optional)
+            "platform_verification_attempt_id": (Optional)
             "status": (Optional)
         }
       parameters:
@@ -6788,6 +6826,59 @@ paths:
       in: path
       required: true
       type: string
+  /mobile/{api_version}/notifications/create-token/:
+    post:
+      operationId: mobile_notifications_create-token_create
+      summary: |-
+        **Use Case**
+            This endpoint allows clients to register a device for push notifications.
+      description: |-
+        If the device is already registered, the existing registration will be updated.
+            If setting PUSH_NOTIFICATIONS_SETTINGS is not configured, the endpoint will return a 501 error.
+
+        **Example Request**
+            POST /api/mobile/{version}/notifications/create-token/
+            **POST Parameters**
+              The body of the POST request can include the following parameters.
+              * name (optional) - A name of the device.
+              * registration_id (required) - The device token of the device.
+              * device_id (optional) - ANDROID_ID / TelephonyManager.getDeviceId() (always as hex)
+              * active (optional) - Whether the device is active, default is True.
+                If False, the device will not receive notifications.
+              * cloud_message_type (required) - You should choose FCM or GCM. Currently, only FCM is supported.
+              * application_id (optional) - Opaque application identity, should be filled in for multiple
+                key/certificate access. Should be equal settings.FCM_APP_NAME.
+        **Example Response**
+            ```json
+            {
+                "id": 1,
+                "name": "My Device",
+                "registration_id": "fj3j4",
+                "device_id": 1234,
+                "active": true,
+                "date_created": "2024-04-18T07:39:37.132787Z",
+                "cloud_message_type": "FCM",
+                "application_id": "my_app_id"
+            }
+            ```
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/GCMDevice'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/GCMDevice'
+      tags:
+      - mobile
+    parameters:
+    - name: api_version
+      in: path
+      required: true
+      type: string
   /mobile/{api_version}/users/{username}:
     get:
       operationId: mobile_users_read
@@ -8849,22 +8940,6 @@ paths:
       tags:
       - user
     parameters: []
-  /user/v1/accounts/verifications/{attempt_id}/:
-    get:
-      operationId: user_v1_accounts_verifications_read
-      description: Get IDV attempt details by attempt_id. Only accessible by global
-        staff.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - user
-    parameters:
-    - name: attempt_id
-      in: path
-      required: true
-      type: string
   /user/v1/accounts/{username}:
     get:
       operationId: user_v1_accounts_read
@@ -9216,21 +9291,6 @@ paths:
       in: path
       required: true
       type: string
-  /user/v1/skill_level/{job_id}/:
-    get:
-      operationId: user_v1_skill_level_read
-      description: GET /api/user/v1/skill_level/{job_id}/
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - user
-    parameters:
-    - name: job_id
-      in: path
-      required: true
-      type: string
   /user/v1/user_prefs/:
     get:
       operationId: user_v1_user_prefs_list
@@ -9423,22 +9483,57 @@ paths:
       - user
     post:
       operationId: user_account_login_session_create
-      summary: Log in a user.
-      description: |-
-        See `login_user` for details.
-
-        Example Usage:
-
-            POST /api/user/v1/login_session
-            with POST params `email`, `password`.
-
-            200 {'success': true}
-      parameters: []
+      summary: POST /user/{api_version}/account/login_session/
+      description: Returns 200 on success, and a detailed error message otherwise.
+      parameters:
+      - name: data
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+            password:
+              type: string
       responses:
-        '201':
+        '200':
           description: ''
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              value:
+                type: string
+              error_code:
+                type: string
+        '400':
+          description: ''
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              value:
+                type: string
+              error_code:
+                type: string
+        '403':
+          description: ''
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              value:
+                type: string
+              error_code:
+                type: string
       tags:
       - user
+      security:
+      - csrf: []
     parameters:
     - name: api_version
       in: path
@@ -10047,6 +10142,7 @@ definitions:
     required:
     - celebrations
     - course_access
+    - studio_access
     - course_id
     - is_enrolled
     - is_self_paced
@@ -10084,6 +10180,9 @@ definitions:
         additionalProperties:
           type: string
           x-nullable: true
+      studio_access:
+        title: Studio access
+        type: boolean
       course_id:
         title: Course id
         type: string
@@ -11237,9 +11336,23 @@ definitions:
         title: Verification attempt id
         type: integer
         x-nullable: true
+      verification_attempt_status:
+        title: Verification attempt status
+        type: string
+        minLength: 1
+        x-nullable: true
       proctored_exam_attempt_id:
         title: Proctored exam attempt id
         type: integer
+        x-nullable: true
+      platform_verification_attempt_id:
+        title: Platform verification attempt id
+        type: integer
+        x-nullable: true
+      platform_verification_attempt_status:
+        title: Platform verification attempt status
+        type: string
+        minLength: 1
         x-nullable: true
       status:
         title: Status
@@ -11277,9 +11390,23 @@ definitions:
         title: Verification attempt id
         type: integer
         x-nullable: true
+      verification_attempt_status:
+        title: Verification attempt status
+        type: string
+        minLength: 1
+        x-nullable: true
       proctored_exam_attempt_id:
         title: Proctored exam attempt id
         type: integer
+        x-nullable: true
+      platform_verification_attempt_id:
+        title: Platform verification attempt id
+        type: integer
+        x-nullable: true
+      platform_verification_attempt_status:
+        title: Platform verification attempt status
+        type: string
+        minLength: 1
         x-nullable: true
       status:
         title: Status
@@ -11710,6 +11837,52 @@ definitions:
         title: Enddatetime
         type: string
         format: date-time
+  GCMDevice:
+    required:
+    - registration_id
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+      name:
+        title: Name
+        type: string
+        maxLength: 255
+        x-nullable: true
+      registration_id:
+        title: Registration ID
+        type: string
+        minLength: 1
+      device_id:
+        title: Device id
+        description: 'ANDROID_ID / TelephonyManager.getDeviceId() (e.g: 0x01)'
+        type: integer
+        x-nullable: true
+      active:
+        title: Is active
+        description: Inactive devices will not be sent notifications
+        type: boolean
+      date_created:
+        title: Creation date
+        type: string
+        format: date-time
+        readOnly: true
+        x-nullable: true
+      cloud_message_type:
+        title: Cloud Message Type
+        description: You should choose FCM, GCM is deprecated
+        type: string
+        enum:
+        - FCM
+        - GCM
+      application_id:
+        title: Application ID
+        description: Opaque application identity, should be filled in for multiple
+          key/certificate access
+        type: string
+        maxLength: 64
+        x-nullable: true
   mobile_api.User:
     required:
     - username
