@@ -1781,7 +1781,7 @@ random2==1.0.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-recommender-xblock==3.0.0
+recommender-xblock @ git+https://github.com/openedx/RecommenderXBlock@navin/remove-mustache
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
