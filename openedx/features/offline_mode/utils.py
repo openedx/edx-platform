@@ -8,6 +8,7 @@ from tempfile import mkdtemp
 
 from django.contrib.auth import get_user_model
 from django.core.files.storage import default_storage
+from django.http.response import Http404
 
 from zipfile import ZipFile
 
@@ -21,6 +22,7 @@ log = logging.getLogger(__name__)
 def generate_offline_content(xblock, html_data):
     """
     Generates archive with XBlock content for offline mode.
+
     Args:
         xblock (XBlock): The XBlock instance
         html_data (str): The rendered HTML representation of the XBlock
@@ -35,6 +37,11 @@ def generate_offline_content(xblock, html_data):
     try:
         save_xblock_html(tmp_dir, xblock, html_data)
         create_zip_file(tmp_dir, base_path, f'{xblock.location.block_id}.zip')
+    except Http404:
+        log.error(
+            f'Block {xblock.location.block_id} cannot be fetched from course'
+            f' {xblock.location.course_key} during offline content generation.'
+        )
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
@@ -42,6 +49,7 @@ def generate_offline_content(xblock, html_data):
 def save_xblock_html(tmp_dir, xblock, html_data):
     """
     Saves the XBlock HTML content to a file.
+
     Generates the 'index.html' file with the HTML added to use it locally.
     Args:
         tmp_dir (str): The temporary directory path to save the xblock content
@@ -58,6 +66,7 @@ def save_xblock_html(tmp_dir, xblock, html_data):
 def create_zip_file(temp_dir, base_path, file_name):
     """
     Creates a zip file with the content of the base_path directory.
+
     Args:
         temp_dir (str): The temporary directory path where the content is stored
         base_path (str): The base path directory to save the zip file
@@ -79,6 +88,7 @@ def create_zip_file(temp_dir, base_path, file_name):
 def add_files_to_zip_recursively(zip_file, current_base_path, current_path_in_zip):
     """
     Recursively adds files to the zip file.
+
     Args:
         zip_file (ZipFile): The zip file object
         current_base_path (str): The current base path directory
