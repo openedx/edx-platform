@@ -37,7 +37,7 @@ def read_static_file(path):
 
 def save_asset_file(temp_dir, xblock, path, filename):
     """
-    Saves an asset file to the default storage.
+    Saves an asset file to the temporary directory.
 
     If the filename contains a '/', it reads the static file directly from the file system.
     Otherwise, it fetches the asset from the AssetManager.
@@ -89,7 +89,6 @@ def clean_outdated_xblock_files(xblock):
         base_path = block_storage_path(xblock)
         offline_zip_path = os.path.join(base_path, f'{xblock.location.block_id}.zip')
 
-        # Delete the 'offline_content.zip' file if it exists
         if default_storage.exists(offline_zip_path):
             default_storage.delete(offline_zip_path)
             log.info(f"Successfully deleted the file: {offline_zip_path}")
