@@ -10,7 +10,6 @@ from xmodule.modulestore.django import modulestore
 
 from .assets_management import is_modified
 from .constants import MAX_RETRY_ATTEMPTS, OFFLINE_SUPPORTED_XBLOCKS, RETRY_BACKOFF_INITIAL_TIMEOUT
-from .renderer import XBlockRenderer
 from .storage_management import OfflineContentGenerator
 
 
@@ -34,7 +33,8 @@ def generate_offline_content_for_course(course_id):
     autoretry_for=(Http404,),
     retry_backoff=RETRY_BACKOFF_INITIAL_TIMEOUT,
     retry_kwargs={'max_retries': MAX_RETRY_ATTEMPTS}
-)@set_code_owner_attribute
+)
+@set_code_owner_attribute
 def generate_offline_content_for_block(block_id):
     """
     Generates offline content for the specified block.
