@@ -115,7 +115,6 @@ class TestSearchApi(ModuleStoreTestCase):
 
         # Create a content library:
         self.library = library_api.create_library(
-            library_type=library_api.COMPLEX,
             org=OrganizationFactory.create(short_name="org1"),
             slug="lib",
             title="Library",
@@ -199,6 +198,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
 
@@ -473,6 +475,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection2_created = {
@@ -488,6 +493,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection2_updated = {
@@ -503,6 +511,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": updated_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_collection1_updated = {
@@ -518,6 +529,9 @@ class TestSearchApi(ModuleStoreTestCase):
             "created": created_date.timestamp(),
             "modified": updated_date.timestamp(),
             "access_id": lib_access.id,
+            "published": {
+                "num_children": 0
+            },
             "breadcrumbs": [{"display_name": "Library"}],
         }
         doc_problem_with_collection1 = {

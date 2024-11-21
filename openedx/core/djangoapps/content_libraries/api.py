@@ -58,6 +58,7 @@ import hashlib
 import logging
 import mimetypes
 
+
 import attr
 import requests
 
@@ -82,6 +83,7 @@ from openedx_events.content_authoring.data import (
     ContentLibraryData,
     LibraryBlockData,
     LibraryCollectionData,
+    ContentObjectChangedData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
@@ -91,6 +93,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
@@ -114,7 +117,7 @@ from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_f
 from xmodule.modulestore.django import modulestore
 
 from . import permissions, tasks
-from .constants import ALL_RIGHTS_RESERVED, COMPLEX
+from .constants import ALL_RIGHTS_RESERVED
 from .models import ContentLibrary, ContentLibraryPermission, ContentLibraryBlockImportTask
 
 log = logging.getLogger(__name__)
@@ -176,7 +179,6 @@ class ContentLibraryMetadata:
     description = attr.ib("")
     num_blocks = attr.ib(0)
     version = attr.ib(0)
-    type = attr.ib(default=COMPLEX)
     last_published = attr.ib(default=None, type=datetime)
     last_draft_created = attr.ib(default=None, type=datetime)
     last_draft_created_by = attr.ib(default=None, type=datetime)
@@ -306,15 +308,13 @@ class LibraryXBlockType:
 # ============
 
 
-def get_libraries_for_user(user, org=None, library_type=None, text_search=None, order=None):
+def get_libraries_for_user(user, org=None, text_search=None, order=None):
     """
     Return content libraries that the user has permission to view.
     """
     filter_kwargs = {}
     if org:
         filter_kwargs['org__short_name'] = org
-    if library_type:
-        filter_kwargs['type'] = library_type
     qs = ContentLibrary.objects.filter(**filter_kwargs) \
                                .select_related('learning_package', 'org') \
                                .order_by('org__short_name', 'slug')
@@ -361,7 +361,6 @@ def get_metadata(queryset, text_search=None):
         ContentLibraryMetadata(
             key=lib.library_key,
             title=lib.learning_package.title if lib.learning_package else "",
-            type=lib.type,
             description="",
             version=0,
             allow_public_learning=lib.allow_public_learning,
@@ -446,7 +445,6 @@ def get_library(library_key):
     return ContentLibraryMetadata(
         key=library_key,
         title=learning_package.title,
-        type=ref.type,
         description=ref.learning_package.description,
         num_blocks=num_blocks,
         version=version,
@@ -474,7 +472,6 @@ def create_library(
         allow_public_learning=False,
         allow_public_read=False,
         library_license=ALL_RIGHTS_RESERVED,
-        library_type=COMPLEX,
 ):
     """
     Create a new content library.
@@ -491,8 +488,6 @@ def create_library(
 
     allow_public_read: Allow anyone to view blocks (including source) in Studio?
 
-    library_type: Deprecated parameter, not really used. Set to COMPLEX.
-
     Returns a ContentLibraryMetadata instance.
     """
     assert isinstance(org, Organization)
@@ -502,7 +497,6 @@ def create_library(
             ref = ContentLibrary.objects.create(
                 org=org,
                 slug=slug,
-                type=library_type,
                 allow_public_learning=allow_public_learning,
                 allow_public_read=allow_public_read,
                 license=library_license,
@@ -526,7 +520,6 @@ def create_library(
     return ContentLibraryMetadata(
         key=ref.library_key,
         title=title,
-        type=library_type,
         description=description,
         num_blocks=0,
         version=0,
@@ -611,7 +604,6 @@ def update_library(
         description=None,
         allow_public_learning=None,
         allow_public_read=None,
-        library_type=None,
         library_license=None,
 ):
     """
@@ -621,7 +613,7 @@ def update_library(
     A value of None means "don't change".
     """
     lib_obj_fields = [
-        allow_public_learning, allow_public_read, library_type, library_license
+        allow_public_learning, allow_public_read, library_license
     ]
     lib_obj_changed = any(field is not None for field in lib_obj_fields)
     learning_pkg_changed = any(field is not None for field in [title, description])
@@ -640,10 +632,6 @@ def update_library(
                 content_lib.allow_public_learning = allow_public_learning
             if allow_public_read is not None:
                 content_lib.allow_public_read = allow_public_read
-            if library_type is not None:
-                # TODO: Get rid of this field entirely, and remove library_type
-                # from any functions that take it as an argument.
-                content_lib.library_type = library_type
             if library_license is not None:
                 content_lib.library_license = library_license
             content_lib.save()
@@ -698,7 +686,11 @@ def _get_library_component_tags_count(library_key) -> dict:
     return get_object_tag_counts(library_key_pattern, count_implicit=True)
 
 
-def get_library_components(library_key, text_search=None, block_types=None) -> QuerySet[Component]:
+def get_library_components(
+    library_key,
+    text_search=None,
+    block_types=None,
+) -> QuerySet[Component]:
     """
     Get the library components and filter.
 
@@ -714,6 +706,7 @@ def get_library_components(library_key, text_search=None, block_types=None) -> Q
         type_names=block_types,
         draft_title=text_search,
     )
+
     return components
 
 
@@ -856,13 +849,6 @@ def validate_can_add_block_to_library(
     """
     assert isinstance(library_key, LibraryLocatorV2)
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    if content_library.type != COMPLEX:
-        if block_type != content_library.type:
-            raise IncompatibleTypesError(
-                _('Block type "{block_type}" is not compatible with library type "{library_type}".').format(
-                    block_type=block_type, library_type=content_library.type,
-                )
-            )
 
     # If adding a component would take us over our max, return an error.
     component_count = authoring_api.get_all_drafts(content_library.learning_package.id).count()
@@ -1035,7 +1021,6 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
                 component_version.pk,
                 content.id,
                 key=filename,
-                learner_downloadable=True,
             )
 
     # Emit library block created event
@@ -1105,7 +1090,6 @@ def _create_component_for_block(content_lib, usage_key, user_id=None):
             component_version.pk,
             content.id,
             key="block.xml",
-            learner_downloadable=False
         )
 
         return component_version
@@ -1116,14 +1100,30 @@ def delete_library_block(usage_key, remove_from_parent=True):
     Delete the specified block from this library (soft delete).
     """
     component = get_component_from_usage_key(usage_key)
+    library_key = usage_key.context_key
+    affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
+
     authoring_api.soft_delete_draft(component.pk)
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
-            library_key=usage_key.context_key,
+            library_key=library_key,
             usage_key=usage_key
         )
     )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    #
+    # To delete the component on collections
+    for collection in affected_collections:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=collection.key,
+                background=True,
+            )
+        )
 
 
 def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticFile]:
@@ -1198,26 +1198,11 @@ def add_library_block_static_asset_file(usage_key, file_path, file_content, user
 
     component = get_component_from_usage_key(usage_key)
 
-    media_type_str, _encoding = mimetypes.guess_type(file_path)
-    # We use "application/octet-stream" as a generic fallback media type, per
-    # RFC 2046: https://datatracker.ietf.org/doc/html/rfc2046
-    # TODO: This probably makes sense to push down to openedx-learning?
-    media_type_str = media_type_str or "application/octet-stream"
-
-    now = datetime.now(tz=timezone.utc)
-
     with transaction.atomic():
-        media_type = authoring_api.get_or_create_media_type(media_type_str)
-        content = authoring_api.get_or_create_file_content(
-            component.publishable_entity.learning_package.id,
-            media_type.id,
-            data=file_content,
-            created=now,
-        )
         component_version = authoring_api.create_next_component_version(
             component.pk,
-            content_to_replace={file_path: content.id},
-            created=now,
+            content_to_replace={file_path: file_content},
+            created=datetime.now(tz=timezone.utc),
             created_by=user.id if user else None,
         )
         transaction.on_commit(
@@ -1242,7 +1227,7 @@ def add_library_block_static_asset_file(usage_key, file_path, file_content, user
     return LibraryXBlockStaticFile(
         path=file_path,
         url=site_root_url + local_path,
-        size=content.size,
+        size=len(file_content),
     )
 
 
@@ -1288,10 +1273,7 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     # TODO: return support status and template options
     # See cms/djangoapps/contentstore/views/component.py
     block_types = sorted(name for name, class_ in XBlock.load_classes())
-    lib = get_library(library_key)
-    if lib.type != COMPLEX:
-        # Problem and Video libraries only permit XBlocks of the same name.
-        block_types = (name for name in block_types if name == lib.type)
+
     info = []
     for block_type in block_types:
         # TODO: unify the contentstore helper with the xblock.api version of
@@ -1358,6 +1340,39 @@ def revert_changes(library_key):
             update_blocks=True
         )
     )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    #
+    # This is to update component counts in all library collections,
+    # because there may be components that have been discarded in the revert.
+    for collection in authoring_api.get_collections(learning_package.id):
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=collection.key,
+                background=True,
+            )
+        )
+
+    # Reindex components that are in collections
+    #
+    # Use case: When a component that was within a collection has been deleted
+    # and the changes are reverted, the component should appear in the
+    # collection again.
+    components_in_collections = authoring_api.get_components(
+        learning_package.id, draft=True, namespace='xblock.v1',
+    ).filter(publishable_entity__collections__isnull=False)
+
+    for component in components_in_collections:
+        usage_key = library_component_usage_key(library_key, component)
+
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            content_object=ContentObjectChangedData(
+                object_id=str(usage_key),
+                changes=["collections"],
+            ),
+        )
 
 
 def create_library_collection(
