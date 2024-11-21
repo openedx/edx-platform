@@ -36,15 +36,20 @@ function sendMessageToAndroid(message) {
 function markProblemCompleted(message) {
   const data = JSON.parse(message).data;
   const problemContainer = $(".xblock-student_view");
+
   const submitButton = problemContainer.find(".submit-attempt-container .submit");
   const notificationContainer = problemContainer.find(".notification-gentle-alert");
+
   submitButton.attr({disabled: "disabled"});
-  notificationContainer.find(".notification-message").text("Answer submitted.");
+  notificationContainer.find(".notification-message").text("Answer submitted");
+  notificationContainer.find(".icon").remove();
   notificationContainer.show();
 
   data.split("&").forEach(function (item) {
     const [inputId, answer] = item.split('=', 2);
-    problemContainer.find(`input[id$="${answer}"], input[id$="${inputId}"]`).each(function () {
+    problemContainer.find(
+      `input[id$="${answer}"], input[id$="${inputId}"]`
+    ).each(function () {
       this.disabled = true;
       if (this.type === "checkbox" || this.type === "radio") {
         this.checked = true;
