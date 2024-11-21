@@ -93,8 +93,8 @@ def link_check_status_handler(request, course_key_string):
 
         -X : Link check unsuccessful due to some error with X as stage [0-3]
         0 : No status info found (task not yet created)
-        1 : Scanning
-        2 : Verifying
+        1 : Preparing
+        2 : Scanning
         3 : Success
 
     If the link check was successful, an output result is also returned.

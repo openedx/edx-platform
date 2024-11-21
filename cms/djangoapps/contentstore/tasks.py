@@ -1108,148 +1108,104 @@ def check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results in a file.
     """
+    def validate_user():
+        """Validate if the user exists. Otherwise log error. """
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist as exc:
+            with translation_language(language):
+                self.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
+            return
+
+    def get_urls(content):
+        """Returns all urls after href and src in content."""
+        regex = r'\s+(?:href|src)=["\']([^"\']*)["\']'
+        urls = re.findall(regex, content)
+        return urls
+
+    def convert_to_standard_url(url, course_key):
+        """
+        Returns standard urls when given studio urls.
+        Example urls:
+          /assets/courseware/v1/506da5d6f866e8f0be44c5df8b6e6b2a/asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
+          /static/getting-started_x250.png
+          /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
+        """
+        if not url.startswith('http://') and not url.startswith('https://'):
+            if url.startswith('/static/'):
+                processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
+                return 'http://' + settings.CMS_BASE + processed_url
+            elif url.startswith('/'):
+                return 'http://' + settings.CMS_BASE + url
+            else:
+                return 'http://' + settings.CMS_BASE + '/container/' + url
+
+    def verify_url(url):
+        """Returns true if url request returns 200"""
+        try:
+            response = requests.get(url, timeout=5)
+            return response.status_code == 200
+        except requests.exceptions.RequestException as e:
+            return False
+
+    def scan_course(course_key):
+        """
+        Scans the course and returns broken link tuples.
+          [<block_id>, <broken_link>]
+        """
+        broken_links = []
+        verticals = modulestore().get_items(course_key, qualifiers={'category': 'vertical'})
+        blocks = []
+
+        for vertical in verticals:
+            blocks.extend(vertical.get_children())
+
+        for block in blocks:
+            usage_key = block.usage_key
+            block_info = get_block_info(block)
+            block_data = block_info['data']
+            urls = get_urls(block_data)
+
+            for url in urls:
+                if url == '#':
+                    break
+                standardized_url = convert_to_standard_url(url, course_key)
+                if not verify_url(standardized_url):
+                    broken_links.append([str(usage_key), url])
+
+        return broken_links
+    
+    user = validate_user()
     courselike_key = CourseKey.from_string(course_key_string)
 
     try:
-        user = User.objects.get(pk=user_id)
-    except User.DoesNotExist:
-        with translation_language(language):
-            self.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
-        return
-    if not has_course_author_access(user, courselike_key):
-        with translation_language(language):
-            self.status.fail(UserErrors.PERMISSION_DENIED)
-        return
-    
-    courselike_block = modulestore().get_course(courselike_key)
+        self.status.set_state('Preparing')
+        file_name = str(courselike_key)
+        links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')
 
-    try:
-        self.status.set_state('Scanning')
-        links_file = _create_broken_link_json(courselike_block, courselike_key, {}, self.status)
+        try:
+            if self.status:
+                self.status.set_state('Scanning')
+                self.status.increment_completed_steps()
+            LOGGER.debug('json file being generated at %s', links_file.name)
+
+            data = scan_course(courselike_key)
+
+            with open(links_file.name, 'w') as file:
+                json.dump(data, file, indent=4)
+        except Exception as exc:
+            LOGGER.exception('There was an error link checking %s', courselike_key, exc_info=True)
+            if self.status:
+                self.status.fail(json.dumps({'raw_error_msg': str(exc)}))
+            raise
+
         artifact = UserTaskArtifact(status=self.status, name='BrokenLinks')
         artifact.file.save(name=os.path.basename(links_file.name), content=File(links_file))
         artifact.save()
+    
     # catch all exceptions so we can record useful error messages
     except Exception as exception:  # pylint: disable=broad-except
         LOGGER.exception('Error checking links for course %s', courselike_key, exc_info=True)
         if self.status.state != UserTaskStatus.FAILED:
             self.status.fail({'raw_error_msg': str(exception)})
         return
-
-
-def _create_broken_link_json(course_block, course_key, context, status=None):
-    """
-    Generates a json file for broken links, or returns None if there was an error.
-    Updates the context with any error information if applicable.
-    Note that because the celery queue does not have credentials, some broken links will
-    need to be checked client side.
-
-    File format:
-    [
-        [<blockId>, <broken link>],
-        ...,
-    ]
-    """
-    name = course_block.url_name
-    links_file = NamedTemporaryFile(prefix=name + '.', suffix='.json')
-
-    try:
-        if status:
-            status.set_state('Verifying')
-            status.increment_completed_steps()
-        LOGGER.debug('json file being generated at %s', links_file.name)
-
-        verticals = modulestore().get_items(
-            course_key,
-            qualifiers={'category': 'vertical'},
-        )
-        blocks = []
-        for vertical in verticals:
-            blocks.extend(vertical.get_children())
-        data = []
-        for block in blocks:
-            usage_key = block.usage_key
-            block_info = get_block_info(block)
-            block_data = block_info['data']
-            urls = _get_urls(block_data)
-
-            for url in urls:
-                if url == '#':
-                    break
-                processed_url = _process_url(url, course_key)
-                if not _verify_url(processed_url):
-                    data.append([str(usage_key), url])
-
-        with open(links_file.name, 'w') as file:
-            json.dump(data, file, indent=4)
-
-    except SerializationError as exc:
-        LOGGER.exception('There was an error link checking %s', course_key, exc_info=True)
-        parent = None
-        try:
-            failed_item = modulestore().get_item(exc.location)
-            parent_loc = modulestore().get_parent_location(failed_item.location)
-
-            if parent_loc is not None:
-                parent = modulestore().get_item(parent_loc)
-        except:  # pylint: disable=bare-except
-            # if we have a nested exception, then we'll show the more generic error message
-            pass
-
-        context.update({
-            'in_err': True,
-            'raw_err_msg': str(exc),
-            'edit_unit_url': reverse_usage_url("container_handler", parent.location) if parent else "",
-        })
-        if status:
-            status.fail(json.dumps({'raw_error_msg': context['raw_err_msg'],
-                                    'edit_unit_url': context['edit_unit_url']}))
-        raise
-    except Exception as exc:
-        LOGGER.exception('There was an error link checking %s', course_key, exc_info=True)
-        context.update({
-            'in_err': True,
-            'edit_unit_url': None,
-            'raw_err_msg': str(exc)})
-        if status:
-            status.fail(json.dumps({'raw_error_msg': context['raw_err_msg']}))
-        raise
-
-    return links_file
-
-
-def _get_urls(content):
-    """
-    Return all urls after hrefs and src in content
-    """
-    urls = re.findall(r'\s+(?:href|src)=["\']([^"\']*)["\']', content)
-    return urls
-
-
-def _process_url(url, course_key):
-    """
-    Returns processed url
-    Some example urls that refer to places in studio:
-        - /assets/courseware/v1/506da5d6f866e8f0be44c5df8b6e6b2a/asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
-        - /static/getting-started_x250.png
-        - /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
-    """
-    if not url.startswith('http://') and not url.startswith('https://'):
-        if url.startswith('/static/'):
-            processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
-            return 'http://' + settings.CMS_BASE + processed_url
-        elif url.startswith('/'):
-            return 'http://' + settings.CMS_BASE + url
-        else:
-            return 'http://' + settings.CMS_BASE + '/container/' + url
-
-
-def _verify_url(url):
-    """
-    Returns true if url request returns 200
-    """
-    try:
-        response = requests.get(url, timeout=5)
-        return response.status_code == 200
-    except requests.exceptions.RequestException as e:
-        return False
