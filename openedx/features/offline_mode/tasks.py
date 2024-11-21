@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from xmodule.modulestore.django import modulestore
 
-from .constants import OFFLINE_SUPPORTED_XBLOCKS
+from .constants import MAX_RETRY_ATTEMPTS, OFFLINE_SUPPORTED_XBLOCKS, RETRY_BACKOFF_INITIAL_TIMEOUT
 from .renderer import XBlockRenderer
 from .utils import generate_offline_content
 
@@ -25,8 +25,11 @@ def generate_offline_content_for_course(course_id):
             generate_offline_content_for_block.apply_async([str(xblock.location), html_data])
 
 
-@shared_task
-@set_code_owner_attribute
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=RETRY_BACKOFF_INITIAL_TIMEOUT,
+    retry_kwargs={'max_retries': MAX_RETRY_ATTEMPTS}
+)@set_code_owner_attribute
 def generate_offline_content_for_block(block_id, html_data):
     """
     Generates offline content for the specified block.
