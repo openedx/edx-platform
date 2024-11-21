@@ -45,15 +45,12 @@ STATUS_FILTERS = user_tasks_settings.USER_TASKS_STATUS_FILTERS
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
 @login_required
-@require_http_methods(('GET', 'POST'))
+@require_http_methods(('POST'))
 @ensure_valid_course_key
 def link_check_handler(request, course_key_string):
     """
     The restful handler for checking broken links in a course.
 
-    GET
-        html: return html page for import page ???
-        json: not supported ???
     POST
         Start a Celery task to check broken links in the course
 
@@ -75,12 +72,8 @@ def link_check_handler(request, course_key_string):
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
-    if request.method == 'POST':
-        check_broken_links.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
-        return JsonResponse({'LinkCheckStatus': 1})
-    else:
-        # Only HTML request format is supported (no JSON).
-        return HttpResponse(status=406)
+    check_broken_links.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
+    return JsonResponse({'LinkCheckStatus': 1})
 
 
 @transaction.non_atomic_requests
