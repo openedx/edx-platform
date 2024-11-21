@@ -2,13 +2,16 @@
 Views for course info API
 """
 
+import os
 import logging
 from typing import Dict, Optional, Union
 
 import django
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -31,6 +34,8 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_utils import get_course_update_items
+from openedx.features.offline_mode.assets_management import get_offline_block_content_path
+from openedx.features.offline_mode.toggles import is_offline_mode_enabled
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 
 from ..decorators import mobile_course_access, mobile_view
@@ -352,6 +357,8 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                     course_key,
                     response.data['blocks'],
                 )
+                if api_version == 'v4' and is_offline_mode_enabled(course_key):
+                    self._extend_block_info_with_offline_data(response.data['blocks'])
 
                 course_info_context = {
                     'user': requested_user,
@@ -409,6 +416,23 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                         }
                     }
                 )
+
+    @staticmethod
+    def _extend_block_info_with_offline_data(blocks_info_data: Dict[str, Dict]) -> None:
+        """
+        Extends block info with offline download data.
+        If offline content is available for the block, adds the offline download data to the block info.
+        """
+        for block_id, block_info in blocks_info_data.items():
+            if offline_content_path := get_offline_block_content_path(usage_key=UsageKey.from_string(block_id)):
+                file_url = os.path.join(settings.MEDIA_URL, offline_content_path)
+                block_info.update({
+                    'offline_download': {
+                        'file_url': file_url,
+                        'last_modified': default_storage.get_created_time(offline_content_path),
+                        'file_size': default_storage.size(offline_content_path)
+                    }
+                })
 
 
 @mobile_view()
