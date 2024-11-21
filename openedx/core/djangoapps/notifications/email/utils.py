@@ -130,17 +130,29 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
         }
         for key, value in app_notifications_dict.items()
     ])
-    email_content = [
-        {
+
+    email_content = []
+    notifications_in_app = 5
+    for key, value in app_notifications_dict.items():
+        total = value['count']
+        app_content = {
             'title': value['title'],
             'help_text': value.get('help_text', ''),
             'help_text_url': value.get('help_text_url', ''),
             'notifications': add_additional_attributes_to_notifications(
                 value.get('notifications', []), courses_data=courses_data
-            )
+            ),
+            'total': total,
+            'show_remaining_count': False,
+            'remaining_count': 0,
+            'url': f'{settings.LEARNER_HOME_MICROFRONTEND_URL}/?showNotifications=true&app={key}'
         }
-        for key, value in app_notifications_dict.items()
-    ]
+        if total > notifications_in_app:
+            app_content['notifications'] = app_content['notifications'][:notifications_in_app]
+            app_content['show_remaining_count'] = True
+            app_content['remaining_count'] = total - notifications_in_app
+        email_content.append(app_content)
+
     context.update({
         "start_date": start_date_str,
         "end_date": end_date_str,
@@ -295,6 +307,7 @@ def filter_notification_with_email_enabled_preferences(notifications, preference
     for notification in notifications:
         if notification.notification_type in enabled_course_prefs[notification.course_id]:
             filtered_notifications.append(notification)
+    filtered_notifications.sort(key=lambda elem: elem.created, reverse=True)
     return filtered_notifications
 
 
