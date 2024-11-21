@@ -1055,5 +1055,5 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    path('offline_mode/', include('openedx.features.offline_mode.urls')),
+    path('offline_mode/', include('openedx.features.offline_mode.urls', namespace='offline_mode')),
 ]

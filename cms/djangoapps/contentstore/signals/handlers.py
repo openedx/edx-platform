@@ -2,7 +2,6 @@
 
 
 import logging
-import requests
 from datetime import datetime, timezone
 from functools import wraps
 from typing import Optional
@@ -23,6 +22,7 @@ from cms.djangoapps.contentstore.courseware_index import (
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
 )
+from cms.djangoapps.contentstore.utils import get_cms_api_client
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.block_utils import yield_dynamic_block_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
@@ -160,7 +160,8 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
     transaction.on_commit(lambda: emit_catalog_info_changed_signal(course_key))
 
     if is_offline_mode_enabled(course_key):
-        requests.post(
+        client = get_cms_api_client()
+        client.post(
             url=urljoin(settings.LMS_ROOT_URL, LMS_OFFLINE_HANDLER_URL),
             data={'course_id': str(course_key)},
         )

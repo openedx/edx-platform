@@ -2525,6 +2525,8 @@ COMMENTS_SERVICE_KEY = 'password'
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 EXAMS_SERVICE_USERNAME = 'edx_exams_worker'
 
+CMS_SERVICE_USER_NAME = 'edxapp_cms_worker'
+
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': None,
