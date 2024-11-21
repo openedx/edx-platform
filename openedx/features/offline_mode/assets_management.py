@@ -68,7 +68,7 @@ def save_asset_file(temp_dir, xblock, path, filename):
 
 def create_subdirectories_for_asset(file_path):
     """
-    Creates subdirectories for asset.
+    Creates the subdirectories for the asset file path if they do not exist.
     """
     out_dir_name = '/'
     for dir_name in file_path.split('/')[:-1]:
