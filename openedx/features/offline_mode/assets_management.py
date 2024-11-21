@@ -127,7 +127,7 @@ def block_storage_path(xblock=None, usage_key=None):
         str: The constructed base storage path.
     """
     loc = usage_key or getattr(xblock, 'location', None)
-    return f'{str(loc.course_key)}/' if loc else ''
+    return f'offline_content/{str(loc.course_key)}/' if loc else ''
 
 
 def is_modified(xblock):
