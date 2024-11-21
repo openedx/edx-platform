@@ -10,7 +10,7 @@ from xmodule.modulestore.django import modulestore
 
 from .constants import MAX_RETRY_ATTEMPTS, OFFLINE_SUPPORTED_XBLOCKS, RETRY_BACKOFF_INITIAL_TIMEOUT
 from .renderer import XBlockRenderer
-from .utils import generate_offline_content
+from .storage_management import OfflineContentGenerator
 
 
 @shared_task
@@ -27,7 +27,7 @@ def generate_offline_content_for_course(course_id):
             if not hasattr(xblock, 'closed') or not xblock.closed():
                 block_id = str(xblock.location)
                 html_data = XBlockRenderer(block_id).render_xblock_from_lms()
-                generate_offline_content_for_block.apply_async([block_id, html_data])
+                OfflineContentGenerator(xblock, html_data).generate_offline_content()
 
 
 @shared_task(
