@@ -1,11 +1,11 @@
 """
 This module contains utility functions for managing assets and files.
 """
-import shutil
 import logging
 import os
 import requests
 
+from botocore.exceptions import ClientError
 from django.conf import settings
 from django.core.files.storage import default_storage
 
@@ -77,35 +77,23 @@ def create_subdirectories_for_asset(file_path):
             os.mkdir(out_dir_name)
 
 
-def remove_old_files(xblock):
+def clean_outdated_xblock_files(xblock):
     """
-    Removes the 'assets' directory, 'index.html', and 'offline_content.zip' files
-    in the specified base path directory.
+    Removes the old zip file with Offline Content from media storage.
+
     Args:
         (XBlock): The XBlock instance
     """
     try:
         base_path = block_storage_path(xblock)
-        assets_path = os.path.join(base_path, 'assets')
-        index_file_path = os.path.join(base_path, 'index.html')
         offline_zip_path = os.path.join(base_path, f'{xblock.location.block_id}.zip')
-
-        # Delete the 'assets' directory if it exists
-        if os.path.isdir(assets_path):
-            shutil.rmtree(assets_path)
-            log.info(f"Successfully deleted the directory: {assets_path}")
-
-        # Delete the 'index.html' file if it exists
-        if default_storage.exists(index_file_path):
-            os.remove(index_file_path)
-            log.info(f"Successfully deleted the file: {index_file_path}")
 
         # Delete the 'offline_content.zip' file if it exists
         if default_storage.exists(offline_zip_path):
-            os.remove(offline_zip_path)
+            default_storage.delete(offline_zip_path)
             log.info(f"Successfully deleted the file: {offline_zip_path}")
 
-    except OSError as e:
+    except ClientError as e:
         log.error(f"Error occurred while deleting the files or directory: {e}")
 
 
@@ -148,8 +136,8 @@ def is_modified(xblock):
     file_path = os.path.join(block_storage_path(xblock), f'{xblock.location.block_id}.zip')
 
     try:
-        last_modified = default_storage.get_created_time(file_path)
-    except OSError:
+        last_modified = default_storage.get_modified_time(file_path)
+    except (OSError, ClientError):
         return True
 
     return xblock.published_on > last_modified
