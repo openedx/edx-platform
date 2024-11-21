@@ -16,7 +16,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .constants import MATHJAX_CDN_URL, MATHJAX_STATIC_PATH
 
-
 log = logging.getLogger(__name__)
 
 
@@ -39,8 +38,10 @@ def read_static_file(path):
 def save_asset_file(temp_dir, xblock, path, filename):
     """
     Saves an asset file to the default storage.
+
     If the filename contains a '/', it reads the static file directly from the file system.
     Otherwise, it fetches the asset from the AssetManager.
+
     Args:
         temp_dir (str): The temporary directory where the assets are stored.
         xblock (XBlock): The XBlock instance
@@ -100,6 +101,7 @@ def clean_outdated_xblock_files(xblock):
 def get_offline_block_content_path(xblock=None, usage_key=None):
     """
     Checks whether 'offline_content.zip' file is present in the specified base path directory.
+
     Args:
         xblock (XBlock): The XBlock instance
         usage_key (UsageKey): The UsageKey of the XBlock
@@ -115,8 +117,10 @@ def get_offline_block_content_path(xblock=None, usage_key=None):
 def block_storage_path(xblock=None, usage_key=None):
     """
     Generates the base storage path for the given XBlock.
+
     The path is constructed based on the XBlock's location, which includes the organization,
     course, block type, and block ID.
+
     Args:
         xblock (XBlock): The XBlock instance for which to generate the storage path.
         usage_key (UsageKey): The UsageKey of the XBlock.
@@ -130,6 +134,7 @@ def block_storage_path(xblock=None, usage_key=None):
 def is_modified(xblock):
     """
     Check if the xblock has been modified since the last time the offline content was generated.
+
     Args:
         xblock (XBlock): The XBlock instance to check.
     """
@@ -146,6 +151,7 @@ def is_modified(xblock):
 def save_mathjax_to_xblock_assets(temp_dir):
     """
     Saves MathJax to the local static directory.
+
     If MathJax is not already saved, it fetches MathJax from
     the CDN and saves it to the local static directory.
     """
@@ -156,3 +162,18 @@ def save_mathjax_to_xblock_assets(temp_dir):
             file.write(response.content)
 
         log.info(f"Successfully saved MathJax to {file_path}")
+
+
+def save_external_file(temp_dir, link, filename):
+    """
+    Save external file to the local directory.
+    """
+    file_path = os.path.join(temp_dir, filename)
+    try:
+        response = requests.get(link)
+    except requests.exceptions.RequestException as e:
+        log.error(f"Failed to download {link}: {e}")
+    else:
+        create_subdirectories_for_asset(file_path)
+        with open(file_path, 'wb') as file:
+            file.write(response.content)
