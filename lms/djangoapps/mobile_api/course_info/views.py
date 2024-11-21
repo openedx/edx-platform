@@ -429,7 +429,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                 block_info.update({
                     'offline_download': {
                         'file_url': file_url,
-                        'last_modified': default_storage.get_created_time(offline_content_path),
+                        'last_modified': default_storage.get_modified_time(offline_content_path),
                         'file_size': default_storage.size(offline_content_path)
                     }
                 })
