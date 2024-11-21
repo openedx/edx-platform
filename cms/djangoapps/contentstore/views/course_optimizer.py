@@ -38,6 +38,7 @@ __all__ = [
 
 log = logging.getLogger(__name__)
 
+# Tuple containing zero or more filters for UserTaskStatus listing REST API calls.
 STATUS_FILTERS = user_tasks_settings.USER_TASKS_STATUS_FILTERS
 
 
@@ -162,7 +163,7 @@ def _latest_task_status(request, course_key_string, view_func=None):
 
 def _create_dto(json_content, request_user):
     """
-    Returns a DTO for frontend given a list of broken links.
+    Returns a Data Transfer Object for frontend given a list of broken links.
 
     json_content contains a list of the following:
         [block_id, link]
@@ -190,12 +191,12 @@ def _create_dto(json_content, request_user):
         block_id, link = item
         usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
-        _add_broken_link(result, block, link)
+        _add_broken_link_description(result, block, link)
 
     return result
 
 
-def _add_broken_link(result, block, link):
+def _add_broken_link_description(result, block, link):
     """
     Adds broken link found in the specified block along with other block data.
     Note that because the celery queue does not have credentials, some broken links will
