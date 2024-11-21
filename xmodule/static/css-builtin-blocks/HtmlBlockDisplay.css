@@ -1,13 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
-.xmodule_display.xmodule_AboutBlock,
-.xmodule_display.xmodule_CourseInfoBlock,
-.xmodule_display.xmodule_HtmlBlock,
-.xmodule_display.xmodule_StaticTabBlock {
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-}
-
 .xmodule_display.xmodule_AboutBlock *,
 .xmodule_display.xmodule_CourseInfoBlock *,
 .xmodule_display.xmodule_HtmlBlock *,
@@ -138,18 +130,18 @@
     font-weight: bold;
 }
 
-.xmodule_display.xmodule_AboutBlock p + p,
-.xmodule_display.xmodule_AboutBlock ul + p,
-.xmodule_display.xmodule_AboutBlock ol + p,
-.xmodule_display.xmodule_CourseInfoBlock p + p,
-.xmodule_display.xmodule_CourseInfoBlock ul + p,
-.xmodule_display.xmodule_CourseInfoBlock ol + p,
-.xmodule_display.xmodule_HtmlBlock p + p,
-.xmodule_display.xmodule_HtmlBlock ul + p,
-.xmodule_display.xmodule_HtmlBlock ol + p,
-.xmodule_display.xmodule_StaticTabBlock p + p,
-.xmodule_display.xmodule_StaticTabBlock ul + p,
-.xmodule_display.xmodule_StaticTabBlock ol + p {
+.xmodule_display.xmodule_AboutBlock p+p,
+.xmodule_display.xmodule_AboutBlock ul+p,
+.xmodule_display.xmodule_AboutBlock ol+p,
+.xmodule_display.xmodule_CourseInfoBlock p+p,
+.xmodule_display.xmodule_CourseInfoBlock ul+p,
+.xmodule_display.xmodule_CourseInfoBlock ol+p,
+.xmodule_display.xmodule_HtmlBlock p+p,
+.xmodule_display.xmodule_HtmlBlock ul+p,
+.xmodule_display.xmodule_HtmlBlock ol+p,
+.xmodule_display.xmodule_StaticTabBlock p+p,
+.xmodule_display.xmodule_StaticTabBlock ul+p,
+.xmodule_display.xmodule_StaticTabBlock ol+p {
     margin-top: var(--baseline);
 }
 
@@ -198,7 +190,11 @@
     list-style: disc outside none;
 }
 
-.xmodule_display.xmodule_AboutBlock a:link, .xmodule_display.xmodule_AboutBlock a:visited, .xmodule_display.xmodule_AboutBlock a:hover, .xmodule_display.xmodule_AboutBlock a:active, .xmodule_display.xmodule_AboutBlock a:focus,
+.xmodule_display.xmodule_AboutBlock a:link,
+.xmodule_display.xmodule_AboutBlock a:visited,
+.xmodule_display.xmodule_AboutBlock a:hover,
+.xmodule_display.xmodule_AboutBlock a:active,
+.xmodule_display.xmodule_AboutBlock a:focus,
 .xmodule_display.xmodule_CourseInfoBlock a:link,
 .xmodule_display.xmodule_CourseInfoBlock a:visited,
 .xmodule_display.xmodule_CourseInfoBlock a:hover,
@@ -222,6 +218,7 @@
 .xmodule_display.xmodule_HtmlBlock img,
 .xmodule_display.xmodule_StaticTabBlock img {
     max-width: 100%;
+    height: auto;
 }
 
 .xmodule_display.xmodule_AboutBlock pre,

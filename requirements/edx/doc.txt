@@ -57,6 +57,10 @@ asn1crypto==1.5.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
+astroid==2.13.5
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   sphinx-autoapi
 attrs==24.2.0
     # via
     #   -r requirements/edx/base.txt
@@ -507,7 +511,7 @@ edx-celeryutils==1.3.0
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
     #   super-csv
-edx-codejail==3.5.1
+edx-codejail==3.5.2
     # via -r requirements/edx/base.txt
 edx-completion==4.7.3
     # via -r requirements/edx/base.txt
@@ -547,7 +551,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==4.30.1
+edx-enterprise==4.33.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -581,7 +585,7 @@ edx-opaque-keys[django]==2.11.0
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/base.txt
-edx-proctoring==4.18.2
+edx-proctoring==4.18.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -594,7 +598,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.1.0
+edx-search==4.1.1
     # via -r requirements/edx/base.txt
 edx-sga==0.25.0
     # via -r requirements/edx/base.txt
@@ -790,6 +794,7 @@ jinja2==3.1.4
     #   -r requirements/edx/base.txt
     #   code-annotations
     #   sphinx
+    #   sphinx-autoapi
 jmespath==1.0.1
     # via
     #   -r requirements/edx/base.txt
@@ -840,6 +845,8 @@ lazy==1.6
     #   lti-consumer-xblock
     #   ora2
     #   xblock
+lazy-object-proxy==1.10.0
+    # via astroid
 libsass==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -850,19 +857,23 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.11.3
     # via -r requirements/edx/base.txt
-lxml==4.9.4
+lxml[html-clean]==5.3.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
     #   edxval
     #   lti-consumer-xblock
+    #   lxml-html-clean
     #   olxcleaner
     #   openedx-calc
     #   ora2
     #   python3-saml
     #   xblock
     #   xmlsec
+lxml-html-clean==0.3.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   lxml
 mailsnake==1.6.4
     # via -r requirements/edx/base.txt
 mako==1.3.6
@@ -986,7 +997,7 @@ openedx-filters==1.11.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-learning==0.16.1
+openedx-learning==0.18.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -996,7 +1007,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-ora2==6.12.2
+ora2==6.14.0
     # via -r requirements/edx/base.txt
 packaging==24.1
     # via
@@ -1243,6 +1254,7 @@ pyyaml==6.0.2
     #   edx-django-release-util
     #   edx-i18n-tools
     #   jsondiff
+    #   sphinx-autoapi
     #   sphinxcontrib-openapi
     #   xblock
 random2==1.0.2
@@ -1401,6 +1413,7 @@ sphinx==8.1.3
     # via
     #   -r requirements/edx/doc.in
     #   pydata-sphinx-theme
+    #   sphinx-autoapi
     #   sphinx-book-theme
     #   sphinx-design
     #   sphinx-mdinclude
@@ -1408,6 +1421,8 @@ sphinx==8.1.3
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
     #   sphinxext-rediraffe
+sphinx-autoapi==3.3.3
+    # via -r requirements/edx/doc.in
 sphinx-book-theme==1.1.3
     # via -r requirements/edx/doc.in
 sphinx-design==0.6.1
@@ -1552,7 +1567,9 @@ webob==1.8.9
     #   -r requirements/edx/base.txt
     #   xblock
 wrapt==1.16.0
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   astroid
 xblock[django]==5.1.0
     # via
     #   -r requirements/edx/base.txt
@@ -1579,9 +1596,8 @@ xblock-utils==4.0.0
     #   -r requirements/edx/base.txt
     #   edx-sga
     #   xblock-poll
-xmlsec==1.3.13
+xmlsec==1.3.14
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   python3-saml
 xss-utils==0.6.0
