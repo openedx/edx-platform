@@ -1261,7 +1261,7 @@ pyyaml==6.0.2
     #   xblock
 random2==1.0.2
     # via -r requirements/edx/base.txt
-recommender-xblock==3.0.0
+recommender-xblock @ git+https://github.com/openedx/RecommenderXBlock@navin/remove-mustache
     # via -r requirements/edx/base.txt
 redis==5.2.1
     # via

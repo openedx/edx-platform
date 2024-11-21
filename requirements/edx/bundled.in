@@ -39,7 +39,7 @@ optimizely-sdk                      # Optimizely provides A/B testing and other 
 ## XBLOCKS
 crowdsourcehinter-xblock
 done-xblock                         # a very simple XBlock that allows learners to mark an activity as Done
-recommender-xblock                  # https://github.com/edx/RecommenderXBlock
+recommender-xblock @ git+https://github.com/openedx/RecommenderXBlock@navin/remove-mustache
 staff-graded-xblock                 # https://github.com/openedx/staff_graded-xblock Allows off-site bulk scoring.
 edx-sga                             # The more well known "staff graded assignment" XBlock, from MIT.
 ora2>=4.5.0                         # Open Response Assessment XBlock
