@@ -1047,3 +1047,7 @@ urlpatterns += [
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]
+
+urlpatterns += [
+    path('offline_mode/', include('openedx.features.offline_mode.urls')),
+]
