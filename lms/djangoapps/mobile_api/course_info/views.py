@@ -425,10 +425,9 @@ class BlocksInfoInCourseView(BlocksInCourseView):
         """
         for block_id, block_info in blocks_info_data.items():
             if offline_content_path := get_offline_block_content_path(usage_key=UsageKey.from_string(block_id)):
-                file_url = os.path.join(settings.MEDIA_URL, offline_content_path)
                 block_info.update({
                     'offline_download': {
-                        'file_url': file_url,
+                        'file_url': default_storage.url(offline_content_path),
                         'last_modified': default_storage.get_modified_time(offline_content_path),
                         'file_size': default_storage.size(offline_content_path)
                     }
