@@ -3,12 +3,13 @@ Module to prepare HTML content for offline use.
 """
 import os
 import re
+import uuid
 
 from bs4 import BeautifulSoup
 
 from django.conf import settings
 
-from .assets_management import save_asset_file, save_mathjax_to_xblock_assets
+from .assets_management import save_asset_file, save_external_file, save_mathjax_to_xblock_assets
 from .constants import MATHJAX_CDN_URL, MATHJAX_STATIC_PATH
 
 
@@ -31,6 +32,8 @@ class HtmlManipulator:
         self._replace_asset_links()
         self._replace_static_links()
         self._replace_mathjax_link()
+        self._replace_external_links()
+        self._copy_platform_fonts()
 
         soup = BeautifulSoup(self.html_data, 'html.parser')
         self._replace_iframe(soup)
@@ -76,6 +79,38 @@ class HtmlManipulator:
         filename = link.split(settings.STATIC_URL)[-1]
         save_asset_file(self.temp_dir, self.xblock, link, filename)
         return f'assets/{filename}'
+
+    def _replace_external_links(self):
+        """
+        Replace external links to images and js files with local links.
+        """
+        pattern = re.compile(r'https:\/\/[^"\s]+?\.(js|jpe?g|png|gif|bmp|svg)')
+        self.html_data = pattern.sub(self._replace_external_link, self.html_data)
+
+    def _replace_external_link(self, match):
+        """
+        Returns the local path of the external file.
+        Downloads the external file and saves it to the local directory.
+        """
+        link = match.group()
+        file_extension = match.group(1)
+        unique_id = uuid.uuid4()
+        filename = f"assets/external/{unique_id}.{file_extension}"
+        save_external_file(self.temp_dir, link, filename)
+
+        return filename
+
+    def _copy_platform_fonts(self):
+        """
+        Copy platform fonts to the block temp directory.
+        """
+        platform_fonts_dir = "xmodule/js/common_static/fonts/vendor/"
+        block_fonts_path = os.path.join(self.temp_dir, "assets", "fonts", "vendor")
+        os.makedirs(block_fonts_path)
+        for font in os.listdir(platform_fonts_dir):
+            font_path = os.path.join(platform_fonts_dir, font)
+            if os.path.isfile(font_path):
+                os.system(f'cp {font_path} {block_fonts_path}')
 
     @staticmethod
     def _replace_iframe(soup):
