@@ -10,21 +10,33 @@
  */
 
 /**
- * Sends a data about student's answer to the IOS app.
- *
- * @param {string} message The stringified JSON object to be sent to the IOS app
+ * Sends a JSON-formatted message to the iOS bridge if available.
+ * @param {string} message - The JSON message to send.
  */
 function sendMessageToIOS(message) {
-  window?.webkit?.messageHandlers?.IOSBridge?.postMessage(message);
+  try {
+    if (window?.webkit?.messageHandlers?.IOSBridge) {
+      window.webkit.messageHandlers.IOSBridge.postMessage(message);
+      console.log("Message sent to iOS:", message);
+    }
+  } catch (error) {
+    console.error("Failed to send message to iOS:", error);
+  }
 }
 
 /**
- * Sends a data about student's answer to the Android app.
- *
- * @param {string} message The stringified JSON object to be sent to the native Android app
+ * Sends a JSON-formatted message to the Android bridge if available.
+ * @param {string} message - The JSON message to send.
  */
 function sendMessageToAndroid(message) {
-  window?.AndroidBridge?.postMessage(message);
+  try {
+    if (window?.AndroidBridge) {
+      window.AndroidBridge.postMessage(message);
+      console.log("Message sent to Android:", message);
+    }
+  } catch (error) {
+    console.error("Failed to send message to Android:", error);
+  }
 }
 
 /**
@@ -34,7 +46,13 @@ function sendMessageToAndroid(message) {
  * @param {string} message The stringified JSON object about the student's answer from the native mobile app.
  */
 function markProblemCompleted(message) {
-  const data = JSON.parse(message).data;
+  let data;
+  try {
+    data = JSON.parse(message).data
+  } catch (error) {
+    console.error("Failed to parse message:", error)
+    return
+  }
   const problemContainer = $(".xblock-student_view");
 
   const submitButton = problemContainer.find(".submit-attempt-container .submit");
@@ -69,8 +87,14 @@ function markProblemCompleted(message) {
 const originalAjax = $.ajax;
 $.ajax = function (options) {
   if (options.url && options.url.endsWith("handler/xmodule_handler/problem_check")) {
-    sendMessageToIOS(JSON.stringify(options));
-    sendMessageToAndroid(JSON.stringify(options));
+    if (options.data) {
+      // Replace spaces with URLEncoded value to ensure correct parsing on the backend
+      let formattedData = options.data.replace(/\+/g, '%20');
+      let jsonMessage = JSON.stringify(formattedData)
+
+      sendMessageToIOS(jsonMessage)
+      sendMessageToAndroid(jsonMessage)
+    }
   }
   return originalAjax.call(this, options);
 }
