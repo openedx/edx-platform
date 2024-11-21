@@ -19,7 +19,7 @@ from enterprise.models import EnterpriseCustomerUser  # lint-amnesty, pylint: di
 from requests.exceptions import HTTPError
 from six.moves.urllib.parse import parse_qs
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
@@ -56,8 +56,12 @@ from openedx.features.enterprise_support.api import (
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerFactory,
     EnterpriseCustomerIdentityProviderFactory,
     EnterpriseCustomerUserFactory,
+    EnterpriseGroupFactory,
+    EnterpriseGroupMembershipFactory,
+    PendingEnterpriseCustomerUserFactory
 )
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, get_data_consent_share_cache_key
@@ -90,7 +94,40 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             email='ent_worker@example.com',
             password='password123',
         )
+        cls.enterprise_customer = EnterpriseCustomerFactory()
+        cls.pending_enterprise_customer_user = PendingEnterpriseCustomerUserFactory()
         super().setUpTestData()
+
+
+    @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
+    def test_list_learners_filtered(self, mock_jwt_builder):
+        """
+        Test that the list learners endpoint can be filtered by user details
+        """
+        user = UserFactory(email='foobar@example.com')
+        UserProfileFactory.create(
+            user=user,
+            defaults={'name': 'Test Enterprise User'},
+        )
+        group = EnterpriseGroupFactory(
+            enterprise_customer=self.enterprise_customer,
+        )
+        pending_user = PendingEnterpriseCustomerUserFactory(
+            user_email="foobar@example.com",
+            enterprise_customer=self.enterprise_customer,
+        )
+
+        pending_user_query_string = f'?user_query={pending_user.user_email}'
+        # approach 1
+        api_client = self._assert_api_client_with_user(EnterpriseApiClient, mock_jwt_builder)
+        response = api_client.get_learners(group.uuid, pending_user_query_string)
+        assert response.status_code == 200
+
+        # approach 2
+        url = f'https://testserver/enterprise/api/v1/enterprise-group/{group.uuid}/learners/{pending_user_query_string}'
+        response = self.client.get(url)
+        assert response.status_code == 200
+
 
     def _assert_api_service_client(self, api_client, mocked_jwt_builder):
         """
@@ -584,7 +621,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         api_client = self._assert_api_client_with_user(EnterpriseApiClient, mock_jwt_builder)
         mock_client = mock.Mock()
         api_client.client = mock_client
-
         user = mock.Mock(is_authenticated=True, username='spongebob')
         response = api_client.fetch_enterprise_learner_data(user)
 

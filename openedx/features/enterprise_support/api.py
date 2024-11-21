@@ -282,6 +282,11 @@ class EnterpriseApiClient:
 
         return response.json()
 
+    def get_learners(self, group_uuid, query):
+        api_url = urljoin(f"{self.base_api_url}/", f"enterprise-group/{group_uuid}/learners/{query}")
+        response = self.client.get(api_url)        
+        response.raise_for_status()
+        return response.json()
 
 class EnterpriseApiServiceClient(EnterpriseServiceClientMixin, EnterpriseApiClient):
     """
