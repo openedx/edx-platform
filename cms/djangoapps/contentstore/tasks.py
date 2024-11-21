@@ -1176,28 +1176,21 @@ def check_broken_links(self, user_id, course_key_string, language):
         return broken_links
     
     user = validate_user()
+
+    self.status.set_state('Scanning')
     courselike_key = CourseKey.from_string(course_key_string)
+    data = scan_course(courselike_key)
 
     try:
-        self.status.set_state('Preparing')
+        self.status.set_state('Saving')
+        self.status.increment_completed_steps()
+
         file_name = str(courselike_key)
         links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')
+        LOGGER.debug('json file being generated at %s', links_file.name)
 
-        try:
-            if self.status:
-                self.status.set_state('Scanning')
-                self.status.increment_completed_steps()
-            LOGGER.debug('json file being generated at %s', links_file.name)
-
-            data = scan_course(courselike_key)
-
-            with open(links_file.name, 'w') as file:
-                json.dump(data, file, indent=4)
-        except Exception as exc:
-            LOGGER.exception('There was an error link checking %s', courselike_key, exc_info=True)
-            if self.status:
-                self.status.fail(json.dumps({'raw_error_msg': str(exc)}))
-            raise
+        with open(links_file.name, 'w') as file:
+            json.dump(data, file, indent=4)
 
         artifact = UserTaskArtifact(status=self.status, name='BrokenLinks')
         artifact.file.save(name=os.path.basename(links_file.name), content=File(links_file))
