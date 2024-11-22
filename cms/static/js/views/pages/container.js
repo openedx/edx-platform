@@ -524,7 +524,7 @@ function($, _, Backbone, gettext, BasePage,
                 ViewUtils.runOperationShowingMessage(gettext('Adding'), () => {
                     return lastAdded.done(() => { doneAddingAllBlocks() });
                 });
-            });
+            }, this.options.isIframeEmbed);
         },
 
         /**
