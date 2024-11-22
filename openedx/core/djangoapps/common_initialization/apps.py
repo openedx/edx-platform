@@ -37,7 +37,9 @@ class CommonInitializationConfig(AppConfig):  # lint-amnesty, pylint: disable=mi
         if 'postgresql' in connection.vendor.lower():
             from opaque_keys.edx.locator import CourseLocator
             from psycopg2.extensions import QuotedString, register_adapter
+
             def adapt_course_locator(course_locator):
+
                 return QuotedString(course_locator._to_string())  # lint-amnesty, pylint: disable=protected-access
 
             # Register the adapter
