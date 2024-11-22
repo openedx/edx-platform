@@ -50,6 +50,7 @@ def grade_updated(**kwargs):
         if not root_id:
             root_id = create_new_event_transaction_id()
         set_event_transaction_type(PROBLEM_SUBMITTED_EVENT_TYPE)
+        #SA || letter_grade changes
         tracker.emit(
             str(PROBLEM_SUBMITTED_EVENT_TYPE),
             {
@@ -60,6 +61,7 @@ def grade_updated(**kwargs):
                 'event_transaction_type': str(PROBLEM_SUBMITTED_EVENT_TYPE),
                 'weighted_earned': kwargs.get('weighted_earned'),
                 'weighted_possible': kwargs.get('weighted_possible'),
+                'letter_grade': kwargs.get('letter_grade'),
             }
         )
 

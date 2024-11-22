@@ -109,7 +109,8 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
 
     # Priority order for retrieving the scores:
     # submissions API -> CSM -> grades persisted block -> latest block content
-    raw_earned, raw_possible, weighted_earned, weighted_possible, first_attempted = (
+    #SA || letter_grade changes
+    raw_earned, raw_possible, weighted_earned, weighted_possible, first_attempted, letter_grade = (
         _get_score_from_submissions(submissions_scores, block) or
         _get_score_from_csm(csm_scores, block, weight) or
         _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
@@ -129,6 +130,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
         has_valid_denominator = weighted_possible > 0.0
         graded = _get_graded_from_block(persisted_block, block) if has_valid_denominator else False
 
+        #SA || letter_grade changes
         return ProblemScore(
             raw_earned,
             raw_possible,
@@ -137,6 +139,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
             weight,
             graded,
             first_attempted=first_attempted,
+            letter_grade=letter_grade,
         )
 
 
@@ -174,12 +177,14 @@ def _get_score_from_submissions(submissions_scores, block):
     """
     if submissions_scores:
         submission_value = submissions_scores.get(str(block.location))
+        #SA || letter_grade changes
         if submission_value:
             first_attempted = submission_value['created_at']
             weighted_earned = submission_value['points_earned']
             weighted_possible = submission_value['points_possible']
+            letter_grade = submission_value.get('letter_grade', '')
             assert weighted_earned >= 0.0 and weighted_possible > 0.0  # per contract from submissions API
-            return (None, None) + (weighted_earned, weighted_possible) + (first_attempted,)
+            return (None, None) + (weighted_earned, weighted_possible) + (first_attempted, letter_grade,)
 
 
 def _get_score_from_csm(csm_scores, block, weight):
@@ -209,7 +214,8 @@ def _get_score_from_csm(csm_scores, block, weight):
             raw_earned = 0.0
 
         raw_possible = score.total
-        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (first_attempted,)
+        #SA || letter_grade changes
+        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (first_attempted, score.letter_grade,)
 
 
 def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
@@ -227,6 +233,9 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     raw_earned = 0.0
     first_attempted = None
 
+    #SA || letter_grade changes
+    letter_grade = None
+
     if persisted_block:
         raw_possible = persisted_block.raw_possible
     else:
@@ -242,7 +251,8 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     else:
         weighted_scores = weighted_score(raw_earned, raw_possible, weight)
 
-    return (raw_earned, raw_possible) + weighted_scores + (first_attempted,)
+    #SA || letter_grade changes
+    return (raw_earned, raw_possible) + weighted_scores + (first_attempted, letter_grade,)
 
 
 def _get_weight_from_block(persisted_block, block):

@@ -342,6 +342,9 @@ class PersistentSubsectionGrade(TimeStampedModel):
     earned_graded = models.FloatField(blank=False)
     possible_graded = models.FloatField(blank=False)
 
+    #SA || letter_grade changes
+    letter_grade = models.CharField(max_length=255, blank=True, null=True)
+
     # timestamp for the learner's first attempt at content in
     # this subsection. If null, indicates no attempt
     # has yet been made.
@@ -368,8 +371,9 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         Returns a string representation of this model.
         """
+        #SA || letter_grade changes
         return (
-            "{} user: {}, course version: {}, subsection: {} ({}). {}/{} graded, {}/{} all, first_attempted: {}"
+            "{} user: {}, course version: {}, subsection: {} ({}). {}/{} graded, {}/{} all, first_attempted: {}, letter_grade: {}"
         ).format(
             type(self).__name__,
             self.user_id,
@@ -381,6 +385,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
             self.earned_all,
             self.possible_all,
             self.first_attempted,
+            self.letter_grade,
         )
 
     @classmethod
