@@ -85,6 +85,7 @@ def test_process_url_no_match():
 
     assert process_static_urls(STATIC_SOURCE, processor) == '"test/static/file.png"'
 
+
 def test_process_url_no_match_starts_with_xblock():
     def processor(original, prefix, quote, rest):  # pylint: disable=unused-argument, redefined-outer-name
         return quote + 'test' + prefix + rest + quote
