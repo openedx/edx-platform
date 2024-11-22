@@ -54,6 +54,7 @@ from openedx.core.djangolib.markup import HTML
   <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.qubit.js')}"></script>
+  <script type="text/javascript" src="https://static.talentsprint.com/edx_scripts/quince_instructor_dashboard.js"></script>  
   
   <%static:webpack entry='HtmlBlockEditor'/>
   <link rel="stylesheet" href="${static.url('css/HtmlBlockEditor.css')}">  
@@ -155,7 +156,9 @@ from openedx.core.djangolib.markup import HTML
           <% is_hidden = section_data.get('is_hidden', False) %>
           <section id="${ section_data['section_key'] }" class="idash-section${' hidden' if hidden else ''}" aria-labelledby="header-${section_data['section_key']}">
               <h3 class="hd hd-3" id="header-${ section_data['section_key'] }" style="display:none;">${ section_data['section_display_name'] }</h3>
-              <%include file="${ section_data.get('template_path_prefix', '') }${ section_data['section_key'] }.html" args="section_data=section_data" />
+              %if "loadOnTabClick" not in section_data:
+                <%include file="${ section_data.get('template_path_prefix', '') }${ section_data['section_key'] }.html" args="section_data=section_data" />
+              %endif
           </section>
           % endfor
         </section>

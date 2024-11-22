@@ -139,7 +139,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     sections = [
             _section_enrolled_students(course, access),
             #_section_gradebook(course, access, course_id),
-            _section_attendance(course, access, course_id),
+            _section_attendance(course, access, course_id, False),
             _section_student_admin(course, access)
     ]
     if access['staff'] and "talentsprint.com" in request.user.email:
@@ -248,7 +248,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     )
 
     certificate_invalidations = CertificateInvalidation.get_certificate_invalidations(course_key)
-    sections.append(_section_course_log(course, access))
+    sections.append(_section_course_log(course, access, False))
     context = {
         'course': course,
         'studio_url': get_studio_url(course, 'course'),
@@ -747,14 +747,17 @@ def _get_dashboard_link(course_key):
     return link
 
 
-def _section_analytics(course, access):
+def _section_analytics(course, access, loadOnTabClick):
     """ Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
-        'course_id': str(course.id),
+        "loadOnTabClick" : loadOnTabClick
+        # 'course_id': str(course.id),
     }
+    if loadOnTabClick:
+        section_data["course_id"] = str(course.id)
     return section_data
 
 
@@ -814,14 +817,17 @@ def is_ecommerce_course(course_key):
     sku_count = len([mode.sku for mode in CourseMode.modes_for_course(course_key) if mode.sku])
     return sku_count > 0
 
-def _section_course_log(course, access):
+def _section_course_log(course, access, loadOnTabClick):
     section_data = {
         'section_key': 'course_log',
         'section_display_name': _('Course Log'),
         'access': access,
         'course_id': str(course.id),
-        'course_logs' : get_course_unit_log(str(course.id))
+        "loadOnTabClick" : loadOnTabClick
+        # 'course_logs' : get_course_unit_log(str(course.id))
     }
+    if loadOnTabClick:
+        section_data["course_logs"] = get_course_unit_log(str(course.id))
     return section_data
 
 # For enrolled students
@@ -912,15 +918,19 @@ def get_gradebook(course_id):
 
 
 # For student attendace
-def _section_attendance(course, access, course_id):
+def _section_attendance(course, access, course_id, loadOnTabClick):
     section_data = {
         'section_key': 'attendance',
         'section_display_name': _('Attendance'),
         'access': access,
-        'course_id': str(course.id),
-        'attendance_link' : get_attendance(str(course.id), "attendance_view")
+        'course_id': course_id,
+        "loadOnTabClick" : loadOnTabClick
+        # 'attendance_link' : get_attendance(str(course.id), "attendance_view")
     }
+    if loadOnTabClick:
+        section_data["attendance_link"] = get_attendance(course_id, "attendance_view")
     return section_data
+
 
 
 # For student attendance
@@ -959,3 +969,30 @@ def get_attendance(course_id, category):
     except Exception as e:
         log.info(e)
         return ""
+
+@ensure_csrf_cookie
+def load_tab(request, course_id, loadTab):
+    log.info(course_id)
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        log.error("Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
+        return HttpResponseServerError()
+
+    if course_key.deprecated:
+        raise Http404
+    
+    course = get_course_by_id(course_key, depth=None)
+    if loadTab == "attendance":
+        context = {"section_data" : _section_attendance(course, {}, course_id, True)}
+    elif loadTab == "course_log":
+        context = {"section_data" : _section_course_log(course, {}, True)}
+    # elif loadTab == "open_response_assessment":
+    #     openassessment_blocks = modulestore().get_items(
+    #     course_key, qualifiers={'category': 'openassessment'}
+    #     )
+    #     openassessment_blocks = [
+    #         block for block in openassessment_blocks if block.parent is not None
+    #     ]
+    #     context = {"course": course, "section_data" : _section_open_response_assessment(request, course, openassessment_blocks, {}, True)}
+    return render_to_response("instructor/instructor_dashboard_2/{0}.html".format(loadTab), context)

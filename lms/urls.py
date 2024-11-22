@@ -543,6 +543,13 @@ urlpatterns += [
         instructor_dashboard_views.instructor_dashboard_2,
         name='instructor_dashboard',
     ),
+    re_path(
+        r'^courses/{}/instructor/extras/(?P<loadTab>.*?)$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        instructor_dashboard_views.load_tab,
+        name='instructor_dashboard',
+    ),
 
     re_path(
         r'^courses/{}/set_course_mode_price$'.format(
