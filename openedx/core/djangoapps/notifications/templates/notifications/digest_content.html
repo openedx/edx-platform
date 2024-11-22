@@ -56,5 +56,13 @@
             </tbody>
         </table>
     </p>
-    <p style="height: 0.75rem; margin: 0;" />
+    <p style="height: 0.375rem; margin: 0;" />
+    {% if notification_app.show_remaining_count %}
+        <p style="margin: 0; height: 0.75rem; font-weight: 400; font-size: 14px; line-height: 24px;">
+            <a href="{{notification_app.url}}" style="color: #00688d; margin: 0; float:right; text-decoration: none;">
+                + {{ notification_app.remaining_count }} more
+            </a>
+        </p>
+    {% endif %}
+    <p style="height: 0.375rem; margin: 0;" />
 {% endfor %}
