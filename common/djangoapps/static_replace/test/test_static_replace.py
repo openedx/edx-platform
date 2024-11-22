@@ -89,7 +89,11 @@ def test_process_url_no_match():
 def test_process_url_no_match_starts_with_xblock():
     def processor(original, prefix, quote, rest):  # pylint: disable=unused-argument, redefined-outer-name
         return quote + 'test' + prefix + rest + quote
-    assert process_static_urls('"/static/xblock-file.png"', processor, data_dir=DATA_DIRECTORY) == '"test/static/xblock-file.png"'
+    assert process_static_urls(
+        '"/static/xblock-file.png"',
+        processor,
+        data_dir=DATA_DIRECTORY
+    ) == '"test/static/xblock-file.png"'
 
 
 @patch('django.http.HttpRequest', autospec=True)
