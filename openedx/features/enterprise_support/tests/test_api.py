@@ -17,9 +17,10 @@ from django.urls import reverse
 from edx_django_utils.cache import get_cache_key, TieredCache
 from enterprise.models import EnterpriseCustomerUser  # lint-amnesty, pylint: disable=wrong-import-order
 from requests.exceptions import HTTPError
+from rest_framework.test import APIClient
 from six.moves.urllib.parse import parse_qs
 
-from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
@@ -93,22 +94,22 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
             email='ent_worker@example.com',
             password='password123',
+            is_staff=True
         )
         cls.enterprise_customer = EnterpriseCustomerFactory()
-        cls.pending_enterprise_customer_user = PendingEnterpriseCustomerUserFactory()
         super().setUpTestData()
 
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.client.login(
+            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
+            password='password123')
 
-    @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
-    def test_list_learners_filtered(self, mock_jwt_builder):
+    def test_list_learners_filtered(self):
         """
         Test that the list learners endpoint can be filtered by user details
         """
-        user = UserFactory(email='foobar@example.com')
-        UserProfileFactory.create(
-            user=user,
-            defaults={'name': 'Test Enterprise User'},
-        )
         group = EnterpriseGroupFactory(
             enterprise_customer=self.enterprise_customer,
         )
@@ -116,18 +117,91 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             user_email="foobar@example.com",
             enterprise_customer=self.enterprise_customer,
         )
-
         pending_user_query_string = f'?user_query={pending_user.user_email}'
-        # approach 1
-        api_client = self._assert_api_client_with_user(EnterpriseApiClient, mock_jwt_builder)
-        response = api_client.get_learners(group.uuid, pending_user_query_string)
-        assert response.status_code == 200
-
-        # approach 2
-        url = f'https://testserver/enterprise/api/v1/enterprise-group/{group.uuid}/learners/{pending_user_query_string}'
+        url = settings.LMS_ROOT_URL + reverse(
+            'enterprise-group-learners',
+            kwargs={'group_uuid': group.uuid},
+        ) + pending_user_query_string
         response = self.client.get(url)
-        assert response.status_code == 200
 
+        assert response.json().get('count') == 0
+
+        group.save()
+        pending_membership = EnterpriseGroupMembershipFactory(
+            group=group,
+            pending_enterprise_customer_user=pending_user,
+            enterprise_customer_user=None,
+        )
+        existing_membership = EnterpriseGroupMembershipFactory(
+            group=group,
+            pending_enterprise_customer_user=None,
+            enterprise_customer_user__enterprise_customer=self.enterprise_customer,
+        )
+        existing_user = existing_membership.enterprise_customer_user.user
+        # Changing email to something that we know will be unique for collision purposes
+        existing_user.email = "ayylmao@example.com"
+
+        existing_user.save()
+        existing_user_query_string = '?user_query=ayylmao'
+        url = settings.LMS_ROOT_URL + reverse(
+            'enterprise-group-learners',
+            kwargs={'group_uuid': group.uuid},
+        ) + existing_user_query_string
+        response = self.client.get(url)
+
+        assert response.json().get('count') == 1
+        assert response.json().get('results')[0].get(
+            'enterprise_customer_user_id'
+        ) == existing_membership.enterprise_customer_user.id
+
+        url = settings.LMS_ROOT_URL + reverse(
+            'enterprise-group-learners',
+            kwargs={'group_uuid': group.uuid},
+        ) + pending_user_query_string
+
+        response = self.client.get(url)
+
+        assert response.json().get('count') == 1
+        assert response.json().get('results')[0].get(
+            'pending_enterprise_customer_user_id'
+        ) == pending_membership.pending_enterprise_customer_user.id
+
+        # test that user can query by name in addition to email
+        name_query_string = f'?user_query={existing_user.profile.name}'
+        url = settings.LMS_ROOT_URL + reverse(
+            'enterprise-group-learners',
+            kwargs={'group_uuid': group.uuid},
+        ) + name_query_string
+
+        response = self.client.get(url)
+        assert response.json().get('count') == 1
+
+    def test_list_members_little_bobby_tables(self):
+        """
+        Test that we properly sanitize member user query filters
+        https://xkcd.com/327/
+        """
+        group = EnterpriseGroupFactory(
+            enterprise_customer=self.enterprise_customer,
+        )
+        group.save()
+        EnterpriseGroupMembershipFactory(
+            group=group,
+            pending_enterprise_customer_user=None,
+            enterprise_customer_user__enterprise_customer=self.enterprise_customer,
+        )
+        # existing_user = existing_membership.enterprise_customer_user.user
+        # url: 'http://testserver/enterprise/api/v1/enterprise_group/<group uuid>/learners/'
+        url = settings.LMS_ROOT_URL + reverse(
+            'enterprise-group-learners',
+            kwargs={'group_uuid': group.uuid},
+        )
+        # The problematic child
+        filter_query_param = "?user_query=Robert`); DROP TABLE enterprise_enterprisecustomeruser;--"
+        sql_injection_protected_response = self.client.get(url + filter_query_param)
+        assert sql_injection_protected_response.status_code == 200
+        assert not sql_injection_protected_response.json().get('results')
+        assert EnterpriseCustomerUser.objects.all()
 
     def _assert_api_service_client(self, api_client, mocked_jwt_builder):
         """

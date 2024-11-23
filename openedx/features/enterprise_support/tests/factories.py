@@ -8,6 +8,7 @@ from uuid import UUID
 import factory
 from faker import Factory as FakerFactory
 
+from common.djangoapps.student.tests.factories import UserFactory
 from enterprise.models import (
     EnterpriseCourseEnrollment,
     EnterpriseCustomer,
@@ -64,7 +65,11 @@ class EnterpriseCustomerUserFactory(factory.django.DjangoModelFactory):
         model = EnterpriseCustomerUser
 
     enterprise_customer = factory.SubFactory(EnterpriseCustomerFactory)
-    user_id = factory.LazyAttribute(lambda x: FAKER.pyint())  # pylint: disable=no-member
+    user_id = factory.LazyAttribute(lambda x: UserFactory.create().id)
+    active = True
+    linked = True
+    is_relinkable = True
+    invite_key = None
 
 
 class EnterpriseCourseEnrollmentFactory(factory.django.DjangoModelFactory):
