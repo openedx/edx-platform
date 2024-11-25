@@ -75,8 +75,10 @@ def link_check_status_handler(request, course_key_string):
     If link_check task was successful, an output result is also returned.
 
     For reference, the following status are in UserTaskStatus:
-        'Pending', 'In Progress', 'Succeeded',
-        'Failed', 'Canceled', 'Retrying'
+        'Pending', 'In Progress' (sent to frontend as 'In-Progress'),
+        'Succeeded', 'Failed', 'Canceled', 'Retrying'
+    This function adds a status for when status from UserTaskStatus is None:
+        'Uninitiated'
     """
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
@@ -112,6 +114,7 @@ def link_check_status_handler(request, course_key_string):
                     # Wasn't JSON, just use the value as a string
                     pass
 
+    status = status.replace(' ', '-')
     response = {
         'LinkCheckStatus': status,
         **({'LinkCheckOutput': broken_links_dto} if broken_links_dto else {}),
