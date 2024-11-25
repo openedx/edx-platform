@@ -6,17 +6,15 @@ courses
 
 import json
 import logging
-import os
-from wsgiref.util import FileWrapper
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponse, StreamingHttpResponse
+from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_http_methods
+from django.views.decorators.http import require_GET, require_POST
 from opaque_keys.edx.keys import CourseKey
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
@@ -25,6 +23,7 @@ from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.views import ensure_valid_course_key
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
+from cms.djangoapps.contentstore.core.course_optimizer_provider import create_dto
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -43,37 +42,25 @@ STATUS_FILTERS = user_tasks_settings.USER_TASKS_STATUS_FILTERS
 
 
 @transaction.non_atomic_requests
+@require_POST
 @ensure_csrf_cookie
 @login_required
-@require_http_methods(('POST'))
 @ensure_valid_course_key
 def link_check_handler(request, course_key_string):
     """
-    The restful handler for checking broken links in a course.
-
-    POST
-        Start a Celery task to check broken links in the course
-
-    The Studio UI uses a POST request to start the link check asynchronously, with
-    a link appearing on the page once it's ready.
+    POST handler to queue an asynchronous celery task. 
+    This celery task checks a course for broken links.
     """
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
-    courselike_block = modulestore().get_course(course_key)
-    if courselike_block is None:
-        raise Http404
-    context = {
-        'context_course': courselike_block,
-        'courselike_home_url': reverse_course_url("course_handler", course_key),
-    }
-    context['status_url'] = reverse_course_url('link_check_status_handler', course_key)
 
-    # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
-    requested_format = request.GET.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
+    course_block = modulestore().get_course(course_key)
+    if course_block is None:
+        raise Http404
 
     check_broken_links.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
-    return JsonResponse({'LinkCheckStatus': 1})
+    return JsonResponse({'LinkCheckStatus': UserTaskStatus.PENDING})
 
 
 @transaction.non_atomic_requests
@@ -83,15 +70,13 @@ def link_check_handler(request, course_key_string):
 @ensure_valid_course_key
 def link_check_status_handler(request, course_key_string):
     """
-    Returns an integer corresponding to the status of a link check. These are:
+    GET handler to return the status of the link_check task from UserTaskStatus.
+    If no task has been started for the course, return 'Uninitiated'.
+    If link_check task was successful, an output result is also returned.
 
-        -X : Link check unsuccessful due to some error with X as stage [0-3]
-        0 : No status info found (task not yet created)
-        1 : Scanning
-        2 : Saving
-        3 : Success
-
-    If the link check was successful, an output result is also returned.
+    For reference, the following status are in UserTaskStatus:
+        'Pending', 'In Progress', 'Succeeded',
+        'Failed', 'Canceled', 'Retrying'
     """
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
@@ -99,45 +84,39 @@ def link_check_status_handler(request, course_key_string):
 
     # The task status record is authoritative once it's been created
     task_status = _latest_task_status(request, course_key_string, link_check_status_handler)
-    json_content = None
-    test = None
-    response = None
-    error = None
+    status = None
     broken_links_dto = None
+    error = None
     if task_status is None:
         # The task hasn't been initialized yet; did we store info in the session already?
         try:
-            session_status = request.session["link_check_status"]
+            session_status = request.session['link_check_status']
             status = session_status[course_key_string]
         except KeyError:
-            status = 0
-    elif task_status.state == UserTaskStatus.SUCCEEDED:
-        status = 3
-        artifact = UserTaskArtifact.objects.get(status=task_status, name='BrokenLinks')
-        with artifact.file as file:
-            content = file.read()
-            json_content = json.loads(content)
-            broken_links_dto = _create_dto(json_content, request.user)
-    elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
-        status = max(-(task_status.completed_steps + 1), -2)
-        errors = UserTaskArtifact.objects.filter(status=task_status, name='Error')
-        if errors:
-            error = errors[0].text
-            try:
-                error = json.loads(error)
-            except ValueError:
-                # Wasn't JSON, just use the value as a string
-                pass
+            status = 'Uninitiated'
     else:
-        status = min(task_status.completed_steps + 1, 2)
+        status = task_status.state
+        if task_status.state == UserTaskStatus.SUCCEEDED:
+            artifact = UserTaskArtifact.objects.get(status=task_status, name='BrokenLinks')
+            with artifact.file as file:
+                content = file.read()
+                json_content = json.loads(content)
+                broken_links_dto = create_dto(json_content, request.user)
+        elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
+            errors = UserTaskArtifact.objects.filter(status=task_status, name='Error')
+            if errors:
+                error = errors[0].text
+                try:
+                    error = json.loads(error)
+                except ValueError:
+                    # Wasn't JSON, just use the value as a string
+                    pass
 
     response = {
-        "LinkCheckStatus": status,
+        'LinkCheckStatus': status,
+        **({'LinkCheckOutput': broken_links_dto} if broken_links_dto else {}),
+        **({'LinkCheckError': error} if error else {})
     }
-    if broken_links_dto:
-        response["LinkCheckOutput"] = broken_links_dto
-    if error:
-        response['LinkCheckError'] = error
     return JsonResponse(response)
 
 
@@ -152,61 +131,3 @@ def _latest_task_status(request, course_key_string, view_func=None):
     for status_filter in STATUS_FILTERS:
         task_status = status_filter().filter_queryset(request, task_status, view_func)
     return task_status.order_by('-created').first()
-
-
-def _create_dto(json_content, request_user):
-    """
-    Returns a Data Transfer Object for frontend given a list of broken links.
-
-    json_content contains a list of the following:
-        [block_id, link]
-
-    Returned DTO structure:
-    {
-        section: {
-            display_name,
-            subsection: {
-                display_name,
-                unit: {
-                    display_name,
-                    block: {
-                        display_name,
-                        url,
-                        broken_links: [],
-                    }
-                }
-            }
-        }
-    }
-    """
-    result = {}
-    for item in json_content:
-        block_id, link = item
-        usage_key = usage_key_with_run(block_id)
-        block = get_xblock(usage_key, request_user)
-        _add_broken_link_description(result, block, link)
-
-    return result
-
-
-def _add_broken_link_description(result, block, link):
-    """
-    Adds broken link found in the specified block along with other block data.
-    Note that because the celery queue does not have credentials, some broken links will
-    need to be checked client side.
-    """
-    hierarchy = []
-    current = block
-    while current:
-        hierarchy.append(current)
-        current = current.get_parent()
-    
-    current_dict = result
-    for xblock in reversed(hierarchy):
-        current_dict = current_dict.setdefault(
-            str(xblock.location.block_id), 
-            { 'display_name': xblock.display_name }
-        )
-    
-    current_dict['url'] = f'/course/{block.course_id}/editor/{block.category}/{block.location}'
-    current_dict.setdefault('broken_links', []).append(link)

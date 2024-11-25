@@ -1084,7 +1084,7 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
 
         For reference, these are:
         1. Scanning
-        2. Verifying
+        2. Saving
         """
         return 2
 
