@@ -80,6 +80,7 @@ class Fields:
     published = "published"
     published_display_name = "display_name"
     published_description = "description"
+    published_num_children = "num_children"
 
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
@@ -106,9 +107,12 @@ def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     we could use PublishableEntity's primary key / UUID instead.
     """
     # The slugified key _may_ not be unique so we append a hashed string to make it unique:
-    key_bin = str(usage_key).encode()
-    suffix = blake2b(key_bin, digest_size=4).hexdigest()  # When we use Python 3.9+, should add usedforsecurity=False
-    return slugify(str(usage_key)) + "-" + suffix
+    key_str = str(usage_key)
+    key_bin = key_str.encode()
+
+    suffix = blake2b(key_bin, digest_size=4, usedforsecurity=False).hexdigest()
+
+    return f"{slugify(key_str)}-{suffix}"
 
 
 def _meili_access_id_from_context_key(context_key: LearningContextKey) -> int:
@@ -485,6 +489,15 @@ def searchable_doc_for_collection(
     if collection:
         assert collection.key == collection_key
 
+        draft_num_children = authoring_api.filter_publishable_entities(
+            collection.entities,
+            has_draft=True,
+        ).count()
+        published_num_children = authoring_api.filter_publishable_entities(
+            collection.entities,
+            has_published=True,
+        ).count()
+
         doc.update({
             Fields.context_key: str(library_key),
             Fields.org: str(library_key.org),
@@ -495,7 +508,10 @@ def searchable_doc_for_collection(
             Fields.description: collection.description,
             Fields.created: collection.created.timestamp(),
             Fields.modified: collection.modified.timestamp(),
-            Fields.num_children: collection.entities.count(),
+            Fields.num_children: draft_num_children,
+            Fields.published: {
+                Fields.published_num_children: published_num_children,
+            },
             Fields.access_id: _meili_access_id_from_context_key(library_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })

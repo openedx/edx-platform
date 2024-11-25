@@ -1,10 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
-.xmodule_edit.xmodule_AboutBlock,
-.xmodule_edit.xmodule_CourseInfoBlock,
-.xmodule_edit.xmodule_HtmlBlock,
-.xmodule_edit.xmodule_StaticTabBlock {
-}
 
 .xmodule_edit.xmodule_AboutBlock .ui-col-wide,
 .xmodule_edit.xmodule_CourseInfoBlock .ui-col-wide,
@@ -118,7 +113,8 @@
     height: 21px;
 }
 
-.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:hover, .xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:focus,
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:hover,
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:focus,
 .xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar button:hover,
 .xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar button:focus,
 .xmodule_edit.xmodule_HtmlBlock .editor .editor-bar button:hover,

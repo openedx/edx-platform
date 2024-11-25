@@ -71,9 +71,9 @@ System Dependencies
 -------------------
 
 OS:
-* Ubuntu 20.04
-
 * Ubuntu 22.04
+
+* Ubuntu 24.04
 
 Interperters/Tools:
 
@@ -106,6 +106,15 @@ Language Packages:
   - ``pip install -r requirements/edx/dev.txt`` (development)
 
   Some Python packages have system dependencies. For example, installing these packages on Debian or Ubuntu will require first running ``sudo apt install python3-dev default-libmysqlclient-dev build-essential pkg-config`` to satisfy the requirements of the ``mysqlclient`` Python package.
+
+Codejail Setup
+--------------
+
+As a part of the baremetal setup, you will need to configure your system to
+work properly with codejail.  See the `codejail installation steps`_ for more
+details.
+
+.. _codejail installation steps: https://github.com/openedx/codejail?tab=readme-ov-file#installation
 
 Build Steps
 -----------

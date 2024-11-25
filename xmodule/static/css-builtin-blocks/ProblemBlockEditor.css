@@ -1,8 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
-.xmodule_edit.xmodule_ProblemBlock {
-}
-
 .xmodule_edit.xmodule_ProblemBlock .ui-col-wide {
     width: 74.46809%;
     margin-right: 2.12766%;
@@ -76,7 +73,8 @@
     height: 21px;
 }
 
-.xmodule_edit.xmodule_ProblemBlock .editor .editor-bar button:hover, .xmodule_edit.xmodule_ProblemBlock .editor .editor-bar button:focus {
+.xmodule_edit.xmodule_ProblemBlock .editor .editor-bar button:hover,
+.xmodule_edit.xmodule_ProblemBlock .editor .editor-bar button:focus {
     background: rgba(255, 255, 255, 0.5);
 }
 
@@ -134,7 +132,8 @@
     cursor: none;
 }
 
-.xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current:hover, .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current:focus {
+.xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current:hover,
+.xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current:focus {
     box-shadow: 0 0 0 0 !important;
     background-color: var(--white);
 }
@@ -208,7 +207,7 @@
     background: none;
 }
 
-.xmodule_edit.xmodule_ProblemBlock .problem-editor .markdown-box + .CodeMirror {
+.xmodule_edit.xmodule_ProblemBlock .problem-editor .markdown-box+.CodeMirror {
     padding: 10px;
     width: 69%;
 }

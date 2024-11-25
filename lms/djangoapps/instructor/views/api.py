@@ -1384,44 +1384,59 @@ class GetGradingConfig(APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_ISSUED_CERTIFICATES)
-def get_issued_certificates(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetIssuedCertificates(APIView):
     """
     Responds with JSON if CSV is not required. contains a list of issued certificates.
-    Arguments:
-        course_id
-    Returns:
-        {"certificates": [{course_id: xyz, mode: 'honor'}, ...]}
-
     """
-    course_key = CourseKey.from_string(course_id)
-    csv_required = request.GET.get('csv', 'false')
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_ISSUED_CERTIFICATES
 
-    query_features = ['course_id', 'mode', 'total_issued_certificate', 'report_run_date']
-    query_features_names = [
-        ('course_id', _('CourseID')),
-        ('mode', _('Certificate Type')),
-        ('total_issued_certificate', _('Total Certificates Issued')),
-        ('report_run_date', _('Date Report Run'))
-    ]
-    certificates_data = instructor_analytics_basic.issued_certificates(course_key, query_features)
-    if csv_required.lower() == 'true':
-        __, data_rows = instructor_analytics_csvs.format_dictlist(certificates_data, query_features)
-        return instructor_analytics_csvs.create_csv_response(
-            'issued_certificates.csv',
-            [col_header for __, col_header in query_features_names],
-            data_rows
-        )
-    else:
-        response_payload = {
-            'certificates': certificates_data,
-            'queried_features': query_features,
-            'feature_names': dict(query_features_names)
-        }
-        return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Arguments: course_id
+        Returns:
+            {"certificates": [{course_id: xyz, mode: 'honor'}, ...]}
+        """
+        return self.all_issued_certificates(request, course_id)
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def get(self, request, course_id):
+        return self.all_issued_certificates(request, course_id)
+
+    def all_issued_certificates(self, request, course_id):
+        """
+        common method for both post and get. This method will return all issued certificates.
+        """
+        course_key = CourseKey.from_string(course_id)
+        csv_required = request.GET.get('csv', 'false')
+
+        query_features = ['course_id', 'mode', 'total_issued_certificate', 'report_run_date']
+        query_features_names = [
+            ('course_id', _('CourseID')),
+            ('mode', _('Certificate Type')),
+            ('total_issued_certificate', _('Total Certificates Issued')),
+            ('report_run_date', _('Date Report Run'))
+        ]
+        certificates_data = instructor_analytics_basic.issued_certificates(course_key, query_features)
+        if csv_required.lower() == 'true':
+            __, data_rows = instructor_analytics_csvs.format_dictlist(certificates_data, query_features)
+            return instructor_analytics_csvs.create_csv_response(
+                'issued_certificates.csv',
+                [col_header for __, col_header in query_features_names],
+                data_rows
+            )
+        else:
+            response_payload = {
+                'certificates': certificates_data,
+                'queried_features': query_features,
+                'feature_names': dict(query_features_names)
+            }
+            return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')

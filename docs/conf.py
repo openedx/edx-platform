@@ -55,7 +55,6 @@ release = ''
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
@@ -68,6 +67,18 @@ extensions = [
     'sphinx_design',
     'code_annotations.contrib.sphinx.extensions.featuretoggles',
     'code_annotations.contrib.sphinx.extensions.settings',
+    'autoapi.extension',
+]
+
+autoapi_type = 'python'
+autoapi_dirs = ['../lms', '../openedx']
+
+autoapi_ignore = [
+    '*/migrations/*',
+    '*/tests/*',
+    '*.pyc',
+    '__init__.py',
+    '**/xblock_serializer/data.py',
 ]
 
 # Rediraffe related settings.
@@ -276,13 +287,6 @@ if os.environ.get("READTHEDOCS", "") == "True":
 intersphinx_mapping = {
     'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
 }
-
-# Mock out these external modules during code import to avoid errors
-autodoc_mock_imports = [
-    'MySQLdb',
-    'django_mysql',
-    'pymongo',
-]
 
 # Start building a map of the directories relative to the repository root to
 # run sphinx-apidoc against and the directories under "docs" in which to store

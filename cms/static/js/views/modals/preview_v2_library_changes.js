@@ -4,9 +4,8 @@
  * authors to preview the new version of a library-sourced XBlock, and decide
  * whether to accept ("sync") or reject ("ignore") the changes.
  */
-define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal',
-    'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils'],
-function($, _, gettext, BaseModal, ViewUtils, XBlockViewUtils) {
+define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'common/js/components/utils/view_utils'],
+function($, _, gettext, BaseModal, ViewUtils) {
     'use strict';
 
     var PreviewLibraryChangesModal = BaseModal.extend({
@@ -40,18 +39,24 @@ function($, _, gettext, BaseModal, ViewUtils, XBlockViewUtils) {
 
         /**
          * Show an edit modal for the specified xblock
-         * @param xblockElement The element that contains the xblock to be edited.
-         * @param rootXBlockInfo An XBlockInfo model that describes the root xblock on the page.
+         * @param xblockInfo The XBlockInfo model that describes the xblock.
+         * @param courseAuthoringMfeUrl The course authoring mfe url.
+         * @param upstreamBlockId The library block id.
+         * @param upstreamBlockVersionSynced The library block current version.
          * @param refreshFunction A function to refresh the block after it has been updated
          */
-        showPreviewFor: function(xblockElement, rootXBlockInfo, refreshFunction) {
-            this.xblockElement = xblockElement;
-            this.xblockInfo = XBlockViewUtils.findXBlockInfo(xblockElement, rootXBlockInfo);
-            this.courseAuthoringMfeUrl = rootXBlockInfo.attributes.course_authoring_url;
-            const headerElement = xblockElement.find('.xblock-header-primary');
+        showPreviewFor: function(
+          xblockInfo,
+          courseAuthoringMfeUrl,
+          upstreamBlockId,
+          upstreamBlockVersionSynced,
+          refreshFunction
+        ) {
+            this.xblockInfo = xblockInfo;
+            this.courseAuthoringMfeUrl = courseAuthoringMfeUrl;
             this.downstreamBlockId = this.xblockInfo.get('id');
-            this.upstreamBlockId = headerElement.data('upstream-ref');
-            this.upstreamBlockVersionSynced = headerElement.data('version-synced');
+            this.upstreamBlockId = upstreamBlockId;
+            this.upstreamBlockVersionSynced = upstreamBlockVersionSynced;
             this.refreshFunction = refreshFunction;
 
             this.render();
