@@ -159,7 +159,7 @@ Here are the different integration points that python plugins can use:
 .. _pluggable_override docstring: https://github.com/openedx/edx-django-utils/blob/master/edx_django_utils/plugins/pluggable_override.py
 .. _separate events library: https://github.com/eduNEXT/openedx-events/
 .. _separate filters library: https://github.com/eduNEXT/openedx-filters/
-.. _hooks guide: https://github.com/openedx/edx-platform/blob/master/docs/guides/hooks/index.rst
+.. _hooks guide: https://docs.openedx.org/en/latest/developers/concepts/hooks_extension_framework.html
 
 Platform Look & Feel
 ====================
