@@ -64,7 +64,7 @@
     "react-router-dom": "5.3.4",
     "react-slick": "0.30.2",
     "redux": "3.7.2",
-    "redux-thunk": "2.2.0",
+    "redux-thunk": "2.4.2",
     "requirejs": "2.3.7",
     "rtlcss": "4.3.0",
     "sass": "^1.54.8",
