@@ -5,7 +5,9 @@ from unittest import mock
 
 import ddt
 import httpretty
+import json
 import pytest
+import requests
 from testfixtures import LogCapture
 from consent.models import DataSharingConsent
 from django.conf import settings
@@ -13,13 +15,18 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
-from django.urls import reverse
+from django.urls import get_resolver, reverse
+from django.utils.http import urlencode
 from edx_django_utils.cache import get_cache_key, TieredCache
+from edx_rest_api_client.auth import SuppliedJwtAuth
 from enterprise.models import EnterpriseCustomerUser  # lint-amnesty, pylint: disable=wrong-import-order
 from requests.exceptions import HTTPError
+from rest_framework.test import APIClient
 from six.moves.urllib.parse import parse_qs
 
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
@@ -56,6 +63,7 @@ from openedx.features.enterprise_support.api import (
 from openedx.features.enterprise_support.tests import FEATURES_WITH_ENTERPRISE_ENABLED
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCourseEnrollmentFactory,
+    EnterpriseCustomerFactory,
     EnterpriseCustomerIdentityProviderFactory,
     EnterpriseCustomerUserFactory,
 )
@@ -89,8 +97,17 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
             email='ent_worker@example.com',
             password='password123',
+            is_staff=True
         )
+        cls.enterprise_customer = EnterpriseCustomerFactory()
         super().setUpTestData()
+
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.client.login(
+            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
+            password='password123')
 
     def _assert_api_service_client(self, api_client, mocked_jwt_builder):
         """
@@ -151,7 +168,7 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
     @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
     def test_enterprise_api_client_with_service_user(self, mock_jwt_builder):
         """
-        Verify that enterprise API service client uses enterprcreate_jwt_for_userise service user
+        Verify that enterprise API service client uses enterprise service user
         by default to authenticate and access enterprise API.
         """
         self._assert_api_service_client(EnterpriseApiServiceClient, mock_jwt_builder)
@@ -1405,3 +1422,57 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         unlink_enterprise_user_from_idp(request, self.user, idp_backend_name='the-backend-name')
 
         assert 0 == EnterpriseCustomerUser.objects.filter(user_id=self.user.id).count()
+
+    @mock.patch('openedx.features.enterprise_support.api.create_jwt_for_user')
+    def test_list_members_filtered(self, mock_jwt_builder):
+        """
+        Test that the enterprise customer members endpoint works and can be filtered
+        by user query
+        """
+        user_1 = UserFactory(first_name="Rhaenyra", last_name="Targaryen")
+        user_2 = UserFactory(first_name="Alicent", last_name="Hightower")
+        user_3 = UserFactory(first_name="Jace", last_name="Targaryen")
+        user_4 = UserFactory(first_name="Bad", last_name="Name")
+        user_4.profile.name = "Helaena Targaryen"
+        user_4.profile.save()
+
+        enterprise_customer = EnterpriseCustomerFactory()
+
+        EnterpriseCustomerUserFactory(
+            user_id=user_1.id,
+            enterprise_customer=enterprise_customer
+        )
+        EnterpriseCustomerUserFactory(
+            user_id=user_2.id,
+            enterprise_customer=enterprise_customer
+        )
+        EnterpriseCustomerUserFactory(
+            user_id=user_3.id,
+            enterprise_customer=enterprise_customer
+        )
+        EnterpriseCustomerUserFactory(
+            user_id=user_4.id,
+            enterprise_customer=enterprise_customer
+        )
+
+        # Test valid UUID
+        url = reverse('enterprise-customer-members', kwargs={'enterprise_uuid': enterprise_customer.uuid})
+        response = self.client.get(url)
+        assert response.status_code == 200
+        results = json.loads(response.content.decode("utf-8"))['results']
+
+        # list should be sorted alphabetically by name
+        assert len(results) == 4
+        assert results[0]['enterprise_customer_user']['name'] == (user_2.first_name + ' ' + user_2.last_name)
+        assert results[1]['enterprise_customer_user']['name'] == (user_4.profile.name)
+        assert results[2]['enterprise_customer_user']['name'] == (user_3.first_name + ' ' + user_3.last_name)
+        assert results[3]['enterprise_customer_user']['name'] == (user_1.first_name + ' ' + user_1.last_name)
+
+        # use user query to filter by name
+        query_params = {'user_query': user_2.first_name}
+        url = reverse('enterprise-customer-members', kwargs={'enterprise_uuid': enterprise_customer.uuid}) + '?' + urlencode(query_params)
+        response = self.client.get(url)
+        response.status_code == 200
+        results = (json.loads(response.content.decode("utf-8"))['results'])
+        assert len(results) == 1
+        assert results[0]['enterprise_customer_user']['name'] == (user_2.first_name + ' ' + user_2.last_name)
