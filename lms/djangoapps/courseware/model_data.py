@@ -941,7 +941,7 @@ class ScoresClient:
         self._locations_to_scores.update({
             location.map_into_course(self.course_key): self.Score(correct, total, created, letter_grade)
             for location, correct, total, created, letter_grade
-            in scores_qset.values_list('module_state_key', 'grade', 'max_grade', 'created')
+            in scores_qset.values_list('module_state_key', 'grade', 'max_grade', 'created', 'letter_grade')
         })
         self._has_fetched = True
 
