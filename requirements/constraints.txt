@@ -19,10 +19,6 @@
 # Ticket: https://github.com/openedx/edx-platform/issues/35334
 algoliasearch<4.0.0
 
-# Date: 2024-03-14
-# Temporary to Support the python 3.11 Upgrade
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35281
-backports.zoneinfo;python_version<"3.9"  # Newer versions have zoneinfo available in the standard library
 
 # Date: 2020-02-26
 # As it is not clarified what exact breaking changes will be introduced as per
@@ -82,7 +78,7 @@ django-storages<1.14.4
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.32.0
+edx-enterprise==4.33.0
 
 # Date: 2024-05-09
 # This has to be constrained as well because newer versions of edx-i18n-tools need the
@@ -139,7 +135,7 @@ optimizely-sdk<5.0
 # Date: 2023-09-18
 # pinning this version to avoid updates while the library is being developed
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35269
-openedx-learning==0.17.0
+openedx-learning==0.18.0
 
 # Date: 2023-11-29
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.
@@ -160,6 +156,7 @@ pycodestyle<2.9.0
 # Date: 2021-07-12
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/33560
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
+astroid<2.14.0
 
 # Date: 2021-08-25
 # At the time of writing this comment, we do not know whether py2neo>=2022
