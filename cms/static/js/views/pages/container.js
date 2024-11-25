@@ -397,6 +397,7 @@ function($, _, Backbone, gettext, BasePage,
                     return window.parent.postMessage(
                         {
                             type: 'manageXBlockAccess',
+                            message: 'Open the manage access modal',
                             payload: {}
                         }, document.referrer
                     );
@@ -634,6 +635,7 @@ function($, _, Backbone, gettext, BasePage,
                     window.parent.postMessage(
                         {
                             type: 'currentXBlockId',
+                            message: 'Send the current XBlock ID to the parent window',
                             payload: {
                                 id: this.findXBlockElement(event.target).data('locator')
                             }
@@ -688,6 +690,7 @@ function($, _, Backbone, gettext, BasePage,
                     return window.parent.postMessage(
                         {
                             type: 'copyXBlock',
+                            message: 'Copy the XBlock',
                             payload: {}
                         }, document.referrer
                     );
@@ -745,6 +748,7 @@ function($, _, Backbone, gettext, BasePage,
                     return window.parent.postMessage(
                         {
                             type: 'duplicateXBlock',
+                            message: 'Duplicate the XBlock',
                             payload: {}
                         }, document.referrer
                     );
@@ -802,6 +806,7 @@ function($, _, Backbone, gettext, BasePage,
                     return window.parent.postMessage(
                         {
                             type: 'deleteXBlock',
+                            message: 'Delete the XBlock',
                             payload: {}
                         }, document.referrer
                     );
@@ -964,13 +969,13 @@ function($, _, Backbone, gettext, BasePage,
             ){
                 var destinationUrl;
                 var pathToXBlockEditor;
-                if (useVideoGalleryFlow === "True" && blockType.includes("video")) {
+                if (useVideoGalleryFlow === 'True' && blockType.includes('video')) {
                     pathToXBlockEditor = `/course-videos/${encodeURI(data.locator)}`;
-                    destinationUrl = `${this.$('.xblock-header-primary').attr("authoring_MFE_base_url")}${pathToXBlockEditor}`;
+                    destinationUrl = `${this.$('.xblock-header-primary').attr('authoring_MFE_base_url')}${pathToXBlockEditor}`;
                 }
                 else {
                     pathToXBlockEditor = `/${blockType[1]}/${encodeURI(data.locator)}`;
-                    destinationUrl = `${this.$('.xblock-header-primary').attr("authoring_MFE_base_url")}${pathToXBlockEditor}`;
+                    destinationUrl = `${this.$('.xblock-header-primary').attr('authoring_MFE_base_url')}${pathToXBlockEditor}`;
                 }
 
                 try {
