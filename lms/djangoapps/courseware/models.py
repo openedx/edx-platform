@@ -121,6 +121,9 @@ class StudentModule(models.Model):
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
 
+    #SA || letter_grade changes
+    letter_grade = models.TextField(null=True, blank=True)
+
     @classmethod
     def all_submitted_problems_read_only(cls, course_id):
         """
@@ -139,6 +142,7 @@ class StudentModule(models.Model):
             return queryset
 
     def __repr__(self):
+        #SA || letter_grade changes
         return 'StudentModule<{!r}>'.format(
             {
                 'course_id': self.course_id,
@@ -149,6 +153,7 @@ class StudentModule(models.Model):
                 'student_id': self.student_id,
                 'module_state_key': self.module_state_key,
                 'state': str(self.state)[:20],
+                'letter_grade': self.letter_grade,
             })
 
     def __str__(self):

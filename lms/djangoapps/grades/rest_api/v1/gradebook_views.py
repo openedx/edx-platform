@@ -475,6 +475,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             # TODO: https://openedx.atlassian.net/browse/EDUCATOR-3559 -- Some fields should be renamed, others removed:
             # 'displayed_value' should maybe be 'description_percent'
             # 'grade_description' should be 'description_ratio'
+            #SA || letter_grade changes
             breakdown.append({
                 'attempted': attempted,
                 'category': subsection_grade.format,
@@ -484,6 +485,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                 'score_earned': score_earned,
                 'score_possible': score_possible,
                 'subsection_name': subsection_grade.display_name,
+                'letter_grade': subsection_grade.letter_grade,
             })
         return breakdown
 
