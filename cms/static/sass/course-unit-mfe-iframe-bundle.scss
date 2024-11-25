@@ -659,5 +659,5 @@ select {
 }
 
 .wrapper-xblock .xblock-header-primary .header-actions .wrapper-nav-sub {
-  z-index: 15;
+  z-index: $zindex-dropdown;
 }
