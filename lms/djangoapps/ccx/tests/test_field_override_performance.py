@@ -234,7 +234,11 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     # TODO: decrease query count as part of REVO-28
+<<<<<<< HEAD
     QUERY_COUNT = 33
+=======
+    QUERY_COUNT = 34
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     TEST_DATA = {
         ('no_overrides', 1, True, False): (QUERY_COUNT, 2),

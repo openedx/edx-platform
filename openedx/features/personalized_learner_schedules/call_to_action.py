@@ -13,6 +13,10 @@ from django.utils.translation import gettext as _, ngettext
 from xmodule.util.misc import is_xblock_an_assignment
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
+<<<<<<< HEAD
+=======
+from openedx.features.course_experience import RELATIVE_DATES_DISABLE_RESET_FLAG
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.features.course_experience.url_helpers import is_request_from_learning_mfe
 from openedx.features.course_experience.utils import dates_banner_should_display
 
@@ -37,7 +41,14 @@ class PersonalizedLearnerScheduleCallToAction:
         request = get_current_request()
 
         course_key = xblock.scope_ids.usage_id.context_key
+<<<<<<< HEAD
         missed_deadlines, missed_gated_content = dates_banner_should_display(course_key, request.user)
+=======
+        missed_deadlines, missed_gated_content = dates_banner_should_display(
+            course_key, request.user, allow_warning=True
+        )
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         # Not showing in the missed_gated_content case because those learners are not eligible
         # to shift due dates.
         if missed_gated_content:
@@ -52,13 +63,21 @@ class PersonalizedLearnerScheduleCallToAction:
             # xblock is a capa problem, and the submit button is disabled. Check if it's because of a personalized
             # schedule due date being missed, and if so, we can offer to shift it.
             if self._is_block_shiftable(xblock, category):
+<<<<<<< HEAD
                 ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
+=======
+                ctas.append(self._make_deadlines_cta(course_key, xblock, category, is_learning_mfe))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         elif category == self.VERTICAL_BANNER and not completed and missed_deadlines:
             # xblock is a vertical, so we'll check all the problems inside it. If there are any that will show a
             # a "shift dates" CTA under CAPA_SUBMIT_DISABLED, then we'll also show the same CTA as a vertical banner.
             if any(self._is_block_shiftable(item, category) for item in xblock.get_children()):
+<<<<<<< HEAD
                 ctas.append(self._make_reset_deadlines_cta(xblock, category, is_learning_mfe))
+=======
+                ctas.append(self._make_deadlines_cta(course_key, xblock, category, is_learning_mfe))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         return ctas
 
@@ -107,11 +126,22 @@ class PersonalizedLearnerScheduleCallToAction:
         PersonalizedLearnerScheduleCallToAction.past_due_class_warnings.add(name)
 
     @classmethod
+<<<<<<< HEAD
     def _make_reset_deadlines_cta(cls, xblock, category, is_learning_mfe=False):
+=======
+    def _make_deadlines_cta(cls, course_key, xblock, category, is_learning_mfe=False):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Constructs a call to action object containing the necessary information for the view
         """
         from lms.urls import RESET_COURSE_DEADLINES_NAME
+<<<<<<< HEAD
+=======
+
+        if RELATIVE_DATES_DISABLE_RESET_FLAG.is_enabled(course_key):
+            return {"description": _("The deadline to complete this assignment has passed.")}
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         course_key = xblock.scope_ids.usage_id.context_key
 
         cta_data = {

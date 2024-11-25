@@ -51,11 +51,19 @@ def format_social_link(platform_name, new_social_link):
     """
     Given a user's social link, returns a safe absolute url for the social link.
 
+<<<<<<< HEAD
     Returns the following based on the provided new_social_link:
     1) Given an empty string, returns ''
     1) Given a valid username, return 'https://www.[platform_name_base][username]'
     2) Given a valid URL, return 'https://www.[platform_name_base][username]'
     3) Given anything unparseable, returns None
+=======
+    Returns:
+    - An empty string if `new_social_link` is empty.
+    - A formatted URL if `new_social_link` is a username.
+    - Returns `new_social_link` if it is a valid URL.
+    - None for unparseable inputs.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     # Blank social links should return '' or None as was passed in.
     if not new_social_link:

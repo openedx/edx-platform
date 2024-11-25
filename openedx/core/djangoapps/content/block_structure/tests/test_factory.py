@@ -5,6 +5,10 @@ Tests for block_structure_factory.py
 import pytest
 from django.test import TestCase
 
+<<<<<<< HEAD
+=======
+from opaque_keys.edx.keys import CourseKey
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..exceptions import BlockStructureNotFound
@@ -18,14 +22,30 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
     Tests for BlockStructureFactory
     """
 
+<<<<<<< HEAD
+=======
+    def block_key_factory(self, block_id):
+        """
+        Returns a usage_key object for the given block_id.
+        This overrides the method in the ChildrenMapTestMixin.
+        """
+        return CourseKey.from_string("course-v1:org+course+run").make_usage_key("html", str(block_id))
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def setUp(self):
         super().setUp()
         self.children_map = self.SIMPLE_CHILDREN_MAP
         self.modulestore = MockModulestoreFactory.create(self.children_map, self.block_key_factory)
 
     def test_from_modulestore(self):
+<<<<<<< HEAD
         block_structure = BlockStructureFactory.create_from_modulestore(
             root_block_usage_key=0, modulestore=self.modulestore
+=======
+        usage_key = CourseKey.from_string("course-v1:org+course+run").make_usage_key("html", "0")
+        block_structure = BlockStructureFactory.create_from_modulestore(
+            root_block_usage_key=usage_key, modulestore=self.modulestore
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
         self.assert_block_structure(block_structure, self.children_map)
 
@@ -48,15 +68,29 @@ class TestBlockStructureFactory(TestCase, ChildrenMapTestMixin):
 
     def test_from_cache_none(self):
         store = BlockStructureStore(MockCache())
+<<<<<<< HEAD
         with pytest.raises(BlockStructureNotFound):
             BlockStructureFactory.create_from_store(
                 root_block_usage_key=0,
+=======
+        # Non-existent usage key
+        usage_key = CourseKey.from_string("course-v1:org+course+run").make_usage_key("html", "0")
+        with pytest.raises(BlockStructureNotFound):
+            BlockStructureFactory.create_from_store(
+                root_block_usage_key=usage_key,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 block_structure_store=store,
             )
 
     def test_new(self):
+<<<<<<< HEAD
         block_structure = BlockStructureFactory.create_from_modulestore(
             root_block_usage_key=0, modulestore=self.modulestore
+=======
+        usage_key = CourseKey.from_string("course-v1:org+course+run").make_usage_key("html", "0")
+        block_structure = BlockStructureFactory.create_from_modulestore(
+            root_block_usage_key=usage_key, modulestore=self.modulestore
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
         new_structure = BlockStructureFactory.create_new(
             block_structure.root_block_usage_key,

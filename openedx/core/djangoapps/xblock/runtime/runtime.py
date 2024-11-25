@@ -1,9 +1,14 @@
 """
 Common base classes for all new XBlock runtimes.
 """
+<<<<<<< HEAD
 from __future__ import annotations
 import logging
 from typing import Callable, Optional
+=======
+import logging
+from typing import Callable, Protocol
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
@@ -15,7 +20,11 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from eventtracking import tracker
+<<<<<<< HEAD
 from opaque_keys.edx.keys import UsageKey, LearningContextKey
+=======
+from opaque_keys.edx.keys import UsageKeyV2, LearningContextKey
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
@@ -38,7 +47,11 @@ from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.types import User as UserType
 from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
+<<<<<<< HEAD
 from openedx.core.djangoapps.xblock.data import StudentDataMode
+=======
+from openedx.core.djangoapps.xblock.data import AuthoredDataMode, StudentDataMode, LatestVersion
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
@@ -63,6 +76,22 @@ def make_track_function():
     return function
 
 
+<<<<<<< HEAD
+=======
+class GetHandlerFunction(Protocol):
+    """ Type definition for our "get handler" callback """
+    def __call__(
+        self,
+        usage_key: UsageKeyV2,
+        handler_name: str,
+        user: UserType | None,
+        *,
+        version: int | LatestVersion = LatestVersion.AUTO,
+    ) -> str:
+        ...
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class XBlockRuntime(RuntimeShim, Runtime):
     """
     This class manages one or more instantiated XBlocks for a particular user,
@@ -94,19 +123,48 @@ class XBlockRuntime(RuntimeShim, Runtime):
     # keep track of view name (student_view, studio_view, etc)
     # currently only used to track if we're in the studio_view (see below under service())
     view_name: str | None
+<<<<<<< HEAD
 
     def __init__(self, system: XBlockRuntimeSystem, user: UserType | None):
         super().__init__(
             id_reader=system.id_reader,
+=======
+    # backing store for authored field data (mostly content+settings scopes)
+    authored_data_store: FieldData
+
+    def __init__(
+        self,
+        user: UserType | None,
+        *,
+        handler_url: GetHandlerFunction,
+        student_data_mode: StudentDataMode,
+        authored_data_mode: AuthoredDataMode,
+        authored_data_store: FieldData,
+        id_reader: IdReader | None = None,
+    ):
+        super().__init__(
+            id_reader=id_reader or OpaqueKeyReader(),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             mixins=(
                 LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
                 XBlockShim,  # Adds deprecated LMS/Studio functionality / backwards compatibility
             ),
             default_class=None,
             select=None,
+<<<<<<< HEAD
             id_generator=system.id_generator,
         )
         self.system = system
+=======
+            id_generator=MemoryIdManager(),  # We don't really use id_generator until we need to support asides
+        )
+        assert student_data_mode in (StudentDataMode.Ephemeral, StudentDataMode.Persisted)
+        self.authored_data_mode = authored_data_mode
+        self.authored_data_store = authored_data_store
+        self.children_data_store = None
+        self.student_data_mode = student_data_mode
+        self.handler_url_fn = handler_url
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.user = user
         # self.user_id must be set as a separate attribute since base class sets it:
         if self.user is None:
@@ -126,7 +184,21 @@ class XBlockRuntime(RuntimeShim, Runtime):
         if thirdparty:
             log.warning("thirdparty handlers are not supported by this runtime for XBlock %s.", type(block))
 
+<<<<<<< HEAD
         url = self.system.handler_url(block.scope_ids.usage_id, handler_name, self.user)
+=======
+        # Note: it's important that we call handlers based on the same version of the block
+        # (draft block -> draft data available to handler; published block -> published data available to handler)
+        kwargs = {}
+        if hasattr(block, "_runtime_requested_version"):  # pylint: disable=protected-access
+            if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
+                default_version = LatestVersion.DRAFT
+            else:
+                default_version = LatestVersion.PUBLISHED
+            if block._runtime_requested_version != default_version:  # pylint: disable=protected-access
+                kwargs["version"] = block._runtime_requested_version  # pylint: disable=protected-access
+        url = self.handler_url_fn(block.usage_key, handler_name, self.user, **kwargs)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if suffix:
             if not url.endswith('/'):
                 url += '/'
@@ -219,14 +291,22 @@ class XBlockRuntime(RuntimeShim, Runtime):
 
     def parse_xml_file(self, fileobj):
         # Deny access to the inherited method
+<<<<<<< HEAD
         raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+=======
+        raise NotImplementedError("XML Serialization is only supported with LearningCoreXBlockRuntime")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def add_node_as_child(self, block, node):
         """
         Called by XBlock.parse_xml to treat a child node as a child block.
         """
         # Deny access to the inherited method
+<<<<<<< HEAD
         raise NotImplementedError("XML Serialization is only supported with BlockstoreXBlockRuntime")
+=======
+        raise NotImplementedError("XML Serialization is only supported with LearningCoreXBlockRuntime")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def service(self, block: XBlock, service_name: str):
         """
@@ -261,8 +341,13 @@ class XBlockRuntime(RuntimeShim, Runtime):
 
             return DjangoXBlockUserService(
                 self.user,
+<<<<<<< HEAD
                 # The value should be updated to whether the user is staff in the context when Blockstore runtime adds
                 # support for courses.
+=======
+                # The value should be updated to whether the user is staff in the context when Learning Core runtime
+                # adds support for courses.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 user_is_staff=self.user.is_staff,  # type: ignore
                 anonymous_user_id=self.anonymous_student_id,
                 # See the docstring of `DjangoXBlockUserService`.
@@ -275,7 +360,11 @@ class XBlockRuntime(RuntimeShim, Runtime):
             # the preview engine, and 'main' otherwise.
             # For backwards compatibility, we check the student_data_mode (Ephemeral indicates CMS) and the
             # view_name for 'studio_view.' self.view_name is set by render() below.
+<<<<<<< HEAD
             if self.system.student_data_mode == StudentDataMode.Ephemeral and self.view_name != 'studio_view':
+=======
+            if self.student_data_mode == StudentDataMode.Ephemeral and self.view_name != 'studio_view':
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 return MakoService(namespace_prefix='lms.')
             return MakoService()
         elif service_name == "i18n":
@@ -301,6 +390,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             return EventPublishingService(self.user, context_key, make_track_function())
         elif service_name == 'enrollments':
             return EnrollmentsService()
+<<<<<<< HEAD
 
         # Check if the XBlockRuntimeSystem wants to handle this:
         service = self.system.get_service(block, service_name)
@@ -309,6 +399,14 @@ class XBlockRuntime(RuntimeShim, Runtime):
         if service is None:
             service = super().service(block, service_name)
         return service
+=======
+        elif service_name == 'error_tracker':
+            return make_error_tracker()
+
+        # Otherwise, fall back to the base implementation which loads services
+        # defined in the constructor:
+        return super().service(block, service_name)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _init_field_data_for_block(self, block: XBlock) -> FieldData:
         """
@@ -322,7 +420,11 @@ class XBlockRuntime(RuntimeShim, Runtime):
             assert isinstance(self.user_id, str) and self.user_id.startswith("anon")
             kvs = EphemeralKeyValueStore()
             student_data_store = KvsFieldData(kvs)
+<<<<<<< HEAD
         elif self.system.student_data_mode == StudentDataMode.Ephemeral:
+=======
+        elif self.student_data_mode == StudentDataMode.Ephemeral:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             # We're in an environment like Studio where we want to let the
             # author test blocks out but not permanently save their state.
             kvs = EphemeralKeyValueStore()
@@ -341,10 +443,17 @@ class XBlockRuntime(RuntimeShim, Runtime):
             student_data_store = KvsFieldData(kvs=DjangoKeyValueStore(field_data_cache))
 
         return SplitFieldData({
+<<<<<<< HEAD
             Scope.content: self.system.authored_data_store,
             Scope.settings: self.system.authored_data_store,
             Scope.parent: self.system.authored_data_store,
             Scope.children: self.system.children_data_store,
+=======
+            Scope.content: self.authored_data_store,
+            Scope.settings: self.authored_data_store,
+            Scope.parent: self.authored_data_store,
+            Scope.children: self.children_data_store,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             Scope.user_state_summary: student_data_store,
             Scope.user_state: student_data_store,
             Scope.user_info: student_data_store,
@@ -407,6 +516,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         # Subclasses should override this
         return None
+<<<<<<< HEAD
 
 
 class XBlockRuntimeSystem:
@@ -466,3 +576,5 @@ class XBlockRuntimeSystem:
         if service_name == 'error_tracker':
             return make_error_tracker()
         return None  # None means see if XBlockRuntime offers this service
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

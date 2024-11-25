@@ -4,11 +4,19 @@ Celery tasks for Content Libraries.
 Architecture note:
 
     Several functions in this file manage the copying/updating of blocks in modulestore
+<<<<<<< HEAD
     and blockstore. These operations should only be performed within the context of CMS.
     However, due to existing edx-platform code structure, we've had to define the functions
     in shared source tree (openedx/) and the tasks are registered in both LMS and CMS.
 
     To ensure that we're not accidentally importing things from blockstore in the LMS context,
+=======
+    and learning core. These operations should only be performed within the context of CMS.
+    However, due to existing edx-platform code structure, we've had to define the functions
+    in shared source tree (openedx/) and the tasks are registered in both LMS and CMS.
+
+    To ensure that we're not accidentally importing things from learning core in the LMS context,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     we use ensure_cms throughout this module.
 
     A longer-term solution to this issue would be to move the content_libraries app to cms:
@@ -21,6 +29,7 @@ import logging
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
+<<<<<<< HEAD
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
@@ -31,10 +40,14 @@ from opaque_keys.edx.locator import (
     LibraryUsageLocatorV2,
     LibraryLocator as LibraryLocatorV1
 )
+=======
+from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
 
+<<<<<<< HEAD
 from common.djangoapps.student.auth import has_studio_write_access
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content_libraries import api as library_api
@@ -48,6 +61,17 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.util.keys import derive_key
+=======
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator
+from openedx.core.lib import ensure_cms
+from xmodule.capa_block import ProblemBlock
+from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.mixed import MixedModuleStore
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from . import api
 from .models import ContentLibraryBlockImportTask
@@ -84,6 +108,7 @@ def import_blocks_from_course(import_task_id, course_key_str, use_course_key_as_
         )
 
 
+<<<<<<< HEAD
 def _import_block(store, user_id, source_block, dest_parent_key):
     """
     Recursively import a blockstore block and its children.`
@@ -161,6 +186,8 @@ def _import_block(store, user_id, source_block, dest_parent_key):
     return new_block_key
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 def _filter_child(store, usage_key, capa_type):
     """
     Return whether this block is both a problem and has a `capa_type` which is included in the filter.
@@ -178,6 +205,7 @@ def _problem_type_filter(store, library, capa_type):
     return [key for key in library.children if _filter_child(store, key, capa_type)]
 
 
+<<<<<<< HEAD
 def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
     """
     Imports a block from a blockstore-based learning context (usually a
@@ -221,6 +249,8 @@ def _import_from_blockstore(user_id, store, dest_block, blockstore_block_ids):
         dest_block.children = store.get_item(dest_key).children
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class LibrarySyncChildrenTask(UserTask):  # pylint: disable=abstract-method
     """
     Base class for tasks which operate upon library_content children.
@@ -250,7 +280,11 @@ def sync_from_library(
     self: LibrarySyncChildrenTask,
     user_id: int,
     dest_block_id: str,
+<<<<<<< HEAD
     library_version: str | int | None,
+=======
+    library_version: str | None,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ) -> None:
     """
     Celery task to update the children of the library_content block at `dest_block_id`.
@@ -306,8 +340,13 @@ def _sync_children(
     task: LibrarySyncChildrenTask,
     store: MixedModuleStore,
     user_id: int,
+<<<<<<< HEAD
     dest_block: LibraryContentBlock,
     library_version: int | str | None,
+=======
+    dest_block: LegacyLibraryContentBlock,
+    library_version: str | None,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ) -> None:
     """
     Implementation helper for `sync_from_library` and `duplicate_children` Celery tasks.
@@ -315,6 +354,7 @@ def _sync_children(
     Can update children with a specific library `library_version`, or latest (`library_version=None`).
     """
     source_blocks = []
+<<<<<<< HEAD
     library_key = dest_block.source_library_key
     filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
     library = library_api.get_v1_or_v2_library(library_key, version=library_version)
@@ -350,6 +390,31 @@ def _sync_children(
             _import_from_blockstore(user_id, store, dest_block, source_block_ids)
             dest_block.source_library_version = str(library.version)
             store.update_item(dest_block, user_id)
+=======
+    library_key = dest_block.source_library_key.for_branch(
+        ModuleStoreEnum.BranchName.library
+    ).for_version(library_version)
+    try:
+        library = store.get_library(library_key, remove_version=False, remove_branch=False, head_validation=False)
+    except ItemNotFoundError:
+        task.status.fail(f"Requested library {library_key} not found.")
+        return
+    filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+    if filter_children:
+        # Apply simple filtering based on CAPA problem types:
+        source_blocks.extend(_problem_type_filter(store, library, dest_block.capa_type))
+    else:
+        source_blocks.extend(library.children)
+    with store.bulk_operations(dest_block.scope_ids.usage_id.context_key):
+        try:
+            dest_block.source_library_version = str(library.location.library_key.version_guid)
+            store.update_item(dest_block, user_id)
+            dest_block.children = store.copy_from_template(
+                source_blocks, dest_block.location, user_id, head_validation=True
+            )
+            # ^-- copy_from_template updates the children in the DB
+            # but we must also set .children here to avoid overwriting the DB again
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         except Exception as exception:  # pylint: disable=broad-except
             TASK_LOGGER.exception('Error importing children for %s', dest_block.scope_ids.usage_id, exc_info=True)
             if task.status.state != UserTaskStatus.FAILED:
@@ -360,8 +425,13 @@ def _sync_children(
 def _copy_overrides(
     store: MixedModuleStore,
     user_id: int,
+<<<<<<< HEAD
     source_block: LibraryContentBlock,
     dest_block: LibraryContentBlock
+=======
+    source_block: LegacyLibraryContentBlock,
+    dest_block: LegacyLibraryContentBlock
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ) -> None:
     """
     Copy any overrides the user has made on children of `source` over to the children of `dest_block`, recursively.

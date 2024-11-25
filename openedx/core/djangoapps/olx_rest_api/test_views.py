@@ -26,7 +26,11 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
         with cls.store.default_store(ModuleStoreEnum.Type.split):
             cls.course = ToyCourseFactory.create(modulestore=cls.store)
         assert str(cls.course.id).startswith("course-v1:"), "This test is for split mongo course exports only"
+<<<<<<< HEAD
         cls.unit_key = cls.course.id.make_usage_key('vertical', 'vertical_test')
+=======
+        cls.video_key = cls.course.id.make_usage_key('video', 'sample_video')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def setUp(self):
         """
@@ -56,7 +60,11 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
         A regular user enrolled in the course (but not part of the authoring
         team) should not be able to use the API.
         """
+<<<<<<< HEAD
         response = self.get_olx_response_for_block(self.unit_key)
+=======
+        response = self.get_olx_response_for_block(self.video_key)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert response.status_code == 403
         assert response.json()['detail'] ==\
                'You must be a member of the course team in Studio to export OLX using this API.'
@@ -67,6 +75,7 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
         the course.
         """
         CourseStaffRole(self.course.id).add_users(self.user)
+<<<<<<< HEAD
 
         response = self.get_olx_response_for_block(self.unit_key)
         assert response.status_code == 200
@@ -85,6 +94,16 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
         # Check the OLX of a video
         self.assertXmlEqual(
             blocks[str(self.course.id.make_usage_key('video', 'sample_video'))]['olx'],
+=======
+        response = self.get_olx_response_for_block(self.video_key)
+        assert response.status_code == 200
+        assert response.json()['root_block_id'] == str(self.video_key)
+        blocks = response.json()['blocks']
+
+        # Check the OLX of a video
+        self.assertXmlEqual(
+            blocks[str(self.video_key)]['olx'],
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             '<video youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" '
             'display_name="default" youtube_id_0_75="JMD_ifUUfsU" youtube_id_1_0="OEoXaMPEzfM" '
             'youtube_id_1_25="AKqURZnYqpk" youtube_id_1_5="DYpADpL7jAY"/>\n'

@@ -3,7 +3,11 @@ Unit tests for user activity methods.
 """
 
 from datetime import datetime, timedelta
+<<<<<<< HEAD
 from unittest.mock import Mock
+=======
+from unittest.mock import Mock, patch
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 import ddt
 from django.contrib.auth import get_user_model
@@ -12,7 +16,10 @@ from django.urls import reverse
 from edx_django_utils.cache import TieredCache
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
+<<<<<<< HEAD
 from mock import patch
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 

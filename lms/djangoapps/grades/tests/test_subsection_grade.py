@@ -14,7 +14,11 @@ from .utils import mock_get_score
 @ddt
 class SubsectionGradeTest(GradeTestBase):  # lint-amnesty, pylint: disable=missing-class-docstring
 
+<<<<<<< HEAD
     @data((50, 100, .50), (59.49, 100, .59), (59.51, 100, .60), (59.50, 100, .60), (60.5, 100, .60))
+=======
+    @data((50, 100, .5), (.5949, 100, .0059), (.5951, 100, .006), (.595, 100, .0059), (.605, 100, .006))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     @unpack
     def test_create_and_read(self, mock_earned, mock_possible, expected_result):
         with mock_get_score(mock_earned, mock_possible):

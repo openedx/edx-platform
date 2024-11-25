@@ -11,7 +11,10 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+<<<<<<< HEAD
 from edx_toggles.toggles.testutils import override_waffle_flag
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from opaque_keys.edx.locator import CourseLocator
 from waffle.testutils import override_switch
 
@@ -21,7 +24,10 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, refund_seat
+<<<<<<< HEAD
 from lms.djangoapps.commerce.waffle import ENABLE_TRANSITION_TO_COORDINATOR_CHECKOUT
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
 from xmodule.modulestore.tests.django_utils import \
@@ -186,6 +192,7 @@ class EcommerceServiceTests(TestCase):
 
         assert url == expected_url
 
+<<<<<<< HEAD
     @override_settings(COMMERCE_COORDINATOR_URL_ROOT='http://coordinator_url')
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
     @ddt.data(
@@ -207,6 +214,8 @@ class EcommerceServiceTests(TestCase):
             self.assertIsNotNone(result)
             self.assertEqual(expected_url, result)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 @ddt.ddt
 @skip_unless_lms

@@ -109,7 +109,17 @@ export class ViewedEventTracker {
     constructor() {
         this.elementViewings = new Set();
         this.handlers = [];
+<<<<<<< HEAD
         this.registerDomHandlers();
+=======
+        if (window === window.parent) {
+          // Preview (legacy LMS frontend).
+          this.registerDomHandlers();
+        } else {
+          // Learning MFE.
+          window.addEventListener('message', this.handleVisibilityMessage.bind(this));
+        }
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     }
 
     /** Add an element to track.  */
@@ -121,7 +131,15 @@ export class ViewedEventTracker {
                 (el, event) => this.callHandlers(el, event),
             ),
         );
+<<<<<<< HEAD
         this.updateVisible();
+=======
+        // Update visibility status immediately after adding the element (in case it's already visible).
+        // We don't need this for the Learning MFE because it will send a message once the iframe is loaded.
+        if (window === window.parent) {
+          this.updateVisible();
+        }
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     }
 
     /** Register a new handler to be called when an element has been viewed.  */
@@ -177,4 +195,39 @@ export class ViewedEventTracker {
             handler(el, event);
         });
     }
+<<<<<<< HEAD
+=======
+
+    /** Handle a unit.visibilityStatus message from the Learning MFE. */
+    handleVisibilityMessage(event) {
+        if (event.data.type === 'unit.visibilityStatus') {
+          const { topPosition, viewportHeight } = event.data.data;
+
+          this.elementViewings.forEach((elv) => {
+              const rect = elv.getBoundingRect();
+              let visible = false;
+
+              // Convert iframe-relative rect coordinates to be relative to the parent's viewport.
+              const elTopPosition = rect.top + topPosition;
+              const elBottomPosition = rect.bottom + topPosition;
+
+              // Check if the element is visible in the parent's viewport.
+              if (elTopPosition < viewportHeight && elTopPosition >= 0) {
+                  elv.markTopSeen();
+                  visible = true;
+              }
+              if (elBottomPosition <= viewportHeight && elBottomPosition > 0) {
+                  elv.markBottomSeen();
+                  visible = true;
+              }
+
+              if (visible) {
+                  elv.handleVisible();
+              } else {
+                  elv.handleNotVisible();
+              }
+          });
+      }
+    }
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 }

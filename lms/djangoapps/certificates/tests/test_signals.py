@@ -13,22 +13,35 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_events.data import EventsMetadata
 from openedx_events.learning.data import ExamAttemptData, UserData, UserPersonalData
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED
+<<<<<<< HEAD
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+=======
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.certificates.api import has_self_generated_certificates_enabled
 from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION
 from lms.djangoapps.certificates.data import CertificateStatuses
+<<<<<<< HEAD
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     GeneratedCertificate
 )
+=======
+from lms.djangoapps.certificates.models import CertificateGenerationConfiguration, GeneratedCertificate
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from lms.djangoapps.certificates.signals import handle_exam_attempt_rejected_event
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+<<<<<<< HEAD
+=======
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
@@ -302,10 +315,24 @@ class FailingGradeCertsTest(ModuleStoreTestCase):
         assert cert.status == CertificateStatuses.downloadable
 
 
+<<<<<<< HEAD
 class LearnerIdVerificationTest(ModuleStoreTestCase):
     """
     Tests for certificate generation task firing on learner id verification
     """
+=======
+class LearnerIdVerificationTest(ModuleStoreTestCase, OpenEdxEventsTestMixin):
+    """
+    Tests for certificate generation task firing on learner id verification
+    """
+    ENABLED_OPENEDX_EVENTS = ['org.openedx.learning.idv_attempt.approved.v1']
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.start_events_isolation()
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def setUp(self):
         super().setUp()
         self.course_one = CourseFactory.create(self_paced=True)

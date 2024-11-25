@@ -2,6 +2,7 @@ name: Upgrade Requirements
 
 on:
   schedule:
+<<<<<<< HEAD
      - cron: "0 2 * * 2"
   workflow_dispatch:
      inputs:
@@ -9,12 +10,22 @@ on:
          description: 'Target branch to create requirements PR against'
          required: true
          default: 'master'
+=======
+    - cron: "0 2 * * 2"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Target branch to create requirements PR against"
+        required: true
+        default: "master"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 jobs:
   call-upgrade-python-requirements-workflow:
     # Don't run the weekly upgrade job on forks -- it will send a weekly failure email.
     if: github.repository == 'openedx/edx-platform' || github.event_name != 'schedule'
     uses: openedx/.github/.github/workflows/upgrade-python-requirements.yml@master
     with:
+<<<<<<< HEAD
        branch: ${{ github.event.inputs.branch }}
        team_reviewers: "arbi-bom"
        email_address: arbi-bom@edx.org
@@ -25,3 +36,14 @@ jobs:
        edx_smtp_username: ${{ secrets.EDX_SMTP_USERNAME }}
        edx_smtp_password: ${{ secrets.EDX_SMTP_PASSWORD }}
 
+=======
+      branch: ${{ github.event.inputs.branch }}
+      team_reviewers: "arbi-bom"
+      email_address: arbi-bom@edx.org
+      send_success_notification: false
+    secrets:
+      requirements_bot_github_token: ${{ secrets.REQUIREMENTS_BOT_GITHUB_TOKEN }}
+      requirements_bot_github_email: ${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}
+      edx_smtp_username: ${{ secrets.EDX_SMTP_USERNAME }}
+      edx_smtp_password: ${{ secrets.EDX_SMTP_PASSWORD }}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

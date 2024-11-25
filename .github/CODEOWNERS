@@ -15,12 +15,23 @@ lms/djangoapps/grades/
 lms/djangoapps/instructor/
 lms/djangoapps/instructor_task/
 lms/djangoapps/mobile_api/
+<<<<<<< HEAD
 openedx/core/djangoapps/credentials                                 @openedx/2U-aperture
 openedx/core/djangoapps/credit                                      @openedx/2U-aperture
+=======
+openedx/core/djangoapps/commerce/                                   @openedx/2u-infinity
+openedx/core/djangoapps/credentials                                 @openedx/2U-aperture
+openedx/core/djangoapps/credit                                      @openedx/2U-aperture
+openedx/core/djangoapps/enrollments/                                @openedx/2U-aperture
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 openedx/core/djangoapps/heartbeat/
 openedx/core/djangoapps/oauth_dispatch
 openedx/core/djangoapps/user_api/                                   @openedx/2U-aperture
 openedx/core/djangoapps/user_authn/                                 @openedx/2U-vanguards                                 
+<<<<<<< HEAD
+=======
+openedx/core/djangoapps/verified_track_content/                     @openedx/2u-infinity
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 openedx/features/course_experience/
 xmodule/
 
@@ -35,6 +46,7 @@ common/djangoapps/track/
 lms/djangoapps/certificates/                                        @openedx/2U-aperture
 
 # Discovery
+<<<<<<< HEAD
 common/djangoapps/course_modes/
 common/djangoapps/enrollment/
 lms/djangoapps/commerce/
@@ -44,6 +56,20 @@ lms/djangoapps/learner_home/                                         @openedx/2U
 openedx/features/content_type_gating/
 openedx/features/course_duration_limits/
 openedx/features/discounts/
+=======
+common/djangoapps/course_modes/                                     @openedx/2U-aperture
+common/djangoapps/enrollment/
+common/djangoapps/entitlements/                                     @openedx/2U-aperture
+lms/djangoapps/branding/                                            @openedx/2U-aperture
+lms/djangoapps/commerce/                                            @openedx/2u-infinity
+lms/djangoapps/experiments/                                         @openedx/2u-infinity
+lms/djangoapps/gating/                                              @openedx/2u-infinity
+lms/djangoapps/learner_dashboard/                                   @openedx/2U-aperture
+lms/djangoapps/learner_home/                                        @openedx/2U-aperture
+openedx/features/content_type_gating/                               @openedx/2u-infinity
+openedx/features/course_duration_limits/
+openedx/features/discounts/                                         @openedx/2u-infinity
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # Ping Axim On-call if someone uses the QuickStart
 # https://docs.openedx.org/en/latest/developers/quickstarts/first_openedx_pr.html

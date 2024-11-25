@@ -293,6 +293,10 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'contact_email': 'info@example.com',
             'contact_mailing_address': '123 Sesame Street',
             'course_ids': [str(self.course.id)],
+<<<<<<< HEAD
+=======
+            'course_id': str(self.course.id),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             'course_name': self.course.display_name,
             'course_url': f'http://learning-mfe/course/{self.course.id}/home',
             'dashboard_url': '/dashboard',

@@ -37,7 +37,12 @@
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
+<<<<<<< HEAD
                 'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie'
+=======
+                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie',
+                'toggleGoogleDisclaimer'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             );
 
             this.state = state;
@@ -493,6 +498,34 @@
             },
 
             /**
+<<<<<<< HEAD
+=======
+            * @desc Shows/Hides Google disclaimer based on captions being AI generated and
+            * if ClosedCaptions are being shown.
+            *
+            * @param {array} captions List of captions for the video.
+            *
+            * @returns {boolean}
+            */
+            toggleGoogleDisclaimer: function(captions) {
+                var self = this,
+                    state = this.state,
+                    aIGeneratedSpan = '<span id="captions-ai-generated"></span>',
+                    captionsAIGenerated = captions.some(caption => caption.includes(aIGeneratedSpan));
+
+                if (!self.hideCaptionsOnLoad && !state.captionsHidden) {
+                    if (captionsAIGenerated) {
+                        state.el.find('.google-disclaimer').show();
+                        self.shouldShowGoogleDisclaimer = true;
+                    } else {
+                        state.el.find('.google-disclaimer').hide();
+                        self.shouldShowGoogleDisclaimer = false;
+                    }
+                }
+            },
+
+            /**
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             * @desc Fetch the caption file specified by the user. Upon successful
             *     receipt of the file, the captions will be rendered.
             * @param {boolean} [fetchWithYoutubeId] Fetch youtube captions if true.
@@ -547,6 +580,11 @@
                         start = results.start;
                         captions = results.captions;
 
+<<<<<<< HEAD
+=======
+                        self.toggleGoogleDisclaimer(captions);
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                         if (self.loaded) {
                             if (self.rendered) {
                                 self.renderCaption(start, captions);
@@ -1068,12 +1106,22 @@
                         if (typeof this.currentIndex !== 'undefined') {
                             this.subtitlesEl
                                 .find('li.current')
+<<<<<<< HEAD
                                 .removeClass('current');
                         }
 
                         this.subtitlesEl
                             .find("span[data-index='" + newIndex + "']")
                             .parent()
+=======
+                                .attr('aria-current', 'false')
+                                .removeClass('current');
+                        }                 
+                        this.subtitlesEl
+                            .find("span[data-index='" + newIndex + "']")
+                            .parent()
+                            .attr('aria-current', 'true')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                             .addClass('current');
 
                         this.currentIndex = newIndex;
@@ -1299,6 +1347,10 @@
             */
             hideCaptions: function(hideCaptions, triggerEvent) {
                 var transcriptControlEl = this.transcriptControlEl,
+<<<<<<< HEAD
+=======
+                    self = this,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     state = this.state,
                     text;
 
@@ -1310,6 +1362,11 @@
                         this.state.el.trigger('transcript:hide');
                     }
 
+<<<<<<< HEAD
+=======
+                    state.el.find('.google-disclaimer').hide();
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     transcriptControlEl
                         .removeClass('is-active')
                         .attr('title', gettext(text))
@@ -1323,6 +1380,13 @@
                         this.state.el.trigger('transcript:show');
                     }
 
+<<<<<<< HEAD
+=======
+                    if (self.shouldShowGoogleDisclaimer) {
+                        state.el.find('.google-disclaimer').show();
+                      }
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     transcriptControlEl
                         .addClass('is-active')
                         .attr('title', gettext(text))

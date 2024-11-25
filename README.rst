@@ -70,9 +70,20 @@ complexity of Open edX configuration and deployment into their own hands.
 System Dependencies
 -------------------
 
+<<<<<<< HEAD
 Interperters/Tools:
 
 * Python 3.11 (preferred) or 3.8 (compatible, for now)
+=======
+OS:
+* Ubuntu 22.04
+
+* Ubuntu 24.04
+
+Interperters/Tools:
+
+* Python 3.11
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 * Node 18
 
@@ -100,6 +111,7 @@ Language Packages:
   - ``pip install -r requirements/edx/base.txt`` (production)
   - ``pip install -r requirements/edx/dev.txt`` (development)
 
+<<<<<<< HEAD
 Build Steps
 -----------
 
@@ -107,6 +119,29 @@ Create a MySQL database and a MySQL user with write permissions, and configure
 Django to use them. Then, run migrations::
 
   ./manage.py lms migrate
+=======
+  Some Python packages have system dependencies. For example, installing these packages on Debian or Ubuntu will require first running ``sudo apt install python3-dev default-libmysqlclient-dev build-essential pkg-config`` to satisfy the requirements of the ``mysqlclient`` Python package.
+
+Codejail Setup
+--------------
+
+As a part of the baremetal setup, you will need to configure your system to
+work properly with codejail.  See the `codejail installation steps`_ for more
+details.
+
+.. _codejail installation steps: https://github.com/openedx/codejail?tab=readme-ov-file#installation
+
+Build Steps
+-----------
+
+Create two MySQL databases and a MySQL user with write permissions to both, and configure
+Django to use them by updating the ``DATABASES`` setting.
+
+Then, run migrations::
+
+  ./manage.py lms migrate
+  ./manage.py lms migrate --database=student_module_history
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
   ./manage.py cms migrate
 
 Build static assets (for more details, see `building static
@@ -121,6 +156,38 @@ sites)::
   ./manage.py lms collectstatic
   ./manage.py cms collectstatic
 
+<<<<<<< HEAD
+=======
+Set up CMS SSO (for Development)::
+
+  ./manage.py lms manage_user studio_worker example@example.com --unusable-password
+  # DO NOT DO THIS IN PRODUCTION. It will make your auth insecure.
+  ./manage.py lms create_dot_application studio-sso-id studio_worker \
+      --grant-type authorization-code \
+      --skip-authorization \
+      --redirect-uris 'http://localhost:18010/complete/edx-oauth2/' \
+      --scopes user_id  \
+      --client-id 'studio-sso-id' \
+      --client-secret 'studio-sso-secret'
+
+Set up CMS SSO (for Production):
+
+* Create the CMS user and the OAuth application::
+
+    ./manage.py lms manage_user studio_worker <email@yourcompany.com> --unusable-password
+    ./manage.py lms create_dot_application studio-sso-id studio_worker \
+        --grant-type authorization-code \
+        --skip-authorization \
+        --redirect-uris 'http://localhost:18010/complete/edx-oauth2/' \
+        --scopes user_id
+
+* Log into Django admin (eg. http://localhost:18000/admin/oauth2_provider/application/),
+  click into the application you created above (``studio-sso-id``), and copy its "Client secret".
+* In your private LMS_CFG yaml file or your private Django settings module:
+
+ * Set ``SOCIAL_AUTH_EDX_OAUTH2_KEY`` to the client ID (``studio-sso-id``).
+ * Set ``SOCIAL_AUTH_EDX_OAUTH2_SECRET`` to the client secret (which you copied).
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 Run the Platform
 ----------------
 
@@ -128,11 +195,19 @@ First, ensure MySQL, Mongo, and Memcached are running.
 
 Start the LMS::
 
+<<<<<<< HEAD
   ./manage.py lms runserver
 
 Start the CMS::
 
   ./manage.py cms runserver
+=======
+  ./manage.py lms runserver 18000
+
+Start the CMS::
+
+  ./manage.py cms runserver 18010
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 This will give you a mostly-headless Open edX platform. Most frontends have
 been migrated to "Micro-Frontends (MFEs)" which need to be installed and run

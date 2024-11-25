@@ -19,9 +19,16 @@ XBLOCKS = [
     "error = xmodule.error_block:ErrorBlock",
     "hidden = xmodule.hidden_block:HiddenBlock",
     "html = xmodule.html_block:HtmlBlock",
+<<<<<<< HEAD
     "image = xmodule.template_block:TranslateCustomTagBlock",
     "library = xmodule.library_root_xblock:LibraryRoot",
     "library_content = xmodule.library_content_block:LibraryContentBlock",
+=======
+    "itembank = xmodule.item_bank_block:ItemBankBlock",
+    "image = xmodule.template_block:TranslateCustomTagBlock",
+    "library = xmodule.library_root_xblock:LibraryRoot",
+    "library_content = xmodule.library_content_block:LegacyLibraryContentBlock",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     "lti = xmodule.lti_block:LTIBlock",
     "poll_question = xmodule.poll_block:PollBlock",
     "problem = xmodule.capa_block:ProblemBlock",
@@ -84,16 +91,27 @@ setup(
         ],
         "openedx.course_app": [
             "calculator = lms.djangoapps.courseware.plugins:CalculatorCourseApp",
+<<<<<<< HEAD
             "discussion = openedx.core.djangoapps.discussions.plugins:DiscussionCourseApp",
             "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesCourseApp",
+=======
+            "custom_pages = lms.djangoapps.courseware.plugins:CustomPagesCourseApp",
+            "discussion = openedx.core.djangoapps.discussions.plugins:DiscussionCourseApp",
+            "edxnotes = lms.djangoapps.edxnotes.plugins:EdxNotesCourseApp",
+            "live = openedx.core.djangoapps.course_live.plugins:LiveCourseApp",
+            "ora_settings = lms.djangoapps.courseware.plugins:ORASettingsApp",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             "proctoring = lms.djangoapps.courseware.plugins:ProctoringCourseApp",
             "progress = lms.djangoapps.courseware.plugins:ProgressCourseApp",
             "teams = lms.djangoapps.teams.plugins:TeamsCourseApp",
             "textbooks = lms.djangoapps.courseware.plugins:TextbooksCourseApp",
             "wiki = lms.djangoapps.course_wiki.plugins.course_app:WikiCourseApp",
+<<<<<<< HEAD
             "custom_pages = lms.djangoapps.courseware.plugins:CustomPagesCourseApp",
             "live = openedx.core.djangoapps.course_live.plugins:LiveCourseApp",
             "ora_settings = lms.djangoapps.courseware.plugins:ORASettingsApp",
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         ],
         "openedx.course_tool": [
             "calendar_sync_toggle = openedx.features.calendar_sync.plugins:CalendarSyncToggleTool",
@@ -102,12 +120,21 @@ setup(
             "financial_assistance = lms.djangoapps.courseware.course_tools:FinancialAssistanceTool",
         ],
         "openedx.user_partition_scheme": [
+<<<<<<< HEAD
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
             "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
             "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",  # lint-amnesty, pylint: disable=line-too-long
             "content_type_gate = openedx.features.content_type_gating.partitions:ContentTypeGatingPartitionScheme",
             "team = lms.djangoapps.teams.team_partition_scheme:TeamPartitionScheme",
+=======
+            "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
+            "content_type_gate = openedx.features.content_type_gating.partitions:ContentTypeGatingPartitionScheme",
+            "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",  # lint-amnesty, pylint: disable=line-too-long
+            "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
+            "team = lms.djangoapps.teams.team_partition_scheme:TeamPartitionScheme",
+            "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         ],
         "openedx.block_structure_transformer": [
             "library_content = lms.djangoapps.course_blocks.transformers.library_content:ContentLibraryTransformer",
@@ -129,17 +156,32 @@ setup(
             'discussions_link = openedx.core.djangoapps.discussions.transformers:DiscussionsTopicLinkTransformer',
         ],
         "openedx.ace.policy": [
+<<<<<<< HEAD
             "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout"
+=======
+            "bulk_email_optout = lms.djangoapps.bulk_email.policies:CourseEmailOptout",
+            "course_push_notification_optout = openedx.core.djangoapps.notifications.policies:CoursePushNotificationOptout",  # lint-amnesty, pylint: disable=line-too-long
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         ],
         "openedx.call_to_action": [
             "personalized_learner_schedules = openedx.features.personalized_learner_schedules.call_to_action:PersonalizedLearnerScheduleCallToAction"  # lint-amnesty, pylint: disable=line-too-long
         ],
         "lms.djangoapp": [
+<<<<<<< HEAD
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
             "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
+=======
+            "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+            "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
+            "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
+            "course_apps = openedx.core.djangoapps.course_apps.apps:CourseAppsConfig",
+            "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
+            "courseware_api = openedx.core.djangoapps.courseware_api.apps:CoursewareAPIConfig",
+            "credentials = openedx.core.djangoapps.credentials.apps:CredentialsConfig",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "discussions = openedx.core.djangoapps.discussions.apps:DiscussionsConfig",
             "grades = lms.djangoapps.grades.apps:GradesConfig",
@@ -151,15 +193,26 @@ setup(
             "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "program_enrollments = lms.djangoapps.program_enrollments.apps:ProgramEnrollmentsConfig",
+<<<<<<< HEAD
             "courseware_api = openedx.core.djangoapps.courseware_api.apps:CoursewareAPIConfig",
             "course_apps = openedx.core.djangoapps.course_apps.apps:CourseAppsConfig",
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         ],
         "cms.djangoapp": [
             "announcements = openedx.features.announcements.apps:AnnouncementsConfig",
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
+<<<<<<< HEAD
             "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
             "content_staging = openedx.core.djangoapps.content_staging.apps:ContentStagingAppConfig",
+=======
+            "bookmarks = openedx.core.djangoapps.bookmarks.apps:BookmarksConfig",
+            "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
+            "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
+            "content_staging = openedx.core.djangoapps.content_staging.apps:ContentStagingAppConfig",
+            "course_apps = openedx.core.djangoapps.course_apps.apps:CourseAppsConfig",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             # Importing an LMS app into the Studio process is not a good
             # practice. We're ignoring this for Discussions here because its
             # placement in LMS is a historical artifact. The eventual goal is to
@@ -167,6 +220,7 @@ setup(
             # either put them in the openedx/ dir, or in another repo entirely.
             "discussion = lms.djangoapps.discussion.apps:DiscussionConfig",
             "discussions = openedx.core.djangoapps.discussions.apps:DiscussionsConfig",
+<<<<<<< HEAD
             "olx_rest_api = openedx.core.djangoapps.olx_rest_api.apps:OlxRestApiAppConfig",
             "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
             "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
@@ -176,13 +230,27 @@ setup(
             "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
             "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
             "course_apps = openedx.core.djangoapps.course_apps.apps:CourseAppsConfig",
+=======
+            "instructor = lms.djangoapps.instructor.apps:InstructorConfig",
+            "olx_rest_api = openedx.core.djangoapps.olx_rest_api.apps:OlxRestApiAppConfig",
+            "password_policy = openedx.core.djangoapps.password_policy.apps:PasswordPolicyConfig",
+            "plugins = openedx.core.djangoapps.plugins.apps:PluginsConfig",
+            "theming = openedx.core.djangoapps.theming.apps:ThemingConfig",
+            "user_authn = openedx.core.djangoapps.user_authn.apps:UserAuthnConfig",
+            "zendesk_proxy = openedx.core.djangoapps.zendesk_proxy.apps:ZendeskProxyConfig",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         ],
         'openedx.learning_context': [
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
         ],
         'openedx.dynamic_partition_generator': [
+<<<<<<< HEAD
             'enrollment_track = xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition',
+=======
+            'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition',
+            'enrollment_track = xmodule.partitions.enrollment_track_partition_generator:create_enrollment_track_partition',  # lint-amnesty, pylint: disable=line-too-long
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             'team = openedx.core.lib.teams_config:create_team_set_partition',
         ],
         'xblock.v1': XBLOCKS,

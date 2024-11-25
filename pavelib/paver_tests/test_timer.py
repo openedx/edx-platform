@@ -77,6 +77,7 @@ class TimedDecoratorTests(TestCase):
         messages = self.get_log_messages()
         assert len(messages) == 1
 
+<<<<<<< HEAD
         # I'm not using assertDictContainsSubset because it is
         # removed in python 3.2 (because the arguments were backwards)
         # and it wasn't ever replaced by anything *headdesk*
@@ -88,6 +89,11 @@ class TimedDecoratorTests(TestCase):
 
         assert 'ended_at' in messages[0]
         assert end.isoformat(' ') == messages[0]['ended_at']
+=======
+        assert 'duration' in messages[0] and messages[0]['duration'] == 35.6
+        assert 'started_at' in messages[0] and messages[0]['started_at'] == start.isoformat(' ')
+        assert 'ended_at' in messages[0] and messages[0]['ended_at'] == end.isoformat(' ')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @patch.object(timer, 'PAVER_TIMER_LOG', None)
     def test_no_logs(self):
@@ -99,6 +105,7 @@ class TimedDecoratorTests(TestCase):
         messages = self.get_log_messages(args=(1, 'foo'), kwargs=dict(bar='baz'))
         assert len(messages) == 1
 
+<<<<<<< HEAD
         # I'm not using assertDictContainsSubset because it is
         # removed in python 3.2 (because the arguments were backwards)
         # and it wasn't ever replaced by anything *headdesk*
@@ -106,12 +113,17 @@ class TimedDecoratorTests(TestCase):
         assert [repr(1), repr('foo')] == messages[0]['args']
         assert 'kwargs' in messages[0]
         assert {'bar': repr('baz')} == messages[0]['kwargs']
+=======
+        assert 'args' in messages[0] and messages[0]['args'] == [repr(1), repr('foo')]
+        assert 'kwargs' in messages[0] and messages[0]['kwargs'] == {'bar': repr('baz')}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @patch.object(timer, 'PAVER_TIMER_LOG', '/tmp/some-log')
     def test_task_name(self):
         messages = self.get_log_messages()
         assert len(messages) == 1
 
+<<<<<<< HEAD
         # I'm not using assertDictContainsSubset because it is
         # removed in python 3.2 (because the arguments were backwards)
         # and it wasn't ever replaced by anything *headdesk*
@@ -121,6 +133,12 @@ class TimedDecoratorTests(TestCase):
     @patch.object(timer, 'PAVER_TIMER_LOG', '/tmp/some-log')
     def test_exceptions(self):
 
+=======
+        assert 'task' in messages[0] and messages[0]['task'] == 'pavelib.paver_tests.test_timer.identity'
+
+    @patch.object(timer, 'PAVER_TIMER_LOG', '/tmp/some-log')
+    def test_exceptions(self):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         @timer.timed
         def raises():
             """
@@ -131,11 +149,15 @@ class TimedDecoratorTests(TestCase):
         messages = self.get_log_messages(task=raises, raises=Exception)
         assert len(messages) == 1
 
+<<<<<<< HEAD
         # I'm not using assertDictContainsSubset because it is
         # removed in python 3.2 (because the arguments were backwards)
         # and it wasn't ever replaced by anything *headdesk*
         assert 'exception' in messages[0]
         assert 'Exception: The Message!' == messages[0]['exception']
+=======
+        assert 'exception' in messages[0] and messages[0]['exception'] == 'Exception: The Message!'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @patch.object(timer, 'PAVER_TIMER_LOG', '/tmp/some-log-%Y-%m-%d-%H-%M-%S.log')
     def test_date_formatting(self):

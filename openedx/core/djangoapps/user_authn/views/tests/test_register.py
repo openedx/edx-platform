@@ -65,6 +65,10 @@ from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions
 )
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ENABLE_AUTO_GENERATED_USERNAME = settings.FEATURES.copy()
 ENABLE_AUTO_GENERATED_USERNAME['ENABLE_AUTO_GENERATED_USERNAME'] = True
 
@@ -315,6 +319,33 @@ class RegistrationViewValidationErrorTest(
             }
         )
 
+<<<<<<< HEAD
+=======
+    def test_register_fullname_max_lenghth_validation_error(self):
+        """
+        Full name error detection test if the length exceeds 255 characters.
+        """
+        expected_error_message = f"Your legal name is too long. It must not exceed {NAME_MAX_LENGTH} characters"
+
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "x" * 256,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": expected_error_message}],
+                "error_code": "validation-error"
+            }
+        )
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_register_fullname_html_validation_error(self):
         """
         Test for catching invalid full name errors
@@ -1556,7 +1587,11 @@ class RegistrationViewTestV1(
         assert len(mail.outbox) == 1
         sent_email = mail.outbox[0]
         assert sent_email.to == [self.EMAIL]
+<<<<<<< HEAD
         assert sent_email.subject ==\
+=======
+        assert sent_email.subject == \
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                f'Action Required: Activate your {settings.PLATFORM_NAME} account'
         assert f'high-quality {settings.PLATFORM_NAME} courses' in sent_email.body
 
@@ -2468,6 +2503,34 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             })
         assert response.status_code == 400
 
+<<<<<<< HEAD
+=======
+    @override_settings(DISABLED_COUNTRIES=['KP'])
+    def test_register_with_disabled_country(self):
+        """
+        Test case to check user registration is forbidden when registration is disabled for a country
+        """
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+            "country": "KP",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {'country':
+                [
+                    {
+                        'user_message': 'Registration from this country is not allowed due to restrictions.'
+                    }
+                ], 'error_code': 'validation-error'}
+        )
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 @httpretty.activate
 @ddt.ddt
@@ -2575,6 +2638,27 @@ class ThirdPartyRegistrationTestMixin(
 
         self._verify_user_existence(user_exists=True, social_link_exists=True, user_is_active=False)
 
+<<<<<<< HEAD
+=======
+    @override_settings(DISABLED_COUNTRIES=['US'])
+    def test_with_disabled_country(self):
+        """
+        Test case to check user registration is forbidden when registration is disabled for a country
+        """
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+        self._setup_provider_response(success=True)
+        response = self.client.post(self.url, self.data())
+        assert response.status_code == 400
+        assert response.json() == {
+            'country': [
+                {
+                    'user_message': 'Registration from this country is not allowed due to restrictions.'
+                }
+            ], 'error_code': 'validation-error'
+        }
+        self._verify_user_existence(user_exists=False, social_link_exists=False, user_is_active=False)
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_unlinked_active_user(self):
         user = UserFactory()
         response = self.client.post(self.url, self.data(user))

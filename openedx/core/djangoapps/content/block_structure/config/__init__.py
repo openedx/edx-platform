@@ -9,6 +9,7 @@ from openedx.core.lib.cache_utils import request_cached
 
 from .models import BlockStructureConfiguration
 
+<<<<<<< HEAD
 # Switches
 # .. toggle_name: block_structure.storage_backing_for_cache
 # .. toggle_implementation: WaffleSwitch
@@ -40,6 +41,8 @@ def enable_storage_backing_for_cache_in_request():
     # pylint: disable=protected-access
     STORAGE_BACKING_FOR_CACHE._cached_switches[STORAGE_BACKING_FOR_CACHE.name] = True
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 @request_cached()
 def num_versions_to_keep():

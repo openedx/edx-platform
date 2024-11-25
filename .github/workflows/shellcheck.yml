@@ -9,7 +9,11 @@ on:
   pull_request:
   push:
     branches:
+<<<<<<< HEAD
     - master
+=======
+      - master
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 permissions:
   contents: read

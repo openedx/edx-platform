@@ -32,9 +32,16 @@ from openedx.core.djangoapps.content.course_overviews.signals import COURSE_PACI
 from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
     COURSE_GRADE_NOW_PASSED,
+<<<<<<< HEAD
     LEARNER_NOW_VERIFIED
 )
 from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED
+=======
+    LEARNER_SSO_VERIFIED,
+    PHOTO_VERIFICATION_APPROVED,
+)
+from openedx_events.learning.signals import EXAM_ATTEMPT_REJECTED, IDV_ATTEMPT_APPROVED
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 User = get_user_model()
 
@@ -118,10 +125,16 @@ def _listen_for_failing_grade(sender, user, course_id, grade, **kwargs):  # pyli
             log.info(f'Certificate marked not passing for {user.id} : {course_id} via failing grade')
 
 
+<<<<<<< HEAD
 @receiver(LEARNER_NOW_VERIFIED, dispatch_uid="learner_track_changed")
 def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylint: disable=unused-argument
     """
     Listen for a signal indicating that the user's id verification status has changed.
+=======
+def _handle_id_verification_approved(user):
+    """
+    Generate a certificate for the user if they are now verified
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     if not auto_certificate_generation_enabled():
         return
@@ -143,6 +156,28 @@ def _listen_for_id_verification_status_changed(sender, user, **kwargs):  # pylin
             )
 
 
+<<<<<<< HEAD
+=======
+@receiver(LEARNER_SSO_VERIFIED, dispatch_uid="sso_learner_verified")
+@receiver(PHOTO_VERIFICATION_APPROVED, dispatch_uid="photo_verification_approved")
+def _listen_for_sso_verification_approved(sender, user, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for a signal on SSOVerification indicating that the user has been verified.
+    """
+    _handle_id_verification_approved(user)
+
+
+@receiver(IDV_ATTEMPT_APPROVED, dispatch_uid="openedx_idv_attempt_approved")
+def _listen_for_id_verification_approved_event(sender, signal, **kwargs):  # pylint: disable=unused-argument
+    """
+    Listen for an openedx event indicating that the user's id verification status has changed.
+    """
+    event_data = kwargs.get('idv_attempt')
+    user = User.objects.get(id=event_data.user.id)
+    _handle_id_verification_approved(user)
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @receiver(ENROLLMENT_TRACK_UPDATED)
 def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs):  # pylint: disable=unused-argument
     """

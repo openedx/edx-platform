@@ -11,3 +11,10 @@ unicodecsv
 simplejson
 simple-salesforce
 google-api-python-client
+<<<<<<< HEAD
+=======
+
+# urllib3 is needed for the user_retirement scripts 
+# constraint will be investigated and removed in a separate issue
+urllib3<2.0.0
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

@@ -22,6 +22,10 @@ from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
+<<<<<<< HEAD
+=======
+import openedx.core.djangoapps.content.block_structure.api as bs_api
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
@@ -2228,6 +2232,12 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             display_name='Unreleased Section',
         )
 
+<<<<<<< HEAD
+=======
+        # We need to update the course in the cache after we create the new block.
+        bs_api.update_course_in_cache(self.course_data.course_key)
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         resp = self.client.get(
             self.get_url(subsection_id=unreleased_subsection.location)
         )

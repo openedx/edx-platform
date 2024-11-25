@@ -53,7 +53,12 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     OrgInstructorRole,
     OrgStaffRole,
+<<<<<<< HEAD
     SupportStaffRole
+=======
+    SupportStaffRole,
+    CourseLimitedStaffRole,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 from common.djangoapps.util import milestones_helpers as milestones_helpers  # lint-amnesty, pylint: disable=useless-import-alias
 from common.djangoapps.util.milestones_helpers import (
@@ -97,6 +102,34 @@ def has_ccx_coach_role(user, course_key):
     return False
 
 
+<<<<<<< HEAD
+=======
+def has_cms_access(user, course_key):
+    """
+    Check if user has access to the CMS. When requesting from the LMS, a user with the
+    limited staff access role needs access to the CMS APIs, but not the CMS site. This
+    function accounts for this edge case when determining if a user has access to the CMS
+    site.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        course_key: Key to course.
+
+    Returns:
+        bool: whether user has access to the CMS site.
+    """
+    has_course_author_access = auth.has_course_author_access(user, course_key)
+    is_limited_staff = auth.user_has_role(
+        user, CourseLimitedStaffRole(course_key)
+    ) and not GlobalStaff().has_user(user)
+
+    if is_limited_staff and has_course_author_access:
+        return False
+
+    return has_course_author_access
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @function_trace('has_access')
 def has_access(user, action, obj, course_key=None):
     """

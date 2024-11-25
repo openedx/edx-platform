@@ -9,7 +9,11 @@ from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+<<<<<<< HEAD
 from edx_rest_api_client import exceptions
+=======
+from requests import exceptions
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.commerce.models import CommerceConfiguration
@@ -210,7 +214,11 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             assert order_detail[i] == expected
 
     def test_commerce_order_detail_exception(self):
+<<<<<<< HEAD
         with mock_get_orders(exception=exceptions.HttpNotFoundError):
+=======
+        with mock_get_orders(exception=exceptions.HTTPError):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             order_detail = get_user_orders(self.user)
 
         assert not order_detail

@@ -12,14 +12,23 @@ jobs:
 
     strategy:
       matrix:
+<<<<<<< HEAD
         python-version: [ '3.8', '3.11', '3.12']
+=======
+        python-version:
+          - "3.12"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
+<<<<<<< HEAD
         uses: actions/setup-python@v4
+=======
+        uses: actions/setup-python@v5
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with:
           python-version: ${{ matrix.python-version }}
 

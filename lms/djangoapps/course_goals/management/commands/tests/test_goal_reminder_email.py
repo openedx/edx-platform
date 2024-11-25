@@ -5,6 +5,10 @@ from pytz import UTC
 from unittest import mock  # lint-amnesty, pylint: disable=wrong-import-order
 
 import ddt
+<<<<<<< HEAD
+=======
+from django.conf import settings
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.core.management import call_command
 from django.test import TestCase
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -20,7 +24,11 @@ from lms.djangoapps.course_goals.tests.factories import (
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+<<<<<<< HEAD
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
+=======
+from openedx.features.course_experience import ENABLE_COURSE_GOALS, ENABLE_SES_FOR_GOALREMINDER
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # Some constants just for clarity of tests (assuming week starts on a Monday, as March 2021 used below does)
 MONDAY = 0
@@ -180,3 +188,36 @@ class TestGoalReminderEmailCommand(TestCase):
     def test_old_course(self, end):
         self.make_valid_goal(overview__end=end)
         self.call_command(expect_sent=False)
+<<<<<<< HEAD
+=======
+
+    @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send')
+    def test_params_with_ses(self, mock_ace):
+        """Test that the parameters of the msg passed to ace.send() are set correctly when SES is enabled"""
+        with override_waffle_flag(ENABLE_SES_FOR_GOALREMINDER, active=None):
+            goal = self.make_valid_goal()
+            flag = get_waffle_flag_model().get(ENABLE_SES_FOR_GOALREMINDER.name)
+            flag.users.add(goal.user)
+
+            with freeze_time('2021-03-02 10:00:00'):
+                call_command('goal_reminder_email')
+
+            assert mock_ace.call_count == 1
+            msg = mock_ace.call_args[0][0]
+            assert msg.options['override_default_channel'] == 'django_email'
+            assert msg.options['from_address'] == settings.LMS_COMM_DEFAULT_FROM_EMAIL
+
+    @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send')
+    def test_params_without_ses(self, mock_ace):
+        """Test that the parameters of the msg passed to ace.send() are set correctly when SES is not enabled"""
+        self.make_valid_goal()
+
+        with freeze_time('2021-03-02 10:00:00'):
+            call_command('goal_reminder_email')
+
+        assert mock_ace.call_count == 1
+        msg = mock_ace.call_args[0][0]
+        assert msg.options['transactional'] is True
+        assert 'override_default_channel' not in msg.options
+        assert 'from_address' not in msg.options
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

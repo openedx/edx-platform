@@ -1,8 +1,14 @@
 """
 Unit tests for Contentstore Proctored Exam Settings.
 """
+<<<<<<< HEAD
 import ddt
 from mock import patch
+=======
+from unittest.mock import patch
+
+import ddt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -276,6 +282,7 @@ class ProctoringExamSettingsPostTests(
 
         # response is correct
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+<<<<<<< HEAD
         self.assertDictEqual(
             response.data,
             {
@@ -288,6 +295,16 @@ class ProctoringExamSettingsPostTests(
                     }
                 ]
             },
+=======
+        self.assertIn(
+            {
+                "proctoring_provider": (
+                    "The selected proctoring provider, notvalidprovider, is not a valid provider. "
+                    "Please select from one of ['test_proctoring_provider']."
+                )
+            },
+            response.data['detail'],
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
 
         # course settings have been updated
@@ -407,6 +424,7 @@ class ProctoringExamSettingsPostTests(
 
         # response is correct
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+<<<<<<< HEAD
         self.assertDictEqual(
             response.data,
             {
@@ -419,6 +437,16 @@ class ProctoringExamSettingsPostTests(
                     }
                 ]
             },
+=======
+        self.assertIn(
+            {
+                "proctoring_provider": (
+                    "The selected proctoring provider, lti_external, is not a valid provider. "
+                    "Please select from one of ['null']."
+                )
+            },
+            response.data['detail'],
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
 
         # course settings have been updated

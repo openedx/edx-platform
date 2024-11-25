@@ -89,6 +89,10 @@ class ContainerHandlerSerializer(serializers.Serializer):
     unit_block_id = serializers.CharField(source="unit.location.block_id")
     subsection_location = serializers.CharField(source="subsection.location")
     course_sequence_ids = serializers.ListField(child=serializers.CharField())
+<<<<<<< HEAD
+=======
+    library_content_picker_url = serializers.CharField()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def get_assets_url(self, obj):
         """
@@ -103,6 +107,21 @@ class ContainerHandlerSerializer(serializers.Serializer):
         return None
 
 
+<<<<<<< HEAD
+=======
+class UpstreamLinkSerializer(serializers.Serializer):
+    """
+    Serializer holding info for syncing a block with its upstream (eg, a library block).
+    """
+    upstream_ref = serializers.CharField()
+    version_synced = serializers.IntegerField()
+    version_available = serializers.IntegerField(allow_null=True)
+    version_declined = serializers.IntegerField(allow_null=True)
+    error_message = serializers.CharField(allow_null=True)
+    ready_to_sync = serializers.BooleanField()
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class ChildVerticalContainerSerializer(serializers.Serializer):
     """
     Serializer for representing a xblock child of vertical container.
@@ -113,6 +132,10 @@ class ChildVerticalContainerSerializer(serializers.Serializer):
     block_type = serializers.CharField()
     user_partition_info = serializers.DictField()
     user_partitions = serializers.ListField()
+<<<<<<< HEAD
+=======
+    upstream_link = UpstreamLinkSerializer(allow_null=True)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     actions = serializers.SerializerMethodField()
     validation_messages = MessageValidation(many=True)
     render_error = serializers.CharField()

@@ -1,6 +1,10 @@
 <%page args="grade_summary, grade_cutoffs, graph_div_id, show_grade_breakdown = True, show_grade_cutoffs = True, **kwargs"/>
 <%!
+<<<<<<< HEAD
     import bleach
+=======
+    import nh3
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     import json
     import math
     import six
@@ -74,7 +78,11 @@ $(function () {
       ## allowing the display of such images, and remove any previously stored HTML
       ## to prevent ugly HTML from being shown to learners.
       ## xss-lint: disable=javascript-jquery-append
+<<<<<<< HEAD
       ticks.append( [tickIndex, bleach.clean(section['label'], tags=set(), strip=True)] )
+=======
+      ticks.append( [tickIndex, nh3.clean(section['label'], tags=set())] )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
       if section['category'] in detail_tooltips:
           ## xss-lint: disable=javascript-jquery-append

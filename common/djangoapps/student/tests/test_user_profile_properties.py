@@ -107,6 +107,7 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
         assert cache.get(cache_key) != country
         assert cache.get(cache_key) is None
 
+<<<<<<< HEAD
     def test_phone_number_can_only_contain_digits(self):
         # validating the profile will fail, because there are letters
         # in the phone number
@@ -127,3 +128,45 @@ class UserProfilePropertiesTest(CacheIsolationTestCase):
             self.profile.full_clean()
         except ValidationError:
             self.fail("This phone number should  be valid.")
+=======
+    def test_valid_phone_numbers(self):
+        """
+        Test that valid phone numbers are accepted.
+
+        Expected behavior:
+            - The phone number '+123456789' should be considered valid.
+            - The phone number '123456789' (without '+') should also be valid.
+
+        This test verifies that valid phone numbers are accepted by the profile model validation.
+        """
+        valid_numbers = ['+123456789', '123456789']
+
+        for number in valid_numbers:
+            self.profile.phone_number = number
+
+            try:
+                self.profile.full_clean()
+            except ValidationError:
+                self.fail("This phone number should be valid.")
+
+    def test_invalid_phone_numbers(self):
+        """
+        Test that invalid phone numbers raise ValidationError.
+
+        Expected behavior:
+            - Phone numbers with letters, mixed digits/letters, whitespace,
+              or special characters should raise a ValidationError.
+
+        This test verifies that invalid phone numbers are rejected by the profile model validation.
+        """
+        invalid_phone_numbers = [
+            'abc',          # Letters in the phone number
+            '1234gb',       # Mixed digits and letters
+            '   123',       # Whitespace
+            '123!@#$%^&*'   # Special characters
+        ]
+
+        for number in invalid_phone_numbers:
+            self.profile.phone_number = number
+            pytest.raises(ValidationError, self.profile.full_clean)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

@@ -6,7 +6,10 @@ import uuid
 from collections import namedtuple
 from copy import deepcopy
 from unittest import mock
+<<<<<<< HEAD
 from urllib.parse import urlencode
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 import ddt
 import httpretty
@@ -44,10 +47,15 @@ from openedx.core.djangoapps.programs.utils import (
     ProgramDataExtender,
     ProgramMarketingDataExtender,
     ProgramProgressMeter,
+<<<<<<< HEAD
     get_buy_subscription_url,
     get_certificates,
     get_logged_in_program_certificate_url,
     get_programs_subscription_data,
+=======
+    get_certificates,
+    get_logged_in_program_certificate_url,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     is_user_enrolled_in_program_type
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
@@ -1759,6 +1767,7 @@ class TestProgramEnrollment(SharedModuleStoreTestCase):
         )
         mock_get_programs_by_type.return_value = [self.program]
         assert is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS)
+<<<<<<< HEAD
 
 
 @skip_unless_lms
@@ -1856,3 +1865,5 @@ class TestBuySubscriptionUrl(TestCase):
         formatted_skus = urlencode({'sku': skus}, doseq=True)
         expected_url = f'{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}{program_uuid}/?{formatted_skus}'
         assert url == expected_url
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

@@ -27,6 +27,11 @@ class IntegritySignature(TimeStampedModel):
 class LTIPIITool(TimeStampedModel):
     """
     This model stores the relationship between a course and the LTI tools in the course that share PII.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     course_key = CourseKeyField(max_length=255, unique=True, db_index=True)
     lti_tools = models.JSONField()
@@ -39,6 +44,11 @@ class LTIPIITool(TimeStampedModel):
 class LTIPIISignature(TimeStampedModel):
     """
     This model stores a user's acknowledgement to share PII via LTI tools in a particular course.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
@@ -57,6 +67,11 @@ class LTIPIISignature(TimeStampedModel):
 class ProctoringPIISignature(TimeStampedModel):
     """
     This model stores a user's acknowledgment to share PII via proctoring in a particular course.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)

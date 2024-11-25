@@ -5,12 +5,20 @@ Tests for the xblock view of the CMS API. This tests only the view itself,
 not the underlying Xblock service.
 It checks that the assets_handler method of the Xblock service is called with the expected parameters.
 """
+<<<<<<< HEAD
 from unittest.mock import patch
 from django.core.files import File
 from django.http import JsonResponse
 
 from django.urls import reverse
 from mock import MagicMock
+=======
+from unittest.mock import patch, MagicMock
+
+from django.core.files import File
+from django.http import JsonResponse
+from django.urls import reverse
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

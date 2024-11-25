@@ -30,6 +30,11 @@ class UserTour(models.Model):
 class UserDiscussionsTours(models.Model):
     """
     Model to track which discussions tours a user has seen.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     tour_name = models.CharField(max_length=255)
     show_tour = models.BooleanField(default=True)

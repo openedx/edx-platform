@@ -42,6 +42,7 @@ class CrawlersConfig(ConfigurationModel):
 
         # If there was no user agent detected or no crawler agents configured,
         # then just return False.
+<<<<<<< HEAD
         if (not req_user_agent) or (not crawler_agents):
             return False
 
@@ -52,6 +53,16 @@ class CrawlersConfig(ConfigurationModel):
         # either version.
         if isinstance(req_user_agent, bytes):
             crawler_agents = [crawler_agent.encode('iso-8859-1') for crawler_agent in crawler_agents]
+=======
+        if not req_user_agent or not crawler_agents:
+            return False
+
+        # Decode req_user_agent if it's bytes, so we can work with consistent string types.
+        if isinstance(req_user_agent, bytes):
+            req_user_agent = req_user_agent.decode('iso-8859-1')
+
+        crawler_agents = [crawler_agent.strip() for crawler_agent in crawler_agents]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         # We perform prefix matching of the crawler agent here so that we don't
         # have to worry about version bumps.

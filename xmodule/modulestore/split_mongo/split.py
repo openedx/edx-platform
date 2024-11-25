@@ -81,7 +81,11 @@ from xmodule.assetstore import AssetMetadata
 from xmodule.course_block import CourseSummary
 from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import null_error_tracker
+<<<<<<< HEAD
 from xmodule.library_content_block import LibrarySummary
+=======
+from xmodule.library_content_block import LegacyLibrarySummary
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore import (
     BlockData,
     BulkOperationsMixin,
@@ -1029,7 +1033,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     @autoretry_read()
     def get_library_summaries(self, **kwargs):
         """
+<<<<<<< HEAD
         Returns a list of `LibrarySummary` objects.
+=======
+        Returns a list of `LegacyLibrarySummary` objects.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         kwargs can be valid db fields to match against active_versions
         collection e.g org='example_org'.
         """
@@ -1057,7 +1065,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 display_name = library_block_fields['display_name']
 
             libraries_summaries.append(
+<<<<<<< HEAD
                 LibrarySummary(library_locator, display_name)
+=======
+                LegacyLibrarySummary(library_locator, display_name)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             )
 
         return libraries_summaries

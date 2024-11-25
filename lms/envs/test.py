@@ -215,6 +215,7 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
+<<<<<<< HEAD
     # Blockstore caching tests require a cache that actually works:
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
@@ -222,6 +223,8 @@ CACHES = {
         'LOCATION': 'edx_loc_mem_cache',
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     },
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 }
 
 ############################# SECURITY SETTINGS ################################
@@ -546,6 +549,7 @@ add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)
 
 derive_settings(__name__)
 
+<<<<<<< HEAD
 ############################### BLOCKSTORE #####################################
 XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'blockstore'  # This must be set to a working cache for the tests to pass
 BUNDLE_ASSET_STORAGE_SETTINGS = dict(
@@ -556,6 +560,8 @@ BUNDLE_ASSET_STORAGE_SETTINGS = dict(
     ),
 )
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
@@ -667,6 +673,7 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 SURVEY_REPORT_ENABLE = True
 ANONYMOUS_SURVEY_REPORT = False
 
+<<<<<<< HEAD
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://localhost:18750"
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
@@ -676,6 +683,8 @@ SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-su
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
 SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
 SUBSCRIPTIONS_TRIAL_LENGTH = 7
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 CSRF_TRUSTED_ORIGINS = ['.example.com']
 CSRF_TRUSTED_ORIGINS_WITH_SCHEME = ['https://*.example.com']
 

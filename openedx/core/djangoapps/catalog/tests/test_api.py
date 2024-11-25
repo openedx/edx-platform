@@ -1,7 +1,11 @@
 """
 Tests for the Catalog apps `api.py` functions.
 """
+<<<<<<< HEAD
 from mock import patch
+=======
+from unittest.mock import patch
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from django.test import TestCase
 

@@ -2,14 +2,22 @@
 Admin site configurations for verify_student.
 """
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.contrib import admin
 
 from lms.djangoapps.verify_student.models import (
     ManualVerification,
     SoftwareSecurePhotoVerification,
     SSOVerification,
+<<<<<<< HEAD
     SSPVerificationRetryConfig
+=======
+    SSPVerificationRetryConfig,
+    VerificationAttempt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 
 
@@ -50,3 +58,16 @@ class SSPVerificationRetryAdmin(admin.ModelAdmin):
     Admin for the SSPVerificationRetryConfig table.
     """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
+<<<<<<< HEAD
+=======
+
+
+@admin.register(VerificationAttempt)
+class VerificationAttemptAdmin(admin.ModelAdmin):
+    """
+    Admin for the VerificationAttempt table.
+    """
+    list_display = ('id', 'user', 'name', 'status', 'expiration_datetime',)
+    raw_id_fields = ('user',)
+    search_fields = ('user__username', 'name',)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

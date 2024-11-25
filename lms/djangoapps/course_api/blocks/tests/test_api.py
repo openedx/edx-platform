@@ -3,16 +3,25 @@ Tests for Blocks api.py
 """
 
 
+<<<<<<< HEAD
 from itertools import product
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from unittest.mock import patch
 
 import ddt
 from django.test.client import RequestFactory
+<<<<<<< HEAD
 from edx_toggles.toggles.testutils import override_waffle_switch
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.config import STORAGE_BACKING_FOR_CACHE
+=======
+
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import SampleCourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
@@ -209,6 +218,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
     Tests query counts for the get_blocks function.
     """
 
+<<<<<<< HEAD
     @ddt.data(
         *product(
             (ModuleStoreEnum.Type.split, ),
@@ -240,3 +250,27 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
                 expected_mongo_queries,
                 expected_sql_queries=num_sql_queries,
             )
+=======
+    @ddt.data(ModuleStoreEnum.Type.split)
+    def test_query_counts_cached(self, store_type):
+        course = self._create_course(store_type)
+        self._get_blocks(
+            course,
+            expected_mongo_queries=0,
+            expected_sql_queries=14,
+        )
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.split, 2, 24),
+    )
+    @ddt.unpack
+    def test_query_counts_uncached(self, store_type, expected_mongo_queries, num_sql_queries):
+        course = self._create_course(store_type)
+        clear_course_from_cache(course.id)
+
+        self._get_blocks(
+            course,
+            expected_mongo_queries,
+            expected_sql_queries=num_sql_queries,
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

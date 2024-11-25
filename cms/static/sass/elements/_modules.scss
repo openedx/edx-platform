@@ -140,12 +140,20 @@
         position: relative;
         display: inline-block;
         width: ($baseline*6.25);
+<<<<<<< HEAD
         height: ($baseline*5);
+=======
+        height: ($baseline*7);
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         margin-bottom: ($baseline/2);
         box-shadow: 0 1px 1px $shadow, 0 1px 0 rgba(255, 255, 255, 0.4) inset;
         border-radius: ($baseline/4);
         padding: 0;
         text-align: center;
+<<<<<<< HEAD
+=======
+        vertical-align: top;
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         @extend %btn-primary-green;
 
@@ -154,6 +162,24 @@
           display: block;
           color: $white;
         }
+<<<<<<< HEAD
+=======
+
+        .beta {
+          margin-top: 3px;
+          margin-bottom: -20px;
+          padding: 4px;
+          display: inline-block;
+
+          color: $uxpl-green-base;
+          background-color: theme-color("inverse");
+          border-color: theme-color("inverse");
+          border-radius: 3px;
+
+          font-size: 90%;
+          line-height: 90%;
+        }
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
       }
     }
   }

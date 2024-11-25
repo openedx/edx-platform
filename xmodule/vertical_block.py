@@ -9,6 +9,10 @@ from datetime import datetime
 from functools import reduce
 
 import pytz
+<<<<<<< HEAD
+=======
+from django.conf import settings
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from lxml import etree
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 from web_fragments.fragment import Fragment
@@ -43,7 +47,11 @@ class VerticalFields:
     discussion_enabled = Boolean(
         display_name=_("Enable in-context discussions for the Unit"),
         help=_("Add discussion for the Unit."),
+<<<<<<< HEAD
         default=True,
+=======
+        default=settings.FEATURES.get('IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT', True),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         scope=Scope.settings,
     )
 
@@ -188,7 +196,11 @@ class VerticalBlock(
         if has_access_error:
             return True
 
+<<<<<<< HEAD
         # Check child nodes if they exist (e.g. randomized library question aka LibraryContentBlock)
+=======
+        # Check child nodes if they exist (e.g. randomized library question aka LegacyLibraryContentBlock)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         for child in block.get_children():
             has_access_error = getattr(child, 'has_access_error', False)
             if has_access_error:

@@ -3,7 +3,11 @@ version: 2
 build:
   os: "ubuntu-22.04"
   tools:
+<<<<<<< HEAD
     python: "3.8"
+=======
+    python: "3.11"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 sphinx:
   configuration: docs/conf.py

@@ -7,6 +7,7 @@ updates:
         interval: "weekly"
     reviewers:
       - "openedx/arbi-bom"
+<<<<<<< HEAD
   - package-ecosystem: "github-actions"
     directory: "/.github/actions/unit-tests/"
     schedule:
@@ -19,3 +20,5 @@ updates:
         interval: "weekly"
     reviewers:
       - "openedx/arbi-bom"
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

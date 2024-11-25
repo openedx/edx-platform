@@ -1,10 +1,22 @@
 """
+<<<<<<< HEAD
 LibraryContent: The XBlock used to include blocks from a library in a course.
+=======
+LegacyLibraryContent: The XBlock used to randomly select a subset of blocks from a "v1" (modulestore-backed) library.
+
+In Studio, it's called the "Randomized Content Module".
+
+In the long-term, this block is deprecated in favor of "v2" (learning core-backed) library references:
+https://github.com/openedx/edx-platform/issues/32457
+
+We need to retain backwards-compatibility, but please do not build any new features into this.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 """
 from __future__ import annotations
 
 import json
 import logging
+<<<<<<< HEAD
 import random
 from copy import copy
 from gettext import ngettext, gettext
@@ -40,6 +52,24 @@ from xmodule.x_module import (
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+=======
+from gettext import ngettext, gettext
+
+import nh3
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from opaque_keys.edx.locator import LibraryLocator
+from web_fragments.fragment import Fragment
+from webob import Response
+from xblock.core import XBlock
+from xblock.fields import Integer, Scope, String
+
+from xmodule.capa.responsetypes import registry
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.item_bank_block import ItemBankMixin
+from xmodule.validation import StudioValidation, StudioValidationMessage
+from xmodule.x_module import XModuleToXBlockMixin
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 _ = lambda text: text
 
 logger = logging.getLogger(__name__)
@@ -74,6 +104,7 @@ class LibraryToolsUnavailable(ValueError):
         super().__init__("Needed 'library_tools' features which were not available in the current runtime")
 
 
+<<<<<<< HEAD
 @XBlock.wants('library_tools')  # TODO: Split this service into its LMS and CMS parts.
 @XBlock.wants('studio_user_permissions')  # Only available in CMS.
 @XBlock.wants('user')
@@ -88,12 +119,20 @@ class LibraryContentBlock(
 ):
     """
     An XBlock whose children are chosen dynamically from a content library.
+=======
+@XBlock.wants('library_tools')
+@XBlock.wants('studio_user_permissions')  # Only available in CMS.
+class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
+    """
+    An XBlock whose children are chosen dynamically from a legacy (v1) content library.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     Can be used to create randomized assessments among other things.
 
     Note: technically, all matching blocks from the content library are added
     as children of this block, but only a subset of those children are shown to
     any particular student.
     """
+<<<<<<< HEAD
     # pylint: disable=abstract-method
     has_children = True
     has_author_view = True
@@ -118,6 +157,8 @@ class LibraryContentBlock(
 
         return XBlockCompletionMode.AGGREGATOR
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),
@@ -135,6 +176,7 @@ class LibraryContentBlock(
         display_name=_("Library Version"),
         scope=Scope.settings,
     )
+<<<<<<< HEAD
     mode = String(
         display_name=_("Mode"),
         help=_("Determines how content is drawn from the library"),
@@ -146,6 +188,8 @@ class LibraryContentBlock(
         ],
         scope=Scope.settings,
     )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     max_count = Integer(
         display_name=_("Count"),
         help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
@@ -159,6 +203,7 @@ class LibraryContentBlock(
         values=_get_capa_types(),
         scope=Scope.settings,
     )
+<<<<<<< HEAD
     selected = List(
         # This is a list of (block_type, block_id) tuples used to record
         # which random/first set of matching blocks was selected per user
@@ -173,11 +218,14 @@ class LibraryContentBlock(
         scope=Scope.settings,
         default=False
     )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @property
     def source_library_key(self):
         """
         Convenience method to get the library ID as a LibraryLocator and not just a string.
+<<<<<<< HEAD
 
         Supports either library v1 or library v2 locators.
         """
@@ -416,6 +464,10 @@ class LibraryContentBlock(
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_reset.js'))
         fragment.initialize_js('LibraryContentReset')
         return fragment
+=======
+        """
+        return LibraryLocator.from_string(self.source_library_id)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def author_view(self, context):
         """
@@ -460,6 +512,7 @@ class LibraryContentBlock(
         fragment.initialize_js('LibraryContentAuthorView')
         return fragment
 
+<<<<<<< HEAD
     def studio_view(self, _context):
         """
         Return the studio view.
@@ -491,6 +544,17 @@ class LibraryContentBlock(
         return non_editable_fields
 
     def get_tools(self, to_read_library_content: bool = False) -> 'LibraryToolsService':
+=======
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super().non_editable_metadata_fields
+        non_editable_fields.extend([
+            LegacyLibraryContentBlock.source_library_version,
+        ])
+        return non_editable_fields
+
+    def get_tools(self, to_read_library_content: bool = False) -> 'LegacyLibraryToolsService':
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Grab the library tools service and confirm that it'll work for us. Else, raise LibraryToolsUnavailable.
         """
@@ -499,6 +563,7 @@ class LibraryContentBlock(
                 return tools
         raise LibraryToolsUnavailable()
 
+<<<<<<< HEAD
     def get_user_id(self):
         """
         Get the ID of the current user.
@@ -510,6 +575,8 @@ class LibraryContentBlock(
             user_id = None
         return user_id
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def _validate_sync_permissions(self):
         """
         Raises PermissionDenied() if we can't confirm that user has write on this block and read on source library.
@@ -564,6 +631,7 @@ class LibraryContentBlock(
             library_version=(None if upgrade_to_latest else self.source_library_version),
         )
 
+<<<<<<< HEAD
     @XBlock.json_handler
     def is_v2_library(self, data, suffix=''):  # pylint: disable=unused-argument
         """
@@ -580,6 +648,8 @@ class LibraryContentBlock(
             is_v2 = True
         return {'is_v2': is_v2}
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     @XBlock.handler
     def children_are_syncing(self, request, suffix=''):  # pylint: disable=unused-argument
         """
@@ -731,7 +801,11 @@ class LibraryContentBlock(
         lib_tools = self.get_tools()
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         all_libraries = [
+<<<<<<< HEAD
             (key, bleach.clean(name)) for key, name in lib_tools.list_available_libraries()
+=======
+            (key, nh3.clean(name)) for key, name in lib_tools.list_available_libraries()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             if user_perms.can_read(key) or self.source_library_id == str(key)
         ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
@@ -744,8 +818,11 @@ class LibraryContentBlock(
     def post_editor_saved(self, user, old_metadata, old_content):  # pylint: disable=unused-argument
         """
         If source library or capa_type have been edited, upgrade library & sync automatically.
+<<<<<<< HEAD
 
         TODO: capa_type doesn't really need to trigger an upgrade once we've migrated to V2.
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         source_lib_changed = (self.source_library_id != old_metadata.get("source_library_id", ""))
         capa_filter_changed = (self.capa_type != old_metadata.get("capa_type", ANY_CAPA_TYPE_VALUE))
@@ -756,6 +833,7 @@ class LibraryContentBlock(
                 # The validation area will display an error message, no need to do anything now.
                 pass
 
+<<<<<<< HEAD
     def has_dynamic_children(self):
         """
         Inform the runtime that our children vary per-user.
@@ -810,13 +888,62 @@ class LibraryContentBlock(
 
 
 class LibrarySummary:
+=======
+    def format_block_keys_for_analytics(self, block_keys: list[tuple[str, str]]) -> list[dict]:
+        """
+        Implement format_block_keys_for_analytics using the modulestore-specific legacy library original-usage system.
+        """
+        def summarize_block(usage_key):
+            """ Basic information about the given block """
+            orig_key, orig_version = self.runtime.modulestore.get_block_original_usage(usage_key)
+            return {
+                "usage_key": str(usage_key),
+                "original_usage_key": str(orig_key.replace(version=None, branch=None)) if orig_key else None,
+                "original_usage_version": str(orig_version) if orig_version else None,
+            }
+
+        result_json = []
+        for block_key in block_keys:
+            key = self.context_key.make_usage_key(*block_key)
+            info = summarize_block(key)
+            info['descendants'] = []
+            try:
+                block = self.runtime.modulestore.get_item(key, depth=None)  # Load the item and all descendants
+                children = list(getattr(block, "children", []))
+                while children:
+                    child_key = children.pop().replace(version=None, branch=None)
+                    child = self.runtime.modulestore.get_item(child_key)
+                    info['descendants'].append(summarize_block(child_key))
+                    children.extend(getattr(child, "children", []))
+            except ItemNotFoundError:
+                pass  # The block has been deleted
+            result_json.append(info)
+        return result_json
+
+    @classmethod
+    def get_selected_event_prefix(cls) -> str:
+        """
+        Prefix for events on `self.selected`.
+
+        We use librarycontent rather than legacylibrarycontent for backwards compatibility (this wasn't always the
+        "legacy" library content block :)
+        """
+        return "edx.librarycontentblock.content"
+
+
+class LegacyLibrarySummary:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     A library summary object which contains the fields required for library listing on studio.
     """
 
     def __init__(self, library_locator, display_name):
         """
+<<<<<<< HEAD
         Initialize LibrarySummary
+=======
+        Initialize LegacyLibrarySummary
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         Arguments:
         library_locator (LibraryLocator):  LibraryLocator object of the library.

@@ -10,6 +10,10 @@ from django.conf import settings
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+<<<<<<< HEAD
+=======
+from openedx_filters.learning.filters import CourseAboutPageURLRequested
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 log = logging.getLogger(__name__)
 
@@ -59,6 +63,16 @@ def get_link_for_about_page(course):
             course_key=str(course.id),
         )
 
+<<<<<<< HEAD
+=======
+        ## .. filter_implemented_name: CourseAboutPageURLRequested
+        ## .. filter_type: org.openedx.learning.course_about.page.url.requested.v1
+        course_about_url, _ = CourseAboutPageURLRequested.run_filter(
+            url=course_about_url,
+            org=course.id.org,
+        )
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     return course_about_url
 
 

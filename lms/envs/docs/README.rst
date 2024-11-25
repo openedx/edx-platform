@@ -1,4 +1,5 @@
 LMS Configuration Settings
+<<<<<<< HEAD
 ==========================
 
 The lms.envs module contains project-wide settings, defined in python modules
@@ -19,6 +20,26 @@ YAML Configuration Files
 In addition, there is a mechanism for reading and overriding configuration settings from YAML files on-disk. The :file:`/lms/envs/production.py` module loads settings from a YAML file.  The location of the YAML file is pulled from the value of the ``LMS_CFG`` environment variable.  Except for a limited set of exceptions, if a key exists in the YAML file, it will be injected into the settings module as it is defined in the YAML file.
 
 The YAML file allow open edX operators to configure the Django runtime
+=======
+##########################
+
+The ``lms.envs`` module contains project-wide settings, defined in python modules
+using the standard `Django Settings`_ mechanism, plus some Open edX
+particularities, which we describe below.
+
+.. _Django Settings: https://docs.djangoproject.com/en/dev/topics/settings/
+
+
+YAML Configuration Files
+************************
+
+In addition, there is a mechanism for reading and overriding configuration settings from YAML files on-disk.
+The :file:`/lms/envs/production.py` module loads settings from a YAML file.
+The location of the YAML file is pulled from the value of the ``LMS_CFG`` environment variable.
+Except for a limited set of exceptions, if a key exists in the YAML file, it will be injected into the settings module as it is defined in the YAML file.
+
+The YAML file allow Open edX operators to configure the Django runtime
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 without needing to make any changes to source-controlled python files in
 edx-platform. Therefore, they are not checked into the edx-platform repo.
 Rather, they are generated from the `edxapp playbook in the configuration
@@ -28,7 +49,11 @@ repo`_ and available in the ``/edx/etc/`` folder on edX servers.
 
 
 Feature Flags and Settings Guidelines
+<<<<<<< HEAD
 -------------------------------------
+=======
+*************************************
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 For guidelines on using Django settings and feature flag mechanisms in the edX
 platform, please see `Feature Flags and Settings`_.
@@ -37,16 +62,30 @@ platform, please see `Feature Flags and Settings`_.
 
 
 Derived Settings
+<<<<<<< HEAD
 ----------------
+=======
+****************
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 In cases where you need to define one or more settings relative to the value of
 another setting, you can explicitly designate them as derived calculations.
 This can let you override one setting (such as a path or a feature toggle) and
 have it automatically propagate to other settings which are defined in terms of
 that value, without needing to track down all potentially impacted settings and
+<<<<<<< HEAD
 explicitly override them as well.  This can be useful for test setting overrides
 even if you don't anticipate end users customizing the value very often.
 
 For example::
+=======
+explicitly override them as well. This can be useful for test setting overrides
+even if you don't anticipate end users customizing the value very often.
+
+For example:
+
+.. code-block:: python
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _make_locale_paths(settings):
         locale_paths = [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
@@ -66,7 +105,13 @@ defined in ``lms/envs/common.py`` and you're using ``lms/envs/production.py`` wh
 includes overrides both from that module and the JSON configuration files.
 
 List entries and dictionary values can also be derived from other settings, even
+<<<<<<< HEAD
 when nested within each other::
+=======
+when nested within each other:
+
+.. code-block:: python
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _make_mako_template_dirs(settings):
         """

@@ -66,3 +66,20 @@
   height: ($baseline*3);
   background: url('#{$static-path}/images/large-library-icon.png') center no-repeat;
 }
+<<<<<<< HEAD
+=======
+
+.large-library_v2-icon {
+  display: inline-block;
+  width: ($baseline*3);
+  height: ($baseline*3);
+  background: url('#{$static-path}/images/large-library_v2-icon.png') center no-repeat;
+}
+
+.large-itembank-icon {
+  display: inline-block;
+  width: ($baseline*3);
+  height: ($baseline*3);
+  background: url('#{$static-path}/images/large-itembank-icon.png') center no-repeat;
+}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

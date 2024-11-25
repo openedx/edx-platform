@@ -878,6 +878,10 @@ def _create_or_rerun_course(request):
         display_name = request.json.get('display_name')
         # force the start date for reruns and allow us to override start via the client
         start = request.json.get('start', CourseFields.start.default)
+<<<<<<< HEAD
+=======
+        end = request.json.get('end', CourseFields.end.default)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         run = request.json.get('run')
         has_course_creator_role = is_content_creator(request.user, org)
 
@@ -892,7 +896,11 @@ def _create_or_rerun_course(request):
                     status=400
                 )
 
+<<<<<<< HEAD
         fields = {'start': start}
+=======
+        fields = {'start': start, 'end': end}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if display_name is not None:
             fields['display_name'] = display_name
 

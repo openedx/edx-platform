@@ -1,8 +1,14 @@
 .. _Split Mongo Modulestore:
 
+<<<<<<< HEAD
 ############################
 Split Mongo Modulestore
 ############################
+=======
+#######################
+Split Mongo Modulestore
+#######################
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 See:
 
@@ -11,9 +17,15 @@ See:
 * `Split Mongo Capabilities`_
 
 
+<<<<<<< HEAD
 ************************
 Overview
 ************************
+=======
+********
+Overview
+********
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 *Split Mongo* is the term used for the new edX modulestore. Split Mongo is
 built on mongoDB. For information about mongoDB, see the `mongoDB website`_. 
@@ -30,9 +42,15 @@ use more advanced capabilities when developing and managing courses.
 
 .. _mongoDB website: http://www.mongodb.org
 
+<<<<<<< HEAD
 ************************
 Split Mongo Data Model
 ************************
+=======
+**********************
+Split Mongo Data Model
+**********************
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 In the Split Mongo data model, edX courses are split into three collections:
 
@@ -42,9 +60,15 @@ In the Split Mongo data model, edX courses are split into three collections:
 
 .. Structures link is a workaround; "Course Structures" as label is already taken 
 
+<<<<<<< HEAD
 =============
 Course Index
 =============
+=======
+============
+Course Index
+============
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 The course index is a dictionary that stores course IDs. Each course ID points
 to a course structure.
@@ -69,13 +93,21 @@ In the edX Platform:
       about page, course updates, other course pages, sections or subsections,
       the draft branch is automatically published; that is, it becomes the
       published branch.
+<<<<<<< HEAD
    
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
    *  For units and components, changes are saved in the draft branch. The user
       must publish the unit to change the draft branch to the published branch.
       When the user begins another set of changes, the draft branch is updated.
 
 Course Reruns
+<<<<<<< HEAD
 **************
+=======
+*************
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 The edX Platform enables you to rerun a course.  When you rerun a course, a new
 course index is created. The new course index points to the same course
@@ -83,9 +115,15 @@ structure as the original course index.
 
 .. _Structures:
 
+<<<<<<< HEAD
 ==========================
 Course Structures
 ==========================
+=======
+=================
+Course Structures
+=================
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 The course structure defines, or outlines, the content of a course.
 
@@ -104,9 +142,15 @@ when a course author changes a course, or a block in the course, a new course
 structure is saved; the previous course structure, and previous versions of
 blocks within the structure, remain in the database and are not modified. 
 
+<<<<<<< HEAD
 ==========================
 XBlock Definitions
 ==========================
+=======
+==================
+XBlock Definitions
+==================
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 XBlock definitions contain the content of each block. For some blocks, such as
 sections and subsections, the definition consists of the block's display name.
@@ -129,7 +173,11 @@ enable:
 * `Multiple Course Branches`_
 * `Versioning`_
 * `Content Reuse`_
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 While these capabilities are not fully implemented in the edX Platform, Split
 Mongo is designed to allow future enhancements that enable these content
 management capabilities.
@@ -145,9 +193,15 @@ different structure.
 The edX Platform currently uses a draft and a published branch for a course.
 Future enhancements may use other branches.
 
+<<<<<<< HEAD
 ============
 Versioning
 ============
+=======
+==========
+Versioning
+==========
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 In Split Mongo, every change to a course or a block within the course is saved,
 with the time and user recorded.
@@ -155,9 +209,15 @@ with the time and user recorded.
 Versioning enables future enhancements such as allowing course authors to
 revert a course or block to a previous version.
 
+<<<<<<< HEAD
 ==============
 Content Reuse
 ==============
+=======
+=============
+Content Reuse
+=============
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 By using pointers to reference XBlock definitions from :ref:`course structures
 <Structures>`, Split Mongo enables content reuse. A single `XBlock

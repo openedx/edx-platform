@@ -15,6 +15,11 @@ from openedx.core.djangoapps.config_model_utils.models import StackedConfigurati
 class DiscountRestrictionConfig(StackedConfigurationModel):
     """
     A ConfigurationModel used to manage restrictons for lms-controlled discounts
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     STACKABLE_FIELDS = ('disabled',)
@@ -43,6 +48,11 @@ class DiscountRestrictionConfig(StackedConfigurationModel):
 class DiscountPercentageConfig(StackedConfigurationModel):
     """
     A ConfigurationModel to configure the discount percentage for the first purchase discount
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     STACKABLE_FIELDS = ('percentage',)
     percentage = models.PositiveIntegerField()

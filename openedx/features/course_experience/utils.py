@@ -141,13 +141,26 @@ def get_start_block(block):
     return get_start_block(first_child)
 
 
+<<<<<<< HEAD
 def dates_banner_should_display(course_key, user):
+=======
+def dates_banner_should_display(course_key, user, allow_warning=False):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Return whether or not the reset banner should display,
     determined by whether or not a course has any past-due,
     incomplete sequentials and which enrollment mode is being
     dealt with for the current user and course.
 
+<<<<<<< HEAD
+=======
+    Args:
+        course_key (CourseKey)
+        user (User)
+        allow_warning (bool): whether to ignore relative_dates_disable_reset_flag, in order to render
+            warnings for past-due incomplete units.
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     Returns:
         (missed_deadlines, missed_gated_content):
             missed_deadlines is True if the user has missed any graded content deadlines
@@ -156,7 +169,11 @@ def dates_banner_should_display(course_key, user):
     if not RELATIVE_DATES_FLAG.is_enabled(course_key):
         return False, False
 
+<<<<<<< HEAD
     if RELATIVE_DATES_DISABLE_RESET_FLAG.is_enabled(course_key):
+=======
+    if RELATIVE_DATES_DISABLE_RESET_FLAG.is_enabled(course_key) and not allow_warning:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         # The `missed_deadlines` value is ignored by `reset_course_deadlines` views. Instead, they check the value of
         # `missed_gated_content` to determine if learners can reset the deadlines by themselves.
         # We could have added this logic directly to `reset_self_paced_schedule`, but this function is used in other

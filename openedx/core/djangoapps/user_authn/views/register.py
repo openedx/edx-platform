@@ -231,7 +231,11 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
         log.exception('Error while setting is_marketable attribute.')
         is_marketable = None
 
+<<<<<<< HEAD
     _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable)
+=======
+    _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable, request=request)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # Sites using multiple languages need to record the language used during registration.
     # If not, compose_and_send_activation_email will be sent in site's default language only.
@@ -356,9 +360,20 @@ def _link_user_to_third_party_provider(
     return third_party_provider, running_pipeline
 
 
+<<<<<<< HEAD
 def _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable):
     """ Track the user's registration. """
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
+=======
+def _track_user_registration(user, profile, params, third_party_provider, registration, is_marketable, request=None):
+    """ Track the user's registration. """
+    if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
+        anonymous_id = ""
+        try:
+            anonymous_id = request.COOKIES.get('ajs_anonymous_id', "")
+        except:       # pylint: disable=bare-except
+            pass
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         traits = {
             'email': user.email,
             'username': user.username,
@@ -370,7 +385,12 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'address': profile.mailing_address,
             'gender': profile.gender_display,
             'country': str(profile.country),
+<<<<<<< HEAD
             'is_marketable': is_marketable
+=======
+            'is_marketable': is_marketable,
+            'anonymous_id': anonymous_id
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         }
         if settings.MARKETING_EMAILS_OPT_IN and params.get('marketing_emails_opt_in'):
             email_subscribe = 'subscribed' if is_marketable else 'unsubscribed'
@@ -390,10 +410,21 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'is_year_of_birth_selected': bool(profile.year_of_birth),
             'is_education_selected': bool(profile.level_of_education_display),
             'is_goal_set': bool(profile.goals),
+<<<<<<< HEAD
             'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
             'activation_key': registration.activation_key if registration else None,
             'host': params.get('host', ''),
             'utm_campaign': params.get('utm_campaign', ''),
+=======
+            'total_registration_time': round(
+                float(params.get('total_registration_time') or params.get('totalRegistrationTime') or 0)
+            ),
+            'activation_key': registration.activation_key if registration else None,
+            'host': params.get('host', ''),
+            'app_name': params.get('app_name', ''),
+            'utm_campaign': params.get('utm_campaign', ''),
+            'anonymous_id': anonymous_id
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         }
         # VAN-738 - added below properties to experiment marketing emails opt in/out events on Braze.
         if params.get('marketing_emails_opt_in') and settings.MARKETING_EMAILS_OPT_IN:

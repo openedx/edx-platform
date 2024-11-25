@@ -53,6 +53,7 @@ def cache_if_anonymous(*get_parameters):
             # specifically the branding index, to do authentication.
             # If that page is cached the authentication doesn't
             # happen, so we disable the cache when that feature is enabled.
+<<<<<<< HEAD
             if (
                 not request.user.is_authenticated
             ):
@@ -60,6 +61,13 @@ def cache_if_anonymous(*get_parameters):
                 # return different things, so include the domain name in the key.
                 domain = str(request.META.get('HTTP_HOST')) + '.'
                 cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
+=======
+            if not request.user.is_authenticated:
+                # Use the cache. The same view accessed through different domain names may
+                # return different things, so include the domain name in the key.
+                domain = request.META.get('HTTP_HOST', '') + '.'
+                cache_key = f"{domain}cache_if_anonymous.{get_language()}.{request.path}"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
                 # Include the values of GET parameters in the cache key.
                 for get_parameter in get_parameters:
@@ -67,6 +75,7 @@ def cache_if_anonymous(*get_parameters):
                     if parameter_value is not None:
                         # urlencode expects data to be of type str, and doesn't deal well with Unicode data
                         # since it doesn't provide a way to specify an encoding.
+<<<<<<< HEAD
                         cache_key = cache_key + '.' + urlencode({
                             get_parameter: str(parameter_value).encode('utf-8')
                         })
@@ -79,12 +88,26 @@ def cache_if_anonymous(*get_parameters):
                     response.content = b''
                     for item in response_content:
                         response.write(item)
+=======
+                        cache_key += '.' + urlencode({get_parameter: str(parameter_value).encode('utf-8')})
+
+                response = cache.get(cache_key)
+                if response:
+                    # Ensure that response content is properly handled for caching
+                    response.content = (
+                        # pylint: disable=protected-access
+                        b''.join(response._container) if hasattr(response, '_container') else response.content
+                    )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 else:
                     response = view_func(request, *args, **kwargs)
                     cache.set(cache_key, response, 60 * 3)
 
                 return response
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             else:
                 # Don't use the cache.
                 return view_func(request, *args, **kwargs)

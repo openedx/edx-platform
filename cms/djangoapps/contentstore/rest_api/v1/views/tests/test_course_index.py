@@ -1,6 +1,10 @@
 """
 Unit tests for course index outline.
 """
+<<<<<<< HEAD
+=======
+from django.conf import settings
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -62,7 +66,11 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 "advance_settings_url": f"/settings/advanced/{self.course.id}"
             },
             "discussions_incontext_feedback_url": "",
+<<<<<<< HEAD
             "discussions_incontext_learnmore_url": "",
+=======
+            "discussions_incontext_learnmore_url": settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             "is_custom_relative_dates_active": True,
             "initial_state": None,
             "initial_user_clipboard": {
@@ -103,7 +111,11 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 "advance_settings_url": f"/settings/advanced/{self.course.id}"
             },
             "discussions_incontext_feedback_url": "",
+<<<<<<< HEAD
             "discussions_incontext_learnmore_url": "",
+=======
+            "discussions_incontext_learnmore_url": settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             "is_custom_relative_dates_active": False,
             "initial_state": {
                 "expanded_locators": [

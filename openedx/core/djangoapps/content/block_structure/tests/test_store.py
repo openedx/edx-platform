@@ -4,11 +4,17 @@ Tests for block_structure/cache.py
 
 import pytest
 import ddt
+<<<<<<< HEAD
 from edx_toggles.toggles.testutils import override_waffle_switch
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from ..config import STORAGE_BACKING_FOR_CACHE
+=======
+
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from ..config.models import BlockStructureConfiguration
 from ..exceptions import BlockStructureNotFound
 from ..store import BlockStructureStore
@@ -46,6 +52,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
                 value=f'{transformer.name()} val',
             )
 
+<<<<<<< HEAD
     @ddt.data(True, False)
     def test_get_none(self, with_storage_backing):
         with override_waffle_switch(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
@@ -71,15 +78,37 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
     def test_uncached_without_storage(self):
         self.store.add(self.block_structure)
         self.mock_cache.map.clear()
+=======
+    def test_get_none(self):
+        with pytest.raises(BlockStructureNotFound):
+            self.store.get(self.block_structure.root_block_usage_key)
+
+    def test_add_and_get(self):
+        self.store.add(self.block_structure)
+        stored_value = self.store.get(self.block_structure.root_block_usage_key)
+        assert stored_value is not None
+        self.assert_block_structure(stored_value, self.children_map)
+
+    def test_delete(self):
+        self.store.add(self.block_structure)
+        self.store.delete(self.block_structure.root_block_usage_key)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with pytest.raises(BlockStructureNotFound):
             self.store.get(self.block_structure.root_block_usage_key)
 
     def test_uncached_with_storage(self):
+<<<<<<< HEAD
         with override_waffle_switch(STORAGE_BACKING_FOR_CACHE, active=True):
             self.store.add(self.block_structure)
             self.mock_cache.map.clear()
             stored_value = self.store.get(self.block_structure.root_block_usage_key)
             self.assert_block_structure(stored_value, self.children_map)
+=======
+        self.store.add(self.block_structure)
+        self.mock_cache.map.clear()
+        stored_value = self.store.get(self.block_structure.root_block_usage_key)
+        self.assert_block_structure(stored_value, self.children_map)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @ddt.data(1, 5, None)
     def test_cache_timeout(self, timeout):

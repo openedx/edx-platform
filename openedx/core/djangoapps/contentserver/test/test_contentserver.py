@@ -1,10 +1,17 @@
 """
+<<<<<<< HEAD
 Tests for StaticContentServer
+=======
+Tests for content server.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 """
 
 
 import copy
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import datetime
 import logging
 import unittest
@@ -17,6 +24,7 @@ from django.test import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
 from opaque_keys import InvalidKeyError
+<<<<<<< HEAD
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, VERSIONED_ASSETS_PREFIX
 from xmodule.modulestore.django import modulestore
@@ -29,6 +37,20 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
 
 from ..middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
+=======
+
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from xmodule.assetstore.assetmgr import AssetManager
+from xmodule.contentstore.content import VERSIONED_ASSETS_PREFIX, StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.xml_importer import import_course_from_xml
+
+from .. import views
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 log = logging.getLogger(__name__)
 
@@ -247,7 +269,10 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         first_byte = self.length_unlocked / 4
         last_byte = self.length_unlocked / 2
+<<<<<<< HEAD
         # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte))
 
@@ -357,8 +382,13 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         assert 'private, no-cache, no-store' == resp['Cache-Control']
 
     def test_get_expiration_value(self):
+<<<<<<< HEAD
         start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", HTTP_DATE_FORMAT)
         near_expire_dt = StaticContentServer.get_expiration_value(start_dt, 55)
+=======
+        start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", views.HTTP_DATE_FORMAT)
+        near_expire_dt = views.get_expiration_value(start_dt, 55)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert 'Thu, 01 Dec 1983 20:00:55 GMT' == near_expire_dt
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -372,7 +402,11 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Chrome 1234')
 
+<<<<<<< HEAD
         is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+=======
+        is_from_cdn = views.is_cdn_request(browser_request)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert is_from_cdn is False
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -386,7 +420,11 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
 
+<<<<<<< HEAD
         is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+=======
+        is_from_cdn = views.is_cdn_request(browser_request)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert is_from_cdn is True
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -401,7 +439,11 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
 
+<<<<<<< HEAD
         is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+=======
+        is_from_cdn = views.is_cdn_request(browser_request)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert is_from_cdn is True
 
 
@@ -416,7 +458,11 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
         self.content_length = 10000
 
     def test_bytes_unit(self):
+<<<<<<< HEAD
         unit, __ = parse_range_header('bytes=100-', self.content_length)
+=======
+        unit, __ = views.parse_range_header('bytes=100-', self.content_length)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert unit == 'bytes'
 
     @ddt.data(
@@ -429,7 +475,11 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     )
     @ddt.unpack
     def test_valid_syntax(self, header_value, excepted_ranges_length, expected_ranges):
+<<<<<<< HEAD
         __, ranges = parse_range_header(header_value, self.content_length)
+=======
+        __, ranges = views.parse_range_header(header_value, self.content_length)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert len(ranges) == excepted_ranges_length
         assert ranges == expected_ranges
 
@@ -447,5 +497,9 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     @ddt.unpack
     def test_invalid_syntax(self, header_value, exception_class, exception_message_regex):
         self.assertRaisesRegex(
+<<<<<<< HEAD
             exception_class, exception_message_regex, parse_range_header, header_value, self.content_length
+=======
+            exception_class, exception_message_regex, views.parse_range_header, header_value, self.content_length
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )

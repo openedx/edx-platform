@@ -8,16 +8,26 @@ from itertools import chain
 from urllib.parse import quote
 
 from django.conf import settings
+<<<<<<< HEAD
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
+=======
+from django.utils.timezone import now
+from django.utils.translation import gettext as _
+from openedx_filters.learning.filters import IDVPageURLRequested
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import User
 from lms.djangoapps.verify_student.utils import is_verification_expiring_soon
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
+<<<<<<< HEAD
 from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+=======
+from .models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification, VerificationAttempt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from .utils import most_recent_verification
 
 log = logging.getLogger(__name__)
@@ -75,7 +85,12 @@ class IDVerificationService:
         Return a list of all verifications associated with the given user.
         """
         verifications = []
+<<<<<<< HEAD
         for verification in chain(SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-created_at'),
+=======
+        for verification in chain(VerificationAttempt.objects.filter(user=user).order_by('-created_at'),
+                                  SoftwareSecurePhotoVerification.objects.filter(user=user).order_by('-created_at'),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                                   SSOVerification.objects.filter(user=user).order_by('-created_at'),
                                   ManualVerification.objects.filter(user=user).order_by('-created_at')):
             verifications.append(verification)
@@ -92,6 +107,14 @@ class IDVerificationService:
             'created_at__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
         }
         return chain(
+<<<<<<< HEAD
+=======
+            VerificationAttempt.objects.filter(**{
+                'user__in': users,
+                'status': 'approved',
+                'created_at__gt': now() - timedelta(days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"])
+            }).values_list('user_id', flat=True),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
             SSOVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True),
             ManualVerification.objects.filter(**filter_kwargs).values_list('user_id', flat=True)
@@ -117,11 +140,21 @@ class IDVerificationService:
             'status__in': statuses,
         }
 
+<<<<<<< HEAD
+=======
+        id_verifications = VerificationAttempt.objects.filter(**filter_kwargs)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         photo_id_verifications = SoftwareSecurePhotoVerification.objects.filter(**filter_kwargs)
         sso_id_verifications = SSOVerification.objects.filter(**filter_kwargs)
         manual_id_verifications = ManualVerification.objects.filter(**filter_kwargs)
 
+<<<<<<< HEAD
         attempt = most_recent_verification((photo_id_verifications, sso_id_verifications, manual_id_verifications))
+=======
+        attempt = most_recent_verification(
+            (photo_id_verifications, sso_id_verifications, manual_id_verifications, id_verifications)
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         return attempt and attempt.expiration_datetime
 
     @classmethod
@@ -167,10 +200,27 @@ class IDVerificationService:
         if verifications:
             attempt = verifications[0]
             for verification in verifications:
+<<<<<<< HEAD
                 if verification.expiration_datetime > now() and verification.status == 'approved':
                     # Always select the LATEST non-expired approved verification if there is such
                     if attempt.status != 'approved' or (
                         attempt.expiration_datetime < verification.expiration_datetime
+=======
+                # If a verification has no expiration_datetime, it's implied that it never expires, so we should still
+                # consider verifications in the approved state that have no expiration date.
+                if (
+                    not verification.expiration_datetime or
+                        verification.expiration_datetime > now()
+                ) and verification.status == 'approved':
+                    # Always select the LATEST non-expired approved verification if there is such.
+                    if (
+                        attempt.status != 'approved' or
+                        (
+                            attempt.expiration_datetime and
+                            verification.expiration_datetime and
+                            attempt.expiration_datetime < verification.expiration_datetime
+                        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     ):
                         attempt = verification
 
@@ -179,7 +229,11 @@ class IDVerificationService:
 
         user_status['should_display'] = attempt.should_display_status_to_user()
 
+<<<<<<< HEAD
         if attempt.expiration_datetime < now() and attempt.status == 'approved':
+=======
+        if attempt.expiration_datetime and attempt.expiration_datetime < now() and attempt.status == 'approved':
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             if user_status['should_display']:
                 user_status['status'] = 'expired'
                 user_status['error'] = _("Your {platform_name} verification has expired.").format(
@@ -235,6 +289,7 @@ class IDVerificationService:
         location = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
         if course_id:
             location += f'?course_id={quote(str(course_id))}'
+<<<<<<< HEAD
         return location
 
     @classmethod
@@ -256,3 +311,9 @@ class IDVerificationService:
                 except ObjectDoesNotExist:
                     pass
         return verification
+=======
+
+        # .. filter_implemented_name: IDVPageURLRequested
+        # .. filter_type: org.openedx.learning.idv.page.url.requested.v1
+        return IDVPageURLRequested.run_filter(location)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

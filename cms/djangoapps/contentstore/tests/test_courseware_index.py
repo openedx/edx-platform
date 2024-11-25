@@ -504,6 +504,14 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         """ Test for removing course from CourseAboutSearchIndexer """
         self._test_delete_course_from_search_index_after_course_deletion(self.store)
 
+<<<<<<< HEAD
+=======
+    def test_empty_course(self):
+        empty_course = CourseFactory.create(modulestore=self.store, start=datetime(2015, 3, 1, tzinfo=UTC))
+        added_to_index = CoursewareSearchIndexer.do_course_reindex(self.store, empty_course.id)
+        assert added_to_index == 0
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 @patch('django.conf.settings.SEARCH_ENGINE', 'search.tests.utils.ForceRefreshElasticSearchEngine')
 @ddt.ddt

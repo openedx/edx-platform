@@ -1,0 +1,18 @@
+<div class="modal-alert warning" role="alert">
+    <span class="fa fa-lg fa-warning" aria-hidden="true"/><span class="sr"><%- gettext("Warning") %></span>
+    <div class="message-content">
+        <strong><%- gettext("You are editing content from a Library.") %></strong>
+        <p>
+        <%- gettext("Edits made here will only be reflected in this course. These edits may be overridden later if updates are accepted.") %>
+        </p>
+    </div>
+    <a
+        href="<%- upstreamLink %>"
+        target="_blank"
+        class="btn action-btn"
+    >
+        <%- gettext('View in Library') %>
+        <span class="fa fa-external-link" aria-hidden="true" />
+    </a>
+</div>
+

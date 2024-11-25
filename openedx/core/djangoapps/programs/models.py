@@ -72,8 +72,20 @@ class AbstractProgramLTIConfiguration(TimeStampedModel):
 
 
 class ProgramLiveConfiguration(AbstractProgramLTIConfiguration):
+<<<<<<< HEAD
+=======
+    """
+    .. no_pii:
+    """
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     history = HistoricalRecords()
 
 
 class ProgramDiscussionsConfiguration(AbstractProgramLTIConfiguration):
+<<<<<<< HEAD
+=======
+    """
+    .. no_pii:
+    """
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     history = HistoricalRecords()

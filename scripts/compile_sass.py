@@ -352,6 +352,7 @@ def main(
                     repo / "lms" / "static" / "sass",
                 ],
             )
+<<<<<<< HEAD
             compile_sass_dir(
                 "Compiling built-in XBlock Sass for default LMS",
                 repo / "xmodule" / "assets",
@@ -364,6 +365,8 @@ def main(
                     repo / "cms" / "static" / "sass",
                 ],
             )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if not skip_cms:
             compile_sass_dir(
                 "Compiling default CMS Sass",
@@ -376,6 +379,7 @@ def main(
                     repo / "cms" / "static" / "sass",
                 ],
             )
+<<<<<<< HEAD
             compile_sass_dir(
                 "Compiling built-in XBlock Sass for default CMS",
                 repo / "xmodule" / "assets",
@@ -388,6 +392,8 @@ def main(
                     repo / "cms" / "static" / "sass",
                 ],
             )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         click.secho(f"Done compiling default Sass!", fg="cyan", bold=True)
         click.echo()
 
@@ -429,6 +435,7 @@ def main(
                 ],
                 tolerate_missing=True,
             )
+<<<<<<< HEAD
             compile_sass_dir(
                 "Compiling built-in XBlock Sass for themed LMS",
                 repo / "xmodule" / "assets",
@@ -443,6 +450,8 @@ def main(
                     repo / "cms" / "static" / "sass",
                 ],
             )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if not skip_cms:
             compile_sass_dir(
                 "Compiling default CMS Sass with themed partials",
@@ -470,6 +479,7 @@ def main(
                 ],
                 tolerate_missing=True,
             )
+<<<<<<< HEAD
             compile_sass_dir(
                 "Compiling built-in XBlock Sass for themed CMS",
                 repo / "xmodule" / "assets",
@@ -484,6 +494,8 @@ def main(
                     repo / "cms" / "static" / "sass",
                 ],
             )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         click.secho(f"Done compiling Sass for theme at {theme}!", fg="cyan", bold=True)
         click.echo()
 

@@ -306,6 +306,7 @@ class TestUpdateHash(unittest.TestCase):
         """
         d1 = {k: 1 for k in "abcdefghijklmnopqrstuvwxyz"}
         d2 = {k: 1 for k in "bcdefghijklmnopqrstuvwxyza"}
+<<<<<<< HEAD
         # TODO: remove the next lines once we are in python3.8
         # since python3.8 dict preserve the order of insertion
         # and therefore d2 and d1 keys are already in different order.
@@ -313,6 +314,8 @@ class TestUpdateHash(unittest.TestCase):
             d2[i] = 1
         for i in range(10000):
             del d2[i]
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         # Check that our dicts are equal, but with different key order.
         assert d1 == d2

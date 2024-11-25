@@ -11,7 +11,11 @@
 # A. You don't *have* to, because settings in devstack.py
 #    override these settings. But, it doesn't harm to also make them
 #    here in order to quell confusion. The hope is that we'll
+<<<<<<< HEAD
 #    adpot OEP-45 eventually, which recommends against having
+=======
+#    adopt OEP-45 eventually, which recommends against having
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 #    a devstack.py at all.
 #
 # This is part of the effort to move our dev tools off of Ansible and

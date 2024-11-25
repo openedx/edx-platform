@@ -8,6 +8,7 @@
     <% } %>
 </aside>
 <aside class="aside js-course-certificates"></aside>
+<<<<<<< HEAD
 <% if (isSubscriptionEligible) { %>
 <aside class="aside js-subscription-info subscription-info">
     <h2 class="divider-heading">
@@ -52,6 +53,8 @@
     </div>
 </aside>
 <% } %>
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 <aside class="aside js-program-record program-record">
     <h2 class="divider-heading"><%- gettext('Program Record') %></h2>
     <div class="sidebar-section">

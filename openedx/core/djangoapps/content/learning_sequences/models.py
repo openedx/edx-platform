@@ -53,6 +53,11 @@ class LearningContext(TimeStampedModel):
     because this table can contain things that are not courses.
 
     It is okay to make a foreign key against this table.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     id = models.BigAutoField(primary_key=True)
     context_key = LearningContextKeyField(
@@ -74,6 +79,11 @@ class LearningContext(TimeStampedModel):
 class CourseContext(TimeStampedModel):
     """
     A model containing course specific information e.g course_visibility
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     learning_context = models.OneToOneField(
         LearningContext, on_delete=models.CASCADE, primary_key=True, related_name="course_context"
@@ -106,6 +116,11 @@ class LearningSequence(TimeStampedModel):
     CourseSectionSequence.
 
     It is okay to make a foreign key against this table.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     id = models.BigAutoField(primary_key=True)
     learning_context = models.ForeignKey(
@@ -131,6 +146,11 @@ class CourseContentVisibilityMixin(models.Model):
 
     We keep the XBlock field names here, even if they're somewhat misleading.
     Please read the comments carefully for each field.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     # This is an obscure, OLX-only flag (there is no UI for it in Studio) that
     # lets you define a Sequence that is reachable by direct URL but not shown
@@ -174,6 +194,11 @@ class UserPartitionGroup(models.Model):
     UserPartitionGroups are not associated with LearningSequence directly
     because User Partitions often carry course-level assumptions (e.g.
     Enrollment Track) that don't make sense outside of a Course.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     id = models.BigAutoField(primary_key=True)
     partition_id = models.BigIntegerField(null=False)
@@ -191,6 +216,11 @@ class UserPartitionGroup(models.Model):
 class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
     """
     Course Section data, mapping to the 'chapter' block type.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     id = models.BigAutoField(primary_key=True)
     course_context = models.ForeignKey(
@@ -225,6 +255,11 @@ class SectionPartitionGroup(models.Model):
     Used for the user_partition_groups ManyToManyField field in the CourseSection model above.
     Adds a cascading delete which will delete these many-to-many relations
     whenever a UserPartitionGroup or CourseSection object is deleted.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     class Meta:
         unique_together = [
@@ -249,6 +284,11 @@ class CourseSectionSequence(CourseContentVisibilityMixin, TimeStampedModel):
 
     Do NOT make a foreign key against this table, as the values are deleted and
     re-created on course publish.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     id = models.BigAutoField(primary_key=True)
     course_context = models.ForeignKey(
@@ -289,6 +329,11 @@ class SectionSequencePartitionGroup(models.Model):
     Used for the user_partition_groups ManyToManyField field in the CourseSectionSequence model above.
     Adds a cascading delete which will delete these many-to-many relations
     whenever a UserPartitionGroup or CourseSectionSequence object is deleted.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     class Meta:
         unique_together = [
@@ -303,6 +348,11 @@ class CourseSequenceExam(TimeStampedModel):
     """
     This model stores XBlock information that affects outline level information
     pertaining to special exams
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     course_section_sequence = models.OneToOneField(CourseSectionSequence, on_delete=models.CASCADE, related_name='exam')
 
@@ -318,6 +368,11 @@ class PublishReport(models.Model):
     All these fields could be derived with aggregate SQL functions, but it would
     be slower and make the admin code more complex. Since we only write at
     publish time, keeping things in sync is less of a concern.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     learning_context = models.OneToOneField(
         LearningContext, on_delete=models.CASCADE, related_name='publish_report'
@@ -350,6 +405,11 @@ class ContentError(models.Model):
     freeform messages. It is quite possible that at some point we will come up
     with a more comprehensive taxonomy of error messages, at which point we
     could do a backfill to regenerate this data in a more normalized way.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     id = models.BigAutoField(primary_key=True)
     publish_report = models.ForeignKey(

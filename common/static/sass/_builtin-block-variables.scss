@@ -1,0 +1,81 @@
+/*
+ * In pursuit of decoupling the built-in XBlocks from edx-platform's Sass build
+ * and ensuring comprehensive theming support in the extracted XBlocks,
+ * we need to expose Sass variables as CSS variables.
+ *
+ * Ticket/Issue: https://github.com/openedx/edx-platform/issues/35173
+ */
+@import 'bourbon/bourbon';
+@import 'lms/theme/variables';
+@import 'lms/theme/variables-v1';
+@import 'cms/static/sass/partials/cms/theme/_variables';
+@import 'cms/static/sass/partials/cms/theme/_variables-v1';
+@import 'bootstrap/scss/variables';
+@import 'vendor/bi-app/bi-app-ltr';
+@import 'edx-pattern-library-shims/base/_variables.scss';
+
+:root {
+    --action-primary-active-bg: $action-primary-active-bg;
+    --base-font-size: $base-font-size;
+    --base-line-height: $base-line-height;
+    --baseline: $baseline;
+    --black: $black;
+    --black-t2: $black-t2;
+    --blue: $blue;
+    --blue-d1: $blue-d1;
+    --blue-d2: $blue-d2;
+    --blue-d4: $blue-d4;
+    --blue-s1: $blue-s1;
+    --body-color: $body-color;
+    --border-color: $border-color;
+    --bp-screen-lg: $bp-screen-lg;
+    --btn-brand-focus-background: $btn-brand-focus-background;
+    --correct: $correct;
+    --danger: $danger;
+    --darkGrey: $darkGrey;
+    --error-color: $error-color;
+    --error-color-dark: darken($error-color, 11%);
+    --error-color-light: lighten($error-color, 25%);
+    --font-bold: $font-bold;
+    --font-family-sans-serif: $font-family-sans-serif;
+    --general-color-accent: $general-color-accent;
+    --gray: $gray;
+    --gray-300: $gray-300;
+    --gray-d1: $gray-d1;
+    --gray-l2: $gray-l2;
+    --gray-l3: $gray-l3;
+    --gray-l4: $gray-l4;
+    --gray-l6: $gray-l6;
+    --icon-correct: url($static-path + '/images/correct-icon.png');
+    --icon-incorrect: url($static-path + '/images/incorrect-icon.png');
+    --icon-info: url($static-path + '/images/info-icon.png');
+    --icon-partially-correct: url($static-path + '/images/partially-correct-icon.png');
+    --icon-spinner: url($static-path + '/images/spinner.gif');
+    --icon-unanswered: url($static-path + '/images/unanswered-icon.png');
+    --incorrect: $incorrect;
+    --lightGrey: $lightGrey;
+    --lighter-base-font-color: $lighter-base-font-color;
+    --link-color: $link-color;
+    --medium-font-size: $medium-font-size;
+    --partially-correct: $partially-correct;
+    --primary: $primary;
+    --shadow: $shadow;
+    --shadow-l1: $shadow-l1;
+    --sidebar-color: $sidebar-color;
+    --small-font-size: $small-font-size;
+    --static-path: $static-path;
+    --submitted: $submitted;
+    --success: $success;
+    --tmg-f2: $tmg-f2;
+    --tmg-s2: $tmg-s2;
+    --transparent: $transparent;
+    --uxpl-gray-background: $uxpl-gray-background;
+    --uxpl-gray-base: $uxpl-gray-base;
+    --uxpl-gray-dark: $uxpl-gray-dark;
+    --very-light-text: $very-light-text;
+    --warning: $warning;
+    --warning-color: $warning-color;
+    --warning-color-accent: $warning-color-accent;
+    --white: $white;
+    --yellow: $yellow;
+}

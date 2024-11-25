@@ -50,13 +50,25 @@ from path import Path as path
 from django.utils.translation import gettext_lazy as _
 from enterprise.constants import (
     ENTERPRISE_ADMIN_ROLE,
+<<<<<<< HEAD
+=======
+    ENTERPRISE_LEARNER_ROLE,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ENTERPRISE_CATALOG_ADMIN_ROLE,
     ENTERPRISE_DASHBOARD_ADMIN_ROLE,
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
     ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
     ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
+<<<<<<< HEAD
     ENTERPRISE_OPERATOR_ROLE
+=======
+    ENTERPRISE_OPERATOR_ROLE,
+    SYSTEM_ENTERPRISE_PROVISIONING_ADMIN_ROLE,
+    PROVISIONING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
+    PROVISIONING_PENDING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
+    DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
@@ -290,7 +302,11 @@ FEATURES = {
     # sandbox, for testing whether it's enabled properly.
     'ENABLE_DEBUG_RUN_PYTHON': False,
 
+<<<<<<< HEAD
     # Enable URL that shows information about the status of variuous services
+=======
+    # Enable URL that shows information about the status of various services
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'ENABLE_SERVICE_STATUS': False,
 
     # Don't autoplay videos for students
@@ -458,7 +474,11 @@ FEATURES = {
     # .. toggle_name: FEATURES['ENABLE_THIRD_PARTY_AUTH']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
+<<<<<<< HEAD
     # .. toggle_description: Turn on third-party auth. Disabled for now because full mplementations are not yet
+=======
+    # .. toggle_description: Turn on third-party auth. Disabled for now because full implementations are not yet
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     #   available. Remember to run migrations if you enable this; we don't create tables by default. This feature can
     #   be enabled on a per-site basis. When enabling this feature, remember to define the allowed authentication
     #   backends with the AUTHENTICATION_BACKENDS setting.
@@ -699,7 +719,11 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: When set to True, Open edX site can be used as an LTI Provider to other systems
     #    and applications.
+<<<<<<< HEAD
     # .. toggle_warning: After enabling this feature flag there are multiple steps invloved to configure edX
+=======
+    # .. toggle_warning: After enabling this feature flag there are multiple steps involved to configure edX
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     #    as LTI provider. Full guide is available here:
     #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/lti/index.html
     # .. toggle_use_cases: open_edx
@@ -946,6 +970,7 @@ FEATURES = {
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/OSPR-5290'
     'ENABLE_BULK_USER_RETIREMENT': False,
 
+<<<<<<< HEAD
     # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -957,6 +982,8 @@ FEATURES = {
     # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
     'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     # .. toggle_name: FEATURES['ENABLE_INTEGRITY_SIGNATURE']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -983,7 +1010,11 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: When true, replaces the bulk email tool found on the
     #   instructor dashboard with a link to the new communications MFE version instead.
+<<<<<<< HEAD
     #   Stting the tool to false will leave the old bulk email tool experience in place.
+=======
+    #   Setting the tool to false will leave the old bulk email tool experience in place.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     # .. toggle_use_cases: opt_in
     # .. toggle_creation_date: 2022-03-21
     # .. toggle_target_removal_date: None
@@ -1018,7 +1049,11 @@ FEATURES = {
     # .. toggle_name: FEATURES['ENABLE_CERTIFICATES_IDV_REQUIREMENT']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
+<<<<<<< HEAD
     # .. toggle_description: Whether to enforce ID Verification requirements for couse certificates generation
+=======
+    # .. toggle_description: Whether to enforce ID Verification requirements for course certificates generation
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2022-04-26
     # .. toggle_target_removal_date: None
@@ -1101,6 +1136,14 @@ DEFAULT_GROUPS = []
 # If this is true, random scores will be generated for the purpose of debugging the profile graphs
 GENERATE_PROFILE_SCORES = False
 
+<<<<<<< HEAD
+=======
+# .. setting_name: GRADEBOOK_FREEZE_DAYS
+# .. setting_default: 30
+# .. setting_description: Sets the number of days after which the gradebook will freeze following the course's end.
+GRADEBOOK_FREEZE_DAYS = 30
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 XQUEUE_INTERFACE = {
@@ -1129,7 +1172,11 @@ MARKETING_EMAILS_OPT_IN = False
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
+<<<<<<< HEAD
 # .. toggle_description: When True, inforces COPPA compliance and removes YOB field from registration form and accounnt
+=======
+# .. toggle_description: When True, enforces COPPA compliance and removes YOB field from registration form and account
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # .. settings page. Also hide YOB banner from profile page.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-10-27
@@ -1157,13 +1204,17 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
 DATABASE_ROUTERS = [
     'openedx.core.lib.django_courseware_routers.StudentModuleHistoryExtendedRouter',
+<<<<<<< HEAD
     'openedx.core.lib.blockstore_api.db_routers.BlockstoreRouter',
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'edx_django_utils.db.read_replica.ReadReplicaRouter',
 ]
 
 ############################ Cache Configuration ###############################
 
 CACHES = {
+<<<<<<< HEAD
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
@@ -1177,6 +1228,8 @@ CACHES = {
             'connect_timeout': 0.5
         }
     },
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'course_structure_cache': {
         'KEY_PREFIX': 'course_structure',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
@@ -1381,7 +1434,11 @@ CONTEXT_PROCESSORS = [
     # Mobile App processor (Detects if request is from the mobile app)
     'lms.djangoapps.mobile_api.context_processor.is_from_mobile_app',
 
+<<<<<<< HEAD
     # Context processor necesarry for the survey report message appear on the admin site
+=======
+    # Context processor necessary for the survey report message appear on the admin site
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'openedx.features.survey_report.context_processors.admin_extra_context'
 
 
@@ -1472,7 +1529,11 @@ SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
 
 # .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
 # .. setting_default: ''
+<<<<<<< HEAD
 # .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
+=======
+# .. setting_description: Specifies the prefix used when naming elasticsearch indexes related to edx-search.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ELASTICSEARCH_INDEX_PREFIX = ""
 
 VIDEO_CDN_URL = {
@@ -1704,6 +1765,14 @@ XBLOCK_FS_STORAGE_PREFIX = None
 #     for more reference.
 XBLOCK_SETTINGS = {}
 
+<<<<<<< HEAD
+=======
+# .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
+# .. setting_default: default
+# .. setting_description: The django cache key of the cache to use for storing anonymous user state for XBlocks.
+XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'default'
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ############# ModuleStore Configuration ##########
 
 MODULESTORE_BRANCH = 'published-only'
@@ -1854,7 +1923,11 @@ CODE_JAIL = {
 #   ]
 COURSES_WITH_UNSAFE_CODE = []
 
+<<<<<<< HEAD
 # Cojail REST service
+=======
+# Code jail REST service
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ENABLE_CODEJAIL_REST_SERVICE = False
 # .. setting_name: CODE_JAIL_REST_SERVICE_REMOTE_EXEC
 # .. setting_default: 'xmodule.capa.safe_exec.remote_exec.send_safe_exec_request_v0'
@@ -1944,6 +2017,13 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     NODE_MODULES_ROOT / "@edx",
+<<<<<<< HEAD
+=======
+    # Temporarily adding the following static path as we are migrating the built-in blocks' Sass to vanilla CSS.
+    # Once all of the built-in blocks are extracted from edx-platform, we can remove this static path.
+    # Relevant ticket: https://github.com/openedx/edx-platform/issues/35300
+    XMODULE_ROOT / "static",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
@@ -2265,6 +2345,10 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.CodeOwnerMonitoringMiddleware',
     'edx_django_utils.monitoring.CookieMonitoringMiddleware',
     'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
+<<<<<<< HEAD
+=======
+    'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # Before anything that looks at cookies, especially the session middleware
     'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
@@ -2295,7 +2379,10 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.safe_sessions.middleware.EmailChangeMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
+<<<<<<< HEAD
     'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # Adds user tags to tracking events
     # Must go before TrackMiddleware, to get the context set up
@@ -3149,7 +3236,11 @@ INSTALLED_APPS = [
     # User tours
     'lms.djangoapps.user_tours',
 
+<<<<<<< HEAD
     # New (Blockstore-based) XBlock runtime
+=======
+    # New (Learning-Core-based) XBlock runtime
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'openedx.core.djangoapps.xblock.apps.LmsXBlockAppConfig',
 
     # Student support tools
@@ -3191,9 +3282,19 @@ INSTALLED_APPS = [
     # Notes
     'lms.djangoapps.edxnotes',
 
+<<<<<<< HEAD
     # User API
     'rest_framework',
 
+=======
+    # Django Rest Framework
+    'rest_framework',
+
+    # REST framework JWT Auth
+    'rest_framework_jwt',
+
+    # User API
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'openedx.core.djangoapps.user_api',
 
     # Different Course Modes
@@ -3354,12 +3455,17 @@ INSTALLED_APPS = [
     # Management of external user ids
     'openedx.core.djangoapps.external_user_ids',
 
+<<<<<<< HEAD
     # Provides api for Demographics support
     'openedx.core.djangoapps.demographics',
 
     # Management of per-user schedules
     'openedx.core.djangoapps.schedules',
     'rest_framework_jwt',
+=======
+    # Management of per-user schedules
+    'openedx.core.djangoapps.schedules',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # Learning Sequence Navigation
     'openedx.core.djangoapps.content.learning_sequences.apps.LearningSequencesConfig',
@@ -3385,9 +3491,12 @@ INSTALLED_APPS = [
     # For edx ace template tags
     'edx_ace',
 
+<<<<<<< HEAD
     # Blockstore
     'blockstore.apps.bundles',
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     # MFE API
     'lms.djangoapps.mfe_config_api',
 
@@ -3397,9 +3506,16 @@ INSTALLED_APPS = [
     'openedx_events',
 
     # Learning Core Apps, used by v2 content libraries (content_libraries app)
+<<<<<<< HEAD
     "openedx_learning.core.components",
     "openedx_learning.core.contents",
     "openedx_learning.core.publishing",
+=======
+    "openedx_learning.apps.authoring.collections",
+    "openedx_learning.apps.authoring.components",
+    "openedx_learning.apps.authoring.contents",
+    "openedx_learning.apps.authoring.publishing",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ]
 
 
@@ -3689,6 +3805,12 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
 # because that decision might happen in a later config file. (The headers to
 # allow is an application logic, and not site policy.)
 CORS_ALLOW_HEADERS = corsheaders_default_headers + (
+<<<<<<< HEAD
+=======
+    'cache-control',
+    'expires',
+    'pragma',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'use-jwt-cookie',
 )
 
@@ -3826,6 +3948,19 @@ ORA_WORKFLOW_UPDATE_ROUTING_KEY = "edx.lms.core.ora_workflow_update"
 # By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
 
+<<<<<<< HEAD
+=======
+# .. setting_name: ORA_PEER_LEASE_EXPIRATION_HOURS
+# .. setting_default: 8
+# .. setting_description: Amount of time before a lease on a peer submission expires
+ORA_PEER_LEASE_EXPIRATION_HOURS = 8
+
+# .. setting_name: ORA_STAFF_LEASE_EXPIRATION_HOURS
+# .. setting_default: 8
+# .. setting_description: Amount of time before a lease on a staff submission expires
+ORA_STAFF_LEASE_EXPIRATION_HOURS = 8
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
@@ -4303,6 +4438,13 @@ SOCIAL_PLATFORMS = {
     }
 }
 
+<<<<<<< HEAD
+=======
+# Enable First Purchase Discount offer override
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE = ''
+FIRST_PURCHASE_DISCOUNT_OVERRIDE_PERCENTAGE = 15
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # E-Commerce API Configuration
 ECOMMERCE_PUBLIC_URL_ROOT = 'http://localhost:8002'
 ECOMMERCE_API_URL = 'http://localhost:8002/api/v2'
@@ -4311,6 +4453,7 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
+<<<<<<< HEAD
 # E-Commerce Commerce Coordinator Configuration
 COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8140'
 COMMERCE_COORDINATOR_REFUND_PATH = '/lms/refund/'
@@ -4318,6 +4461,8 @@ COMMERCE_COORDINATOR_REFUND_SOURCE_SYSTEMS = ('SET-ME-PLEASE',)
 COMMERCE_COORDINATOR_SERVICE_WORKER_USERNAME = 'commerce_coordinator_worker'
 COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/payment_page_redirect/'
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
@@ -4534,7 +4679,11 @@ FINANCIAL_ASSISTANCE_MAX_LENGTH = 2500
 
 REGISTRATION_EXTENSION_FORM = None
 
+<<<<<<< HEAD
 # Identifier included in the User Agent from open edX mobile apps.
+=======
+# Identifier included in the User Agent from Open edX mobile apps.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 MOBILE_APP_USER_AGENT_REGEXES = [
     r'edX/org.edx.mobile',
 ]
@@ -4686,11 +4835,19 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_channel_worker',
     'enterprise_access_worker',
     'enterprise_subsidy_worker',
+<<<<<<< HEAD
     'subscriptions_worker'
 ]
 
 # Setting for Open API key and prompts used by edx-enterprise.
 OPENAI_API_KEY = ''
+=======
+]
+
+# Setting for Open API key and prompts used by edx-enterprise.
+CHAT_COMPLETION_API = 'https://example.com/chat/completion'
+CHAT_COMPLETION_API_KEY = 'i am a key'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
 LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
 LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
@@ -4732,11 +4889,21 @@ ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
 SYSTEM_TO_FEATURE_ROLE_MAPPING = {
+<<<<<<< HEAD
+=======
+    ENTERPRISE_LEARNER_ROLE: [
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
+    ],
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ENTERPRISE_ADMIN_ROLE: [
         ENTERPRISE_DASHBOARD_ADMIN_ROLE,
         ENTERPRISE_CATALOG_ADMIN_ROLE,
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+<<<<<<< HEAD
+=======
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ],
     ENTERPRISE_OPERATOR_ROLE: [
         ENTERPRISE_DASHBOARD_ADMIN_ROLE,
@@ -4745,6 +4912,14 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
         ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
         ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
+<<<<<<< HEAD
+=======
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
+    ],
+    SYSTEM_ENTERPRISE_PROVISIONING_ADMIN_ROLE: [
+        PROVISIONING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
+        PROVISIONING_PENDING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ],
 }
 
@@ -5196,6 +5371,7 @@ RATE_LIMIT_FOR_VIDEO_METADATA_API = '10/minute'
 ########################## MAILCHIMP SETTINGS #################################
 MAILCHIMP_NEW_USER_LIST_ID = ""
 
+<<<<<<< HEAD
 ########################## BLOCKSTORE #####################################
 
 # .. setting_name: XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE
@@ -5247,6 +5423,8 @@ BUNDLE_ASSET_STORAGE_SETTINGS = dict(
     ),
 )
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 SYSLOG_SERVER = ''
 FEEDBACK_SUBMISSION_EMAIL = ''
 GITHUB_REPO_ROOT = '/edx/var/edxapp/data'
@@ -5426,6 +5604,7 @@ ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
 
+<<<<<<< HEAD
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = ""
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
@@ -5441,6 +5620,12 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 83
+=======
+############## NOTIFICATIONS ##############
+NOTIFICATIONS_EXPIRY = 60
+EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
+NOTIFICATION_CREATION_BATCH_SIZE = 76
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
@@ -5519,6 +5704,13 @@ EVENT_BUS_PRODUCER_CONFIG = {
         'learning-course-access-role-lifecycle':
             {'event_key_field': 'course_access_role_data.course_key', 'enabled': False},
     },
+<<<<<<< HEAD
+=======
+    'org.openedx.enterprise.learner_credit_course_enrollment.revoked.v1': {
+        'learner-credit-course-enrollment-lifecycle':
+            {'event_key_field': 'learner_credit_course_enrollment.uuid', 'enabled': False},
+    },
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     # CMS events. These have to be copied over here because cms.common adds some derived entries as well,
     # and the derivation fails if the keys are missing. If we ever fully decouple the lms and cms settings,
     # we can remove these.
@@ -5594,3 +5786,17 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_default: empty dictionary
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
+<<<<<<< HEAD
+=======
+
+
+# .. setting_name: DISABLED_COUNTRIES
+# .. setting_default: []
+# .. setting_description: List of country codes that should be disabled
+# .. for now it wil impact country listing in auth flow and user profile.
+# .. eg ['US', 'CA']
+DISABLED_COUNTRIES = []
+
+
+LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

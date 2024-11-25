@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ _("Email Digest Preferences Updated") }}</title>
+    </head>
+    <body>
+        <script>
+            alert('{{ _("You have successfully unsubscribed from email digest for learning activity") }}');
+            window.location.replace("{{ notification_preferences_url }}");
+        </script>
+    </body>
+</html>

@@ -302,7 +302,11 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
             + [
                 {
                     'category': 'Homework',
+<<<<<<< HEAD
                     'detail': 'Homework Average = 0%',
+=======
+                    'detail': 'Homework Average = 0.00%',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     'label': 'HW Avg', 'percent': 0.0,
                     'prominent': True
                 }
@@ -332,21 +336,33 @@ class SectionGradesBreakdownTest(GradeViewTestMixin, APITestCase):
                 },
                 {
                     'category': 'Lab',
+<<<<<<< HEAD
                     'detail': 'Lab Average = 0%',
+=======
+                    'detail': 'Lab Average = 0.00%',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     'label': 'Lab Avg',
                     'percent': 0.0,
                     'prominent': True
                 },
                 {
                     'category': 'Midterm Exam',
+<<<<<<< HEAD
                     'detail': 'Midterm Exam = 0%',
+=======
+                    'detail': 'Midterm Exam = 0.00%',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     'label': 'Midterm',
                     'percent': 0.0,
                     'prominent': True
                 },
                 {
                     'category': 'Final Exam',
+<<<<<<< HEAD
                     'detail': 'Final Exam = 0%',
+=======
+                    'detail': 'Final Exam = 0.00%',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     'label': 'Final',
                     'percent': 0.0,
                     'prominent': True

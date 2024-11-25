@@ -207,7 +207,11 @@ class CacheInvalidationManager:
 
 def zpickle(data):
     """Given any data structure, returns a zlib compressed pickled serialization."""
+<<<<<<< HEAD
     return zlib.compress(pickle.dumps(data, 4))  # Keep this constant as we upgrade from python 2 to 3.
+=======
+    return zlib.compress(pickle.dumps(data, 4))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 def zunpickle(zdata):

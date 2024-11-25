@@ -2,6 +2,10 @@
 Mixin to support editing in Studio.
 """
 from xblock.core import XBlock, XBlockMixin
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 
 
@@ -12,6 +16,10 @@ class StudioEditableBlock(XBlockMixin):
 
     This class is only intended to be used with an XBlock!
     """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     has_author_view = True
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):
@@ -49,6 +57,7 @@ class StudioEditableBlock(XBlockMixin):
         """
         return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 
+<<<<<<< HEAD
     # Some parts of the code use getattr to dynamically check for the following methods on subclasses.
     # We'd like to refactor so that we can actually declare them here as overridable methods.
     # For now, we leave them here as documentation.
@@ -90,6 +99,8 @@ class StudioEditableBlock(XBlockMixin):
     #     """
     #     return False
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 def has_author_view(block):
     """

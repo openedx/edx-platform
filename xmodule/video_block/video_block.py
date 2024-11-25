@@ -48,7 +48,11 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
+<<<<<<< HEAD
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+=======
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
@@ -242,7 +246,11 @@ class VideoBlock(
         Return the student view.
         """
         fragment = Fragment(self.get_html(context=context))
+<<<<<<< HEAD
         add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
+=======
+        add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
@@ -260,7 +268,11 @@ class VideoBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
+<<<<<<< HEAD
         add_sass_to_fragment(fragment, 'VideoBlockEditor.scss')
+=======
+        add_css_to_fragment(fragment, 'VideoBlockEditor.css')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         add_webpack_js_to_fragment(fragment, 'VideoBlockEditor')
         shim_xmodule_js(fragment, 'TabsEditingDescriptor')
         return fragment
@@ -276,7 +288,11 @@ class VideoBlock(
             return self.student_view(context)
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
+<<<<<<< HEAD
         add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
+=======
+        add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
@@ -482,7 +498,11 @@ class VideoBlock(
             'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
             'block_id': str(self.location),
+<<<<<<< HEAD
             'course_id': str(self.location.course_key),
+=======
+            'course_id': str(self.context_key),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             'video_id': str(self.edx_video_id),
             'user_id': self.get_user_id(),
             'is_embed': is_embed,
@@ -510,8 +530,15 @@ class VideoBlock(
         """
         Return course video sharing options override or None
         """
+<<<<<<< HEAD
         try:
             course = get_course_by_id(self.course_id)
+=======
+        if not self.context_key.is_course:
+            return False  # Only courses support this feature at all (not libraries)
+        try:
+            course = get_course_by_id(self.context_key)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             return getattr(course, 'video_sharing_options', None)
 
         # In case the course / modulestore does something weird
@@ -523,11 +550,21 @@ class VideoBlock(
         """
         Is public sharing enabled for this video?
         """
+<<<<<<< HEAD
         try:
             # Video share feature must be enabled for sharing settings to take effect
             feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key)
         except Exception as err:  # pylint: disable=broad-except
             log.exception(f"Error retrieving course for course ID: {self.location.course_key}")
+=======
+        if not self.context_key.is_course:
+            return False  # Only courses support this feature at all (not libraries)
+        try:
+            # Video share feature must be enabled for sharing settings to take effect
+            feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.context_key)
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.context_key}")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             return False
         if not feature_enabled:
             return False
@@ -552,11 +589,21 @@ class VideoBlock(
         """
         Is transcript feedback enabled for this video?
         """
+<<<<<<< HEAD
         try:
             # Video transcript feedback must be enabled in order to show the widget
             feature_enabled = TRANSCRIPT_FEEDBACK.is_enabled(self.location.course_key)
         except Exception as err:  # pylint: disable=broad-except
             log.exception(f"Error retrieving course for course ID: {self.location.course_key}")
+=======
+        if not self.context_key.is_course:
+            return False  # Only courses support this feature at all (not libraries)
+        try:
+            # Video transcript feedback must be enabled in order to show the widget
+            feature_enabled = TRANSCRIPT_FEEDBACK.is_enabled(self.context_key)
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.context_key}")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             return False
         return feature_enabled
 

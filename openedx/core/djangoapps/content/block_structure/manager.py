@@ -35,7 +35,11 @@ class BlockStructureManager:
         self.modulestore = modulestore
         self.store = BlockStructureStore(cache)
 
+<<<<<<< HEAD
     def get_transformed(self, transformers, starting_block_usage_key=None, collected_block_structure=None):
+=======
+    def get_transformed(self, transformers, starting_block_usage_key=None, collected_block_structure=None, user=None):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Returns the transformed Block Structure for the root_block_usage_key,
         starting at starting_block_usage_key, getting block data from the cache
@@ -57,11 +61,21 @@ class BlockStructureManager:
                 get_collected.  Can be optionally provided if already available,
                 for optimization.
 
+<<<<<<< HEAD
+=======
+            user (django.contrib.auth.models.User) - User object for
+                which the block structure is to be transformed.
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         Returns:
             BlockStructureBlockData - A transformed block structure,
                 starting at starting_block_usage_key.
         """
+<<<<<<< HEAD
         block_structure = collected_block_structure.copy() if collected_block_structure else self.get_collected()
+=======
+        block_structure = collected_block_structure.copy() if collected_block_structure else self.get_collected(user)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         if starting_block_usage_key:
             # Override the root_block_usage_key so traversals start at the
@@ -77,7 +91,11 @@ class BlockStructureManager:
         transformers.transform(block_structure)
         return block_structure
 
+<<<<<<< HEAD
     def get_collected(self):
+=======
+    def get_collected(self, user=None):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Returns the collected Block Structure for the root_block_usage_key,
         getting block data from the cache and modulestore, as needed.
@@ -86,6 +104,13 @@ class BlockStructureManager:
         the modulestore is accessed if needed (at cache miss), and the
         transformers data is collected if needed.
 
+<<<<<<< HEAD
+=======
+        In the case of a cache miss, the function bypasses runtime access checks for the current
+        user. This is done to prevent inconsistencies in the data, which can occur when
+        certain blocks are inaccessible due to access restrictions.
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         Returns:
             BlockStructureBlockData - A collected block structure,
                 starting at root_block_usage_key, with collected data
@@ -99,7 +124,19 @@ class BlockStructureManager:
             BlockStructureTransformers.verify_versions(block_structure)
 
         except (BlockStructureNotFound, TransformerDataIncompatible):
+<<<<<<< HEAD
             block_structure = self._update_collected()
+=======
+            if user and getattr(user, "known", True):
+                # This bypasses the runtime access checks. When we are populating the course blocks cache,
+                # we do not want to perform access checks. Access checks result in inconsistent blocks where
+                # inaccessible blocks are missing from the cache. Cached course blocks are then used for all the users.
+                user.known = False
+                block_structure = self._update_collected()
+                user.known = True
+            else:
+                block_structure = self._update_collected()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         return block_structure
 

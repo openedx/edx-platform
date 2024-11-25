@@ -22,6 +22,10 @@ from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+<<<<<<< HEAD
+=======
+from xmodule.course_block import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -201,6 +205,23 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             display_name='Tech Beta Course',
             emit_signals=True,
         )
+<<<<<<< HEAD
+=======
+        self.course_with_none_visibility = CourseFactory.create(
+            org='MITx',
+            number='1003',
+            catalog_visibility=CATALOG_VISIBILITY_NONE,
+            display_name='Course with "none" catalog visibility',
+            emit_signals=True,
+        )
+        self.course_with_about_visibility = CourseFactory.create(
+            org='MITx',
+            number='1003',
+            catalog_visibility=CATALOG_VISIBILITY_ABOUT,
+            display_name='Course with "about" catalog visibility',
+            emit_signals=True,
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.factory = RequestFactory()
 
     @patch('common.djangoapps.student.views.management.render_to_response', RENDER_MOCK)
@@ -300,6 +321,18 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         assert context['courses'][1].id == self.starting_earlier.id
         assert context['courses'][2].id == self.course_with_default_start_date.id
 
+<<<<<<< HEAD
+=======
+    @patch('lms.djangoapps.courseware.views.views.render_to_response', RENDER_MOCK)
+    def test_invisible_courses_are_not_displayed(self):
+        response = self.client.get(reverse('courses'))
+        ((_template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
+
+        rendered_ids = [course.id for course in context["courses"]]
+        assert self.course_with_none_visibility.id not in rendered_ids
+        assert self.course_with_about_visibility.id not in rendered_ids
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 class IndexPageProgramsTests(SiteMixin, ModuleStoreTestCase):
     """

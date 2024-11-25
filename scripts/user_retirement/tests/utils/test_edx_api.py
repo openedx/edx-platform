@@ -2,12 +2,19 @@
 Tests for edX API calls.
 """
 import unittest
+<<<<<<< HEAD
+=======
+from unittest.mock import DEFAULT, patch
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from urllib.parse import urljoin
 
 import requests
 import responses
 from ddt import data, ddt, unpack
+<<<<<<< HEAD
 from mock import DEFAULT, patch
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from requests.exceptions import ConnectionError, HTTPError
 from responses import GET, PATCH, POST, matchers
 from responses.registries import OrderedRegistry
@@ -21,7 +28,11 @@ from scripts.user_retirement.tests.retirement_helpers import (
     FAKE_USERNAMES,
     TEST_RETIREMENT_QUEUE_STATES,
     TEST_RETIREMENT_STATE,
+<<<<<<< HEAD
     get_fake_user_retirement
+=======
+    get_fake_user_retirement,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 from scripts.user_retirement.utils import edx_api
 
@@ -499,6 +510,7 @@ class TestDiscoveryApi(OAuth2Mixin, unittest.TestCase):
         )
 
 
+<<<<<<< HEAD
 class TestDemographicsApi(OAuth2Mixin, unittest.TestCase):
     """
     Test the edX Demographics API client.
@@ -539,6 +551,8 @@ class TestDemographicsApi(OAuth2Mixin, unittest.TestCase):
         )
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class TestLicenseManagerApi(OAuth2Mixin, unittest.TestCase):
     """
     Test the edX License Manager API client.

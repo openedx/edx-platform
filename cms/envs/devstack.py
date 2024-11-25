@@ -174,9 +174,12 @@ FEATURES['ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES'] = True
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
 FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
 
+<<<<<<< HEAD
 ################### FRONTEND APPLICATION LIBRARY AUTHORING ###################
 LIBRARY_AUTHORING_MICROFRONTEND_URL = 'http://localhost:3001'
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ################### FRONTEND APPLICATION COURSE AUTHORING ###################
 COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 
@@ -218,9 +221,12 @@ IDA_LOGOUT_URI_LIST = [
 
 ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms/oauth2"
 
+<<<<<<< HEAD
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 #####################################################################
 
 # pylint: disable=wrong-import-order, wrong-import-position
@@ -264,6 +270,7 @@ FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
+<<<<<<< HEAD
 ############## CourseGraph devstack settings ############################
 
 COURSEGRAPH_CONNECTION: dict = {
@@ -275,13 +282,20 @@ COURSEGRAPH_CONNECTION: dict = {
     "password": "edx",
 }
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 
 ################ Using LMS SSO for login to Studio ################
 SOCIAL_AUTH_EDX_OAUTH2_KEY = 'studio-sso-key'
 SOCIAL_AUTH_EDX_OAUTH2_SECRET = 'studio-sso-secret'  # in stage, prod would be high-entropy secret
+<<<<<<< HEAD
 SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = 'http://edx.devstack.lms:18000'  # routed internally server-to-server
+=======
+# routed internally server-to-server
+SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = ENV_TOKENS.get('SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT', 'http://edx.devstack.lms:18000')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = 'http://localhost:18000'  # used in browser redirect
 
 # Don't form the return redirect URL with HTTPS on devstack

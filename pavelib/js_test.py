@@ -7,12 +7,19 @@ import os
 import re
 import sys
 
+<<<<<<< HEAD
 from paver.easy import cmdopts, needs, task
+=======
+from paver.easy import cmdopts, needs, sh, task
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from pavelib.utils.envs import Env
 from pavelib.utils.test.suites import JestSnapshotTestSuite, JsTestSuite
 from pavelib.utils.timer import timed
+<<<<<<< HEAD
 from paver.easy import cmdopts, needs, sh, task
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 try:
     from pygments.console import colorize

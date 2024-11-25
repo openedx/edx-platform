@@ -22,21 +22,35 @@ class XBlockSerializer:
     static_files: list[StaticFile]
     tags: TagValuesByObjectIdDict
 
+<<<<<<< HEAD
     def __init__(self, block):
+=======
+    def __init__(self, block, write_url_name=True, fetch_asset_data=False):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
+<<<<<<< HEAD
+=======
+        self.write_url_name = write_url_name
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
         self.tags = {}
         olx_node = self._serialize_block(block)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
 
         course_key = self.orig_block_key.course_key
         # Search the OLX for references to files stored in the course's
         # "Files & Uploads" (contentstore):
         self.olx_str = utils.rewrite_absolute_static_urls(self.olx_str, course_key)
+<<<<<<< HEAD
         for asset in utils.collect_assets_from_text(self.olx_str, course_key):
             path = asset['path']
             if path not in [sf.name for sf in self.static_files]:
@@ -50,6 +64,34 @@ class XBlockSerializer:
             js_input_files = utils.get_js_input_files_if_using(self.olx_str, course_key)
             for js_input_file in js_input_files:
                 self.static_files.append(js_input_file)
+=======
+
+        runtime_supports_explicit_assets = hasattr(block.runtime, 'get_block_assets')
+        if runtime_supports_explicit_assets:
+            # If a block supports explicitly tracked assets, things are simple.
+            # Learning Core backed content supports this, which currently means
+            # v2 Content Libraries.
+            self.static_files.extend(
+                block.runtime.get_block_assets(block, fetch_asset_data)
+            )
+        else:
+            # Otherwise, we have to scan the content to extract associated asset
+            # by inference. This is what we have to do for Modulestore-backed
+            # courses, which store files a course-global "Files and Uploads".
+            for asset in utils.collect_assets_from_text(self.olx_str, course_key):
+                path = asset['path']
+                if path not in [sf.name for sf in self.static_files]:
+                    self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
+
+            if block.scope_ids.usage_id.block_type in ['problem', 'vertical']:
+                py_lib_zip_file = utils.get_python_lib_zip_if_using(self.olx_str, course_key)
+                if py_lib_zip_file:
+                    self.static_files.append(py_lib_zip_file)
+
+                js_input_files = utils.get_js_input_files_if_using(self.olx_str, course_key)
+                for js_input_file in js_input_files:
+                    self.static_files.append(js_input_file)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
@@ -58,6 +100,15 @@ class XBlockSerializer:
         else:
             olx = self._serialize_normal_block(block)
 
+<<<<<<< HEAD
+=======
+        # The url_name attribute can come either because it was already in the
+        # block's field data, or because this class adds it in the calls above.
+        # However it gets set though, we can remove it here:
+        if not self.write_url_name:
+            olx.attrib.pop("url_name", None)
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         # Store the block's tags
         block_key = block.scope_ids.usage_id
         block_id = str(block_key)
@@ -133,6 +184,7 @@ class XBlockSerializer:
 
         # Escape any CDATA special chars
         escaped_block_data = block.data.replace("]]>", "]]&gt;")
+<<<<<<< HEAD
         olx_node.text = etree.CDATA("\n" + escaped_block_data + "\n")
         return olx_node
 
@@ -209,3 +261,7 @@ class XBlockSerializerForBlockstore(XBlockSerializer):
                         key,
                         str(usage_id)
                     )
+=======
+        olx_node.text = etree.CDATA(escaped_block_data)
+        return olx_node
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

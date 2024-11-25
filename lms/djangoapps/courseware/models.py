@@ -545,6 +545,11 @@ class LastSeenCoursewareTimezone(models.Model):
 class FinancialAssistanceConfiguration(ConfigurationModel):
     """
     Manages configuration for connecting to Financial Assistance backend service and using its API.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     api_base_url = models.URLField(

@@ -16,6 +16,11 @@ class TaxonomyOrg(models.Model):
 
     We keep this as a separate class from ContentTaxonomy so that class can remain a proxy for Taxonomy, keeping the
     data models and usage simple.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     class RelType(models.TextChoices):

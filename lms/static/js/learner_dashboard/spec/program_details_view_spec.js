@@ -7,11 +7,14 @@ describe('Program Details View', () => {
     let view = null;
     const options = {
         programData: {
+<<<<<<< HEAD
             subscription_eligible: false,
             subscription_prices: [{
                 price: '100.00',
                 currency: 'USD',
             }],
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             subtitle: '',
             overview: '',
             weeks_to_complete: null,
@@ -468,6 +471,7 @@ describe('Program Details View', () => {
                 },
             ],
         },
+<<<<<<< HEAD
         subscriptionData: [
             {
                 trial_end: '1970-01-01T03:25:45Z',
@@ -477,15 +481,20 @@ describe('Program Details View', () => {
                 subscription_state: 'pre',
             },
         ],
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         urls: {
             program_listing_url: '/dashboard/programs/',
             commerce_api_url: '/api/commerce/v0/baskets/',
             track_selection_url: '/course_modes/choose/',
             program_record_url: 'http://credentials.example.com/records/programs/UUID',
+<<<<<<< HEAD
             buy_subscription_url: '/subscriptions',
             manage_subscription_url: '/orders',
             subscriptions_learner_help_center_url: '/learner',
             orders_and_subscriptions_url: '/orders',
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         },
         userPreferences: {
             'pref-lang': 'en',
@@ -513,6 +522,7 @@ describe('Program Details View', () => {
             },
         ],
         programTabViewEnabled: false,
+<<<<<<< HEAD
         isUserB2CSubscriptionsEnabled: false,
     };
     const data = options.programData;
@@ -566,6 +576,11 @@ describe('Program Details View', () => {
             .toContainText(body);
     };
 
+=======
+    };
+    const data = options.programData;
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     const initView = (updates) => {
         // eslint-disable-next-line no-undef
         const viewOptions = $.extend({}, options, updates);
@@ -730,6 +745,7 @@ describe('Program Details View', () => {
             properties,
         );
     });
+<<<<<<< HEAD
 
     it('should not render the get subscription link if program is not active', () => {
         testSubscriptionSunsetting(
@@ -763,4 +779,6 @@ describe('Program Details View', () => {
             '$100/month USD subscription. Cancel anytime.',
         );
     });
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 });

@@ -1,8 +1,14 @@
 """
 Tests for discussions tasks.
 """
+<<<<<<< HEAD
 import ddt
 import mock
+=======
+from unittest import mock
+
+import ddt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_events.learning.data import DiscussionTopicContext
 

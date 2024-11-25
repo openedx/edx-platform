@@ -31,7 +31,13 @@ workspace {
         }
 
         grades_app -> signal_handlers "Emits COURSE_GRADE_NOW_PASSED signal"
+<<<<<<< HEAD
         verify_student_app -> signal_handlers "Emits LEARNER_NOW_VERIFIED signal"
+=======
+        verify_student_app -> signal_handlers "Emits IDV_ATTEMPT_APPROVED signal"
+        verify_student_app -> signal_handlers "Emits LEARNER_SSO_VERIFIED signal"
+        verify_student_app -> signal_handlers "Emits PHOTO_VERIFICATION_APPROVED signal"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         student_app -> signal_handlers "Emits ENROLLMENT_TRACK_UPDATED signal"
         allowlist -> signal_handlers "Emits APPEND_CERTIFICATE_ALLOWLIST signal"
         signal_handlers -> generation_handler "Invokes generate_allowlist_certificate()"

@@ -1,8 +1,16 @@
 """
+<<<<<<< HEAD
 Permissions for Content Libraries (v2, Blockstore-based)
 """
 from bridgekeeper import perms, rules
 from bridgekeeper.rules import Attribute, ManyRelation, Relation, in_current_groups
+=======
+Permissions for Content Libraries (v2, Learning-Core-based)
+"""
+from bridgekeeper import perms, rules
+from bridgekeeper.rules import Attribute, ManyRelation, Relation, blanket_rule, in_current_groups
+from django.conf import settings
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 
@@ -41,6 +49,15 @@ has_explicit_admin_permission_for_library = (
 )
 
 
+<<<<<<< HEAD
+=======
+# Are we in Studio? (Is there a better or more contextual way to define this, e.g. get from learning context?)
+@blanket_rule
+def is_studio_request(_):
+    return settings.SERVICE_VARIANT == "cms"
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ########################### Permissions ###########################
 
 # Is the user allowed to view XBlocks from the specified content library
@@ -51,10 +68,19 @@ CAN_LEARN_FROM_THIS_CONTENT_LIBRARY = 'content_libraries.learn_from_library'
 perms[CAN_LEARN_FROM_THIS_CONTENT_LIBRARY] = (
     # Global staff can learn from any library:
     is_global_staff |
+<<<<<<< HEAD
     # Regular users can learn if the library allows public learning:
     Attribute('allow_public_learning', True) |
     # Users/groups who are explicitly granted permission can learn from the library:
     (is_user_active & has_explicit_read_permission_for_library)
+=======
+    # Regular and even anonymous users can learn if the library allows public learning:
+    Attribute('allow_public_learning', True) |
+    # Users/groups who are explicitly granted permission can learn from the library:
+    (is_user_active & has_explicit_read_permission_for_library) |
+    # Or, in Studio (but not the LMS) any users can access libraries with "public read" permissions:
+    (is_studio_request & is_user_active & Attribute('allow_public_read', True))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 
 # Is the user allowed to create content libraries?

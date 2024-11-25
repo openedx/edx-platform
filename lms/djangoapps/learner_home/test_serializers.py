@@ -522,9 +522,18 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
         # ... with a certificate
         input_context = self.create_test_context(input_data.course)
 
+<<<<<<< HEAD
         # ... and some data preemptively gathered
         available_date = random_date()
         input_data.course.certificate_available_date = available_date
+=======
+        # ... and some data preemptively gathered, including a certificate display behavior
+        available_date = random_date()
+        input_data.course.certificate_available_date = available_date
+        input_data.course.certificates_display_behavior = (
+            CertificatesDisplayBehaviors.END_WITH_DATE
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         cert_url = input_context["cert_statuses"][input_data.course.id][
             "cert_web_view_url"
         ]
@@ -544,6 +553,7 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
             },
         )
 
+<<<<<<< HEAD
     @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=False)
     def test_available_date_old_format(self):
         # Given new cert display settings are not enabled
@@ -561,6 +571,8 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
         self.assertEqual(output_data["availableDate"], expected_available_date)
 
     @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_available_date_course_end(self):
         # Given new cert display settings are enabled
         input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)
@@ -578,7 +590,10 @@ class TestCertificateSerializer(LearnerDashboardBaseTest):
         expected_available_date = datetime_to_django_format(input_data.course.end)
         self.assertEqual(output_data["availableDate"], expected_available_date)
 
+<<<<<<< HEAD
     @mock.patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_available_date_specific_end(self):
         # Given new cert display settings are enabled
         input_data = self.create_test_enrollment(course_mode=CourseMode.VERIFIED)

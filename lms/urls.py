@@ -111,6 +111,12 @@ urlpatterns = [
 
     path('i18n/', include('django.conf.urls.i18n')),
 
+<<<<<<< HEAD
+=======
+    # Course assets
+    path('', include('openedx.core.djangoapps.contentserver.urls')),
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     # Enrollment API RESTful endpoints
     path('api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
@@ -126,9 +132,12 @@ urlpatterns = [
         ),
     ),
 
+<<<<<<< HEAD
     # Demographics API RESTful endpoints
     path('api/demographics/', include('openedx.core.djangoapps.demographics.rest_api.urls')),
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     # Courseware search endpoints
     path('search/', include('search.urls')),
 
@@ -218,7 +227,11 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
+<<<<<<< HEAD
         re_path(r'^api/mobile/(?P<api_version>v(3|2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
+=======
+        re_path(r'^api/mobile/(?P<api_version>v(4|3|2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ]
 
 urlpatterns += [
@@ -336,7 +349,11 @@ urlpatterns += [
         name='xblock_resource_url',
     ),
 
+<<<<<<< HEAD
     # New (Blockstore-based) XBlock REST API
+=======
+    # New (Learning-Core-based) XBlock REST API
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     path('', include(('openedx.core.djangoapps.xblock.rest_api.urls', 'openedx.core.djangoapps.xblock'),
                      namespace='xblock_api')),
 

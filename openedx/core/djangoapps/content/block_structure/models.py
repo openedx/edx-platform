@@ -74,7 +74,10 @@ def _bs_model_storage():
     # .. setting_default: None
     # .. setting_description: Specifies the storage used for storage-backed block structure cache.
     #   For more information, check https://github.com/openedx/edx-platform/pull/14571.
+<<<<<<< HEAD
     # .. setting_warnings: Depends on `block_structure.storage_backing_for_cache`.
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     storage_class = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS')
 
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_KWARGS']
@@ -82,8 +85,12 @@ def _bs_model_storage():
     # .. setting_description: Specifies the keyword arguments needed to setup the storage, which
     #   would be used for storage-backed block structure cache.
     #   For more information, check https://github.com/openedx/edx-platform/pull/14571.
+<<<<<<< HEAD
     # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
     #   `block_structure.storage_backing_for_cache`.
+=======
+    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']`
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     storage_kwargs = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})
 
     return get_storage(storage_class, **storage_kwargs)

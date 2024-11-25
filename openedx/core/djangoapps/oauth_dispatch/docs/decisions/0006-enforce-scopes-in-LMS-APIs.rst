@@ -99,7 +99,11 @@ unprotected microservices.
 4. Associate Available Scopes with Applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+<<<<<<< HEAD
 In order to allow open edX operators to a priori limit the
+=======
+In order to allow Open edX operators to a priori limit the
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 types of access an Application can request, we will allow them
 to configure Application-specific "available scopes".
 

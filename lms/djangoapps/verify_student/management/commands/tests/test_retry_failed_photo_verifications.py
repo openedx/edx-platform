@@ -121,7 +121,11 @@ class TestRetryFailedPhotoVerificationsBetweenDates(MockS3Boto3Mixin, TestVerifi
         for _ in range(num_attempts):
             self.create_upload_and_submit_attempt_for_user()
 
+<<<<<<< HEAD
     @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
+=======
+    @patch('lms.djangoapps.verify_student.signals.signals.idv_update_signal.send')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_resubmit_in_date_range(self, send_idv_update_mock):
         call_command('retry_failed_photo_verifications',
                      status="submitted",

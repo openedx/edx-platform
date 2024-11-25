@@ -25,6 +25,10 @@ from freezegun import freeze_time
 from pytz import UTC
 
 import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
+<<<<<<< HEAD
+=======
+import openedx.core.djangoapps.content.block_structure.api as bs_api
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -396,6 +400,11 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         )
         _ = CreditCourseFactory(course_key=course.id)
 
+<<<<<<< HEAD
+=======
+        bs_api.update_course_in_cache(course.id)
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         num_users = 5
         for _ in range(num_users):
             user = UserFactory.create()
@@ -406,7 +415,11 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
 
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with check_mongo_calls(2):
+<<<<<<< HEAD
                 with self.assertNumQueries(53):
+=======
+                with self.assertNumQueries(46):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     CourseGradeReport.generate(None, None, course.id, {}, 'graded')
 
     def test_inactive_enrollments(self):

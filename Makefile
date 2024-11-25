@@ -27,17 +27,25 @@ clean: ## archive and delete most git-ignored files
 
 SWAGGER = docs/lms-openapi.yaml
 
+<<<<<<< HEAD
 docs: guides technical-docs ## build all the developer documentation for this repository
+=======
+docs: swagger guides technical-docs ## build the documentation for this repository
+	$(MAKE) -C docs html
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
 
+<<<<<<< HEAD
 technical-docs:  ## build the technical docs
 	$(MAKE) -C docs/technical html
 
 guides:	swagger ## build the developer guide docs
 	cd docs/guides; make clean html
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 extract_translations: ## extract localizable strings from sources
 	i18n_tool extract --no-segment -v
 	cd conf/locale/en/LC_MESSAGES && msgcat djangojs.po underscore.po -o djangojs.po
@@ -55,7 +63,11 @@ pull_xblock_translations:  ## pull xblock translations via atlas
 
 clean_translations: ## Remove existing translations to prepare for a fresh pull
 	# Removes core edx-platform translations but keeps config files and Esperanto (eo) test translations
+<<<<<<< HEAD
 	find conf/locale -mindepth 1 -maxdepth 1 -type d -a ! -name eo -exec rm -rf {} +
+=======
+	find conf/locale/ -type f \! -path '*/eo/*' \( -name '*.mo' -o -name '*.po' \) -delete
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 	# Removes the xblocks/plugins and js-compiled translations
 	rm -rf conf/plugins-locale cms/static/js/i18n/ lms/static/js/i18n/ cms/static/js/xblock.v1-i18n/ lms/static/js/xblock.v1-i18n/
 
@@ -114,8 +126,13 @@ REQ_FILES = \
 	requirements/edx/base \
 	requirements/edx/doc \
 	requirements/edx/testing \
+<<<<<<< HEAD
 	requirements/edx/development \
 	requirements/edx/assets \
+=======
+	requirements/edx/assets \
+	requirements/edx/development \
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 	requirements/edx/semgrep \
 	scripts/xblock/requirements \
 	scripts/user_retirement/requirements/base \
@@ -142,6 +159,11 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
 	sed 's/Django<4.0//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
 	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+<<<<<<< HEAD
+=======
+	sed 's/event-tracking<2.4.1//g' requirements/common_constraints.txt > requirements/common_constraints.tmp
+	mv requirements/common_constraints.tmp requirements/common_constraints.txt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
 	pip install -r requirements/pip.txt
 

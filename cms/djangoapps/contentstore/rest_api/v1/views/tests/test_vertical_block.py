@@ -70,6 +70,11 @@ class BaseXBlockContainer(CourseTestCase):
             parent=self.vertical.location,
             category="html",
             display_name="Html Content 2",
+<<<<<<< HEAD
+=======
+            upstream="lb:FakeOrg:FakeLib:html:FakeBlock",
+            upstream_version=5,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
 
     def create_block(self, parent, category, display_name, **kwargs):
@@ -193,6 +198,10 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                 "name": self.html_unit_first.display_name_with_default,
                 "block_id": str(self.html_unit_first.location),
                 "block_type": self.html_unit_first.location.block_type,
+<<<<<<< HEAD
+=======
+                "upstream_link": None,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 "user_partition_info": expected_user_partition_info,
                 "user_partitions": expected_user_partitions,
                 "actions": {
@@ -218,12 +227,27 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                     "can_delete": True,
                     "can_manage_tags": True,
                 },
+<<<<<<< HEAD
+=======
+                "upstream_link": {
+                    "upstream_ref": "lb:FakeOrg:FakeLib:html:FakeBlock",
+                    "version_synced": 5,
+                    "version_available": None,
+                    "version_declined": None,
+                    "error_message": "Linked library item was not found in the system",
+                    "ready_to_sync": False,
+                },
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 "user_partition_info": expected_user_partition_info,
                 "user_partitions": expected_user_partitions,
                 "validation_messages": [],
                 "render_error": "",
             },
         ]
+<<<<<<< HEAD
+=======
+        self.maxDiff = None
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.assertEqual(response.data["children"], expected_response)
 
     def test_not_valid_usage_key_string(self):

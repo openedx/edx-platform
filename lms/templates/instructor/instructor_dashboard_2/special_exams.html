@@ -7,7 +7,11 @@ import pytz
 <div class="proctoring-wrapper">
   % if section_data.get('mfe_view_url'):
   <div id="proctoring-mfe-view">
+<<<<<<< HEAD
     <iframe width="100%" height="1280" frameborder="0" src="${ section_data['mfe_view_url'] }"></iframe>
+=======
+    <iframe width="100%" style="height: 55vh;" frameborder="0" src="${ section_data['mfe_view_url'] }"></iframe>
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
   </div>
   % else:
     % if section_data.get('escalation_email'):

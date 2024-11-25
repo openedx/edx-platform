@@ -61,8 +61,11 @@
         </picture>
     </div>
 </a>
+<<<<<<< HEAD
 <% if (isSubscribed) { %>
 <div class="subscription-badge">
     <span class="badge badge-light"><%- gettext('Subscribed') %></span>
 </div>
 <% } %>
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

@@ -156,8 +156,13 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
             tz_aware=True,
         )
         self.connection.drop_database(self.DB)
+<<<<<<< HEAD
         self.addCleanup(self.connection.drop_database, self.DB)
         self.addCleanup(self.connection.close)
+=======
+        self.addCleanup(self._drop_database)
+        self.addCleanup(self._close_connection)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         # define attrs which get set in initdb to quell pylint
         self.writable_chapter_location = self.store = self.fake_location = None
@@ -165,6 +170,46 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
 
         self.user_id = ModuleStoreEnum.UserID.test
 
+<<<<<<< HEAD
+=======
+    def _check_connection(self):
+        """
+        Check mongodb connection is open or not.
+        """
+        try:
+            self.connection.admin.command('ping')
+            return True
+        except pymongo.errors.InvalidOperation:
+            return False
+
+    def _ensure_connection(self):
+        """
+        Make sure that mongodb connection is open.
+        """
+        if not self._check_connection():
+            self.connection = pymongo.MongoClient(
+                host=self.HOST,
+                port=self.PORT,
+                tz_aware=True,
+            )
+
+    def _drop_database(self):
+        """
+        Drop mongodb database.
+        """
+        self._ensure_connection()
+        self.connection.drop_database(self.DB)
+
+    def _close_connection(self):
+        """
+        Close mongodb connection.
+        """
+        try:
+            self.connection.close()
+        except pymongo.errors.InvalidOperation:
+            pass
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def _create_course(self, course_key, asides=None):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
@@ -1715,7 +1760,11 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             for location, expected in should_work:
                 # each iteration has different find count, pop this iter's find count
                 with check_mongo_calls(num_finds.pop(0), num_sends), self.assertNumQueries(num_mysql.pop(0)):
+<<<<<<< HEAD
                     path = path_to_location(self.store, location)
+=======
+                    path = path_to_location(self.store, location, branch_type=ModuleStoreEnum.Branch.published_only)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     assert path == expected
 
         not_found = (

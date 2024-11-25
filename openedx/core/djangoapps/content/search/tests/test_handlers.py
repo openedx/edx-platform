@@ -1,15 +1,26 @@
 """
 Tests for the search index update handlers
 """
+<<<<<<< HEAD
 from unittest.mock import MagicMock, patch
 
 from django.test import LiveServerTestCase, override_settings
+=======
+from datetime import datetime, timezone
+from unittest.mock import MagicMock, patch
+
+from django.test import LiveServerTestCase, override_settings
+from freezegun import freeze_time
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from organizations.tests.factories import OrganizationFactory
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as library_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+<<<<<<< HEAD
 from openedx.core.lib.blockstore_api.tests.base import BlockstoreAppTestMixin
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 
 
@@ -25,11 +36,15 @@ except RuntimeError:
 @patch("openedx.core.djangoapps.content.search.api.MeilisearchClient")
 @override_settings(MEILISEARCH_ENABLED=True)
 @skip_unless_cms
+<<<<<<< HEAD
 class TestUpdateIndexHandlers(
     ModuleStoreTestCase,
     BlockstoreAppTestMixin,
     LiveServerTestCase,
 ):
+=======
+class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Test that the search index is updated when XBlocks and Library Blocks are modified
     """
@@ -137,7 +152,14 @@ class TestUpdateIndexHandlers(
         )
         lib_access, _ = SearchAccess.objects.get_or_create(context_key=library.key)
 
+<<<<<<< HEAD
         problem = library_api.create_library_block(library.key, "problem", "Problem1")
+=======
+        # Populate it with a problem, freezing the date so we can verify created date serializes correctly.
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            problem = library_api.create_library_block(library.key, "problem", "Problem1")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         doc_problem = {
             "id": "lborgalib_aproblemproblem1-ca3186e9",
             "type": "library_block",
@@ -148,8 +170,16 @@ class TestUpdateIndexHandlers(
             "context_key": "lib:orgA:lib_a",
             "org": "orgA",
             "breadcrumbs": [{"display_name": "Library Org A"}],
+<<<<<<< HEAD
             "content": {"problem_types": [], "capa_content": " "},
             "access_id": lib_access.id,
+=======
+            "content": {"problem_types": [], "capa_content": ""},
+            "access_id": lib_access.id,
+            "last_published": None,
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
@@ -157,10 +187,32 @@ class TestUpdateIndexHandlers(
         # Rename the content library
         library_api.update_library(library.key, title="Updated Library Org A")
 
+<<<<<<< HEAD
         # The breadcrumbs should be updated
         doc_problem["breadcrumbs"][0]["display_name"] = "Updated Library Org A"
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
 
+=======
+        # The breadcrumbs should be updated (but nothing else)
+        doc_problem["breadcrumbs"][0]["display_name"] = "Updated Library Org A"
+        meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
+
+        # Edit the problem block, freezing the date so we can verify modified date serializes correctly
+        modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
+        with freeze_time(modified_date):
+            library_api.set_library_block_olx(problem.usage_key, "<problem />")
+        doc_problem["modified"] = modified_date.timestamp()
+        meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
+
+        # Publish the content library, freezing the date so we can verify last_published date serializes correctly
+        published_date = datetime(2024, 6, 7, 8, 9, 10, tzinfo=timezone.utc)
+        with freeze_time(published_date):
+            library_api.publish_changes(library.key)
+        doc_problem["last_published"] = published_date.timestamp()
+        doc_problem["published"] = {"display_name": "Blank Problem"}
+        meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         # Delete the Library Block
         library_api.delete_library_block(problem.usage_key)
 

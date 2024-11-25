@@ -10,6 +10,10 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockMixin
 from xblock.fields import String, Scope
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 log = logging.getLogger(__name__)
 
 VISIBILITY_VIEW = 'visibility_view'
@@ -21,6 +25,10 @@ class AuthoringMixin(XBlockMixin):
     """
     Mixin class that provides authoring capabilities for XBlocks.
     """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def _get_studio_resource_url(self, relative_url):
         """
         Returns the Studio URL to a static resource.
@@ -51,3 +59,20 @@ class AuthoringMixin(XBlockMixin):
         scope=Scope.settings,
         enforce_type=True,
     )
+<<<<<<< HEAD
+=======
+
+    def editor_saved(self, user, old_metadata, old_content) -> None:  # pylint: disable=unused-argument
+        """
+        Called right *before* the block is written to the DB. Can be used, e.g., to modify fields before saving.
+
+        By default, is a no-op. Can be overriden in subclasses.
+        """
+
+    def post_editor_saved(self, user, old_metadata, old_content) -> None:  # pylint: disable=unused-argument
+        """
+        Called right *after* the block is written to the DB. Can be used, e.g., to spin up followup tasks.
+
+        By default, is a no-op. Can be overriden in subclasses.
+        """
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

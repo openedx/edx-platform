@@ -4,15 +4,21 @@ This file contains celery tasks for entitlements-related functionality.
 import logging
 
 from celery import shared_task
+<<<<<<< HEAD
 from celery.exceptions import MaxRetriesExceededError
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from celery.utils.log import get_task_logger
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
+<<<<<<< HEAD
 from common.djangoapps.entitlements.utils import revoke_entitlements_and_downgrade_courses_to_audit
 from openedx.core.djangoapps.credentials.utils import get_courses_completion_status
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 LOGGER = get_task_logger(__name__)
 log = logging.getLogger(__name__)
@@ -154,6 +160,7 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
              '%d entries, task id :%s',
              len(entitlement_ids),
              self.request.id)
+<<<<<<< HEAD
 
 
 @shared_task(bind=True)
@@ -191,3 +198,5 @@ def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids
                     'for user [%s] duing the retry_revoke_subscriptions_verified_access task',
                     revocable_entitlement_uuids,
                     username)
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

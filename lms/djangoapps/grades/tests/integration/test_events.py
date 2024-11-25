@@ -7,6 +7,10 @@ from unittest.mock import patch
 
 from crum import set_current_request
 
+<<<<<<< HEAD
+=======
+import openedx.core.djangoapps.content.block_structure.api as bs_api
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -76,10 +80,17 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
         CourseEnrollment.enroll(self.student, self.course.id)
         self.instructor = UserFactory.create(is_staff=True, username='test_instructor', password=self.TEST_PASSWORD)
         self.refresh_course()
+<<<<<<< HEAD
+=======
+        # Since this doesn't happen automatically and we don't want to run all the publish signal handlers
+        # Just make sure we have the latest version of the course in cache before we test the problem.
+        bs_api.update_course_in_cache(self.course.id)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @patch('lms.djangoapps.grades.events.tracker')
     def test_submit_answer(self, events_tracker):
         self.submit_question_answer('p1', {'2_1': 'choice_choice_2'})
+<<<<<<< HEAD
         course = self.store.get_course(self.course.id, depth=0)
 
         event_transaction_id = events_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
@@ -114,6 +125,40 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
             ],
             any_order=True,
         )
+=======
+
+        event_transaction_id = events_tracker.emit.mock_calls[0][1][1]['event_transaction_id']
+        expected_calls = [
+            mock_call(
+                events.PROBLEM_SUBMITTED_EVENT_TYPE,
+                {
+                    'user_id': str(self.student.id),
+                    'event_transaction_id': event_transaction_id,
+                    'event_transaction_type': events.PROBLEM_SUBMITTED_EVENT_TYPE,
+                    'course_id': str(self.course.id),
+                    'problem_id': str(self.problem.location),
+                    'weighted_earned': 2.0,
+                    'weighted_possible': 2.0,
+                },
+            ),
+            mock_call(
+                events.COURSE_GRADE_CALCULATED,
+                {
+                    'course_version': str(self.course.course_version),
+                    'percent_grade': 0.02,
+                    'grading_policy_hash': 'ChVp0lHGQGCevD0t4njna/C44zQ=',
+                    'user_id': str(self.student.id),
+                    'letter_grade': '',
+                    'event_transaction_id': event_transaction_id,
+                    'event_transaction_type': events.PROBLEM_SUBMITTED_EVENT_TYPE,
+                    'course_id': str(self.course.id),
+                    'course_edited_timestamp': str(self.course.subtree_edited_on),
+                }
+            ),
+        ]
+
+        events_tracker.emit.assert_has_calls(expected_calls, any_order=True)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @ddt.data(True, False)
     def test_delete_student_state(self, emit_signals):

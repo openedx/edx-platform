@@ -126,9 +126,19 @@ class ChooseModeView(View):
             if ecommerce_service.is_enabled(request.user):
                 professional_mode = modes.get(CourseMode.NO_ID_PROFESSIONAL_MODE) or modes.get(CourseMode.PROFESSIONAL)
                 if purchase_workflow == "single" and professional_mode.sku:
+<<<<<<< HEAD
                     redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.sku)
                 if purchase_workflow == "bulk" and professional_mode.bulk_sku:
                     redirect_url = ecommerce_service.get_checkout_page_url(professional_mode.bulk_sku)
+=======
+                    redirect_url = ecommerce_service.get_checkout_page_url(
+                        professional_mode.sku, course_run_keys=[course_id]
+                    )
+                if purchase_workflow == "bulk" and professional_mode.bulk_sku:
+                    redirect_url = ecommerce_service.get_checkout_page_url(
+                        professional_mode.bulk_sku, course_run_keys=[course_id]
+                    )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             return redirect(redirect_url)
         course = modulestore().get_course(course_key)
 
@@ -237,7 +247,11 @@ class ChooseModeView(View):
 
             if verified_mode.sku:
                 context["use_ecommerce_payment_flow"] = ecommerce_service.is_enabled(request.user)
+<<<<<<< HEAD
                 context["ecommerce_payment_page"] = ecommerce_service.get_add_to_basket_url()
+=======
+                context["ecommerce_payment_page"] = ecommerce_service.payment_page_url()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 context["sku"] = verified_mode.sku
                 context["bulk_sku"] = verified_mode.bulk_sku
 

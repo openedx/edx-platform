@@ -86,8 +86,13 @@ def _change_access(course, user, level, action, send_email=True):
                 course_id=course.id,
                 student_email=user.email,
                 auto_enroll=True,
+<<<<<<< HEAD
                 email_students=send_email,
                 email_params=email_params,
+=======
+                message_students=send_email,
+                message_params=email_params,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             )
         role.add_users(user)
     elif action == 'revoke':

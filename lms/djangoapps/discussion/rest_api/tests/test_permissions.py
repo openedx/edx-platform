@@ -66,10 +66,17 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         actual = get_initializable_thread_fields(context)
         expected = {
             "abuse_flagged", "copy_link", "course_id", "following", "raw_body",
+<<<<<<< HEAD
             "read", "title", "topic_id", "type", "voted"
         }
         if is_privileged:
             expected |= {"closed", "pinned", "close_reason_code"}
+=======
+            "read", "title", "topic_id", "type"
+        }
+        if is_privileged:
+            expected |= {"closed", "pinned", "close_reason_code", "voted"}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if is_privileged and is_cohorted:
             expected |= {"group_id"}
         if allow_anonymous:
@@ -88,8 +95,15 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         )
         actual = get_initializable_comment_fields(context)
         expected = {
+<<<<<<< HEAD
             "anonymous", "abuse_flagged", "parent_id", "raw_body", "thread_id", "voted"
         }
+=======
+            "anonymous", "abuse_flagged", "parent_id", "raw_body", "thread_id"
+        }
+        if is_privileged:
+            expected |= {"voted"}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if (is_thread_author and thread_type == "question") or is_privileged:
             expected |= {"endorsed"}
         assert actual == expected
@@ -119,11 +133,20 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             is_staff_or_admin=is_staff_or_admin,
         )
         actual = get_editable_fields(thread, context)
+<<<<<<< HEAD
         expected = {"abuse_flagged", "copy_link", "following", "read", "voted"}
+=======
+        expected = {"abuse_flagged", "copy_link", "following", "read"}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if has_moderation_privilege:
             expected |= {"closed", "close_reason_code"}
         if has_moderation_privilege or is_staff_or_admin:
             expected |= {"pinned"}
+<<<<<<< HEAD
+=======
+        if has_moderation_privilege or not is_author or is_staff_or_admin:
+            expected |= {"voted"}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if has_moderation_privilege and not is_author:
             expected |= {"edit_reason_code"}
         if is_author or has_moderation_privilege:
@@ -162,7 +185,13 @@ class GetEditableFieldsTest(ModuleStoreTestCase):
             has_moderation_privilege=has_moderation_privilege,
         )
         actual = get_editable_fields(comment, context)
+<<<<<<< HEAD
         expected = {"abuse_flagged", "voted"}
+=======
+        expected = {"abuse_flagged"}
+        if has_moderation_privilege or not is_author:
+            expected |= {"voted"}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if has_moderation_privilege and not is_author:
             expected |= {"edit_reason_code"}
         if is_author or has_moderation_privilege:

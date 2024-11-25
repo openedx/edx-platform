@@ -1,10 +1,17 @@
 """Helper functions for working with Credentials."""
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import logging
 from typing import Dict, List
 from urllib.parse import urljoin
 
 import requests
+<<<<<<< HEAD
 from django.conf import settings
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.contrib.auth import get_user_model
 from edx_rest_api_client.auth import SuppliedJwtAuth
 
@@ -36,7 +43,11 @@ def get_credentials_records_url(program_uuid=None):
     return base_url
 
 
+<<<<<<< HEAD
 def get_credentials_api_client(user):
+=======
+def get_credentials_api_client(user) -> requests.Session:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Returns an authenticated Credentials API client.
 
@@ -104,9 +115,13 @@ def get_credentials(
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
     use_cache = credential_configuration.is_cache_enabled and not user.is_staff
+<<<<<<< HEAD
     cache_key = (
         f"{credential_configuration.CACHE_KEY}.{user.username}" if use_cache else None
     )
+=======
+    cache_key = f"{credential_configuration.CACHE_KEY}.{user.username}" if use_cache else None
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     if cache_key and program_uuid:
         cache_key = f"{cache_key}.{program_uuid}"
 
@@ -122,6 +137,7 @@ def get_credentials(
         cache_key=cache_key,
         raise_on_error=raise_on_error,
     )
+<<<<<<< HEAD
 
 
 def get_courses_completion_status(username, course_run_ids):
@@ -183,3 +199,5 @@ def get_courses_completion_status(username, course_run_ids):
         ]
         return filtered_records, False
     return [], False
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

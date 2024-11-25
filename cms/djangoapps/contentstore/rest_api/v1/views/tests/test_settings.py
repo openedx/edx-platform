@@ -1,10 +1,18 @@
 """
 Unit tests for course settings views.
 """
+<<<<<<< HEAD
 import ddt
 from django.conf import settings
 from django.urls import reverse
 from mock import patch
+=======
+from unittest.mock import patch
+
+import ddt
+from django.conf import settings
+from django.urls import reverse
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -54,7 +62,10 @@ class CourseSettingsViewTest(CourseTestCase, PermissionAccessMixin):
             "show_min_grade_warning": False,
             "upgrade_deadline": None,
             "licensing_enabled": False,
+<<<<<<< HEAD
             "use_v2_cert_display_settings": False,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

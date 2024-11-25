@@ -5,7 +5,11 @@ import tempfile
 import ddt
 from django.test.testcases import TestCase
 from fs.osfs import OSFS
+<<<<<<< HEAD
 from opaque_keys.edx.keys import CourseKey, UsageKey
+=======
+from opaque_keys.edx.keys import CourseKey, UsageKey, LibraryCollectionKey
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
@@ -380,6 +384,26 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
         with self.assertNumQueries(31):  # TODO why so high?
             self._test_copy_object_tags(src_key, dst_key, expected_tags)
 
+<<<<<<< HEAD
+=======
+    def test_tag_collection(self):
+        collection_key = LibraryCollectionKey.from_string("lib-collection:orgA:libX:1")
+
+        api.tag_object(
+            object_id=str(collection_key),
+            taxonomy=self.taxonomy_3,
+            tags=["Tag 3.1"],
+        )
+
+        with self.assertNumQueries(1):
+            object_tags, taxonomies = api.get_all_object_tags(collection_key)
+
+        assert object_tags == {'lib-collection:orgA:libX:1': {3: ['Tag 3.1']}}
+        assert taxonomies == {
+            self.taxonomy_3.id: self.taxonomy_3,
+        }
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 class TestExportImportTags(TaggedCourseMixin):
     """

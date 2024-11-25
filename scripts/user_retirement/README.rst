@@ -28,11 +28,19 @@ To download the scripts, you can perform a partial clone of the edx-platform rep
 Create Python Virtual Environment
 ---------------------------------
 
+<<<<<<< HEAD
 Create a Python virtual environment using Python 3.8:
 
 .. code-block:: bash
 
     python3.8 -m venv ../venv
+=======
+Create a Python virtual environment using Python 3.11:
+
+.. code-block:: bash
+
+    python3.11 -m venv ../venv
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     source ../venv/bin/activate
 
 Install Pip Packages

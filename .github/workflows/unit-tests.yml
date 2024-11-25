@@ -6,6 +6,7 @@ on:
     branches:
       - master
 
+<<<<<<< HEAD
 jobs:
   run-tests:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
@@ -15,6 +16,21 @@ jobs:
       matrix:
         python-version:
           - "3.8"
+=======
+concurrency:
+  # We only need to be running tests for the latest commit on each PR
+  # (however, we fully test every commit on master, even as new ones land).
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  run-tests:
+    name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
+    runs-on: ${{ matrix.os-version }}
+    strategy:
+      matrix:
+        python-version:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
           - "3.11"
         django-version:
           - "pinned"
@@ -38,16 +54,31 @@ jobs:
           - "xmodule-with-lms"
           - "xmodule-with-cms"
         mongo-version:
+<<<<<<< HEAD
           - "4.4"
           - "7.0"
 
         # We only need to test Mongo 4.4 for modules that directly interface with Mongo (that is: xmodule.modulestore)
         exclude:
           - mongo-version: "4.4"
+=======
+          - "7.0"
+        os-version:
+          - ubuntu-24.04
+
+        # It's useful to run some subset of the tests on the older version of Ubuntu
+        # so that we don't spend too many resources on this but can find major issues quickly
+        # while we're in a situation where we support two versions.  This section may be commented
+        # out when not in use to easily add/drop future support for any given major dependency.
+        #
+        # We're testing the older version of Ubuntu and running the xmodule tests since those rely on many
+        # dependent complex libraries and will hopefully catch most issues quickly.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         include:
           - shard_name: "xmodule-with-cms"
             python-version: "3.11"
             django-version: "pinned"
+<<<<<<< HEAD
             mongo-version: "4.4"
           - shard_name: "xmodule-with-lms"
             python-version: "3.11"
@@ -88,34 +119,200 @@ jobs:
           if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
             sudo pip install "django~=${{ matrix.django-version }}.0"
             sudo pip check # fail if this test-reqs/Django combination is broken
+=======
+            mongo-version: "7.0"
+            os-version: "ubuntu-22.04"
+          - shard_name: "xmodule-with-lms"
+            python-version: "3.11"
+            django-version: "pinned"
+            mongo-version: "7.0"
+            os-version: "ubuntu-22.04"
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+
+      - name: install system requirements
+        run: |
+          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx openssl
+
+      # This is needed until the ENABLE_BLAKE2B_HASHING can be removed and we
+      # can stop using MD4 by default.
+      - name: enable md4 hashing in libssl
+        run: |
+          cat <<EOF | sudo tee /etc/ssl/openssl.cnf
+          # Use this in order to automatically load providers.
+          openssl_conf = openssl_init
+
+          [openssl_init]
+          providers = provider_sect
+
+          [provider_sect]
+          default = default_sect
+          legacy = legacy_sect
+
+          [default_sect]
+          activate = 1
+
+          [legacy_sect]
+          activate = 1
+          EOF
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-version: ${{ matrix.mongo-version }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: install requirements
+        run: |
+          make test-requirements
+          if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
+            pip install "django~=${{ matrix.django-version }}.0"
+            pip check # fail if this test-reqs/Django combination is broken
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
           fi
 
       - name: list installed package versions
         run: |
+<<<<<<< HEAD
           sudo pip freeze
 
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
+=======
+          pip freeze
+
+      - name: set settings path
+        shell: bash
+        run: |
+          echo "settings_path=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} --output settings )" >> $GITHUB_ENV
+
+      - name: get unit tests for shard
+        shell: bash
+        run: |
+          echo "unit_test_paths=$(python scripts/unit_test_shards_parser.py --shard-name=${{ matrix.shard_name }} )" >> $GITHUB_ENV
+
+      - name: run tests
+        shell: bash
+        run: |
+          python -Wd -m pytest -p no:randomly --ds=${{ env.settings_path }} ${{ env.unit_test_paths }} --cov=.
+
+      - name: rename warnings json file
+        if: success()
+        shell: bash
+        run: |
+          cd test_root/log
+          mv pytest_warnings.json pytest_warnings_${{ matrix.shard_name }}.json
+
+      - name: save pytest warnings json file
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-warnings-json-${{ matrix.shard_name }}
+          path: |
+            test_root/log/pytest_warnings*.json
+          overwrite: true
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
       - name: Renaming coverage data file
         run: |
           mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
 
       - name: Upload coverage
+<<<<<<< HEAD
         uses: actions/upload-artifact@v3
         with:
           name: coverage
           path: reports/${{matrix.shard_name}}.coverage
+=======
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.shard_name }}
+          path: reports/${{ matrix.shard_name }}.coverage
+          overwrite: true
+
+  collect-and-verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: install system requirements
+        run: |
+          sudo apt-get update && sudo apt-get install libxmlsec1-dev
+
+      - name: install requirements
+        run: |
+          make test-requirements
+
+      - name: collect tests from all modules
+        shell: bash
+        run: |
+          echo "root_cms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=cms.envs.test cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "root_lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ xmodule/ pavelib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+
+      - name: get GHA unit test paths
+        shell: bash
+        run: |
+          echo "cms_unit_test_paths=$(python scripts/gha_unit_tests_collector.py --cms-only)" >> $GITHUB_ENV
+          echo "lms_unit_test_paths=$(python scripts/gha_unit_tests_collector.py --lms-only)" >> $GITHUB_ENV
+
+      - name: collect tests from GHA unit test shards
+        shell: bash
+        run: |
+          echo "cms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=cms.envs.test ${{ env.cms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test ${{ env.lms_unit_test_paths }} -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+
+      - name: add unit tests count
+        shell: bash
+        run: |
+          echo "root_all_unit_tests_count=$((${{ env.root_cms_unit_tests_count }}+${{ env.root_lms_unit_tests_count }}))" >> $GITHUB_ENV
+          echo "shards_all_unit_tests_count=$((${{ env.cms_unit_tests_count }}+${{ env.lms_unit_tests_count }}))" >> $GITHUB_ENV
+
+      - name: print unit tests count
+        shell: bash
+        run: |
+          echo CMS unit tests from root: ${{ env.root_cms_unit_tests_count }}
+          echo LMS unit tests from root: ${{ env.root_lms_unit_tests_count }}
+          echo CMS unit tests from shards: ${{ env.cms_unit_tests_count }}
+          echo LMS unit tests from shards: ${{ env.lms_unit_tests_count }}
+          echo All root unit tests count: ${{ env.root_all_unit_tests_count }}
+          echo All shards unit tests count: ${{ env.shards_all_unit_tests_count }}
+
+      - name: fail the check
+        shell: bash
+        if: ${{ env.root_all_unit_tests_count != env.shards_all_unit_tests_count }}
+        run: |
+          echo "::error title='Unit test modules in unit-test-shards.json (unit-tests.yml workflow) are outdated'::unit tests running in unit-tests
+          workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows
+          to add any missing apps and match the count. for more details please take a look at scripts/gha-shards-readme.md"
+          exit 1
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
   # https://github.com/orgs/community/discussions/33579
   success:
     name: Unit tests successful
+<<<<<<< HEAD
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
     needs:
       - run-tests
     runs-on: ubuntu-latest
+=======
+    runs-on: ubuntu-24.04
+    if: always()
+    needs: [run-tests]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         # uses: re-actors/alls-green@v1.2.1
@@ -124,6 +321,7 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
   compile-warnings-report:
+<<<<<<< HEAD
     runs-on: [ edx-platform-runner ]
     needs: [ run-tests ]
     steps:
@@ -134,6 +332,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: pytest-warnings-json
+=======
+    runs-on: ubuntu-24.04
+    needs: [run-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: collect pytest warnings files
+        uses: actions/download-artifact@v4
+        with:
+          pattern: pytest-warnings-json-*
+          merge-multiple: true
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
           path: test_root/log
 
       - name: display structure of downloaded files
@@ -145,11 +354,16 @@ jobs:
 
       - name: save warning report
         if: success()
+<<<<<<< HEAD
         uses: actions/upload-artifact@v3
+=======
+        uses: actions/upload-artifact@v4
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with:
           name: pytest-warning-report-html
           path: |
             reports/pytest_warnings/warning_report_all.html
+<<<<<<< HEAD
 
   # Combine and upload coverage reports.
   coverage:
@@ -164,13 +378,57 @@ jobs:
 
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
+=======
+          overwrite: true
+
+  merge-artifacts:
+    runs-on: ubuntu-24.04
+    needs: [compile-warnings-report]
+    steps:
+      - name: Merge Pytest Warnings JSON Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: pytest-warnings-json
+          pattern: pytest-warnings-json-*
+          delete-merged: true
+
+      - name: Merge Coverage Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: coverage
+          pattern: coverage-*
+          delete-merged: true
+
+  # Combine and upload coverage reports.
+  coverage:
+    if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
+    runs-on: ubuntu-24.04
+    needs: [run-tests]
+    strategy:
+      matrix:
+        python-version:
+          - 3.11
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download all artifacts
+<<<<<<< HEAD
         uses: actions/download-artifact@v3
         with:
           name: coverage
+=======
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          merge-multiple: true
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
           path: reports
 
       - name: Install Python dependencies
@@ -182,4 +440,8 @@ jobs:
           coverage combine reports/*
           coverage report
           coverage xml
+<<<<<<< HEAD
       - uses: codecov/codecov-action@v3
+=======
+      - uses: codecov/codecov-action@v4
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

@@ -133,6 +133,7 @@ class TestJumpTo(ModuleStoreTestCase):
     Check the jumpto link for a course.
     """
     @ddt.data(
+<<<<<<< HEAD
         (True, False),  # preview -> Legacy experience
         (False, True),  # no preview -> MFE experience
     )
@@ -165,6 +166,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url.split('?')[0] == expected_url
 
     @ddt.data(
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -174,6 +177,7 @@ class TestJumpTo(ModuleStoreTestCase):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             location = course.id.make_usage_key(None, 'NoSuchPlace')
+<<<<<<< HEAD
         expected_redirect_url = (
             f'/courses/{course.id}/courseware?' + urlencode({'activate_block_id': str(course.location)})
         ) if preview_mode else (
@@ -183,16 +187,35 @@ class TestJumpTo(ModuleStoreTestCase):
         # can't use the reverse calls from the CMS
         jumpto_url = f'/courses/{course.id}/jump_to/{location}'
         with set_preview_mode(preview_mode):
+=======
+
+        expected_redirect_url = f'http://learning-mfe/course/{course.id}'
+        jumpto_url = (
+            f'/courses/{course.id}/jump_to/{location}?preview=1'
+        ) if preview_mode else (
+            f'/courses/{course.id}/jump_to/{location}'
+        )
+
+        # This is fragile, but unfortunately the problem is that within the LMS we
+        # can't use the reverse calls from the CMS
+        with set_preview_mode(False):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
+<<<<<<< HEAD
     @set_preview_mode(True)
     def test_jump_to_legacy_from_sequence(self):
+=======
+    @set_preview_mode(False)
+    def test_jump_to_preview_from_sequence(self):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
             sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
+<<<<<<< HEAD
         activate_block_id = urlencode({'activate_block_id': str(sequence.location)})
         expected_redirect_url = (
             f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/?{activate_block_id}'
@@ -200,6 +223,15 @@ class TestJumpTo(ModuleStoreTestCase):
         jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
+=======
+        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}?preview=1'
+        expected_redirect_url = (
+            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}'
+        )
+        response = self.client.get(jumpto_url)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @set_preview_mode(False)
     def test_jump_to_mfe_from_sequence(self):
@@ -214,8 +246,13 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
+<<<<<<< HEAD
     @set_preview_mode(True)
     def test_jump_to_legacy_from_block(self):
+=======
+    @set_preview_mode(False)
+    def test_jump_to_preview_from_block(self):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -225,6 +262,7 @@ class TestJumpTo(ModuleStoreTestCase):
             block1 = BlockFactory.create(category='html', parent_location=vertical1.location)
             block2 = BlockFactory.create(category='html', parent_location=vertical2.location)
 
+<<<<<<< HEAD
         activate_block_id = urlencode({'activate_block_id': str(block1.location)})
         expected_redirect_url = (
             f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
@@ -240,6 +278,23 @@ class TestJumpTo(ModuleStoreTestCase):
         jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
+=======
+        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}?preview=1'
+        expected_redirect_url = (
+            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}/{vertical1.location}'
+        )
+        response = self.client.get(jumpto_url)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
+
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}?preview=1'
+        expected_redirect_url = (
+            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}/{vertical2.location}'
+        )
+        response = self.client.get(jumpto_url)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @set_preview_mode(False)
     def test_jump_to_mfe_from_block(self):
@@ -300,8 +355,17 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jump_to_id_invalid_location(self, preview_mode, store_type):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
+<<<<<<< HEAD
         jumpto_url = f'/courses/{course.id}/jump_to/NoSuchPlace'
         with set_preview_mode(preview_mode):
+=======
+        jumpto_url = (
+            f'/courses/{course.id}/jump_to/NoSuchPlace?preview=1'
+        ) if preview_mode else (
+            f'/courses/{course.id}/jump_to/NoSuchPlace'
+        )
+        with set_preview_mode(False):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             response = self.client.get(jumpto_url)
         assert response.status_code == 404
 
@@ -1498,8 +1562,13 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "earned a certificate for this course.")
 
     @ddt.data(
+<<<<<<< HEAD
         (True, 53),
         (False, 53),
+=======
+        (True, 54),
+        (False, 54),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1514,13 +1583,21 @@ class ProgressPageTests(ProgressPageBaseTests):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with self.assertNumQueries(
+<<<<<<< HEAD
             53, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+=======
+            54, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         ), check_mongo_calls(2):
             self._get_progress_page()
 
         for _ in range(2):
             with self.assertNumQueries(
+<<<<<<< HEAD
                 38, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+=======
+                39, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             ), check_mongo_calls(2):
                 self._get_progress_page()
 
@@ -3359,7 +3436,11 @@ class PreviewTests(BaseViewsTestCase):
     def test_preview_no_redirect(self):
         __, __, preview_url = self._get_urls()
         with set_preview_mode(True):
+<<<<<<< HEAD
             # Previews will not redirect to the mfe
+=======
+            # Previews server from PREVIEW_LMS_BASE will not redirect to the mfe
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             course_staff = UserFactory.create(is_staff=False)
             CourseStaffRole(self.course_key).add_users(course_staff)
             self.client.login(username=course_staff.username, password=TEST_PASSWORD)
@@ -3803,7 +3884,11 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
     def test_is_mfe_search_waffle_disabled(self):
         """
+<<<<<<< HEAD
         Courseware search is only available when the waffle flag is enabled.
+=======
+        Courseware search is only available when the waffle flag is enabled, if no inclusion date is provided.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         user_admin = UserFactory(is_staff=True, is_superuser=True)
         CourseEnrollmentFactory.create(user=user_admin, course_id=self.course.id, mode=CourseMode.VERIFIED)
@@ -3814,6 +3899,30 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(body, {'enabled': False})
 
+<<<<<<< HEAD
+=======
+    @patch.dict('django.conf.settings.FEATURES', {'COURSEWARE_SEARCH_INCLUSION_DATE': '2020'})
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
+    @ddt.data(
+        (datetime(2013, 9, 18, 11, 30, 00), False),
+        (None, False),
+        (datetime(2024, 9, 18, 11, 30, 00), True),
+    )
+    @ddt.unpack
+    def test_inclusion_date_greater_than_course_start(self, start_date, expected_enabled):
+        course_with_start = CourseFactory.create(start=start_date)
+        api_url = reverse('courseware_search_enabled_view', kwargs={'course_id': str(course_with_start.id)})
+
+        user_staff = UserFactory(is_staff=True)
+
+        self.client.login(username=user_staff.username, password=TEST_PASSWORD)
+        response = self.client.get(api_url, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': expected_enabled})
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
     """

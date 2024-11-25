@@ -98,9 +98,12 @@ module.exports = Merge.smart({
             StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
             StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',
             ProblemBrowser: './lms/djangoapps/instructor/static/instructor/ProblemBrowser/index.jsx',
+<<<<<<< HEAD
             DemographicsCollectionBanner: './lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx',
             DemographicsCollectionModal: './lms/static/js/demographics_collection/DemographicsCollectionModal.jsx',
             AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             EnterpriseLearnerPortalModal: './lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx',
 
             // Learner Dashboard

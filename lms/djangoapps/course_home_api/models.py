@@ -11,6 +11,11 @@ from openedx.core.djangoapps.config_model_utils.models import StackedConfigurati
 class DisableProgressPageStackedConfig(StackedConfigurationModel):
     """
     Stacked Config Model for disabling the frontend-app-learning progress page
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     STACKABLE_FIELDS = ('disabled',)

@@ -388,7 +388,11 @@ class XmlMixin:
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):
         """
+<<<<<<< HEAD
         This XML lives within Blockstore and the new runtime doesn't need this
+=======
+        This XML lives within Learning Core and the new runtime doesn't need this
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         legacy XModule code. Use the "normal" XBlock parsing code.
         """
         try:

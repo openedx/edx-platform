@@ -84,6 +84,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                 );
             }
 
+<<<<<<< HEAD
             if (this.useV2CertDisplaySettings) {
                 if (
                     newattrs.certificates_display_behavior
@@ -113,6 +114,35 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                         }
                     );
                 }
+=======
+            if (
+                newattrs.certificates_display_behavior
+                    && !(Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).includes(newattrs.certificates_display_behavior))
+            ) {
+                errors.certificates_display_behavior = StringUtils.interpolate(
+                    gettext(
+                        'The certificate display behavior must be one of: {behavior_options}'
+                    ),
+                    {
+                        behavior_options: Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).join(', ')
+                    }
+                );
+            }
+
+            // Throw error if there's a value for certificate_available_date
+            if (
+                (newattrs.certificate_available_date && newattrs.certificates_display_behavior != CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
+                    || (!newattrs.certificate_available_date && newattrs.certificates_display_behavior == CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
+            ) {
+                errors.certificates_display_behavior = StringUtils.interpolate(
+                    gettext(
+                        'The certificates display behavior must be {valid_option} if certificate available date is set.'
+                    ),
+                    {
+                        valid_option: CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE
+                    }
+                );
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             }
 
             if (newattrs.intro_video && newattrs.intro_video !== this.get('intro_video')) {

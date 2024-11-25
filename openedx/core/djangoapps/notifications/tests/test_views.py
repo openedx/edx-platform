@@ -7,6 +7,10 @@ from unittest import mock
 
 import ddt
 from django.conf import settings
+<<<<<<< HEAD
+=======
+from django.test.utils import override_settings
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
@@ -19,13 +23,17 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
+<<<<<<< HEAD
 from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR
 )
+<<<<<<< HEAD
 from openedx.core.djangoapps.notifications.config.waffle import (
     ENABLE_COURSEWIDE_NOTIFICATIONS,
     ENABLE_NOTIFICATIONS,
@@ -33,6 +41,16 @@ from openedx.core.djangoapps.notifications.config.waffle import (
 )
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
+=======
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.models import (
+    CourseNotificationPreference,
+    Notification,
+    get_course_notification_preference_config_version
+)
+from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
+from openedx.core.djangoapps.notifications.email.utils import encrypt_object, encrypt_string
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -80,13 +98,19 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
         )
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+<<<<<<< HEAD
     @ddt.data((False,), (True,))
     @ddt.unpack
     def test_course_enrollment_list_view(self, show_notifications_tray):
+=======
+    @ddt.unpack
+    def test_course_enrollment_list_view(self):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Test the CourseEnrollmentListView.
         """
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+<<<<<<< HEAD
         # Enable or disable the waffle flag based on the test case data
         with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray):
             url = reverse('enrollment-list')
@@ -100,6 +124,19 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
             self.assertEqual(len(data), 1)
             self.assertEqual(data, expected_data)
             self.assertEqual(response.data['show_preferences'], show_notifications_tray)
+=======
+        url = reverse('enrollment-list')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data['results']
+        enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
+        expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data, expected_data)
+        self.assertEqual(response.data['show_preferences'], True)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def test_course_enrollment_api_permission(self):
         """
@@ -172,7 +209,10 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+<<<<<<< HEAD
 @override_waffle_flag(ENABLE_REPORTED_CONTENT_NOTIFICATIONS, active=True)
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @ddt.ddt
 class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
     """
@@ -281,9 +321,15 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                     'enabled': True,
                     'core_notification_types': [],
                     'notification_types': {
+<<<<<<< HEAD
                         'course_update': {
                             'web': True,
                             'email': True,
+=======
+                        'course_updates': {
+                            'web': True,
+                            'email': False,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                             'push': True,
                             'email_cadence': 'Daily',
                             'info': ''
@@ -315,17 +361,31 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'push': True,
                             'email_cadence': 'Daily',
                             'info': 'Notifications for submission grading.'
+<<<<<<< HEAD
                         }
+=======
+                        },
+                        'ora_grade_assigned': {
+                            'web': True,
+                            'email': True,
+                            'push': False,
+                            'email_cadence': 'Daily',
+                            'info': ''
+                        },
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     },
                     'non_editable': {}
                 }
             }
         }
+<<<<<<< HEAD
         if not ENABLE_COURSEWIDE_NOTIFICATIONS.is_enabled(course.id):
             app_prefs = response['notification_preference_config']['discussion']
             notification_types = app_prefs['notification_types']
             for notification_type in ['new_discussion_post', 'new_question_post']:
                 notification_types.pop(notification_type)
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         return response
 
     def test_get_user_notification_preference_without_login(self):
@@ -336,7 +396,10 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @mock.patch("eventtracking.tracker.emit")
+<<<<<<< HEAD
     @override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True)
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_get_user_notification_preference(self, mock_emit):
         """
         Test get user notification preference.
@@ -351,7 +414,10 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
 
     @mock.patch("eventtracking.tracker.emit")
+<<<<<<< HEAD
     @override_waffle_flag(ENABLE_COURSEWIDE_NOTIFICATIONS, active=True)
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     @mock.patch.dict(COURSE_NOTIFICATION_TYPES, {
         **COURSE_NOTIFICATION_TYPES,
         **{
@@ -472,6 +538,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                 assert 'info' not in type_prefs.keys()
 
 
+<<<<<<< HEAD
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
 @override_waffle_flag(ENABLE_REPORTED_CONTENT_NOTIFICATIONS, active=True)
 @ddt.ddt
@@ -673,6 +740,8 @@ class UserNotificationChannelPreferenceAPITest(ModuleStoreTestCase):
             self.assertEqual(event_data['value'], value)
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @ddt.ddt
 class NotificationListAPIViewTest(APITestCase):
     """
@@ -910,13 +979,20 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
 
+<<<<<<< HEAD
     @ddt.data((False,), (True,))
     @ddt.unpack
     def test_get_unseen_notifications_count_with_show_notifications_tray(self, show_notifications_tray_enabled):
+=======
+    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @ddt.unpack
+    def test_get_unseen_notifications_count_with_show_notifications_tray(self):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Test that the endpoint returns the correct count of unseen notifications and show_notifications_tray value.
         """
         self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+<<<<<<< HEAD
 
         # Enable or disable the waffle flag based on the test case data
         with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray_enabled):
@@ -928,6 +1004,16 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
             self.assertEqual(response.data['count_by_app_name'], {
                 'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0, 'grading': 0})
             self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
+=======
+        # Make a request to the view
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 4)
+        self.assertEqual(response.data['count_by_app_name'], {
+            'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0, 'updates': 0, 'grading': 0})
+        self.assertEqual(response.data['show_notifications_tray'], True)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
         """
@@ -1105,6 +1191,66 @@ class NotificationReadAPIViewTestCase(APITestCase):
         self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
 
 
+<<<<<<< HEAD
+=======
+@ddt.ddt
+class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
+    """
+    Tests if preference is updated when encrypted url is hit
+    """
+    def setUp(self):
+        """
+        Setup test case
+        """
+        super().setUp()
+        password = 'password'
+        self.user = UserFactory(password=password)
+        self.client.login(username=self.user.username, password=password)
+        self.course = CourseFactory.create(display_name='test course 1', run="Testing_course_1")
+        CourseNotificationPreference(course_id=self.course.id, user=self.user).save()
+
+    @override_settings(LMS_BASE="")
+    @ddt.data('get', 'post')
+    def test_if_preference_is_updated(self, request_type):
+        """
+        Tests if preference is updated when url is hit
+        """
+        user_hash = encrypt_string(self.user.username)
+        patch_hash = encrypt_object({'channel': 'email', 'value': False})
+        url_params = {
+            "username": user_hash,
+            "patch": patch_hash
+        }
+        url = reverse("preference_update_from_encrypted_username_view", kwargs=url_params)
+        func = getattr(self.client, request_type)
+        response = func(url)
+        assert response.status_code == status.HTTP_200_OK
+        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
+        config = preference.notification_preference_config
+        for app_name, app_prefs in config.items():
+            for type_prefs in app_prefs['notification_types'].values():
+                assert type_prefs['email'] is False
+
+    def test_if_config_version_is_updated(self):
+        """
+        Tests if preference version is updated before applying patch data
+        """
+        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
+        preference.config_version -= 1
+        preference.save()
+        user_hash = encrypt_string(self.user.username)
+        patch_hash = encrypt_object({'channel': 'email', 'value': False})
+        url_params = {
+            "username": user_hash,
+            "patch": patch_hash
+        }
+        url = reverse("preference_update_from_encrypted_username_view", kwargs=url_params)
+        self.client.get(url)
+        preference = CourseNotificationPreference.objects.get(user=self.user, course_id=self.course.id)
+        assert preference.config_version == get_course_notification_preference_config_version()
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 def remove_notifications_with_visibility_settings(expected_response):
     """
     Remove notifications with visibility settings from the expected response.

@@ -5,8 +5,11 @@ Tests for LTI views.
 from django.conf import settings
 from django.test import TestCase, override_settings
 
+<<<<<<< HEAD
 from openedx.core.djangoapps.content_libraries.constants import PROBLEM
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from .base import (
     ContentLibrariesRestApiTest,
     URL_LIB_LTI_JWKS,
@@ -60,10 +63,17 @@ class LibraryBlockLtiUrlViewTestMixin:
         """
 
         library = self._create_library(
+<<<<<<< HEAD
             slug="libgg", title="A Test Library", description="Testing library", library_type=PROBLEM,
         )
 
         block = self._add_block_to_library(library['id'], PROBLEM, PROBLEM)
+=======
+            slug="libgg", title="A Test Library", description="Testing library",
+        )
+
+        block = self._add_block_to_library(library['id'], 'problem', 'problem')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         usage_key = str(block['id'])
 
         url = f'/api/libraries/v2/blocks/{usage_key}/lti/'
@@ -87,5 +97,9 @@ class LibraryBlockLtiUrlViewTest(
     ContentLibrariesRestApiTest,
 ):
     """
+<<<<<<< HEAD
     Test generating LTI URL for a block in a library, using the installed Blockstore app.
+=======
+    Test generating LTI URL for a block in a library, using the installed Learning Core app.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """

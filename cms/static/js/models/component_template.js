@@ -11,7 +11,12 @@ define(['backbone'], function(Backbone) {
             // boilerplate_name (may be null)
             // is_common (only used for problems)
             templates: [],
+<<<<<<< HEAD
             support_legend: {}
+=======
+            support_legend: {},
+            beta: false,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         },
         parse: function(response) {
             // Returns true only for templates that both have no boilerplate and are of
@@ -26,6 +31,10 @@ define(['backbone'], function(Backbone) {
             this.templates = response.templates;
             this.display_name = response.display_name;
             this.support_legend = response.support_legend;
+<<<<<<< HEAD
+=======
+            this.beta = response.beta;
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
             // Sort the templates.
             this.templates.sort(function(a, b) {

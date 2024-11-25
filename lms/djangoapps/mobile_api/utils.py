@@ -6,6 +6,10 @@ API_V05 = 'v0.5'
 API_V1 = 'v1'
 API_V2 = 'v2'
 API_V3 = 'v3'
+<<<<<<< HEAD
+=======
+API_V4 = 'v4'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 def parsed_version(version):

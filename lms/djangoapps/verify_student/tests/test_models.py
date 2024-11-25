@@ -20,6 +20,10 @@ from lms.djangoapps.verify_student.models import (
     PhotoVerification,
     SoftwareSecurePhotoVerification,
     SSOVerification,
+<<<<<<< HEAD
+=======
+    VerificationAttempt,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     VerificationException
 )
 from lms.djangoapps.verify_student.tests import TestVerificationBase
@@ -437,3 +441,17 @@ class ManualVerificationTest(TestVerificationBase):
         user = UserFactory.create()
         verification = ManualVerification.objects.create(user=user)
         self.verification_active_at_datetime(verification)
+<<<<<<< HEAD
+=======
+
+
+class VerificationAttemptTest(TestVerificationBase):
+    """
+    Tests for the VerificationAttempt model
+    """
+
+    def test_active_at_datetime(self):
+        user = UserFactory.create()
+        attempt = VerificationAttempt.objects.create(user=user)
+        self.verification_active_at_datetime(attempt)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

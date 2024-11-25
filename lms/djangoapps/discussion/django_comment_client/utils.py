@@ -1038,7 +1038,11 @@ def sanitize_body(body):
     This is possibly overly broad, and might tamper with legitimate posts that
     contain this code in fenced code blocks. As far as we can tell, this is an
     extra layer of protection, and current handling in the front end and using
+<<<<<<< HEAD
     bleach for HTML rendering on the server side should cover these cases.
+=======
+    nh3 for HTML rendering on the server side should cover these cases.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     if not body:
         return body

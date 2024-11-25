@@ -14,7 +14,11 @@ on:
   pull_request:
     types: [opened]
     paths:
+<<<<<<< HEAD
       - 'lms/templates/dashboard.html'
+=======
+      - "lms/templates/dashboard.html"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 jobs:
   # Provide helpful bot comment
@@ -23,7 +27,11 @@ jobs:
     name: provide helpful bot comment
     steps:
       - name: Checkout
+<<<<<<< HEAD
         uses: actions/checkout@v3
+=======
+        uses: actions/checkout@v4
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
@@ -32,4 +40,8 @@ jobs:
             Thank you for your pull request! Congratulations on completing the Open edX tutorial! A team member will be by to take a look shortly.
             To those watching community pull requests: No need to worry about this one, a tCRIL team member will be taking care of it.
             For this PR's author: If this is a PR that is NOT coming from the Open edX tutorial, please comment and let us know to disregard this message.
+<<<<<<< HEAD
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+=======
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

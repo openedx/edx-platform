@@ -3,6 +3,7 @@ Utils function for notifications app
 """
 from typing import Dict, List
 
+<<<<<<< HEAD
 from common.djangoapps.student.models import CourseEnrollment, CourseAccessRole
 from lms.djangoapps.discussion.toggles import ENABLE_REPORTED_CONTENT_NOTIFICATIONS
 from openedx.core.djangoapps.django_comment_common.models import Role
@@ -10,6 +11,13 @@ from openedx.core.lib.cache_utils import request_cached
 
 from .config.waffle import ENABLE_COURSEWIDE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
 
+=======
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
+from openedx.core.djangoapps.django_comment_common.models import Role
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NEW_NOTIFICATION_VIEW
+from openedx.core.lib.cache_utils import request_cached
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 def find_app_in_normalized_apps(app_name, apps_list):
     """
@@ -42,13 +50,27 @@ def get_show_notifications_tray(user):
     ).values_list('course_id', flat=True)
 
     for course_id in learner_enrollments_course_ids:
+<<<<<<< HEAD
         if SHOW_NOTIFICATIONS_TRAY.is_enabled(course_id):
+=======
+        if ENABLE_NOTIFICATIONS.is_enabled(course_id):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             show_notifications_tray = True
             break
 
     return show_notifications_tray
 
 
+<<<<<<< HEAD
+=======
+def get_is_new_notification_view_enabled():
+    """
+    Returns True if the waffle flag for the new notification view is enabled, False otherwise.
+    """
+    return ENABLE_NEW_NOTIFICATION_VIEW.is_enabled()
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 def get_list_in_batches(input_list, batch_size):
     """
     Divides the list of objects into list of list of objects each of length batch_size.
@@ -58,6 +80,7 @@ def get_list_in_batches(input_list, batch_size):
         yield input_list[index: index + batch_size]
 
 
+<<<<<<< HEAD
 def filter_course_wide_preferences(course_key, preferences):
     """
     If course wide notifications is disabled for course, it filters course_wide
@@ -79,6 +102,8 @@ def filter_course_wide_preferences(course_key, preferences):
     return preferences
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 def get_user_forum_roles(user_id: int, course_id: str) -> List[str]:
     """
     Get forum roles for the given user in the specified course.

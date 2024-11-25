@@ -30,8 +30,16 @@ def connect_to_mongodb(
     handles AutoReconnect errors by retrying read operations, since these exceptions
     typically indicate a temporary step-down condition for MongoDB.
     """
+<<<<<<< HEAD
     # If the MongoDB server uses a separate authentication database that should be specified here
     auth_source = kwargs.get('authsource', '') or None
+=======
+    # If the MongoDB server uses a separate authentication database that should be specified here.
+    # Convert the lowercased authsource parameter to the camel-cased authSource expected by MongoClient.
+    auth_source = db
+    if auth_source_key := {'authSource', 'authsource'}.intersection(set(kwargs.keys())):
+        auth_source = kwargs.pop(auth_source_key.pop()) or db
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # sanitize a kwarg which may be present and is no longer expected
     # AED 2020-03-02 TODO: Remove this when 'auth_source' will no longer exist in kwargs
@@ -51,6 +59,7 @@ def connect_to_mongodb(
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
 
+<<<<<<< HEAD
     mongo_conn = pymongo.database.Database(
         pymongo.MongoClient(
             host=host,
@@ -72,6 +81,32 @@ def connect_to_mongodb(
         mongo_conn.authenticate(user, password, source=auth_source)
 
     return mongo_conn
+=======
+    if 'replicaSet' in kwargs and kwargs['replicaSet'] == '':
+        kwargs['replicaSet'] = None
+
+    connection_params = {
+        'host': host,
+        'port': port,
+        'tz_aware': tz_aware,
+        'document_class': dict,
+        **kwargs,
+    }
+
+    if user is not None and password is not None and not db.startswith('test_'):
+        connection_params.update({'username': user, 'password': password, 'authSource': auth_source})
+
+    mongo_conn = pymongo.MongoClient(**connection_params)
+
+    if proxy:
+        mongo_conn = MongoProxy(
+            mongo_conn[db],
+            wait_time=retry_wait_time
+        )
+        return mongo_conn
+
+    return mongo_conn[db]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 def create_collection_index(

@@ -135,6 +135,7 @@ class DeprecatedRestApiClientTest(TestCase):
         self.base_url = get_ecommerce_api_base_url()
 
     @httpretty.activate
+<<<<<<< HEAD
     def test_tracking_context(self):
         """
         Ensure the tracking context is set up in the api client correctly and automatically.
@@ -168,6 +169,8 @@ class DeprecatedRestApiClientTest(TestCase):
             assert actual_header == expected_header
 
     @httpretty.activate
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_client_unicode(self):
         """
         The client should handle json responses properly when they contain unicode character data.

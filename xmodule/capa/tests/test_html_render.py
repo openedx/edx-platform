@@ -6,9 +6,15 @@ CAPA HTML rendering tests.
 import os
 import textwrap
 import unittest
+<<<<<<< HEAD
 
 import ddt
 import mock
+=======
+from unittest import mock
+
+import ddt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from lxml import etree
 from xmodule.capa.tests.helpers import new_loncapa_problem, test_capa_system
 from openedx.core.djangolib.markup import HTML

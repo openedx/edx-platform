@@ -123,9 +123,12 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         update_search_index,
         update_special_exams_and_publish
     )
+<<<<<<< HEAD
     from cms.djangoapps.coursegraph.tasks import (
         dump_course_to_neo4j
     )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # DEVELOPER README: probably all tasks here should use transaction.on_commit
     # to avoid stale data, but the tasks are owned by many teams and are often
@@ -146,10 +149,13 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
         # Push the course outline to learning_sequences asynchronously.
         update_outline_from_modulestore_task.delay(course_key_str)
 
+<<<<<<< HEAD
     if settings.COURSEGRAPH_DUMP_COURSE_ON_PUBLISH:
         # Push the course out to CourseGraph asynchronously.
         dump_course_to_neo4j.delay(course_key_str)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     # Kick off a courseware indexing action after the data is ready
     if CoursewareSearchIndexer.indexing_is_enabled() and CourseAboutSearchIndexer.indexing_is_enabled():
         transaction.on_commit(lambda: update_search_index.delay(course_key_str, datetime.now(UTC).isoformat()))

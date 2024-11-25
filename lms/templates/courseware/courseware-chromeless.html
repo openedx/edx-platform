@@ -144,10 +144,19 @@ ${HTML(fragment.foot_html())}
                 // to stay in relatively the same position so viewing of the video
                 // is not disrupted.
                 if ($(this).attr('class') === 'transcript-start'||$(this).attr('class') === 'transcript-end') {
+<<<<<<< HEAD
                   event.preventDefault();
                   $(targetId)[0].scrollIntoView({
                     block: 'nearest',
                   });
+=======
+                  var target = $(targetId)[0];
+                  event.preventDefault();
+                  target.scrollIntoView({
+                    block: 'nearest',
+                  });
+                  target.focus();
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 } else {
                   var targetName = $(this).attr('href').slice(1);
                   // Checks if the target uses an id or name.
@@ -159,6 +168,10 @@ ${HTML(fragment.foot_html())}
                     target.scrollIntoView({
                       block: 'start',
                     });
+<<<<<<< HEAD
+=======
+                    target.focus();
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                   }
                 }
               }

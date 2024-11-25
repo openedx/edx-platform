@@ -38,7 +38,11 @@ class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin
         for _ in range(num_attempts):
             self.create_and_submit_attempt_for_user()
 
+<<<<<<< HEAD
     @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
+=======
+    @patch('lms.djangoapps.verify_student.signals.signals.idv_update_signal.send')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_command(self, send_idv_update_mock):
         call_command('trigger_softwaresecurephotoverifications_post_save_signal', start_date_time='2021-10-31 06:00:00')
 

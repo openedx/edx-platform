@@ -9,7 +9,11 @@ from django.test import TestCase
 from django.utils.timezone import now
 
 from common.djangoapps.student.tests.factories import UserFactory
+<<<<<<< HEAD
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+=======
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationAttempt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class TestVerificationBase(TestCase):
@@ -52,11 +56,22 @@ class TestVerificationBase(TestCase):
 
         # Active immediately before expiration date
         expiration = attempt.expiration_datetime
+<<<<<<< HEAD
         before_expiration = expiration - timedelta(seconds=1)
         assert attempt.active_at_datetime(before_expiration)
 
         # Not active after the expiration date
         attempt.expiration_date = now() - timedelta(days=1)
+=======
+        if expiration:
+            before_expiration = expiration - timedelta(seconds=1)
+            assert attempt.active_at_datetime(before_expiration)
+
+        # Not active after the expiration date
+        field = 'expiration_datetime' if isinstance(attempt, VerificationAttempt) else 'expiration_date'
+        setattr(attempt, field, now() - timedelta(days=1))
+        # attempt.expiration_date = now() - timedelta(days=1)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         attempt.save()
         assert not attempt.active_at_datetime(now())
 

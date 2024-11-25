@@ -19,6 +19,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+<<<<<<< HEAD
+=======
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
@@ -594,6 +598,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError as exc:
             raise NotFound(f"Invalid usage key: '{usage_key_string}'.") from exc
+<<<<<<< HEAD
         _, request.user = setup_masquerade(
             request,
             usage_key.course_key,
@@ -618,6 +623,42 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
 
         context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)}
         return Response(sequence.get_metadata(view=view, context=context))
+=======
+
+        staff_access = has_access(request.user, 'staff', usage_key.course_key)
+        is_preview = request.GET.get('preview', '0') == '1'
+        _, request.user = setup_masquerade(
+            request,
+            usage_key.course_key,
+            staff_access=staff_access,
+            reset_masquerade_data=True,
+        )
+
+        branch_type = (
+            ModuleStoreEnum.Branch.draft_preferred
+        ) if is_preview and staff_access else (
+            ModuleStoreEnum.Branch.published_only
+        )
+
+        with modulestore().branch_setting(branch_type, usage_key.course_key):
+            sequence, _ = get_block_by_usage_id(
+                self.request,
+                str(usage_key.course_key),
+                str(usage_key),
+                disable_staff_debug_info=True,
+                will_recheck_access=True)
+
+            if not hasattr(sequence, 'get_metadata'):
+                # Looks like we were asked for metadata on something that is not a sequence (or section).
+                return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+            view = STUDENT_VIEW
+            if request.user.is_anonymous:
+                view = PUBLIC_VIEW
+
+            context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)}
+            return Response(sequence.get_metadata(view=view, context=context))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class Resume(DeveloperErrorViewMixin, APIView):

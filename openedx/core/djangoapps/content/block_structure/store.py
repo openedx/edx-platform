@@ -19,6 +19,7 @@ from .transformer_registry import TransformerRegistry
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
+<<<<<<< HEAD
 class StubModel:
     """
     Stub model to use when storage backing is disabled.
@@ -39,6 +40,8 @@ class StubModel:
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class BlockStructureStore:
     """
     Storage for BlockStructure objects.
@@ -120,6 +123,7 @@ class BlockStructureStore:
         Returns whether the data in storage for the given key is
         already up-to-date with the version in the given modulestore.
         """
+<<<<<<< HEAD
         if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             try:
                 bs_model = self._get_model(root_block_usage_key)
@@ -127,6 +131,14 @@ class BlockStructureStore:
                 return self._version_data_of_model(bs_model) == self._version_data_of_block(root_block)
             except BlockStructureNotFound:
                 pass
+=======
+        try:
+            bs_model = self._get_model(root_block_usage_key)
+            root_block = modulestore.get_item(root_block_usage_key)
+            return self._version_data_of_model(bs_model) == self._version_data_of_block(root_block)
+        except BlockStructureNotFound:
+            pass
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         return False
 
@@ -134,16 +146,21 @@ class BlockStructureStore:
         """
         Returns the model associated with the given key.
         """
+<<<<<<< HEAD
         if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             return BlockStructureModel.get(root_block_usage_key)
         else:
             return StubModel(root_block_usage_key)
+=======
+        return BlockStructureModel.get(root_block_usage_key)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _update_or_create_model(self, block_structure, serialized_data):
         """
         Updates or creates the model for the given block_structure
         and serialized_data.
         """
+<<<<<<< HEAD
         if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             root_block = block_structure[block_structure.root_block_usage_key]
             bs_model, _ = BlockStructureModel.update_or_create(
@@ -154,6 +171,15 @@ class BlockStructureStore:
             return bs_model
         else:
             return StubModel(block_structure.root_block_usage_key)
+=======
+        root_block = block_structure[block_structure.root_block_usage_key]
+        bs_model, _ = BlockStructureModel.update_or_create(
+            serialized_data,
+            data_usage_key=block_structure.root_block_usage_key,
+            **self._version_data_of_block(root_block)
+        )
+        return bs_model
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _add_to_cache(self, serialized_data, bs_model):
         """
@@ -186,9 +212,12 @@ class BlockStructureStore:
         Raises:
              BlockStructureNotFound if not found.
         """
+<<<<<<< HEAD
         if not config.STORAGE_BACKING_FOR_CACHE.is_enabled():
             raise BlockStructureNotFound(bs_model.data_usage_key)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         return bs_model.get_serialized_data()
 
     def _serialize(self, block_structure):
@@ -226,6 +255,7 @@ class BlockStructureStore:
     def _encode_root_cache_key(bs_model):
         """
         Returns the cache key to use for the given
+<<<<<<< HEAD
         BlockStructureModel or StubModel.
         """
         if config.STORAGE_BACKING_FOR_CACHE.is_enabled():
@@ -234,6 +264,11 @@ class BlockStructureStore:
             version=str(BlockStructureBlockData.VERSION),
             root_usage_key=str(bs_model.data_usage_key),
         )
+=======
+        BlockStructureModel.
+        """
+        return str(bs_model)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @staticmethod
     def _version_data_of_block(root_block):

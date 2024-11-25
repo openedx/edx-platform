@@ -8,6 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+<<<<<<< HEAD
         python-version: ['3.8', '3.11']
         os: ['ubuntu-20.04']
 
@@ -15,6 +16,16 @@ jobs:
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v4
+=======
+        python-version:
+          - "3.11"
+        os: ["ubuntu-24.04"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -26,11 +37,19 @@ jobs:
 
       - name: Get pip cache dir
         id: pip-cache-dir
+<<<<<<< HEAD
         run: echo "::set-output name=dir::$(pip cache dir)"
 
       - name: Cache pip dependencies
         id: cache-dependencies
         uses: actions/cache@v3
+=======
+        run: echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache pip dependencies
+        id: cache-dependencies
+        uses: actions/cache@v4
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with:
           path: ${{ steps.pip-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}

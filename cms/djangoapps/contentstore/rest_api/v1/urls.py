@@ -17,6 +17,10 @@ from .views import (
     CourseRerunView,
     CourseSettingsView,
     CourseVideosView,
+<<<<<<< HEAD
+=======
+    CourseWaffleFlagsView,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     HomePageView,
     HomePageCoursesView,
     HomePageLibrariesView,
@@ -131,6 +135,14 @@ urlpatterns = [
         VerticalContainerView.as_view(),
         name="container_vertical"
     ),
+<<<<<<< HEAD
+=======
+    re_path(
+        fr'^course_waffle_flags(?:/{COURSE_ID_PATTERN})?$',
+        CourseWaffleFlagsView.as_view(),
+        name="course_waffle_flags"
+    ),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # Authoring API
     # Do not use under v1 yet (Nov. 23). The Authoring API is still experimental and the v0 versions should be used

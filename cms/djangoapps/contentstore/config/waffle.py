@@ -4,7 +4,11 @@ waffle switches for the contentstore app.
 """
 
 
+<<<<<<< HEAD
 from edx_toggles.toggles import WaffleFlag, WaffleSwitch
+=======
+from edx_toggles.toggles import WaffleSwitch
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
@@ -26,6 +30,7 @@ SHOW_REVIEW_RULES_FLAG = CourseWaffleFlag(  # lint-amnesty, pylint: disable=togg
     f'{WAFFLE_NAMESPACE}.show_review_rules', __name__, LOG_PREFIX
 )
 
+<<<<<<< HEAD
 # Waffle flag to redirect to the library authoring MFE.
 # .. toggle_name: contentstore.library_authoring_mfe
 # .. toggle_implementation: WaffleFlag
@@ -40,6 +45,8 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
     f'{WAFFLE_NAMESPACE}.library_authoring_mfe', __name__, LOG_PREFIX
 )
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # .. toggle_name: studio.custom_relative_dates
 # .. toggle_implementation: CourseWaffleFlag
@@ -53,6 +60,7 @@ REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND = WaffleFlag(
 # .. toggle_warning: Flag course_experience.relative_dates should also be active for relative dates functionalities to work.
 # .. toggle_tickets: https://openedx.atlassian.net/browse/AA-844
 CUSTOM_RELATIVE_DATES = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.custom_relative_dates', __name__)
+<<<<<<< HEAD
 
 
 # .. toggle_name: studio.enable_course_update_notifications
@@ -66,3 +74,5 @@ ENABLE_COURSE_UPDATE_NOTIFICATIONS = CourseWaffleFlag(
     f'{WAFFLE_NAMESPACE}.enable_course_update_notifications',
     __name__
 )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

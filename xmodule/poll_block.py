@@ -21,7 +21,11 @@ from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, py
 from openedx.core.djangolib.markup import Text, HTML
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.stringify import stringify_children
+<<<<<<< HEAD
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+=======
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
@@ -136,7 +140,11 @@ class PollBlock(
             'configuration_json': self.dump_poll(),
         }
         fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('poll.html', params))
+<<<<<<< HEAD
         add_sass_to_fragment(fragment, 'PollBlockDisplay.scss')
+=======
+        add_css_to_fragment(fragment, 'PollBlockDisplay.css')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         add_webpack_js_to_fragment(fragment, 'PollBlockDisplay')
         shim_xmodule_js(fragment, 'Poll')
         return fragment

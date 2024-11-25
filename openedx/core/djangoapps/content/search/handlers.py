@@ -6,29 +6,69 @@ import logging
 
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+<<<<<<< HEAD
 from openedx_events.content_authoring.data import ContentLibraryData, ContentObjectData, LibraryBlockData, XBlockData
+=======
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryCollectionLocator
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+    ContentObjectChangedData,
+    LibraryBlockData,
+    LibraryCollectionData,
+    XBlockData,
+)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
+<<<<<<< HEAD
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
     CONTENT_OBJECT_TAGS_CHANGED,
 )
 from openedx.core.djangoapps.content_tagging.utils import get_content_key_from_string
+=======
+    LIBRARY_BLOCK_UPDATED,
+    LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_DELETED,
+    LIBRARY_COLLECTION_UPDATED,
+    XBLOCK_CREATED,
+    XBLOCK_DELETED,
+    XBLOCK_UPDATED,
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import SearchAccess
 
+<<<<<<< HEAD
 from .api import only_if_meilisearch_enabled, upsert_block_tags_index_docs
+=======
+from .api import (
+    only_if_meilisearch_enabled,
+    upsert_block_collections_index_docs,
+    upsert_block_tags_index_docs,
+    upsert_collection_tags_index_docs,
+)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from .tasks import (
     delete_library_block_index_doc,
     delete_xblock_index_doc,
     update_content_library_index_docs,
+<<<<<<< HEAD
     upsert_library_block_index_doc,
     upsert_xblock_index_doc
+=======
+    update_library_collection_index_doc,
+    upsert_library_block_index_doc,
+    upsert_xblock_index_doc,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 
 log = logging.getLogger(__name__)
@@ -96,6 +136,10 @@ def xblock_deleted_handler(**kwargs) -> None:
 
 
 @receiver(LIBRARY_BLOCK_CREATED)
+<<<<<<< HEAD
+=======
+@receiver(LIBRARY_BLOCK_UPDATED)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @only_if_meilisearch_enabled
 def library_block_updated_handler(**kwargs) -> None:
     """
@@ -106,7 +150,13 @@ def library_block_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
+<<<<<<< HEAD
     upsert_library_block_index_doc.delay(str(library_block_data.usage_key))
+=======
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches results. This is only a single document update so is very fast.
+    upsert_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @receiver(LIBRARY_BLOCK_DELETED)
@@ -120,7 +170,13 @@ def library_block_deleted(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
+<<<<<<< HEAD
     delete_library_block_index_doc.delay(str(library_block_data.usage_key))
+=======
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches results. This is only a single document update so is very fast.
+    delete_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @receiver(CONTENT_LIBRARY_UPDATED)
@@ -134,6 +190,7 @@ def content_library_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
+<<<<<<< HEAD
     update_content_library_index_docs.delay(str(content_library_data.library_key))
 
 
@@ -156,3 +213,73 @@ def content_object_tags_changed_handler(**kwargs) -> None:
         return
 
     upsert_block_tags_index_docs(content_object_tags.object_id)
+=======
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches index.
+    # Currently, this is only required to make sure that removed/discarded components are removed
+    # from the search index and displayed to user properly. If it becomes a performance bottleneck
+    # for other update operations other than discard, we can update CONTENT_LIBRARY_UPDATED event
+    # to include a parameter which can help us decide if the task needs to run sync or async.
+    update_content_library_index_docs.apply(args=[str(content_library_data.library_key)])
+
+
+@receiver(LIBRARY_COLLECTION_CREATED)
+@receiver(LIBRARY_COLLECTION_DELETED)
+@receiver(LIBRARY_COLLECTION_UPDATED)
+@only_if_meilisearch_enabled
+def library_collection_updated_handler(**kwargs) -> None:
+    """
+    Create or update the index for the content library collection
+    """
+    library_collection = kwargs.get("library_collection", None)
+    if not library_collection or not isinstance(library_collection, LibraryCollectionData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+
+    if library_collection.background:
+        update_library_collection_index_doc.delay(
+            str(library_collection.library_key),
+            library_collection.collection_key,
+        )
+    else:
+        # Update collection index synchronously to make sure that search index is updated before
+        # the frontend invalidates/refetches index.
+        # See content_library_updated_handler for more details.
+        update_library_collection_index_doc.apply(args=[
+            str(library_collection.library_key),
+            library_collection.collection_key,
+        ])
+
+
+@receiver(CONTENT_OBJECT_ASSOCIATIONS_CHANGED)
+@only_if_meilisearch_enabled
+def content_object_associations_changed_handler(**kwargs) -> None:
+    """
+    Update the collections/tags data in the index for the Content Object
+    """
+    content_object = kwargs.get("content_object", None)
+    if not content_object or not isinstance(content_object, ContentObjectChangedData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    try:
+        # Check if valid if course or library block
+        usage_key = UsageKey.from_string(str(content_object.object_id))
+    except InvalidKeyError:
+        try:
+            # Check if valid if library collection
+            usage_key = LibraryCollectionLocator.from_string(str(content_object.object_id))
+        except InvalidKeyError:
+            log.error("Received invalid content object id")
+            return
+
+    # This event's changes may contain both "tags" and "collections", but this will happen rarely, if ever.
+    # So we allow a potential double "upsert" here.
+    if not content_object.changes or "tags" in content_object.changes:
+        if isinstance(usage_key, LibraryCollectionLocator):
+            upsert_collection_tags_index_docs(usage_key)
+        else:
+            upsert_block_tags_index_docs(usage_key)
+    if not content_object.changes or "collections" in content_object.changes:
+        upsert_block_collections_index_docs(usage_key)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

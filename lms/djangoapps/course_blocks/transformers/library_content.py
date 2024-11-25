@@ -14,7 +14,11 @@ from openedx.core.djangoapps.content.block_structure.transformer import (
     BlockStructureTransformer,
     FilteringTransformerMixin
 )
+<<<<<<< HEAD
 from xmodule.library_content_block import LibraryContentBlock  # lint-amnesty, pylint: disable=wrong-import-order
+=======
+from xmodule.library_content_block import LegacyLibraryContentBlock  # lint-amnesty, pylint: disable=wrong-import-order
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import get_student_module_as_dict
@@ -47,7 +51,10 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
         Collects any information that's necessary to execute this
         transformer's transform method.
         """
+<<<<<<< HEAD
         block_structure.request_xblock_fields('mode')
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         block_structure.request_xblock_fields('max_count')
         block_structure.request_xblock_fields('category')
         store = modulestore()
@@ -83,7 +90,10 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             if library_children:
                 all_library_children.update(library_children)
                 selected = []
+<<<<<<< HEAD
                 mode = block_structure.get_xblock_field(block_key, 'mode')
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 max_count = block_structure.get_xblock_field(block_key, 'max_count')
                 if max_count < 0:
                     max_count = len(library_children)
@@ -100,7 +110,11 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
 
                 # Update selected
                 previous_count = len(selected)
+<<<<<<< HEAD
                 block_keys = LibraryContentBlock.make_selection(selected, library_children, max_count, mode)
+=======
+                block_keys = LegacyLibraryContentBlock.make_selection(selected, library_children, max_count)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 selected = block_keys['selected']
 
                 # Save back any changes
@@ -176,7 +190,11 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
             with tracker.get_tracker().context(full_event_name, context):
                 tracker.emit(full_event_name, event_data)
 
+<<<<<<< HEAD
         LibraryContentBlock.publish_selected_children_events(
+=======
+        LegacyLibraryContentBlock.publish_selected_children_events(
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             block_keys,
             format_block_keys,
             publish_event,

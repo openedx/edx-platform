@@ -110,7 +110,11 @@ class TestDeprecatedPaverAssets(TestCase):
                     "NODE_ENV=production " +
                     "STATIC_ROOT_LMS=/fake/lms/staticfiles " +
                     "STATIC_ROOT_CMS=/fake/cms/staticfiles " +
+<<<<<<< HEAD
                     'JS_ENV_EXTRA_CONFIG=' + +
+=======
+                    'JS_ENV_EXTRA_CONFIG=' +
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     '"{\\"key1\\": [true, false], \\"key2\\": {\\"key2.1\\": 1369, \\"key2.2\\": \\"1369\\"}}" ' +
                     "npm run webpack"
                 ),

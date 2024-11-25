@@ -46,6 +46,7 @@ class MakoTemplateBlockBase:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+<<<<<<< HEAD
         if getattr(self.runtime, 'render_template', None) is None:
             raise TypeError(
                 '{runtime} must have a render_template function'
@@ -53,6 +54,8 @@ class MakoTemplateBlockBase:
                     runtime=self.runtime,
                 )
             )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def get_context(self):
         """
@@ -69,7 +72,11 @@ class MakoTemplateBlockBase:
         """
         # pylint: disable=no-member
         fragment = Fragment(
+<<<<<<< HEAD
             self.runtime.render_template(self.mako_template, self.get_context())
+=======
+            self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
         shim_xmodule_js(fragment, self.js_module_name)
         return fragment

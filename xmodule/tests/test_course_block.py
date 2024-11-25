@@ -542,14 +542,37 @@ class ProctoringProviderTestCase(unittest.TestCase):
         with override_settings(FEATURES=FEATURES_WITH_PROCTORED_EXAMS):
             if proctored_exams_setting_enabled:
                 with pytest.raises(InvalidProctoringProvider) as context_manager:
+<<<<<<< HEAD
                     self.proctoring_provider.from_json(provider)
+=======
+                    self.proctoring_provider.from_json(provider, validate_providers=True)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 expected_error = f'The selected proctoring provider, {provider}, is not a valid provider. ' \
                     f'Please select from one of {allowed_proctoring_providers}.'
                 assert str(context_manager.value) == expected_error
             else:
+<<<<<<< HEAD
                 provider_value = self.proctoring_provider.from_json(provider)
                 assert provider_value == self.proctoring_provider.default
 
+=======
+                provider_value = self.proctoring_provider.from_json(provider, validate_providers=True)
+                assert provider_value == self.proctoring_provider.default
+
+    def test_from_json_validate_providers(self):
+        """
+        Test that an invalid provider is ignored if validate providers is set to false
+        """
+        provider = 'invalid-provider'
+
+        FEATURES_WITH_PROCTORED_EXAMS = settings.FEATURES.copy()
+        FEATURES_WITH_PROCTORED_EXAMS['ENABLE_PROCTORED_EXAMS'] = True
+
+        with override_settings(FEATURES=FEATURES_WITH_PROCTORED_EXAMS):
+            provider_value = self.proctoring_provider.from_json(provider, validate_providers=False)
+            assert provider_value == provider
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_from_json_adds_platform_default_for_missing_provider(self):
         """
         Test that a value with no provider will inherit the default provider

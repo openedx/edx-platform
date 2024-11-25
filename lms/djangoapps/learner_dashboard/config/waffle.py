@@ -37,6 +37,7 @@ ENABLE_MASTERS_PROGRAM_TAB_VIEW = WaffleFlag(
     'learner_dashboard.enable_masters_program_tab_view',
     __name__,
 )
+<<<<<<< HEAD
 
 # .. toggle_name: learner_dashboard.enable_b2c_subscriptions
 # .. toggle_implementation: WaffleFlag
@@ -54,3 +55,5 @@ ENABLE_B2C_SUBSCRIPTIONS = WaffleFlag(
     'learner_dashboard.enable_b2c_subscriptions',
     __name__,
 )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

@@ -3,7 +3,10 @@
 from django.contrib.auth import get_user_model
 from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+<<<<<<< HEAD
 from edx_rest_framework_extensions.permissions import IsStaff
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -61,6 +64,7 @@ class IDVerificationStatusDetailsView(ListAPIView):
             return sorted(verifications, key=lambda x: x.updated_at, reverse=True)
         except User.DoesNotExist:
             raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+<<<<<<< HEAD
 
 
 class IDVerificationSupportView(APIView):
@@ -79,3 +83,5 @@ class IDVerificationSupportView(APIView):
         return Response(
             IDVerificationDetailsSerializer(verification_detail).data
         )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

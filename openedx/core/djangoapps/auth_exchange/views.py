@@ -132,9 +132,16 @@ class LoginWithAccessTokenView(APIView):
                 return backend_path
 
     @staticmethod
+<<<<<<< HEAD
     def _ensure_access_token_has_password_grant(request):
         """
         Ensures the access token provided has password type grant.
+=======
+    def _ensure_access_token_has_password_grant_or_privileged_application(request):
+        """
+        Ensures the access token provided has password type grant, or if 'skip_authorization'
+        has been enabled, implying this is a trusted application.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         if is_jwt_authenticated(request):
             jwt_payload = get_decoded_jwt_from_auth(request)
@@ -143,12 +150,25 @@ class LoginWithAccessTokenView(APIView):
         else:
             token_query = dot_models.AccessToken.objects.select_related('user')
             dot_token = token_query.filter(token=request.auth).first()
+<<<<<<< HEAD
             if dot_token and dot_token.application.authorization_grant_type == dot_models.Application.GRANT_PASSWORD:
+=======
+            if dot_token and (
+                dot_token.application.authorization_grant_type == dot_models.Application.GRANT_PASSWORD
+                or dot_token.application.skip_authorization
+            ):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 return
 
         raise AuthenticationFailed({
             'error_code': 'non_supported_token',
+<<<<<<< HEAD
             'developer_message': 'Only access tokens with grant type password are supported.'
+=======
+            'developer_message': 'Only Django Oauth Toolkit access tokens for applications which '
+                                 'are trusted (with "skip_authentication" set to True, or with grant type '
+                                 'password) are supported.'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         })
 
     @staticmethod
@@ -194,7 +214,11 @@ class LoginWithAccessTokenView(APIView):
             request.user.backend = self._get_path_of_arbitrary_backend_for_user(request.user)
 
         self._ensure_user_is_not_disabled(request)
+<<<<<<< HEAD
         self._ensure_access_token_has_password_grant(request)
+=======
+        self._ensure_access_token_has_password_grant_or_privileged_application(request)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self._ensure_jwt_is_asymmetric(request)
 
         login(request, request.user)  # login generates and stores the user's cookies in the session

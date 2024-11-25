@@ -168,11 +168,23 @@ class TestLoginWithAccessTokenView(TestCase):
         if expected_cookie_name:
             assert expected_cookie_name in response.cookies
 
+<<<<<<< HEAD
     def _create_dot_access_token(self, grant_type='Client credentials'):
         """
         Create dot based access token
         """
         dot_application = dot_factories.ApplicationFactory(user=self.user, authorization_grant_type=grant_type)
+=======
+    def _create_dot_access_token(self, grant_type='Client credentials', skip_authorization=False):
+        """
+        Create dot based access token
+        """
+        dot_application = dot_factories.ApplicationFactory(
+            user=self.user,
+            authorization_grant_type=grant_type,
+            skip_authorization=skip_authorization,
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         return dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
 
     def test_failure_with_invalid_token(self):
@@ -189,6 +201,13 @@ class TestLoginWithAccessTokenView(TestCase):
         access_token = self._create_dot_access_token()
         self._verify_response(access_token, expected_status_code=401)
 
+<<<<<<< HEAD
+=======
+    def test_dot_client_credentials_supported_if_authorization_skipped(self):
+        access_token = self._create_dot_access_token(skip_authorization=True)
+        self._verify_response(access_token, expected_status_code=204, expected_cookie_name='sessionid')
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def _create_jwt_token(self, grant_type='password', scope='email profile', use_asymmetric_key=True):
         """
         Create jwt token

@@ -1,17 +1,26 @@
 """
 This module contains tests for programs-related signals and signal handlers.
 """
+<<<<<<< HEAD
 import datetime
 
+=======
+
+import datetime
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from unittest import mock
 
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
+<<<<<<< HEAD
 from openedx.core.djangoapps.content.course_overviews.tests.factories import (
     CourseOverviewFactory,
 )
+=======
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.programs.signals import (
     handle_course_cert_awarded,
     handle_course_cert_changed,
@@ -28,15 +37,26 @@ from openedx.core.djangoapps.signals.signals import (
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
+<<<<<<< HEAD
 TEST_USERNAME = 'test-user'
 TEST_COURSE_KEY = CourseKey.from_string('course-v1:edX+test_course+1')
+=======
+TEST_USERNAME = "test-user"
+TEST_COURSE_KEY = CourseKey.from_string("course-v1:edX+test_course+1")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
+<<<<<<< HEAD
 @mock.patch('openedx.core.djangoapps.programs.tasks.award_program_certificates.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
+=======
+@mock.patch("openedx.core.djangoapps.programs.tasks.award_program_certificates.delay")
+@mock.patch(
+    "openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     new_callable=mock.PropertyMock,
     return_value=False,
 )
@@ -54,8 +74,13 @@ class CertAwardedReceiverTest(TestCase):
             sender=self.__class__,
             user=UserFactory.create(username=TEST_USERNAME),
             course_key=TEST_COURSE_KEY,
+<<<<<<< HEAD
             mode='test-mode',
             status='test-status',
+=======
+            mode="test-mode",
+            status="test-status",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
 
     def test_signal_received(self, mock_is_learner_issuance_enabled, mock_task):  # pylint: disable=unused-argument
@@ -95,9 +120,15 @@ class CertAwardedReceiverTest(TestCase):
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
+<<<<<<< HEAD
 @mock.patch('openedx.core.djangoapps.programs.tasks.award_course_certificate.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
+=======
+@mock.patch("openedx.core.djangoapps.programs.tasks.award_course_certificate.delay")
+@mock.patch(
+    "openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     new_callable=mock.PropertyMock,
     return_value=False,
 )
@@ -119,8 +150,13 @@ class CertChangedReceiverTest(TestCase):
             sender=self.__class__,
             user=self.user,
             course_key=TEST_COURSE_KEY,
+<<<<<<< HEAD
             mode='test-mode',
             status='test-status',
+=======
+            mode="test-mode",
+            status="test-status",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
 
     def test_signal_received(self, mock_is_learner_issuance_enabled, mock_task):  # pylint: disable=unused-argument
@@ -160,9 +196,13 @@ class CertChangedReceiverTest(TestCase):
     def test_records_enabled(self, mock_is_learner_issuance_enabled, mock_task):
         mock_is_learner_issuance_enabled.return_value = True
 
+<<<<<<< HEAD
         site_config = SiteConfigurationFactory.create(
             site_values={'course_org_filter': ['edX']}
         )
+=======
+        site_config = SiteConfigurationFactory.create(site_values={"course_org_filter": ["edX"]})
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         # Correctly sent
         handle_course_cert_changed(**self.signal_kwargs)
@@ -170,7 +210,11 @@ class CertChangedReceiverTest(TestCase):
         mock_task.reset_mock()
 
         # Correctly not sent
+<<<<<<< HEAD
         site_config.site_values['ENABLE_LEARNER_RECORDS'] = False
+=======
+        site_config.site_values["ENABLE_LEARNER_RECORDS"] = False
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         site_config.save()
         handle_course_cert_changed(**self.signal_kwargs)
         assert not mock_task.called
@@ -178,9 +222,15 @@ class CertChangedReceiverTest(TestCase):
 
 # The credentials app isn't installed for the CMS.
 @skip_unless_lms
+<<<<<<< HEAD
 @mock.patch('openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
+=======
+@mock.patch("openedx.core.djangoapps.programs.tasks.revoke_program_certificates.delay")
+@mock.patch(
+    "openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     new_callable=mock.PropertyMock,
     return_value=False,
 )
@@ -198,8 +248,13 @@ class CertRevokedReceiverTest(TestCase):
             sender=self.__class__,
             user=UserFactory.create(username=TEST_USERNAME),
             course_key=TEST_COURSE_KEY,
+<<<<<<< HEAD
             mode='test-mode',
             status='test-status',
+=======
+            mode="test-mode",
+            status="test-status",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         )
 
     def test_signal_received(self, mock_is_learner_issuance_enabled, mock_task):  # pylint: disable=unused-argument
@@ -238,10 +293,16 @@ class CertRevokedReceiverTest(TestCase):
 
 
 @skip_unless_lms
+<<<<<<< HEAD
 @mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update.delay')
 @mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update.delay')
 @mock.patch(
     'openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled',
+=======
+@mock.patch("openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update.delay")
+@mock.patch(
+    "openedx.core.djangoapps.credentials.models.CredentialsApiConfig.is_learner_issuance_enabled",
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     new_callable=mock.PropertyMock,
     return_value=False,
 )
@@ -255,6 +316,7 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         """
         DRY helper.
         """
+<<<<<<< HEAD
         return {
             'sender': self.__class__,
             'course_key': TEST_COURSE_KEY,
@@ -267,25 +329,42 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
         mock_visible_date_task,
         mock_cad_task
     ):
+=======
+        return {"sender": self.__class__, "course_key": TEST_COURSE_KEY, "available_date": datetime.datetime.now()}
+
+    def test_signal_received(self, mock_is_learner_issuance_enabled, mock_cad_task):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Ensures the receiver function is invoked when COURSE_CERT_DATE_CHANGE is sent.
         """
         COURSE_CERT_DATE_CHANGE.send(**self.signal_kwargs)
         assert mock_is_learner_issuance_enabled.call_count == 1
+<<<<<<< HEAD
         assert mock_visible_date_task.call_count == 0
         assert mock_cad_task.call_count == 0
 
     def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_visible_date_task, mock_cad_task):
+=======
+        assert mock_cad_task.call_count == 0
+
+    def test_programs_disabled(self, mock_is_learner_issuance_enabled, mock_cad_task):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Ensures that the receiver function does not queue any celery tasks if the system is not configured to use the
         Credentials service.
         """
         handle_course_cert_date_change(**self.signal_kwargs)
         assert mock_is_learner_issuance_enabled.call_count == 1
+<<<<<<< HEAD
         assert mock_visible_date_task.call_count == 0
         assert mock_cad_task.call_count == 0
 
     def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_visible_date_task, mock_cad_task):
+=======
+        assert mock_cad_task.call_count == 0
+
+    def test_programs_enabled(self, mock_is_learner_issuance_enabled, mock_cad_task):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Ensures that the receiver function enqueues the expected celery tasks when the system is configured to use the
         Credentials IDA.
@@ -294,14 +373,22 @@ class CourseCertAvailableDateChangedReceiverTest(TestCase):
 
         handle_course_cert_date_change(**self.signal_kwargs)
         assert mock_is_learner_issuance_enabled.call_count == 1
+<<<<<<< HEAD
         assert mock_visible_date_task.call_count == 1
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert mock_cad_task.call_count == 1
 
 
 @skip_unless_lms
+<<<<<<< HEAD
 @mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update.delay')
 @mock.patch('openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update.delay')
 @mock.patch('openedx.core.djangoapps.programs.signals.is_credentials_enabled')
+=======
+@mock.patch("openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update.delay")
+@mock.patch("openedx.core.djangoapps.programs.signals.is_credentials_enabled")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class CoursePacingChangedReceiverTest(TestCase):
     """
     Tests for the `handle_course_pacing_change` signal handler function.
@@ -319,15 +406,23 @@ class CoursePacingChangedReceiverTest(TestCase):
         DRY helper.
         """
         return {
+<<<<<<< HEAD
             'sender': self.__class__,
             'updated_course_overview': self.course_overview,
+=======
+            "sender": self.__class__,
+            "updated_course_overview": self.course_overview,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         }
 
     def test_handle_course_pacing_change_credentials_disabled(
         self,
         mock_is_creds_enabled,
         mock_cad_task,
+<<<<<<< HEAD
         mock_visible_date_task,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ):
         """
         Test the verifies the behavior of the `handle_course_pacing_change` signal receiver when use of the Credentials
@@ -337,14 +432,20 @@ class CoursePacingChangedReceiverTest(TestCase):
 
         handle_course_pacing_change(**self.signal_kwargs)
         assert mock_is_creds_enabled.call_count == 1
+<<<<<<< HEAD
         assert mock_visible_date_task.call_count == 0
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert mock_cad_task.call_count == 0
 
     def test_handle_course_pacing_change_credentials_enabled(
         self,
         mock_is_creds_enabled,
         mock_cad_task,
+<<<<<<< HEAD
         mock_visible_date_task
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ):
         """
         Test that verifies the behavior of the `handle_course_pacing_change` signal receiver when use of the Credentials
@@ -355,5 +456,8 @@ class CoursePacingChangedReceiverTest(TestCase):
 
         handle_course_pacing_change(**self.signal_kwargs)
         assert mock_is_creds_enabled.call_count == 1
+<<<<<<< HEAD
         assert mock_visible_date_task.call_count == 1
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert mock_cad_task.call_count == 1

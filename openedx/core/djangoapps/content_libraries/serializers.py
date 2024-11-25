@@ -4,18 +4,36 @@ Serializers for the content libraries REST API
 # pylint: disable=abstract-method
 from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
+<<<<<<< HEAD
 
 from openedx.core.djangoapps.content_libraries.constants import (
     LIBRARY_TYPES,
     COMPLEX,
+=======
+from rest_framework.exceptions import ValidationError
+
+from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys import InvalidKeyError
+
+from openedx_learning.api.authoring_models import Collection
+from openedx.core.djangoapps.content_libraries.constants import (
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ALL_RIGHTS_RESERVED,
     LICENSE_OPTIONS,
 )
 from openedx.core.djangoapps.content_libraries.models import (
+<<<<<<< HEAD
     ContentLibraryPermission, ContentLibraryBlockImportTask
 )
 from openedx.core.lib import blockstore_api
 from openedx.core.lib.api.serializers import CourseKeyField
+=======
+    ContentLibraryPermission, ContentLibraryBlockImportTask,
+    ContentLibrary
+)
+from openedx.core.lib.api.serializers import CourseKeyField
+from . import permissions
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
@@ -31,22 +49,56 @@ class ContentLibraryMetadataSerializer(serializers.Serializer):
     # begins with 'lib:'. (The numeric ID of the ContentLibrary object in MySQL
     # is not exposed via this API.)
     id = serializers.CharField(source="key", read_only=True)
+<<<<<<< HEAD
     type = serializers.ChoiceField(choices=LIBRARY_TYPES, default=COMPLEX)
     org = serializers.SlugField(source="key.org")
     slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
     bundle_uuid = serializers.UUIDField(format='hex_verbose', read_only=True)
     collection_uuid = serializers.UUIDField(format='hex_verbose', write_only=True)
+=======
+    org = serializers.SlugField(source="key.org")
+    slug = serializers.CharField(source="key.slug", validators=(validate_unicode_slug, ))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     title = serializers.CharField()
     description = serializers.CharField(allow_blank=True)
     num_blocks = serializers.IntegerField(read_only=True)
     version = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+<<<<<<< HEAD
+=======
+    published_by = serializers.CharField(read_only=True)
+    last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    last_draft_created_by = serializers.CharField(read_only=True)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     allow_lti = serializers.BooleanField(default=False, read_only=True)
     allow_public_learning = serializers.BooleanField(default=False)
     allow_public_read = serializers.BooleanField(default=False)
     has_unpublished_changes = serializers.BooleanField(read_only=True)
     has_unpublished_deletes = serializers.BooleanField(read_only=True)
     license = serializers.ChoiceField(choices=LICENSE_OPTIONS, default=ALL_RIGHTS_RESERVED)
+<<<<<<< HEAD
+=======
+    can_edit_library = serializers.SerializerMethodField()
+    created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    updated = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+
+    def get_can_edit_library(self, obj):
+        """
+        Verifies if the user in request has permission
+        to edit a library.
+        """
+        request = self.context.get('request', None)
+        if request is None:
+            return False
+
+        user = request.user
+
+        if not user:
+            return False
+
+        library_obj = ContentLibrary.objects.get_by_key(obj.key)
+        return user.has_perm(permissions.CAN_EDIT_THIS_CONTENT_LIBRARY, obj=library_obj)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class ContentLibraryUpdateSerializer(serializers.Serializer):
@@ -58,7 +110,10 @@ class ContentLibraryUpdateSerializer(serializers.Serializer):
     description = serializers.CharField()
     allow_public_learning = serializers.BooleanField()
     allow_public_read = serializers.BooleanField()
+<<<<<<< HEAD
     type = serializers.ChoiceField(choices=LIBRARY_TYPES)
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     license = serializers.ChoiceField(choices=LICENSE_OPTIONS)
 
 
@@ -90,12 +145,17 @@ class ContentLibraryPermissionSerializer(ContentLibraryPermissionLevelSerializer
     group_name = serializers.CharField(source="group.name", allow_null=True, allow_blank=False, default=None)
 
 
+<<<<<<< HEAD
 class BaseFilterSerializer(serializers.Serializer):
+=======
+class ContentLibraryFilterSerializer(serializers.Serializer):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Base serializer for filtering listings on the content library APIs.
     """
     text_search = serializers.CharField(default=None, required=False)
     org = serializers.CharField(default=None, required=False)
+<<<<<<< HEAD
 
 
 class ContentLibraryFilterSerializer(BaseFilterSerializer):
@@ -103,6 +163,17 @@ class ContentLibraryFilterSerializer(BaseFilterSerializer):
     Serializer for filtering library listings.
     """
     type = serializers.ChoiceField(choices=LIBRARY_TYPES, default=None, required=False)
+=======
+    order = serializers.CharField(default=None, required=False)
+
+
+class CollectionMetadataSerializer(serializers.Serializer):
+    """
+    Serializer for CollectionMetadata
+    """
+    key = serializers.CharField()
+    title = serializers.CharField()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class LibraryXBlockMetadataSerializer(serializers.Serializer):
@@ -119,13 +190,28 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
 
     block_type = serializers.CharField(source="usage_key.block_type")
     display_name = serializers.CharField(read_only=True)
+<<<<<<< HEAD
     has_unpublished_changes = serializers.BooleanField(read_only=True)
+=======
+    last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    published_by = serializers.CharField(read_only=True)
+    last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    last_draft_created_by = serializers.CharField(read_only=True)
+    has_unpublished_changes = serializers.BooleanField(read_only=True)
+    created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    modified = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # When creating a new XBlock in a library, the slug becomes the ID part of
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True)
     tags_count = serializers.IntegerField(read_only=True)
 
+<<<<<<< HEAD
+=======
+    collections = CollectionMetadataSerializer(many=True, required=False)
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 class LibraryXBlockTypeSerializer(serializers.Serializer):
     """
@@ -155,12 +241,30 @@ class LibraryXBlockCreationSerializer(serializers.Serializer):
     # slugs at the moment, but hopefully we can change this soon.
     definition_id = serializers.CharField(validators=(validate_unicode_slug, ))
 
+<<<<<<< HEAD
+=======
+    # Optional param specified when pasting data from clipboard instead of
+    # creating new block from scratch
+    staged_content = serializers.CharField(required=False)
+
+
+class LibraryPasteClipboardSerializer(serializers.Serializer):
+    """
+    Serializer for pasting clipboard data into library
+    """
+    block_id = serializers.CharField(validators=(validate_unicode_slug, ))
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 class LibraryXBlockOlxSerializer(serializers.Serializer):
     """
     Serializer for representing an XBlock's OLX
     """
     olx = serializers.CharField()
+<<<<<<< HEAD
+=======
+    version_num = serializers.IntegerField(read_only=True, required=False)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class LibraryXBlockStaticFileSerializer(serializers.Serializer):
@@ -175,6 +279,7 @@ class LibraryXBlockStaticFileSerializer(serializers.Serializer):
     url = serializers.URLField()
     size = serializers.IntegerField(min_value=0)
 
+<<<<<<< HEAD
     def to_representation(self, instance):
         """
         Generate the serialized representation of this static asset file.
@@ -185,6 +290,8 @@ class LibraryXBlockStaticFileSerializer(serializers.Serializer):
         result['url'] = blockstore_api.force_browser_url(result['url'])
         return result
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 class LibraryXBlockStaticFilesSerializer(serializers.Serializer):
     """
@@ -220,3 +327,63 @@ class ContentLibraryBlockImportTaskCreateSerializer(serializers.Serializer):
     """
 
     course_key = CourseKeyField()
+<<<<<<< HEAD
+=======
+
+
+class ContentLibraryCollectionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for a Content Library Collection
+    """
+
+    class Meta:
+        model = Collection
+        fields = '__all__'
+
+
+class ContentLibraryCollectionUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for updating a Collection in a Content Library
+    """
+
+    title = serializers.CharField()
+    description = serializers.CharField(allow_blank=True)
+
+
+class UsageKeyV2Serializer(serializers.Serializer):
+    """
+    Serializes a UsageKeyV2.
+    """
+    def to_representation(self, value: UsageKeyV2) -> str:
+        """
+        Returns the UsageKeyV2 value as a string.
+        """
+        return str(value)
+
+    def to_internal_value(self, value: str) -> UsageKeyV2:
+        """
+        Returns a UsageKeyV2 from the string value.
+
+        Raises ValidationError if invalid UsageKeyV2.
+        """
+        try:
+            return UsageKeyV2.from_string(value)
+        except InvalidKeyError as err:
+            raise ValidationError from err
+
+
+class ContentLibraryCollectionComponentsUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for adding/removing Components to/from a Collection.
+    """
+
+    usage_keys = serializers.ListField(child=UsageKeyV2Serializer(), allow_empty=False)
+
+
+class ContentLibraryComponentCollectionsUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for adding/removing Collections to/from a Component.
+    """
+
+    collection_keys = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

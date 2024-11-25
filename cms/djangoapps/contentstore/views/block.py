@@ -13,6 +13,10 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
+<<<<<<< HEAD
+=======
+from cms.djangoapps.contentstore.utils import load_services_for_studio
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.student.auth import (
@@ -47,7 +51,10 @@ from .preview import get_preview_fragment
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     handle_xblock,
     create_xblock_info,
+<<<<<<< HEAD
     load_services_for_studio,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     get_block_info,
     get_xblock,
     delete_orphans,
@@ -135,6 +142,11 @@ def xblock_handler(request, usage_key_string=None):
                      if duplicate_source_locator is not present
                 :staged_content: use "clipboard" to paste from the OLX user's clipboard. (Incompatible with all other
                      fields except parent_locator)
+<<<<<<< HEAD
+=======
+                :library_content_key: the key of the library content to add. (Incompatible with
+                     all other fields except parent_locator)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
     return handle_xblock(request, usage_key_string)

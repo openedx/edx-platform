@@ -55,7 +55,10 @@ release = ''
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+<<<<<<< HEAD
     'sphinx.ext.autodoc',
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
@@ -68,6 +71,21 @@ extensions = [
     'sphinx_design',
     'code_annotations.contrib.sphinx.extensions.featuretoggles',
     'code_annotations.contrib.sphinx.extensions.settings',
+<<<<<<< HEAD
+=======
+    'autoapi.extension',
+]
+
+autoapi_type = 'python'
+autoapi_dirs = ['../lms', '../openedx']
+
+autoapi_ignore = [
+    '*/migrations/*',
+    '*/tests/*',
+    '*.pyc',
+    '__init__.py',
+    '**/xblock_serializer/data.py',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ]
 
 # Rediraffe related settings.
@@ -83,11 +101,19 @@ try:
 except git.InvalidGitRepositoryError:
     edx_platform_version = "master"
 
+<<<<<<< HEAD
 featuretoggles_source_path = edxplatform_source_path
 featuretoggles_repo_url = edxplatform_repo_url
 featuretoggles_repo_version = edx_platform_version
 
 settings_source_path = edxplatform_source_path
+=======
+featuretoggles_source_path = str(edxplatform_source_path)
+featuretoggles_repo_url = edxplatform_repo_url
+featuretoggles_repo_version = edx_platform_version
+
+settings_source_path = str(edxplatform_source_path)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 settings_repo_url = edxplatform_repo_url
 settings_repo_version = edx_platform_version
 
@@ -108,7 +134,11 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
+<<<<<<< HEAD
 language = None
+=======
+language = 'en'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -170,7 +200,11 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
+<<<<<<< HEAD
 html_static_path = ['_static']
+=======
+# html_static_path = ['_static']
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -258,12 +292,26 @@ epub_title = project
 epub_exclude_files = ['search.html']
 
 
+<<<<<<< HEAD
+=======
+# -- Read the Docs Specific Configuration
+# Define the canonical URL if you are using a custom domain on Read the Docs
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    html_context["READTHEDOCS"] = True
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # -- Extension configuration -------------------------------------------------
 
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
+<<<<<<< HEAD
     'https://docs.python.org/2.7': None,
     'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
 }
@@ -275,6 +323,11 @@ autodoc_mock_imports = [
     'pymongo',
 ]
 
+=======
+    'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
+}
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Start building a map of the directories relative to the repository root to
 # run sphinx-apidoc against and the directories under "docs" in which to store
 # the generated *.rst files

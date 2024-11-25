@@ -9,8 +9,11 @@ import ExpiredNotificationView from './expired_notification_view';
 import CourseEnrollView from './course_enroll_view';
 import EntitlementView from './course_entitlement_view';
 
+<<<<<<< HEAD
 import SubscriptionModel from '../models/program_subscription_model';
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import pageTpl from '../../../templates/learner_dashboard/course_card.underscore';
 
 class CourseCardView extends Backbone.View {
@@ -27,9 +30,12 @@ class CourseCardView extends Backbone.View {
         this.enrollModel = new EnrollModel();
         if (options.context) {
             this.urlModel = new Backbone.Model(options.context.urls);
+<<<<<<< HEAD
             this.subscriptionModel = new SubscriptionModel({
                 context: options.context,
             });
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url');
         }
         this.context = options.context || {};
@@ -93,8 +99,11 @@ class CourseCardView extends Backbone.View {
             this.upgradeMessage = new UpgradeMessageView({
                 $el: $upgradeMessage,
                 model: this.model,
+<<<<<<< HEAD
                 subscriptionModel: this.subscriptionModel,
                 isSubscriptionEligible: this.context.isSubscriptionEligible,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             });
 
             $certStatus.remove();

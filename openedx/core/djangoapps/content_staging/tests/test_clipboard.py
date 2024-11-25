@@ -159,7 +159,11 @@ class ClipboardTestCase(ModuleStoreTestCase):
             <html url_name="toyhtml" display_name="Text"><![CDATA[
             <a href='/static/handouts/sample_handout.txt'>Sample</a>
             ]]></html>
+<<<<<<< HEAD
         """).lstrip()
+=======
+        """).replace("\n", "") + "\n"  # No newlines, expect one trailing newline.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         # Now if we GET the clipboard again, the GET response should exactly equal the last POST response:
         assert client.get(CLIPBOARD_ENDPOINT).json() == response_data

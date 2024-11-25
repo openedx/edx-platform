@@ -1,5 +1,9 @@
 <%! from django.utils.translation import gettext as _ %>
+<<<<<<< HEAD
 ${_("User '{user}' with e-mail {email} has requested {studio_name} course creator privileges on edge.").format(
+=======
+${_("User '{user}' with e-mail {email} has requested {studio_name} course creator privileges.").format(
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     user=user_name, email=user_email, studio_name=settings.STUDIO_SHORT_NAME,
 )}
 ${_("To grant or deny this request, use the course creator admin table.")}

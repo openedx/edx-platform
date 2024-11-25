@@ -46,10 +46,19 @@ RUN useradd -m --shell /bin/false app
 RUN echo "locales locales/default_environment_locale select en_US.UTF-8" | debconf-set-selections
 RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8" | debconf-set-selections
 
+<<<<<<< HEAD
+=======
+# Setting up ppa deadsnakes to get python 3.11
+RUN apt-get update && \
+  apt-get install -y software-properties-common && \
+  apt-add-repository -y ppa:deadsnakes/ppa
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Install requirements that are absolutely necessary
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install --no-install-recommends \
+<<<<<<< HEAD
         python3 \
         python3-venv \
         python3.8 \
@@ -60,6 +69,17 @@ RUN apt-get update && \
         libpython3.8-stdlib \
         libmysqlclient21 \
         # libmysqlclient-dev: required for building mysqlclient python package version 2.2.0
+=======
+        python3-pip \
+        python3.11 \
+        # python3-dev: required for building mysqlclient python package
+        python3.11-dev \
+        python3.11-venv \
+        libpython3.11 \
+        libpython3.11-stdlib \
+        libmysqlclient21 \
+        # libmysqlclient-dev: required for building mysqlclient python package
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         libmysqlclient-dev \
         pkg-config \
         libssl1.1 \
@@ -105,7 +125,11 @@ RUN apt-get update && \
 
 # Setup python virtual environment
 # It is already 'activated' because $VIRTUAL_ENV/bin was put on $PATH
+<<<<<<< HEAD
 RUN python3.8 -m venv "${VIRTUAL_ENV}"
+=======
+RUN python3.11 -m venv "${VIRTUAL_ENV}"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # Install python requirements
 # Requires copying over requirements files, but not entire repository

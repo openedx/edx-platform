@@ -37,6 +37,10 @@ class ExperimentKeyValue(TimeStampedModel):
     """
     ExperimentData stores any generic key-value associated with experiments
     identified by experiment_id.
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     .. no_pii:
     """
     experiment_id = models.PositiveSmallIntegerField(

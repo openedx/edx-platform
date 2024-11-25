@@ -8,13 +8,20 @@ from django.db import IntegrityError, transaction
 from django.dispatch import receiver
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
+<<<<<<< HEAD
     COURSE_UNENROLLMENT_COMPLETED,
     USER_NOTIFICATION_REQUESTED,
     COURSE_NOTIFICATION_REQUESTED,
+=======
+    COURSE_NOTIFICATION_REQUESTED,
+    COURSE_UNENROLLMENT_COMPLETED,
+    USER_NOTIFICATION_REQUESTED
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.audience_filters import (
+<<<<<<< HEAD
     ForumRoleAudienceFilter,
     EnrollmentAudienceFilter,
     TeamAudienceFilter,
@@ -22,6 +29,15 @@ from openedx.core.djangoapps.notifications.audience_filters import (
     CourseRoleAudienceFilter,
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_ORA_STAFF_NOTIFICATION
+=======
+    CohortAudienceFilter,
+    CourseRoleAudienceFilter,
+    EnrollmentAudienceFilter,
+    ForumRoleAudienceFilter,
+    TeamAudienceFilter
+)
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_ORA_GRADE_NOTIFICATION
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 
 log = logging.getLogger(__name__)
@@ -72,6 +88,15 @@ def generate_user_notifications(signal, sender, notification_data, metadata, **k
     """
     Watches for USER_NOTIFICATION_REQUESTED signal and calls send_web_notifications task
     """
+<<<<<<< HEAD
+=======
+    if (
+        notification_data.notification_type == 'ora_grade_assigned'
+        and not ENABLE_ORA_GRADE_NOTIFICATION.is_enabled(notification_data.course_key)
+    ):
+        return
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     from openedx.core.djangoapps.notifications.tasks import send_notifications
     notification_data = notification_data.__dict__
     notification_data['course_key'] = str(notification_data['course_key'])
@@ -108,11 +133,14 @@ def generate_course_notifications(signal, sender, course_notification_data, meta
     """
     Watches for COURSE_NOTIFICATION_REQUESTED signal and calls send_notifications task
     """
+<<<<<<< HEAD
     if (
         course_notification_data.notification_type == 'ora_staff_notification'
         and not ENABLE_ORA_STAFF_NOTIFICATION.is_enabled(course_notification_data.course_key)
     ):
         return
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     from openedx.core.djangoapps.notifications.tasks import send_notifications
     course_notification_data = course_notification_data.__dict__

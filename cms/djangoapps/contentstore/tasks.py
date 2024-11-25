@@ -19,7 +19,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
+<<<<<<< HEAD
 from django.db.transaction import atomic
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from edx_django_utils.monitoring import (
@@ -31,7 +34,11 @@ from edx_django_utils.monitoring import (
 from olxcleaner.exceptions import ErrorLevel
 from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys.edx.keys import CourseKey
+<<<<<<< HEAD
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+=======
+from opaque_keys.edx.locator import LibraryLocator
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization, OrganizationCourse
@@ -66,7 +73,10 @@ from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTU
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
+<<<<<<< HEAD
 from openedx.core.lib.blockstore_api import get_collection
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.lib.extract_archive import safe_extractall
 from xmodule.contentstore.django import contentstore
 from xmodule.course_block import CourseFields
@@ -900,6 +910,7 @@ def _create_copy_content_task(v2_library_key, v1_library_key):
     )
 
 
+<<<<<<< HEAD
 def _create_metadata(v1_library_key, collection_uuid):
     """instansiate an index for the V2 lib in the collection"""
 
@@ -1009,6 +1020,8 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     }
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def delete_v1_library(v1_library_key_string):

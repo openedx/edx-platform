@@ -6,12 +6,15 @@ describe('Sidebar View', () => {
     let view = null;
     const context = {
         marketingUrl: 'https://www.example.org/programs',
+<<<<<<< HEAD
         subscriptionUpsellData: {
             marketing_url: 'https://www.example.org/program-subscriptions',
             minimum_price: '$39',
             trial_length: 7,
         },
         isUserB2CSubscriptionsEnabled: true,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     };
 
     beforeEach(() => {
@@ -32,10 +35,13 @@ describe('Sidebar View', () => {
         expect(view).toBeDefined();
     });
 
+<<<<<<< HEAD
     it('should not render the subscription upsell section', () => {
         expect(view.$('.js-subscription-upsell')[0]).not.toBeInDOM();
     });
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     it('should load the exploration panel given a marketing URL', () => {
         expect(view.$('.program-advertise .advertise-message').html().trim())
             .toEqual(
@@ -49,10 +55,13 @@ describe('Sidebar View', () => {
         view.remove();
         view = new SidebarView({
             el: '.sidebar',
+<<<<<<< HEAD
             context: {
                 isUserB2CSubscriptionsEnabled: true,
                 subscriptionUpsellData: context.subscriptionUpsellData,
             },
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         });
         view.render();
         const $ad = view.$el.find('.program-advertise');

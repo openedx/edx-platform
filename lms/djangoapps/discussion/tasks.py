@@ -12,6 +12,10 @@ from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from edx_ace import ace
+<<<<<<< HEAD
+=======
+from edx_ace.channel import ChannelType
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from edx_ace.recipient import Recipient
 from edx_ace.utils import date
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -74,6 +78,15 @@ class ReportedContentNotification(BaseMessageType):
         self.options['transactional'] = True
 
 
+<<<<<<< HEAD
+=======
+class CommentNotification(BaseMessageType):
+    """
+    Notify discussion participants of new comments.
+    """
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
 def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -82,16 +95,50 @@ def send_ace_message(context):  # lint-amnesty, pylint: disable=missing-function
     if _should_send_message(context):
         context['site'] = Site.objects.get(id=context['site_id'])
         thread_author = User.objects.get(id=context['thread_author_id'])
+<<<<<<< HEAD
         with emulate_http_request(site=context['site'], user=thread_author):
             message_context = _build_message_context(context)
+=======
+        comment_author = User.objects.get(id=context['comment_author_id'])
+        with emulate_http_request(site=context['site'], user=comment_author):
+            message_context = _build_message_context(context, notification_type='forum_response')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             message = ResponseNotification().personalize(
                 Recipient(thread_author.id, thread_author.email),
                 _get_course_language(context['course_id']),
                 message_context
             )
+<<<<<<< HEAD
             log.info('Sending forum comment email notification with context %s', message_context)
             ace.send(message)
             _track_notification_sent(message, context)
+=======
+            log.info('Sending forum comment notification with context %s', message_context)
+            if _is_first_comment(context['comment_id'], context['thread_id']):
+                limit_to_channels = None
+            else:
+                limit_to_channels = [ChannelType.PUSH]
+            ace.send(message, limit_to_channels=limit_to_channels)
+            _track_notification_sent(message, context)
+
+    elif _should_send_subcomment_message(context):
+        context['site'] = Site.objects.get(id=context['site_id'])
+        comment_author = User.objects.get(id=context['comment_author_id'])
+        thread_author = User.objects.get(id=context['thread_author_id'])
+
+        with emulate_http_request(site=context['site'], user=comment_author):
+            message_context = _build_message_context(context)
+            message = CommentNotification().personalize(
+                Recipient(thread_author.id, thread_author.email),
+                _get_course_language(context['course_id']),
+                message_context
+            )
+            log.info('Sending forum comment notification with context %s', message_context)
+            ace.send(message, limit_to_channels=[ChannelType.PUSH])
+            _track_notification_sent(message, context)
+    else:
+        return
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @shared_task(base=LoggedTask)
@@ -154,19 +201,49 @@ def _should_send_message(context):
     return (
         _is_user_subscribed_to_thread(cc_thread_author, context['thread_id']) and
         _is_not_subcomment(context['comment_id']) and
+<<<<<<< HEAD
         _is_first_comment(context['comment_id'], context['thread_id'])
     )
 
 
+=======
+        not _comment_author_is_thread_author(context)
+    )
+
+
+def _should_send_subcomment_message(context):
+    cc_thread_author = cc.User(id=context['thread_author_id'], course_id=context['course_id'])
+    return (
+        _is_user_subscribed_to_thread(cc_thread_author, context['thread_id']) and
+        _is_subcomment(context['comment_id']) and
+        not _comment_author_is_thread_author(context)
+    )
+
+
+def _comment_author_is_thread_author(context):
+    return context.get('comment_author_id', '') == context['thread_author_id']
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 def _is_content_still_reported(context):
     if context.get('comment_id') is not None:
         return len(cc.Comment.find(context['comment_id']).abuse_flaggers) > 0
     return len(cc.Thread.find(context['thread_id']).abuse_flaggers) > 0
 
 
+<<<<<<< HEAD
 def _is_not_subcomment(comment_id):
     comment = cc.Comment.find(id=comment_id).retrieve()
     return not getattr(comment, 'parent_id', None)
+=======
+def _is_subcomment(comment_id):
+    comment = cc.Comment.find(id=comment_id).retrieve()
+    return getattr(comment, 'parent_id', None)
+
+
+def _is_not_subcomment(comment_id):
+    return not _is_subcomment(comment_id)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 def _is_first_comment(comment_id, thread_id):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -204,7 +281,11 @@ def _get_course_language(course_id):
     return language
 
 
+<<<<<<< HEAD
 def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-function-docstring
+=======
+def _build_message_context(context, notification_type='forum_comment'):  # lint-amnesty, pylint: disable=missing-function-docstring
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     message_context = get_base_template_context(context['site'])
     message_context.update(context)
     thread_author = User.objects.get(id=context['thread_author_id'])
@@ -218,6 +299,17 @@ def _build_message_context(context):  # lint-amnesty, pylint: disable=missing-fu
         'thread_username': thread_author.username,
         'comment_username': comment_author.username,
         'post_link': post_link,
+<<<<<<< HEAD
+=======
+        'push_notification_extra_context': {
+            'course_id': str(context['course_id']),
+            'parent_id': str(context['comment_parent_id']),
+            'notification_type': notification_type,
+            'topic_id': str(context['thread_commentable_id']),
+            'thread_id': context['thread_id'],
+            'comment_id': context['comment_id'],
+        },
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         'comment_created_at': date.deserialize(context['comment_created_at']),
         'thread_created_at': date.deserialize(context['thread_created_at'])
     })

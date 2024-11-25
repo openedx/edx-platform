@@ -5,9 +5,15 @@ Evolving the library_content block schema
 Status
 ******
 
+<<<<<<< HEAD
 **Provisional**
 
 Subject to change due to implementation learnings and stakeholder feedback.
+=======
+**Replaced** by the `Upstream-Downstream ADR`_.
+
+.. _Upstream-Downstream ADR: https://docs/decisions/0020-upstream-block.rst
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 Context
 *******

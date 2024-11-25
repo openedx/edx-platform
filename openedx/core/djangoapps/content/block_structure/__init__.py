@@ -59,4 +59,13 @@ contained transformers within them.
 Note: A partial subset (as an ordered list) of the registered
 transformers can be requested during the Transform phase, allowing
 the client to manipulate exactly which transformers to call.
+<<<<<<< HEAD
+=======
+
+Links to Other Block Structure Related Documentation:
+
+  * https://openedx.atlassian.net/wiki/spaces/AC/pages/154861855/Block+Structure+Cache+Invalidation+Proposal
+  * https://openedx.atlassian.net/wiki/spaces/AC/pages/34734111/Course+Block+Transformers
+  * https://openedx.atlassian.net/wiki/spaces/AC/pages/41910826/Course+Blocks+API+Storage+Cache+Requirements
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 """

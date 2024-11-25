@@ -84,7 +84,11 @@ class RenderBodyTest(TestCase):
 
     def test_script_tag(self):
         raw_body = '<script type="text/javascript">alert("evil script");</script>'
+<<<<<<< HEAD
         assert render_body(raw_body) == 'alert("evil script");'
+=======
+        assert render_body(raw_body) == ''
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @ddt.data(
         ("br", '<p>foo<br>bar</p>'),  # br is allowed inside p

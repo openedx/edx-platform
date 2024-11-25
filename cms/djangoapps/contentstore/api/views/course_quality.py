@@ -272,5 +272,9 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
                 max=max(data),
                 mean=np.around(np.mean(data)),
                 median=np.around(np.median(data)),
+<<<<<<< HEAD
                 mode=stats.mode(data, axis=None)[0][0],
+=======
+                mode=stats.mode(data, axis=None)[0],
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             )

@@ -552,7 +552,14 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
     bio = models.CharField(blank=True, null=True, max_length=3000, db_index=False)
     profile_image_uploaded_at = models.DateTimeField(null=True, blank=True)
+<<<<<<< HEAD
     phone_regex = RegexValidator(regex=r'^\+?1?\d*$', message="Phone number can only contain numbers.")
+=======
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d*$',
+        message="Phone number must start with '+' (optional) followed by digits (0-9) only.",
+    )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     phone_number = models.CharField(validators=[phone_regex], blank=True, null=True, max_length=50)
 
     @property
@@ -1682,6 +1689,11 @@ class AllowedAuthUser(TimeStampedModel):
 class AccountRecoveryConfiguration(ConfigurationModel):
     """
     configuration model for recover account management command
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
@@ -1821,6 +1833,11 @@ class UserCelebration(TimeStampedModel):
 class UserPasswordToggleHistory(TimeStampedModel):
     """
     Keeps track of user password disable/enable history
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     user = models.ForeignKey(User, related_name='password_toggle_history', on_delete=models.CASCADE)
     comment = models.CharField(max_length=255, help_text=_("Add a reason"), blank=True, null=True)

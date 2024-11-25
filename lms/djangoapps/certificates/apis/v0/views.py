@@ -244,6 +244,10 @@ class CertificatesListView(APIView):
                     'is_passing': user_cert.get('is_passing'),
                     'download_url': user_cert.get('download_url'),
                     'grade': user_cert.get('grade'),
+<<<<<<< HEAD
+=======
+                    'uuid': user_cert.get('uuid'),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 })
         return Response(user_certs)
 

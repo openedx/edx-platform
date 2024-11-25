@@ -129,11 +129,79 @@ class UnenrollmentNotAllowed(CourseEnrollmentException):
     pass
 
 
+<<<<<<< HEAD
+=======
+class CourseEnrollmentQuerySet(models.QuerySet):
+    """
+    Custom queryset for CourseEnrollment with Table-level filter methods.
+    """
+
+    def active(self):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that are currently active.
+        """
+        return self.filter(is_active=True)
+
+    def without_certificates(self, username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that do not have a certificate.
+        """
+        return self.exclude(course_id__in=self.get_user_course_ids_with_certificates(username))
+
+    def with_certificates(self, username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have a certificate.
+        """
+        return self.filter(course_id__in=self.get_user_course_ids_with_certificates(username))
+
+    def in_progress(self, username, time_zone=UTC):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that are currently in progress.
+        """
+        now = datetime.now(time_zone)
+        return self.active().without_certificates(username).filter(
+            Q(course__start__lte=now, course__end__gte=now)
+            | Q(course__start__isnull=True, course__end__isnull=True)
+            | Q(course__start__isnull=True, course__end__gte=now)
+            | Q(course__start__lte=now, course__end__isnull=True),
+        )
+
+    def completed(self, username):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have been completed.
+        """
+        return self.active().with_certificates(username)
+
+    def expired(self, username, time_zone=UTC):
+        """
+        Returns a queryset of CourseEnrollment objects for courses that have expired.
+        """
+        now = datetime.now(time_zone)
+        return self.active().without_certificates(username).filter(course__end__lt=now)
+
+    def get_user_course_ids_with_certificates(self, username):
+        """
+        Gets user's course ids with certificates.
+        """
+        from lms.djangoapps.certificates.models import GeneratedCertificate  # pylint: disable=import-outside-toplevel
+        course_ids_with_certificates = GeneratedCertificate.objects.filter(
+            user__username=username
+        ).values_list('course_id', flat=True)
+        return course_ids_with_certificates
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class CourseEnrollmentManager(models.Manager):
     """
     Custom manager for CourseEnrollment with Table-level filter methods.
     """
 
+<<<<<<< HEAD
+=======
+    def get_queryset(self):
+        return CourseEnrollmentQuerySet(self.model, using=self._db)
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def is_small_course(self, course_id):
         """
         Returns false if the number of enrollments are one greater than 'max_enrollments' else true
@@ -1016,18 +1084,33 @@ class CourseEnrollment(models.Model):
             self.course_id
         )
         if certificate and not CertificateStatuses.is_refundable_status(certificate.status):
+<<<<<<< HEAD
+=======
+            log.info(f"{self.user} has already been given a certificate therefore cannot be refunded.")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             return False
 
         # If it is after the refundable cutoff date they should not be refunded.
         refund_cutoff_date = self.refund_cutoff_date()
         # `refund_cuttoff_date` will be `None` if there is no order. If there is no order return `False`.
         if refund_cutoff_date is None:
+<<<<<<< HEAD
             return False
         if datetime.now(UTC) > refund_cutoff_date:
+=======
+            log.info("Refund cutoff date is null")
+            return False
+        if datetime.now(UTC) > refund_cutoff_date:
+            log.info(f"Refund cutoff date: {refund_cutoff_date} has passed")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             return False
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified', include_expired=True)
         if course_mode is None:
+<<<<<<< HEAD
+=======
+            log.info(f"Course mode for {self.course_id} doesn't exist.")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             return False
         else:
             return True
@@ -1037,14 +1120,26 @@ class CourseEnrollment(models.Model):
         # NOTE: This is here to avoid circular references
         from openedx.core.djangoapps.commerce.utils import ECOMMERCE_DATE_FORMAT
         date_placed = self.get_order_attribute_value('date_placed')
+<<<<<<< HEAD
+=======
+        log.info(f"Successfully retrieved date_placed: {date_placed} from order")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         if not date_placed:
             order_number = self.get_order_attribute_value('order_number')
             if not order_number:
+<<<<<<< HEAD
+=======
+                log.info("Failed to get order number")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 return None
 
             date_placed = self.get_order_attribute_from_ecommerce('date_placed')
             if not date_placed:
+<<<<<<< HEAD
+=======
+                log.info("Failed to get date_placed attribute")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 return None
 
             # also save the attribute so that we don't need to call ecommerce again.
@@ -1681,7 +1776,11 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
 
 class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
     """
+<<<<<<< HEAD
 
+=======
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
@@ -1694,6 +1793,11 @@ class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: di
 class BulkChangeEnrollmentConfiguration(ConfigurationModel):
     """
     config model for the bulk_change_enrollment_csv command
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],

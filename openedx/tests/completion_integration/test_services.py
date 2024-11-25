@@ -10,7 +10,11 @@ from completion.test_utils import CompletionWaffleTestMixin
 from django.conf import settings
 from django.test import override_settings
 from opaque_keys.edx.keys import CourseKey
+<<<<<<< HEAD
 from xmodule.library_tools import LibraryToolsService
+=======
+from xmodule.library_tools import LegacyLibraryToolsService
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory
 from xmodule.tests import prepare_block_runtime
@@ -122,7 +126,11 @@ class CompletionServiceTestCase(CompletionWaffleTestMixin, SharedModuleStoreTest
         Bind a block (part of self.course) so we can access student-specific data.
         """
         prepare_block_runtime(block.runtime, course_id=block.location.course_key)
+<<<<<<< HEAD
         block.runtime._services.update({'library_tools': LibraryToolsService(self.store, self.user.id)})  # lint-amnesty, pylint: disable=protected-access
+=======
+        block.runtime._services.update({'library_tools': LegacyLibraryToolsService(self.store, self.user.id)})  # lint-amnesty, pylint: disable=protected-access
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         def get_block(descriptor):
             """Mocks module_system get_block_for_descriptor function"""

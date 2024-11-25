@@ -326,9 +326,15 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         self.request.path = '/xblock/block-v1:org+course+run+type@html+block@block_id'
         self.verify_success()
 
+<<<<<<< HEAD
     @override_settings(MOBILE_APP_USER_AGENT_REGEXES=[r'open edX Mobile App'])
     def test_success_from_mobile_app(self):
         self.request.META = {'HTTP_USER_AGENT': 'open edX Mobile App Version 2.1'}
+=======
+    @override_settings(MOBILE_APP_USER_AGENT_REGEXES=[r'Open edX Mobile App'])
+    def test_success_from_mobile_app(self):
+        self.request.META = {'HTTP_USER_AGENT': 'Open edX Mobile App Version 2.1'}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.verify_success()
 
     def verify_error(self, expected_response_status):
@@ -364,9 +370,15 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, CacheIsolationTestCase
         self.request.META['HTTP_ACCEPT'] = http_accept
         self.verify_error(expected_response)
 
+<<<<<<< HEAD
     @override_settings(MOBILE_APP_USER_AGENT_REGEXES=[r'open edX Mobile App'])
     def test_error_from_mobile_app(self):
         self.request.META = {'HTTP_USER_AGENT': 'open edX Mobile App Version 2.1'}
+=======
+    @override_settings(MOBILE_APP_USER_AGENT_REGEXES=[r'Open edX Mobile App'])
+    def test_error_from_mobile_app(self):
+        self.request.META = {'HTTP_USER_AGENT': 'Open edX Mobile App Version 2.1'}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.verify_error(401)
 
     @override_settings(ENFORCE_SAFE_SESSIONS=False)

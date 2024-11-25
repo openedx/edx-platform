@@ -526,6 +526,10 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
                 'week_num': week_num,
                 'week_highlights': week_highlights,
                 # This is used by the bulk email optout policy
+<<<<<<< HEAD
+=======
+                'course_id': str(course.id),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 'course_ids': [str(course.id)],
                 'unsubscribe_url': unsubscribe_url,
             })

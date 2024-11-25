@@ -1,14 +1,22 @@
 """Helper functions for working with Programs."""
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import datetime
 import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
+<<<<<<< HEAD
 from urllib.parse import urlencode, urljoin, urlparse, urlunparse
 
 import requests
+=======
+from urllib.parse import urljoin, urlparse, urlunparse
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -16,7 +24,10 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.urls import reverse
 from django.utils.functional import cached_property
+<<<<<<< HEAD
 from edx_rest_api_client.auth import SuppliedJwtAuth
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from requests.exceptions import RequestException
@@ -36,14 +47,21 @@ from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import (
     get_fulfillable_course_runs_for_entitlement,
     get_pathways,
+<<<<<<< HEAD
     get_programs
+=======
+    get_programs,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
 from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
+<<<<<<< HEAD
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
@@ -65,6 +83,7 @@ def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
     return program_data, course_data
 
 
+<<<<<<< HEAD
 def get_buy_subscription_url(program_uuid, skus):
     """
     Returns the URL to the Subscription Purchase page for the given program UUID and course Skus.
@@ -79,6 +98,14 @@ def get_program_urls(program_data):
     from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
     program_uuid = program_data.get('uuid')
     skus = program_data.get('skus')
+=======
+def get_program_urls(program_data):
+    """Returns important urls of program."""
+    from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
+
+    program_uuid = program_data.get("uuid")
+    skus = program_data.get("skus")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ecommerce_service = EcommerceService()
 
     # TODO: Don't have business logic of course-certificate==record-available here in LMS.
@@ -87,6 +114,7 @@ def get_program_urls(program_data):
     # a waffle flag. This feature is in active developoment.
     program_record_url = get_credentials_records_url(program_uuid=program_uuid)
     urls = {
+<<<<<<< HEAD
         'program_listing_url': reverse('program_listing_view'),
         'track_selection_url': strip_course_id(
             reverse('course_modes_choose', kwargs={'course_id': FAKE_COURSE_KEY})
@@ -98,6 +126,13 @@ def get_program_urls(program_data):
         'manage_subscription_url': settings.SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL,
         'orders_and_subscriptions_url': settings.ORDER_HISTORY_MICROFRONTEND_URL,
         'subscriptions_learner_help_center_url': settings.SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL
+=======
+        "program_listing_url": reverse("program_listing_view"),
+        "track_selection_url": strip_course_id(reverse("course_modes_choose", kwargs={"course_id": FAKE_COURSE_KEY})),
+        "commerce_api_url": reverse("commerce_api:v0:baskets:create"),
+        "buy_button_url": ecommerce_service.get_checkout_page_url(*skus),
+        "program_record_url": program_record_url,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     }
     return urls
 
@@ -107,12 +142,21 @@ def get_industry_and_credit_pathways(program_data, site):
     industry_pathways = []
     credit_pathways = []
     try:
+<<<<<<< HEAD
         for pathway_id in program_data['pathway_ids']:
             pathway = get_pathways(site, pathway_id)
             if pathway and pathway['email']:
                 if pathway['pathway_type'] == PathwayType.CREDIT.value:
                     credit_pathways.append(pathway)
                 elif pathway['pathway_type'] == PathwayType.INDUSTRY.value:
+=======
+        for pathway_id in program_data["pathway_ids"]:
+            pathway = get_pathways(site, pathway_id)
+            if pathway and pathway["email"]:
+                if pathway["pathway_type"] == PathwayType.CREDIT.value:
+                    credit_pathways.append(pathway)
+                elif pathway["pathway_type"] == PathwayType.INDUSTRY.value:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     industry_pathways.append(pathway)
     # if pathway caching did not complete fully (no pathway_ids)
     except KeyError:
@@ -124,13 +168,20 @@ def get_industry_and_credit_pathways(program_data, site):
 def get_program_marketing_url(programs_config, mobile_only=False):
     """Build a URL used to link to programs on the marketing site."""
     if mobile_only:
+<<<<<<< HEAD
         marketing_url = 'edxapp://course?programs'
     else:
         marketing_url = urljoin(settings.MKTG_URLS.get('ROOT'), programs_config.marketing_path).rstrip('/')
+=======
+        marketing_url = "edxapp://course?programs"
+    else:
+        marketing_url = urljoin(settings.MKTG_URLS.get("ROOT"), programs_config.marketing_path).rstrip("/")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     return marketing_url
 
 
+<<<<<<< HEAD
 def get_program_subscriptions_marketing_url():
     """Build a URL used to link to subscription eligible programs on the marketing site."""
     marketing_urls = settings.MKTG_URLS
@@ -140,6 +191,8 @@ def get_program_subscriptions_marketing_url():
     )
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 def attach_program_detail_url(programs, mobile_only=False):
     """Extend program representations by attaching a URL to be used when linking to program details.
 
@@ -153,6 +206,7 @@ def attach_program_detail_url(programs, mobile_only=False):
     """
     for program in programs:
         if mobile_only:
+<<<<<<< HEAD
             detail_fragment_url = reverse('program_details_fragment_view', kwargs={'program_uuid': program['uuid']})
             path_id = detail_fragment_url.replace('/dashboard/', '')
             detail_url = f'edxapp://enrolled_program_info?path_id={path_id}'
@@ -160,6 +214,15 @@ def attach_program_detail_url(programs, mobile_only=False):
             detail_url = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
 
         program['detail_url'] = detail_url
+=======
+            detail_fragment_url = reverse("program_details_fragment_view", kwargs={"program_uuid": program["uuid"]})
+            path_id = detail_fragment_url.replace("/dashboard/", "")
+            detail_url = f"edxapp://enrolled_program_info?path_id={path_id}"
+        else:
+            detail_url = reverse("program_details_view", kwargs={"program_uuid": program["uuid"]})
+
+        program["detail_url"] = detail_url
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     return programs
 
@@ -220,14 +283,24 @@ class ProgramProgressMeter:
         inverted_programs = defaultdict(list)
 
         for program in self.programs:
+<<<<<<< HEAD
             for course in program['courses']:
                 course_uuid = course['uuid']
+=======
+            for course in program["courses"]:
+                course_uuid = course["uuid"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 if course_uuid in self.course_uuids:
                     program_list = inverted_programs[course_uuid]
                     if program not in program_list:
                         program_list.append(program)
+<<<<<<< HEAD
                 for course_run in course['course_runs']:
                     course_run_id = course_run['key']
+=======
+                for course_run in course["course_runs"]:
+                    course_run_id = course_run["key"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     if course_run_id in self.course_run_ids:
                         program_list = inverted_programs[course_run_id]
                         if program not in program_list:
@@ -235,7 +308,11 @@ class ProgramProgressMeter:
 
         # Sort programs by title for consistent presentation.
         for program_list in inverted_programs.values():
+<<<<<<< HEAD
             program_list.sort(key=lambda p: p['title'])
+=======
+            program_list.sort(key=lambda p: p["title"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         return inverted_programs
 
@@ -280,6 +357,7 @@ class ProgramProgressMeter:
         Returns:
             bool, indicating whether the course is in progress.
         """
+<<<<<<< HEAD
         enrolled_runs = [run for run in course['course_runs'] if run['key'] in self.course_run_ids]
 
         # Check if the user is enrolled in a required run and mode/seat.
@@ -290,15 +368,30 @@ class ProgramProgressMeter:
 
         if runs_with_required_mode:
             not_failed_runs = [run for run in runs_with_required_mode if run['key'] not in self.failed_course_runs]
+=======
+        enrolled_runs = [run for run in course["course_runs"] if run["key"] in self.course_run_ids]
+
+        # Check if the user is enrolled in a required run and mode/seat.
+        runs_with_required_mode = [run for run in enrolled_runs if run["type"] == self.enrolled_run_modes[run["key"]]]
+
+        if runs_with_required_mode:
+            not_failed_runs = [run for run in runs_with_required_mode if run["key"] not in self.failed_course_runs]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             if not_failed_runs:
                 return True
 
         # Check if seats required for course completion are still available.
         upgrade_deadlines = []
         for run in enrolled_runs:
+<<<<<<< HEAD
             for seat in run['seats']:
                 if seat['type'] == run['type'] and run['type'] != self.enrolled_run_modes[run['key']]:
                     upgrade_deadlines.append(seat['upgrade_deadline'])
+=======
+            for seat in run["seats"]:
+                if seat["type"] == run["type"] and run["type"] != self.enrolled_run_modes[run["key"]]:
+                    upgrade_deadlines.append(seat["upgrade_deadline"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         # An upgrade deadline of None means the course is always upgradeable.
         return any(not deadline or deadline and parse(deadline) > now for deadline in upgrade_deadlines)
@@ -326,16 +419,23 @@ class ProgramProgressMeter:
             program_copy = deepcopy(program)
             completed, in_progress, not_started = [], [], []
 
+<<<<<<< HEAD
             for course in program_copy['courses']:
                 active_entitlement = CourseEntitlement.get_entitlement_if_active(
                     user=self.user,
                     course_uuid=course['uuid']
+=======
+            for course in program_copy["courses"]:
+                active_entitlement = CourseEntitlement.get_entitlement_if_active(
+                    user=self.user, course_uuid=course["uuid"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 )
                 if self._is_course_complete(course):
                     completed.append(course)
                 elif self._is_course_enrolled(course) or active_entitlement:
                     # Show all currently enrolled courses and active entitlements as in progress
                     if active_entitlement:
+<<<<<<< HEAD
                         course['course_runs'] = get_fulfillable_course_runs_for_entitlement(
                             active_entitlement,
                             course['course_runs']
@@ -344,6 +444,14 @@ class ProgramProgressMeter:
                         course['enroll_url'] = reverse(
                             'entitlements_api:v1:enrollments',
                             args=[str(active_entitlement.uuid)]
+=======
+                        course["course_runs"] = get_fulfillable_course_runs_for_entitlement(
+                            active_entitlement, course["course_runs"]
+                        )
+                        course["user_entitlement"] = active_entitlement.to_dict()
+                        course["enroll_url"] = reverse(
+                            "entitlements_api:v1:enrollments", args=[str(active_entitlement.uuid)]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                         )
                         in_progress.append(course)
                     else:
@@ -351,11 +459,16 @@ class ProgramProgressMeter:
                         if course_in_progress:
                             in_progress.append(course)
                         else:
+<<<<<<< HEAD
                             course['expired'] = not course_in_progress
+=======
+                            course["expired"] = not course_in_progress
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                             not_started.append(course)
                 else:
                     not_started.append(course)
 
+<<<<<<< HEAD
             progress.append({
                 'uuid': program_copy['uuid'],
                 'completed': len(completed) if count_only else completed,
@@ -365,6 +478,17 @@ class ProgramProgressMeter:
                     not self._is_course_enrolled(course) for course in program_copy['courses']
                 ),
             })
+=======
+            progress.append(
+                {
+                    "uuid": program_copy["uuid"],
+                    "completed": len(completed) if count_only else completed,
+                    "in_progress": len(in_progress) if count_only else in_progress,
+                    "not_started": len(not_started) if count_only else not_started,
+                    "all_unenrolled": all(not self._is_course_enrolled(course) for course in program_copy["courses"]),
+                }
+            )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         return progress
 
@@ -383,7 +507,11 @@ class ProgramProgressMeter:
         for program in self.programs:
             available_date = self._available_date_for_program(program, certificates_by_run)
             if available_date:
+<<<<<<< HEAD
                 completed[program['uuid']] = available_date
+=======
+                completed[program["uuid"]] = available_date
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         return completed
 
     def _available_date_for_program(self, program_data, certificates):
@@ -397,11 +525,19 @@ class ProgramProgressMeter:
         Returns a datetime object or None if the program is not complete.
         """
         program_available_date = None
+<<<<<<< HEAD
         for course in program_data['courses']:
             earliest_course_run_date = None
 
             for course_run in course['course_runs']:
                 key = CourseKey.from_string(course_run['key'])
+=======
+        for course in program_data["courses"]:
+            earliest_course_run_date = None
+
+            for course_run in course["course_runs"]:
+                key = CourseKey.from_string(course_run["key"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
                 # Get a certificate if one exists
                 certificate = certificates.get(key)
@@ -409,13 +545,18 @@ class ProgramProgressMeter:
                     continue
 
                 # Modes must match (see _is_course_complete() comments for why)
+<<<<<<< HEAD
                 course_run_mode = self._course_run_mode_translation(course_run['type'])
+=======
+                course_run_mode = self._course_run_mode_translation(course_run["type"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 certificate_mode = self._certificate_mode_translation(certificate.mode)
                 modes_match = course_run_mode == certificate_mode
 
                 # Grab the available date and keep it if it's the earliest one for this catalog course.
                 if modes_match and CertificateStatuses.is_passing_status(certificate.status):
                     course_overview = CourseOverview.get_from_id(key)
+<<<<<<< HEAD
                     available_date = certificate_api.available_date_for_certificate(
                         course_overview,
                         certificate
@@ -423,6 +564,10 @@ class ProgramProgressMeter:
                     earliest_course_run_date = min(
                         date for date in [available_date, earliest_course_run_date] if date
                     )
+=======
+                    available_date = certificate_api.available_date_for_certificate(course_overview, certificate)
+                    earliest_course_run_date = min(date for date in [available_date, earliest_course_run_date] if date)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
             # If we're missing a cert for a course, the program isn't completed and we should just bail now
             if earliest_course_run_date is None:
@@ -477,7 +622,11 @@ class ProgramProgressMeter:
             with course run certificates.
             """
             return {
+<<<<<<< HEAD
                 'course_run_id': course_run['key'],
+=======
+                "course_run_id": course_run["key"],
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 # A course run's type is assumed to indicate which mode must be
                 # completed in order for the run to count towards program completion.
                 # This supports the same flexible program construction allowed by the
@@ -485,10 +634,17 @@ class ProgramProgressMeter:
                 # count towards completion of a course in a program). This may change
                 # in the future to make use of the more rigid set of "applicable seat
                 # types" associated with each program type in the catalog.
+<<<<<<< HEAD
                 'type': self._course_run_mode_translation(course_run['type']),
             }
 
         return any(reshape(course_run) in self.completed_course_runs for course_run in course['course_runs'])
+=======
+                "type": self._course_run_mode_translation(course_run["type"]),
+            }
+
+        return any(reshape(course_run) in self.completed_course_runs for course_run in course["course_runs"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @cached_property
     def completed_course_runs(self):
@@ -498,7 +654,11 @@ class ProgramProgressMeter:
         Returns:
             list of dicts, each representing a course run certificate
         """
+<<<<<<< HEAD
         return self.course_runs_with_state['completed']
+=======
+        return self.course_runs_with_state["completed"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @cached_property
     def failed_course_runs(self):
@@ -508,7 +668,11 @@ class ProgramProgressMeter:
         Returns:
             list of strings, each a course run ID
         """
+<<<<<<< HEAD
         return [run['course_run_id'] for run in self.course_runs_with_state['failed']]
+=======
+        return [run["course_run_id"] for run in self.course_runs_with_state["failed"]]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @cached_property
     def course_runs_with_state(self):
@@ -525,10 +689,17 @@ class ProgramProgressMeter:
 
         completed_runs, failed_runs = [], []
         for certificate in course_run_certificates:
+<<<<<<< HEAD
             course_key = certificate['course_key']
             course_data = {
                 'course_run_id': str(course_key),
                 'type': self._certificate_mode_translation(certificate['type']),
+=======
+            course_key = certificate["course_key"]
+            course_data = {
+                "course_run_id": str(course_key),
+                "type": self._certificate_mode_translation(certificate["type"]),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             }
 
             try:
@@ -538,15 +709,23 @@ class ProgramProgressMeter:
             else:
                 may_certify = certificate_api.certificates_viewable_for_course(course_overview)
 
+<<<<<<< HEAD
             if (
                 CertificateStatuses.is_passing_status(certificate['status'])
                 and may_certify
             ):
+=======
+            if CertificateStatuses.is_passing_status(certificate["status"]) and may_certify:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 completed_runs.append(course_data)
             else:
                 failed_runs.append(course_data)
 
+<<<<<<< HEAD
         return {'completed': completed_runs, 'failed': failed_runs}
+=======
+        return {"completed": completed_runs, "failed": failed_runs}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _is_course_enrolled(self, course):
         """Check if a user is enrolled in a course.
@@ -560,7 +739,11 @@ class ProgramProgressMeter:
         Returns:
             bool, indicating whether the course is in progress.
         """
+<<<<<<< HEAD
         return any(course_run['key'] in self.course_run_ids for course_run in course['course_runs'])
+=======
+        return any(course_run["key"] in self.course_run_ids for course_run in course["course_runs"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 # pylint: disable=missing-docstring
@@ -578,7 +761,11 @@ class ProgramDataExtender:
         self.data = program_data
         self.user = user
         self.mobile_only = mobile_only
+<<<<<<< HEAD
         self.data.update({'is_mobile_only': self.mobile_only})
+=======
+        self.data.update({"is_mobile_only": self.mobile_only})
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         self.course_run_key = None
         self.course_overview = None
@@ -586,7 +773,11 @@ class ProgramDataExtender:
 
     def extend(self):
         """Execute extension handlers, returning the extended data."""
+<<<<<<< HEAD
         self._execute('_extend')
+=======
+        self._execute("_extend")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self._collect_one_click_purchase_eligibility_data()
         return self.data
 
@@ -601,16 +792,24 @@ class ProgramDataExtender:
 
     def _extend_course_runs(self):
         """Execute course run data handlers."""
+<<<<<<< HEAD
         for course in self.data['courses']:
             for course_run in course['course_runs']:
                 # State to be shared across handlers.
                 self.course_run_key = CourseKey.from_string(course_run['key'])
+=======
+        for course in self.data["courses"]:
+            for course_run in course["course_runs"]:
+                # State to be shared across handlers.
+                self.course_run_key = CourseKey.from_string(course_run["key"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
                 # Some (old) course runs may exist for a program which do not exist in LMS. In that case,
                 # continue without the course run.
                 try:
                     self.course_overview = CourseOverview.get_from_id(self.course_run_key)
                 except CourseOverview.DoesNotExist:
+<<<<<<< HEAD
                     log.warning('Failed to get course overview for course run key: %s', course_run.get('key'))
                 else:
                     self.enrollment_start = self.course_overview.enrollment_start or DEFAULT_ENROLLMENT_START_DATE
@@ -646,6 +845,47 @@ class ProgramDataExtender:
     def _attach_course_run_is_enrollment_open(self, run_mode):
         enrollment_end = self.course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=utc)
         run_mode['is_enrollment_open'] = self.enrollment_start <= datetime.datetime.now(utc) < enrollment_end
+=======
+                    log.warning("Failed to get course overview for course run key: %s", course_run.get("key"))
+                else:
+                    self.enrollment_start = self.course_overview.enrollment_start or DEFAULT_ENROLLMENT_START_DATE
+
+                    self._execute("_attach_course_run", course_run)
+
+    def _attach_course_run_certificate_url(self, run_mode):
+        certificate_data = certificate_api.certificate_downloadable_status(self.user, self.course_run_key)
+        certificate_uuid = certificate_data.get("uuid")
+        run_mode["certificate_url"] = (
+            certificate_api.get_certificate_url(
+                user_id=self.user.id,  # Providing user_id allows us to fall back to PDF certificates
+                # if web certificates are not configured for a given course.
+                course_id=self.course_run_key,
+                uuid=certificate_uuid,
+            )
+            if certificate_uuid
+            else None
+        )
+
+    def _attach_course_run_course_url(self, run_mode):
+        if self.mobile_only:
+            run_mode["course_url"] = "edxapp://enrolled_course_info?course_id={}".format(run_mode.get("key"))
+        else:
+            run_mode["course_url"] = reverse("course_root", args=[self.course_run_key])
+
+    def _attach_course_run_enrollment_open_date(self, run_mode):
+        run_mode["enrollment_open_date"] = strftime_localized(self.enrollment_start, "SHORT_DATE")
+
+    def _attach_course_run_is_course_ended(self, run_mode):
+        end_date = self.course_overview.end or datetime.datetime.max.replace(tzinfo=utc)
+        run_mode["is_course_ended"] = end_date < datetime.datetime.now(utc)
+
+    def _attach_course_run_is_enrolled(self, run_mode):
+        run_mode["is_enrolled"] = CourseEnrollment.is_enrolled(self.user, self.course_run_key)
+
+    def _attach_course_run_is_enrollment_open(self, run_mode):
+        enrollment_end = self.course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=utc)
+        run_mode["is_enrollment_open"] = self.enrollment_start <= datetime.datetime.now(utc) < enrollment_end
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _attach_course_run_advertised_start(self, run_mode):
         """
@@ -654,10 +894,17 @@ class ProgramDataExtender:
         to start on December 1, 2016, the author might provide 'Winter 2016' as
         the advertised start.
         """
+<<<<<<< HEAD
         run_mode['advertised_start'] = self.course_overview.advertised_start
 
     def _attach_course_run_upgrade_url(self, run_mode):
         required_mode_slug = run_mode['type']
+=======
+        run_mode["advertised_start"] = self.course_overview.advertised_start
+
+    def _attach_course_run_upgrade_url(self, run_mode):
+        required_mode_slug = run_mode["type"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         enrolled_mode_slug, _ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_run_key)
         is_mode_mismatch = required_mode_slug != enrolled_mode_slug
         is_upgrade_required = is_mode_mismatch and CourseEnrollment.is_enrolled(self.user, self.course_run_key)
@@ -666,6 +913,7 @@ class ProgramDataExtender:
             # Requires that the ecommerce service be in use.
             required_mode = CourseMode.mode_for_course(self.course_run_key, required_mode_slug)
             ecommerce = EcommerceService()
+<<<<<<< HEAD
             sku = getattr(required_mode, 'sku', None)
             if ecommerce.is_enabled(self.user) and sku:
                 run_mode['upgrade_url'] = ecommerce.get_checkout_page_url(required_mode.sku)
@@ -679,6 +927,23 @@ class ProgramDataExtender:
 
     def _attach_course_run_is_mobile_only(self, run_mode):
         run_mode['is_mobile_only'] = self.mobile_only
+=======
+            sku = getattr(required_mode, "sku", None)
+            if ecommerce.is_enabled(self.user) and sku:
+                run_mode["upgrade_url"] = ecommerce.get_checkout_page_url(
+                    required_mode.sku, course_run_keys=[self.course_run_key]
+                )
+            else:
+                run_mode["upgrade_url"] = None
+        else:
+            run_mode["upgrade_url"] = None
+
+    def _attach_course_run_may_certify(self, run_mode):
+        run_mode["may_certify"] = certificate_api.certificates_viewable_for_course(self.course_overview)
+
+    def _attach_course_run_is_mobile_only(self, run_mode):
+        run_mode["is_mobile_only"] = self.mobile_only
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _filter_out_courses_with_entitlements(self, courses):
         """
@@ -694,17 +959,28 @@ class ProgramDataExtender:
         Returns:
             A subset of the given list of course dicts
         """
+<<<<<<< HEAD
         course_uuids = {course['uuid'] for course in courses}
         # Filter the entitlements' modes with a case-insensitive match against applicable seat_types
         entitlements = self.user.courseentitlement_set.filter(
             mode__in=self.data['applicable_seat_types'],
+=======
+        course_uuids = {course["uuid"] for course in courses}
+        # Filter the entitlements' modes with a case-insensitive match against applicable seat_types
+        entitlements = self.user.courseentitlement_set.filter(
+            mode__in=self.data["applicable_seat_types"],
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             course_uuid__in=course_uuids,
         )
         # Here we check the entitlements' expired_at_datetime property rather than filter by the expired_at attribute
         # to ensure that the expiration status is as up to date as possible
         entitlements = [e for e in entitlements if not e.expired_at_datetime]
         courses_with_entitlements = {str(entitlement.course_uuid) for entitlement in entitlements}
+<<<<<<< HEAD
         return [course for course in courses if course['uuid'] not in courses_with_entitlements]
+=======
+        return [course for course in courses if course["uuid"] not in courses_with_entitlements]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _filter_out_courses_with_enrollments(self, courses):
         """
@@ -717,6 +993,7 @@ class ProgramDataExtender:
         Returns:
             A subset of the given list of course dicts
         """
+<<<<<<< HEAD
         enrollments = self.user.courseenrollment_set.filter(
             is_active=True,
             mode__in=self.data['applicable_seat_types']
@@ -725,6 +1002,13 @@ class ProgramDataExtender:
         courses_without_enrollments = []
         for course in courses:
             if all(str(run['key']) not in course_runs_with_enrollments for run in course['course_runs']):
+=======
+        enrollments = self.user.courseenrollment_set.filter(is_active=True, mode__in=self.data["applicable_seat_types"])
+        course_runs_with_enrollments = {str(enrollment.course_id) for enrollment in enrollments}
+        courses_without_enrollments = []
+        for course in courses:
+            if all(str(run["key"]) not in course_runs_with_enrollments for run in course["course_runs"]):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 courses_without_enrollments.append(course)
 
         return courses_without_enrollments
@@ -734,6 +1018,7 @@ class ProgramDataExtender:
         Extend the program data with data about learner's eligibility for one click purchase,
         discount data of the program and SKUs of seats that should be added to basket.
         """
+<<<<<<< HEAD
         if 'professional' in self.data['applicable_seat_types']:
             self.data['applicable_seat_types'].append('no-id-professional')
         applicable_seat_types = {seat for seat in self.data['applicable_seat_types'] if seat != 'credit'}
@@ -745,10 +1030,24 @@ class ProgramDataExtender:
 
         if is_learner_eligible_for_one_click_purchase:  # lint-amnesty, pylint: disable=too-many-nested-blocks
             courses = self.data['courses']
+=======
+        if "professional" in self.data["applicable_seat_types"]:
+            self.data["applicable_seat_types"].append("no-id-professional")
+        applicable_seat_types = {seat for seat in self.data["applicable_seat_types"] if seat != "credit"}
+
+        is_learner_eligible_for_one_click_purchase = self.data["is_program_eligible_for_one_click_purchase"]
+        bundle_uuid = self.data.get("uuid")
+        skus = []
+        bundle_variant = "full"
+
+        if is_learner_eligible_for_one_click_purchase:  # lint-amnesty, pylint: disable=too-many-nested-blocks
+            courses = self.data["courses"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             if not self.user.is_anonymous:
                 courses = self._filter_out_courses_with_enrollments(courses)
                 courses = self._filter_out_courses_with_entitlements(courses)
 
+<<<<<<< HEAD
             if len(courses) < len(self.data['courses']):
                 bundle_variant = 'partial'
 
@@ -768,6 +1067,27 @@ class ProgramDataExtender:
                         for seat in published_course_runs[0]['seats']:
                             if seat['type'] in applicable_seat_types and seat['sku']:
                                 skus.append(seat['sku'])
+=======
+            if len(courses) < len(self.data["courses"]):
+                bundle_variant = "partial"
+
+            for course in courses:
+                entitlement_product = False
+                for entitlement in course.get("entitlements", []):
+                    # We add the first entitlement product found with an applicable seat type because, at this time,
+                    # we are assuming that, for any given course, there is at most one paid entitlement available.
+                    if entitlement["mode"] in applicable_seat_types:
+                        skus.append(entitlement["sku"])
+                        entitlement_product = True
+                        break
+                if not entitlement_product:
+                    course_runs = course.get("course_runs", [])
+                    published_course_runs = [run for run in course_runs if run["status"] == "published"]
+                    if len(published_course_runs) == 1:
+                        for seat in published_course_runs[0]["seats"]:
+                            if seat["type"] in applicable_seat_types and seat["sku"]:
+                                skus.append(seat["sku"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                                 break
                     else:
                         # If a course in the program has more than 1 published course run
@@ -798,14 +1118,19 @@ class ProgramDataExtender:
                         params = dict(sku=skus, is_anonymous=True)
                 else:
                     if bundle_uuid:
+<<<<<<< HEAD
                         params = dict(
                             sku=skus, username=self.user.username, bundle=bundle_uuid
                         )
+=======
+                        params = dict(sku=skus, username=self.user.username, bundle=bundle_uuid)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     else:
                         params = dict(sku=skus, username=self.user.username)
                 response = api_client.get(api_url, params=params)
                 response.raise_for_status()
                 discount_data = response.json()
+<<<<<<< HEAD
                 program_discounted_price = discount_data['total_incl_tax']
                 program_full_price = discount_data['total_incl_tax_excl_discounts']
                 discount_data['is_discounted'] = program_discounted_price < program_full_price
@@ -828,6 +1153,32 @@ class ProgramDataExtender:
             'is_learner_eligible_for_one_click_purchase': is_learner_eligible_for_one_click_purchase,
             'skus': skus,
         })
+=======
+                program_discounted_price = discount_data["total_incl_tax"]
+                program_full_price = discount_data["total_incl_tax_excl_discounts"]
+                discount_data["is_discounted"] = program_discounted_price < program_full_price
+                discount_data["discount_value"] = program_full_price - program_discounted_price
+
+                self.data.update(
+                    {
+                        "discount_data": discount_data,
+                        "full_program_price": discount_data["total_incl_tax"],
+                        "variant": bundle_variant,
+                    }
+                )
+            except RequestException:
+                log.exception("Failed to get discount price for following product SKUs: %s ", ", ".join(skus))
+                self.data.update({"discount_data": {"is_discounted": False}})
+        else:
+            is_learner_eligible_for_one_click_purchase = False
+
+        self.data.update(
+            {
+                "is_learner_eligible_for_one_click_purchase": is_learner_eligible_for_one_click_purchase,
+                "skus": skus,
+            }
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 def get_certificates(user, extended_program):
@@ -846,6 +1197,7 @@ def get_certificates(user, extended_program):
     """
     certificates = []
 
+<<<<<<< HEAD
     for course in extended_program['courses']:
         for course_run in course['course_runs']:
             url = course_run.get('certificate_url')
@@ -855,10 +1207,24 @@ def get_certificates(user, extended_program):
                     'title': course_run['title'],
                     'url': url,
                 })
+=======
+    for course in extended_program["courses"]:
+        for course_run in course["course_runs"]:
+            url = course_run.get("certificate_url")
+            if url and course_run.get("may_certify"):
+                certificates.append(
+                    {
+                        "type": "course",
+                        "title": course_run["title"],
+                        "url": url,
+                    }
+                )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
                 # We only want one certificate per course to be returned.
                 break
 
+<<<<<<< HEAD
     program_credentials = get_credentials(user, program_uuid=extended_program['uuid'], credential_type='program')
     # only include a program certificate if a certificate is available for every course
     if program_credentials and (len(certificates) == len(extended_program['courses'])):
@@ -874,14 +1240,35 @@ def get_certificates(user, extended_program):
             'title': extended_program['title'],
             'url': url,
         })
+=======
+    program_credentials = get_credentials(user, program_uuid=extended_program["uuid"], credential_type="program")
+    # only include a program certificate if a certificate is available for every course
+    if program_credentials and (len(certificates) == len(extended_program["courses"])):
+        enabled_force_program_cert_auth = configuration_helpers.get_value("force_program_cert_auth", True)
+        cert_url = program_credentials[0]["certificate_url"]
+        url = get_logged_in_program_certificate_url(cert_url) if enabled_force_program_cert_auth else cert_url
+
+        certificates.append(
+            {
+                "type": "program",
+                "title": extended_program["title"],
+                "url": url,
+            }
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     return certificates
 
 
 def get_logged_in_program_certificate_url(certificate_url):
     parsed_url = urlparse(certificate_url)
+<<<<<<< HEAD
     query_string = 'next=' + parsed_url.path
     url_parts = (parsed_url.scheme, parsed_url.netloc, '/login/', '', query_string, '')
+=======
+    query_string = "next=" + parsed_url.path
+    url_parts = (parsed_url.scheme, parsed_url.netloc, "/login/", "", query_string, "")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     return urlunparse(url_parts)
 
 
@@ -903,6 +1290,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         self.instructors = []
 
         # Values for programs' price calculation.
+<<<<<<< HEAD
         self.data['avg_price_per_course'] = 0.0
         self.data['number_of_courses'] = 0
         self.data['full_program_price'] = 0.0
@@ -919,12 +1307,29 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             if not program_instructors:
                 for course_run in course['course_runs']:
                     self._execute('_collect_instructors', course_run)
+=======
+        self.data["avg_price_per_course"] = 0.0
+        self.data["number_of_courses"] = 0
+        self.data["full_program_price"] = 0.0
+
+    def _extend_program(self):
+        """Aggregates data from the program data structure."""
+        cache_key = "program.instructors.{uuid}".format(uuid=self.data["uuid"])
+        program_instructors = cache.get(cache_key)
+
+        for course in self.data["courses"]:
+            self._execute("_collect_course", course)
+            if not program_instructors:
+                for course_run in course["course_runs"]:
+                    self._execute("_collect_instructors", course_run)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         if not program_instructors:
             # We cache the program instructors list to avoid repeated modulestore queries
             program_instructors = self.instructors
             cache.set(cache_key, program_instructors, 3600)
 
+<<<<<<< HEAD
         if 'instructor_ordering' not in self.data:
             # If no instructor ordering is set in discovery, it doesn't populate this key
             self.data['instructor_ordering'] = []
@@ -946,6 +1351,26 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             key=lambda item: sorted_instructor_names.index(item['name'])
         )
         self.data['instructors'] = sorted_instructors + instructors_to_not_be_sorted
+=======
+        if "instructor_ordering" not in self.data:
+            # If no instructor ordering is set in discovery, it doesn't populate this key
+            self.data["instructor_ordering"] = []
+
+        sorted_instructor_names = [
+            " ".join([name for name in (instructor["given_name"], instructor["family_name"]) if name])
+            for instructor in self.data["instructor_ordering"]
+        ]
+        instructors_to_be_sorted = [
+            instructor for instructor in program_instructors if instructor["name"] in sorted_instructor_names
+        ]
+        instructors_to_not_be_sorted = [
+            instructor for instructor in program_instructors if instructor["name"] not in sorted_instructor_names
+        ]
+        sorted_instructors = sorted(
+            instructors_to_be_sorted, key=lambda item: sorted_instructor_names.index(item["name"])
+        )
+        self.data["instructors"] = sorted_instructors + instructors_to_not_be_sorted
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def extend(self):
         """Execute extension handlers, returning the extended data."""
@@ -961,7 +1386,11 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         return {name for name in chain(cls.__dict__, ProgramDataExtender.__dict__) if name.startswith(prefix)}
 
     def _attach_course_run_can_enroll(self, run_mode):
+<<<<<<< HEAD
         run_mode['can_enroll'] = bool(self.user.has_perm(ENROLL_IN_COURSE, self.course_overview))
+=======
+        run_mode["can_enroll"] = bool(self.user.has_perm(ENROLL_IN_COURSE, self.course_overview))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _attach_course_run_certificate_url(self, run_mode):
         """
@@ -977,6 +1406,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         if not self.user.is_anonymous:
             super()._attach_course_run_upgrade_url(run_mode)
         else:
+<<<<<<< HEAD
             run_mode['upgrade_url'] = None
 
     def _collect_course_pricing(self, course):
@@ -987,6 +1417,18 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
             if seats:
                 self.data['full_program_price'] += float(seats[0]['price'])
             self.data['avg_price_per_course'] = self.data['full_program_price'] / self.data['number_of_courses']
+=======
+            run_mode["upgrade_url"] = None
+
+    def _collect_course_pricing(self, course):
+        self.data["number_of_courses"] += 1
+        course_runs = course["course_runs"]
+        if course_runs:
+            seats = course_runs[0]["seats"]
+            if seats:
+                self.data["full_program_price"] += float(seats[0]["price"])
+            self.data["avg_price_per_course"] = self.data["full_program_price"] / self.data["number_of_courses"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _collect_instructors(self, course_run):
         """
@@ -996,6 +1438,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         instructor data into the catalog, retrieve it via the catalog API, and remove this code.
         """
         module_store = modulestore()
+<<<<<<< HEAD
         course_run_key = CourseKey.from_string(course_run['key'])
         course_block = module_store.get_course(course_run_key)
         if course_block:
@@ -1009,6 +1452,23 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
 
 
 def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes_only=False, enrollments=None, entitlements=None):  # lint-amnesty, pylint: disable=line-too-long
+=======
+        course_run_key = CourseKey.from_string(course_run["key"])
+        course_block = module_store.get_course(course_run_key)
+        if course_block:
+            course_instructors = getattr(course_block, "instructor_info", {})
+
+            # Deduplicate program instructors using instructor name
+            curr_instructors_names = [instructor.get("name", "").strip() for instructor in self.instructors]
+            for instructor in course_instructors.get("instructors", []):
+                if instructor.get("name", "").strip() not in curr_instructors_names:
+                    self.instructors.append(instructor)
+
+
+def is_user_enrolled_in_program_type(
+    user, program_type_slug, paid_modes_only=False, enrollments=None, entitlements=None
+):  # lint-amnesty, pylint: disable=line-too-long
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     This method will look at the learners Enrollments and Entitlements to determine
     if a learner is enrolled in a Program of the given type.
@@ -1036,10 +1496,17 @@ def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes_only=Fa
         return False
 
     for program in programs:
+<<<<<<< HEAD
         for course in program.get('courses', []):
             course_uuids.add(course.get('uuid'))
             for course_run in course.get('course_runs', []):
                 course_runs.add(course_run['key'])
+=======
+        for course in program.get("courses", []):
+            course_uuids.add(course.get("uuid"))
+            for course_run in course.get("course_runs", []):
+                course_runs.add(course_run["key"])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     # Check Entitlements first, because there will be less Course Entitlements than
     # Course Run Enrollments.
@@ -1050,15 +1517,24 @@ def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes_only=Fa
 
     student_enrollments = enrollments if enrollments is not None else get_enrollments(user.username)
     for enrollment in student_enrollments:
+<<<<<<< HEAD
         course_run_id = enrollment['course_details']['course_id']
         if paid_modes_only:
             course_run_key = CourseKey.from_string(course_run_id)
             paid_modes = [mode.slug for mode in get_paid_modes_for_course(course_run_key)]
             if enrollment['mode'] in paid_modes and course_run_id in course_runs:
+=======
+        course_run_id = enrollment["course_details"]["course_id"]
+        if paid_modes_only:
+            course_run_key = CourseKey.from_string(course_run_id)
+            paid_modes = [mode.slug for mode in get_paid_modes_for_course(course_run_key)]
+            if enrollment["mode"] in paid_modes and course_run_id in course_runs:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 return True
         elif course_run_id in course_runs:
             return True
     return False
+<<<<<<< HEAD
 
 
 def get_subscription_api_client(user):
@@ -1107,3 +1583,5 @@ def get_programs_subscription_data(user, program_uuid=None):
             + f" for program_uuid: {str(program_uuid)}" if program_uuid is not None else ""
         )
     return subscription_data
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

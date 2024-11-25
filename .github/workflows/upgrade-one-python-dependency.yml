@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
+<<<<<<< HEAD
         description: 'Target branch to create requirements PR against'
         required: true
         default: 'master'
@@ -15,11 +16,28 @@ on:
       version:
         description: 'Version number to upgrade to in constraints.txt (only needed if pinned)'
         default: ''
+=======
+        description: "Target branch to create requirements PR against"
+        required: true
+        default: "master"
+        type: string
+      package:
+        description: "Name of package to upgrade"
+        required: true
+        type: string
+      version:
+        description: "Version number to upgrade to in constraints.txt (only needed if pinned)"
+        default: ""
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         type: string
       change_desc:
         description: |
           Description of change, for commit message and PR. (What does the new version add or fix?)
+<<<<<<< HEAD
         default: ''
+=======
+        default: ""
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         type: string
 
 defaults:
@@ -28,18 +46,32 @@ defaults:
 
 jobs:
   upgrade-one-python-dependency:
+<<<<<<< HEAD
     runs-on: ubuntu-20.04
 
     steps:
       - name: Check out target branch
         uses: actions/checkout@v3
+=======
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out target branch
+        uses: actions/checkout@v4
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         with:
           ref: "${{ inputs.branch }}"
 
       - name: Set up Python environment
+<<<<<<< HEAD
         uses: actions/setup-python@v4
         with:
           python-version: "3.8"
+=======
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
       - name: Update any pinned dependencies
         env:

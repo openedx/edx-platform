@@ -4,12 +4,19 @@ Test the retirement_archive_and_cleanup.py script
 
 import datetime
 import os
+<<<<<<< HEAD
+=======
+from unittest.mock import DEFAULT, call, patch
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 import boto3
 import pytest
 from botocore.exceptions import ClientError
 from click.testing import CliRunner
+<<<<<<< HEAD
 from mock import DEFAULT, call, patch
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from moto import mock_ec2, mock_s3
 
 from scripts.user_retirement.retirement_archive_and_cleanup import (

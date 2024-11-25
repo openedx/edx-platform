@@ -378,7 +378,11 @@ class SubmissionHistoryView(GradeViewMixin, PaginatedAPIView):
     def get(self, request, course_id=None):
         """
         Get submission history details. This submission history is related to only
+<<<<<<< HEAD
         ProblemBlock and it doesn't support LibraryContentBlock or ContentLibraries
+=======
+        ProblemBlock and it doesn't support LegacyLibraryContentBlock or ContentLibraries
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         as of now.
 
         **Usecases**:
@@ -463,7 +467,11 @@ class SubmissionHistoryView(GradeViewMixin, PaginatedAPIView):
     @staticmethod
     def get_problem_blocks(course):
         """ Get a list of problem xblock for the course.
+<<<<<<< HEAD
             This doesn't support LibraryContentBlock or ContentLibraries
+=======
+            This doesn't support LegacyLibraryContentBlock or ContentLibraries
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             as of now
         """
         blocks = []

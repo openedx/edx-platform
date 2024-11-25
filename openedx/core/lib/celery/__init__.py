@@ -23,7 +23,10 @@ from celery import Celery
 # lms.celery. See module docstring!
 APP = Celery('proj')
 
+<<<<<<< HEAD
 APP.conf.task_protocol = 1
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.
 APP.config_from_object('django.conf:settings')

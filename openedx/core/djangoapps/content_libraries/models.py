@@ -8,7 +8,11 @@ This module contains the models for new Content Libraries.
 LTI 1.3 Models
 ==============
 
+<<<<<<< HEAD
 Content Libraries serves blockstore-based content through LTI 1.3 launches.
+=======
+Content Libraries serves learning-core-based content through LTI 1.3 launches.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 The interface supports resource link launches and grading services.  Two use
 cases justify the current data model to support LTI launches.  They are:
 
@@ -27,7 +31,11 @@ Relationship with LMS's ``lti_provider``` models
 The data model above is similar to the one provided by the current LTI 1.1
 implementation for modulestore and courseware content.  But, Content Libraries
 is orthogonal.  Its use-case is to offer standalone, embedded content from a
+<<<<<<< HEAD
 specific backend (blockstore).  As such, it decouples from LTI 1.1. and the
+=======
+specific backend (learning core).  As such, it decouples from LTI 1.1. and the
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 logic assume no relationship or impact across the two applications.  The same
 reasoning applies to steps beyond the data model, such as at the XBlock
 runtime, authentication, and score handling, etc.
@@ -54,10 +62,16 @@ from pylti1p3.grade import Grade
 
 from opaque_keys.edx.django.models import UsageKeyField
 from openedx.core.djangoapps.content_libraries.constants import (
+<<<<<<< HEAD
     LIBRARY_TYPES, COMPLEX, LICENSE_OPTIONS,
     ALL_RIGHTS_RESERVED,
 )
 from openedx_learning.core.publishing.models import LearningPackage
+=======
+    LICENSE_OPTIONS, ALL_RIGHTS_RESERVED,
+)
+from openedx_learning.api.authoring_models import LearningPackage
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .apps import ContentLibrariesConfig
@@ -85,11 +99,21 @@ class ContentLibrary(models.Model):
     """
     A Content Library is a collection of content (XBlocks and/or static assets)
 
+<<<<<<< HEAD
     All actual content is stored in Blockstore, and any data that we'd want to
     transfer to another instance if this library were exported and then
     re-imported on another Open edX instance should be kept in Blockstore. This
     model in Studio should only be used to track settings specific to this Open
     edX instance, like who has permission to edit this content library.
+=======
+    All actual content is stored in Learning Core, and any data that we'd want to
+    transfer to another instance if this library were exported and then
+    re-imported on another Open edX instance should be kept in Learning Core. This
+    model in Studio should only be used to track settings specific to this Open
+    edX instance, like who has permission to edit this content library.
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     objects: ContentLibraryManager[ContentLibrary] = ContentLibraryManager()
 
@@ -101,6 +125,7 @@ class ContentLibrary(models.Model):
     org = models.ForeignKey(Organization, on_delete=models.PROTECT, null=False)
     slug = models.SlugField(allow_unicode=True)
 
+<<<<<<< HEAD
     # We no longer use the ``bundle_uuid`` and ``type`` fields, but we'll leave
     # them in the model until after the Redwood release, just in case someone
     # out there was using v2 libraries. We don't expect this, since it wasn't in
@@ -113,6 +138,8 @@ class ContentLibrary(models.Model):
     bundle_uuid = models.UUIDField(unique=True, null=True, default=None)
     type = models.CharField(max_length=25, default=COMPLEX, choices=LIBRARY_TYPES)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     license = models.CharField(max_length=25, default=ALL_RIGHTS_RESERVED, choices=LICENSE_OPTIONS)
     learning_package = models.OneToOneField(
         LearningPackage,
@@ -196,6 +223,11 @@ class ContentLibrary(models.Model):
 class ContentLibraryPermission(models.Model):
     """
     Row recording permissions for a content library
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     library = models.ForeignKey(ContentLibrary, on_delete=models.CASCADE, related_name="permission_grants")
     # One of the following must be set (but not both):
@@ -239,6 +271,11 @@ class ContentLibraryPermission(models.Model):
 class ContentLibraryBlockImportTask(models.Model):
     """
     Model of a task to import blocks from an external source (e.g. modulestore).
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     library = models.ForeignKey(
@@ -344,6 +381,11 @@ class LtiProfile(models.Model):
     Unless Anonymous, this should be a unique representation of the LTI subject
     (as per the client token ``sub`` identify claim) that initiated an LTI
     launch through Content Libraries.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     objects = LtiProfileManager()
@@ -466,6 +508,11 @@ class LtiGradedResource(models.Model):
     launch.  This model links the profile that launched the resource with the
     resource itself, allowing identifcation of the link through its usage key
     string and user id.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     objects = LtiGradedResourceManager()
@@ -479,7 +526,11 @@ class LtiGradedResource(models.Model):
 
     usage_key = UsageKeyField(
         max_length=255,
+<<<<<<< HEAD
         help_text=_('The usage key string of the blockstore resource serving the '
+=======
+        help_text=_('The usage key string of the resource serving the '
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     'content of this launch.'),
     )
 

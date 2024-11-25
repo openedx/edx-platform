@@ -4,7 +4,10 @@ requiring Superuser access for all other Request types on an API endpoint.
 """
 
 
+<<<<<<< HEAD
 from django.conf import settings
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 from lms.djangoapps.courseware.access import has_access
@@ -22,6 +25,7 @@ class IsAdminOrSupportOrAuthenticatedReadOnly(BasePermission):
             return request.user.is_authenticated
         else:
             return request.user.is_staff or has_access(request.user, "support", "global")
+<<<<<<< HEAD
 
 
 class IsSubscriptionWorkerUser(BasePermission):
@@ -31,3 +35,5 @@ class IsSubscriptionWorkerUser(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.username == settings.SUBSCRIPTIONS_SERVICE_WORKER_USERNAME
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

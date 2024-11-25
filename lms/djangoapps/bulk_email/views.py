@@ -7,6 +7,10 @@ import logging
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import Http404
+<<<<<<< HEAD
+=======
+from eventtracking import tracker
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
@@ -60,4 +64,20 @@ def opt_out_email_updates(request, token, course_id):
             course_id,
         )
 
+<<<<<<< HEAD
+=======
+    event_name = 'edx.bulk_email.opt_out'
+    event_data = {
+        "username": user.username,
+        "user_email": user.email,
+        "user_id": user.id,
+        "course_id": course_id,
+    }
+    with tracker.get_tracker().context(event_name, event_data):
+        tracker.emit(
+            event_name,
+            event_data
+        )
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     return render_to_response('bulk_email/unsubscribe_success.html', context)

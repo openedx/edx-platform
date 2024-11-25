@@ -167,9 +167,15 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         self.problem.runtime.is_author_mode = True
         assert 'original_get_html' == self.problem.get_html()
 
+<<<<<<< HEAD
     def test_edxnotes_blockstore_runtime(self):
         """
         Tests that get_html is not wrapped when problem is rendered by Blockstore runtime.
+=======
+    def test_edxnotes_learning_core_runtime(self):
+        """
+        Tests that get_html is not wrapped when problem is rendered by the learning core runtime.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         del self.problem.block.runtime.modulestore
         assert 'original_get_html' == self.problem.get_html()

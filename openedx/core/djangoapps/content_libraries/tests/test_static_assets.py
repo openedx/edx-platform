@@ -1,4 +1,5 @@
 """
+<<<<<<< HEAD
 Tests for static asset files in Blockstore-based Content Libraries
 """
 from unittest import skip
@@ -6,6 +7,20 @@ from unittest import skip
 from openedx.core.djangoapps.content_libraries.tests.base import (
     ContentLibrariesRestApiTest,
 )
+=======
+Tests for static asset files in Learning-Core-based Content Libraries
+"""
+from uuid import UUID
+
+from opaque_keys.edx.keys import UsageKey
+
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries.tests.base import (
+    ContentLibrariesRestApiTest,
+)
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
+from openedx.core.djangolib.testing.utils import skip_unless_cms
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # Binary data representing an SVG image file
 SVG_DATA = """<svg xmlns="http://www.w3.org/2000/svg" height="30" width="100">
@@ -23,6 +38,7 @@ I'm Anant Agarwal, I'm the president of edX,
 """
 
 
+<<<<<<< HEAD
 @skip("Assets are being reimplemented in Learning Core. Disable until that's ready.")
 class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
     """
@@ -32,6 +48,12 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
     the django/mysql database gets reset for each test case, the lookup between
     library slug and bundle UUID does not because it's assumed to be immutable
     and cached forever.
+=======
+@skip_unless_cms
+class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
+    """
+    Tests for static asset files in Learning-Core-based Content Libraries
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     def test_asset_filenames(self):
@@ -65,7 +87,11 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
 
     def test_video_transcripts(self):
         """
+<<<<<<< HEAD
         Test that video blocks can read transcript files out of blockstore.
+=======
+        Test that video blocks can read transcript files out of learning core.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         library = self._create_library(slug="transcript-test-lib", title="Transcripts Test Library")
         block = self._add_block_to_library(library["id"], "video", "video1")
@@ -79,7 +105,11 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
             />
         """)
         # Upload the transcript file
+<<<<<<< HEAD
         self._set_library_block_asset(block_id, "3_yD_cEKoCk-en.srt", TRANSCRIPT_DATA)
+=======
+        self._set_library_block_asset(block_id, "static/3_yD_cEKoCk-en.srt", TRANSCRIPT_DATA)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         transcript_handler_url = self._get_block_handler_url(block_id, "transcript")
 
@@ -104,7 +134,117 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
         check_sjson()
         check_download()
         # Publish the OLX and the transcript file, since published data gets
+<<<<<<< HEAD
         # served differently by Blockstore and we should test that too.
         self._commit_library_changes(library["id"])
         check_sjson()
         check_download()
+=======
+        # served differently by Learning Core and we should test that too.
+        self._commit_library_changes(library["id"])
+        check_sjson()
+        check_download()
+
+
+@skip_unless_cms
+class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
+    """
+    Tests for the view that actually delivers the Library asset in Studio.
+    """
+
+    def setUp(self):
+        super().setUp()
+
+        library = self._create_library(slug="asset-lib2", title="Static Assets Test Library")
+        block = self._add_block_to_library(library["id"], "html", "html1")
+        self._set_library_block_asset(block["id"], "static/test.svg", SVG_DATA)
+        usage_key = UsageKey.from_string(block["id"])
+        self.usage_key = usage_key
+        self.component = get_component_from_usage_key(usage_key)
+        self.draft_component_version = self.component.versioning.draft
+
+    def test_good_responses(self):
+        get_response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
+        )
+        assert get_response.status_code == 200
+        content = b''.join(chunk for chunk in get_response.streaming_content)
+        assert content == SVG_DATA
+
+        good_head_response = self.client.head(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
+        )
+        assert good_head_response.headers == get_response.headers
+
+    def test_missing(self):
+        """Test asset requests that should 404."""
+        # Non-existent version...
+        wrong_version_uuid = UUID('11111111-1111-1111-1111-111111111111')
+        response = self.client.get(
+            f"/library_assets/component_versions/{wrong_version_uuid}/static/test.svg"
+        )
+        assert response.status_code == 404
+
+        # Non-existent file...
+        response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/missing.svg"
+        )
+        assert response.status_code == 404
+
+        # File-like ComponenVersionContent entry that isn't an actually
+        # downloadable file...
+        response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/block.xml"
+        )
+        assert response.status_code == 404
+
+    def test_anonymous_user(self):
+        """Anonymous users shouldn't get access to library assets."""
+        self.client.logout()
+        response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
+        )
+        assert response.status_code == 401
+
+    def test_unauthorized_user(self):
+        """User who is not a Content Library staff should not have access."""
+        self.client.logout()
+        UserFactory.create(
+            username="student",
+            email="student@example.com",
+            password="student-pass",
+            is_staff=False,
+            is_superuser=False,
+        )
+        self.client.login(username="student", password="student-pass")
+        get_response = self.client.get(
+            f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
+        )
+        assert get_response.status_code == 403
+
+    def test_draft_version(self):
+        """Get draft version of asset"""
+        get_response = self.client.get(
+            f"/library_assets/blocks/{self.usage_key}/static/test.svg"
+        )
+        assert get_response.status_code == 200
+        content = b''.join(chunk for chunk in get_response.streaming_content)
+        assert content == SVG_DATA
+
+        good_head_response = self.client.head(
+            f"/library_assets/blocks/{self.usage_key}/static/test.svg"
+        )
+        assert good_head_response.headers == get_response.headers
+
+    def test_draft_version_404(self):
+        """Get draft version of asset"""
+        get_response = self.client.get(
+            f"/library_assets/blocks/{self.usage_key}@/static/test.svg"
+        )
+        assert get_response.status_code == 404
+
+        get_response = self.client.get(
+            f"/library_assets/blocks/{self.usage_key}/static/test2.svg"
+        )
+        assert get_response.status_code == 404
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

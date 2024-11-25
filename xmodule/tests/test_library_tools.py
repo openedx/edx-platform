@@ -1,14 +1,22 @@
 """
+<<<<<<< HEAD
 Tests for library tools service (only used by CMS)
 
 Currently, the only known user of the LibraryToolsService is the
 LibraryContentBlock, so these tests are all written with only that
+=======
+Tests for legacy library tools service (only used by CMS)
+
+The only known user of the LegacyLibraryToolsService is the
+LegacyLibraryContentBlock, so these tests are all written with only that
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 block type in mind.
 """
 
 from unittest import mock
 
 import ddt
+<<<<<<< HEAD
 from django.conf import settings
 from django.test import override_settings
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
@@ -18,6 +26,14 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from xmodule.library_tools import LibraryToolsService
+=======
+from opaque_keys.edx.locator import LibraryLocator
+
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_cms
+from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from xmodule.library_tools import LegacyLibraryToolsService
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
@@ -26,13 +42,18 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 @ddt.ddt
 class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
     """
+<<<<<<< HEAD
     Tests for LibraryToolsService.
 
     Tests interaction with blockstore-based (V2) and mongo-based (V1) content libraries.
+=======
+    Tests for LegacyLibraryToolsService.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     def setUp(self):
         super().setUp()
         UserFactory(is_staff=True, id=self.user_id)
+<<<<<<< HEAD
         self.tools = LibraryToolsService(self.store, self.user_id)
 
     def test_list_available_libraries(self):
@@ -54,6 +75,20 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
             all_libraries = self.tools.list_available_libraries()
             assert all_libraries
             assert len(all_libraries) == 1
+=======
+        self.tools = LegacyLibraryToolsService(self.store, self.user_id)
+
+    def test_list_available_libraries(self):
+        """
+        Test listing of v1 libraries.
+        """
+        # create V1 library
+        _ = LibraryFactory.create(modulestore=self.store)
+        # create V2 library (should not be included in this list)
+        self._create_library(slug="testlib1_preview", title="Test Library 1", description="Testing XBlocks")
+        all_libraries = self.tools.list_available_libraries()
+        assert len(all_libraries) == 1
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @mock.patch('xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_library_summaries')
     def test_list_available_libraries_fetch(self, mock_get_library_summaries):
@@ -63,7 +98,11 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         _ = self.tools.list_available_libraries()
         assert mock_get_library_summaries.called
 
+<<<<<<< HEAD
     def test_get_latest_v1_library_version(self):
+=======
+    def test_get_latest_library_version(self):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Test get_v1_library_version for V1 libraries.
 
@@ -84,14 +123,20 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         assert result == str(lib.location.library_key.version_guid)
 
     @ddt.data(
+<<<<<<< HEAD
         'library-v1:Fake+Key',  # V1 library key
         'lib:Fake:V-2',         # V2 library key
         LibraryLocator.from_string('library-v1:Fake+Key'),
         LibraryLocatorV2.from_string('lib:Fake:V-2'),
+=======
+        'library-v1:Fake+Key',
+        LibraryLocator.from_string('library-v1:Fake+Key'),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     )
     def test_get_latest_library_version_no_library(self, lib_key):
         """
         Test get_latest_library_version result when the library does not exist.
+<<<<<<< HEAD
 
         Provided lib_key's are valid V1 or V2 keys.
         """
@@ -127,6 +172,12 @@ class ContentLibraryToolsTest(MixedSplitTestCase, ContentLibrariesRestApiTest):
         assert len(content_block.children) == 1
 
     def test_update_children_for_v1_lib(self):
+=======
+        """
+        assert self.tools.get_latest_library_version(lib_key) is None
+
+    def test_update_children(self):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Test update_children with V1 library as a source.
 

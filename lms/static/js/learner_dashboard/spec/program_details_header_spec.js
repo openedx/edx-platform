@@ -45,6 +45,7 @@ describe('Program Details Header View', () => {
                 },
             ],
         },
+<<<<<<< HEAD
         subscriptionData: [
             {
                 trial_end: '1970-01-01T03:25:45Z',
@@ -55,6 +56,8 @@ describe('Program Details Header View', () => {
             },
         ],
         isSubscriptionEligible: true,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     };
 
     beforeEach(() => {
@@ -81,8 +84,11 @@ describe('Program Details Header View', () => {
         expect(view.$('.org-logo').attr('alt'))
             .toEqual(`${context.programData.authoring_organizations[0].name}'s logo`);
     });
+<<<<<<< HEAD
     
     it('should render the subscription badge if subscription is active', () => {
         expect(view.$('.meta-info .badge').html().trim()).toEqual('Subscribed');
     });
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 });

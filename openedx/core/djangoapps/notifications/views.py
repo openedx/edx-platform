@@ -10,11 +10,19 @@ from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import generics, status
+<<<<<<< HEAD
+=======
+from rest_framework.decorators import api_view
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
+<<<<<<< HEAD
+=======
+from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     get_course_notification_preference_config_version
@@ -35,9 +43,15 @@ from .serializers import (
     NotificationCourseEnrollmentSerializer,
     NotificationSerializer,
     UserCourseNotificationPreferenceSerializer,
+<<<<<<< HEAD
     UserNotificationPreferenceUpdateSerializer, UserNotificationChannelPreferenceUpdateSerializer,
 )
 from .utils import get_show_notifications_tray
+=======
+    UserNotificationPreferenceUpdateSerializer,
+)
+from .utils import get_show_notifications_tray, get_is_new_notification_view_enabled
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @allow_any_authenticated_user()
@@ -237,6 +251,7 @@ class UserNotificationPreferenceView(APIView):
 
 
 @allow_any_authenticated_user()
+<<<<<<< HEAD
 class UserNotificationChannelPreferenceView(APIView):
     """
     Supports retrieving and patching the UserNotificationPreference
@@ -286,6 +301,8 @@ class UserNotificationChannelPreferenceView(APIView):
 
 
 @allow_any_authenticated_user()
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class NotificationListAPIView(generics.ListAPIView):
     """
     API view for listing notifications for a user.
@@ -338,7 +355,11 @@ class NotificationListAPIView(generics.ListAPIView):
 
         if app_name:
             params['app_name'] = app_name
+<<<<<<< HEAD
         return Notification.objects.filter(**params).order_by('-id')
+=======
+        return Notification.objects.filter(**params).order_by('-created')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @allow_any_authenticated_user()
@@ -375,7 +396,12 @@ class NotificationCountView(APIView):
             .annotate(count=Count('*'))
         )
         count_total = 0
+<<<<<<< HEAD
         show_notifications_tray = get_show_notifications_tray(request.user)
+=======
+        show_notifications_tray = get_show_notifications_tray(self.request.user)
+        is_new_notification_view_enabled = get_is_new_notification_view_enabled()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS
@@ -391,7 +417,12 @@ class NotificationCountView(APIView):
             "show_notifications_tray": show_notifications_tray,
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
+<<<<<<< HEAD
             "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY
+=======
+            "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY,
+            "is_new_notification_view_enabled": is_new_notification_view_enabled
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         })
 
 
@@ -479,3 +510,16 @@ class NotificationReadAPIView(APIView):
             return Response({'message': _('Notifications marked read.')}, status=status.HTTP_200_OK)
 
         return Response({'error': _('Invalid app_name or notification_id.')}, status=status.HTTP_400_BAD_REQUEST)
+<<<<<<< HEAD
+=======
+
+
+@api_view(['GET', 'POST'])
+def preference_update_from_encrypted_username_view(request, username, patch):
+    """
+    View to update user preferences from encrypted username and patch.
+    username and patch must be string
+    """
+    update_user_preferences_from_patch(username, patch)
+    return Response({"result": "success"}, status=status.HTTP_200_OK)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

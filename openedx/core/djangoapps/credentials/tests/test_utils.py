@@ -1,4 +1,5 @@
 """Tests covering Credentials utilities."""
+<<<<<<< HEAD
 import uuid
 from unittest import mock
 
@@ -6,26 +7,47 @@ from django.conf import settings
 from requests import Response
 from requests.exceptions import HTTPError
 
+=======
+
+import uuid
+from unittest import mock
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangoapps.credentials.utils import (
+<<<<<<< HEAD
     get_courses_completion_status,
     get_credentials,
     get_credentials_records_url
+=======
+    get_credentials,
+    get_credentials_records_url,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 )
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 
+<<<<<<< HEAD
 UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
+=======
+UTILS_MODULE = "openedx.core.djangoapps.credentials.utils"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @skip_unless_lms
 class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
+<<<<<<< HEAD
     """ Tests for credentials utility functions. """
 
     ENABLED_CACHES = ['default']
+=======
+    """Tests for credentials utility functions."""
+
+    ENABLED_CACHES = ["default"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def setUp(self):
         super().setUp()
@@ -35,7 +57,11 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         self.credentials_config = self.create_credentials_config(cache_ttl=1)
         self.user = UserFactory()
 
+<<<<<<< HEAD
     @mock.patch(UTILS_MODULE + '.get_api_data')
+=======
+    @mock.patch(UTILS_MODULE + ".get_api_data")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_get_many(self, mock_get_edx_api_data):
         expected = factories.UserCredential.create_batch(3)
         mock_get_edx_api_data.return_value = expected
@@ -47,6 +73,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         __, __, kwargs = call
 
         querystring = {
+<<<<<<< HEAD
             'username': self.user.username,
             'status': 'awarded',
             'only_visible': 'True',
@@ -58,6 +85,19 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         assert actual == expected
 
     @mock.patch(UTILS_MODULE + '.get_api_data')
+=======
+            "username": self.user.username,
+            "status": "awarded",
+            "only_visible": "True",
+        }
+        cache_key = f"{self.credentials_config.CACHE_KEY}.{self.user.username}"
+        assert kwargs["querystring"] == querystring
+        assert kwargs["cache_key"] == cache_key
+
+        assert actual == expected
+
+    @mock.patch(UTILS_MODULE + ".get_api_data")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_get_one(self, mock_get_edx_api_data):
         expected = factories.UserCredential()
         mock_get_edx_api_data.return_value = expected
@@ -70,6 +110,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         __, __, kwargs = call
 
         querystring = {
+<<<<<<< HEAD
             'username': self.user.username,
             'status': 'awarded',
             'only_visible': 'True',
@@ -84,18 +125,43 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
     @mock.patch(UTILS_MODULE + '.get_api_data')
     def test_type_filter(self, mock_get_edx_api_data):
         get_credentials(self.user, credential_type='program')
+=======
+            "username": self.user.username,
+            "status": "awarded",
+            "only_visible": "True",
+            "program_uuid": program_uuid,
+        }
+        cache_key = f"{self.credentials_config.CACHE_KEY}.{self.user.username}.{program_uuid}"
+        assert kwargs["querystring"] == querystring
+        assert kwargs["cache_key"] == cache_key
+
+        assert actual == expected
+
+    @mock.patch(UTILS_MODULE + ".get_api_data")
+    def test_type_filter(self, mock_get_edx_api_data):
+        get_credentials(self.user, credential_type="program")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         mock_get_edx_api_data.assert_called_once()
         call = mock_get_edx_api_data.mock_calls[0]
         __, __, kwargs = call
 
         querystring = {
+<<<<<<< HEAD
             'username': self.user.username,
             'status': 'awarded',
             'only_visible': 'True',
             'type': 'program',
         }
         assert kwargs['querystring'] == querystring
+=======
+            "username": self.user.username,
+            "status": "awarded",
+            "only_visible": "True",
+            "type": "program",
+        }
+        assert kwargs["querystring"] == querystring
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def test_get_credentials_records_url(self):
         """
@@ -106,6 +172,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
 
         result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
         assert result == "https://credentials.example.com/records/programs/abcdefghijklmnopqrstuvwxyz123456"
+<<<<<<< HEAD
 
     @mock.patch('requests.Response.raise_for_status')
     @mock.patch('requests.Response.json')
@@ -134,3 +201,5 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         api_response, is_exception = get_courses_completion_status(self.user.id, ['fake1', 'fake2', 'fake3'])
         assert api_response == []
         assert is_exception is True
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

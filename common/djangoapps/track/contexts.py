@@ -48,7 +48,11 @@ def course_context_from_course_id(course_id):
     """
     Creates a course context from a `course_id`.
 
+<<<<<<< HEAD
     For newer parts of the system (i.e. Blockstore-based libraries/courses/etc.)
+=======
+    For newer parts of the system (i.e. Learning-Core-based libraries/courses/etc.)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     use context_dict_for_learning_context instead of this method.
 
     Example Returned Context::

@@ -2,10 +2,14 @@
 REST API views for content staging
 """
 from __future__ import annotations
+<<<<<<< HEAD
 import hashlib
 import logging
 
 from django.core.files.base import ContentFile
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -13,12 +17,17 @@ from django.utils.decorators import method_decorator
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
+<<<<<<< HEAD
 from opaque_keys.edx.locator import CourseLocator
+=======
+from opaque_keys.edx.locator import CourseLocator, LibraryLocatorV2
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
+<<<<<<< HEAD
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx, StaticFile
 from xmodule import block_metadata_utils
@@ -33,6 +42,18 @@ from .serializers import UserClipboardSerializer, PostToClipboardSerializer
 from .tasks import delete_expired_clipboards
 
 log = logging.getLogger(__name__)
+=======
+from openedx.core.djangoapps.content_libraries import api as lib_api
+from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.lib.api.view_utils import view_auth_classes
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from . import api
+from .data import StagedContentStatus
+from .models import StagedContent
+from .serializers import UserClipboardSerializer, PostToClipboardSerializer
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @view_auth_classes(is_authenticated=True)
@@ -75,6 +96,7 @@ class ClipboardEndpoint(APIView):
         """
         Get the detailed status of the user's clipboard. This does not return the OLX.
         """
+<<<<<<< HEAD
         try:
             clipboard = UserClipboard.objects.get(user=request.user.id)
         except UserClipboard.DoesNotExist:
@@ -87,6 +109,9 @@ class ClipboardEndpoint(APIView):
             })
         serializer = UserClipboardSerializer(clipboard, context={"request": request})
         return Response(serializer.data)
+=======
+        return Response(api.get_user_clipboard_json(request.user.id, request))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @apidocs.schema(
         body=PostToClipboardSerializer,
@@ -109,6 +134,7 @@ class ClipboardEndpoint(APIView):
         if usage_key.block_type in ('course', 'chapter', 'sequential'):
             raise ValidationError('Requested XBlock tree is too large')
         course_key = usage_key.context_key
+<<<<<<< HEAD
         if not isinstance(course_key, CourseLocator):
             # In the future, we'll support libraries too but for now we don't.
             raise ValidationError('Invalid usage key: not a modulestore course')
@@ -221,3 +247,37 @@ class ClipboardEndpoint(APIView):
                 )
             except Exception:  # pylint: disable=broad-except
                 log.exception(f"Unable to copy static file {f.name} to clipboard for component {usage_key}")
+=======
+
+        # Load the block and copy it to the user's clipboard
+        try:
+            if isinstance(course_key, CourseLocator):
+                # Make sure the user has permission on that course
+                if not has_studio_read_access(request.user, course_key):
+                    raise PermissionDenied(
+                        "You must be a member of the course team in Studio to export OLX using this API."
+                    )
+                block = modulestore().get_item(usage_key)
+                version_num = None
+
+            elif isinstance(course_key, LibraryLocatorV2):
+                lib_api.require_permission_for_library_key(
+                    course_key,
+                    request.user,
+                    lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
+                )
+                block = xblock_api.load_block(usage_key, user=None)
+                version_num = lib_api.get_library_block(usage_key).draft_version_num
+
+            else:
+                raise ValidationError("Invalid usage_key for the content.")
+
+        except ItemNotFoundError as exc:
+            raise NotFound("The requested usage key does not exist.") from exc
+
+        clipboard = api.save_xblock_to_user_clipboard(block=block, version_num=version_num, user_id=request.user.id)
+
+        # Return the current clipboard exactly as if GET was called:
+        serializer = UserClipboardSerializer(clipboard, context={"request": request})
+        return Response(serializer.data)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

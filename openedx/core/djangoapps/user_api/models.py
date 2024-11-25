@@ -426,6 +426,11 @@ class UserRetirementStatus(TimeStampedModel):
 class BulkUserRetirementConfig(ConfigurationModel):
     """
     Configuration to store a csv file that will be used in retire_user management command.
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     # Timeout set to 0 so that the model does not read from cached config in case the config entry is deleted.
     cache_timeout = 0

@@ -75,6 +75,30 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             this.$('.modal-window-title').html(this.loadTemplate('edit-title-button')({title: title}));
         },
 
+<<<<<<< HEAD
+=======
+        createWarningToast: function(upstreamLink) {
+            // xss-lint: disable=javascript-jquery-insertion
+            this.$('.modal-header').before(this.loadTemplate('edit-upstream-alert')({
+                upstreamLink: upstreamLink,
+            }));
+        },
+
+        getXBlockUpstreamLink: function() {
+            const usageKey = this.xblockElement.data('locator');
+            $.ajax({
+                url: '/api/contentstore/v2/downstreams/' + usageKey,
+                type: 'GET',
+                success: function(data) {
+                    if (data?.upstream_link) {
+                        this.createWarningToast(data.upstream_link);
+                    }
+                }.bind(this),
+                notifyOnError: false,
+            })
+        },
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         onDisplayXBlock: function() {
             var editorView = this.editorView,
                 title = this.getTitle(),
@@ -101,6 +125,10 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             } else {
                 this.$('.modal-window-title').text(title);
             }
+<<<<<<< HEAD
+=======
+            this.getXBlockUpstreamLink();
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
             // If the xblock is not using custom buttons then choose which buttons to show
             if (!editorView.hasCustomButtons()) {

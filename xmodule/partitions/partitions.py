@@ -10,6 +10,7 @@ from stevedore.extension import ExtensionManager
 # pylint: disable=redefined-builtin
 
 
+<<<<<<< HEAD
 # UserPartition IDs must be unique. The Cohort and Random UserPartitions (when they are
 # created via Studio) choose an unused ID in the range of 100 (historical) to MAX_INT. Therefore the
 # dynamic UserPartitionIDs must be under 100, and they have to be hard-coded to ensure
@@ -18,6 +19,23 @@ from stevedore.extension import ExtensionManager
 ENROLLMENT_TRACK_PARTITION_ID = 50
 
 MINIMUM_STATIC_PARTITION_ID = 100
+=======
+# Each user partition has an ID that is unique within its learning context.
+# The IDs must be valid MySQL primary keys, ie positive integers 1 -> 2^31-1.
+# We must carefully manage these IDs, because once they are saved to OLX and the db, they cannot change.
+# Here is how we delegate the ID range:
+# * 1 -> 49: Unused/Reserved
+# * 50: The enrollment track partition
+# * 51: The content type gating partition (defined elsewhere)
+# * 52-99: Available for other single user partitions, plugged in via setup.py.
+#          Operators, beware of conflicting IDs between plugins!
+# * 100 -> 2^31-1: General namespace for generating IDs at runtime.
+#                  This includes, at least: content partitions, the cohort partition, and teamset partitions.
+#                  When using this range, user partition implementations must check to see that they
+#                  are not conflicting with an existing partition for the course.
+ENROLLMENT_TRACK_PARTITION_ID = 50
+MINIMUM_UNUSED_PARTITION_ID = 100
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class UserPartitionError(Exception):

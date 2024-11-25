@@ -7,7 +7,11 @@ from datetime import datetime
 
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
+<<<<<<< HEAD
 from opaque_keys.edx.keys import UsageKey, AssetKey
+=======
+from opaque_keys.edx.keys import UsageKey, AssetKey, LearningContextKey
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class StagedContentStatus(TextChoices):
@@ -43,6 +47,10 @@ class StagedContentData:
     block_type: str = field(validator=validators.instance_of(str))
     display_name: str = field(validator=validators.instance_of(str))
     tags: dict = field(validator=validators.optional(validators.instance_of(dict)))
+<<<<<<< HEAD
+=======
+    version_num: int = field(validator=validators.instance_of(int))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @frozen
@@ -65,3 +73,12 @@ class UserClipboardData:
     """ Read-only data model for User Clipboard data (copied OLX) """
     content: StagedContentData = field(validator=validators.instance_of(StagedContentData))
     source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))  # type: ignore[type-abstract]
+<<<<<<< HEAD
+=======
+    source_context_title: str
+
+    @property
+    def source_context_key(self) -> LearningContextKey:
+        """ Get the context (course/library) that this was copied from """
+        return self.source_usage_key.context_key
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

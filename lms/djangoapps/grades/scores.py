@@ -162,8 +162,13 @@ def compute_percent(earned, possible):
      Returns the percentage of the given earned and possible values.
      """
     if possible > 0:
+<<<<<<< HEAD
         # Rounds to two decimal places.
         return around(earned / possible, decimals=2)
+=======
+        # Rounds to four decimal places.
+        return around(earned / possible, decimals=4)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     else:
         return 0.0
 

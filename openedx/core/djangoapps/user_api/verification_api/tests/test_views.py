@@ -4,7 +4,10 @@
 import datetime
 import json
 
+<<<<<<< HEAD
 import ddt
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import freezegun
 from django.conf import settings
 from django.test import TestCase
@@ -258,6 +261,7 @@ class VerificationsDetailsViewTests(VerificationStatusViewTestsMixin, TestCase):
             },
         ]
         assert json.loads(response.content.decode('utf-8')) == expected
+<<<<<<< HEAD
 
 
 @override_settings(VERIFY_STUDENT=VERIFY_STUDENT)
@@ -306,3 +310,5 @@ class VerificationSupportViewTests(VerificationViewTestsMixinBase, TestCase):
         not_found_path = self.path.replace(str(self.photo_verification.id), str(attempt_id))
         response = self.client.get(not_found_path)
         assert response.status_code == 404
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

@@ -10,7 +10,11 @@ from fs.memoryfs import MemoryFS
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
+<<<<<<< HEAD
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
+=======
+from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID, Group, UserPartition
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.partitions.tests.test_partitions import MockPartitionService, MockUserPartitionScheme, PartitionTestCase
 from xmodule.split_test_block import (
     SplitTestBlock,
@@ -94,10 +98,17 @@ class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
         self.course.user_partitions = [
             self.user_partition,
             UserPartition(
+<<<<<<< HEAD
                 MINIMUM_STATIC_PARTITION_ID, 'second_partition', 'Second Partition',
                 [
                     Group(str(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
                     Group(str(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
+=======
+                MINIMUM_UNUSED_PARTITION_ID, 'second_partition', 'Second Partition',
+                [
+                    Group(str(MINIMUM_UNUSED_PARTITION_ID + 1), 'abel'),
+                    Group(str(MINIMUM_UNUSED_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 ],
                 MockUserPartitionScheme()
             )

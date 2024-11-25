@@ -3,7 +3,10 @@
 Programmatic integration point for User API Accounts sub-application
 """
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import datetime
 import re
 
@@ -152,6 +155,15 @@ def update_account_settings(requesting_user, update, username=None):
 
     _validate_email_change(user, update, field_errors)
     _validate_secondary_email(user, update, field_errors)
+<<<<<<< HEAD
+=======
+    if update.get('country', '') in settings.DISABLED_COUNTRIES:
+        field_errors['country'] = {
+            'developer_message': 'Country is disabled for registration',
+            'user_message': 'This country cannot be selected for user registration'
+        }
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     old_name = _validate_name_change(user_profile, update, field_errors)
     old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
 

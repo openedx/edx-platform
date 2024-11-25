@@ -36,7 +36,12 @@ from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.views import require_global_staff
 from lms.djangoapps.commerce.utils import EcommerceService, is_account_activation_requirement_disabled
+<<<<<<< HEAD
 from lms.djangoapps.verify_student.emails import send_verification_approved_email, send_verification_confirmation_email
+=======
+from lms.djangoapps.verify_student.api import send_approval_email
+from lms.djangoapps.verify_student.emails import send_verification_confirmation_email
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from lms.djangoapps.verify_student.image import InvalidImageData, decode_image_data
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
 from lms.djangoapps.verify_student.tasks import send_verification_status_email
@@ -502,7 +507,12 @@ class PayAndVerifyView(View):
             if ecommerce_service.is_enabled(user):
                 url = ecommerce_service.get_checkout_page_url(
                     sku,
+<<<<<<< HEAD
                     catalog=self.request.GET.get('catalog')
+=======
+                    catalog=self.request.GET.get('catalog'),
+                    course_run_keys=[str(course_key)]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 )
 
         # Redirect if necessary, otherwise implicitly return None
@@ -1117,6 +1127,7 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         log.info("[COSMO-184] Approved verification for receipt_id={receipt_id}.".format(receipt_id=receipt_id))
         attempt.approve()
 
+<<<<<<< HEAD
         expiration_datetime = attempt.expiration_datetime.date()
         if settings.VERIFY_STUDENT.get('USE_DJANGO_MAIL'):
             verification_status_email_vars['expiration_datetime'] = expiration_datetime.strftime("%m/%d/%Y")
@@ -1135,6 +1146,9 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
             email_context = {'user': user, 'expiration_datetime': expiration_datetime.strftime("%m/%d/%Y")}
             send_verification_approved_email(context=email_context)
 
+=======
+        send_approval_email(attempt)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
 

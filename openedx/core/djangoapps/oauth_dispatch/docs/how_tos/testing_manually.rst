@@ -1,7 +1,11 @@
 Manually Testing OAuth2 Provider implementation
 -----------------------------------------------
 
+<<<<<<< HEAD
 This document explains how to manually test the open edX LMS' OAuth2 Provider
+=======
+This document explains how to manually test the Open edX LMS' OAuth2 Provider
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 implementation. In order to verify that it correctly implements the
 `OAuth2 standard`_, use a publicly available 3rd party standard OAuth2 client.
 The steps here show how to use `Google's OAuth2 Playground`_ as the client for

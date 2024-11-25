@@ -135,7 +135,11 @@ REQUIRE_DEBUG = DEBUG
 
 PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
 
+<<<<<<< HEAD
 # Load development webpack donfiguration
+=======
+# Load development webpack configuration
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ########################### VERIFIED CERTIFICATES #################################
@@ -262,9 +266,12 @@ TOKEN_SIGNING.update({
     )
 })
 
+<<<<<<< HEAD
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ########################## PROGRAMS LEARNER PORTAL ##############################
 LEARNER_PORTAL_URL_ROOT = 'http://localhost:8734'
 
@@ -525,6 +532,7 @@ course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG[
 ]
 course_access_role_removed_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
 
+<<<<<<< HEAD
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
@@ -534,6 +542,11 @@ SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-su
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
 SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
 SUBSCRIPTIONS_TRIAL_LENGTH = 7
+=======
+lc_enrollment_revoked_setting = \
+    EVENT_BUS_PRODUCER_CONFIG['org.openedx.enterprise.learner_credit_course_enrollment.revoked.v1']
+lc_enrollment_revoked_setting['learner-credit-course-enrollment-lifecycle']['enabled'] = True
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
@@ -549,14 +562,26 @@ AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 # MFEs that will call this service in devstack
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:2000',  # frontend-app-learning
+<<<<<<< HEAD
+=======
+    'http://localhost:2001',  # frontend-app-course-authoring
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'http://localhost:1997',  # frontend-app-account
     'http://localhost:1995',  # frontend-app-profile
     'http://localhost:1992',  # frontend-app-ora
     'http://localhost:2002',  # frontend-app-discussions
     'http://localhost:1991',  # frontend-app-admin-portal
+<<<<<<< HEAD
     'http://localhost:1999',  # frontend-app-authn
     'http://localhost:18450',  # frontend-app-support-tools
     'http://localhost:1994',  # frontend-app-gradebook
+=======
+    'http://localhost:8734',  # frontend-app-learner-portal-enterprise
+    'http://localhost:1999',  # frontend-app-authn
+    'http://localhost:18450',  # frontend-app-support-tools
+    'http://localhost:1994',  # frontend-app-gradebook
+    'http://localhost:1996',  # frontend-app-learner-dashboard
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ]
 
 

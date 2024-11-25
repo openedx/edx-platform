@@ -1,7 +1,10 @@
 /* globals setFixtures */
 
+<<<<<<< HEAD
 import Backbone from 'backbone';
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import CollectionListView from '../views/collection_list_view';
 import ProgramCardView from '../views/program_card_view';
 import ProgramCollection from '../collections/program_collection';
@@ -11,7 +14,10 @@ describe('Collection List View', () => {
     let view = null;
     let programCollection;
     let progressCollection;
+<<<<<<< HEAD
     let subscriptionCollection;
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     const context = {
         programsData: [
             {
@@ -101,21 +107,29 @@ describe('Collection List View', () => {
                 not_started: 3,
             },
         ],
+<<<<<<< HEAD
         programsSubscriptionData: [{
             resource_id: 'a87e5eac-3c93-45a1-a8e1-4c79ca8401c8',
             subscription_state: 'active',
         }],
         isUserB2CSubscriptionsEnabled: false,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     };
 
     beforeEach(() => {
         setFixtures('<div class="program-cards-container"></div>');
         programCollection = new ProgramCollection(context.programsData);
         progressCollection = new ProgressCollection();
+<<<<<<< HEAD
         subscriptionCollection = new Backbone.Collection(context.programsSubscriptionData);
         progressCollection.set(context.userProgress);
         context.progressCollection = progressCollection;
         context.subscriptionCollection = subscriptionCollection;
+=======
+        progressCollection.set(context.userProgress);
+        context.progressCollection = progressCollection;
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         view = new CollectionListView({
             el: '.program-cards-container',

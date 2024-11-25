@@ -646,6 +646,7 @@ def _is_certificate_earned_but_not_available(course_overview, status):
         (bool): True if the user earned the certificate but it's hidden due to display behavior, else False
 
     """
+<<<<<<< HEAD
     if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
         return (
             not certificates_viewable_for_course(course_overview)
@@ -661,6 +662,16 @@ def _is_certificate_earned_but_not_available(course_overview, status):
             CertificateStatuses.is_passing_status(status) and
             course_overview.certificate_available_date
         )
+=======
+    return (
+        not certificates_viewable_for_course(course_overview)
+        and CertificateStatuses.is_passing_status(status)
+        and course_overview.certificates_display_behavior in (
+            CertificatesDisplayBehaviors.END_WITH_DATE,
+            CertificatesDisplayBehaviors.END
+        )
+    )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 def process_survey_link(survey_link, user):

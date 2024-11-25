@@ -5,7 +5,10 @@ from datetime import datetime, timedelta
 from unittest.mock import patch
 
 import ddt
+<<<<<<< HEAD
 from django.conf import settings
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.test import TestCase
 from pytz import utc
 
@@ -80,6 +83,7 @@ class CertificateUtilityTests(TestCase):
         (CertificatesDisplayBehaviors.END, False, False, _LAST_MONTH, True, True),
     )
     @ddt.unpack
+<<<<<<< HEAD
     @patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
     def test_should_certificate_be_visible_v2(
         self,
@@ -114,6 +118,9 @@ class CertificateUtilityTests(TestCase):
     @ddt.unpack
     @patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=False)
     def test_should_certificate_be_visible_v1(
+=======
+    def test_should_certificate_be_visible(
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self,
         certificates_display_behavior,
         certificates_show_before_end,

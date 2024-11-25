@@ -30,6 +30,10 @@ from openedx.core.djangoapps.programs.signals import (
     handle_course_cert_changed,
     handle_course_cert_revoked,
 )
+<<<<<<< HEAD
+=======
+from openedx.core.djangoapps.programs.tasks import update_certificate_available_date_on_course_update
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 User = get_user_model()
@@ -429,6 +433,7 @@ def is_course_run_in_a_program(course_run_key):
 @set_code_owner_attribute
 def backfill_date_for_all_course_runs():
     """
+<<<<<<< HEAD
     This task will update the course certificate configuration's certificate_available_date in credentials for all
     course runs. This is different from the "visable_date" attribute. This date will either be the available date that
     is set in studio for a given course, or it will be None. This will exclude any course runs that do not have a
@@ -475,5 +480,20 @@ def backfill_date_for_all_course_runs():
             except Exception:  # lint-amnesty, pylint: disable=W0703
                 error_msg = f"Failed to send certificate_available_date for course {course_key}."
                 logger.exception(error_msg)
+=======
+    This task enqueues an `update_certificate_available_date_on_course_update` subtask for each course overview in the
+    system in order to determine and update the certificate date stored by the Credentials IDA.
+    """
+    course_overviews = CourseOverview.objects.all()
+    for index, course_overview in enumerate(course_overviews):
+        logger.info(
+            "Enqueueing an `update_certificate_available_date_on_course_update` task for course run "
+            f"`{course_overview.id}`, self_paced={course_overview.self_paced}, end={course_overview.end}, "
+            f"available_date={course_overview.certificate_available_date}, and "
+            f"display_behavior={course_overview.certificates_display_behavior}"
+        )
+        update_certificate_available_date_on_course_update.delay(str(course_overview.id))
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if index % 10 == 0:
             time.sleep(3)

@@ -6,15 +6,25 @@ import pytest
 import json
 import logging
 from contextlib import contextmanager
+<<<<<<< HEAD
 
 import ddt
 import mock
+=======
+from unittest import mock
+from unittest.mock import ANY, Mock, patch
+
+import ddt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test.client import RequestFactory
 from django.urls import reverse
 from eventtracking.processors.exceptions import EventEmissionExit
+<<<<<<< HEAD
 from mock import ANY, Mock, patch
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.signals import FORUM_THREAD_CREATED, FORUM_THREAD_RESPONSE_CREATED, FORUM_RESPONSE_COMMENT_CREATED
 
@@ -1458,6 +1468,11 @@ class CreateSubCommentUnicodeTestCase(
 @disable_signal(views, 'comment_created')
 @disable_signal(views, 'comment_voted')
 @disable_signal(views, 'comment_deleted')
+<<<<<<< HEAD
+=======
+@disable_signal(views, 'comment_flagged')
+@disable_signal(views, 'thread_flagged')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
     # Most of the test points use the same ddt data.
     # args: user, commentable_id, status_code

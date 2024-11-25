@@ -47,7 +47,11 @@ import sys
 import time
 from datetime import datetime
 
+<<<<<<< HEAD
 import bleach
+=======
+import nh3
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import html5lib
 import pyparsing
 import six
@@ -800,7 +804,11 @@ class CodeInput(InputTypeBase):
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg  # lint-amnesty, pylint: disable=attribute-defined-outside-init
+<<<<<<< HEAD
             self.msg = bleach.clean(self.submitted_msg)
+=======
+            self.msg = nh3.clean(self.submitted_msg)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def setup(self):
         """ setup this input type """

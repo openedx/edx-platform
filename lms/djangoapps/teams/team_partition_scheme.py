@@ -58,7 +58,11 @@ class TeamPartitionScheme:
 
     This is how it works:
     - A user partition is created for each team-set in the course with a unused partition ID generated in runtime
+<<<<<<< HEAD
     by using generate_int_id() with min=MINIMUM_STATIC_PARTITION_ID and max=MYSQL_MAX_INT.
+=======
+    by using generate_int_id() with min=MINIMUM_UNUSED_PARTITION_ID and max=MYSQL_MAX_INT.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     - A (Content) group is created for each team in the team-set with the database team ID as the group ID,
     and the team name as the group name.
     - A user is assigned to a group if they are a member of the team.

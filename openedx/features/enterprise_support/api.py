@@ -422,8 +422,18 @@ def enterprise_customer_from_session(request):
     """
     Retrieve enterprise_customer data from the request's session,
     returning a ``__CACHE_MISS__`` if absent.
+<<<<<<< HEAD
     """
     return request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME, _CACHE_MISS)
+=======
+
+    Now checks for session existence before attempting to access it.
+    """
+    if not request or not hasattr(request, 'session'):
+        return _CACHE_MISS
+    else:
+        return request.session.get(ENTERPRISE_CUSTOMER_KEY_NAME, _CACHE_MISS)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 def enterprise_customer_uuid_from_session(request):

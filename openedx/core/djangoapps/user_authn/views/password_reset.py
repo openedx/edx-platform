@@ -52,6 +52,10 @@ from common.djangoapps.util.password_policy_validators import normalize_password
 POST_EMAIL_KEY = 'openedx.core.djangoapps.util.ratelimit.request_post_email'
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
+<<<<<<< HEAD
+=======
+PASSWORD_RESET_INITIATED = 'edx.user.passwordreset.initiated'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # Maintaining this naming for backwards compatibility.
 log = logging.getLogger("edx.student")
@@ -289,6 +293,16 @@ def password_reset(request):
     user = request.user
     # Prefer logged-in user's email
     email = user.email if user.is_authenticated else request.POST.get('email')
+<<<<<<< HEAD
+=======
+    tracker.emit(
+        PASSWORD_RESET_INITIATED,
+        {
+            "user_id": user.id,
+            "source": "Logistration Page",
+        }
+    )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     AUDIT_LOG.info("Password reset initiated for email %s.", email)
 
     if getattr(request, 'limited', False):
@@ -608,6 +622,16 @@ def password_change_request_handler(request):
         # Prefer logged-in user's email
         email = user.email if user.is_authenticated else request.POST.get('email')
     AUDIT_LOG.info("Password reset initiated for email %s.", email)
+<<<<<<< HEAD
+=======
+    tracker.emit(
+        PASSWORD_RESET_INITIATED,
+        {
+            "user_id": user.id,
+            "source": "Account API",
+        }
+    )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     if getattr(request, 'limited', False) and not request_from_support_tools:
         AUDIT_LOG.warning("Password reset rate limit exceeded for email %s.", email)

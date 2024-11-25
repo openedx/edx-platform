@@ -1,7 +1,11 @@
 """
 course_overview api tests
 """
+<<<<<<< HEAD
 from mock import patch
+=======
+from unittest.mock import patch
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from django.http.response import Http404
 from opaque_keys.edx.keys import CourseKey

@@ -1,6 +1,7 @@
 """ Constants used for the content libraries. """
 from django.utils.translation import gettext_lazy as _
 
+<<<<<<< HEAD
 # ./api.py and ./views.py are only used in Studio, so we always work with this draft of any
 # content library bundle:
 DRAFT_NAME = 'studio_draft'
@@ -14,6 +15,8 @@ LIBRARY_TYPES = (
     (COMPLEX, _('Complex')),
     (PROBLEM, _('Problem')),
 )
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 # These are all the licenses we support so far.
 ALL_RIGHTS_RESERVED = ''

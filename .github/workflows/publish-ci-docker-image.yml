@@ -7,11 +7,19 @@ on:
 
 jobs:
   push:
+<<<<<<< HEAD
     runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+=======
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
       # This has to happen after checkout in order for gh to work.
       - name: "Cancel scheduled job on forks"
@@ -41,4 +49,7 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f scripts/ci-runner.Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

@@ -2,7 +2,10 @@
 Waffle flags and switches for user authn.
 """
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from edx_toggles.toggles import WaffleSwitch
 
 _WAFFLE_NAMESPACE = 'user_authn'

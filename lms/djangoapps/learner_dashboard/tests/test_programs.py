@@ -86,6 +86,7 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     def assert_dict_contains_subset(self, superset, subset):
         """
         Verify that the dict superset contains the dict subset.
+<<<<<<< HEAD
 
         Works like assertDictContainsSubset, deprecated since Python 3.2.
         See: https://docs.python.org/2.7/library/unittest.html#unittest.TestCase.assertDictContainsSubset.
@@ -95,6 +96,11 @@ class TestProgramListing(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         intersection = {key: superset[key] for key in superset_keys & subset_keys}
 
         assert subset == intersection
+=======
+        """
+        for key, value in subset.items():
+            assert key in superset and superset[key] == value, f"{key}: {value} not found in superset or does not match"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def test_login_required(self, mock_get_programs):
         """

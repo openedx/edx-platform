@@ -11,24 +11,31 @@ import HeaderView from './views/program_list_header_view';
 
 function ProgramListFactory(options) {
     const progressCollection = new ProgressCollection();
+<<<<<<< HEAD
     const subscriptionCollection = new Backbone.Collection();
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     if (options.userProgress) {
         progressCollection.set(options.userProgress);
         options.progressCollection = progressCollection; // eslint-disable-line no-param-reassign
     }
 
+<<<<<<< HEAD
     if (options.programsSubscriptionData.length) {
         subscriptionCollection.set(options.programsSubscriptionData);
         options.subscriptionCollection = subscriptionCollection; // eslint-disable-line no-param-reassign
     }
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     if (options.programsData.length) {
         if (!options.mobileOnly) {
             new HeaderView({
                 context: options,
             }).render();
         }
+<<<<<<< HEAD
 
         const activeSubscriptions = options.programsSubscriptionData
             // eslint-disable-next-line camelcase
@@ -63,6 +70,8 @@ function ProgramListFactory(options) {
                     }
                 });
         }
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     }
 
     new CollectionListView({

@@ -91,7 +91,11 @@ class ContentTypeGatingPartition(UserPartition):
         if expiration_datetime and expiration_datetime < datetime.datetime.now(pytz.UTC):
             ecommerce_checkout_link = None
         else:
+<<<<<<< HEAD
             ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku)
+=======
+            ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku, str(course_key))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         request = crum.get_current_request()
 
@@ -118,11 +122,19 @@ class ContentTypeGatingPartition(UserPartition):
         else:
             return _("Graded assessments are available to Verified Track learners. Upgrade to Unlock.")
 
+<<<<<<< HEAD
     def _get_checkout_link(self, user, sku):
         ecomm_service = EcommerceService()
         ecommerce_checkout = ecomm_service.is_enabled(user)
         if ecommerce_checkout and sku:
             return ecomm_service.get_checkout_page_url(sku) or ''
+=======
+    def _get_checkout_link(self, user, sku, course_run_key):
+        ecomm_service = EcommerceService()
+        ecommerce_checkout = ecomm_service.is_enabled(user)
+        if ecommerce_checkout and sku:
+            return ecomm_service.get_checkout_page_url(sku, course_run_keys=[course_run_key]) or ''
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def _get_course_key_from_course_block(self, block):
         """

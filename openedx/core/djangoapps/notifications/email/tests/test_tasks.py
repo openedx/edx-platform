@@ -16,6 +16,10 @@ from openedx.core.djangoapps.notifications.email.tasks import (
     send_digest_email_to_all_users,
     send_digest_email_to_user
 )
+<<<<<<< HEAD
+=======
+from openedx.core.djangoapps.notifications.email.utils import get_start_end_date
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -42,8 +46,14 @@ class TestEmailDigestForUser(ModuleStoreTestCase):
         """
         Tests email is sent iff waffle flag is enabled
         """
+<<<<<<< HEAD
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY)
+=======
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert not mock_func.called
 
     @ddt.data(True, False)
@@ -54,8 +64,14 @@ class TestEmailDigestForUser(ModuleStoreTestCase):
         """
         created_date = datetime.datetime.now() - datetime.timedelta(days=1)
         create_notification(self.user, self.course.id, created=created_date)
+<<<<<<< HEAD
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, flag_value):
             send_digest_email_to_user(self.user, EmailCadence.DAILY)
+=======
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, flag_value):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert mock_func.called is flag_value
 
     @patch('edx_ace.ace.send')
@@ -63,9 +79,16 @@ class TestEmailDigestForUser(ModuleStoreTestCase):
         """
         Tests email is not sent if notification is created on next day
         """
+<<<<<<< HEAD
         create_notification(self.user, self.course.id)
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY)
+=======
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+        create_notification(self.user, self.course.id, created=end_date + datetime.timedelta(minutes=2))
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert not mock_func.called
 
     @patch('edx_ace.ace.send')
@@ -73,12 +96,44 @@ class TestEmailDigestForUser(ModuleStoreTestCase):
         """
         Tests email is not sent if notification is created day before yesterday
         """
+<<<<<<< HEAD
         created_date = datetime.datetime.now() - datetime.timedelta(days=2)
         create_notification(self.user, self.course.id, created=created_date)
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY)
         assert not mock_func.called
 
+=======
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+        created_date = datetime.datetime.now() - datetime.timedelta(days=1, minutes=18)
+        create_notification(self.user, self.course.id, created=created_date)
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+        assert not mock_func.called
+
+    @ddt.data(
+        (EmailCadence.DAILY, datetime.datetime.now() - datetime.timedelta(days=1, minutes=30), False),
+        (EmailCadence.DAILY, datetime.datetime.now() - datetime.timedelta(minutes=10), True),
+        (EmailCadence.DAILY, datetime.datetime.now() - datetime.timedelta(days=1), True),
+        (EmailCadence.DAILY, datetime.datetime.now() + datetime.timedelta(minutes=20), False),
+        (EmailCadence.WEEKLY, datetime.datetime.now() - datetime.timedelta(days=7, minutes=30), False),
+        (EmailCadence.WEEKLY, datetime.datetime.now() - datetime.timedelta(days=7), True),
+        (EmailCadence.WEEKLY, datetime.datetime.now() - datetime.timedelta(minutes=20), True),
+        (EmailCadence.WEEKLY, datetime.datetime.now() + datetime.timedelta(minutes=20), False),
+    )
+    @ddt.unpack
+    @patch('edx_ace.ace.send')
+    def test_notification_content(self, cadence_type, created_time, notification_created, mock_func):
+        """
+        Tests email only contains notification created within date
+        """
+        start_date, end_date = get_start_end_date(cadence_type)
+        create_notification(self.user, self.course.id, created=created_time)
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+        assert mock_func.called is notification_created
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 @ddt.ddt
 class TestEmailDigestAudience(ModuleStoreTestCase):
@@ -146,6 +201,7 @@ class TestEmailDigestAudience(ModuleStoreTestCase):
         """
         Tests email is sent only when notifications with email=True exists
         """
+<<<<<<< HEAD
         created_date = datetime.datetime.now() - datetime.timedelta(days=1)
         create_notification(self.user, self.course.id, created=created_date, email=email_value)
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
@@ -153,6 +209,17 @@ class TestEmailDigestAudience(ModuleStoreTestCase):
             assert mock_func.called is email_value
 
 
+=======
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+        created_date = datetime.datetime.now() - datetime.timedelta(hours=23, minutes=59)
+        create_notification(self.user, self.course.id, created=created_date, email=email_value)
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+            assert mock_func.called is email_value
+
+
+@ddt.ddt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class TestPreferences(ModuleStoreTestCase):
     """
     Tests preferences
@@ -165,7 +232,11 @@ class TestPreferences(ModuleStoreTestCase):
         self.user = UserFactory()
         self.course = CourseFactory.create(display_name='test course', run="Testing_course")
         self.preference = CourseNotificationPreference.objects.create(user=self.user, course_id=self.course.id)
+<<<<<<< HEAD
         created_date = datetime.datetime.now() - datetime.timedelta(days=1)
+=======
+        created_date = datetime.datetime.now() - datetime.timedelta(hours=23)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         create_notification(self.user, self.course.id, notification_type='new_discussion_post', created=created_date)
 
     @patch('edx_ace.ace.send')
@@ -173,6 +244,7 @@ class TestPreferences(ModuleStoreTestCase):
         """
         Tests email is send for digest notification preference
         """
+<<<<<<< HEAD
         config = self.preference.notification_preference_config
         types = config['discussion']['notification_types']
         types['new_discussion_post']['email_cadence'] = EmailCadence.DAILY
@@ -181,15 +253,51 @@ class TestPreferences(ModuleStoreTestCase):
             send_digest_email_to_user(self.user, EmailCadence.DAILY)
         assert mock_func.called
 
+=======
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+        config = self.preference.notification_preference_config
+        types = config['discussion']['notification_types']
+        types['new_discussion_post']['email_cadence'] = EmailCadence.DAILY
+        types['new_discussion_post']['email'] = True
+        self.preference.save()
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+        assert mock_func.called
+
+    @ddt.data(True, False)
+    @patch('edx_ace.ace.send')
+    def test_email_send_for_email_preference_value(self, pref_value, mock_func):
+        """
+        Tests email is sent iff preference value is True
+        """
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+        config = self.preference.notification_preference_config
+        types = config['discussion']['notification_types']
+        types['new_discussion_post']['email_cadence'] = EmailCadence.DAILY
+        types['new_discussion_post']['email'] = pref_value
+        self.preference.save()
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+        assert mock_func.called is pref_value
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     @patch('edx_ace.ace.send')
     def test_email_not_send_if_different_digest_preference(self, mock_func):
         """
         Tests email is not send if digest notification preference doesnot match
         """
+<<<<<<< HEAD
+=======
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         config = self.preference.notification_preference_config
         types = config['discussion']['notification_types']
         types['new_discussion_post']['email_cadence'] = EmailCadence.WEEKLY
         self.preference.save()
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+<<<<<<< HEAD
             send_digest_email_to_user(self.user, EmailCadence.DAILY)
+=======
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert not mock_func.called

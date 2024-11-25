@@ -169,7 +169,12 @@ ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', LMS_IN
 AUTHORING_API_URL = ENV_TOKENS.get('AUTHORING_API_URL', '')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
+<<<<<<< HEAD
 OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
+=======
+CHAT_COMPLETION_API = ENV_TOKENS.get('CHAT_COMPLETION_API', '')
+CHAT_COMPLETION_API_KEY = ENV_TOKENS.get('CHAT_COMPLETION_API_KEY', '')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
 LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
     'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
@@ -405,11 +410,14 @@ XBLOCK_FIELD_DATA_WRAPPERS = ENV_TOKENS.get(
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG', DOC_STORE_CONFIG)
 
+<<<<<<< HEAD
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
 # Configure an API auth token at (blockstore URL)/admin/authtoken/token/
 BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Celery Broker
 CELERY_ALWAYS_EAGER = ENV_TOKENS.get("CELERY_ALWAYS_EAGER", False)
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
@@ -522,9 +530,12 @@ JWT_AUTH.update(AUTH_TOKENS.get('JWT_AUTH', {}))
 if FEATURES.get('CUSTOM_COURSES_EDX'):
     INSTALLED_APPS.append('openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig')
 
+<<<<<<< HEAD
 ############## Settings for CourseGraph ############################
 COURSEGRAPH_JOB_QUEUE = ENV_TOKENS.get('COURSEGRAPH_JOB_QUEUE', LOW_PRIORITY_QUEUE)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ########## Settings for video transcript migration tasks ############
 VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = ENV_TOKENS.get('VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE', DEFAULT_PRIORITY_QUEUE)
 
@@ -621,8 +632,11 @@ EXPLICIT_QUEUES = {
         'queue': SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY},
     'cms.djangoapps.contentstore.tasks.update_search_index': {
         'queue': UPDATE_SEARCH_INDEX_JOB_QUEUE},
+<<<<<<< HEAD
     'cms.djangoapps.coursegraph.tasks.dump_course_to_neo4j': {
         'queue': COURSEGRAPH_JOB_QUEUE},
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 }
 
 LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
@@ -698,3 +712,13 @@ SPECTACULAR_SETTINGS = {
 }
 
 BEAMER_PRODUCT_ID = ENV_TOKENS.get('BEAMER_PRODUCT_ID', BEAMER_PRODUCT_ID)
+<<<<<<< HEAD
+=======
+
+# .. setting_name: DISABLED_COUNTRIES
+# .. setting_default: []
+# .. setting_description: List of country codes that should be disabled
+# .. for now it wil impact country listing in auth flow and user profile.
+# .. eg ['US', 'CA']
+DISABLED_COUNTRIES = ENV_TOKENS.get('DISABLED_COUNTRIES', [])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

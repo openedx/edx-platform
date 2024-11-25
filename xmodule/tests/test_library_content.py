@@ -1,7 +1,11 @@
 """
+<<<<<<< HEAD
 Basic unit tests for LibraryContentBlock
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
+=======
+Basic unit tests for LegacyLibraryContentBlock
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 """
 from unittest.mock import MagicMock, Mock, patch
 
@@ -9,15 +13,24 @@ import ddt
 from bson.objectid import ObjectId
 from fs.memoryfs import MemoryFS
 from lxml import etree
+<<<<<<< HEAD
 from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
+=======
+from opaque_keys.edx.locator import LibraryLocator
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from rest_framework import status
 from search.search_engine_base import SearchEngine
 from web_fragments.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
 from openedx.core.djangolib.testing.utils import skip_unless_cms
+<<<<<<< HEAD
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LibraryContentBlock
 from xmodule.library_tools import LibraryToolsService
+=======
+from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
+from xmodule.library_tools import LegacyLibraryToolsService
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
@@ -33,15 +46,25 @@ dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-
 
 
 @skip_unless_cms
+<<<<<<< HEAD
 class LibraryContentTest(MixedSplitTestCase):
     """
     Base class for tests of LibraryContentBlock (library_content_block.py)
+=======
+class LegacyLibraryContentTest(MixedSplitTestCase):
+    """
+    Base class for tests of LegacyLibraryContentBlock (library_content_block.py)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     def setUp(self):
         super().setUp()
         self.user_id = UserFactory().id
+<<<<<<< HEAD
         self.tools = LibraryToolsService(self.store, self.user_id)
+=======
+        self.tools = LegacyLibraryToolsService(self.store, self.user_id)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.library = LibraryFactory.create(modulestore=self.store)
         self.lib_blocks = [
             self.make_block("html", self.library, data=f"Hello world from block {i}")
@@ -88,6 +111,7 @@ class LibraryContentTest(MixedSplitTestCase):
 
 
 @ddt.ddt
+<<<<<<< HEAD
 class LibraryContentGeneralTest(LibraryContentTest):
     """
     Test the base functionality of the LibraryContentBlock.
@@ -103,14 +127,30 @@ class LibraryContentGeneralTest(LibraryContentTest):
         Test the source_library_key property of the xblock.
 
         The method should correctly work either with V1 or V2 libraries.
+=======
+class LegacyLibraryContentGeneralTest(LegacyLibraryContentTest):
+    """
+    Test the base functionality of the LegacyLibraryContentBlock.
+    """
+
+    def test_source_library_key(self):
+        """
+        Test the source_library_key property of the xblock.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         library = self.make_block(
             "library_content",
             self.vertical,
             max_count=1,
+<<<<<<< HEAD
             source_library_id=library_key
         )
         assert isinstance(library.source_library_key, expected_locator_type)
+=======
+            source_library_id='library-v1:ProblemX+PR0B',
+        )
+        assert isinstance(library.source_library_key, LibraryLocator)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def test_initial_sync_from_library(self):
         """
@@ -133,9 +173,15 @@ class LibraryContentGeneralTest(LibraryContentTest):
         assert len(self.lc_block.children) == len(self.lib_blocks)
 
 
+<<<<<<< HEAD
 class TestLibraryContentExportImport(LibraryContentTest):
     """
     Export and import tests for LibraryContentBlock
+=======
+class TestLibraryContentExportImport(LegacyLibraryContentTest):
+    """
+    Export and import tests for LegacyLibraryContentBlock
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     def setUp(self):
         super().setUp()
@@ -173,7 +219,10 @@ class TestLibraryContentExportImport(LibraryContentTest):
         assert imported_lc_block.display_name == self.lc_block.display_name
         assert imported_lc_block.source_library_id == self.lc_block.source_library_id
         assert imported_lc_block.source_library_version == self.lc_block.source_library_version
+<<<<<<< HEAD
         assert imported_lc_block.mode == self.lc_block.mode
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert imported_lc_block.max_count == self.lc_block.max_count
         assert imported_lc_block.capa_type == self.lc_block.capa_type
         assert len(imported_lc_block.children) == len(self.lc_block.children)
@@ -195,13 +244,21 @@ class TestLibraryContentExportImport(LibraryContentTest):
 
         # Now import it.
         olx_element = etree.fromstring(exported_olx)
+<<<<<<< HEAD
         imported_lc_block = LibraryContentBlock.parse_xml(olx_element, self.runtime, None)
+=======
+        imported_lc_block = LegacyLibraryContentBlock.parse_xml(olx_element, self.runtime, None)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         self._verify_xblock_properties(imported_lc_block)
 
     def test_xml_import_with_comments(self):
         """
+<<<<<<< HEAD
         Test that XML comments within LibraryContentBlock are ignored during the import.
+=======
+        Test that XML comments within LegacyLibraryContentBlock are ignored during the import.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         olx_with_comments = (
             '<!-- Comment -->\n'
@@ -219,15 +276,25 @@ class TestLibraryContentExportImport(LibraryContentTest):
 
         # Import the olx.
         olx_element = etree.fromstring(olx_with_comments)
+<<<<<<< HEAD
         imported_lc_block = LibraryContentBlock.parse_xml(olx_element, self.runtime, None)
+=======
+        imported_lc_block = LegacyLibraryContentBlock.parse_xml(olx_element, self.runtime, None)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         self._verify_xblock_properties(imported_lc_block)
 
 
 @ddt.ddt
+<<<<<<< HEAD
 class LibraryContentBlockTestMixin:
     """
     Basic unit tests for LibraryContentBlock
+=======
+class LegacyLibraryContentBlockTestMixin:
+    """
+    Basic unit tests for LegacyLibraryContentBlock
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     problem_types = [
         ["multiplechoiceresponse"], ["optionresponse"], ["optionresponse", "coderesponse"],
@@ -424,8 +491,13 @@ class LibraryContentBlockTestMixin:
         Test the settings that are marked as "non-editable".
         """
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
+<<<<<<< HEAD
         assert LibraryContentBlock.mode in non_editable_metadata_fields
         assert LibraryContentBlock.display_name not in non_editable_metadata_fields
+=======
+        assert LegacyLibraryContentBlock.source_library_version in non_editable_metadata_fields
+        assert LegacyLibraryContentBlock.display_name not in non_editable_metadata_fields
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def test_overlimit_blocks_chosen_randomly(self):
         """
@@ -503,7 +575,11 @@ search_index_mock = Mock(spec=SearchEngine)  # pylint: disable=invalid-name
 
 
 @patch.object(SearchEngine, 'get_search_engine', Mock(return_value=None, autospec=True))
+<<<<<<< HEAD
 class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, LibraryContentTest):
+=======
+class TestLegacyLibraryContentBlockWithSearchIndex(LegacyLibraryContentBlockTestMixin, LegacyLibraryContentTest):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Tests for library container with mocked search engine response.
     """
@@ -532,9 +608,15 @@ class TestLibraryContentBlockWithSearchIndex(LibraryContentBlockTestMixin, Libra
 )
 @patch('xmodule.html_block.HtmlBlock.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
+<<<<<<< HEAD
 class TestLibraryContentRender(LibraryContentTest):
     """
     Rendering unit tests for LibraryContentBlock
+=======
+class TestLibraryContentRender(LegacyLibraryContentTest):
+    """
+    Rendering unit tests for LegacyLibraryContentBlock
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     def setUp(self):
@@ -559,9 +641,15 @@ class TestLibraryContentRender(LibraryContentTest):
         # but some js initialization should happen
 
 
+<<<<<<< HEAD
 class TestLibraryContentAnalytics(LibraryContentTest):
     """
     Test analytics features of LibraryContentBlock
+=======
+class TestLibraryContentAnalytics(LegacyLibraryContentTest):
+    """
+    Test analytics features of LegacyLibraryContentBlock
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     def setUp(self):
@@ -573,7 +661,11 @@ class TestLibraryContentAnalytics(LibraryContentTest):
 
     def _assert_event_was_published(self, event_type):
         """
+<<<<<<< HEAD
         Check that a LibraryContentBlock analytics event was published by self.lc_block.
+=======
+        Check that a LegacyLibraryContentBlock analytics event was published by self.lc_block.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         assert self.publisher.called
         assert len(self.publisher.call_args[0]) == 3  # pylint:disable=unsubscriptable-object

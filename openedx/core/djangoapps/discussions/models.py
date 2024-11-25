@@ -318,6 +318,11 @@ def get_supported_providers() -> List[str]:
 class ProviderFilter(StackedConfigurationModel):
     """
     Associate allow/deny-lists of discussions providers with courses/orgs
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     allow = ListCharField(
@@ -406,6 +411,11 @@ T = TypeVar('T', bound='DiscussionsConfiguration')
 class DiscussionsConfiguration(TimeStampedModel):
     """
     Associates a learning context with discussion provider and configuration
+<<<<<<< HEAD
+=======
+
+    .. no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
 
     context_key = LearningContextKeyField(
@@ -554,6 +564,11 @@ class DiscussionsConfiguration(TimeStampedModel):
 class DiscussionTopicLink(models.Model):
     """
     A model linking discussion topics ids to the part of a course they are linked to.
+<<<<<<< HEAD
+=======
+
+    ..no_pii:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     context_key = LearningContextKeyField(
         db_index=True,

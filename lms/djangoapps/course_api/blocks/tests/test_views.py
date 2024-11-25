@@ -1,6 +1,7 @@
 """
 Tests for Blocks Views
 """
+<<<<<<< HEAD
 import ddt
 
 from datetime import datetime
@@ -8,20 +9,43 @@ from unittest import mock
 from unittest.mock import Mock
 from urllib.parse import urlencode, urlunparse
 
+=======
+from datetime import datetime
+from unittest import mock
+from unittest.mock import MagicMock, Mock
+from urllib.parse import urlencode, urlunparse
+
+import ddt
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.urls import reverse
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+<<<<<<< HEAD
+=======
+from rest_framework.utils.serializer_helpers import ReturnList
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseDataResearcherRole
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+<<<<<<< HEAD
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
     Provider,
 )
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+=======
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
+from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import (  # lint-amnesty, pylint: disable=wrong-import-order
+    BlockFactory,
+    ToyCourseFactory
+)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from .helpers import deserialize_usage_key
 
@@ -207,8 +231,14 @@ class TestBlocksView(SharedModuleStoreTestCase):
         self.query_params['all_blocks'] = True
         self.verify_response(403)
 
+<<<<<<< HEAD
     @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
     def test_not_authenticated_public_course_with_blank_username(self):
+=======
+    @mock.patch('lms.djangoapps.courseware.courses.get_course_assignments', return_value=[])
+    @mock.patch("lms.djangoapps.course_api.blocks.forms.permissions.is_course_public", Mock(return_value=True))
+    def test_not_authenticated_public_course_with_blank_username(self, get_course_assignment_mock: MagicMock) -> None:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Verify behaviour when accessing course blocks of a public course for anonymous user anonymously.
         """
@@ -366,7 +396,12 @@ class TestBlocksView(SharedModuleStoreTestCase):
                 block_data['type'] == 'course'
             )
 
+<<<<<<< HEAD
     def test_data_researcher_access(self):
+=======
+    @mock.patch('lms.djangoapps.courseware.courses.get_course_assignments', return_value=[])
+    def test_data_researcher_access(self, get_course_assignment_mock: MagicMock) -> None:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Test if data researcher has access to the api endpoint
         """
@@ -498,6 +533,7 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
             assert response.data['blocks'][block_id].get('completion')
 
     @ddt.data(
+<<<<<<< HEAD
         False,
         True,
     )
@@ -509,6 +545,28 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
             for key, value in blocks.items():
                 if value.get('type') == 'discussion':
                     return True
+=======
+        (False, 'list'),
+        (True, 'list'),
+        (False, 'dict'),
+        (True, 'dict'),
+    )
+    @ddt.unpack
+    def test_filter_discussion_xblocks(self, is_openedx_provider, return_type):
+        """
+        Tests if discussion xblocks are hidden for openedx provider
+        """
+
+        def blocks_has_discussion_xblock(blocks):
+            if isinstance(blocks, ReturnList):
+                for value in blocks:
+                    if value.get('type') == 'discussion':
+                        return True
+            else:
+                for key, value in blocks.items():
+                    if value.get('type') == 'discussion':
+                        return True
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             return False
 
         BlockFactory.create(
@@ -520,9 +578,20 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
         )
         if is_openedx_provider:
             DiscussionsConfiguration.objects.create(context_key=self.course_key, provider_type=Provider.OPEN_EDX)
+<<<<<<< HEAD
         response = self.client.get(self.url, self.query_params)
 
         has_discussion_xblock = blocks_has_discussion_xblock(response.data.get('blocks', {}))
+=======
+        params = self.query_params.copy()
+        if return_type == 'list':
+            params['return_type'] = 'list'
+        response = self.client.get(self.url, params)
+
+        has_discussion_xblock = blocks_has_discussion_xblock(
+            response.data if isinstance(response.data, ReturnList) else response.data.get('blocks', {})
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if is_openedx_provider:
             assert not has_discussion_xblock
         else:

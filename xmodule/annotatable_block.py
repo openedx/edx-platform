@@ -11,7 +11,11 @@ from xblock.fields import Scope, String
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
+<<<<<<< HEAD
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+=======
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     ResourceTemplates,
@@ -180,7 +184,11 @@ class AnnotatableBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.get_html())
+<<<<<<< HEAD
         add_sass_to_fragment(fragment, 'AnnotatableBlockDisplay.scss')
+=======
+        add_css_to_fragment(fragment, 'AnnotatableBlockDisplay.css')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         add_webpack_js_to_fragment(fragment, 'AnnotatableBlockDisplay')
         shim_xmodule_js(fragment, 'Annotatable')
 
@@ -193,7 +201,11 @@ class AnnotatableBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
+<<<<<<< HEAD
         add_sass_to_fragment(fragment, 'AnnotatableBlockEditor.scss')
+=======
+        add_css_to_fragment(fragment, 'AnnotatableBlockEditor.css')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         add_webpack_js_to_fragment(fragment, 'AnnotatableBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment

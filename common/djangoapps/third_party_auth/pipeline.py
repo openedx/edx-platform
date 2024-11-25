@@ -90,7 +90,13 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_api.accounts.utils import username_suffix_generator
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
+<<<<<<< HEAD
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+=======
+from openedx.core.djangoapps.user_authn.toggles import is_auto_generated_username_enabled
+from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
+from openedx.core.djangoapps.user_authn.views.utils import get_auto_generated_username
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from common.djangoapps.third_party_auth.utils import (
     get_associated_user_by_email_response,
     get_user_from_email,
@@ -991,12 +997,24 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         else:
             slug_func = lambda val: val
 
+<<<<<<< HEAD
         if email_as_username and details.get('email'):
             username = details['email']
         elif details.get('username'):
             username = details['username']
         else:
             username = uuid4().hex
+=======
+        if is_auto_generated_username_enabled():
+            username = get_auto_generated_username(details)
+        else:
+            if email_as_username and details.get('email'):
+                username = details['email']
+            elif details.get('username'):
+                username = details['username']
+            else:
+                username = uuid4().hex
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         input_username = username
         final_username = slug_func(clean_func(username[:max_length]))

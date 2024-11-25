@@ -15,7 +15,11 @@ defaults:
 jobs:
   check-requirements:
     name: Compile requirements
+<<<<<<< HEAD
     runs-on: ubuntu-22.04
+=======
+    runs-on: ubuntu-24.04
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     steps:
       # Only run remaining steps if there are changes to requirements/**
@@ -34,6 +38,7 @@ jobs:
               echo "RELEVANT=true" >> "$GITHUB_ENV"
           fi
 
+<<<<<<< HEAD
       - uses: actions/checkout@v3
         if: ${{ env.RELEVANT == 'true' }}
 
@@ -41,6 +46,15 @@ jobs:
         if: ${{ env.RELEVANT == 'true' }}
         with:
           python-version: '3.8'
+=======
+      - uses: actions/checkout@v4
+        if: ${{ env.RELEVANT == 'true' }}
+
+      - uses: actions/setup-python@v5
+        if: ${{ env.RELEVANT == 'true' }}
+        with:
+          python-version: '3.11'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
       - name: "Recompile requirements"
         if: ${{ env.RELEVANT == 'true' }}

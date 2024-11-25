@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 name: CI
+=======
+name: Verify Dunder __init__.py Files
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 on:
   pull_request:
@@ -6,6 +10,7 @@ on:
       - master
 
 jobs:
+<<<<<<< HEAD
 
   verify_dunder_init:
 
@@ -24,3 +29,20 @@ jobs:
     - name: Verify __init__.py files exist
       run: |
         scripts/verify-dunder-init.sh
+=======
+  verify_dunder_init:
+    name: Verify __init__.py Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Ensure git is installed
+        run: |
+          sudo apt-get update && sudo apt-get install git
+
+      - name: Verify __init__.py files exist
+        run: |
+          scripts/verify-dunder-init.sh
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

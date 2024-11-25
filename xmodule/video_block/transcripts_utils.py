@@ -8,17 +8,31 @@ import copy
 import html
 import logging
 import os
+<<<<<<< HEAD
+=======
+import pathlib
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import re
 from functools import wraps
 
 import requests
 import simplejson as json
 from django.conf import settings
+<<<<<<< HEAD
 from lxml import etree
 from opaque_keys.edx.locator import BundleDefinitionLocator
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
 
+=======
+from django.core.exceptions import ObjectDoesNotExist
+from lxml import etree
+from opaque_keys.edx.keys import UsageKeyV2
+from pysrt import SubRipFile, SubRipItem, SubRipTime
+from pysrt.srtexc import Error
+
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
@@ -866,8 +880,17 @@ class VideoTranscriptsMixin:
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
 
+<<<<<<< HEAD
         if dest_lang and dest_lang in other_lang.keys():
             transcript_language = dest_lang
+=======
+        # language in plugin selector exists as transcript
+        if dest_lang and dest_lang in other_lang.keys():
+            transcript_language = dest_lang
+        # language in plugin selector is english and empty transcripts or transcripts and sub exists
+        elif dest_lang and dest_lang == 'en' and (not other_lang or (other_lang and sub)):
+            transcript_language = 'en'
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         elif self.transcript_language in other_lang:
             transcript_language = self.transcript_language
         elif sub:
@@ -945,7 +968,11 @@ def get_transcript_for_video(video_location, subs_id, file_name, language):
     """
     Get video transcript from content store. This is a lower level function and is used by
     `get_transcript_from_contentstore`. Prefer that function instead where possible. If you
+<<<<<<< HEAD
     need to support getting transcripts from VAL or Blockstore as well, use the `get_transcript`
+=======
+    need to support getting transcripts from VAL or Learning Core as well, use the `get_transcript`
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     function instead.
 
     NOTE: Transcripts can be searched from content store by two ways:
@@ -1033,6 +1060,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     return transcript_content, transcript_name, Transcript.mime_types[output_format]
 
 
+<<<<<<< HEAD
 def get_transcript_from_blockstore(video_block, language, output_format, transcripts_info):
     """
     Get video transcript from Blockstore.
@@ -1045,6 +1073,24 @@ def get_transcript_from_blockstore(video_block, language, output_format, transcr
         video/video1/static/video1-en.srt
     This is the same place where other public static files are placed for other
     XBlocks, such as image files used by HTML blocks.
+=======
+def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):
+    """
+    Get video transcript from Learning Core (used for Content Libraries)
+
+    Limitation: This is only going to grab from the Draft version.
+
+    Learning Core models a VideoBlock's data in a more generic thing it calls a
+    Component. Each Component has its own virtual space for file-like data. The
+    OLX for the VideoBlock itself is stored at the root of that space, as
+    ``block.xml``. Static assets that are meant to be user-downloadable are
+    placed in a `static/` directory for that Component, and this is where we
+    expect to store transcript files.
+
+    So if there is a ``video1-en.srt`` file for a particular VideoBlock, we
+    expect that to be stored as ``static/video1-en.srt`` in the Component. Any
+    other downloadable files would be here as well, such as thumbnails.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     Video XBlocks in Blockstore must set the 'transcripts' XBlock field to a
     JSON dictionary listing the filename of the transcript for each language:
@@ -1055,7 +1101,11 @@ def get_transcript_from_blockstore(video_block, language, output_format, transcr
             download_track="true"
         />
 
+<<<<<<< HEAD
     This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
+=======
+      This method is tested in openedx/core/djangoapps/content_libraries/tests/test_static_assets.py
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     Arguments:
         video_block (Video XBlock): The video XBlock
@@ -1066,9 +1116,77 @@ def get_transcript_from_blockstore(video_block, language, output_format, transcr
     Returns:
         tuple containing content, filename, mimetype
     """
+<<<<<<< HEAD
     # TODO: Update to use Learning Core data models once static assets support
     # has been added.
     raise NotImplementedError("Transcripts not supported.")
+=======
+    usage_key = video_block.usage_key
+
+    # Validate that the format is something we even support...
+    if output_format not in (Transcript.SRT, Transcript.SJSON, Transcript.TXT):
+        raise NotFoundError(f'Invalid transcript format `{output_format}`')
+
+    # See if the requested language exists.
+    transcripts = transcripts_info['transcripts']
+    if language not in transcripts:
+        raise NotFoundError(
+            f"Video {usage_key} does not have a transcript file defined for the "
+            f"'{language}' language in its OLX."
+        )
+
+    # Grab the underlying Component. There's no version parameter to this call,
+    # so we're just going to grab the file associated with the latest draft
+    # version for now.
+    component = get_component_from_usage_key(usage_key)
+    component_version = component.versioning.draft
+    if not component_version:
+        raise NotFoundError(
+            f"No transcript for {usage_key} because Component {component.uuid} "
+            "was soft-deleted."
+        )
+
+    file_path = pathlib.Path(f"static/{transcripts[language]}")
+    if file_path.suffix != '.srt':
+        # We want to standardize on .srt
+        raise NotFoundError(
+            "Video XBlocks in Content Libraries only support storing .srt "
+            f"transcript files, but we tried to look up {file_path} for {usage_key}"
+        )
+
+    # TODO: There should be a Learning Core API call for this:
+    try:
+        content = (
+            component_version
+            .componentversioncontent_set
+            .filter(content__has_file=True)
+            .select_related('content')
+            .get(key=file_path)
+            .content
+        )
+        data = content.read_file().read()
+    except ObjectDoesNotExist as exc:
+        raise NotFoundError(
+            f"No file {file_path} found for {usage_key} "
+            f"(ComponentVersion {component_version.uuid})"
+        ) from exc
+
+    # Now convert the transcript data to the requested format:
+    output_filename = f'{file_path.stem}.{output_format}'
+    output_transcript = Transcript.convert(
+        data.decode('utf-8'),
+        input_format=Transcript.SRT,
+        output_format=output_format,
+    )
+    if not output_transcript.strip():
+        raise NotFoundError(
+            f"Transcript file {file_path} found for {usage_key} "
+            f"(ComponentVersion {component_version.uuid}), but it has no "
+            "content or is malformed."
+        )
+
+    return output_transcript, output_filename, Transcript.mime_types[output_format]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=None):
@@ -1088,11 +1206,17 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     if not lang:
         lang = video.get_default_transcript_language(transcripts_info)
 
+<<<<<<< HEAD
     if isinstance(video.scope_ids.def_id, BundleDefinitionLocator):
         # This block is in Blockstore.
         # For Blockstore, VAL is considered deprecated and we can load the transcript file
         # directly using the Blockstore API:
         return get_transcript_from_blockstore(video, lang, output_format, transcripts_info)
+=======
+    if isinstance(video.scope_ids.usage_id, UsageKeyV2):
+        # This block is in Learning Core.
+        return get_transcript_from_learning_core(video, lang, output_format, transcripts_info)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     try:
         edx_video_id = clean_video_id(video.edx_video_id)

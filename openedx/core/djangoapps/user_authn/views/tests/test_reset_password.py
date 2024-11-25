@@ -33,7 +33,11 @@ from openedx.core.djangoapps.user_api.models import UserRetirementRequest
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH, EMAIL_MIN_LENGTH
 from openedx.core.djangoapps.user_authn.views.password_reset import (
+<<<<<<< HEAD
     SETTING_CHANGE_INITIATED, password_reset, LogistrationPasswordResetView,
+=======
+    SETTING_CHANGE_INITIATED, PASSWORD_RESET_INITIATED, password_reset, LogistrationPasswordResetView,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     PasswordResetConfirmWrapper, password_change_request_handler)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
@@ -114,7 +118,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         assert bad_pwd_resp.status_code == 200
         obj = json.loads(bad_pwd_resp.content.decode('utf-8'))
         assert obj == {'success': True, 'value': "('registration/password_reset_done.html', [])"}
+<<<<<<< HEAD
         self.assert_no_events_were_emitted()
+=======
+        self.assert_event_emission_count(PASSWORD_RESET_INITIATED, 1)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @patch(
         'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
@@ -134,7 +142,11 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         assert bad_email_resp.status_code == 200
         obj = json.loads(bad_email_resp.content.decode('utf-8'))
         assert obj == {'success': True, 'value': "('registration/password_reset_done.html', [])"}
+<<<<<<< HEAD
         self.assert_no_events_were_emitted()
+=======
+        self.assert_event_emission_count(PASSWORD_RESET_INITIATED, 1)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @patch(
         'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',
@@ -146,7 +158,10 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         for non-existing user.
         """
         self.assert_password_reset_ratelimitted('thisdoesnotexist@foo.com', AnonymousUser())
+<<<<<<< HEAD
         self.assert_no_events_were_emitted()
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @patch(
         'openedx.core.djangoapps.user_authn.views.password_reset.render_to_string',

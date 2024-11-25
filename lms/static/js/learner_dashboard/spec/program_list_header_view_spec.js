@@ -13,13 +13,17 @@ describe('Program List Header View', () => {
             {
                 uuid: '5b234e3c-3a2e-472e-90db-6f51501dc86c',
                 title: 'edX Demonstration Program',
+<<<<<<< HEAD
                 subscription_eligible: null,
                 subscription_prices: [],
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 detail_url: '/dashboard/programs/5b234e3c-3a2e-472e-90db-6f51501dc86c/',
             },
             {
                 uuid: 'b90d70d5-f981-4508-bdeb-5b792d930c03',
                 title: 'Test Program',
+<<<<<<< HEAD
                 subscription_eligible: true,
                 subscription_prices: [{ price: '500.00', currency: 'USD' }],
                 detail_url: '/dashboard/programs/b90d70d5-f981-4508-bdeb-5b792d930c03/',
@@ -34,6 +38,11 @@ describe('Program List Header View', () => {
                 subscription_state: 'active',
             },
         ],
+=======
+                detail_url: '/dashboard/programs/b90d70d5-f981-4508-bdeb-5b792d930c03/',
+            },
+        ],
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         userProgress: [
             {
                 uuid: '5b234e3c-3a2e-472e-90db-6f51501dc86c',
@@ -50,6 +59,7 @@ describe('Program List Header View', () => {
                 all_unenrolled: true,
             },
         ],
+<<<<<<< HEAD
         isUserB2CSubscriptionsEnabled: true,
     };
 
@@ -57,6 +67,11 @@ describe('Program List Header View', () => {
         context.subscriptionCollection = new Backbone.Collection(
             context.programsSubscriptionData,
         );
+=======
+    };
+
+    beforeEach(() => {
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         context.progressCollection = new ProgressCollection(
             context.userProgress,
         );
@@ -78,6 +93,7 @@ describe('Program List Header View', () => {
     it('should render the program heading', () => {
         expect(view.$('h2:first').text().trim()).toEqual('My programs');
     });
+<<<<<<< HEAD
 
     it('should render a program alert', () => {
         expect(
@@ -92,4 +108,6 @@ describe('Program List Header View', () => {
             view.$('.js-program-list-alerts .alert .view-button').attr('href'),
         ).toEqual('/dashboard/programs/b90d70d5-f981-4508-bdeb-5b792d930c03/');
     });
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 });

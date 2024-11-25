@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 #################
 MixedModuleStore
 #################
+=======
+################
+MixedModuleStore
+################
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 MixedModuleStore provides a common API for all modulestore functions.
 

@@ -32,6 +32,7 @@ class TestPaverQualityViolations(unittest.TestCase):
         self.f.close()
         self.addCleanup(os.remove, self.f.name)
 
+<<<<<<< HEAD
     def test_pylint_parser_other_string(self):
         with open(self.f.name, 'w') as f:
             f.write("hello")
@@ -57,6 +58,8 @@ class TestPaverQualityViolations(unittest.TestCase):
         num = pavelib.quality._count_pylint_violations(f.name)  # pylint: disable=protected-access
         assert num == 1
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_pep8_parser(self):
         with open(self.f.name, 'w') as f:
             f.write("hello\nhithere")

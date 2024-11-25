@@ -1,7 +1,12 @@
 // studio - elements - side drawers
 // ====================
 
+<<<<<<< HEAD
 .drawer-cover {
+=======
+.drawer-cover,
+.picker-cover {
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
   @extend %ui-depth3;
 
   display: none;
@@ -13,7 +18,12 @@
   background: rgba(0, 0, 0, 0.8);
 }
 
+<<<<<<< HEAD
 .drawer-cover.gray-cover {
+=======
+.drawer-cover.gray-cover,
+.picker-cover.gray-cover {
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
   background: rgba(112, 112, 112, 0.8);
 }
 
@@ -29,6 +39,26 @@
   background-color: $gray-l4;
 }
 
+<<<<<<< HEAD
 body.drawer-open {
   overflow: hidden;
 }
+=======
+body.drawer-open,
+body.picker-open {
+  overflow: hidden;
+}
+
+.picker {
+  @extend %ui-depth4;
+
+  display: none;
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  right: 1em;
+  bottom: 1em;
+  background-color: $gray-l4;
+}
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

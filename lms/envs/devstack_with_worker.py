@@ -1,5 +1,9 @@
 """
+<<<<<<< HEAD
 This config file follows the devstack enviroment, but adds the
+=======
+This config file follows the devstack environment, but adds the
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 requirement of a celery worker running in the background to process
 celery tasks.
 

@@ -3,6 +3,10 @@ MongoDB/GridFS-level code for the contentstore.
 """
 
 
+<<<<<<< HEAD
+=======
+import hashlib
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import json
 import os
 
@@ -40,6 +44,7 @@ class MongoContentStore(ContentStore):
         # GridFS will throw an exception if the Database is wrapped in a MongoProxy. So don't wrap it.
         # The appropriate methods below are marked as autoretry_read - those methods will handle
         # the AutoReconnect errors.
+<<<<<<< HEAD
         proxy = False
         mongo_db = connect_to_mongodb(
             db, host,
@@ -50,6 +55,31 @@ class MongoContentStore(ContentStore):
 
         self.fs_files = mongo_db[bucket + ".files"]  # the underlying collection GridFS uses
         self.chunks = mongo_db[bucket + ".chunks"]
+=======
+        self.connection_params = {
+            'db': db,
+            'host': host,
+            'port': port,
+            'tz_aware': tz_aware,
+            'user': user,
+            'password': password,
+            'proxy': False,
+            **kwargs
+        }
+        self.bucket = bucket
+        self.do_connection()
+
+    def do_connection(self):
+        """
+        Connects to mongodb.
+        """
+        mongo_db = connect_to_mongodb(**self.connection_params)
+
+        self.fs = gridfs.GridFS(mongo_db, self.bucket)  # pylint: disable=invalid-name
+
+        self.fs_files = mongo_db[self.bucket + ".files"]  # the underlying collection GridFS uses
+        self.chunks = mongo_db[self.bucket + ".chunks"]
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def close_connections(self):
         """
@@ -57,6 +87,28 @@ class MongoContentStore(ContentStore):
         """
         self.fs_files.database.client.close()
 
+<<<<<<< HEAD
+=======
+    def ensure_connection(self):
+        """
+        Ensure that mongodb connection is open.
+        """
+        if self.check_connection():
+            return
+        self.do_connection()
+
+    def check_connection(self):
+        """
+        Check if mongodb connection is open or not.
+        """
+        connection = self.fs_files.database.client
+        try:
+            connection.admin.command('ping')
+            return True
+        except pymongo.errors.InvalidOperation:
+            return False
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
@@ -69,8 +121,13 @@ class MongoContentStore(ContentStore):
 
         If connections is True, then close the connection to the database as well.
         """
+<<<<<<< HEAD
         connection = self.fs_files.database.client
 
+=======
+        self.ensure_connection()
+        connection = self.fs_files.database.client
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if database:
             connection.drop_database(self.fs_files.database.name)
         elif collections:
@@ -103,16 +160,33 @@ class MongoContentStore(ContentStore):
             # but many more objects have this in python3 and shouldn't be using the chunking logic. For string and
             # byte streams we write them directly to gridfs and convert them to byetarrys if necessary.
             if hasattr(content.data, '__iter__') and not isinstance(content.data, (bytes, (str,))):
+<<<<<<< HEAD
                 for chunk in content.data:
                     fp.write(chunk)
+=======
+                custom_md5 = hashlib.md5()
+                for chunk in content.data:
+                    fp.write(chunk)
+                    custom_md5.update(chunk)
+                fp.custom_md5 = custom_md5.hexdigest()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             else:
                 # Ideally we could just ensure that we don't get strings in here and only byte streams
                 # but being confident of that wolud be a lot more work than we have time for so we just
                 # handle both cases here.
                 if isinstance(content.data, str):
+<<<<<<< HEAD
                     fp.write(content.data.encode('utf-8'))
                 else:
                     fp.write(content.data)
+=======
+                    encoded_data = content.data.encode('utf-8')
+                    fp.write(encoded_data)
+                    fp.custom_md5 = hashlib.md5(encoded_data).hexdigest()
+                else:
+                    fp.write(content.data)
+                    fp.custom_md5 = hashlib.md5(content.data).hexdigest()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         return content
 
@@ -142,12 +216,20 @@ class MongoContentStore(ContentStore):
                         'thumbnail',
                         thumbnail_location[4]
                     )
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                     thumbnail_location=thumbnail_location,
                     import_path=getattr(fp, 'import_path', None),
                     length=fp.length, locked=getattr(fp, 'locked', False),
+<<<<<<< HEAD
                     content_digest=getattr(fp, 'md5', None),
+=======
+                    content_digest=getattr(fp, 'custom_md5', None),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 )
             else:
                 with self.fs.get(content_id) as fp:
@@ -161,12 +243,20 @@ class MongoContentStore(ContentStore):
                             'thumbnail',
                             thumbnail_location[4]
                         )
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=thumbnail_location,
                         import_path=getattr(fp, 'import_path', None),
                         length=fp.length, locked=getattr(fp, 'locked', False),
+<<<<<<< HEAD
                         content_digest=getattr(fp, 'md5', None),
+=======
+                        content_digest=getattr(fp, 'custom_md5', None),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     )
         except NoFile:
             if throw_on_not_found:  # lint-amnesty, pylint: disable=no-else-raise

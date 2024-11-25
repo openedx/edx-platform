@@ -68,6 +68,7 @@ And it shouldn't matter if we use entities or numeric codes &mdash; &Omega; &ne;
 """
 
 
+<<<<<<< HEAD
 EXPECTED_OPENASSESSMENT_OLX = """
 <openassessment
     submission_start="2001-01-01T00:00"
@@ -174,6 +175,8 @@ I think that this response...
 """
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @skip_unless_cms
 class XBlockSerializationTestCase(SharedModuleStoreTestCase):
     """
@@ -240,17 +243,31 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
             ),
         ])
 
+<<<<<<< HEAD
     def test_html_with_static_asset_blockstore(self):
         """
         Test the blockstore-specific serialization of an HTML block
+=======
+    def test_html_with_static_asset_learning_core(self):
+        """
+        Test the learning-core-specific serialization of an HTML block
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         block_id = self.course.id.make_usage_key('html', 'just_img')  # see sample_courses.py
         html_block = modulestore().get_item(block_id)
         serialized = api.serialize_xblock_to_olx(html_block)
+<<<<<<< HEAD
         serialized_blockstore = api.serialize_modulestore_block_for_blockstore(html_block)
         self.assertXmlEqual(
             serialized_blockstore.olx_str,
             # For blockstore, OLX should never contain "url_name" as that ID is specified by the filename:
+=======
+        serialized_learning_core = api.serialize_modulestore_block_for_learning_core(html_block)
+        self.assertXmlEqual(
+            serialized_learning_core.olx_str,
+            # For learning core, OLX should never contain "url_name" as that ID
+            # is specified by the Component key:
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             """
             <html display_name="Text"><![CDATA[
                 <img src="/static/foo_bar.jpg" />
@@ -259,9 +276,13 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         )
         self.assertIn("CDATA", serialized.olx_str)
         # Static files should be identical:
+<<<<<<< HEAD
         self.assertEqual(serialized.static_files, serialized_blockstore.static_files)
         # This is the only other difference - an extra field with the blockstore-specific definition ID:
         self.assertEqual(serialized_blockstore.def_id, "html/just_img")
+=======
+        self.assertEqual(serialized.static_files, serialized_learning_core.static_files)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def test_html_with_fields(self):
         """ Test an HTML Block with non-default fields like editor='raw' """
@@ -299,6 +320,7 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         self.assertXmlEqual(serialized.olx_str, EXPECTED_SEQUENTIAL_OLX)
 
+<<<<<<< HEAD
     def test_export_sequential_blockstore(self):
         """
         Export a sequential from the toy course, formatted for blockstore.
@@ -321,6 +343,8 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
             </sequential>
         """)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_capa_python_lib(self):
         """ Test capa problem blocks with and without python_lib.zip """
         course = CourseFactory.create(display_name='Python Testing course', run="PY")
@@ -701,10 +725,18 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
 
         # Check that the tags data is serialized and omitted from the OLX
         serialized = api.serialize_xblock_to_olx(openassessment_block)
+<<<<<<< HEAD
         self.assertXmlEqual(
             serialized.olx_str,
             EXPECTED_OPENASSESSMENT_OLX
         )
+=======
+
+        self.assertNotIn("normal tag", serialized.olx_str)
+        self.assertNotIn("<special \"'-=,. |= chars > tag", serialized.olx_str)
+        self.assertNotIn("anotherTag", serialized.olx_str)
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self.assertEqual(serialized.tags, {
             str(openassessment_block.location): {
                 self.taxonomy1.id: ["normal tag", "<special \"'-=,. |= chars > tag", "anotherTag"],

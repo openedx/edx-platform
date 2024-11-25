@@ -17,5 +17,9 @@ class VerifyStudentConfig(AppConfig):
         """
         Connect signal handlers.
         """
+<<<<<<< HEAD
         from lms.djangoapps.verify_student import signals  # pylint: disable=unused-import
+=======
+        from lms.djangoapps.verify_student.signals import handlers, signals  # pylint: disable=unused-import
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         from lms.djangoapps.verify_student import tasks    # pylint: disable=unused-import

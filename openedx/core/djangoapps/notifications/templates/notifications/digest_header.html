@@ -5,6 +5,16 @@
     style="background: #00262b; color: white; width: 100%; padding: 1.5rem"
 >
     <tbody>
+<<<<<<< HEAD
+=======
+        <tr align="right">
+            <td>
+                <a href="{{unsubscribe_url}}" rel="noopener noreferrer" target="_blank" style="color: white; text-decoration: none; font-size: 12px; line-height: 10px">
+                    Unsubscribe
+                </a>
+            </td>
+        </tr>
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         <tr align="center">
             <td>
                 <img src="{{ logo_url }}" style="width: 64px" height="auto" alt="logo_url" />
@@ -12,7 +22,11 @@
         </tr>
         <tr style="height: 20px"></tr>
         <tr align="center">
+<<<<<<< HEAD
             <td style="font-family: Inter; font-size: 32px; font-style: normal; font-weight: 700; line-height: 36px">
+=======
+            <td style="font-family: Inter, Arial, Verdana, sans-serif; font-size: 32px; font-style: normal; font-weight: 700; line-height: 36px">
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 {{ digest_frequency }} email digest
             </td>
         </tr>
@@ -21,7 +35,11 @@
             <td
                 style="
                     color: #bfc9ca;
+<<<<<<< HEAD
                     font-family: Inter;
+=======
+                    font-family: Inter, Arial, Verdana, sans-serif;
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     font-size: 14px;
                     font-style: normal;
                     font-weight: 400;
@@ -38,6 +56,7 @@
                     <tbody>
                         <tr>
                             {% for update in email_digest_updates %}
+<<<<<<< HEAD
                                 <td width="50%">
                                     <p style="
                                         {% if not forloop.last %}padding-right: 0.5rem{% endif %}
@@ -66,6 +85,28 @@
                                     </p>
                                 </td>
                             {% endfor %}
+=======
+                            <td width="33.33%" style="padding: 0.5rem;">
+                                    <table width="100%" cellpadding="0" cellspacing="0" style="background: #1b3b40; color: white; border-radius: 8px; padding: 1.25rem 1rem;">
+                                        <tbody>
+                                            <tr align="center">
+                                                <td style="font-weight: 700; font-size: 32px; line-height: 44px; padding: 0">
+                                                    {{update.count}}
+                                                </td>
+                                            </tr>
+                                            <tr align="center">
+                                                <td style="font-weight: 600; font-size: 14px; line-height: 20px; padding: 0">
+                                                    {{update.title}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </td>
+                            {% if forloop.counter|divisibleby:3 %}
+                            </tr><tr> <!-- Close the row after every third td -->
+                            {% endif %}
+                        {% endfor %}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                         </tr>
                     </tbody>
                 </table>

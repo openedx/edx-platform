@@ -149,6 +149,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertRedirects(response, '/test_basket/add/?sku=TEST', fetch_redirect_response=False)
         ecomm_test_utils.update_commerce_config(enabled=False)
 
+<<<<<<< HEAD
     def test_verified_mode_response_contains_course_run_key(self):
         # Create only the verified mode and enroll the user
         CourseModeFactory.create(
@@ -193,6 +194,8 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
                         response = self.client.get(url)
                         self.assertNotContains(response, "&course_run_key=")
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     @httpretty.activate
     @ddt.data(
         '',

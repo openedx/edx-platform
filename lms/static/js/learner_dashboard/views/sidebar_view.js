@@ -10,9 +10,12 @@ class SidebarView extends Backbone.View {
     constructor(options) {
         const defaults = {
             el: '.sidebar',
+<<<<<<< HEAD
             events: {
                 'click .js-subscription-upsell-cta ': 'trackSubscriptionUpsellCTA',
             },
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         };
         // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
@@ -33,12 +36,15 @@ class SidebarView extends Backbone.View {
             context: this.context,
         });
     }
+<<<<<<< HEAD
 
     trackSubscriptionUpsellCTA() {
         window.analytics.track(
             'edx.bi.user.subscription.program-dashboard.upsell.clicked',
         );
     }
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 }
 
 export default SidebarView;

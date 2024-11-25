@@ -32,6 +32,11 @@ locations.
     how-tos/index
     references/index
     concepts/index
+<<<<<<< HEAD
+=======
+    hooks/index
+    extensions/tinymce_plugins
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 .. grid:: 1 2 2 2
    :gutter: 3
@@ -74,6 +79,21 @@ locations.
          :outline:
          :expand:
 
+<<<<<<< HEAD
+=======
+   .. grid-item-card:: Hooks and Extensions
+      :class-card: sd-shadow-md sd-p-2
+      :class-footer: sd-border-0
+
+      * :doc:`hooks/index`
+      * :doc:`extensions/tinymce_plugins`
+      +++
+      .. button-ref:: hooks/index
+         :color: primary
+         :outline:
+         :expand:
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 Change History
 **************

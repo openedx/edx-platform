@@ -7,7 +7,10 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.roles import GlobalStaff
 from lms.djangoapps.learner_dashboard.config.waffle import (
+<<<<<<< HEAD
     ENABLE_B2C_SUBSCRIPTIONS,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ENABLE_MASTERS_PROGRAM_TAB_VIEW,
     ENABLE_PROGRAM_TAB_VIEW
 )
@@ -50,6 +53,7 @@ def is_enrolled_or_staff(request, program_uuid):
     except ObjectDoesNotExist:
         return False
     return True
+<<<<<<< HEAD
 
 
 def b2c_subscriptions_is_enabled() -> bool:
@@ -66,3 +70,5 @@ def b2c_subscriptions_enabled(is_mobile=False) -> bool:
     if not is_mobile and b2c_subscriptions_is_enabled():
         return True
     return False
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

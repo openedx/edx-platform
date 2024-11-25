@@ -17,10 +17,15 @@ describe('Course Card View', () => {
             programData,
             collectionCourseStatus,
             courseData: {},
+<<<<<<< HEAD
             subscriptionData: [],
             urls: {},
             userPreferences: {},
             isSubscriptionEligible: false,
+=======
+            urls: {},
+            userPreferences: {},
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         };
 
         if (typeof collectionCourseStatus === 'undefined') {

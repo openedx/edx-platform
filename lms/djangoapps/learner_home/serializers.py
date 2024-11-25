@@ -3,7 +3,11 @@ Serializers for Learner Home
 """
 
 from datetime import date, timedelta
+<<<<<<< HEAD
 from urllib.parse import urljoin
+=======
+from urllib.parse import urlencode, urljoin
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from django.conf import settings
 from django.urls import reverse
@@ -132,7 +136,17 @@ class CourseRunSerializer(serializers.Serializer):
         )
 
         if ecommerce_payment_page and verified_sku:
+<<<<<<< HEAD
             return f"{ecommerce_payment_page}?sku={verified_sku}"
+=======
+            query_params = {
+                'sku': verified_sku,
+                'course_run_key': str(instance.course_id)
+            }
+            encoded_params = urlencode(query_params)
+            upgrade_url = f"{ecommerce_payment_page}?{encoded_params}"
+            return upgrade_url
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def get_resumeUrl(self, instance):
         return self.context.get("resume_course_urls", {}).get(instance.course_id)
@@ -293,6 +307,7 @@ class CertificateSerializer(serializers.Serializer):
     def get_availableDate(self, enrollment):
         """Available date changes based off of Certificate display behavior"""
         course_overview = enrollment.course_overview
+<<<<<<< HEAD
         available_date = course_overview.certificate_available_date
 
         if settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
@@ -310,6 +325,22 @@ class CertificateSerializer(serializers.Serializer):
                 available_date = course_overview.end
         else:
             available_date = course_overview.certificate_available_date
+=======
+        available_date = None
+
+        if (
+            course_overview.certificates_display_behavior
+            == CertificatesDisplayBehaviors.END_WITH_DATE
+            and course_overview.certificate_available_date
+        ):
+            available_date = course_overview.certificate_available_date
+        elif (
+            course_overview.certificates_display_behavior
+            == CertificatesDisplayBehaviors.END
+            and course_overview.end
+        ):
+            available_date = course_overview.end
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         return serializers.DateTimeField().to_representation(available_date)
 

@@ -371,10 +371,13 @@ class CourseDetails:
             tuple[str, str]: updated certificate_available_date, updated certificates_display_behavior
             None
         """
+<<<<<<< HEAD
         # If V2 is not enable, return original values
         if not settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False):
             return (certificate_available_date, certificates_display_behavior)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         # "early_no_info" will always show regardless of settings
         if certificates_display_behavior == CertificatesDisplayBehaviors.EARLY_NO_INFO:
             return (None, CertificatesDisplayBehaviors.EARLY_NO_INFO)

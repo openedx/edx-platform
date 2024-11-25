@@ -2,10 +2,13 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
+<<<<<<< HEAD
 import AlertListView from './program_alert_list_view';
 
 import SubscriptionModel from '../models/program_subscription_model';
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import programListHeaderTpl from '../../../templates/learner_dashboard/program_list_header_view.underscore';
 
 class ProgramListHeaderView extends Backbone.View {
@@ -19,6 +22,7 @@ class ProgramListHeaderView extends Backbone.View {
     initialize({ context }) {
         this.context = context;
         this.tpl = HtmlUtils.template(programListHeaderTpl);
+<<<<<<< HEAD
         this.programAndSubscriptionData = context.programsData
             .map((programData) => ({
                 programData,
@@ -30,11 +34,14 @@ class ProgramListHeaderView extends Backbone.View {
                     ?.toJSON(),
             }))
             .filter(({ subscriptionData }) => !!subscriptionData);
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         this.render();
     }
 
     render() {
         HtmlUtils.setHtml(this.$el, this.tpl(this.context));
+<<<<<<< HEAD
         this.postRender();
     }
 
@@ -89,6 +96,8 @@ class ProgramListHeaderView extends Backbone.View {
                 );
             })
             .filter(Boolean);
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     }
 }
 

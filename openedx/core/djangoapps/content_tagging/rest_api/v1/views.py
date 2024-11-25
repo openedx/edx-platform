@@ -13,8 +13,16 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+<<<<<<< HEAD
 from openedx_events.content_authoring.data import ContentObjectData
 from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
+=======
+from openedx_events.content_authoring.data import ContentObjectData, ContentObjectChangedData
+from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    CONTENT_OBJECT_TAGS_CHANGED,
+)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from ...auth import has_view_object_tags_access
 from ...api import (
@@ -28,7 +36,16 @@ from ...api import (
 )
 from ...rules import get_admin_orgs
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
+<<<<<<< HEAD
 from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
+=======
+from .serializers import (
+    ObjectTagCopiedMinimalSerializer,
+    TaxonomyOrgListQueryParamsSerializer,
+    TaxonomyOrgSerializer,
+    TaxonomyUpdateOrgBodySerializer,
+)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class TaxonomyOrgView(TaxonomyView):
@@ -145,18 +162,42 @@ class ObjectTagOrgView(ObjectTagView):
 
     Refer to ObjectTagView docstring for usage details.
     """
+<<<<<<< HEAD
+=======
+    minimal_serializer_class = ObjectTagCopiedMinimalSerializer
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     filter_backends = [ObjectTagTaxonomyOrgFilterBackend]
 
     def update(self, request, *args, **kwargs) -> Response:
         """
+<<<<<<< HEAD
         Extend the update method to fire CONTENT_OBJECT_TAGS_CHANGED event
+=======
+        Extend the update method to fire CONTENT_OBJECT_ASSOCIATIONS_CHANGED event
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         response = super().update(request, *args, **kwargs)
         if response.status_code == 200:
             object_id = kwargs.get('object_id')
+<<<<<<< HEAD
             CONTENT_OBJECT_TAGS_CHANGED.send_event(
                 content_object=ContentObjectData(object_id=object_id)
             )
+=======
+
+            CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                content_object=ContentObjectChangedData(
+                    object_id=object_id,
+                    changes=["tags"],
+                )
+            )
+
+            # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+            CONTENT_OBJECT_TAGS_CHANGED.send_event(
+                content_object=ContentObjectData(object_id=object_id)
+            )
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         return response
 
 

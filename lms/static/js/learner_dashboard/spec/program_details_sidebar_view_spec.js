@@ -1,9 +1,13 @@
 /* globals setFixtures */
 
 import Backbone from 'backbone';
+<<<<<<< HEAD
 import moment from 'moment';
 
 import SubscriptionModel from '../models/program_subscription_model';
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import ProgramSidebarView from '../views/program_details_sidebar_view';
 
 describe('Program Progress View', () => {
@@ -25,15 +29,23 @@ describe('Program Progress View', () => {
         "url": "/certificates/bed3980e67ca40f0b31e309d9dfe9e7e", "type": "course", "title": "Introduction to the Treatment of Urban Sewage"
       }
     ],
+<<<<<<< HEAD
     urls: {"program_listing_url": "/dashboard/programs/", "commerce_api_url": "/api/commerce/v0/baskets/", "track_selection_url": "/course_modes/choose/", "program_record_url": "/foo/bar", "buy_subscription_url": "/subscriptions", "orders_and_subscriptions_url": "/orders", "subscriptions_learner_help_center_url": "/learner"},
+=======
+    urls: {"program_listing_url": "/dashboard/programs/", "commerce_api_url": "/api/commerce/v0/baskets/", "track_selection_url": "/course_modes/choose/"},
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     userPreferences: {"pref-lang": "en"}
     };
     /* eslint-enable */
     let programModel;
     let courseData;
+<<<<<<< HEAD
     let subscriptionData;
     let certificateCollection;
     let isSubscriptionEligible;
+=======
+    let certificateCollection;
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     const testCircle = (progress) => {
         const $circle = view.$('.progress-circle');
@@ -53,6 +65,7 @@ describe('Program Progress View', () => {
         expect(parseInt($numbers.find('.total').html(), 10)).toEqual(total);
     };
 
+<<<<<<< HEAD
     const testSubscriptionState = (state, heading, body) => {
         isSubscriptionEligible = true;
         subscriptionData.subscription_state = state;
@@ -78,10 +91,13 @@ describe('Program Progress View', () => {
         ).toEqual('/learner');
     };
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     const initView = () => new ProgramSidebarView({
         el: '.js-program-sidebar',
         model: programModel,
         courseModel: courseData,
+<<<<<<< HEAD
         subscriptionModel: new SubscriptionModel({
             context: {
                 programData: {
@@ -96,12 +112,17 @@ describe('Program Progress View', () => {
                 userPreferences: data.userPreferences,
             },
         }),
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         certificateCollection,
         industryPathways: data.industryPathways,
         creditPathways: data.creditPathways,
         programTabViewEnabled: false,
         urls: data.urls,
+<<<<<<< HEAD
         isSubscriptionEligible,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     });
 
     beforeEach(() => {
@@ -109,6 +130,7 @@ describe('Program Progress View', () => {
         programModel = new Backbone.Model(data.programData);
         courseData = new Backbone.Model(data.courseData);
         certificateCollection = new Backbone.Collection(data.certificateData);
+<<<<<<< HEAD
         isSubscriptionEligible = false;
         subscriptionData = {
             trial_end: '1970-01-01T03:25:45Z',
@@ -117,6 +139,8 @@ describe('Program Progress View', () => {
             currency: 'USD',
             subscription_state: 'pre',
         };
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     });
 
     afterEach(() => {
@@ -203,6 +227,7 @@ describe('Program Progress View', () => {
             el: '.js-program-sidebar',
             model: programModel,
             courseModel: courseData,
+<<<<<<< HEAD
             subscriptionModel: new SubscriptionModel({
                 context: {
                     programData: {
@@ -217,17 +242,23 @@ describe('Program Progress View', () => {
                     userPreferences: data.userPreferences,
                 },
             }),
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             certificateCollection,
             industryPathways: [],
             creditPathways: [],
             programTabViewEnabled: false,
             urls: data.urls,
+<<<<<<< HEAD
             isSubscriptionEligible,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         });
 
         expect(emptyView.$('.program-credit-pathways .divider-heading')).toHaveLength(0);
         expect(emptyView.$('.program-industry-pathways .divider-heading')).toHaveLength(0);
     });
+<<<<<<< HEAD
 
     it('should not render subscription info if program is not subscription eligible', () => {
         view = initView();
@@ -268,4 +299,6 @@ describe('Program Progress View', () => {
             'Restart your subscription for $100/month USD. Your payment history is still available',
         );
     });
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 });

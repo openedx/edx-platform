@@ -1,6 +1,9 @@
 """HTTP end-points for the User API. """
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
@@ -16,21 +19,35 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from openedx.core.djangoapps.django_comment_common.models import Role
+<<<<<<< HEAD
 from openedx.core.lib.api.view_utils import require_post_params
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
 from openedx.core.djangoapps.user_api.serializers import (
     CountryTimeZoneSerializer,
     UserPreferenceSerializer,
+<<<<<<< HEAD
     UserSerializer
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+=======
+    UserSerializer,
+)
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from openedx.core.lib.api.view_utils import require_post_params
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
     DRF class for interacting with the User ORM object
     """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = User.objects.all().prefetch_related("preferences").select_related("profile")
     serializer_class = UserSerializer
@@ -42,6 +59,10 @@ class ForumRoleUsersListView(generics.ListAPIView):
     """
     Forum roles are represented by a list of user dicts
     """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     permission_classes = (ApiKeyHeaderPermission,)
     serializer_class = UserSerializer
     paginate_by = 10
@@ -51,10 +72,17 @@ class ForumRoleUsersListView(generics.ListAPIView):
         """
         Return a list of users with the specified role/course pair
         """
+<<<<<<< HEAD
         name = self.kwargs['name']
         course_id_string = self.request.query_params.get('course_id')
         if not course_id_string:
             raise ParseError('course_id must be specified')
+=======
+        name = self.kwargs["name"]
+        course_id_string = self.request.query_params.get("course_id")
+        if not course_id_string:
+            raise ParseError("course_id must be specified")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         course_id = CourseKey.from_string(course_id_string)
         role = Role.objects.get_or_create(course_id=course_id, name=name)[0]
         users = role.users.prefetch_related("preferences").select_related("profile").all()
@@ -65,6 +93,10 @@ class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
     """
     DRF class for interacting with the UserPreference ORM
     """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = UserPreference.objects.all()
     filter_backends = (DjangoFilterBackend,)
@@ -78,12 +110,17 @@ class PreferenceUsersListView(generics.ListAPIView):
     """
     DRF class for listing a user's preferences
     """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     permission_classes = (ApiKeyHeaderPermission,)
     serializer_class = UserSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
 
     def get_queryset(self):
+<<<<<<< HEAD
         return User.objects.filter(
             preferences__key=self.kwargs["pref_key"]
         ).prefetch_related("preferences").select_related("profile")
@@ -91,13 +128,29 @@ class PreferenceUsersListView(generics.ListAPIView):
 
 class UpdateEmailOptInPreference(APIView):
     """View for updating the email opt in preference. """
+=======
+        return (
+            User.objects.filter(preferences__key=self.kwargs["pref_key"])
+            .prefetch_related("preferences")
+            .select_related("profile")
+        )
+
+
+class UpdateEmailOptInPreference(APIView):
+    """View for updating the email opt in preference."""
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     authentication_classes = (SessionAuthenticationAllowInactiveUser,)
     permission_classes = (IsAuthenticated,)
 
     @method_decorator(require_post_params(["course_id", "email_opt_in"]))
     @method_decorator(ensure_csrf_cookie)
     def post(self, request):
+<<<<<<< HEAD
         """ Post function for updating the email opt in preference.
+=======
+        """Post function for updating the email opt in preference.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         Allows the modification or creation of the email opt in preference at an
         organizational level.
@@ -111,6 +164,7 @@ class UpdateEmailOptInPreference(APIView):
                     assume False.
 
         """
+<<<<<<< HEAD
         course_id = request.data['course_id']
         try:
             org = locator.CourseLocator.from_string(course_id).org
@@ -122,6 +176,15 @@ class UpdateEmailOptInPreference(APIView):
             )
         # Only check for true. All other values are False.
         email_opt_in = request.data['email_opt_in'].lower() == 'true'
+=======
+        course_id = request.data["course_id"]
+        try:
+            org = locator.CourseLocator.from_string(course_id).org
+        except InvalidKeyError:
+            return HttpResponse(status=400, content=f"No course '{course_id}' found", content_type="text/plain")
+        # Only check for true. All other values are False.
+        email_opt_in = request.data["email_opt_in"].lower() == "true"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         update_email_opt_in(request.user, org, email_opt_in)
         return HttpResponse(status=status.HTTP_200_OK)
 
@@ -152,9 +215,17 @@ class CountryTimeZoneListView(generics.ListAPIView):
             * time_zone: The name of the time zone.
             * description: The display version of the time zone
     """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     serializer_class = CountryTimeZoneSerializer
     paginator = None
 
     def get_queryset(self):
+<<<<<<< HEAD
         country_code = self.request.GET.get('country_code', None)
+=======
+        country_code = self.request.GET.get("country_code", None)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         return get_country_time_zones(country_code)

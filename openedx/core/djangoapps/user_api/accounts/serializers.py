@@ -47,12 +47,33 @@ LOGGER = logging.getLogger(__name__)
 
 class PhoneNumberSerializer(serializers.BaseSerializer):  # lint-amnesty, pylint: disable=abstract-method
     """
+<<<<<<< HEAD
     Class to serialize phone number into a digit only representation
     """
 
     def to_internal_value(self, data):
         """Remove all non numeric characters in phone number"""
         return re.sub("[^0-9]", "", data) or None
+=======
+    Class to serialize phone number into a digit only representation.
+
+    This serializer removes all non-numeric characters from the phone number,
+    allowing '+' only at the beginning of the number.
+    """
+
+    def to_internal_value(self, data):
+        """
+        Remove all non-numeric characters from the phone number.
+
+        Args:
+            data (str): The input phone number string.
+
+        Returns:
+            str or None: The cleaned phone number string containing only digits,
+                with an optional '+' at the beginning.
+        """
+        return re.sub(r'(?!^)\+|[^0-9+]', "", data) or None
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class LanguageProficiencySerializer(serializers.ModelSerializer):

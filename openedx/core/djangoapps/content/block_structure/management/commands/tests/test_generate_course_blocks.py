@@ -85,6 +85,7 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
             assert mock_update_from_store.call_count == (self.num_courses if force_update else 0)
 
     def test_one_course(self):
+<<<<<<< HEAD
         self._assert_courses_not_in_block_cache(*self.course_keys)
         self.command.handle(courses=[str(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
@@ -94,6 +95,10 @@ class TestGenerateCourseBlocks(ModuleStoreTestCase):
     def test_with_storage(self):
         self.command.handle(with_storage=True, courses=[str(self.course_keys[0])])
         self._assert_courses_in_block_cache(self.course_keys[0])
+=======
+        self.command.handle(courses=[str(self.course_keys[0])])
+        self._assert_courses_in_block_cache(self.course_keys[0])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         self._assert_courses_in_block_storage(self.course_keys[0])
         self._assert_courses_not_in_block_storage(*self.course_keys[1:])
 

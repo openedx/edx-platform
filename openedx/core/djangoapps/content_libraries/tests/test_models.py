@@ -15,7 +15,10 @@ from organizations.models import Organization
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 
 from ..models import ALL_RIGHTS_RESERVED
+<<<<<<< HEAD
 from ..models import COMPLEX
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from ..models import ContentLibrary
 from ..models import LtiGradedResource
 from ..models import LtiProfile
@@ -35,7 +38,10 @@ class ContentLibraryTest(TestCase):
         return ContentLibrary.objects.create(
             org=org,
             slug='foobar',
+<<<<<<< HEAD
             type=COMPLEX,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             allow_public_learning=False,
             allow_public_read=False,
             license=ALL_RIGHTS_RESERVED,

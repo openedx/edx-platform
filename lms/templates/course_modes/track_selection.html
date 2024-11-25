@@ -35,9 +35,15 @@ from openedx.core.djangolib.js_utils import js_escaped_string
             $('.popover-icon').click(function(e){
                 e.stopPropagation();
                 if ($('.popover').css("visibility") == "hidden" || $('.popover').css("visibility") == "" ) {
+<<<<<<< HEAD
                     $('.popover').css({"visibility":"visible", "opacity": 1});   
                 } else {
                     $('.popover').css({"visibility":"hidden", "opacity": 0});   
+=======
+                    $('.popover').css({"visibility":"visible", "opacity": 1});
+                } else {
+                    $('.popover').css({"visibility":"hidden", "opacity": 0});
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 }
             });
         });
@@ -52,7 +58,11 @@ from openedx.core.djangolib.js_utils import js_escaped_string
         }
         window.addEventListener("resize", onresize);
 
+<<<<<<< HEAD
         // responsive: show more 
+=======
+        // responsive: show more
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         $(function(){
             if($(window).width() <= 768) {
             $('.collapsible-item').css({"display":"none"});
@@ -64,7 +74,11 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                 e.preventDefault();
                 $('.collapsible').css({"display":"none"});
             $('.collapsible-item').css({"display":"list-item"});
+<<<<<<< HEAD
             }); 
+=======
+            });
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         });
     </script>
 </%block>
@@ -112,7 +126,11 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                                     </span>
                                     <p class="price-display upgrade-price-string">${currency_symbol}${min_price} ${currency}</p>
                                     <div class="choice-title"><h4>${_("Earn a certificate")}</h4></div>
+<<<<<<< HEAD
                                     <%block name="track_selection_certificate_bullets"/> 
+=======
+                                    <%block name="track_selection_certificate_bullets"/>
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                                     <ul class="list-actions">
                                         <li class="action action-select track-selection-button">
                                             <input type="hidden" name="contribution" value="${price_before_discount or min_price}" />

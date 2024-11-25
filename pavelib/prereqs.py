@@ -8,7 +8,11 @@ import os
 import re
 import subprocess
 import sys
+<<<<<<< HEAD
 from distutils import sysconfig
+=======
+from distutils import sysconfig  # pylint: disable=deprecated-module
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from paver.easy import sh, task  # lint-amnesty, pylint: disable=unused-import
 
@@ -169,7 +173,11 @@ def python_prereqs_installation():
     Installs Python prerequisites
     """
     # 	edx-platform installs some Python projects from within the edx-platform repo itself.
+<<<<<<< HEAD
     sh(f"pip install -e .")
+=======
+    sh("pip install -e .")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     for req_file in PYTHON_REQ_FILES:
         pip_install_req_file(req_file)
 

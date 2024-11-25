@@ -14,7 +14,10 @@ from stevedore.extension import Extension, ExtensionManager
 
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from xmodule.partitions.partitions import (
+<<<<<<< HEAD
     ENROLLMENT_TRACK_PARTITION_ID,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     USER_PARTITION_SCHEME_NAMESPACE,
     Group,
     NoSuchUserPartitionGroupError,
@@ -463,6 +466,7 @@ class TestPartitionService(PartitionServiceBaseClass):
     Test getting a user's group out of a partition
     """
 
+<<<<<<< HEAD
     def test_get_user_group_id_for_partition(self):
         # assign the first group to be returned
         user_partition_id = self.user_partition.id
@@ -478,6 +482,8 @@ class TestPartitionService(PartitionServiceBaseClass):
         group2_id = self.partition_service.get_user_group_id_for_partition(self.user, user_partition_id)
         assert group2_id == groups[1].id
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_caching(self):
         username = "psvc_cache_user"
         user_partition_id = self.user_partition.id
@@ -552,6 +558,7 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         """
         FEATURES['ENABLE_ENROLLMENT_TRACK_USER_PARTITION'] = enable
 
+<<<<<<< HEAD
     def test_enrollment_track_partition_not_added_if_conflict(self):
         """
         Test that the dynamic enrollment track scheme is NOT added if a UserPartition exists with that ID.
@@ -578,6 +585,8 @@ class TestGetCourseUserPartitions(PartitionServiceBaseClass):
         assert 1 == len(all_partitions)
         assert self.TEST_SCHEME_NAME == all_partitions[0].scheme.name
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_filter_inactive_user_partitions(self):
         """
         Tests supplying the `active_only` parameter.

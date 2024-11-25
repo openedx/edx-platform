@@ -108,6 +108,10 @@ class EmailString(String):
     """
     Parse String with email validation
     """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def from_json(self, value):
         if value:
             validate_email(value)
@@ -226,7 +230,12 @@ class ProctoringProvider(String):
     ProctoringProvider field, which includes validation of the provider
     and default that pulls from edx platform settings.
     """
+<<<<<<< HEAD
     def from_json(self, value):
+=======
+
+    def from_json(self, value, validate_providers=False):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         """
         Return ProctoringProvider as full featured Python type. Perform validation on the provider
         and include any inherited values from the platform default.
@@ -235,7 +244,12 @@ class ProctoringProvider(String):
         if settings.FEATURES.get('ENABLE_PROCTORED_EXAMS'):
             # Only validate the provider value if ProctoredExams are enabled on the environment
             # Otherwise, the passed in provider does not matter. We should always return default
+<<<<<<< HEAD
             self._validate_proctoring_provider(value)
+=======
+            if validate_providers:
+                self._validate_proctoring_provider(value)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             value = self._get_proctoring_value(value)
             return value
         else:
@@ -1112,9 +1126,12 @@ class CourseBlock(
         except InvalidTabsException as err:
             raise type(err)(f'{str(err)} For course: {str(self.id)}')  # lint-amnesty, pylint: disable=line-too-long
 
+<<<<<<< HEAD
         if not settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS"):
             self.set_default_certificate_available_date()
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def set_grading_policy(self, course_policy):
         """
         The JSON object can have the keys GRADER and GRADE_CUTOFFS. If either is
@@ -1457,6 +1474,7 @@ class CourseBlock(
     @property
     def forum_posts_allowed(self):
         """
+<<<<<<< HEAD
         Return whether forum posts are allowed by the discussion_blackouts
         setting
         """
@@ -1466,6 +1484,20 @@ class CourseBlock(
             if blackout["start"] <= now <= blackout["end"]:
                 return False
         return True
+=======
+        Return whether forum posts are allowed by the discussion_blackouts setting
+        Checks if posting restrictions are enabled or if there's a currently ongoing blackout period.
+        """
+
+        blackouts = self.get_discussion_blackout_datetimes()
+        posting_restrictions = self.discussions_settings.get('posting_restrictions', 'disabled')
+        now = datetime.now(utc)
+
+        if posting_restrictions == 'enabled':
+            return False
+
+        return all(not (blackout["start"] <= now <= blackout["end"]) for blackout in blackouts)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @property
     def number(self):

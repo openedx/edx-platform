@@ -12,6 +12,10 @@ from io import StringIO
 from unittest.mock import Mock, patch
 
 import dateutil.parser
+<<<<<<< HEAD
+=======
+from common.djangoapps.student.tests.factories import UserFactory
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import ddt
 import pytz
 from django.test import TestCase
@@ -37,6 +41,11 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
 )
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+<<<<<<< HEAD
+=======
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..videos import (
@@ -367,6 +376,10 @@ class VideosHandlerTestCase(
                     'created',
                     'duration',
                     'status',
+<<<<<<< HEAD
+=======
+                    'status_nontranslated',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                     'course_video_image_url',
                     'file_size',
                     'download_link',
@@ -388,8 +401,13 @@ class VideosHandlerTestCase(
         (
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
+<<<<<<< HEAD
                 'status', 'course_video_image_url', 'file_size', 'download_link',
                 'transcripts', 'transcription_status', 'transcript_urls',
+=======
+                'status', 'status_nontranslated', 'course_video_image_url', 'file_size',
+                'download_link', 'transcripts', 'transcription_status', 'transcript_urls',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 'error_description'
             ],
             [
@@ -406,8 +424,13 @@ class VideosHandlerTestCase(
         (
             [
                 'edx_video_id', 'client_video_id', 'created', 'duration',
+<<<<<<< HEAD
                 'status', 'course_video_image_url', 'file_size', 'download_link',
                 'transcripts', 'transcription_status', 'transcript_urls',
+=======
+                'status', 'status_nontranslated', 'course_video_image_url', 'file_size',
+                'download_link', 'transcripts', 'transcription_status', 'transcript_urls',
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 'error_description'
             ],
             [
@@ -1661,3 +1684,85 @@ class GetStorageBucketTestCase(TestCase):
 
         self.assertIn("https://vem_test_bucket.s3.amazonaws.com:443/test_root/", upload_url)
         self.assertIn(edx_video_id, upload_url)
+<<<<<<< HEAD
+=======
+
+
+class CourseYoutubeEdxVideoIds(ModuleStoreTestCase):
+    """
+    This test checks youtube videos in a course
+    """
+    VIEW_NAME = 'youtube_edx_video_ids'
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.course_with_no_youtube_videos = CourseFactory.create()
+        self.store = modulestore()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password='Password1234')
+
+    def get_url_for_course_key(self, course_key, kwargs=None):
+        """Return video handler URL for the given course"""
+        return reverse_course_url(self.VIEW_NAME, course_key, kwargs)  # lint-amnesty, pylint: disable=no-member
+
+    def test_course_with_youtube_videos(self):
+        course_key = self.course.id
+
+        with self.store.bulk_operations(course_key):
+            chapter_loc = self.store.create_child(
+                self.user.id, self.course.location, 'chapter', 'test_chapter'
+            ).location
+            seq_loc = self.store.create_child(
+                self.user.id, chapter_loc, 'sequential', 'test_seq'
+            ).location
+            vert_loc = self.store.create_child(self.user.id, seq_loc, 'vertical', 'test_vert').location
+            self.store.create_child(
+                self.user.id,
+                vert_loc,
+                'problem',
+                'test_problem',
+                fields={"data": "<problem>Test</problem>"}
+            )
+            self.store.create_child(
+                self.user.id, vert_loc, 'video', fields={
+                    "youtube_is_available": False,
+                    "name": "sample_video",
+                    "edx_video_id": "youtube_193_84709099",
+                }
+            )
+
+            response = self.client.get(self.get_url_for_course_key(course_key))
+            self.assertEqual(response.status_code, 200)
+
+            edx_video_ids = json.loads(response.content.decode('utf-8'))['edx_video_ids']
+            self.assertEqual(len(edx_video_ids), 1)
+
+    def test_course_with_no_youtube_videos(self):
+        course_key = self.course_with_no_youtube_videos.id
+
+        with self.store.bulk_operations(course_key):
+            chapter_loc = self.store.create_child(
+                self.user.id, self.course_with_no_youtube_videos.location, 'chapter', 'test_chapter'
+            ).location
+            seq_loc = self.store.create_child(
+                self.user.id, chapter_loc, 'sequential', 'test_seq'
+            ).location
+            vert_loc = self.store.create_child(self.user.id, seq_loc, 'vertical', 'test_vert').location
+            self.store.create_child(
+                self.user.id, vert_loc, 'problem', 'test_problem', fields={"data": "<problem>Test</problem>"}
+            )
+            self.store.create_child(
+                self.user.id, vert_loc, 'video', fields={
+                    "youtube_id_1_0": None,
+                    "name": "sample_video",
+                    "edx_video_id": "no_youtube_193_84709099",
+                }
+            )
+
+            response = self.client.get(self.get_url_for_course_key(course_key))
+
+            edx_video_ids = json.loads(response.content.decode('utf-8'))['edx_video_ids']
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(edx_video_ids), 0)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

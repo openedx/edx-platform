@@ -173,6 +173,7 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
+<<<<<<< HEAD
     'blockstore': {
         'KEY_PREFIX': 'blockstore',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
@@ -190,6 +191,10 @@ BUNDLE_ASSET_STORAGE_SETTINGS = dict(
     ),
 )
 
+=======
+}
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
@@ -348,3 +353,16 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
     "SECRET": "***",
     "URL": "***",
 }
+<<<<<<< HEAD
+=======
+
+############## openedx-learning (Learning Core) config ##############
+OPENEDX_LEARNING = {
+    'MEDIA': {
+        'BACKEND': 'django.core.files.storage.InMemoryStorage',
+        'OPTIONS': {
+            'location': MEDIA_ROOT + "_private"
+        }
+    }
+}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

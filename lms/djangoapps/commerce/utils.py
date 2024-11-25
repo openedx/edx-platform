@@ -13,7 +13,10 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from common.djangoapps.course_modes.models import CourseMode
+<<<<<<< HEAD
 from common.djangoapps.student.models import CourseEnrollmentAttribute
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.commerce.utils import (
     get_ecommerce_api_base_url,
     get_ecommerce_api_client,
@@ -23,10 +26,14 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from .models import CommerceConfiguration
+<<<<<<< HEAD
 from .waffle import (  # lint-amnesty, pylint: disable=invalid-django-waffle-import
     should_redirect_to_commerce_coordinator_checkout,
     should_redirect_to_commerce_coordinator_refunds,
 )
+=======
+from edx_django_utils.plugins import pluggable_override
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 log = logging.getLogger(__name__)
 
@@ -56,6 +63,10 @@ class EcommerceService:
         """ Retrieve Ecommerce service public url root. """
         return configuration_helpers.get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
 
+<<<<<<< HEAD
+=======
+    @pluggable_override('OVERRIDE_GET_ABSOLUTE_ECOMMERCE_URL')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def get_absolute_ecommerce_url(self, ecommerce_page_url):
         """ Return the absolute URL to the ecommerce page.
 
@@ -108,6 +119,7 @@ class EcommerceService:
         """
         return self.get_absolute_ecommerce_url(self.config.basket_checkout_page)
 
+<<<<<<< HEAD
     def get_add_to_basket_url(self):
         """ Return the URL for the payment page based on the waffle switch.
 
@@ -118,12 +130,19 @@ class EcommerceService:
             return urljoin(settings.COMMERCE_COORDINATOR_URL_ROOT, settings.COORDINATOR_CHECKOUT_REDIRECT_PATH)
         return self.payment_page_url()
 
+=======
+    @pluggable_override('OVERRIDE_GET_CHECKOUT_PAGE_URL')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def get_checkout_page_url(self, *skus, **kwargs):
         """ Construct the URL to the ecommerce checkout page and include products.
 
         Args:
             skus (list): List of SKUs associated with products to be added to basket
             program_uuid (string): The UUID of the program, if applicable
+<<<<<<< HEAD
+=======
+            course_run_keys (list): The course run keys of the products to be added to basket.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         Returns:
             Absolute path to the ecommerce checkout page showing basket that contains specified products.
@@ -153,10 +172,19 @@ class EcommerceService:
         """
         Returns the URL for the user to upgrade, or None if not applicable.
         """
+<<<<<<< HEAD
         verified_mode = CourseMode.verified_mode_for_course(course_key)
         if verified_mode:
             if self.is_enabled(user):
                 return self.get_checkout_page_url(verified_mode.sku)
+=======
+        course_run_key = str(course_key)
+
+        verified_mode = CourseMode.verified_mode_for_course(course_key)
+        if verified_mode:
+            if self.is_enabled(user):
+                return self.get_checkout_page_url(verified_mode.sku, course_run_keys=[course_run_key])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             else:
                 return reverse('dashboard')
         return None
@@ -233,6 +261,10 @@ def refund_entitlement(course_entitlement):
         return False
 
 
+<<<<<<< HEAD
+=======
+@pluggable_override('OVERRIDE_REFUND_SEAT')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 def refund_seat(course_enrollment, change_mode=False):
     """
     Attempt to initiate a refund for any orders associated with the seat being unenrolled,
@@ -255,10 +287,13 @@ def refund_seat(course_enrollment, change_mode=False):
     course_key_str = str(course_enrollment.course_id)
     enrollee = course_enrollment.user
 
+<<<<<<< HEAD
     if should_redirect_to_commerce_coordinator_refunds():
         if _refund_in_commerce_coordinator(course_enrollment, change_mode):
             return
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
     api_client = get_ecommerce_api_client(service_user)
 
@@ -282,13 +317,18 @@ def refund_seat(course_enrollment, change_mode=False):
             user=enrollee,
         )
         if change_mode:
+<<<<<<< HEAD
             _auto_enroll(course_enrollment)
+=======
+            auto_enroll(course_enrollment)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     else:
         log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 
     return refund_ids
 
 
+<<<<<<< HEAD
 def _refund_in_commerce_coordinator(course_enrollment, change_mode):
     """
     Helper function to perform refund in Commerce Coordinator.
@@ -359,6 +399,9 @@ def _refund_in_commerce_coordinator(course_enrollment, change_mode):
 
 
 def _auto_enroll(course_enrollment):
+=======
+def auto_enroll(course_enrollment):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Helper method to update an enrollment to a default course mode.
 

@@ -6,11 +6,18 @@ import json
 import re
 import unittest
 from itertools import islice
+<<<<<<< HEAD
+=======
+from unittest.mock import Mock, call, mock_open, patch
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 import backoff
 import ddt
 import requests_mock
+<<<<<<< HEAD
 from mock import Mock, call, mock_open, patch
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 import scripts.user_retirement.utils.jenkins as jenkins
 from scripts.user_retirement.utils.exception import BackendError

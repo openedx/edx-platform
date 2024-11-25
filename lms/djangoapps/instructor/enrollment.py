@@ -34,6 +34,10 @@ from common.djangoapps.track.event_transaction_utils import (
     get_event_transaction_id,
     set_event_transaction_type
 )
+<<<<<<< HEAD
+=======
+from lms.djangoapps.branding.api import get_logo_url_for_email
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.grades.api import constants as grades_constants
 from lms.djangoapps.grades.api import disconnect_submissions_signal_receiver
@@ -124,7 +128,18 @@ def get_user_email_language(user):
     return UserPreference.get_value(user, LANGUAGE_KEY)
 
 
+<<<<<<< HEAD
 def enroll_email(course_id, student_email, auto_enroll=False, email_students=False, email_params=None, language=None):
+=======
+def enroll_email(
+    course_id,
+    student_email,
+    auto_enroll=False,
+    message_students=False,
+    message_params=None,
+    language=None
+):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Enroll a student by email.
 
@@ -132,8 +147,13 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     `auto_enroll` determines what is put in CourseEnrollmentAllowed.auto_enroll
         if auto_enroll is set, then when the email registers, they will be
         enrolled in the course automatically.
+<<<<<<< HEAD
     `email_students` determines if student should be notified of action by email.
     `email_params` parameters used while parsing email templates (a `dict`).
+=======
+    `message_students` determines if student should be notified of action by email or push message.
+    `message_params` parameters used while parsing message templates (a `dict`).
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     `language` is the language used to render the email.
 
     returns two EmailEnrollmentState's
@@ -141,6 +161,19 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
     enrollment_obj = None
+<<<<<<< HEAD
+=======
+    if message_params:
+        message_params.update({
+            'app_label': 'instructor',
+            'push_notification_extra_context': {
+                'notification_type': 'enroll',
+                'course_id': str(course_id),
+            },
+        })
+    else:
+        message_params = {}
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     if previous_state.user and previous_state.user.is_active:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
@@ -158,42 +191,70 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
             course_mode = previous_state.mode
 
         enrollment_obj = CourseEnrollment.enroll_by_email(student_email, course_id, course_mode)
+<<<<<<< HEAD
         if email_students:
             email_params['message_type'] = 'enrolled_enroll'
             email_params['email_address'] = student_email
             email_params['user_id'] = previous_state.user.id
             email_params['full_name'] = previous_state.full_name
             send_mail_to_student(student_email, email_params, language=language)
+=======
+        if message_students:
+            message_params['message_type'] = 'enrolled_enroll'
+            message_params['email_address'] = student_email
+            message_params['user_id'] = previous_state.user.id
+            message_params['full_name'] = previous_state.full_name
+            send_mail_to_student(student_email, message_params, language=language)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     elif not is_email_retired(student_email):
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
         cea.auto_enroll = auto_enroll
         cea.save()
+<<<<<<< HEAD
         if email_students:
             email_params['message_type'] = 'allowed_enroll'
             email_params['email_address'] = student_email
             if previous_state.user:
                 email_params['user_id'] = previous_state.user.id
             send_mail_to_student(student_email, email_params, language=language)
+=======
+        if message_students:
+            message_params['message_type'] = 'allowed_enroll'
+            message_params['email_address'] = student_email
+            if previous_state.user:
+                message_params['user_id'] = previous_state.user.id
+            send_mail_to_student(student_email, message_params, language=language)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
     return previous_state, after_state, enrollment_obj
 
 
+<<<<<<< HEAD
 def unenroll_email(course_id, student_email, email_students=False, email_params=None, language=None):
+=======
+def unenroll_email(course_id, student_email, message_students=False, message_params=None, language=None):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Unenroll a student by email.
 
     `student_email` is student's emails e.g. "foo@bar.com"
+<<<<<<< HEAD
     `email_students` determines if student should be notified of action by email.
     `email_params` parameters used while parsing email templates (a `dict`).
+=======
+    `message_students` determines if student should be notified of action by email or push message.
+    `message_params` parameters used while parsing email templates (a `dict`).
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     `language` is the language used to render the email.
 
     returns two EmailEnrollmentState's
         representing state before and after the action.
     """
     previous_state = EmailEnrollmentState(course_id, student_email)
+<<<<<<< HEAD
     if previous_state.enrollment:
         CourseEnrollment.unenroll_by_email(student_email, course_id)
         if email_students:
@@ -213,18 +274,53 @@ def unenroll_email(course_id, student_email, email_students=False, email_params=
                 email_params['user_id'] = previous_state.user.id
             # Since no User object exists for this student there is no "full_name" available.
             send_mail_to_student(student_email, email_params, language=language)
+=======
+    if message_params:
+        message_params.update({
+            'app_label': 'instructor',
+            'push_notification_extra_context': {
+                'notification_type': 'unenroll',
+            },
+        })
+    else:
+        message_params = {}
+    if previous_state.enrollment:
+        CourseEnrollment.unenroll_by_email(student_email, course_id)
+        if message_students:
+            message_params['message_type'] = 'enrolled_unenroll'
+            message_params['email_address'] = student_email
+            if previous_state.user:
+                message_params['user_id'] = previous_state.user.id
+            message_params['full_name'] = previous_state.full_name
+            send_mail_to_student(student_email, message_params, language=language)
+
+    if previous_state.allowed:
+        CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email).delete()
+        if message_students:
+            message_params['message_type'] = 'allowed_unenroll'
+            message_params['email_address'] = student_email
+            if previous_state.user:
+                message_params['user_id'] = previous_state.user.id
+            # Since no User object exists for this student there is no "full_name" available.
+            send_mail_to_student(student_email, message_params, language=language)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
     return previous_state, after_state
 
 
+<<<<<<< HEAD
 def send_beta_role_email(action, user, email_params):
+=======
+def send_beta_role_email(action, user, message_params):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     """
     Send an email to a user added or removed as a beta tester.
 
     `action` is one of 'add' or 'remove'
     `user` is the User affected
+<<<<<<< HEAD
     `email_params` parameters used while parsing email templates (a `dict`).
     """
     if action in ('add', 'remove'):
@@ -232,11 +328,29 @@ def send_beta_role_email(action, user, email_params):
         email_params['email_address'] = user.email
         email_params['user_id'] = user.id
         email_params['full_name'] = user.profile.name
+=======
+    `message_params` parameters used while parsing email templates (a `dict`).
+    """
+    if action in ('add', 'remove'):
+        message_params['message_type'] = '%s_beta_tester' % action
+        message_params['email_address'] = user.email
+        message_params['user_id'] = user.id
+        message_params['full_name'] = user.profile.name
+        message_params['app_label'] = 'instructor'
+        message_params['push_notification_extra_context'] = {
+            'notification_type': message_params['message_type'],
+            'course_id': str(getattr(message_params.get('course'), 'id', '')),
+        }
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     else:
         raise ValueError(f"Unexpected action received '{action}' - expected 'add' or 'remove'")
     trying_to_add_inactive_user = not user.is_active and action == 'add'
     if not trying_to_add_inactive_user:
+<<<<<<< HEAD
         send_mail_to_student(user.email, email_params, language=get_user_email_language(user))
+=======
+        send_mail_to_student(user.email, message_params, language=get_user_email_language(user))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 @contextmanager
@@ -489,6 +603,10 @@ def get_email_params(course, auto_enroll, secure=True, course_key=None, display_
         'contact_mailing_address': contact_mailing_address,
         'platform_name': platform_name,
         'site_configuration_values': configuration_helpers.get_current_site_configuration_values(),
+<<<<<<< HEAD
+=======
+        'logo_url': get_logo_url_for_email(),
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     }
     return email_params
 

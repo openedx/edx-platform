@@ -10,10 +10,13 @@ import CourseCardView from './course_card_view';
 // eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
+<<<<<<< HEAD
 import AlertListView from './program_alert_list_view';
 
 // eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import SubscriptionModel from '../models/program_subscription_model';
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 import launchIcon from '../../../images/launch-icon.svg';
 import restartIcon from '../../../images/restart-icon.svg';
@@ -27,7 +30,10 @@ class ProgramDetailsView extends Backbone.View {
             el: '.js-program-details-wrapper',
             events: {
                 'click .complete-program': 'trackPurchase',
+<<<<<<< HEAD
                 'click .js-subscription-cta': 'trackSubscriptionCTA',
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             },
         };
         // eslint-disable-next-line prefer-object-spread
@@ -46,9 +52,12 @@ class ProgramDetailsView extends Backbone.View {
         this.certificateCollection = new Backbone.Collection(
             this.options.certificateData,
         );
+<<<<<<< HEAD
         this.subscriptionModel = new SubscriptionModel({
             context: this.options,
         });
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         this.completedCourseCollection = new CourseCardCollection(
             this.courseData.get('completed') || [],
             this.options.userPreferences,
@@ -61,11 +70,14 @@ class ProgramDetailsView extends Backbone.View {
             this.courseData.get('not_started') || [],
             this.options.userPreferences,
         );
+<<<<<<< HEAD
         this.subscriptionEventParams = {
             label: this.options.programData.title,
             program_uuid: this.options.programData.uuid,
         };
         this.options.isSubscriptionEligible = this.getIsSubscriptionEligible();
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         this.render();
 
@@ -76,7 +88,10 @@ class ProgramDetailsView extends Backbone.View {
             pageName: 'program_dashboard',
             linkCategory: 'green_upgrade',
         });
+<<<<<<< HEAD
         this.trackSubscriptionEligibleProgramView();
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     }
 
     static getUrl(base, programData) {
@@ -107,7 +122,10 @@ class ProgramDetailsView extends Backbone.View {
             creditPathways: this.options.creditPathways,
             discussionFragment: this.options.discussionFragment,
             live_fragment: this.options.live_fragment,
+<<<<<<< HEAD
             isSubscriptionEligible: this.options.isSubscriptionEligible,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             launchIcon,
             restartIcon,
         };
@@ -115,7 +133,10 @@ class ProgramDetailsView extends Backbone.View {
         data = $.extend(
             data,
             this.programModel.toJSON(),
+<<<<<<< HEAD
             this.subscriptionModel.toJSON(),
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         );
         HtmlUtils.setHtml(this.$el, this.tpl(data));
         this.postRender();
@@ -126,6 +147,7 @@ class ProgramDetailsView extends Backbone.View {
             model: new Backbone.Model(this.options),
         });
 
+<<<<<<< HEAD
         if (this.options.isSubscriptionEligible) {
             const { enrollmentAlerts, trialEndingAlerts } = this.getAlerts();
 
@@ -140,6 +162,8 @@ class ProgramDetailsView extends Backbone.View {
             }
         }
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         if (this.remainingCourseCollection.length > 0) {
             new CollectionListView({
                 el: '.js-course-list-remaining',
@@ -178,12 +202,18 @@ class ProgramDetailsView extends Backbone.View {
             el: '.js-program-sidebar',
             model: this.programModel,
             courseModel: this.courseData,
+<<<<<<< HEAD
             subscriptionModel: this.subscriptionModel,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             certificateCollection: this.certificateCollection,
             industryPathways: this.options.industryPathways,
             creditPathways: this.options.creditPathways,
             programTabViewEnabled: this.options.programTabViewEnabled,
+<<<<<<< HEAD
             isSubscriptionEligible: this.options.isSubscriptionEligible,
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             urls: this.options.urls,
         });
         let hasIframe = false;
@@ -197,6 +227,7 @@ class ProgramDetailsView extends Backbone.View {
         }).bind(this);
     }
 
+<<<<<<< HEAD
     getIsSubscriptionEligible() {
         const courseCollections = [
             this.completedCourseCollection,
@@ -250,6 +281,8 @@ class ProgramDetailsView extends Backbone.View {
         return alerts;
     }
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     trackPurchase() {
         const data = this.options.programData;
         window.analytics.track('edx.bi.user.dashboard.program.purchase', {
@@ -258,6 +291,7 @@ class ProgramDetailsView extends Backbone.View {
             uuid: data.uuid,
         });
     }
+<<<<<<< HEAD
 
     trackSubscriptionCTA() {
         const state = this.subscriptionModel.get('subscriptionState');
@@ -289,6 +323,8 @@ class ProgramDetailsView extends Backbone.View {
             );
         }
     }
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 }
 
 export default ProgramDetailsView;

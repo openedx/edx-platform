@@ -40,6 +40,12 @@ class TestReindexCourse(ModuleStoreTestCase):
         self.third_course = CourseFactory.create(
             org="test", course="course3", display_name="run1", start=None, end=None
         )
+<<<<<<< HEAD
+=======
+        self.fourth_course = CourseFactory.create(
+            org="test", course="course4", display_name="run1", start=datetime.min.today() - timedelta(weeks=60)
+        )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     REINDEX_PATH_LOCATION = (
         'cms.djangoapps.contentstore.management.commands.reindex_course.CoursewareSearchIndexer.do_course_reindex'
@@ -111,7 +117,13 @@ class TestReindexCourse(ModuleStoreTestCase):
                 call_command('reindex_course', all=True)
 
                 patched_yes_no.assert_called_once_with(ReindexCommand.CONFIRMATION_PROMPT, default='no')
+<<<<<<< HEAD
                 expected_calls = self._build_calls(self.first_course, self.second_course, self.third_course)
+=======
+                expected_calls = self._build_calls(
+                    self.first_course, self.second_course, self.third_course, self.fourth_course
+                )
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 self.assertCountEqual(patched_index.mock_calls, expected_calls)
 
     def test_given_all_key_prompts_and_reindexes_all_courses_cancelled(self):
@@ -134,5 +146,25 @@ class TestReindexCourse(ModuleStoreTestCase):
                 mock.patch(self.MODULESTORE_PATCH_LOCATION, mock.Mock(return_value=self.store)):
             call_command('reindex_course', active=True)
 
+<<<<<<< HEAD
             expected_calls = self._build_calls(self.first_course)
+=======
+            expected_calls = self._build_calls(self.first_course, self.fourth_course)
+            self.assertCountEqual(patched_index.mock_calls, expected_calls)
+
+    @mock.patch.dict(
+        'django.conf.settings.FEATURES',
+        {'COURSEWARE_SEARCH_INCLUSION_DATE': (datetime.min.today() - timedelta(weeks=52)).strftime('%Y-%m-%d')}
+    )
+    def test_given_from_inclusion_date_key_prompt(self):
+        """
+            Test that reindexes all courses that have a start date after a defined inclusion date
+            when --from_inclusion_date key is given.
+        """
+        with mock.patch(self.REINDEX_PATH_LOCATION) as patched_index, \
+                mock.patch(self.MODULESTORE_PATCH_LOCATION, mock.Mock(return_value=self.store)):
+            call_command('reindex_course', from_inclusion_date=True)
+
+            expected_calls = self._build_calls(self.first_course, self.second_course)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             self.assertCountEqual(patched_index.mock_calls, expected_calls)

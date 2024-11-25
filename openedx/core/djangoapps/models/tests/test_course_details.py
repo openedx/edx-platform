@@ -8,7 +8,10 @@ from django.test import override_settings
 import pytest
 import ddt
 from pytz import UTC
+<<<<<<< HEAD
 from unittest.mock import patch  # lint-amnesty, pylint: disable=wrong-import-order
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from django.conf import settings
 from xmodule.modulestore import ModuleStoreEnum
@@ -212,6 +215,7 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
         ),
     )
     @ddt.unpack
+<<<<<<< HEAD
     @patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=True)
     def test_validate_certificate_settings_v2(self, stored_date, stored_behavior, expected_date, expected_behavior):
         assert CourseDetails.validate_certificate_settings(
@@ -236,6 +240,9 @@ class CourseDetailsTestCase(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, ENABLE_V2_CERT_DISPLAY_SETTINGS=False)
     def test_validate_certificate_settings_v1(self, stored_date, stored_behavior, expected_date, expected_behavior):
         """Test that method just returns passed in arguments if v2 is off"""
+=======
+    def test_validate_certificate_settings(self, stored_date, stored_behavior, expected_date, expected_behavior):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         assert CourseDetails.validate_certificate_settings(
             stored_date, stored_behavior
         ) == (expected_date, expected_behavior)

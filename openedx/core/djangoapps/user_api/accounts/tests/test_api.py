@@ -3,7 +3,10 @@ Unit tests for behavior that is specific to the api methods (vs. the view method
 Most of the functionality is covered in test_views.py.
 """
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 import datetime
 import itertools
 import unicodedata
@@ -16,6 +19,10 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+<<<<<<< HEAD
+=======
+from django.test.utils import override_settings
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.urls import reverse
 from pytz import UTC
 from social_django.models import UserSocialAuth
@@ -82,7 +89,12 @@ class CreateAccountMixin:  # lint-amnesty, pylint: disable=missing-class-docstri
 
 @skip_unless_lms
 @ddt.ddt
+<<<<<<< HEAD
 @patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+=======
+@patch('common.djangoapps.student.views.management.render_to_response',
+       Mock(side_effect=mock_render_to_response, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAccountMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -205,7 +217,11 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['social_links'] == \
+<<<<<<< HEAD
             sorted((original_social_links + extra_social_links), key=(lambda s: s['platform']))
+=======
+               sorted((original_social_links + extra_social_links), key=(lambda s: s['platform']))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     def test_replace_social_links(self):
         original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
@@ -306,7 +322,11 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
                 with pytest.raises(AccountValidationError) as validation_error:
                     update_account_settings(self.user, update_data)
                     field_errors = validation_error.value.field_errors
+<<<<<<< HEAD
                     assert 'This field is not editable via this API' ==\
+=======
+                    assert 'This field is not editable via this API' == \
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                            field_errors[field_name_value[0]]['developer_message']
             else:
                 update_account_settings(self.user, update_data)
@@ -424,8 +444,13 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         """
         Test that the user can change their name if change does not require IDV.
         """
+<<<<<<< HEAD
         with patch('openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user') as mock_get_certs,\
              patch('openedx.core.djangoapps.user_api.accounts.api.get_verified_enrollments') as \
+=======
+        with patch('openedx.core.djangoapps.user_api.accounts.api.get_certificates_for_user') as mock_get_certs, \
+            patch('openedx.core.djangoapps.user_api.accounts.api.get_verified_enrollments') as \
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 mock_get_verified_enrollments:
             mock_get_certs.return_value = (
                 [{'status': CertificateStatuses.downloadable}] if
@@ -439,7 +464,12 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert account_settings['name'] == 'New Name'
 
     @patch('django.core.mail.EmailMultiAlternatives.send')
+<<<<<<< HEAD
     @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))  # lint-amnesty, pylint: disable=line-too-long
+=======
+    @patch('common.djangoapps.student.views.management.render_to_string',
+           Mock(side_effect=mock_render_to_string, autospec=True))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_update_sending_email_fails(self, send_mail):
         """Test what happens if all validation checks pass, but sending the email for email change fails."""
         send_mail.side_effect = [Exception, None]
@@ -514,6 +544,10 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         """
         Test that eventing of language proficiencies, which happens update_account_settings method, behaves correctly.
         """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         def verify_event_emitted(new_value, old_value):
             """
             Confirm that the user setting event was properly emitted
@@ -571,6 +605,23 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert account_settings['country'] is None
         assert account_settings['state'] is None
 
+<<<<<<< HEAD
+=======
+    @override_settings(DISABLED_COUNTRIES=['KP'])
+    def test_change_to_disabled_country(self):
+        """
+        Test that changing the country to a disabled country is not allowed
+        """
+        # First set the country and state
+        update_account_settings(self.user, {"country": UserProfile.COUNTRY_WITH_STATES, "state": "MA"})
+        account_settings = get_account_settings(self.default_request)[0]
+        assert account_settings['country'] == UserProfile.COUNTRY_WITH_STATES
+        assert account_settings['state'] == 'MA'
+
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(self.user, {"country": "KP"})
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     def test_get_name_validation_error_too_long(self):
         """
         Test validation error when the name is too long.

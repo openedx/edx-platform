@@ -88,6 +88,27 @@ class AuthNotConfigured(SocialAuthBaseException):
         )
 
 
+<<<<<<< HEAD
+=======
+def _get_site_id_from_settings() -> int:
+    """
+    Simply return SITE_ID from settings.
+
+    We define this function so the current SITE_ID can be used as the default value on a
+    couple fields in this module. We can't use `settings.SITE_ID` directly in the model class,
+    because then the migration file will contain whatever the value of SITE_ID was when the
+    migration was created. This value is usually 1, but in the event that a developer is
+    running a non-default site, they would get a value like 2 or 3, which will result in
+    a dirty migration state. By defining this wrapper function, the name
+    `_get_site_id_from_settings` will be serialized to the migration file as the default,
+    regardless of what any developer's active SITE_ID is.
+
+    Reference: https://docs.djangoproject.com/en/dev/ref/models/fields/#default
+    """
+    return settings.SITE_ID
+
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 class ProviderConfig(ConfigurationModel):
     """
     Abstract Base Class for configuring a third_party_auth provider
@@ -143,7 +164,11 @@ class ProviderConfig(ConfigurationModel):
     )
     site = models.ForeignKey(
         Site,
+<<<<<<< HEAD
         default=settings.SITE_ID,
+=======
+        default=_get_site_id_from_settings,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         related_name='%(class)ss',
         help_text=_(
             'The Site that this provider configuration belongs to.'
@@ -455,7 +480,11 @@ class SAMLConfiguration(ConfigurationModel):
     KEY_FIELDS = ('site_id', 'slug')
     site = models.ForeignKey(
         Site,
+<<<<<<< HEAD
         default=settings.SITE_ID,
+=======
+        default=_get_site_id_from_settings,
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         related_name='%(class)ss',
         help_text=_(
             'The Site that this SAML configuration belongs to.'

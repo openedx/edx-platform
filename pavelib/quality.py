@@ -10,8 +10,11 @@ from xml.sax.saxutils import quoteattr
 
 from paver.easy import BuildFailure, cmdopts, needs, sh, task
 
+<<<<<<< HEAD
 from openedx.core.djangolib.markup import HTML
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from .utils.envs import Env
 from .utils.timer import timed
 
@@ -79,6 +82,7 @@ def top_python_dirs(dirname):
     return top_dirs
 
 
+<<<<<<< HEAD
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
@@ -216,6 +220,8 @@ def _count_pylint_violations(report_file):
     return num_violations_report
 
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 def _get_pep8_violations(clean=True):
     """
     Runs pycodestyle. Returns a tuple of (number_of_violations, violations_string)
@@ -248,7 +254,10 @@ def _pep8_violations(report_file):
 
 
 @task
+<<<<<<< HEAD
 @needs('pavelib.prereqs.install_python_prereqs')
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 @cmdopts([
     ("system=", "s", "System to act on"),
 ])
@@ -740,6 +749,7 @@ def check_keywords():
                 report_path
             )
         )
+<<<<<<< HEAD
 
 
 @task
@@ -807,3 +817,5 @@ def get_violations_reports(violations_type):
             if f == f"{violations_type}.report":
                 violations_files.append(os.path.join(subdir, f))
     return violations_files
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

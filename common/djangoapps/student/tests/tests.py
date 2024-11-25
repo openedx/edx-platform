@@ -440,6 +440,7 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         assert response.status_code == 200
         self.assertContains(response, 'Add Certificate to LinkedIn')
 
+<<<<<<< HEAD
         # We can switch to this and the commented out assertContains once edx-platform reaches Python 3.8
         # expected_url = (
         #     'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
@@ -462,6 +463,21 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         self.assertContains(response, escape('&organizationId={company_identifier}'.format(
             company_identifier=linkedin_config.company_identifier
         )))
+=======
+        expected_url = (
+            'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+            'name={platform}+Honor+Code+Certificate+for+Omega&'
+            'certUrl={cert_url}&'
+            'organizationId={company_identifier}'
+        ).format(
+            platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+            cert_url=quote(cert.download_url, safe=''),
+            company_identifier=linkedin_config.company_identifier
+        )
+
+        # Single assertion for the expected LinkedIn URL
+        self.assertContains(response, escape(expected_url))
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
     @skip_unless_lms
     def test_dashboard_metadata_caching(self):

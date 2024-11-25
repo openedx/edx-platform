@@ -5,7 +5,10 @@ Javascript test tasks
 
 from paver import tasks
 
+<<<<<<< HEAD
 from pavelib import assets
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from pavelib.utils.envs import Env
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites.suite import TestSuite

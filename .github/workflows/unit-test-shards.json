@@ -106,7 +106,10 @@
       "openedx/core/djangoapps/course_live/",
       "openedx/core/djangoapps/dark_lang/",
       "openedx/core/djangoapps/debug/",
+<<<<<<< HEAD
       "openedx/core/djangoapps/demographics/",
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
       "openedx/core/djangoapps/discussions/",
       "openedx/core/djangoapps/django_comment_common/",
       "openedx/core/djangoapps/embargo/",
@@ -187,7 +190,10 @@
       "openedx/core/djangoapps/credit/",
       "openedx/core/djangoapps/dark_lang/",
       "openedx/core/djangoapps/debug/",
+<<<<<<< HEAD
       "openedx/core/djangoapps/demographics/",
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
       "openedx/core/djangoapps/discussions/",
       "openedx/core/djangoapps/django_comment_common/",
       "openedx/core/djangoapps/embargo/",
@@ -239,7 +245,10 @@
     "paths": [
       "cms/djangoapps/api/",
       "cms/djangoapps/cms_user_tasks/",
+<<<<<<< HEAD
       "cms/djangoapps/coursegraph/",
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
       "cms/djangoapps/course_creators/",
       "cms/djangoapps/export_course_metadata/",
       "cms/djangoapps/maintenance/",
@@ -259,13 +268,23 @@
   "common-with-lms": {
     "settings": "lms.envs.test",
     "paths": [
+<<<<<<< HEAD
       "common/djangoapps/"
+=======
+      "common/djangoapps/",
+      "pavelib/"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ]
   },
   "common-with-cms": {
     "settings": "cms.envs.test",
     "paths": [
+<<<<<<< HEAD
       "common/djangoapps/"
+=======
+      "common/djangoapps/",
+      "pavelib/"
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     ]
   },
   "xmodule-with-lms": {

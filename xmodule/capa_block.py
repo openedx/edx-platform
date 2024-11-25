@@ -14,7 +14,11 @@ import struct
 import sys
 import traceback
 
+<<<<<<< HEAD
 from bleach.sanitizer import Cleaner
+=======
+import nh3
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
@@ -37,7 +41,11 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
 from xmodule.util.sandboxing import SandboxService
+<<<<<<< HEAD
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+=======
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from xmodule.x_module import (
     ResourceTemplates,
     XModuleMixin,
@@ -361,7 +369,11 @@ class ProblemBlock(
         else:
             html = self.get_html()
         fragment = Fragment(html)
+<<<<<<< HEAD
         add_sass_to_fragment(fragment, "ProblemBlockDisplay.scss")
+=======
+        add_css_to_fragment(fragment, "ProblemBlockDisplay.css")
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         add_webpack_js_to_fragment(fragment, 'ProblemBlockDisplay')
         shim_xmodule_js(fragment, 'Problem')
         return fragment
@@ -393,7 +405,11 @@ class ProblemBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
+<<<<<<< HEAD
         add_sass_to_fragment(fragment, 'ProblemBlockEditor.scss')
+=======
+        add_css_to_fragment(fragment, 'ProblemBlockEditor.css')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         add_webpack_js_to_fragment(fragment, 'ProblemBlockEditor')
         shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
         return fragment
@@ -616,11 +632,23 @@ class ProblemBlock(
             "",
             capa_content
         )
+<<<<<<< HEAD
         capa_content = re.sub(
             r"(\s|&nbsp;|//)+",
             " ",
             Cleaner(tags=[], strip=True).clean(capa_content)
         )
+=======
+        # Strip out all other tags, leaving their content. But we want spaces between adjacent tags, so that
+        # <choice correct="true"><div>Option A</div></choice><choice correct="false"><div>Option B</div></choice>
+        # becomes "Option A Option B" not "Option AOption B" (these will appear in search results)
+        capa_content = re.sub(r"</(\w+)><([^>]+)>", r"</\1> <\2>", capa_content)
+        capa_content = re.sub(
+            r"(\s|&nbsp;|//)+",
+            " ",
+            nh3.clean(capa_content, tags=set())
+        ).strip()
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
         capa_body = {
             "capa_content": capa_content,

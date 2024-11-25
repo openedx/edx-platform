@@ -3,8 +3,14 @@
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
     'js/views/components/add_xblock_button', 'js/views/components/add_xblock_menu',
+<<<<<<< HEAD
     'edx-ui-toolkit/js/utils/html-utils'],
 function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, HtmlUtils) {
+=======
+    'js/views/components/add_library_content',
+    'edx-ui-toolkit/js/utils/html-utils'],
+function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, AddLibraryContent, HtmlUtils) {
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'use strict';
 
     var AddXBlockComponent = BaseView.extend({
@@ -67,6 +73,7 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Htm
                 oldOffset = ViewUtils.getScrollOffset(this.$el);
             event.preventDefault();
             this.closeNewComponent(event);
+<<<<<<< HEAD
             ViewUtils.runOperationShowingMessage(
                 gettext('Adding'),
                 _.bind(this.options.createComponent, this, saveData, $element)
@@ -75,6 +82,34 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Htm
                 // component appears above them.
                 ViewUtils.setScrollOffset(self.$el, oldOffset);
             });
+=======
+
+            if (saveData.type === 'library_v2') {
+                var modal = new AddLibraryContent();
+                modal.showComponentPicker(
+                    this.options.libraryContentPickerUrl,
+                    function(data) {
+                        ViewUtils.runOperationShowingMessage(
+                            gettext('Adding'),
+                            _.bind(this.options.createComponent, this, data, $element),
+                        ).always(function() {
+                            // Restore the scroll position of the buttons so that the new
+                            // component appears above them.
+                            ViewUtils.setScrollOffset(self.$el, oldOffset);
+                        });
+                    }.bind(this)
+                );
+            } else {
+                ViewUtils.runOperationShowingMessage(
+                    gettext('Adding'),
+                    _.bind(this.options.createComponent, this, saveData, $element),
+                ).always(function() {
+                    // Restore the scroll position of the buttons so that the new
+                    // component appears above them.
+                    ViewUtils.setScrollOffset(self.$el, oldOffset);
+                });
+            }
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         }
     });
 

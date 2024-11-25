@@ -27,6 +27,7 @@ However, we are proactively working towards a system where:
 Themable Sass (.scss)
 *********************
 
+<<<<<<< HEAD
 XBlock CSS for ``student_view``, ``author_view``, and ``public_view`` is compiled from the various ``./<ClassName>BlockDisplay.scss`` modules, such as `AnnotatableBlockDisplay.scss`_.
 
 XBlock CSS for ``studio_view`` is compiled from the various ``./<ClassName>BlockEditor.scss`` modules, such as `AnnotatableBlockEditor.scss`_.
@@ -46,6 +47,17 @@ It is collected into the static root, and then linked to from XBlock fragments b
 .. _annotatable/_display.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/annotatable/_display.scss
 .. _simplify things: https://github.com/openedx/edx-platform/issues/32621
 
+=======
+Formerly, built-in XBlock CSS for ``student_view``, ``author_view``, and
+``public_view`` was compiled from the various
+``./<ClassName>BlockDisplay.scss`` modules, and ``studio_view`` CSS was
+compiled from the various ``./<ClassName>BlockEditor.scss`` modules.
+
+As of November 2024, all that built-in XBlock Sass was been permanently
+compiled into CSS, stored at ``../static/css-builtin-blocks/``.
+The theme-overridable Sass variables are injected into CSS variables via
+``../../common/static/sass/_builtin-block-variables.scss``.
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 JavaScript (.js)
 ****************

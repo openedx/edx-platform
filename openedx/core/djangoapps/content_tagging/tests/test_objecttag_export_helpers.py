@@ -4,14 +4,23 @@ Test the objecttag_export_helpers module
 import time
 from unittest.mock import patch
 
+<<<<<<< HEAD
+=======
+from openedx_tagging.core.tagging.models import ObjectTag
+from organizations.models import Organization
+
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from openedx.core.djangoapps.content_libraries import api as library_api
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .. import api
 from ..helpers.objecttag_export_helpers import TaggedContent, build_object_tree_with_objecttags, iterate_with_level
+<<<<<<< HEAD
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 
 class TestGetAllObjectTagsMixin:

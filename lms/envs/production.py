@@ -143,8 +143,13 @@ if STATIC_URL_BASE:
 REQUIRE_BUILD_PROFILE = ENV_TOKENS.get('REQUIRE_BUILD_PROFILE', REQUIRE_BUILD_PROFILE)
 
 # The following variables use (or) instead of the default value inside (get). This is to enforce using the Lazy Text
+<<<<<<< HEAD
 # values when the varibale is an empty string. Therefore, setting these variable as empty text in related
 # json files will make the system reads thier values from django translation files
+=======
+# values when the variable is an empty string. Therefore, setting these variable as empty text in related
+# json files will make the system reads their values from django translation files
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME') or PLATFORM_NAME
 PLATFORM_DESCRIPTION = ENV_TOKENS.get('PLATFORM_DESCRIPTION') or PLATFORM_DESCRIPTION
 
@@ -362,7 +367,11 @@ VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
 # Determines whether the CSRF token can be transported on
 # unencrypted channels. It is set to False here for backward compatibility,
+<<<<<<< HEAD
 # but it is highly recommended that this is True for enviroments accessed
+=======
+# but it is highly recommended that this is True for environments accessed
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # by end users.
 CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
 
@@ -502,9 +511,15 @@ MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTOR
 
 # After conversion above, the modulestore will have a "stores" list with all defined stores, for all stores, add the
 # fs_root entry to derived collection so that if it's a callable it can be resolved.  We need to do this because the
+<<<<<<< HEAD
 # `derived_collection_entry` takes an exact index value but the config file might have overidden the number of stores
 # and so we can't be sure that the 2 we define in common.py will be there when we try to derive settings.  This could
 # lead to execptions being thrown when the `derive_settings` call later in this file tries to update settings.  We call
+=======
+# `derived_collection_entry` takes an exact index value but the config file might have overridden the number of stores
+# and so we can't be sure that the 2 we define in common.py will be there when we try to derive settings.  This could
+# lead to exceptions being thrown when the `derive_settings` call later in this file tries to update settings.  We call
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # the derived_collection_entry function here to ensure that we update the fs_root for any callables that remain after
 # we've updated the MODULESTORE setting from our config file.
 for idx, store in enumerate(MODULESTORE['default']['OPTIONS']['stores']):
@@ -516,11 +531,14 @@ MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', '')  # django default is ''
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', '')  # django default is ''
 
+<<<<<<< HEAD
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = ENV_TOKENS.get('BLOCKSTORE_API_URL', None)  # e.g. "https://blockstore.example.com/api/v1/"
 # Configure an API auth token at (blockstore URL)/admin/authtoken/token/
 BLOCKSTORE_API_AUTH_TOKEN = AUTH_TOKENS.get('BLOCKSTORE_API_AUTH_TOKEN', None)
 
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 # Analytics API
 ANALYTICS_API_KEY = AUTH_TOKENS.get("ANALYTICS_API_KEY", ANALYTICS_API_KEY)
 ANALYTICS_API_URL = ENV_TOKENS.get("ANALYTICS_API_URL", ANALYTICS_API_URL)
@@ -927,7 +945,12 @@ ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
     ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
 )
 
+<<<<<<< HEAD
 OPENAI_API_KEY = ENV_TOKENS.get('OPENAI_API_KEY', '')
+=======
+CHAT_COMPLETION_API = ENV_TOKENS.get('CHAT_COMPLETION_API', '')
+CHAT_COMPLETION_API_KEY = ENV_TOKENS.get('CHAT_COMPLETION_API_KEY', '')
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
 LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
     'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
@@ -1067,8 +1090,11 @@ EXPLICIT_QUEUES = {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.revoke_program_certificates': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
+<<<<<<< HEAD
     'openedx.core.djangoapps.programs.tasks.update_certificate_visible_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
     'openedx.core.djangoapps.programs.tasks.update_certificate_available_date_on_course_update': {
         'queue': PROGRAM_CERTIFICATES_ROUTING_KEY},
     'openedx.core.djangoapps.programs.tasks.award_course_certificate': {
@@ -1130,3 +1156,13 @@ NOTIFICATIONS_EXPIRY = ENV_TOKENS.get('NOTIFICATIONS_EXPIRY', NOTIFICATIONS_EXPI
 EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
                                                    ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))
 BEAMER_PRODUCT_ID = ENV_TOKENS.get('BEAMER_PRODUCT_ID', BEAMER_PRODUCT_ID)
+<<<<<<< HEAD
+=======
+
+# .. setting_name: DISABLED_COUNTRIES
+# .. setting_default: []
+# .. setting_description: List of country codes that should be disabled
+# .. for now it wil impact country listing in auth flow and user profile.
+# .. eg ['US', 'CA']
+DISABLED_COUNTRIES = ENV_TOKENS.get('DISABLED_COUNTRIES', [])
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

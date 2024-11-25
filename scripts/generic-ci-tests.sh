@@ -77,8 +77,11 @@ case "$TEST_SUITE" in
 
         mkdir -p reports
 
+<<<<<<< HEAD
         echo "Finding fixme's and storing report..."
         run_paver_quality find_fixme || { EXIT=1; }
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         echo "Finding pycodestyle violations and storing report..."
         run_paver_quality run_pep8 || { EXIT=1; }
         echo "Finding ESLint violations and storing report..."

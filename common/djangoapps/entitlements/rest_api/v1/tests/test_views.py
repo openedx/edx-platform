@@ -6,7 +6,10 @@ import logging
 import uuid
 from datetime import datetime, timedelta
 from unittest.mock import patch
+<<<<<<< HEAD
 from uuid import uuid4
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from django.conf import settings
 from django.urls import reverse
@@ -1236,6 +1239,7 @@ class EntitlementEnrollmentViewSetTest(ModuleStoreTestCase):
         assert CourseEnrollment.is_enrolled(self.user, self.course.id)
         assert course_entitlement.enrollment_course_run is not None
         assert course_entitlement.expired_at is None
+<<<<<<< HEAD
 
 
 @skip_unless_lms
@@ -1393,3 +1397,5 @@ class RevokeSubscriptionsVerifiedAccessViewTest(ModuleStoreTestCase):
         mock_task.assert_called_once_with(args=([str(course_entitlement.uuid)],
                                                 [str(enrollment.course_id)],
                                                 self.user.username))
+=======
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374

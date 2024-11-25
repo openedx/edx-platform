@@ -1,6 +1,7 @@
 """
 Tests for the Course Home Course Metadata API in the Course Home API
 """
+<<<<<<< HEAD
 
 import ddt
 import json
@@ -9,6 +10,15 @@ from django.db import transaction
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from unittest.mock import patch
+=======
+import json
+from unittest.mock import patch
+
+import ddt
+from django.db import transaction
+from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -108,7 +118,11 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=True):
             UPDATES_METHOD_NAME = 'common.djangoapps.student.models.user.UserCelebration.perform_streak_updates'
+<<<<<<< HEAD
             with mock.patch(UPDATES_METHOD_NAME, return_value=3):
+=======
+            with patch(UPDATES_METHOD_NAME, return_value=3):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
                 assert celebrations['streak_length_to_celebrate'] == 3
@@ -187,7 +201,11 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
             self.update_masquerade(role=masquerade_role)
 
         consent_url = 'dump/consent/url' if dsc_required else None
+<<<<<<< HEAD
         with mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url', return_value=consent_url):
+=======
+        with patch('openedx.features.enterprise_support.api.get_enterprise_consent_url', return_value=consent_url):
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             response = self.client.get(self.url)
 
         self._assert_course_access_response(response, expect_course_access, error_code)

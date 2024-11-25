@@ -45,7 +45,11 @@ class LTI20RESTResultServiceTest(unittest.TestCase):
 
         test_cases = (  # (before sanitize, after sanitize)
             ("plaintext", "plaintext"),
+<<<<<<< HEAD
             ("a <script>alert(3)</script>", "a &lt;script&gt;alert(3)&lt;/script&gt;"),  # encodes scripts
+=======
+            ("a <script>alert(3)</script>", "a "),  # drops scripts
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
             ("<b>bold 包</b>", "<b>bold 包</b>"),  # unicode, and <b> tags pass through
         )
         for case in test_cases:

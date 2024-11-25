@@ -8,6 +8,10 @@ from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 
+<<<<<<< HEAD
+=======
+import openedx.core.djangoapps.content.block_structure.api as bs_api
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
 from ...api import get_course_blocks
 from ..library_content import ContentLibraryOrderTransformer, ContentLibraryTransformer
 from .helpers import CourseStructureTestCase
@@ -41,6 +45,11 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
+<<<<<<< HEAD
+=======
+        # Do this manually because publish signals are not fired by default in tests.
+        bs_api.update_course_in_cache(self.course.id)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         clear_course_from_cache(self.course.id)
 
         # Enroll user in course.
@@ -122,6 +131,10 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         )
         assert len(list(raw_block_structure.get_block_keys())) == len(self.blocks)
 
+<<<<<<< HEAD
+=======
+        bs_api.update_course_in_cache(self.course.id)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         clear_course_from_cache(self.course.id)
         trans_block_structure = get_course_blocks(
             self.user,
@@ -175,6 +188,10 @@ class ContentLibraryOrderTransformerTestCase(CourseStructureTestCase):
         self.course_hierarchy = self.get_course_hierarchy()
         self.blocks = self.build_course(self.course_hierarchy)
         self.course = self.blocks['course']
+<<<<<<< HEAD
+=======
+        bs_api.update_course_in_cache(self.course.id)
+>>>>>>> 139b4167b37b49d2d69cccdbd19d8ccef40d3374
         clear_course_from_cache(self.course.id)
 
         # Enroll user in course.
