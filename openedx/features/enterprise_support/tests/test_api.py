@@ -101,6 +101,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
         cls.enterprise_customer = EnterpriseCustomerFactory()
         super().setUpTestData()
+    
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.client.login(
+            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
+            password='password123')
 
     def setUp(self):
         super().setUp()
@@ -1437,7 +1444,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         user_4.profile.save()
 
         enterprise_customer = EnterpriseCustomerFactory()
-
         EnterpriseCustomerUserFactory(
             user_id=user_1.id,
             enterprise_customer=enterprise_customer
