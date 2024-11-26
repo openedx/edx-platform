@@ -315,6 +315,7 @@ redirects = {
     'hooks/index': 'https://docs.openedx.org/en/latest/developers/concepts/hooks_extension_framework.html',
 }
 
+
 def update_settings_module(service='lms'):
     """
     Set the "DJANGO_SETTINGS_MODULE" environment variable appropriately
