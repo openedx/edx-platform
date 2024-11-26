@@ -68,6 +68,7 @@ extensions = [
     'code_annotations.contrib.sphinx.extensions.featuretoggles',
     'code_annotations.contrib.sphinx.extensions.settings',
     # 'autoapi.extension',  # Temporarily disabled
+    'sphinx_reredirects',
 ]
 
 # Temporarily disabling autoapi_dirs and the AutoAPI extension due to performance issues.
@@ -304,6 +305,15 @@ modules = {
     # 'xmodule': 'references/docstrings/xmodule',
 }
 
+# Mapping permanently moved pages to appropriate new location outside of edx-platform
+# with by sphinx-reredirects extension redirects.
+# More information: https://documatt.com/sphinx-reredirects/usage.html
+
+redirects = {
+    'hooks/events': 'https://docs.openedx.org/projects/openedx-events/en/latest/',
+    'hooks/filters': 'https://docs.openedx.org/projects/openedx-filters/en/latest/',
+    'hooks/index': 'https://docs.openedx.org/en/latest/developers/concepts/hooks_extension_framework.html',
+}
 
 def update_settings_module(service='lms'):
     """
