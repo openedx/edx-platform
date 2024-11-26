@@ -320,3 +320,4 @@ WordCloudBlock = (
     _ExtractedWordCloudBlock if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK
     else _BuiltInWordCloudBlock
 )
+WordCloudBlock.__name__ = "WordCloudBlock"

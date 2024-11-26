@@ -283,3 +283,4 @@ DiscussionXBlock = (
     _ExtractedDiscussionXBlock if settings.USE_EXTRACTED_DISCUSSION_BLOCK
     else _BuiltInDiscussionXBlock
 )
+DiscussionXBlock.__name__ = "DiscussionXBlock"

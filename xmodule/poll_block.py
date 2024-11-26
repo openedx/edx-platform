@@ -253,3 +253,4 @@ PollBlock = (
     _ExtractedPollBlock if settings.USE_EXTRACTED_POLL_QUESTION_BLOCK
     else _BuiltInPollBlock
 )
+PollBlock.__name__ = "PollBlock"

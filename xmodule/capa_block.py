@@ -2516,3 +2516,4 @@ ProblemBlock = (
     _ExtractedProblemBlock if settings.USE_EXTRACTED_PROBLEM_BLOCK
     else _BuiltInProblemBlock
 )
+ProblemBlock.__name__ = "ProblemBlock"

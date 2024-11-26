@@ -1267,3 +1267,4 @@ VideoBlock = (
     _ExtractedVideoBlock if settings.USE_EXTRACTED_VIDEO_BLOCK
     else _BuiltInVideoBlock
 )
+VideoBlock.__name__ = "VideoBlock"

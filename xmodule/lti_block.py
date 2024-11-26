@@ -990,3 +990,4 @@ LTIBlock = (
     _ExtractedLTIBlock if settings.USE_EXTRACTED_LTI_BLOCK
     else _BuiltInLTIBlock
 )
+LTIBlock.__name__ = "LTIBlock"

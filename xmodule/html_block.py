@@ -51,7 +51,6 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     The HTML XBlock mixin.
     This provides the base class for all Html-ish blocks (including the HTML XBlock).
     """
-    is_extracted = False
 
     display_name = String(
         display_name=_("Display Name"),
@@ -361,6 +360,7 @@ class _BuiltInHtmlBlock(HtmlBlockMixin):  # lint-amnesty, pylint: disable=abstra
     This is the actual HTML XBlock.
     Nothing extra is required; this is just a wrapper to include edxnotes support.
     """
+    is_extracted = False
 
 
 class AboutFields:  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -498,3 +498,4 @@ HtmlBlock = (
     _ExtractedHtmlBlock if settings.USE_EXTRACTED_HTML_BLOCK
     else _BuiltInHtmlBlock
 )
+HtmlBlock.__name__ = "HtmlBlock"

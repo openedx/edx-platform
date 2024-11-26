@@ -207,3 +207,4 @@ AnnotatableBlock = (
     _ExtractedAnnotatableBlock if settings.USE_EXTRACTED_ANNOTATABLE_BLOCK
     else _BuiltInAnnotatableBlock
 )
+AnnotatableBlock.__name__ = "AnnotatableBlock"
