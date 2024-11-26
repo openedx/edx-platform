@@ -2316,28 +2316,35 @@ def courseware_mfe_search_enabled(request, course_id=None):
     Simple GET endpoint to expose whether the user may use Courseware Search
     for a given course.
     """
-    enabled = False
     course_key = CourseKey.from_string(course_id) if course_id else None
     user = request.user
 
+    has_required_enrollment = False
     if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED'):
         enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
         if (
             auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
             or (enrollment_mode in CourseMode.VERIFIED_MODES)
         ):
-            enabled = True
+            has_required_enrollment = True
     else:
-        enabled = True
+        has_required_enrollment = True
 
     inclusion_date = settings.FEATURES.get('COURSEWARE_SEARCH_INCLUSION_DATE')
     start_date = CourseOverview.get_from_id(course_key).start
+    has_valid_inclusion_date = False
 
-    # only include courses that have a start date later than the setting-defined inclusion date
+    # only include courses that have a start date later than the setting-defined inclusion date, if setting exists
     if inclusion_date:
-        enabled = enabled and (start_date and start_date.strftime('%Y-%m-%d') > inclusion_date)
+        has_valid_inclusion_date = start_date and start_date.strftime('%Y-%m-%d') > inclusion_date
 
-    payload = {"enabled": courseware_mfe_search_is_enabled(course_key) if enabled else False}
+    # if the user has the appropriate enrollment, the feature is enabled if the course has a valid start date
+    # or if the feature is explicitly enabled via waffle flag.
+    enabled = (has_valid_inclusion_date or courseware_mfe_search_is_enabled(course_key)) \
+        if has_required_enrollment \
+        else False
+
+    payload = {"enabled": enabled}
     return JsonResponse(payload)
 
 
