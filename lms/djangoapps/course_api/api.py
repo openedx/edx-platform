@@ -75,8 +75,12 @@ def course_detail(request, username, course_key):
     user = get_effective_user(request.user, username)
     overview = get_course_overview_with_access(
         user,
-        get_permission_for_course_about(),
-        course_key,
+        action=(
+            "load"
+            if CourseEnrollment.is_enrolled(request.user, course_key)
+            else get_permission_for_course_about()
+        ),
+        course_key=course_key,
     )
     overview.effective_user = user
     return overview
