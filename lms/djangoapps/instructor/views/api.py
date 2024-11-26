@@ -3512,48 +3512,52 @@ def get_student(username_or_email):
     return student
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GENERATE_CERTIFICATE_EXCEPTIONS)
-@require_POST
-@common_exceptions_400
-def generate_certificate_exceptions(request, course_id, generate_for=None):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GenerateCertificateExceptions(DeveloperErrorViewMixin, APIView):
     """
     Generate Certificate for students on the allowlist.
-
-    :param request: HttpRequest object,
-    :param course_id: course identifier of the course for whom to generate certificates
-    :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
-            additions to the allowlist
-    :return: JsonResponse object containing success/failure message and certificate exception data
     """
-    course_key = CourseKey.from_string(course_id)
 
-    if generate_for == 'all':
-        # Generate Certificates for all allowlisted students
-        students = 'all_allowlisted'
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GENERATE_CERTIFICATE_EXCEPTIONS
 
-    elif generate_for == 'new':
-        students = 'allowlisted_not_generated'
+    @method_decorator(transaction.non_atomic_requests)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id, generate_for=None):
+        """
+        :param request: HttpRequest object,
+        :param course_id: course identifier of the course for whom to generate certificates
+        :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
+                additions to the allowlist
+        :return: JsonResponse object containing success/failure message and certificate exception data
+        """
+        course_key = CourseKey.from_string(course_id)
 
-    else:
-        # Invalid data, generate_for must be present for all certificate exceptions
-        return JsonResponse(
-            {
-                'success': False,
-                'message': _('Invalid data, generate_for must be "new" or "all".'),
-            },
-            status=400
-        )
+        if generate_for == 'all':
+            # Generate Certificates for all allowlisted students
+            students = 'all_allowlisted'
 
-    task_api.generate_certificates_for_students(request, course_key, student_set=students)
-    response_payload = {
-        'success': True,
-        'message': _('Certificate generation started for students on the allowlist.'),
-    }
+        elif generate_for == 'new':
+            students = 'allowlisted_not_generated'
 
-    return JsonResponse(response_payload)
+        else:
+            # Invalid data, generate_for must be present for all certificate exceptions
+            return JsonResponse(
+                {
+                    'success': False,
+                    'message': _('Invalid data, generate_for must be "new" or "all".'),
+                },
+                status=400
+            )
+
+        task_api.generate_certificates_for_students(request, course_key, student_set=students)
+        response_payload = {
+            'success': True,
+            'message': _('Certificate generation started for students on the allowlist.'),
+        }
+
+        return JsonResponse(response_payload)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
