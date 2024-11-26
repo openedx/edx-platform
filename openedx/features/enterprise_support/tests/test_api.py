@@ -7,7 +7,6 @@ import ddt
 import httpretty
 import json
 import pytest
-import requests
 from testfixtures import LogCapture
 from consent.models import DataSharingConsent
 from django.conf import settings
@@ -15,18 +14,15 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
-from django.urls import get_resolver, reverse
+from django.urls import reverse
 from django.utils.http import urlencode
 from edx_django_utils.cache import get_cache_key, TieredCache
-from edx_rest_api_client.auth import SuppliedJwtAuth
 from enterprise.models import EnterpriseCustomerUser  # lint-amnesty, pylint: disable=wrong-import-order
 from requests.exceptions import HTTPError
 from rest_framework.test import APIClient
 from six.moves.urllib.parse import parse_qs
 
-from common.djangoapps.student.tests.factories import UserFactory, UserProfileFactory
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.features.enterprise_support.api import (
@@ -101,13 +97,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         )
         cls.enterprise_customer = EnterpriseCustomerFactory()
         super().setUpTestData()
-
-    def setUp(self):
-        super().setUp()
-        self.client = APIClient()
-        self.client.login(
-            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
-            password='password123')
 
     def setUp(self):
         super().setUp()
@@ -1476,9 +1465,11 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
 
         # use user query to filter by name
         query_params = {'user_query': user_2.first_name}
-        url = reverse('enterprise-customer-members', kwargs={'enterprise_uuid': enterprise_customer.uuid}) + '?' + urlencode(query_params)
+        url = reverse(
+            'enterprise-customer-members',
+            kwargs={'enterprise_uuid': enterprise_customer.uuid}) + '?' + urlencode(query_params)
         response = self.client.get(url)
-        response.status_code == 200
+        assert response.status_code == 200
         results = (json.loads(response.content.decode("utf-8"))['results'])
         assert len(results) == 1
         assert results[0]['enterprise_customer_user']['name'] == (user_2.first_name + ' ' + user_2.last_name)
