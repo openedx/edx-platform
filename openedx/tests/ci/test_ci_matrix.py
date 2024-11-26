@@ -8,10 +8,14 @@ import yaml
 
 DIRS_TO_EXCLUDE = [
     'lms/djangoapps',
+    'lms/djangoapps/learner_recommendations',
+    'lms/djangoapps/save_for_later',
     'lms/static',
     'lms/templates',
     'openedx/core',
-    'openedx/core/djangoapps'
+    'openedx/core/djangoapps',
+    'openedx/core/djangoapps/demographics',
+    'openedx/core/djangoapps/self_paced',
 ]
 
 
