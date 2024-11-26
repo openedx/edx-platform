@@ -109,6 +109,13 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
             username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
             password='password123')
 
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.client.login(
+            username=settings.ENTERPRISE_SERVICE_WORKER_USERNAME,
+            password='password123')
+
     def _assert_api_service_client(self, api_client, mocked_jwt_builder):
         """
         Verify that the provided api client uses the enterprise service user to generate
@@ -1437,7 +1444,6 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         user_4.profile.save()
 
         enterprise_customer = EnterpriseCustomerFactory()
-
         EnterpriseCustomerUserFactory(
             user_id=user_1.id,
             enterprise_customer=enterprise_customer
