@@ -18,6 +18,7 @@ from fs.memoryfs import MemoryFS
 from openedx_filters import PipelineStep
 from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, VerticalBlockRenderCompleted
 
+from ..html_block import HtmlBlock
 from ..x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
 from . import prepare_block_runtime
 from .helpers import StubUserService
@@ -89,7 +90,7 @@ class TestVerticalBlockChildRenderStep(PipelineStep):
 
     def run_filter(self, block, context):  # lint-amnesty, pylint: disable=arguments-differ
         """Pipeline step that changes child content"""
-        if type(block).__name__ == "HtmlBlockWithMixins":
+        if type(block).__name__ == f"{HtmlBlock.__name__}WithMixins":
             block.get_html = lambda: TestVerticalBlockChildRenderStep.filter_content
         return {"block": block, "context": context}
 
@@ -101,7 +102,7 @@ class TestPreventVerticalBlockChildRender(PipelineStep):
 
     def run_filter(self, block, context):  # lint-amnesty, pylint: disable=arguments-differ
         """Pipeline step that raises exceptions during child block rendering"""
-        if type(block).__name__ == "HtmlBlockWithMixins":
+        if type(block).__name__ == f"{HtmlBlock.__name__}WithMixins":
             raise VerticalBlockChildRenderStarted.PreventChildBlockRender(
                 "Skip block test exception"
             )
