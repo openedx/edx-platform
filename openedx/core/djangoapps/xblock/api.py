@@ -33,6 +33,7 @@ from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreXBlockRuntime,
 )
 from .data import CheckPerm, LatestVersion
+from .rest_api.url_converters import VersionConverter
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
 
 from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
@@ -214,6 +215,9 @@ def get_block_olx(
     *,
     version: int | LatestVersion = LatestVersion.AUTO
 ) -> str:
+    """
+    Get the OLX source of the of the given Learning-Core-backed XBlock and a version.
+    """
     component = get_component_from_usage_key(usage_key)
     runtime = get_runtime(user=user)
     version = runtime.get_auto_latest_version(version)
@@ -319,3 +323,7 @@ def get_handler_url(
     # can be called by the XBlock from python as well and in that case we don't
     # have access to the request.
     return site_root_url + path
+
+def string_to_version(version: str | None) -> LatestVersion | int:
+    """ Convert from string to LatestVersion or integer version spec """
+    return VersionConverter().to_python(version)
