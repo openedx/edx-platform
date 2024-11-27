@@ -1550,8 +1550,8 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             wrap_xblock_display=True,
         )
         result_fragment = block.render(STUDENT_VIEW)
-        html_block_identifier = f"div.xblock.xblock-student_view.xmodule_{HtmlBlock.__name__}"
-        assert len(PyQuery(result_fragment.content)(html_block_identifier)) == 1
+
+        assert len(PyQuery(result_fragment.content)('div.xblock.xblock-student_view.xmodule_HtmlBlock')) == 1
 
     def test_xmodule_display_wrapper_disabled(self):
         block = render.get_block(
@@ -2573,12 +2573,11 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     def test_dynamic_updates(self):
         """Tests that the list of disabled xblocks can dynamically update."""
         course = CourseFactory()
-        block = f"{ProblemBlock.__name__}WithMixins"
-        item_usage_id = self._verify_block('problem', course, block)
+        item_usage_id = self._verify_block('problem', course, 'ProblemBlockWithMixins')
         XBlockConfiguration(name='problem', enabled=False).save()
 
         # First verify that the cached value is used until there is a new request cache.
-        self._verify_block('problem', course, block, item_usage_id)
+        self._verify_block('problem', course, 'ProblemBlockWithMixins', item_usage_id)
 
         # Now simulate a new request cache.
         self.store.request_cache.data.clear()
