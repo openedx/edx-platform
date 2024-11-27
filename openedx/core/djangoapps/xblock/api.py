@@ -324,6 +324,7 @@ def get_handler_url(
     # have access to the request.
     return site_root_url + path
 
+
 def string_to_version(version: str | None) -> LatestVersion | int:
     """ Convert from string to LatestVersion or integer version spec """
     return VersionConverter().to_python(version)
