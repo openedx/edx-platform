@@ -208,13 +208,25 @@ def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
     )
 
 
-def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
-    """
-    Get the OLX source of the draft version of the given Learning-Core-backed XBlock.
-    """
-    # Inefficient but simple approach. Optimize later if needed.
+def get_block_olx(
+    usage_key: UsageKeyV2,
+    user: UserType,
+    *,
+    version: int | LatestVersion = LatestVersion.AUTO
+) -> str:
     component = get_component_from_usage_key(usage_key)
-    component_version = component.versioning.draft
+    runtime = get_runtime(user=user)
+    version = runtime.get_auto_latest_version(version)
+
+    if version == LatestVersion.DRAFT:
+        component_version = component.versioning.draft
+    elif version == LatestVersion.PUBLISHED:
+        component_version = component.versioning.published
+    else:
+        assert isinstance(version, int)
+        component_version = component.versioning.version_num(version)
+    if component_version is None:
+        raise NoSuchUsage(usage_key)
 
     # TODO: we should probably make a method on ComponentVersion that returns
     # a content based on the name. Accessing by componentversioncontent__key is

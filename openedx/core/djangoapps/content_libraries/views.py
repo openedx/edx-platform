@@ -122,6 +122,7 @@ import openedx.core.djangoapps.site_configuration.helpers as configuration_helpe
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.djangoapps.xblock.rest_api.url_converters import VersionConverter
 
 from .models import ContentLibrary, LtiGradedResource, LtiProfile
 
@@ -713,8 +714,13 @@ class LibraryBlockOlxView(APIView):
         Get the block's OLX
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        version = request.query_params.get('version', None)
+
+        # Use the default `LatestVersion.AUTO` if `version` is None
+        version = VersionConverter().to_python(version)
+
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        xml_str = xblock_api.get_block_draft_olx(key)
+        xml_str = xblock_api.get_block_olx(key, request.user, version=version)
         return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
     @convert_exceptions

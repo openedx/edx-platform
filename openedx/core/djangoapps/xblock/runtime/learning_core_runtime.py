@@ -178,11 +178,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         # just get it the easy way.
         component = self._get_component_from_usage_key(usage_key)
 
-        if version == LatestVersion.AUTO:
-            if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
-                version = LatestVersion.DRAFT
-            else:
-                version = LatestVersion.PUBLISHED
+        version = self.get_auto_latest_version(version)
         if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
             raise ValidationError("This runtime only allows accessing the published version of components")
         if version == LatestVersion.DRAFT:
@@ -315,6 +311,18 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 created=now,
             )
         self.authored_data_store.mark_unchanged(block)
+
+    def get_auto_latest_version(self, version: int | LatestVersion) -> int | LatestVersion:
+        """
+        Gets the actual LatesVersion if is `LatestVersion.AUTO`;
+        otherwise, returns the same value.
+        """
+        if version == LatestVersion.AUTO:
+            if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
+                return LatestVersion.DRAFT
+            else:
+                return LatestVersion.PUBLISHED
+        return version
 
     def _get_component_from_usage_key(self, usage_key):
         """
