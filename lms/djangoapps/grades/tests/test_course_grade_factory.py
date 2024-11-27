@@ -46,6 +46,7 @@ class TestCourseGradeFactory(GradeTestBase):
         grade = CourseGradeFactory().read(self.request.user, invisible_course)
         assert grade.percent == 0
 
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     def test_read_and_update(self):
         grade_factory = CourseGradeFactory()
 
