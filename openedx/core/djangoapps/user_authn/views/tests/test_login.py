@@ -100,6 +100,8 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
     FEATURES_WITH_AUTHN_MFE_ENABLED = settings.FEATURES.copy()
     FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_AUTHN_MICROFRONTEND'] = True
+    FEATURES_WITH_AUTHN_MFE_ENABLED['ENABLE_ENTERPRISE_INTEGRATION'] = False
+
 
     @override_settings(MARKETING_EMAILS_OPT_IN=True)
     def test_login_success_with_opt_in_flag_enabled(self):

@@ -68,7 +68,6 @@ from openedx.features.enterprise_support.utils import clear_data_consent_share_c
 
 LOGGER_NAME = "edx.enterprise_helpers"
 
-
 class MockEnrollment(mock.MagicMock):
     """
     Mock object for an enrollment which has a consistent string representation

@@ -61,12 +61,13 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         self.configure_google_provider(enabled=True, visible=True)
         self.configure_facebook_provider(enabled=True, visible=True)
 
-        # Python-social saves auth failure notifcations in Django messages.
+        # Python-social saves auth failure notifications in Django messages.
         # See pipeline.get_duplicate_provider() for details.
         self.request.COOKIES = {}
         MessageMiddleware(get_response=lambda request: None).process_request(self.request)
         messages.error(self.request, 'Facebook is already in use.', extra_tags='Auth facebook')
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     def test_context(self, mock_enterprise_customer_for_request):
         self.request.site = SiteFactory.create()
@@ -109,6 +110,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
             expected_beta_language = {'code': 'lt-lt', 'name': settings.LANGUAGE_DICT.get('lt-lt')}
             assert context['beta_language'] == expected_beta_language
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     @with_site_configuration(
         configuration={
             'extended_profile_fields': ['work_experience']
@@ -124,6 +126,7 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiCon
         assert extended_pofile_field['field_name'] == 'work_experience'
         assert extended_pofile_field['field_label'] == 'Work experience'
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     @mock.patch('openedx.core.djangoapps.user_api.accounts.settings_views.enterprise_customer_for_request')
     @mock.patch('openedx.features.enterprise_support.utils.third_party_auth.provider.Registry.get')
     def test_context_for_enterprise_learner(
