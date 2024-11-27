@@ -1130,7 +1130,6 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         # Assert 400 status code in response
         assert response.status_code == 400
         res_json = json.loads(response.content.decode('utf-8'))
-
         # Assert Error Message
         assert res_json['message'] == f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
 
@@ -1149,7 +1148,6 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         # Assert 400 status code in response
         assert response.status_code == 400
         res_json = json.loads(response.content.decode('utf-8'))
-
         # Assert Error Message
         assert res_json['message'] == f'The student {self.enrolled_user_2.username} does not have certificate for the course {self.course.number}. Kindly verify student username/email and the selected course are correct and try again.'  # pylint: disable=line-too-long
 

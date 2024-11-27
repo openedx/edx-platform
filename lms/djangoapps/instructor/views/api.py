@@ -14,7 +14,6 @@ import string
 import random
 import re
 
-
 import dateutil
 import pytz
 import edx_api_doc_tools as apidocs
@@ -3306,7 +3305,7 @@ class StartCertificateGeneration(DeveloperErrorViewMixin, APIView):
             'task_id': task.task_id
         }
 
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 @transaction.non_atomic_requests
@@ -3564,48 +3563,52 @@ def get_student(username_or_email):
     return student
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GENERATE_CERTIFICATE_EXCEPTIONS)
-@require_POST
-@common_exceptions_400
-def generate_certificate_exceptions(request, course_id, generate_for=None):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GenerateCertificateExceptions(DeveloperErrorViewMixin, APIView):
     """
     Generate Certificate for students on the allowlist.
-
-    :param request: HttpRequest object,
-    :param course_id: course identifier of the course for whom to generate certificates
-    :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
-            additions to the allowlist
-    :return: JsonResponse object containing success/failure message and certificate exception data
     """
-    course_key = CourseKey.from_string(course_id)
 
-    if generate_for == 'all':
-        # Generate Certificates for all allowlisted students
-        students = 'all_allowlisted'
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GENERATE_CERTIFICATE_EXCEPTIONS
 
-    elif generate_for == 'new':
-        students = 'allowlisted_not_generated'
+    @method_decorator(transaction.non_atomic_requests)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id, generate_for=None):
+        """
+        :param request: HttpRequest object,
+        :param course_id: course identifier of the course for whom to generate certificates
+        :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
+                additions to the allowlist
+        :return: JsonResponse object containing success/failure message and certificate exception data
+        """
+        course_key = CourseKey.from_string(course_id)
 
-    else:
-        # Invalid data, generate_for must be present for all certificate exceptions
-        return JsonResponse(
-            {
-                'success': False,
-                'message': _('Invalid data, generate_for must be "new" or "all".'),
-            },
-            status=400
-        )
+        if generate_for == 'all':
+            # Generate Certificates for all allowlisted students
+            students = 'all_allowlisted'
 
-    task_api.generate_certificates_for_students(request, course_key, student_set=students)
-    response_payload = {
-        'success': True,
-        'message': _('Certificate generation started for students on the allowlist.'),
-    }
+        elif generate_for == 'new':
+            students = 'allowlisted_not_generated'
 
-    return JsonResponse(response_payload)
+        else:
+            # Invalid data, generate_for must be present for all certificate exceptions
+            return JsonResponse(
+                {
+                    'success': False,
+                    'message': _('Invalid data, generate_for must be "new" or "all".'),
+                },
+                status=400
+            )
+
+        task_api.generate_certificates_for_students(request, course_key, student_set=students)
+        response_payload = {
+            'success': True,
+            'message': _('Certificate generation started for students on the allowlist.'),
+        }
+
+        return JsonResponse(response_payload)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -3713,12 +3716,9 @@ def generate_bulk_certificate_exceptions(request, course_id):
     return JsonResponse(results)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CERTIFICATE_INVALIDATION_VIEW)
-@require_http_methods(['POST', 'DELETE'])
-def certificate_invalidation_view(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CertificateInvalidationView(APIView):
     """
     Invalidate/Re-Validate students to/from certificate.
 
@@ -3726,17 +3726,39 @@ def certificate_invalidation_view(request, course_id):
     :param course_id: course identifier of the course for whom to add/remove certificates exception.
     :return: JsonResponse object with success/error message or certificate invalidation data.
     """
-    course_key = CourseKey.from_string(course_id)
-    # Validate request data and return error response in case of invalid data
-    try:
-        certificate_invalidation_data = parse_request_data(request)
-        student = _get_student_from_request_data(certificate_invalidation_data)
-        certificate = _get_certificate_for_user(course_key, student)
-    except ValueError as error:
-        return JsonResponse({'message': str(error)}, status=400)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CERTIFICATE_INVALIDATION_VIEW
+    serializer_class = CertificateSerializer
+    http_method_names = ['post', 'delete']
 
-    # Invalidate certificate of the given student for the course course
-    if request.method == 'POST':
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+         Invalidate/Re-Validate students to/from certificate.
+        """
+        course_key = CourseKey.from_string(course_id)
+        # Validate request data and return error response in case of invalid data
+        serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            # return HttpResponseBadRequest(reason=serializer_data.errors)
+            return JsonResponse({'message': serializer_data.errors}, status=400)
+
+        student = serializer_data.validated_data.get('user')
+        notes = serializer_data.validated_data.get('notes')
+
+        if not student:
+            invalid_user = request.data.get('user')
+            response_payload = f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
+
+            return JsonResponse({'message': response_payload}, status=400)
+
+        try:
+            certificate = _get_certificate_for_user(course_key, student)
+        except Exception as ex:  # pylint: disable=broad-except
+            return JsonResponse({'message': str(ex)}, status=400)
+
+        # Invalidate certificate of the given student for the course course
         try:
             if certs_api.is_on_allowlist(student, course_key):
                 log.warning(f"Invalidating certificate for student {student.id} in course {course_key} failed. "
@@ -3749,15 +3771,39 @@ def certificate_invalidation_view(request, course_id):
             certificate_invalidation = invalidate_certificate(
                 request,
                 certificate,
-                certificate_invalidation_data,
+                notes,
                 student
             )
+
         except ValueError as error:
             return JsonResponse({'message': str(error)}, status=400)
         return JsonResponse(certificate_invalidation)
 
-    # Re-Validate student certificate for the course course
-    elif request.method == 'DELETE':
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def delete(self, request, course_id):
+        """
+        Invalidate/Re-Validate students to/from certificate.
+        """
+        # Re-Validate student certificate for the course course
+        course_key = CourseKey.from_string(course_id)
+        try:
+            data = json.loads(self.request.body.decode('utf8') or '{}')
+        except Exception:  # pylint: disable=broad-except
+            data = {}
+
+        serializer_data = self.serializer_class(data=data)
+
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        student = serializer_data.validated_data.get('user')
+
+        try:
+            certificate = _get_certificate_for_user(course_key, student)
+        except Exception as ex:  # pylint: disable=broad-except
+            return JsonResponse({'message': str(ex)}, status=400)
+
         try:
             re_validate_certificate(request, course_key, certificate, student)
         except ValueError as error:
@@ -3766,13 +3812,13 @@ def certificate_invalidation_view(request, course_id):
         return JsonResponse({}, status=204)
 
 
-def invalidate_certificate(request, generated_certificate, certificate_invalidation_data, student):
+def invalidate_certificate(request, generated_certificate, notes, student):
     """
     Invalidate given GeneratedCertificate and add CertificateInvalidation record for future reference or re-validation.
 
     :param request: HttpRequest object
     :param generated_certificate: GeneratedCertificate object, the certificate we want to invalidate
-    :param certificate_invalidation_data: dict object containing data for CertificateInvalidation.
+    :param notes: notes values.
     :param student: User object, this user is tied to the generated_certificate we are going to invalidate
     :return: dict object containing updated certificate invalidation data.
     """
@@ -3795,7 +3841,7 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
     certificate_invalidation = certs_api.create_certificate_invalidation_entry(
         generated_certificate,
         request.user,
-        certificate_invalidation_data.get("notes", ""),
+        notes,
     )
 
     # Invalidate the certificate
@@ -3806,7 +3852,7 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
         'user': student.username,
         'invalidated_by': certificate_invalidation.invalidated_by.username,
         'created': certificate_invalidation.created.strftime("%B %d, %Y"),
-        'notes': certificate_invalidation.notes,
+        'notes': notes,
     }
 
 
