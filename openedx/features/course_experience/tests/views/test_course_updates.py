@@ -6,6 +6,7 @@ from datetime import datetime
 
 from django.urls import reverse
 from pytz import UTC
+from unittest.mock import patch
 
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -40,6 +41,7 @@ class TestCourseUpdatesPage(BaseCourseUpdatesTestCase):
         self.assertContains(response, 'First Message')
         self.assertContains(response, 'Second Message')
 
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     def test_queries(self):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=UTC))
         self.create_course_update('First Message')
