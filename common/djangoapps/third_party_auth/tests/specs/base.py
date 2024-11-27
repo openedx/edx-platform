@@ -585,6 +585,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
         self.assert_exception_redirect_looks_correct('/')
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     @mock.patch('common.djangoapps.third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_linking_account(self, _mock_segment_track):
         # First, create, the GET request and strategy that store pipeline state,
@@ -632,6 +633,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_social_auth_exists_for_user(get_request.user, strategy)
         self.assert_account_settings_context_looks_correct(account_settings_context(get_request), linked=True)
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     def test_full_pipeline_succeeds_for_unlinking_account(self):
         # First, create, the GET request and strategy that store pipeline state,
         # configure the backend, and mock out wire traffic.
@@ -702,6 +704,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
             # pylint: disable=protected-access
             actions.do_complete(backend, social_views._do_login, user=unlinked_user, request=strategy.request)
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     def test_already_associated_exception_populates_dashboard_with_error(self):
         # Instrument the pipeline with an exception. We test that the
         # exception is raised correctly separately, so it's ok that we're
@@ -737,6 +740,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
         self.assert_account_settings_context_looks_correct(
             account_settings_context(post_request), duplicate=True, linked=True)
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     @mock.patch('common.djangoapps.third_party_auth.pipeline.segment.track')
     def test_full_pipeline_succeeds_for_signing_in_to_existing_active_account(self, _mock_segment_track):
         # First, create, the GET request and strategy that store pipeline state,
@@ -866,6 +870,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
             requested_redirect_url,
         )
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     def test_full_pipeline_succeeds_registering_new_account(self):
         # First, create, the request and strategy that store pipeline state.
         # Mock out wire traffic.

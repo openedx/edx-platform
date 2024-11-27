@@ -192,6 +192,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
 
     @ddt.data(*itertools.product(('no_overrides', 'ccx'), list(range(1, 4)), (True, False), (True, False)))
     @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_ENTERPRISE_INTEGRATION": False})
     @override_settings(
         XBLOCK_FIELD_DATA_WRAPPERS=[],
         MODULESTORE_FIELD_OVERRIDE_PROVIDERS=[],
