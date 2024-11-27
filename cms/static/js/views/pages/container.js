@@ -391,14 +391,16 @@ function($, _, Backbone, gettext, BasePage,
 
         editXBlock: function(event, options) {
             event.preventDefault();
-            var isAccessButton = event.currentTarget.className === 'access-button';
+            const isAccessButton = event.currentTarget.className === 'access-button';
+            const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
+            const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
             try {
                 if (this.options.isIframeEmbed && isAccessButton) {
                     return window.parent.postMessage(
                         {
                             type: 'manageXBlockAccess',
                             message: 'Open the manage access modal',
-                            payload: {}
+                            payload: { usageId }
                         }, document.referrer
                     );
                 }
@@ -418,8 +420,9 @@ function($, _, Backbone, gettext, BasePage,
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
-                    var pathToNewXBlockEditor = `/${blockType}/${encodeURI(primaryHeader.attr('data-usage-id'))}`;
-                    var destinationUrl = `${primaryHeader.attr('authoring_MFE_base_url')}${pathToNewXBlockEditor}`;
+                    var destinationUrl = primaryHeader.attr('authoring_MFE_base_url')
+                      + '/' + blockType
+                      + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
 
                     try {
                         if (this.options.isIframeEmbed) {
@@ -428,7 +431,8 @@ function($, _, Backbone, gettext, BasePage,
                                     type: 'newXBlockEditor',
                                     message: 'Open the new XBlock editor',
                                     payload: {
-                                        url: pathToNewXBlockEditor,
+                                        blockType,
+                                        usageId: encodeURI(primaryHeader.attr('data-usage-id')),
                                     }
                                 }, document.referrer
                             );
@@ -588,40 +592,35 @@ function($, _, Backbone, gettext, BasePage,
             const courseXBlockDropdownHeight = subMenu.offsetHeight;
             const clickYPosition = event.clientY;
 
-            function sendMessageToParent(type, message, payload) {
-                try {
-                    if (this.options.isIframeEmbed) {
-                        window.parent.postMessage(
-                            {
-                                type,
-                                message,
-                                payload
-                            },
-                            document.referrer
-                        );
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-
             if (courseUnitXBlockIframeHeight < courseXBlockDropdownHeight) {
                 // If the dropdown menu is taller than the iframe, adjust the height of the dropdown menu.
-                sendMessageToParent.call(
-                    this,
-                    'toggleCourseXBlockDropdown',
-                    'Adjust the height of the dropdown menu',
-                    { courseXBlockDropdownHeight },
-                );
+                try {
+                    window.parent.postMessage(
+                        {
+                            type: 'toggleCourseXBlockDropdown',
+                            message: 'Adjust the height of the dropdown menu',
+                            payload: { courseXBlockDropdownHeight },
+                        }, document.referrer
+                    );
+                } catch (error) {
+                    console.error(error);
+                }
             } else if ((courseXBlockDropdownHeight + clickYPosition) > courseUnitXBlockIframeHeight) {
                 if (courseXBlockDropdownHeight > courseUnitXBlockIframeHeight / 2) {
                     // If the dropdown menu is taller than half the iframe, send a message to adjust its height.
-                    sendMessageToParent.call(
-                        this,
-                        'toggleCourseXBlockDropdown',
-                        'Adjust the height of the dropdown menu',
-                        { courseXBlockDropdownHeight },
-                    );
+                    try {
+                        window.parent.postMessage(
+                            {
+                                type: 'toggleCourseXBlockDropdown',
+                                message: 'Adjust the height of the dropdown menu',
+                                payload: {
+                                  courseXBlockDropdownHeight: courseXBlockDropdownHeight / 2,
+                                },
+                            }, document.referrer
+                        );
+                    } catch (error) {
+                        console.error(error);
+                    }
                 } else {
                     // Move the dropdown menu upward to prevent it from overflowing out of the viewport.
                     if (this.options.isIframeEmbed) {
@@ -630,21 +629,6 @@ function($, _, Backbone, gettext, BasePage,
                 }
             }
 
-            try {
-                if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
-                        {
-                            type: 'currentXBlockId',
-                            message: 'Send the current XBlock ID to the parent window',
-                            payload: {
-                                id: this.findXBlockElement(event.target).data('locator')
-                            }
-                        }, document.referrer
-                    );
-                }
-            } catch (e) {
-                console.error(e);
-            }
             // if propagation is not stopped, the event will bubble up to the
             // body element, which will close the dropdown.
             event.stopPropagation();
@@ -685,13 +669,15 @@ function($, _, Backbone, gettext, BasePage,
 
         copyXBlock: function(event) {
             event.preventDefault();
+            const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
+            const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
             try {
                 if (this.options.isIframeEmbed) {
                     return window.parent.postMessage(
                         {
                             type: 'copyXBlock',
                             message: 'Copy the XBlock',
-                            payload: {}
+                            payload: { usageId }
                         }, document.referrer
                     );
                 }
@@ -743,13 +729,16 @@ function($, _, Backbone, gettext, BasePage,
 
         duplicateXBlock: function(event) {
             event.preventDefault();
+            const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
+            const blockType = primaryHeader.attr('data-block-type');
+            const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
             try {
                 if (this.options.isIframeEmbed) {
                     return window.parent.postMessage(
                         {
                             type: 'duplicateXBlock',
                             message: 'Duplicate the XBlock',
-                            payload: {}
+                            payload: { blockType, usageId }
                         }, document.referrer
                     );
                 }
@@ -801,13 +790,15 @@ function($, _, Backbone, gettext, BasePage,
 
         deleteXBlock: function(event) {
             event.preventDefault();
+            const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
+            const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
             try {
                 if (this.options.isIframeEmbed) {
                     return window.parent.postMessage(
                         {
                             type: 'deleteXBlock',
                             message: 'Delete the XBlock',
-                            payload: {}
+                            payload: { usageId }
                         }, document.referrer
                     );
                 }
@@ -968,30 +959,11 @@ function($, _, Backbone, gettext, BasePage,
                     || (useNewProblemEditor === 'True' && blockType.includes('problem')))
             ){
                 var destinationUrl;
-                var pathToXBlockEditor;
                 if (useVideoGalleryFlow === 'True' && blockType.includes('video')) {
-                    pathToXBlockEditor = `/course-videos/${encodeURI(data.locator)}`;
-                    destinationUrl = `${this.$('.xblock-header-primary').attr('authoring_MFE_base_url')}${pathToXBlockEditor}`;
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/course-videos/' + encodeURI(data.locator);
                 }
                 else {
-                    pathToXBlockEditor = `/${blockType[1]}/${encodeURI(data.locator)}`;
-                    destinationUrl = `${this.$('.xblock-header-primary').attr('authoring_MFE_base_url')}${pathToXBlockEditor}`;
-                }
-
-                try {
-                    if (this.options.isIframeEmbed) {
-                        return window.parent.postMessage(
-                            {
-                                type: 'newXBlockEditor',
-                                message: 'Sends a message when the new XBlock editor is opened',
-                                payload: {
-                                    url: pathToXBlockEditor,
-                                }
-                            }, document.referrer
-                        );
-                    }
-                } catch (e) {
-                    console.error(e);
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
                 }
 
                 window.location.href = destinationUrl;
