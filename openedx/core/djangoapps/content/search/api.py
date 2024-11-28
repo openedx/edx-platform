@@ -397,7 +397,7 @@ def _is_index_configured(index_name: str) -> bool:
     """
     client = _get_meilisearch_client()
     index = client.get_index(index_name)
-    settings = index.get_settings()
+    index_settings = index.get_settings()
     for k, v in (
         ("distinctAttribute", INDEX_DISTINCT_ATTRIBUTE),
         ("filterableAttributes", INDEX_FILTRABLE_ATTRIBUTES),
@@ -405,7 +405,7 @@ def _is_index_configured(index_name: str) -> bool:
         ("sortableAttributes", INDEX_SORTABLE_ATTRIBUTES),
         ("rankingRules", INDEX_RANKING_RULES),
     ):
-        setting = settings.get(k, [])
+        setting = index_settings.get(k, [])
         if isinstance(v, list):
             v = set(v)
             setting = set(setting)
