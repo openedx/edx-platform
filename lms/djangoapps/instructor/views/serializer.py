@@ -232,7 +232,11 @@ class BlockDueDateSerializer(serializers.Serializer):
 
 class CertificateSerializer(serializers.Serializer):
     """
-    Serializer for resetting a students attempts counter or starts a task to reset all students
+    Serializer for multiple operations related with certificates.
+    resetting a students attempts counter or starts a task to reset all students
+    attempts counters
+    Also Add/Remove students to/from the certificate allowlist.
+    Also For resetting a students attempts counter or starts a task to reset all students
     attempts counters.
     """
     user = serializers.CharField(
