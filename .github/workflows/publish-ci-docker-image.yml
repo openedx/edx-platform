@@ -21,7 +21,6 @@ jobs:
         run: |
           gh run cancel "${{ github.run_id }}"
           gh run watch "${{ github.run_id }}"
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
