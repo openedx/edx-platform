@@ -297,6 +297,14 @@ class TestSearchApi(ModuleStoreTestCase):
 
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_init_meilisearch_index(self, mock_meilisearch):
+        # Test index already exists
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_not_called()
+        mock_meilisearch.return_value.create_index.assert_not_called()
+        mock_meilisearch.return_value.delete_index.assert_not_called()
+
+        # Test index already exists and has no documents
+        mock_meilisearch.return_value.get_stats.return_value = 0
         api.init_index()
         mock_meilisearch.return_value.swap_indexes.assert_not_called()
         mock_meilisearch.return_value.create_index.assert_not_called()
