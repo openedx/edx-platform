@@ -1177,8 +1177,10 @@ class VerificationDeadline(TimeStampedModel):
 
 class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-missing-unicode, useless-suppression
     """
-        SSPVerificationRetryConfig used to inject arguments
-        to retry_failed_photo_verifications management command
+    SSPVerificationRetryConfig used to inject arguments
+    to retry_failed_photo_verifications management command
+
+    .. no_pii:
     """
 
     class Meta:
@@ -1201,6 +1203,10 @@ class VerificationAttempt(StatusModel):
 
     Plugins that implement forms of IDV can store information about IDV attempts in this model for use across
     the platform.
+
+    .. pii: Contains the name of the user
+    .. pii_types: name
+    .. pii_retirement: local_api
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=255)
@@ -1228,6 +1234,22 @@ class VerificationAttempt(StatusModel):
     def should_display_status_to_user(self):
         """When called, returns true or false based on the type of VerificationAttempt"""
         return not self.hide_status_from_user
+
+    def active_at_datetime(self, deadline):
+        """Check whether the verification was active at a particular datetime.
+
+        Arguments:
+            deadline (datetime): The date at which the verification was active
+                (created before and expiration datetime is after today).
+
+        Returns:
+            bool
+
+        """
+        return (
+            self.created_at <= deadline and
+            (self.expiration_datetime is None or self.expiration_datetime > now())
+        )
 
     @classmethod
     def retire_user(cls, user_id):

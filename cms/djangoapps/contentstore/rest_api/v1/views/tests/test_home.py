@@ -33,12 +33,7 @@ class HomePageViewTest(CourseTestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("cms.djangoapps.contentstore:v1:home")
-
-    def test_home_page_courses_response(self):
-        """Check successful response content"""
-        response = self.client.get(self.url)
-
-        expected_response = {
+        self.expected_response = {
             "allow_course_reruns": True,
             "allow_to_create_new_org": False,
             "allow_unicode_course_id": False,
@@ -51,11 +46,11 @@ class HomePageViewTest(CourseTestCase):
             "in_process_course_actions": [],
             "libraries": [],
             "libraries_enabled": True,
+            "libraries_v1_enabled": True,
+            "libraries_v2_enabled": False,
             "taxonomies_enabled": True,
-            "library_authoring_mfe_url": settings.LIBRARY_AUTHORING_MICROFRONTEND_URL,
             "taxonomy_list_mfe_url": 'http://course-authoring-mfe/taxonomies',
             "optimization_enabled": False,
-            "redirect_to_library_authoring_mfe": False,
             "request_course_creator_url": "/request_course_creator",
             "rerun_creator_status": True,
             "show_new_library_button": True,
@@ -67,6 +62,21 @@ class HomePageViewTest(CourseTestCase):
             "platform_name": settings.PLATFORM_NAME,
             "user_is_active": True,
         }
+
+    def test_home_page_studio_response(self):
+        """Check successful response content"""
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(self.expected_response, response.data)
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_home_page_studio_with_meilisearch_enabled(self):
+        """Check response content when Meilisearch is enabled"""
+        response = self.client.get(self.url)
+
+        expected_response = self.expected_response
+        expected_response["libraries_v2_enabled"] = True
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
@@ -107,7 +117,7 @@ class HomePageCoursesViewTest(CourseTestCase):
             "courses": [{
                 "course_key": course_id,
                 "display_name": self.course.display_name,
-                "lms_link": f'//{settings.LMS_BASE}/courses/{course_id}/jump_to/{self.course.location}',
+                "lms_link": f'{settings.LMS_ROOT_URL}/courses/{course_id}/jump_to/{self.course.location}',
                 "number": self.course.number,
                 "org": self.course.org,
                 "rerun_link": f'/course_rerun/{course_id}',
@@ -134,7 +144,7 @@ class HomePageCoursesViewTest(CourseTestCase):
                 OrderedDict([
                     ("course_key", course_id),
                     ("display_name", self.course.display_name),
-                    ("lms_link", f'//{settings.LMS_BASE}/courses/{course_id}/jump_to/{self.course.location}'),
+                    ("lms_link", f'{settings.LMS_ROOT_URL}/courses/{course_id}/jump_to/{self.course.location}'),
                     ("number", self.course.number),
                     ("org", self.course.org),
                     ("rerun_link", f'/course_rerun/{course_id}'),

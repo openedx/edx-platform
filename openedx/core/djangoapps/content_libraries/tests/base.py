@@ -9,7 +9,7 @@ from organizations.models import Organization
 from rest_framework.test import APITransactionTestCase, APIClient
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
+from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 # Define the URLs here - don't use reverse() because we want to detect
@@ -27,6 +27,7 @@ URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{username}/'  # Add/edit/remove a user'
 URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
 URL_LIB_PASTE_CLIPBOARD = URL_LIB_DETAIL + 'paste_clipboard/'  # Paste user clipboard (POST) containing Xblock data
 URL_LIB_BLOCK = URL_PREFIX + 'blocks/{block_key}/'  # Get data about a block, or delete it
+URL_LIB_BLOCK_PUBLISH = URL_LIB_BLOCK + 'publish/'  # Publish changes from a specified XBlock
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
@@ -36,6 +37,7 @@ URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
 URL_LIB_LTI_LAUNCH = URL_LIB_LTI_PREFIX + 'launch/'
 
 URL_BLOCK_RENDER_VIEW = '/api/xblock/v2/xblocks/{block_key}/view/{view_name}/'
+URL_BLOCK_EMBED_VIEW = '/xblocks/v2/{block_key}/embed/{view_name}/'  # Returns HTML not JSON so its URL is different
 URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{handler_name}/'
 URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
 URL_BLOCK_FIELDS_URL = '/api/xblock/v2/xblocks/{block_key}/fields/'
@@ -84,11 +86,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """
         Assert that the first dict contains at least all of the same entries as
         the second dict.
-
-        Like python 2's assertDictContainsSubset, but with the arguments in the
-        correct order.
         """
-        assert big_dict.items() >= subset_dict.items()
+        for key, value in subset_dict.items():
+            assert key in big_dict, f"Missing key: {key}"
+            assert big_dict[key] == value, f"Value for key {key} does not match: expected {value}, got {big_dict[key]}"
 
     def assertOrderEqual(self, libraries_list, expected_order):
         """
@@ -122,7 +123,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         self.client = old_client  # pylint: disable=attribute-defined-outside-init
 
     def _create_library(
-        self, slug, title, description="", org=None, library_type=COMPLEX,
+        self, slug, title, description="", org=None,
         license_type=ALL_RIGHTS_RESERVED, expect_response=200,
     ):
         """ Create a library """
@@ -133,7 +134,6 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             "slug": slug,
             "title": title,
             "description": description,
-            "type": library_type,
             "license": license_type,
         }, expect_response)
 
@@ -285,20 +285,44 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         url = URL_LIB_BLOCK_ASSET_FILE.format(block_key=block_key, file_name=file_name)
         return self._api('delete', url, None, expect_response)
 
+    def _publish_library_block(self, block_key, expect_response=200):
+        """ Publish changes from a specified XBlock """
+        return self._api('post', URL_LIB_BLOCK_PUBLISH.format(block_key=block_key), None, expect_response)
+
     def _paste_clipboard_content_in_library(self, lib_key, block_id, expect_response=200):
         """ Paste's the users clipboard content into Library """
         url = URL_LIB_PASTE_CLIPBOARD.format(lib_key=lib_key)
         data = {"block_id": block_id}
         return self._api('post', url, data, expect_response)
 
-    def _render_block_view(self, block_key, view_name, expect_response=200):
+    def _render_block_view(self, block_key, view_name, version=None, expect_response=200):
         """
         Render an XBlock's view in the active application's runtime.
         Note that this endpoint has different behavior in Studio (draft mode)
         vs. the LMS (published version only).
         """
+        if version is not None:
+            block_key += f"@{version}"
         url = URL_BLOCK_RENDER_VIEW.format(block_key=block_key, view_name=view_name)
         return self._api('get', url, None, expect_response)
+
+    def _embed_block(
+        self,
+        block_key,
+        *,
+        view_name="student_view",
+        version: str | int | None = None,
+        expect_response=200,
+    ) -> str:
+        """
+        Get an HTML response that displays the given XBlock. Returns HTML.
+        """
+        url = URL_BLOCK_EMBED_VIEW.format(block_key=block_key, view_name=view_name)
+        if version is not None:
+            url += f"?version={version}"
+        response = self.client.get(url)
+        assert response.status_code == expect_response, 'Unexpected response code {}:'.format(response.status_code)
+        return response.content.decode()
 
     def _get_block_handler_url(self, block_key, handler_name):
         """
@@ -308,3 +332,21 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """
         url = URL_BLOCK_GET_HANDLER_URL.format(block_key=block_key, handler_name=handler_name)
         return self._api('get', url, None, expect_response=200)["handler_url"]
+
+    def _get_basic_xblock_metadata(self, block_key, version=None, expect_response=200):
+        """ Get basic metadata about a specific block in the library. """
+        if version is not None:
+            block_key += f"@{version}"
+        result = self._api('get', URL_BLOCK_METADATA_URL.format(block_key=block_key), None, expect_response)
+        return result
+
+    def _get_library_block_fields(self, block_key, version=None, expect_response=200):
+        """ Get the fields of a specific block in the library. This API is only used by the MFE editors. """
+        if version is not None:
+            block_key += f"@{version}"
+        result = self._api('get', URL_BLOCK_FIELDS_URL.format(block_key=block_key), None, expect_response)
+        return result
+
+    def _set_library_block_fields(self, block_key, new_fields, expect_response=200):
+        """ Set the fields of a specific block in the library. This API is only used by the MFE editors. """
+        return self._api('post', URL_BLOCK_FIELDS_URL.format(block_key=block_key), new_fields, expect_response)

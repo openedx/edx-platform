@@ -50,6 +50,7 @@ from path import Path as path
 from django.utils.translation import gettext_lazy as _
 from enterprise.constants import (
     ENTERPRISE_ADMIN_ROLE,
+    ENTERPRISE_LEARNER_ROLE,
     ENTERPRISE_CATALOG_ADMIN_ROLE,
     ENTERPRISE_DASHBOARD_ADMIN_ROLE,
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
@@ -60,6 +61,7 @@ from enterprise.constants import (
     SYSTEM_ENTERPRISE_PROVISIONING_ADMIN_ROLE,
     PROVISIONING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
     PROVISIONING_PENDING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
+    DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
 )
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
@@ -1932,6 +1934,10 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     NODE_MODULES_ROOT / "@edx",
+    # Temporarily adding the following static path as we are migrating the built-in blocks' Sass to vanilla CSS.
+    # Once all of the built-in blocks are extracted from edx-platform, we can remove this static path.
+    # Relevant ticket: https://github.com/openedx/edx-platform/issues/35300
+    XMODULE_ROOT / "static",
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
@@ -3815,6 +3821,16 @@ ORA_WORKFLOW_UPDATE_ROUTING_KEY = "edx.lms.core.ora_workflow_update"
 # By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
 
+# .. setting_name: ORA_PEER_LEASE_EXPIRATION_HOURS
+# .. setting_default: 8
+# .. setting_description: Amount of time before a lease on a peer submission expires
+ORA_PEER_LEASE_EXPIRATION_HOURS = 8
+
+# .. setting_name: ORA_STAFF_LEASE_EXPIRATION_HOURS
+# .. setting_default: 8
+# .. setting_description: Amount of time before a lease on a staff submission expires
+ORA_STAFF_LEASE_EXPIRATION_HOURS = 8
+
 # Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
@@ -4304,13 +4320,6 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
-# E-Commerce Commerce Coordinator Configuration
-COMMERCE_COORDINATOR_URL_ROOT = 'http://localhost:8140'
-COMMERCE_COORDINATOR_REFUND_PATH = '/lms/refund/'
-COMMERCE_COORDINATOR_REFUND_SOURCE_SYSTEMS = ('SET-ME-PLEASE',)
-COMMERCE_COORDINATOR_SERVICE_WORKER_USERNAME = 'commerce_coordinator_worker'
-COORDINATOR_CHECKOUT_REDIRECT_PATH = '/lms/payment_page_redirect/'
-
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
@@ -4725,11 +4734,15 @@ ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
 SYSTEM_TO_FEATURE_ROLE_MAPPING = {
+    ENTERPRISE_LEARNER_ROLE: [
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
+    ],
     ENTERPRISE_ADMIN_ROLE: [
         ENTERPRISE_DASHBOARD_ADMIN_ROLE,
         ENTERPRISE_CATALOG_ADMIN_ROLE,
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
     ],
     ENTERPRISE_OPERATOR_ROLE: [
         ENTERPRISE_DASHBOARD_ADMIN_ROLE,
@@ -4738,6 +4751,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
         ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
         ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
     ],
     SYSTEM_ENTERPRISE_PROVISIONING_ADMIN_ROLE: [
         PROVISIONING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
@@ -5541,3 +5555,6 @@ SURVEY_REPORT_EXTRA_DATA = {}
 # .. for now it wil impact country listing in auth flow and user profile.
 # .. eg ['US', 'CA']
 DISABLED_COUNTRIES = []
+
+
+LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"

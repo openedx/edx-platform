@@ -250,3 +250,29 @@ class CertificateStatusesSerializer(serializers.Serializer):
         ]),
         allow_empty=False  # Set to True if you want to allow empty lists
     )
+
+
+class CertificateSerializer(serializers.Serializer):
+    """
+    Serializer for multiple operations related with certificates.
+    resetting a students attempts counter or starts a task to reset all students
+    attempts counters
+    Also Add/Remove students to/from the certificate allowlist.
+    Also For resetting a students attempts counter or starts a task to reset all students
+    attempts counters.
+    """
+    user = serializers.CharField(
+        help_text="Email or username of student.", required=True
+    )
+    notes = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    def validate_user(self, value):
+        """
+        Validate that the user corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user

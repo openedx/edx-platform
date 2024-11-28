@@ -1,7 +1,6 @@
 """
 Views that implement a RESTful API for interacting with XBlocks.
 """
-import itertools
 import json
 
 from common.djangoapps.util.json_request import JsonResponse
@@ -9,12 +8,12 @@ from corsheaders.signals import check_request_enabled
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
-from django.http import Http404
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework import permissions
+from opaque_keys.edx.keys import UsageKeyV2
+from rest_framework import permissions, serializers
 from rest_framework.decorators import api_view, permission_classes  # lint-amnesty, pylint: disable=unused-import
 from rest_framework.exceptions import PermissionDenied, AuthenticationFailed, NotFound
 from rest_framework.response import Response
@@ -23,12 +22,12 @@ from xblock.django.request import DjangoWebobRequest, webob_to_django_response
 from xblock.exceptions import NoSuchUsage
 from xblock.fields import Scope
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
 import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.lib.api.view_utils import view_auth_classes
 from ..api import (
+    CheckPerm,
+    LatestVersion,
     get_block_metadata,
     get_block_display_name,
     get_handler_url as _get_handler_url,
@@ -36,16 +35,15 @@ from ..api import (
     render_block_view as _render_block_view,
 )
 from ..utils import validate_secure_token_for_xblock_handler
+from .url_converters import VersionConverter
 
 User = get_user_model()
-
-invalid_not_found_fmt = "XBlock {usage_key} does not exist, or you don't have permission to view it."
 
 
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
-def block_metadata(request, usage_key_str):
+def block_metadata(request, usage_key: UsageKeyV2, version: LatestVersion | int = LatestVersion.AUTO):
     """
     Get metadata about the specified block.
 
@@ -54,12 +52,7 @@ def block_metadata(request, usage_key_str):
     * "include": a comma-separated list of keys to include.
       Valid keys are "index_dictionary" and "student_view_data".
     """
-    try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
-
-    block = load_block(usage_key, request.user)
+    block = load_block(usage_key, request.user, version=version)
     includes = request.GET.get("include", "").split(",")
     metadata_dict = get_block_metadata(block, includes=includes)
     if 'children' in metadata_dict:
@@ -72,17 +65,17 @@ def block_metadata(request, usage_key_str):
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
-def render_block_view(request, usage_key_str, view_name):
+def render_block_view(
+    request,
+    usage_key: UsageKeyV2,
+    view_name: str,
+    version: LatestVersion | int = LatestVersion.AUTO,
+):
     """
     Get the HTML, JS, and CSS needed to render the given XBlock.
     """
     try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
-
-    try:
-        block = load_block(usage_key, request.user)
+        block = load_block(usage_key, request.user, version=version)
     except NoSuchUsage as exc:
         raise NotFound(f"{usage_key} not found") from exc
 
@@ -96,27 +89,32 @@ def render_block_view(request, usage_key_str, view_name):
 @view_auth_classes(is_authenticated=False)
 @permission_classes((permissions.AllowAny, ))  # Permissions are handled at a lower level, by the learning context
 @xframe_options_exempt
-def embed_block_view(request, usage_key_str, view_name):
+def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     """
     Render the given XBlock in an <iframe>
 
     Unstable - may change after Sumac
     """
+    # Check if a specific version has been requested. TODO: move this to a URL path param like the other views?
     try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
+        version = VersionConverter().to_python(request.GET.get("version"))
+    except ValueError as exc:
+        raise serializers.ValidationError("Invalid version specifier") from exc
 
     try:
-        block = load_block(usage_key, request.user)
+        block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_LEARN, version=version)
     except NoSuchUsage as exc:
         raise NotFound(f"{usage_key} not found") from exc
 
     fragment = _render_block_view(block, view_name, request.user)
     handler_urls = {
-        str(key): _get_handler_url(key, 'handler_name', request.user)
-        for key in itertools.chain([block.scope_ids.usage_id], getattr(block, 'children', []))
+        str(block.usage_key): _get_handler_url(block.usage_key, 'handler_name', request.user, version=version)
     }
+    # Currently we don't support child blocks so we don't need this pre-loading of child handler URLs:
+    # handler_urls = {
+    #     str(key): _get_handler_url(key, 'handler_name', request.user)
+    #     for key in itertools.chain([block.scope_ids.usage_id], getattr(block, 'children', []))
+    # }
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     context = {
         'fragment': fragment,
@@ -135,19 +133,19 @@ def embed_block_view(request, usage_key_str, view_name):
 
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=False)
-def get_handler_url(request, usage_key_str, handler_name):
+def get_handler_url(
+    request,
+    usage_key: UsageKeyV2,
+    handler_name: str,
+    version: LatestVersion | int = LatestVersion.AUTO,
+):
     """
     Get an absolute URL which can be used (without any authentication) to call
     the given XBlock handler.
 
     The URL will expire but is guaranteed to be valid for a minimum of 2 days.
     """
-    try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
-
-    handler_url = _get_handler_url(usage_key, handler_name, request.user)
+    handler_url = _get_handler_url(usage_key, handler_name, request.user, version=version)
     return Response({"handler_url": handler_url})
 
 
@@ -157,7 +155,15 @@ def get_handler_url(request, usage_key_str, handler_name):
 # and https://github.com/openedx/XBlock/pull/383 for context.
 @csrf_exempt
 @xframe_options_exempt
-def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, suffix=None):
+def xblock_handler(
+    request,
+    user_id,
+    secure_token: str,
+    usage_key: UsageKeyV2,
+    handler_name: str,
+    suffix: str | None = None,
+    version: LatestVersion | int = LatestVersion.AUTO,
+):
     """
     Run an XBlock's handler and return the result
 
@@ -165,16 +171,11 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
     auth token included in the URL (see below). As a result it can be exempt
     from CSRF, session auth, and JWT/OAuth.
     """
-    try:
-        usage_key = UsageKey.from_string(usage_key_str)
-    except InvalidKeyError as e:
-        raise Http404 from e
-
     # To support sandboxed XBlocks, custom frontends, and other use cases, we
     # authenticate requests using a secure token in the URL. see
     # openedx.core.djangoapps.xblock.utils.get_secure_hash_for_xblock_handler
     # for details and rationale.
-    if not validate_secure_token_for_xblock_handler(user_id, usage_key_str, secure_token):
+    if not validate_secure_token_for_xblock_handler(user_id, str(usage_key), secure_token):
         raise PermissionDenied("Invalid/expired auth token.")
     if request.user.is_authenticated:
         # The user authenticated twice, e.g. with session auth and the token.
@@ -204,7 +205,8 @@ def xblock_handler(request, user_id, secure_token, usage_key_str, handler_name, 
         raise AuthenticationFailed("Invalid user ID format.")
 
     request_webob = DjangoWebobRequest(request)  # Convert from django request to the webob format that XBlocks expect
-    block = load_block(usage_key, user)
+
+    block = load_block(usage_key, user, version=version)
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
     response = webob_to_django_response(response_webob)
@@ -237,40 +239,38 @@ class BlockFieldsView(APIView):
     """
 
     @atomic
-    def get(self, request, usage_key_str):
+    def get(self, request, usage_key: UsageKeyV2, version: LatestVersion | int = LatestVersion.AUTO):
         """
         retrieves the xblock, returning display_name, data, and metadata
         """
-        try:
-            usage_key = UsageKey.from_string(usage_key_str)
-        except InvalidKeyError as e:
-            raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
 
-        block = load_block(usage_key, request.user)
+        # The "fields" view requires "read as author" permissions because the fields can contain answers, etc.
+        block = load_block(usage_key, request.user, check_permission=CheckPerm.CAN_READ_AS_AUTHOR, version=version)
+        # It would make more sense if this just had a "fields" dict with all the content+settings fields, but
+        # for backwards compatibility we call the settings metadata and split it up like this, ignoring all content
+        # fields except "data".
         block_dict = {
-            "display_name": get_block_display_name(block),  # potentially duplicated from metadata
-            "data": block.data,
-            "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
+            "display_name": get_block_display_name(block),  # note this is also present in metadata
+            "metadata": self.get_explicitly_set_fields_by_scope(block, Scope.settings),
         }
+        if hasattr(block, "data"):
+            block_dict["data"] = block.data
         return Response(block_dict)
 
     @atomic
-    def post(self, request, usage_key_str):
+    def post(self, request, usage_key, version: LatestVersion | int = LatestVersion.AUTO):
         """
         edits the xblock, saving changes to data and metadata only (display_name included in metadata)
         """
-        try:
-            usage_key = UsageKey.from_string(usage_key_str)
-        except InvalidKeyError as e:
-            raise NotFound(invalid_not_found_fmt.format(usage_key=usage_key_str)) from e
-
+        if version != LatestVersion.AUTO:
+            raise serializers.ValidationError("Cannot specify a version when saving changes")
         user = request.user
-        block = load_block(usage_key, user)
+        block = load_block(usage_key, user, check_permission=CheckPerm.CAN_EDIT)
         data = request.data.get("data")
         metadata = request.data.get("metadata")
 
-        old_metadata = block.get_explicitly_set_fields_by_scope(Scope.settings)
-        old_content = block.get_explicitly_set_fields_by_scope(Scope.content)
+        old_metadata = self.get_explicitly_set_fields_by_scope(block, Scope.settings)
+        old_content = self.get_explicitly_set_fields_by_scope(block, Scope.content)
 
         # only update data if it was passed
         if data is not None:
@@ -307,8 +307,26 @@ class BlockFieldsView(APIView):
         context_impl = get_learning_context_impl(usage_key)
         context_impl.send_block_updated_event(usage_key)
 
-        return Response({
-            "id": str(block.location),
-            "data": data,
-            "metadata": block.get_explicitly_set_fields_by_scope(Scope.settings),
-        })
+        block_dict = {
+            "id": str(block.usage_key),
+            "display_name": get_block_display_name(block),  # note this is also present in metadata
+            "metadata": self.get_explicitly_set_fields_by_scope(block, Scope.settings),
+        }
+        if hasattr(block, "data"):
+            block_dict["data"] = block.data
+        return Response(block_dict)
+
+    def get_explicitly_set_fields_by_scope(self, block, scope=Scope.content):
+        """
+        Get a dictionary of the fields for the given scope which are set explicitly on the given xblock.
+
+        (Including any set to None.)
+        """
+        result = {}
+        for field in block.fields.values():  # lint-amnesty, pylint: disable=no-member
+            if field.scope == scope and field.is_set_on(block):
+                try:
+                    result[field.name] = field.read_json(block)
+                except TypeError as exc:
+                    raise TypeError(f"Unable to read field {field.name} from block {block.usage_key}") from exc
+        return result

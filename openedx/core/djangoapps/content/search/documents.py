@@ -11,11 +11,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from openedx_learning.api import authoring as authoring_api
 from opaque_keys.edx.locator import LibraryLocatorV2
+from rest_framework.exceptions import NotFound
 
 from openedx.core.djangoapps.content.search.models import SearchAccess
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.djangoapps.xblock.data import LatestVersion
 from openedx_learning.api.authoring_models import Collection
 
 log = logging.getLogger(__name__)
@@ -74,6 +76,12 @@ class Fields:
     # Structural XBlocks may use this one day to indicate how many child blocks they ocntain.
     num_children = "num_children"
 
+    # Published data (dictionary) of this object
+    published = "published"
+    published_display_name = "display_name"
+    published_description = "description"
+    published_num_children = "num_children"
+
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
     # command (changing those settings on an large active index is not recommended).
@@ -99,9 +107,12 @@ def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     we could use PublishableEntity's primary key / UUID instead.
     """
     # The slugified key _may_ not be unique so we append a hashed string to make it unique:
-    key_bin = str(usage_key).encode()
-    suffix = blake2b(key_bin, digest_size=4).hexdigest()  # When we use Python 3.9+, should add usedforsecurity=False
-    return slugify(str(usage_key)) + "-" + suffix
+    key_str = str(usage_key)
+    key_bin = key_str.encode()
+
+    suffix = blake2b(key_bin, digest_size=4, usedforsecurity=False).hexdigest()
+
+    return f"{slugify(key_str)}-{suffix}"
 
 
 def _meili_access_id_from_context_key(context_key: LearningContextKey) -> int:
@@ -121,6 +132,48 @@ def searchable_doc_for_usage_key(usage_key: UsageKey) -> dict:
     }
 
 
+def _get_content_from_block(block) -> dict:
+    """
+    Get the content from block
+    """
+    try:
+        content_data = block.index_dictionary()
+        # Will be something like:
+        # {
+        #     'content': {'display_name': '...', 'capa_content': '...'},
+        #     'content_type': 'CAPA',
+        #     'problem_types': ['multiplechoiceresponse']
+        # }
+        # Which we need to flatten:
+        if "content_type" in content_data:
+            del content_data["content_type"]  # Redundant with our standard Fields.block_type field.
+        if "content" in content_data and isinstance(content_data["content"], dict):
+            content = content_data["content"]
+            if "display_name" in content:
+                del content["display_name"]
+            del content_data["content"]
+            content_data.update(content)
+
+        return content_data
+
+    except Exception as err:  # pylint: disable=broad-except
+        log.exception(f"Failed to process index_dictionary for {block.usage_key}: {err}")
+
+
+def _get_description_from_block_content(block_type, block_content) -> str:
+    """
+    Generate description from block content
+    """
+    result = None
+
+    if block_type == 'html' and 'html_content' in block_content:
+        result = block_content['html_content']
+    elif block_type == 'problem' and 'capa_content' in block_content:
+        result = block_content['capa_content']
+
+    return result
+
+
 def _fields_from_block(block) -> dict:
     """
     Given an XBlock instance, call its index_dictionary() method to load any
@@ -130,16 +183,17 @@ def _fields_from_block(block) -> dict:
     class implementation returns only:
         {"content": {"display_name": "..."}, "content_type": "..."}
     """
+    block_type = block.scope_ids.block_type
     block_data = {
         Fields.usage_key: str(block.usage_key),
         Fields.block_id: str(block.usage_key.block_id),
         Fields.display_name: xblock_api.get_block_display_name(block),
-        Fields.block_type: block.scope_ids.block_type,
+        Fields.block_type: block_type,
         # This is called context_key so it's the same for courses and libraries
         Fields.context_key: str(block.usage_key.context_key),  # same as lib_key
         Fields.org: str(block.usage_key.context_key.org),
         Fields.access_id: _meili_access_id_from_context_key(block.usage_key.context_key),
-        Fields.breadcrumbs: []
+        Fields.breadcrumbs: [],
     }
     # Get the breadcrumbs (course, section, subsection, etc.):
     if block.usage_key.context_key.is_course:  # Getting parent is not yet implemented in Learning Core (for libraries).
@@ -160,25 +214,14 @@ def _fields_from_block(block) -> dict:
                 parent_data,
             )
     try:
-        content_data = block.index_dictionary()
-        # Will be something like:
-        # {
-        #     'content': {'display_name': '...', 'capa_content': '...'},
-        #     'content_type': 'CAPA',
-        #     'problem_types': ['multiplechoiceresponse']
-        # }
-        # Which we need to flatten:
-        if "content_type" in content_data:
-            del content_data["content_type"]  # Redundant with our standard Fields.block_type field.
-        if "content" in content_data and isinstance(content_data["content"], dict):
-            content = content_data["content"]
-            if "display_name" in content:
-                del content["display_name"]
-            del content_data["content"]
-            content_data.update(content)
-        # Now we have something like:
-        # { 'capa_content': '...', 'problem_types': ['multiplechoiceresponse'] }
+        content_data = _get_content_from_block(block)
         block_data[Fields.content] = content_data
+
+        # Generate description from the content
+        description = _get_description_from_block_content(block_type, content_data)
+        if description:
+            block_data[Fields.description] = description
+
     except Exception as err:  # pylint: disable=broad-except
         log.exception(f"Failed to process index_dictionary for {block.usage_key}: {err}")
     return block_data
@@ -267,6 +310,13 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
         }
 
     """
+    result = {
+        Fields.collections: {
+            Fields.collections_display_name: [],
+            Fields.collections_key: [],
+        }
+    }
+
     # Gather the collections associated with this object
     collections = None
     try:
@@ -279,17 +329,37 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
         log.warning(f"No component found for {object_id}")
 
     if not collections:
-        return {Fields.collections: {}}
+        return result
 
-    result = {
-        Fields.collections: {
-            Fields.collections_display_name: [],
-            Fields.collections_key: [],
-        }
-    }
     for collection in collections:
         result[Fields.collections][Fields.collections_display_name].append(collection.title)
         result[Fields.collections][Fields.collections_key].append(collection.key)
+
+    return result
+
+
+def _published_data_from_block(block_published) -> dict:
+    """
+    Given an library block get the published data.
+    """
+    result = {
+        Fields.published: {
+            Fields.published_display_name: xblock_api.get_block_display_name(block_published),
+        }
+    }
+
+    try:
+        content_data = _get_content_from_block(block_published)
+
+        description = _get_description_from_block_content(
+            block_published.scope_ids.block_type,
+            content_data,
+        )
+
+        if description:
+            result[Fields.published][Fields.published_description] = description
+    except Exception as err:  # pylint: disable=broad-except
+        log.exception(f"Failed to process index_dictionary for {block_published.usage_key}: {err}")
 
     return result
 
@@ -306,6 +376,12 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     library_name = lib_api.get_library(xblock_metadata.usage_key.context_key).title
     block = xblock_api.load_block(xblock_metadata.usage_key, user=None)
 
+    try:
+        block_published = xblock_api.load_block(xblock_metadata.usage_key, user=None, version=LatestVersion.PUBLISHED)
+    except NotFound:
+        # Never published
+        block_published = None
+
     doc = searchable_doc_for_usage_key(xblock_metadata.usage_key)
     doc.update({
         Fields.type: DocType.library_block,
@@ -316,6 +392,9 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     })
 
     doc.update(_fields_from_block(block))
+
+    if block_published:
+        doc.update(_published_data_from_block(block_published))
 
     # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:
     doc[Fields.breadcrumbs] = [{"display_name": library_name}]
@@ -410,6 +489,15 @@ def searchable_doc_for_collection(
     if collection:
         assert collection.key == collection_key
 
+        draft_num_children = authoring_api.filter_publishable_entities(
+            collection.entities,
+            has_draft=True,
+        ).count()
+        published_num_children = authoring_api.filter_publishable_entities(
+            collection.entities,
+            has_published=True,
+        ).count()
+
         doc.update({
             Fields.context_key: str(library_key),
             Fields.org: str(library_key.org),
@@ -420,7 +508,10 @@ def searchable_doc_for_collection(
             Fields.description: collection.description,
             Fields.created: collection.created.timestamp(),
             Fields.modified: collection.modified.timestamp(),
-            Fields.num_children: collection.entities.count(),
+            Fields.num_children: draft_num_children,
+            Fields.published: {
+                Fields.published_num_children: published_num_children,
+            },
             Fields.access_id: _meili_access_id_from_context_key(library_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })
