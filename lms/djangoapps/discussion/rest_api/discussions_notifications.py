@@ -155,7 +155,6 @@ class DiscussionNotificationSender:
                 "author_name": str(author_name),
                 "author_pronoun": str(author_pronoun),
                 "email_content": clean_thread_html_body(self.comment.body),
-                "group_by_id": self.parent_response.id
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
