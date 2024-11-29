@@ -354,6 +354,11 @@ def _track_user_login(user, request):
     # .. pii: Username and email are sent to Segment here. Retired directly through Segment API call in Tubular.
     # .. pii_types: email_address, username
     # .. pii_retirement: third_party
+    anonymous_id = ""
+    try:
+        anonymous_id = request.COOKIES.get('ajs_anonymous_id', "")
+    except:  # pylint: disable=bare-except
+        pass
     segment.identify(
         user.id,
         {"email": user.email, "username": user.username},
@@ -367,7 +372,12 @@ def _track_user_login(user, request):
     segment.track(
         user.id,
         "edx.bi.user.account.authenticated",
-        {"category": "conversion", "label": request.POST.get("course_id"), "provider": None},
+        {
+            "category": "conversion",
+            "label": request.POST.get("course_id"),
+            "provider": None,
+            "anonymous_id": anonymous_id,
+        },
     )
 
 
