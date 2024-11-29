@@ -17,10 +17,10 @@ from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
 from common.djangoapps.util.course import get_link_for_about_page
-from lms.djangoapps.mobile_api.utils import API_V05, API_V1, API_V2, API_V3, API_V4
+from lms.djangoapps.course_api.blocks.tests.test_views import TestBlocksInCourseView
 from lms.djangoapps.mobile_api.course_info.views import BlocksInfoInCourseView
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
-from lms.djangoapps.mobile_api.utils import API_V1, API_V05
+from lms.djangoapps.mobile_api.utils import API_V05, API_V1, API_V2, API_V3, API_V4
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from openedx.features.offline_mode.constants import DEFAULT_OFFLINE_SUPPORTED_XBLOCKS
