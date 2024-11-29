@@ -34,7 +34,11 @@ from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
 )
 from .data import CheckPerm, LatestVersion
 from .rest_api.url_converters import VersionConverter
-from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
+from .utils import (
+    get_secure_token_for_xblock_handler,
+    get_xblock_id_for_anonymous_user,
+    get_auto_latest_version,
+)
 
 from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
 
@@ -211,7 +215,6 @@ def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
 
 def get_block_olx(
     usage_key: UsageKeyV2,
-    user: UserType,
     *,
     version: int | LatestVersion = LatestVersion.AUTO
 ) -> str:
@@ -219,8 +222,7 @@ def get_block_olx(
     Get the OLX source of the of the given Learning-Core-backed XBlock and a version.
     """
     component = get_component_from_usage_key(usage_key)
-    runtime = get_runtime(user=user)
-    version = runtime.get_auto_latest_version(version)
+    version = get_auto_latest_version(version)
 
     if version == LatestVersion.DRAFT:
         component_version = component.versioning.draft
@@ -238,6 +240,11 @@ def get_block_olx(
     content = component_version.contents.get(componentversioncontent__key="block.xml")
 
     return content.text
+
+
+def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
+    """ DEPRECATED. Use get_block_olx(). Can be removed post-Teak. """
+    return get_block_olx(usage_key, version=LatestVersion.DRAFT)
 
 
 def render_block_view(block, view_name, user):  # pylint: disable=unused-argument
