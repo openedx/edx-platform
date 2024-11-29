@@ -1,13 +1,10 @@
 """
 Views for course info API
 """
-
-import os
 import logging
 from typing import Dict, Optional, Union
 
 import django
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.storage import default_storage
 from opaque_keys import InvalidKeyError
