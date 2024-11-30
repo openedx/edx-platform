@@ -20,7 +20,7 @@ block_endpoints = [
     # get/post full json fields of an XBlock:
     path('fields/', views.BlockFieldsView.as_view()),
     # Get the OLX source code of the specified block
-    path('fields/olx/', views.get_block_olx_view),
+    path('olx/', views.get_block_olx_view),
     # render one of this XBlock's views (e.g. student_view)
     path('view/<str:view_name>/', views.render_block_view),
     # get the URL needed to call this XBlock's handlers

@@ -369,14 +369,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert published_block_data['published_by'] == "Bob"
         assert published_block_data['has_unpublished_changes'] is False
 
-        # Updated OLX and verify draft and published version
-        published_olx = new_olx
-        draft_olx = "<problem><p>Not Published OLX</p></problem>"
-
-        self._set_library_block_olx(block_id, draft_olx)
-        assert self._get_library_block_olx(block_id, version='published') == published_olx
-        assert self._get_library_block_olx(block_id, version='draft') == draft_olx
-
         # fin
 
     def test_library_blocks_studio_view(self):

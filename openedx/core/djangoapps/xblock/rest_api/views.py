@@ -222,6 +222,9 @@ def get_block_olx_view(
     usage_key: UsageKeyV2,
     version: LatestVersion | int = LatestVersion.AUTO,
 ):
+    """
+    Get the OLX (XML serialization) of the specified XBlock
+    """
     context_impl = get_learning_context_impl(usage_key)
     if not context_impl.can_view_block_for_editing(request.user, usage_key):
         raise PermissionDenied(f"You don't have permission to access the OLX of component '{usage_key}'.")

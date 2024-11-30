@@ -15,6 +15,7 @@ from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
 from .data import AuthoredDataMode, LatestVersion
 
+
 def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     """
     Get a secure token (one-way hash) used to authenticate XBlock handler
@@ -94,7 +95,7 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     return _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx, hashing_key)
 
 
-def _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx: int, hashing_key: str):
+def _get_secuversionre_token_for_xblock_handler(user_id, block_key_str, time_idx: int, hashing_key: str):
     """
     Internal function to extract repeating hashing steps which we
     call multiple times with different time_idx and hashing key.
@@ -177,7 +178,7 @@ def get_auto_latest_version(version: int | LatestVersion) -> int | LatestVersion
     Gets the actual LatestVersion if is `LatestVersion.AUTO`;
     otherwise, returns the same value.
     """
-    authored_data_mode = get_xblock_app_config().get_runtime_params()["authored_data_mode"]
     if version == LatestVersion.AUTO:
+        authored_data_mode = get_xblock_app_config().get_runtime_params()["authored_data_mode"]
         version = LatestVersion.DRAFT if authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT else LatestVersion.PUBLISHED
     return version

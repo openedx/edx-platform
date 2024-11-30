@@ -712,17 +712,12 @@ class LibraryBlockOlxView(APIView):
         """
         DEPRECATED. Use get_block_olx_view() in xblock REST-API.
         Can be removed post-Teak.
-        
+
         Get the block's OLX
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
-        version = request.query_params.get('version', None)
-
-        # Use the default `LatestVersion.AUTO` if `version` is None
-        version = xblock_api.string_to_version(version)
-
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
-        xml_str = xblock_api.get_block_olx(key, request.user, version=version)
+        xml_str = xblock_api.get_block_draft_olx(key)
         return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
     @convert_exceptions
