@@ -95,7 +95,7 @@ def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     return _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx, hashing_key)
 
 
-def _get_secuversionre_token_for_xblock_handler(user_id, block_key_str, time_idx: int, hashing_key: str):
+def _get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx: int, hashing_key: str):
     """
     Internal function to extract repeating hashing steps which we
     call multiple times with different time_idx and hashing key.

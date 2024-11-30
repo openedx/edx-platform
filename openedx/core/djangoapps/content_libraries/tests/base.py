@@ -242,9 +242,9 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Delete a specific block from the library """
         self._api('delete', URL_LIB_BLOCK.format(block_key=block_key), None, expect_response)
 
-    def _get_library_block_olx(self, block_key, version="draft", expect_response=200):
+    def _get_library_block_olx(self, block_key, expect_response=200):
         """ Get the OLX of a specific block in the library """
-        result = self._api('get', URL_LIB_BLOCK_OLX.format(block_key=block_key), {"version": version}, expect_response)
+        result = self._api('get', URL_LIB_BLOCK_OLX.format(block_key=block_key), None, expect_response)
         if expect_response == 200:
             return result["olx"]
         return result
