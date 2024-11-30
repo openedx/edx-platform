@@ -180,5 +180,9 @@ def get_auto_latest_version(version: int | LatestVersion) -> int | LatestVersion
     """
     if version == LatestVersion.AUTO:
         authored_data_mode = get_xblock_app_config().get_runtime_params()["authored_data_mode"]
-        version = LatestVersion.DRAFT if authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT else LatestVersion.PUBLISHED
+        version = (
+            LatestVersion.DRAFT
+            if authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT
+            else LatestVersion.PUBLISHED
+        )
     return version
