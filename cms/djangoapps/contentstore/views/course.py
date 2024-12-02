@@ -621,7 +621,7 @@ def get_courses_order_by(order_query, course_overviews):
         order_query (str): any string used to order Course Overviews.
         course_overviews (Course Overview objects): queryset to be ordered.
     """
-    if not order_query:
+    if not (order_query and course_overviews):
         return course_overviews
     try:
         return course_overviews.order_by(order_query)

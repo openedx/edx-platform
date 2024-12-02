@@ -46,6 +46,31 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
         )
 
+    def test_no_courses_non_staff_user(self):
+        """Get list of courses when there are no courses available.
+
+        Expected result:
+        - An empty list of courses available to the logged in user.
+        """
+        client, _ = self.create_non_staff_authed_user_client()
+        CourseOverviewFactory._meta.model.objects.all().delete()
+        response = client.get(self.api_v2_url, {"order": "display_name"})
+
+        expected_data = {
+            "courses": [],
+            "in_process_course_actions": [],
+        }
+        expected_response = OrderedDict([
+            ('count', 0),
+            ('num_pages', 1),
+            ('next', None),
+            ('previous', None),
+            ('results', expected_data),
+        ])
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(expected_response, response.data)
+
     def test_home_page_response(self):
         """Get list of courses available to the logged in user.
 
