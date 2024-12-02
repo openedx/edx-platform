@@ -8,7 +8,7 @@ from collections import defaultdict, namedtuple
 from datetime import datetime
 
 import six
-import pytz
+from zoneinfo import ZoneInfo
 from crum import get_current_request
 from dateutil.parser import parse as parse_date
 from django.conf import settings
@@ -290,7 +290,7 @@ def course_open_for_self_enrollment(course_key):
 
     # Check the enrollment start and end dates.
     course_details = get_course_enrollment_details(str(course_key))
-    now = datetime.now().replace(tzinfo=pytz.UTC)
+    now = datetime.now().replace(tzinfo=ZoneInfo("UTC"))
     start = course_details['enrollment_start']
     end = course_details['enrollment_end']
 
@@ -504,7 +504,7 @@ def date_block_key_fn(block):
     If the block's date is None, return the maximum datetime in order
     to force it to the end of the list of displayed blocks.
     """
-    return block.date or datetime.max.replace(tzinfo=pytz.UTC)
+    return block.date or datetime.max.replace(tzinfo=ZoneInfo("UTC"))
 
 
 def _get_absolute_url(request, url_path):
@@ -605,7 +605,7 @@ def get_course_assignments(course_key, user, include_access=False, include_witho
     course_usage_key = store.make_course_usage_key(course_key)
     block_data = get_course_blocks(user, course_usage_key, allow_start_dates_in_future=True, include_completion=True)
 
-    now = datetime.now(pytz.UTC)
+    now = datetime.now(ZoneInfo("UTC"))
     assignments = []
     for section_key in block_data.get_children(course_usage_key):  # lint-amnesty, pylint: disable=too-many-nested-blocks
         for subsection_key in block_data.get_children(section_key):
@@ -726,9 +726,9 @@ def _ora_assessment_to_assignment(
     else:
         assessment_start, assessment_due = None, None
         if assessment.get('start'):
-            assessment_start = parse_date(assessment.get('start')).replace(tzinfo=pytz.UTC)
+            assessment_start = parse_date(assessment.get('start')).replace(tzinfo=ZoneInfo("UTC"))
         if assessment.get('due'):
-            assessment_due = parse_date(assessment.get('due')).replace(tzinfo=pytz.UTC)
+            assessment_due = parse_date(assessment.get('due')).replace(tzinfo=ZoneInfo("UTC"))
         extra_info = _(
             "This Open Response Assessment's due dates are set by your instructor and can't be shifted."
         )
@@ -752,7 +752,7 @@ def _ora_assessment_to_assignment(
         assessment_type = assessment_name
     title = f"{block_title} ({assessment_type})"
     url = ''
-    now = datetime.now(pytz.UTC)
+    now = datetime.now(ZoneInfo("UTC"))
     assignment_released = not assessment_start or assessment_start < now
     if assignment_released:
         url = reverse('jump_to', args=[block_key.course_key, ora_block])

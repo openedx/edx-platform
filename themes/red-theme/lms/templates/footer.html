@@ -7,7 +7,7 @@ from django.utils.translation import gettext as _
 from django.conf import settings
 
 from datetime import datetime
-import pytz
+from zoneinfo import ZoneInfo
 
 from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 from openedx.core.djangolib.markup import HTML, Text
@@ -65,7 +65,7 @@ from openedx.core.djangolib.markup import HTML, Text
         </p>
       </div>
 
-      <p class="copyright">&copy; ${datetime.now(pytz.timezone(settings.TIME_ZONE)).year} ${static.get_platform_name()}.</p>
+      <p class="copyright">&copy; ${datetime.now(ZoneInfo(settings.TIME_ZONE)).year} ${static.get_platform_name()}.</p>
 
       ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
       <p class="copyright">

@@ -32,7 +32,7 @@ from openedx_events.learning.data import CourseNotificationData
 from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
 
 from milestones import api as milestones_api
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import (
@@ -567,7 +567,7 @@ def is_currently_visible_to_students(xblock):
 
     # Check start date
     if 'detached' not in published._class_tags and published.start is not None:  # lint-amnesty, pylint: disable=protected-access
-        return datetime.now(UTC) > published.start
+        return datetime.now(ZoneInfo("UTC")) > published.start
 
     # No start date, so it's always visible
     return True

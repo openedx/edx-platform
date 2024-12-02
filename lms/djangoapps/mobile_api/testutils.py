@@ -16,7 +16,7 @@ import datetime
 from unittest.mock import patch
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
@@ -46,8 +46,8 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         self.course = CourseFactory.create(
             mobile_available=True,
             static_asset_path="needed_for_split",
-            end=datetime.datetime.now(pytz.UTC),
-            certificate_available_date=datetime.datetime.now(pytz.UTC)
+            end=datetime.datetime.now(ZoneInfo("UTC")),
+            certificate_available_date=datetime.datetime.now(ZoneInfo("UTC"))
         )
         self.user = UserFactory.create()
         self.password = self.TEST_PASSWORD

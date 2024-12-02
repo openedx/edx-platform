@@ -6,13 +6,13 @@ from unittest.mock import patch
 
 import ddt
 from django.test import TestCase
-from pytz import utc
+from zoneinfo import ZoneInfo
 
 from lms.djangoapps.certificates.utils import has_html_certificates_enabled, should_certificate_be_visible
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
 
-_TODAY = datetime.now(utc)
+_TODAY = datetime.now(ZoneInfo("UTC"))
 _LAST_MONTH = _TODAY - timedelta(days=30)
 _LAST_WEEK = _TODAY - timedelta(days=7)
 _NEXT_WEEK = _TODAY + timedelta(days=7)

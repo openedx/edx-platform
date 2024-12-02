@@ -18,7 +18,7 @@ from django.urls import resolve, reverse
 from django.utils.translation import gettext as _
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -176,8 +176,8 @@ class TestCCXProgressChanges(CcxTestCase, LoginEnrollmentTestCase):
         Set up tests
         """
         super().setUpClass()
-        start = datetime.datetime(2016, 7, 1, 0, 0, tzinfo=UTC)
-        due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=UTC)
+        start = datetime.datetime(2016, 7, 1, 0, 0, tzinfo=ZoneInfo("UTC"))
+        due = datetime.datetime(2016, 7, 8, 0, 0, tzinfo=ZoneInfo("UTC"))
 
         cls.course = course = CourseFactory.create(enable_ccx=True, start=start)
         chapter = BlockFactory.create(start=start, parent=course, category='chapter')
@@ -466,7 +466,7 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         Get CCX schedule, modify it, save it.
         """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=UTC)
+        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=ZoneInfo("UTC"))
         self.make_coach()
         ccx = self.make_ccx()
         url = reverse(
@@ -805,10 +805,10 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
 
         # Create a course outline
         self.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=UTC
+            2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC")
         )
         self.mooc_due = due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=UTC
+            2010, 7, 7, 0, 0, tzinfo=ZoneInfo("UTC")
         )
 
         self.chapters = [
@@ -890,7 +890,7 @@ class TestCoachDashboardSchedule(CcxTestCase, LoginEnrollmentTestCase, ModuleSto
         Hides nodes at a different depth and checks that these nodes
         are not in the schedule.
         """
-        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=UTC)
+        today.return_value = datetime.datetime(2014, 11, 25, tzinfo=ZoneInfo("UTC"))
         self.make_coach()
         ccx = self.make_ccx()
         url = reverse(
@@ -950,7 +950,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
 
         # Create a course outline
         cls.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=UTC
+            2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC")
         )
         chapter = BlockFactory.create(
             start=start, parent=course, category='sequential'
@@ -1206,7 +1206,7 @@ class TestStudentViewsWithCCX(ModuleStoreTestCase):
 
         # Create a CCX course and enroll the user in it.
         self.ccx = CcxFactory(course_id=self.split_course.id, coach=self.coach)
-        last_week = datetime.datetime.now(UTC) - datetime.timedelta(days=7)
+        last_week = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=7)
         override_field_for_ccx(self.ccx, self.split_course, 'start', last_week)  # Required by self.ccx.has_started().
         self.ccx_course_key = CCXLocator.from_course_locator(self.split_course.id, self.ccx.id)
         CourseEnrollment.enroll(self.student, self.ccx_course_key)

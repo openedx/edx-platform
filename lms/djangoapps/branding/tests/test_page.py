@@ -13,7 +13,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from milestones.tests.utils import MilestonesTestCaseMixin
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.milestones_helpers import set_prerequisite_courses
@@ -48,7 +48,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.factory = RequestFactory()
         self.course = CourseFactory.create(
             days_early_for_beta=5,
-            enrollment_start=datetime.datetime.now(UTC) + datetime.timedelta(days=3),
+            enrollment_start=datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=3),
             user_id=self.user.id,
         )
 
@@ -181,8 +181,8 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             number='1000',
             display_name='Starting later, Announced later',
             metadata={
-                'start': datetime.datetime.now(UTC) + datetime.timedelta(days=4),
-                'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=3),
+                'start': datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=4),
+                'announcement': datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=3),
             },
             emit_signals=True,
         )
@@ -191,8 +191,8 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
             number='1001',
             display_name='Starting earlier, Announced earlier',
             metadata={
-                'start': datetime.datetime.now(UTC) + datetime.timedelta(days=2),
-                'announcement': datetime.datetime.now(UTC) + datetime.timedelta(days=1),
+                'start': datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=2),
+                'announcement': datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1),
             },
             emit_signals=True,
         )

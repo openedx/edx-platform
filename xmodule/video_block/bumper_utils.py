@@ -9,7 +9,7 @@ import logging
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
 
 from .video_utils import set_query_parameter
@@ -48,7 +48,7 @@ def is_bumper_enabled(video):
          bool.
     """
     bumper_last_view_date = getattr(video, 'bumper_last_view_date', None)
-    utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    utc_now = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
     periodicity = settings.FEATURES.get('SHOW_BUMPER_PERIODICITY', 0)
     has_viewed = any([
         video.bumper_do_not_show_again,

@@ -5,7 +5,7 @@ Platform plugins to support course tools.
 
 import datetime
 
-import pytz
+from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -33,7 +33,7 @@ class FinancialAssistanceTool(CourseTool):
         """
         Show this link for active courses where financial assistance is available, unless upgrade deadline has passed
         """
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         feature_flags = None
         try:
             course_overview = CourseOverview.objects.get(id=course_key)

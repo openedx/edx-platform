@@ -11,7 +11,7 @@ import ddt
 import pytest
 from django.conf import settings
 from lazy.lazy import lazy
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.courseware_index import (
@@ -56,7 +56,7 @@ def create_children(store, parent, category, load_factor):
             display_name=f"{category} {child_index} {time.clock()}",  # lint-amnesty, pylint: disable=no-member
             modulestore=store,
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         created_count += 1
 
@@ -72,7 +72,7 @@ def create_large_course(store, load_factor):
     load_factor ^ 4 - e.g. load_factor of 10 => 10 chapters, 100
     sequentials, 1000 verticals, 10000 html blocks
     """
-    course = CourseFactory.create(modulestore=store, start=datetime(2015, 3, 1, tzinfo=UTC))
+    course = CourseFactory.create(modulestore=store, start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")))
     with store.bulk_operations(course.id):
         child_count = create_children(store, course, COURSE_CHILD_STRUCTURE["course"], load_factor)
     return course, child_count
@@ -148,7 +148,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         """
         self.course = CourseFactory.create(
             modulestore=store,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
             display_name="Search Index Test Course"
         )
 
@@ -158,7 +158,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             display_name="Week 1",
             modulestore=store,
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
@@ -166,7 +166,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             display_name="Lesson 1",
             modulestore=store,
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         self.vertical = BlockFactory.create(
             parent_location=self.sequential.location,
@@ -174,7 +174,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             display_name='Subsection 1',
             modulestore=store,
             publish_item=True,
-            start=datetime(2015, 4, 1, tzinfo=UTC),
+            start=datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
         )
         # unspecified start - should inherit from container
         self.html_unit = BlockFactory.create(
@@ -193,7 +193,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 
     def index_recent_changes(self, store, since_time):
         """ index course using recent changes """
-        trigger_time = datetime.now(UTC)
+        trigger_time = datetime.now(ZoneInfo("UTC"))
         return CoursewareSearchIndexer.index(
             store,
             self.course.id,
@@ -322,7 +322,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             display_name='Section 2',
             modulestore=store,
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
 
         # add a new vertical
@@ -341,7 +341,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             modulestore=store,
         )
 
-        before_time = datetime.now(UTC)
+        before_time = datetime.now(ZoneInfo("UTC"))
         self.publish_item(store, vertical2.location)
         # index based on time, will include an index of the origin sequential
         # because it is in a common subtree but not of the original vertical
@@ -432,7 +432,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
             display_name=None,
             modulestore=store,
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         # add a new vertical
         vertical2 = BlockFactory.create(
@@ -605,28 +605,28 @@ class TestTaskExecution(SharedModuleStoreTestCase):
         super().setUpClass()
         SignalHandler.course_published.disconnect(listen_for_course_publish)
         SignalHandler.library_updated.disconnect(listen_for_library_update)
-        cls.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=UTC))
+        cls.course = CourseFactory.create(start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")))
 
         cls.chapter = BlockFactory.create(
             parent_location=cls.course.location,
             category='chapter',
             display_name="Week 1",
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         cls.sequential = BlockFactory.create(
             parent_location=cls.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         cls.vertical = BlockFactory.create(
             parent_location=cls.sequential.location,
             category='vertical',
             display_name='Subsection 1',
             publish_item=True,
-            start=datetime(2015, 4, 1, tzinfo=UTC),
+            start=datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
         )
         # unspecified start - should inherit from container
         cls.html_unit = BlockFactory.create(
@@ -881,7 +881,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             display_name="Week 1",
             modulestore=self.store,
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
 
         self.sequential = BlockFactory.create(
@@ -890,7 +890,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             display_name="Lesson 1",
             modulestore=self.store,
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
 
         self.sequential2 = BlockFactory.create(
@@ -899,7 +899,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             display_name="Lesson 2",
             modulestore=self.store,
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
 
         self.vertical = BlockFactory.create(
@@ -908,7 +908,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             display_name='Subsection 1',
             modulestore=self.store,
             publish_item=True,
-            start=datetime(2015, 4, 1, tzinfo=UTC),
+            start=datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
         )
 
         self.vertical2 = BlockFactory.create(
@@ -917,7 +917,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             display_name='Subsection 2',
             modulestore=self.store,
             publish_item=True,
-            start=datetime(2015, 4, 1, tzinfo=UTC),
+            start=datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
         )
 
         self.vertical3 = BlockFactory.create(
@@ -926,7 +926,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             display_name='Subsection 3',
             modulestore=self.store,
             publish_item=True,
-            start=datetime(2015, 4, 1, tzinfo=UTC),
+            start=datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
         )
 
         # unspecified start - should inherit from container
@@ -1091,7 +1091,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             'content_type': 'Text',
             'org': self.course.org,
             'content_groups': content_groups,
-            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC)
+            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=ZoneInfo("UTC"))
         }
 
     def _html_experiment_group_result(self, html_unit, content_groups):
@@ -1111,7 +1111,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             'content_type': 'Text',
             'org': self.course.org,
             'content_groups': content_groups,
-            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC)
+            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=ZoneInfo("UTC"))
         }
 
     def _vertical_experiment_group_result(self, vertical, content_groups):
@@ -1119,7 +1119,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         Return object with arguments and content group for split_test vertical.
         """
         return {
-            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC),
+            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=ZoneInfo("UTC")),
             'content': {'display_name': vertical.display_name},
             'course': str(self.course.id),
             'location': [
@@ -1151,7 +1151,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
             'content_type': 'Text',
             'org': self.course.org,
             'content_groups': None,
-            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=UTC)
+            'start_date': datetime(2015, 4, 1, 0, 0, tzinfo=ZoneInfo("UTC"))
         }
 
     def _get_index_values_from_call_args(self, mock_index):
