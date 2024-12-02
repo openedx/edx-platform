@@ -367,7 +367,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert Error Message
         assert res_json['message'] ==\
-               'Please select one or more certificate statuses that require certificate regeneration.'
+               'Please select certificate statuses from the list only.'
 
         # Access the url passing 'certificate_statuses' that are not present in db
         url = reverse('start_certificate_regeneration', kwargs={'course_id': str(self.course.id)})
@@ -378,7 +378,8 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
-        assert res_json['message'] == 'Please select certificate statuses from the list only.'
+        assert (res_json['message'] ==
+                'Please select certificate statuses from the list only.')
 
 
 @override_settings(CERT_QUEUE='certificates')
