@@ -247,3 +247,25 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         mock_modulestore().get_course_summaries.assert_called_once()
         mock_course_overview.get_all_courses.assert_not_called()
+
+    @ddt.data(
+        ("active_only", "true"),
+        ("archived_only", "true"),
+        ("search", "sample"),
+        ("order", "org"),
+        ("page", 1),
+    )
+    @ddt.unpack
+    def test_if_empty_list_of_courses(self, query_param, value):
+        """Get list of courses when no courses are available.
+
+        Expected result:
+        - An empty list of courses available to the logged in user.
+        """
+        self.active_course.delete()
+        self.archived_course.delete()
+
+        response = self.client.get(self.api_v2_url, {query_param: value})
+
+        self.assertEqual(len(response.data['results']['courses']), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
