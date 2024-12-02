@@ -196,9 +196,6 @@ def update_notification_fields(
         if field in source_config:
             target_config[field] |= source_config[field]
 
-    # Set email_cadence to default value
-    target_config["email_cadence"] = default_type_config["email_cadence"]
-
 
 def update_core_notification_types(app_config: Dict, user_config: Dict) -> None:
     """
@@ -216,7 +213,8 @@ def process_app_config(
     app_config: Dict,
     user_config: Dict,
     app: str,
-    default_config: Dict
+    default_config: Dict,
+    email_cadences: Set[str]
 ) -> None:
     """
     Process a single category configuration against another config.
@@ -235,6 +233,13 @@ def process_app_config(
     # Update notification types
     update_notification_types(app_config, user_app_config, default_config, app)
 
+    # Collect email cadences
+    for type_key in app_config["notification_types"]:
+        if "email_cadence" in user_app_config.get("notification_types", {}).get(type_key, {}):
+            email_cadences.add(
+                user_app_config["notification_types"][type_key]["email_cadence"]
+            )
+
 
 def aggregate_notification_configs(default_config: Dict, existing_user_configs: List[Dict]) -> Dict:
     """
@@ -242,7 +247,7 @@ def aggregate_notification_configs(default_config: Dict, existing_user_configs: 
     Rules:
     1. Start with default config as base
     2. If any value is True in other configs, make it True
-    3. All email_cadence will be set to "Daily"
+    3. Set email_cadence to "Mixed" if different cadences found, else use default
 
     Args:
         default_config: Base configuration to start with
@@ -259,7 +264,18 @@ def aggregate_notification_configs(default_config: Dict, existing_user_configs: 
 
     for app in apps:
         app_config = result_config[app]
+        email_cadences: Set[str] = set()
+
         for user_config in existing_user_configs:
-            process_app_config(app_config, user_config, app, default_config)
+            process_app_config(app_config, user_config, app, default_config, email_cadences)
+
+        # Determine email cadence
+        for type_key in app_config["notification_types"]:
+            email_cadence = default_config[app]["notification_types"][type_key]["email_cadence"]
+            if len(email_cadences) > 1:
+                email_cadence = "Mixed"
+            elif email_cadences:
+                email_cadence = list(email_cadences)[0]
+            app_config["notification_types"][type_key]["email_cadence"] = email_cadence
 
     return result_config
