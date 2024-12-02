@@ -42,7 +42,7 @@ def generate_broken_links_descriptor(json_content, request_user):
 
     return result
 
-
+["sections", "subsections", "units", "blocks"]
 def _add_broken_link_description(result, block, link):
     """
     Adds broken link found in the specified block along with other block data.

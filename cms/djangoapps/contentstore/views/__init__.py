@@ -4,7 +4,6 @@ from .assets import *
 from .checklists import *
 from .component import *
 from .course import *  # lint-amnesty, pylint: disable=redefined-builtin
-from .course_optimizer import *
 from .entrance_exam import *
 from .error import *
 from .export_git import *

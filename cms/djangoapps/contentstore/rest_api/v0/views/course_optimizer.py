@@ -181,6 +181,38 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                         # Wasn't JSON, just use the value as a string
                         pass
 
+        # mock dto for testing
+        broken_links_dto = {
+            'sections': [
+                {
+                    'id': 'sectid',
+                    'displayName': 'sectname',
+                    'subsections': [
+                        {
+                            'id': 'subid',
+                            'displayName': 'subname',
+                            'units': [
+                                {
+                                    'id': 'unitid',
+                                    'displayName': 'unitname',
+                                    'blocks': [
+                                        {
+                                            'id': 'blockid',
+                                            'displayName': 'blockname',
+                                            'url': 'blockurl',
+                                            'brokenLinks': [
+                                                'link1',
+                                                'link2',
+                                            ],
+                                        },
+                                    ],
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
         data = {
             'LinkCheckStatus': status,
             **({'LinkCheckOutput': broken_links_dto} if broken_links_dto else {}),
