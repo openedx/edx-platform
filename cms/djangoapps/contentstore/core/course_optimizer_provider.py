@@ -8,7 +8,7 @@ from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import ge
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
 
 
-def create_dto(json_content, request_user):
+def generate_broken_links_descriptor(json_content, request_user):
     """
     Returns a Data Transfer Object for frontend given a list of broken links.
 
@@ -58,8 +58,11 @@ def _add_broken_link_description(result, block, link):
     current_dict = result
     for xblock in reversed(hierarchy):
         current_dict = current_dict.setdefault(
-            str(xblock.location.block_id), 
-            { 'display_name': xblock.display_name }
+            str(xblock.location.block_id),
+            { 
+                'id': str(xblock.location.block_id),
+                'display_name': xblock.display_name
+            }
         )
     
     current_dict['url'] = f'/course/{block.course_id}/editor/{block.category}/{block.location}'

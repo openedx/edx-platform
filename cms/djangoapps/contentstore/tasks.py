@@ -1084,9 +1084,8 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
 
         For reference, these are:
         1. Scanning
-        2. Saving
         """
-        return 2
+        return 1
 
     @classmethod
     def generate_name(cls, arguments_dict):
@@ -1140,6 +1139,19 @@ def check_broken_links(self, user_id, course_key_string, language):
             else:
                 return 'http://' + settings.CMS_BASE + '/container/' + url
 
+    def check_url(url):
+        """Returns SUCCESS, ACCESS_DENIED, or FAILURE after checking url request"""
+        try:
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                return "SUCCESS"
+            elif response.status_code == 403:
+                return "ACCESS_DENIED"
+            else:
+                return "FAILURE"
+        except requests.exceptions.RequestException as e:
+            return "FAILURE"
+
     def verify_url(url):
         """Returns true if url request returns 200"""
         try:
@@ -1170,6 +1182,7 @@ def check_broken_links(self, user_id, course_key_string, language):
                 if url == '#':
                     break
                 standardized_url = convert_to_standard_url(url, course_key)
+                # TODO if check_url ACCESS_DENIED and is studio link, it's locked
                 if not verify_url(standardized_url):
                     broken_links.append([str(usage_key), url])
 
@@ -1182,7 +1195,6 @@ def check_broken_links(self, user_id, course_key_string, language):
     data = scan_course(courselike_key)
 
     try:
-        self.status.set_state('Saving')
         self.status.increment_completed_steps()
 
         file_name = str(courselike_key)
