@@ -575,9 +575,10 @@ def _accessible_courses_list_from_groups(request):
 
     if course_keys:
         courses_list = CourseOverview.get_all_courses(filter_={'id__in': course_keys})
-
-    if not courses_list:
-        return [], []
+    else:
+        # If no course keys are found for the current user, then return without filtering
+        # or ordering the courses list.
+        return courses_list, []
 
     search_query, order, active_only, archived_only = get_query_params_if_present(request)
     courses_list = get_filtered_and_ordered_courses(
