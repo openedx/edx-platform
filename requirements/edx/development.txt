@@ -76,6 +76,7 @@ asgiref==3.8.1
     #   django
     #   django-cors-headers
     #   django-countries
+    #   django-stubs
 asn1crypto==1.5.1
     # via
     #   -r requirements/edx/doc.txt
@@ -575,9 +576,8 @@ django-storages==1.14.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-stubs==1.16.0
+django-stubs==5.1.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
     #   djangorestframework-stubs
 django-stubs-ext==5.1.1
@@ -622,9 +622,8 @@ djangorestframework==3.14.0
     #   openedx-learning
     #   ora2
     #   super-csv
-djangorestframework-stubs==3.14.0
+djangorestframework-stubs==3.15.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
 djangorestframework-xml==2.0.0
     # via
@@ -1296,7 +1295,6 @@ mypy==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
-    #   django-stubs
     #   djangorestframework-stubs
 mypy-extensions==1.0.0
     # via mypy
@@ -2108,8 +2106,6 @@ tinycss2==1.2.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   bleach
-tomli==2.0.2
-    # via django-stubs
 tomlkit==0.13.2
     # via
     #   -r requirements/edx/doc.txt
@@ -2124,8 +2120,6 @@ tqdm==4.66.6
     #   -r requirements/edx/testing.txt
     #   nltk
     #   openai
-types-pytz==2024.2.0.20241003
-    # via django-stubs
 types-pyyaml==6.0.12.20240917
     # via
     #   django-stubs
