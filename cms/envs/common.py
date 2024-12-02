@@ -122,6 +122,16 @@ from lms.envs.common import (
     # Password Validator Settings
     AUTH_PASSWORD_VALIDATORS
 )
+from lms.envs.common import (
+    USE_EXTRACTED_WORD_CLOUD_BLOCK,
+    USE_EXTRACTED_ANNOTATABLE_BLOCK,
+    USE_EXTRACTED_POLL_QUESTION_BLOCK,
+    USE_EXTRACTED_LTI_BLOCK,
+    USE_EXTRACTED_HTML_BLOCK,
+    USE_EXTRACTED_DISCUSSION_BLOCK,
+    USE_EXTRACTED_PROBLEM_BLOCK,
+    USE_EXTRACTED_VIDEO_BLOCK,
+)
 from path import Path as path
 from django.urls import reverse_lazy
 
