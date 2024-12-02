@@ -78,7 +78,7 @@
     "webpack": "^5.90.3",
     "webpack-bundle-tracker": "0.4.3",
     "webpack-merge": "4.2.2",
-    "whatwg-fetch": "2.0.4",
+    "whatwg-fetch": "3.6.20",
     "which-country": "1.0.0"
   },
   "devDependencies": {
