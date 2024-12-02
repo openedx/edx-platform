@@ -53,7 +53,7 @@ def run_eslint():
                 "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
         else:
             print(f"successfully run eslint with '{num_violations}' violations")
-    
+
     # An AttributeError will occur if the regex finds no matches.
     except (AttributeError, ValueError):
         print(f"FAILURE: Number of eslint violations could not be found in '{last_line}'")
