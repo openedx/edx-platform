@@ -1,4 +1,4 @@
-"""  # lint-amnesty, pylint: disable=django-not-configured
+"""  # pylint: disable=django-not-configured
 Check code quality using pycodestyle, pylint, and diff_quality.
 """
 
@@ -42,20 +42,21 @@ def run_eslint():
     )
 
     last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
+    print(result.stdout)
     regex = r'^\d+'
     try:
         num_violations = int(re.search(regex, last_line).group(0)) if last_line else 0
+        # Fail if number of violations is greater than the limit
+        if num_violations > violations_limit:
+            fail_quality(
+                'eslint',
+                "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
+        else:
+            print(f"successfully run eslint with '{num_violations}' violations")
+    
     # An AttributeError will occur if the regex finds no matches.
     except (AttributeError, ValueError):
         print(f"FAILURE: Number of eslint violations could not be found in '{last_line}'")
-
-    # Fail if number of violations is greater than the limit
-    if num_violations > violations_limit:
-        fail_quality(
-            'eslint',
-            "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
-    else:
-        print(f"successfully run eslint with '{num_violations}' violations")
 
 
 if __name__ == "__main__":
