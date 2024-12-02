@@ -49,6 +49,9 @@ HTML should be processed, all related assets files, images and scripts should be
 The Generation process should work with local media storage as well as s3.
 If error retrieving block happened, the generation task will be scheduled for retry 2 more times, with progressive delay.
 
+    .. image:: _images/mobile_offline_content_generation.svg
+        :alt: Mobile Offline Content Generation Process Diagram
+
 Mobile API extension
 ~~~~~~~~~~~~~~~~~~~~
 
