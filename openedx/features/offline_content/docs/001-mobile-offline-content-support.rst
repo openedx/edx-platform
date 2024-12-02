@@ -15,9 +15,9 @@ later without an internet connection, also it should support synchronization of 
 with backend service as connection become available again. This feature is crucial for learners
 in areas with unreliable internet connectivity or those who prefer to study on the go without using mobile data.
 It is possible to provide different kind of content using the Open edX platform, such as read-only materials,
-videos, and assessments. Therefore to provide the whole course experience in offline mode it's required to 
+videos, and assessments. Therefore to provide the whole course experience in offline mode it's required to
 make all these types of content available offline. Of course it won't be feasible to recreate grading
-algorithms in mobile, so it's possible to save submission on the mobile app and execute synchronization 
+algorithms in mobile, so it's possible to save submission on the mobile app and execute synchronization
 of the user progres as not limited conectivity is back.
 From the product perspective the following Figma designs and product requirements should be considered:
 * Figma
@@ -35,9 +35,9 @@ The implementation of the offline content support require addition of the follow
 * To support CAPA problems and other kinds of assessments in offline mode it's necessary to create an additional
   JavaScript layer that will allow communication with Mobile applications by sending JSON messages
   using Android and IOS Bridge.
-  
-  
-  
+
+
+
 Offline content generation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -87,7 +87,26 @@ This script should expose markCompleted JS function so mobile can change state o
 Supported xBlocks in offline mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It was decided to include a fraction of Open edX xBlocks to be supported 
+It was decided to include a fraction of Open edX xBlocks to be supported.
+The following list of blocks is currently planned to be added to the support:
+
+* **Common problems**:
+    * **Checkboxes** - full support
+    * **Dropdown** - full support
+    * **Multiple Choice** - full support
+    * **Numerical Input** - full support
+    * **Text Input** - full support
+    * **Checkboxes with Hints and Feedback** - partial support without Hints and Feedback
+    * **Dropdown with Hints and Feedback** - partial support without Hints and Feedback
+    * **Multiple Choice with Hints and Feedback** - partial support without Hints and Feedback
+    * **Numerical Input with Hints and Feedback** - partially supported without Hints and Feedback
+    * **Text Input with Hints and Feedback** - partially supported without Hints and Feedback
+* **Text**:
+    * **Text** - full support
+    * **IFrame Tool** - full support
+    * **Raw HTML** - full support
+    * **Zooming Image Tool** - full support
+* **Video** - already supported
 
 
 Consequences
