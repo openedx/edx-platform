@@ -223,13 +223,15 @@ pii_check: ## check django models for pii annotations
 	code_annotations django_find_annotations \
 		--config_file .pii_annotations.yml \
 		--app_name cms \
-		--coverage
+		--coverage \
+		--lint
 	
 	DJANGO_SETTINGS_MODULE=lms.envs.test \
 	code_annotations django_find_annotations \
 		--config_file .pii_annotations.yml \
 		--app_name lms \
-		--coverage		
+		--coverage \
+		--lint	
 
 check_keywords: ## check django models for reserve keywords
 	DJANGO_SETTINGS_MODULE=cms.envs.test \
