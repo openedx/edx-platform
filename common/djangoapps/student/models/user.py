@@ -1020,7 +1020,7 @@ class LoginFailures(models.Model):
         return record.failure_count >= max_failures_allowed / 2, record.failure_count
 
     @classmethod
-    def clear_lockout_counter(cls, user):
+    def clear_lockout_counter(cls, user):   # pylint: disable=useless-return
         """
         Removes the lockout counters (normally called after a successful login)
         """

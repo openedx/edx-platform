@@ -43,6 +43,6 @@ singledispatch            # Backport of functools.singledispatch from Python 3.4
 testfixtures              # Provides a LogCapture utility used by several tests
 tox                       # virtualenv management for tests
 unidiff                   # Required by coverage_pytest_plugin
-pylint-pytest==0.3.0      # A Pylint plugin to suppress pytest-related false positives.
+pylint-pytest==1.1.7      # A Pylint plugin to suppress pytest-related false positives.
 pact-python               # Library for contract testing
 py                        # Needed for pytest configurations, was previously been fetched through tox

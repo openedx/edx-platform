@@ -55,7 +55,7 @@ asn1crypto==1.5.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-astroid==2.13.5
+astroid==3.3.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   pylint
@@ -890,8 +890,6 @@ lazy==1.6
     #   lti-consumer-xblock
     #   ora2
     #   xblock
-lazy-object-proxy==1.10.0
-    # via astroid
 libsass==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1220,9 +1218,8 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==2.15.10
+pylint==3.3.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   edx-lint
     #   pylint-celery
     #   pylint-django
@@ -1230,13 +1227,13 @@ pylint==2.15.10
     #   pylint-pytest
 pylint-celery==0.3
     # via edx-lint
-pylint-django==2.5.5
+pylint-django==2.6.1
     # via edx-lint
 pylint-plugin-utils==0.8.2
     # via
     #   pylint-celery
     #   pylint-django
-pylint-pytest==0.3.0
+pylint-pytest==1.1.7
     # via -r requirements/edx/testing.in
 pylti1p3==2.0.0
     # via -r requirements/edx/base.txt
@@ -1657,9 +1654,7 @@ webob==1.8.9
     #   -r requirements/edx/base.txt
     #   xblock
 wrapt==1.16.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   astroid
+    # via -r requirements/edx/base.txt
 xblock[django]==5.1.0
     # via
     #   -r requirements/edx/base.txt
