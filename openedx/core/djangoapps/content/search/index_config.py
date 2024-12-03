@@ -1,3 +1,4 @@
+"""Configuration for the search index."""
 from .documents import Fields
 
 
