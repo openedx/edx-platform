@@ -68,7 +68,7 @@ class LinkCheckView(DeveloperErrorViewMixin, APIView):
         return JsonResponse({'LinkCheckStatus': UserTaskStatus.PENDING})
 
 
-@view_auth_classes(is_authenticated=True)
+@view_auth_classes()
 class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
     """
     View for checking the status of the celery task and returning the results.
@@ -180,39 +180,40 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                     except ValueError:
                         # Wasn't JSON, just use the value as a string
                         pass
-
+        # print('DTO')
+        # print(broken_links_dto)
         # mock dto for testing
-        broken_links_dto = {
-            'sections': [
-                {
-                    'id': 'sectid',
-                    'displayName': 'sectname',
-                    'subsections': [
-                        {
-                            'id': 'subid',
-                            'displayName': 'subname',
-                            'units': [
-                                {
-                                    'id': 'unitid',
-                                    'displayName': 'unitname',
-                                    'blocks': [
-                                        {
-                                            'id': 'blockid',
-                                            'displayName': 'blockname',
-                                            'url': 'blockurl',
-                                            'brokenLinks': [
-                                                'link1',
-                                                'link2',
-                                            ],
-                                        },
-                                    ],
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
+        # broken_links_dto = {
+        #     'sections': [
+        #         {
+        #             'id': 'sectid',
+        #             'displayName': 'sectname',
+        #             'subsections': [
+        #                 {
+        #                     'id': 'subid',
+        #                     'displayName': 'subname',
+        #                     'units': [
+        #                         {
+        #                             'id': 'unitid',
+        #                             'displayName': 'unitname',
+        #                             'blocks': [
+        #                                 {
+        #                                     'id': 'blockid',
+        #                                     'displayName': 'blockname',
+        #                                     'url': 'blockurl',
+        #                                     'brokenLinks': [
+        #                                         'link1',
+        #                                         'link2',
+        #                                     ],
+        #                                 },
+        #                             ],
+        #                         }
+        #                     ]
+        #                 }
+        #             ]
+        #         }
+        #     ]
+        # }
         data = {
             'LinkCheckStatus': status,
             **({'LinkCheckOutput': broken_links_dto} if broken_links_dto else {}),
