@@ -25,6 +25,13 @@ from rest_framework.request import Request
 from common.djangoapps.student.role_helpers import get_course_roles
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import get_access_ids_for_request, IncrementalIndexCompleted
+from openedx.core.djangoapps.content.search.index_config import (
+    INDEX_DISTINCT_ATTRIBUTE,
+    INDEX_FILTERABLE_ATTRIBUTES,
+    INDEX_SEARCHABLE_ATTRIBUTES,
+    INDEX_SORTABLE_ATTRIBUTES,
+    INDEX_RANKING_RULES,
+)
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 
@@ -61,65 +68,6 @@ MAX_ACCESS_IDS_IN_FILTER = 1_000
 MAX_ORGS_IN_FILTER = 1_000
 
 EXCLUDED_XBLOCK_TYPES = ['course', 'course_info']
-
-INDEX_DISTINCT_ATTRIBUTE = "usage_key"
-INDEX_FILTRABLE_ATTRIBUTES = [
-    # Get specific block/collection using combination of block_id and context_key
-    Fields.block_id,
-    Fields.block_type,
-    Fields.context_key,
-    Fields.usage_key,
-    Fields.org,
-    Fields.tags,
-    Fields.tags + "." + Fields.tags_taxonomy,
-    Fields.tags + "." + Fields.tags_level0,
-    Fields.tags + "." + Fields.tags_level1,
-    Fields.tags + "." + Fields.tags_level2,
-    Fields.tags + "." + Fields.tags_level3,
-    Fields.collections,
-    Fields.collections + "." + Fields.collections_display_name,
-    Fields.collections + "." + Fields.collections_key,
-    Fields.type,
-    Fields.access_id,
-    Fields.last_published,
-    Fields.content + "." + Fields.problem_types,
-]
-INDEX_SEARCHABLE_ATTRIBUTES = [
-    # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
-    Fields.display_name,
-    Fields.block_id,
-    Fields.content,
-    Fields.description,
-    Fields.tags,
-    Fields.collections,
-    # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
-    # are searchable only if at least one document in the index has a value. If we didn't list them here and,
-    # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
-    # these sub-fields: "Attribute `tags.level3` is not searchable."
-    Fields.tags + "." + Fields.tags_taxonomy,
-    Fields.tags + "." + Fields.tags_level0,
-    Fields.tags + "." + Fields.tags_level1,
-    Fields.tags + "." + Fields.tags_level2,
-    Fields.tags + "." + Fields.tags_level3,
-    Fields.collections + "." + Fields.collections_display_name,
-    Fields.collections + "." + Fields.collections_key,
-    Fields.published + "." + Fields.display_name,
-    Fields.published + "." + Fields.published_description,
-]
-INDEX_SORTABLE_ATTRIBUTES = [
-    Fields.display_name,
-    Fields.created,
-    Fields.modified,
-    Fields.last_published,
-]
-INDEX_RANKING_RULES = [
-    "sort",
-    "words",
-    "typo",
-    "proximity",
-    "attribute",
-    "exactness",
-]
 
 
 @contextmanager
@@ -301,7 +249,7 @@ def _configure_index(index_name):
     # Mark usage_key as unique (it's not the primary key for the index, but nevertheless must be unique):
     client.index(index_name).update_distinct_attribute(INDEX_DISTINCT_ATTRIBUTE)
     # Mark which attributes can be used for filtering/faceted search:
-    client.index(index_name).update_filterable_attributes(INDEX_FILTRABLE_ATTRIBUTES)
+    client.index(index_name).update_filterable_attributes(INDEX_FILTERABLE_ATTRIBUTES)
     # Mark which attributes are used for keyword search, in order of importance:
     client.index(index_name).update_searchable_attributes(INDEX_SEARCHABLE_ATTRIBUTES)
     # Mark which attributes can be used for sorting search results:
@@ -400,7 +348,7 @@ def _is_index_configured(index_name: str) -> bool:
     index_settings = index.get_settings()
     for k, v in (
         ("distinctAttribute", INDEX_DISTINCT_ATTRIBUTE),
-        ("filterableAttributes", INDEX_FILTRABLE_ATTRIBUTES),
+        ("filterableAttributes", INDEX_FILTERABLE_ATTRIBUTES),
         ("searchableAttributes", INDEX_SEARCHABLE_ATTRIBUTES),
         ("sortableAttributes", INDEX_SORTABLE_ATTRIBUTES),
         ("rankingRules", INDEX_RANKING_RULES),
