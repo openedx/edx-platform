@@ -1558,6 +1558,9 @@ def extras_update_lti_grades(request):
     #SA || letter_grade changes
     letter_grade = request.POST.get("letter_grade", "")
     grade = 0 if letter_grade else request.POST.get("user_grade", "")
+    
+    #AK || feedback/comment changes
+    comment = request.POST.get("comment", "")
 
     try:
         block_data = get_course_blocks(User.objects.get(id = user_id), modulestore().make_course_usage_key(CourseKey.from_string(str(course_id))), allow_start_dates_in_future=True, include_completion=True)
@@ -1568,6 +1571,7 @@ def extras_update_lti_grades(request):
             #Update Grades
             studentmodule.grade = grade
             studentmodule.letter_grade = letter_grade
+            studentmodule.comment = comment
             student_state = json.loads(studentmodule.state)
             student_state["module_score"] = grade
             studentmodule.state = json.dumps(student_state)
@@ -1585,9 +1589,10 @@ def extras_update_lti_grades(request):
                 only_if_higher=False,
                 modified=datetime.datetime.now().replace(tzinfo=pytz.UTC),
                 score_db_table=grades_constants.ScoreDatabaseTableEnum.courseware_student_module,
+                comment=comment,
             )
         except StudentModule.DoesNotExist:
-            studentmodule = StudentModule.objects.create(student_id=user_id,course_id=request.POST.get("course_id"),module_state_key=usage_id,state=json.dumps({"module_score" : grade, "score_comment" : ""}), max_grade= 0 if letter_grade else block_data.get_xblock_field(usage_id, 'weight'), letter_grade=letter_grade)
+            studentmodule = StudentModule.objects.create(student_id=user_id,course_id=request.POST.get("course_id"),module_state_key=usage_id,state=json.dumps({"module_score" : grade, "score_comment" : ""}), max_grade= 0 if letter_grade else block_data.get_xblock_field(usage_id, 'weight'), letter_grade=letter_grade, comment=comment)
 
             log.info("Student module created {0}".format(studentmodule))
             

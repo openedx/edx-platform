@@ -476,6 +476,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             # 'displayed_value' should maybe be 'description_percent'
             # 'grade_description' should be 'description_ratio'
             #SA || letter_grade changes
+            #AK || feedback/comment changes
             breakdown.append({
                 'attempted': attempted,
                 'category': subsection_grade.format,
@@ -486,6 +487,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
                 'score_possible': score_possible,
                 'subsection_name': subsection_grade.display_name,
                 'letter_grade': subsection_grade.letter_grade,
+                'comment': subsection_grade.comment,
             })
         return breakdown
 

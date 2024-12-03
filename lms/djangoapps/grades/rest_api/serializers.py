@@ -47,6 +47,9 @@ class SectionBreakdownSerializer(serializers.Serializer):
     
     #SA || letter_grade changes
     letter_grade = serializers.CharField()
+    
+    #AK || feedback/comment changes
+    comment = serializers.CharField()
 
 
 class StudentGradebookEntrySerializer(serializers.Serializer):

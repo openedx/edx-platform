@@ -208,6 +208,7 @@ def problem_raw_score_changed_handler(sender, **kwargs):  # pylint: disable=unus
         weighted_earned, weighted_possible = kwargs['raw_earned'], kwargs['raw_possible']
 
     #SA || letter_grade changes
+    #AK || feedback/comment changes
     PROBLEM_WEIGHTED_SCORE_CHANGED.send(
         sender=None,
         weighted_earned=weighted_earned,
@@ -220,7 +221,8 @@ def problem_raw_score_changed_handler(sender, **kwargs):  # pylint: disable=unus
         modified=kwargs['modified'],
         score_db_table=kwargs['score_db_table'],
         grader_response=kwargs.get('grader_response', False),
-        letter_grade=kwargs.get('letter_grade', '')
+        letter_grade=kwargs.get('letter_grade', ''),
+        comment = kwargs.get('comment', '')
     )
 
 
@@ -236,6 +238,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     if not context_key.is_course:
         return  # If it's not a course, it has no subsections, so skip the subsection grading update
     #SA || letter_grade changes
+    #AK || feedback/comment changes
     recalculate_subsection_grade_v3.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],
@@ -250,6 +253,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             score_db_table=kwargs['score_db_table'],
             force_update_subsections=kwargs.get('force_update_subsections', False),
             letter_grade=kwargs.get('letter_grade', ''),
+            comment = kwargs.get('comment', ''),
         ),
         countdown=RECALCULATE_GRADE_DELAY_SECONDS,
     )

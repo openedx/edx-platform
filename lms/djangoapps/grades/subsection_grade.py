@@ -167,7 +167,33 @@ class ZeroSubsectionGrade(SubsectionGradeBase):
                     letter_grades[block_key] = problem_score.letter_grade
                     letter_grade = problem_score.letter_grade
         return letter_grade
-
+    
+    #AK || feedback/comment changes
+    @property
+    def comment(self):
+        """
+        Overrides the problem_scores member variable in order
+        to return empty scores for all scorable problems in the
+        course.
+        NOTE: The use of `course_data.structure` here is very intentional.
+        It means we look through the user-specific subtree of this subsection,
+        taking into account which problems are visible to the user.
+        """
+        comments = OrderedDict()  # dict of problem locations to ProblemScore
+        comment = ''
+        for block_key in self.course_data.structure.post_order_traversal(
+                filter_func=possibly_scored,
+                start_node=self.location,
+        ):
+            block = self.course_data.structure[block_key]
+            if getattr(block, 'has_score', False):
+                problem_score = get_score(
+                    submissions_scores={}, csm_scores={}, persisted_block=None, block=block,
+                )
+                if problem_score is not None:
+                    comments[block_key] = problem_score.comment
+                    comment = problem_score.comment
+        return comment
 
 class NonZeroSubsectionGrade(SubsectionGradeBase, metaclass=ABCMeta):
     """
@@ -317,6 +343,26 @@ class ReadSubsectionGrade(NonZeroSubsectionGrade):
             if problem_score:
                 letter_grade = problem_score.letter_grade
         return letter_grade
+    
+    #AK || feedback/comment changes
+    @property
+    def comment(self):
+        """
+        Returns the letter grade from model
+        """
+        # pylint: disable=protected-access
+        comment = ''
+        for block in self.model.visible_blocks.blocks:
+            problem_score = self._compute_block_score(
+                block.locator,
+                self.factory.course_data.structure,
+                self.factory._submissions_scores,
+                self.factory._csm_scores,
+                block,
+            )
+            if problem_score:
+                comment = problem_score.comment
+        return comment    
 
 
 class CreateSubsectionGrade(NonZeroSubsectionGrade):
@@ -328,6 +374,9 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
 
         #SA || letter_grade changes
         self.letter_grade = ''
+        
+        #AK || feedback/comment changes
+        self.comment = ''
         for block_key in course_structure.post_order_traversal(
                 filter_func=possibly_scored,
                 start_node=subsection.location,
@@ -342,6 +391,7 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
             if problem_score:
                 self.problem_scores[block_key] = problem_score
                 self.letter_grade = problem_score.letter_grade
+                self.comment = problem_score.comment
 
         all_total, graded_total = graders.aggregate_scores(list(self.problem_scores.values()))
 
@@ -413,6 +463,7 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
         persisted model for this subsection grade.
         """
         #SA || letter_grade changes
+        #AK || feedback/comment changes
         return dict(
             user_id=student.id,
             usage_key=self.location,
@@ -425,6 +476,7 @@ class CreateSubsectionGrade(NonZeroSubsectionGrade):
             visible_blocks=self._get_visible_blocks,
             first_attempted=self.all_total.first_attempted,
             letter_grade=self.letter_grade,
+            comment=self.comment,
         )
 
     @property

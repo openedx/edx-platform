@@ -39,6 +39,9 @@ class SubsectionScoresSerializer(ReadOnlySerializer):
     
     #SA || letter_grade changes
     letter_grade = serializers.CharField()
+    
+    #AK || feedback/comment changes
+    comment = serializers.CharField()
 
     def get_override(self, subsection):
         """Proctoring or grading score override"""
