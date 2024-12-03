@@ -1166,7 +1166,8 @@ def check_broken_links(self, user_id, course_key_string, language):
           [<block_id>, <broken_link>]
         """
         broken_links = []
-        verticals = modulestore().get_items(course_key, qualifiers={'category': 'vertical'})
+        verticals = modulestore().get_items(course_key, qualifiers={'category': 'vertical'}, revision=ModuleStoreEnum.RevisionOption.published_only)
+        print('verticals: ', verticals)
         blocks = []
 
         for vertical in verticals:
@@ -1187,7 +1188,7 @@ def check_broken_links(self, user_id, course_key_string, language):
                     broken_links.append([str(usage_key), url])
 
         return broken_links
-    
+
     user = validate_user()
 
     self.status.set_state('Scanning')
