@@ -12,26 +12,41 @@ def generate_broken_links_descriptor(json_content, request_user):
     """
     Returns a Data Transfer Object for frontend given a list of broken links.
 
-    json_content contains a list of the following:
-        [block_id, link]
+    json_content contains a list of [block_id, link]
 
-    Returned DTO structure:
+    ** Example DTO structure **
     {
-        sectionId: {
-            displayName,
-            subsectionId: {
-                displayName,
-                unitId: {
-                    displayName,
-                    blockId: {
-                        displayName,
-                        url,
-                        brokenLinks: [],
-                        lockedLinks: [],
-                    }
-                }
-            }
-        }
+        'sections': [
+            {
+                'id': 'section_id',
+                'displayName': 'section name',
+                'subsections': [
+                    {
+                        'id': 'subsection_id',
+                        'displayName': 'subsection name',
+                        'units': [
+                            {
+                                'id': 'unit_id',
+                                'displayName': 'unit name',
+                                'blocks': [
+                                    {
+                                        'id': 'block_id',
+                                        'displayName': 'block name',
+                                        'url': 'url/to/block',
+                                        'brokenLinks: [],
+                                        'lockedLinks: [],
+                                    },
+                                    ...,
+                                ]
+                            },
+                            ...,
+                        ]
+                    },
+                    ...,
+                ]
+            },
+            ...,
+        ]
     }
     """
     dict_result = {}
@@ -39,12 +54,13 @@ def generate_broken_links_descriptor(json_content, request_user):
         block_id, link = item
         usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
-        _add_broken_link_description(dict_result, block, link)
+        # _add_broken_link_description(dict_result, block, link)
+        _create_node_tree(dict_result, block, link)
+    print('TREE', dict_result)
+    test = _transform_from_dict_to_list_format_recursive(dict_result)
+    print('TEST', test)
+    return test
 
-    # print('TEST', dict_result)
-    # list_result = {
-    #     'sections': _transform_from_dict_to_list_format_recursive(dict_result)
-    # }
     return dict_result
 
 PARENT_CATEGORIES = ["course", "chapter", "sequential", "vertical"]
@@ -60,19 +76,26 @@ def _add_broken_link_description(result, block, link):
     Note that because the celery queue does not have credentials, some broken links will
     need to be checked client side.
     """
-    bottom_up_hierarchy = []
-    current = block
-    while current:
-        category = getattr(current, 'category', '')
-        parent = current.get_parent()
-        parent_category = getattr(parent, 'category', '')
-        if parent_category in PARENT_CATEGORIES:
-            bottom_up_hierarchy.append(current)
-            current = parent
-        else:
-            current = None
+    # bottom_up_hierarchy = []
+    # current = block
+    # while current:
+    #     category = getattr(current, 'category', '')
+    #     parent = current.get_parent()
+    #     parent_category = getattr(parent, 'category', '')
+    #     if parent_category in PARENT_CATEGORIES:
+    #         bottom_up_hierarchy.append(current)
+    #         current = parent
+    #     else:
+    #         current = None
     
-    top_down_hierarchy = list(reversed(bottom_up_hierarchy))
+    # top_down_hierarchy = list(reversed(bottom_up_hierarchy))
+
+    # path = _get_node_path(block)
+    # for node_index, data in path:
+         # assume last node is block
+         # future proofs when you add more subsections or something
+    
+    top_down_hierarchy = _get_node_path(block)
     [section, subsection, unit, block] = top_down_hierarchy
     current_dict = result
 
@@ -80,20 +103,6 @@ def _add_broken_link_description(result, block, link):
         # print('HIERARCHY', getattr(xblock, 'category', ''), xblock)
         # category = CATEGORY_TO_DTO_KEYS[category] if category in CATEGORY_TO_DTO_KEYS else "blocks"
 
-        # result object
-        # {
-        #   sections: [
-        #     {
-        #         id: 'section1',
-        #         displayName: 'sectionName'
-        #         subsections: [
-        #             {
-        #                 id...
-        #             }
-        #         ]
-        #     }
-        #   ]
-        # }
         if not result.get('sections', False):
             result['sections'] = []
         
@@ -179,19 +188,23 @@ def _add_broken_link_description(result, block, link):
                 # TODO check if lockedLinks instead
                 result['sections'][section_index]['subsections'][subsection_index]['units'][unit_index]['blocks'][block_index]['brokenLinks'].append(link)
         
-    #     current_dict = current_dict.setdefault(
-    #         str(xblock.location.block_id),
-    #         # getattr(xblock, "category", ""),
-    #         # category,
-    #         { 
-    #             # 'id': str(xblock.location.block_id),
-    #             'display_name': xblock.display_name,
-    #             'category': getattr(xblock, 'category', ''),
-    #         }
-    #     )
+
+def _get_node_path(block):
+    """
+    Returns a list of block nodes that represents the path from the course root node to the block node.
+    The list excludes the course root node.
+    For example: [chapter_node, sequential_node, vertical_node, html_node]
+    """
+    path = []
+    current_node = block
+    parent_node = current_node.get_parent()
+    while parent_node:
+        path.append(current_node)
+        current_node = parent_node
+        parent_node = current_node.get_parent()
     
-    # current_dict['url'] = f'/course/{block.course_id}/editor/{block.category}/{block.location}'
-    # current_dict.setdefault('broken_links', []).append(link)
+    return list(reversed(path))
+
 
 def _find_by_id(data, search_id):
     """Return index. data is array"""
@@ -200,38 +213,66 @@ def _find_by_id(data, search_id):
             return index
     return None
 
-# def _transform_from_dict_to_list_format_recursive(data, parent_level=None):
-#     """"""
-#     if parent_level is None:
-#         parent_level = 'subsections'
 
-#     transformed = []
-#     for key, value in data.items():
-#         if key == 'category':
-#             continue
+def _create_node_tree(result, block, link):
+    """TODO"""
+    # hierarchy = []
+    # current = block
+    # while current:
+    #     hierarchy.append(current)
+    #     current = current.get_parent()
 
-#         display_name = value.get('display_name')
-#         category = value.get('category')
-#         level = CATEGORY_TO_LEVEL[category] if category in CATEGORY_TO_LEVEL else 'blocks'
-
-#         entry = {
-#             'id': key,
-#             'displayName': display_name,
-#         }
-#         if level == 'blocks':
-#             entry.update({
-#                 'url': value.get('url'),
-#                 'brokenLinks': value.get('brokenLinks', []),
-#                 'lockedLinks': value.get('lockedLinks', []),
-#             })
-#         else:
-#             child_key = level
-#             child_data = {k: v for k, v in value.items() if k not in {'display_name', 'category'}}
-#             entry[child_key] = _transform_from_dict_to_list_format_recursive(
-#                 child_data,
-#                 parent_level=level
-#             )
-        
-#         transformed.append(entry)
+    path = _get_node_path(block)
     
-#     return transformed
+    current_dict = result
+    for xblock in path:
+        current_dict = current_dict.setdefault(
+            str(xblock.location.block_id),
+            { 
+                'display_name': xblock.display_name,
+                'category': getattr(xblock, 'category', ''),
+            }
+        )
+    
+    current_dict['url'] = f'/course/{block.course_id}/editor/{block.category}/{block.location}'
+    current_dict.setdefault('broken_links', []).append(link)
+
+
+def _transform_from_dict_to_list_format_recursive(data, parent_level=None):
+    """TODO"""
+    if parent_level is None:
+        parent_level = 'subsections'
+
+    transformed = []
+    for key, value in data.items():
+        if key == 'category':
+            continue
+        
+        print('VALUE', value)
+        display_name = value.get('display_name', '')
+        category = value.get('category')
+        level = CATEGORY_TO_LEVEL[category] if category in CATEGORY_TO_LEVEL else 'blocks'
+
+        entry = {
+            'id': key,
+            'displayName': display_name,
+        }
+        if level == 'blocks':
+            entry.update({
+                'url': value.get('url'),
+                'brokenLinks': value.get('broken_links', []),
+                'lockedLinks': value.get('locked_links', []),
+            })
+        else:
+            child_key = level
+            child_data = {k: v for k, v in value.items() if k not in {'display_name', 'category'}}
+            child_blocks = _transform_from_dict_to_list_format_recursive(
+                child_data,
+                parent_level=level
+            )
+            entry.update(child_blocks)
+        
+        transformed.append(entry)
+    
+    return { level: transformed }
+            
