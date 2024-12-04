@@ -14,7 +14,7 @@
     "watch-webpack": "npm run webpack-dev -- --watch",
     "watch-sass": "scripts/watch_sass.sh",
     "lint": "scripts/eslint.py",
-    "test": "npm run test-cms && npm run test-lms && npm run test-xmodule && npm run test-common",
+    "test": "npm run test-cms && npm run test-lms && npm run test-xmodule && npm run test-common && npm run test-jest",
     "test-kind-vanilla": "npm run test-cms-vanilla && npm run test-xmodule-vanilla && npm run test-common-vanilla",
     "test-kind-require": "npm run test-cms-require && npm run test-common-require",
     "test-kind-webpack": "npm run test-cms-webpack && npm run test-lms-webpack && npm run test-xmodule-webpack",
@@ -30,7 +30,8 @@
     "test-common": "npm run test-common-vanilla && npm run test-common-require",
     "test-common-vanilla": "npm run test-suite -- common/static/karma_common.conf.js",
     "test-common-require": "npm run test-suite -- common/static/karma_common_requirejs.conf.js",
-    "test-suite": "${NODE_WRAPPER:-xvfb-run --auto-servernum} node --max_old_space_size=4096 node_modules/.bin/karma start --single-run=true --capture-timeout=60000 --browsers=FirefoxNoUpdates"
+    "test-suite": "${NODE_WRAPPER:-xvfb-run --auto-servernum} node --max_old_space_size=4096 node_modules/.bin/karma start --single-run=true --capture-timeout=60000 --browsers=FirefoxNoUpdates",
+    "test-jest": "jest"
   },
   "dependencies": {
     "@babel/core": "7.26.0",
