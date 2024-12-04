@@ -593,8 +593,11 @@ def _accessible_courses_list_from_groups(request):
     return courses_list, []
 
 
-def get_courses_by_status(active_only: bool, archived_only: bool, course_overviews: QuerySet[CourseOverview]) \
--> QuerySet[CourseOverview]:
+def get_courses_by_status(
+    active_only: bool,
+    archived_only: bool,
+    course_overviews: QuerySet[CourseOverview]
+) -> QuerySet[CourseOverview]:
     """
     Return course overviews based on a base queryset filtered by a status.
 
@@ -608,8 +611,10 @@ def get_courses_by_status(active_only: bool, archived_only: bool, course_overvie
     return CourseOverview.get_courses_by_status(active_only, archived_only, course_overviews)
 
 
-def get_courses_by_search_query(search_query: str | None, course_overviews: QuerySet[CourseOverview]) \
--> QuerySet[CourseOverview]:
+def get_courses_by_search_query(
+    search_query: str | None,
+    course_overviews: QuerySet[CourseOverview]
+) -> QuerySet[CourseOverview]:
     """Return course overviews based on a base queryset filtered by a search query.
 
     Args:
@@ -621,8 +626,10 @@ def get_courses_by_search_query(search_query: str | None, course_overviews: Quer
     return CourseOverview.get_courses_matching_query(search_query, course_overviews=course_overviews)
 
 
-def get_courses_order_by(order_query: str | None, course_overviews: QuerySet[CourseOverview]) \
--> QuerySet[CourseOverview]:
+def get_courses_order_by(
+    order_query: str | None,
+    course_overviews: QuerySet[CourseOverview]
+) -> QuerySet[CourseOverview]:
     """Return course overviews based on a base queryset ordered by a query.
 
     Args:
