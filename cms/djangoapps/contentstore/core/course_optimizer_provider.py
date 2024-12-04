@@ -150,7 +150,6 @@ def _create_dto_from_node_tree_recursive(xblock_node, xblock_dictionary):
             category = xblock_data.get('category', None)
             level = CATEGORY_TO_LEVEL_MAP[category] if category in CATEGORY_TO_LEVEL_MAP else None
             xblock_entry.update(child_blocks)
-            print('TEST', category, level)
 
         xblock_children.append(xblock_entry)
 

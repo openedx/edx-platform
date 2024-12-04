@@ -64,7 +64,7 @@ class LinkCheckView(DeveloperErrorViewMixin, APIView):
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
 
-        check_broken_links.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
+        check_broken_links.delay(request.user.id, course_id, request.LANGUAGE_CODE)
         return JsonResponse({'LinkCheckStatus': UserTaskStatus.PENDING})
 
 
