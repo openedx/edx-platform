@@ -5372,12 +5372,6 @@ COOL_OFF_DAYS = 14
 ############ Settings for externally hosted executive education courses ############
 EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
-############## PLOTLY ##############
-
-ENTERPRISE_PLOTLY_SECRET = "I am a secret"
-
-############## PLOTLY ##############
-
 ############ Internal Enterprise Settings ############
 ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
 ############ Internal Enterprise Settings ############
