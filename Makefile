@@ -205,9 +205,6 @@ migrate: migrate-lms migrate-cms
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
 
-eslint:	## check javascript for quality issues
-	python scripts/eslint.py
-
 xsslint: ## check xss for quality issuest
 	python scripts/xsslint/xss_linter.py \
 	--rule-totals \
@@ -241,9 +238,3 @@ check_keywords: ## check django models for reserve keywords
 	DJANGO_SETTINGS_MODULE=lms.envs.test \
 	python manage.py lms check_reserved_keywords \
 	--override_file db_keyword_overrides.yml
-
-test-js: ## run javascript tests
-	node --max_old_space_size=4096 node_modules/.bin/karma start common/static/karma_common.conf.js \
-		--single-run=true \
-		--capture-timeout=60000 \
-		--browsers=FirefoxNoUpdates

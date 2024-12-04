@@ -70,7 +70,7 @@ jobs:
 
       - name: Run JS Tests
         run: |
-          xvfb-run --auto-servernum make test-js
+          npm run test
 
       - name: Save Job Artifacts
         uses: actions/upload-artifact@v4
