@@ -13,7 +13,7 @@
     "watch": "{ npm run watch-webpack& npm run watch-sass& } && sleep infinity",
     "watch-webpack": "npm run webpack-dev -- --watch",
     "watch-sass": "scripts/watch_sass.sh",
-    "lint": "scripts/eslint.py",
+    "lint": "python scripts/eslint.py",
     "test": "npm run test-cms && npm run test-lms && npm run test-xmodule && npm run test-common && npm run test-jest",
     "test-kind-vanilla": "npm run test-cms-vanilla && npm run test-xmodule-vanilla && npm run test-common-vanilla",
     "test-kind-require": "npm run test-cms-require && npm run test-common-require",
