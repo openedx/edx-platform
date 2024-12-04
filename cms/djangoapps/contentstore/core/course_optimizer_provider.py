@@ -12,7 +12,8 @@ def generate_broken_links_descriptor(json_content, request_user):
     """
     Returns a Data Transfer Object for frontend given a list of broken links.
 
-    json_content contains a list of [block_id, link]
+    json_content contains a list of [block_id, link, is_locked]
+        is_locked is true if the link is a studio link and returns 403 on request
 
     ** Example DTO structure **
     {
@@ -49,145 +50,51 @@ def generate_broken_links_descriptor(json_content, request_user):
         ]
     }
     """
-    dict_result = {}
+    xblock_node_tree = {}   # tree representation of xblock relationships
+    xblock_dictionary = {}  # dictionary of xblock attributes
     for item in json_content:
-        block_id, link = item
+        block_id, link, *is_locked = item
         usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
-        # _add_broken_link_description(dict_result, block, link)
-        _create_node_tree(dict_result, block, link)
-    print('TREE', dict_result)
-    test = _transform_from_dict_to_list_format_recursive(dict_result)
-    print('TEST', test)
-    return test
+        _update_node_tree(
+            block,
+            link,
+            True if is_locked else False,
+            xblock_node_tree,
+            xblock_dictionary
+        )
 
-    return dict_result
+    dto = _create_dto_from_node_tree_recursive(xblock_node_tree, xblock_dictionary)
+    return dto
 
-PARENT_CATEGORIES = ["course", "chapter", "sequential", "vertical"]
-CATEGORY_TO_LEVEL = {
-    "chapter": "sections",
-    "sequential": "subsections",
-    "vertical": "units"
-}
 
-def _add_broken_link_description(result, block, link):
+def _update_node_tree(block, link, is_locked, node_tree, dictionary):
     """
-    Adds broken link found in the specified block along with other block data.
-    Note that because the celery queue does not have credentials, some broken links will
-    need to be checked client side.
+    Inserts a block into the node tree and add its attributes to the dictionary.
     """
-    # bottom_up_hierarchy = []
-    # current = block
-    # while current:
-    #     category = getattr(current, 'category', '')
-    #     parent = current.get_parent()
-    #     parent_category = getattr(parent, 'category', '')
-    #     if parent_category in PARENT_CATEGORIES:
-    #         bottom_up_hierarchy.append(current)
-    #         current = parent
-    #     else:
-    #         current = None
+    path = _get_node_path(block)
     
-    # top_down_hierarchy = list(reversed(bottom_up_hierarchy))
-
-    # path = _get_node_path(block)
-    # for node_index, data in path:
-         # assume last node is block
-         # future proofs when you add more subsections or something
+    current_node = node_tree
+    xblock_id = ''
+    for xblock in path:
+        xblock_id = xblock.location.block_id
+        current_node = current_node.setdefault(xblock_id, {})
+        dictionary.setdefault(xblock_id,
+            { 
+                'display_name': xblock.display_name,
+                'category': getattr(xblock, 'category', ''),
+            }
+        )
     
-    top_down_hierarchy = _get_node_path(block)
-    [section, subsection, unit, block] = top_down_hierarchy
-    current_dict = result
+    # additional information stored at block level
+    dictionary[xblock_id].setdefault('url',
+        f'/course/{block.course_id}/editor/{block.category}/{block.location}'
+    )
+    if is_locked:
+        dictionary[xblock_id].setdefault('locked_links', []).append(link)
+    else:
+        dictionary[xblock_id].setdefault('broken_links', []).append(link)
 
-    for xblock in top_down_hierarchy:
-        # print('HIERARCHY', getattr(xblock, 'category', ''), xblock)
-        # category = CATEGORY_TO_DTO_KEYS[category] if category in CATEGORY_TO_DTO_KEYS else "blocks"
-
-        if not result.get('sections', False):
-            result['sections'] = []
-        
-        block_id = str(xblock.location.block_id)
-        category = getattr(xblock, "category", "")
-
-        if category == 'chapter':
-            section_index = _find_by_id(result['sections'], block_id)
-            if section_index == None:
-                # append section info
-                result['sections'].append(
-                    {
-                        'id': block_id,
-                        'displayName': xblock.display_name,
-                        'subsections': []
-                    }
-                )
-
-        elif category == 'sequential':
-            # get section index
-            section_id = str(section.location.block_id)
-            section_index = _find_by_id(result['sections'], section_id)
-
-            subsection_index = _find_by_id(result['sections'][section_index]['subsections'], block_id)
-            if subsection_index == None:
-                # append section info
-                result['sections'][section_index]['subsections'].append(
-                    {
-                        'id': block_id,
-                        'displayName': xblock.display_name,
-                        'units': []
-                    }
-                )
-        
-        elif category == 'vertical':
-            # get section index
-            section_id = str(section.location.block_id)
-            section_index = _find_by_id(result['sections'], section_id)
-
-            # get subsection index
-            subsection_id = str(subsection.location.block_id)
-            subsection_index = _find_by_id(result['sections'][section_index]['subsections'], subsection_id)
-
-            unit_index = _find_by_id(result['sections'][section_index]['subsections'][subsection_index]['units'], block_id)
-            if unit_index == None:
-                # append section info
-                result['sections'][section_index]['subsections'][subsection_index]['units'].append(
-                    {
-                        'id': block_id,
-                        'displayName': xblock.display_name,
-                        'blocks': []
-                    }
-                )
-        
-        else:
-            # get section index
-            section_id = str(section.location.block_id)
-            section_index = _find_by_id(result['sections'], section_id)
-
-            # get subsection index
-            subsection_id = str(subsection.location.block_id)
-            subsection_index = _find_by_id(result['sections'][section_index]['subsections'], subsection_id)
-
-            # get unit index
-            unit_id = str(unit.location.block_id)
-            unit_index = _find_by_id(result['sections'][section_index]['subsections'][subsection_index]['units'], unit_id)
-
-            block_index = _find_by_id(result['sections'][section_index]['subsections'][subsection_index]['units'][unit_index]['blocks'], block_id)
-            if block_index == None:
-                # append section info
-                result['sections'][section_index]['subsections'][subsection_index]['units'][unit_index]['blocks'].append(
-                    {
-                        'id': block_id,
-                        'displayName': xblock.display_name,
-                        'url': f'/course/{block.course_id}/editor/{block.category}/{block.location}',
-                        'brokenLinks': [],
-                        'lockedLinks': []
-                    }
-                )
-                # TODO check if lockedLinks instead
-                result['sections'][section_index]['subsections'][subsection_index]['units'][unit_index]['blocks'][0]['brokenLinks'].append(link)
-            else:
-                # TODO check if lockedLinks instead
-                result['sections'][section_index]['subsections'][subsection_index]['units'][unit_index]['blocks'][block_index]['brokenLinks'].append(link)
-        
 
 def _get_node_path(block):
     """
@@ -206,73 +113,47 @@ def _get_node_path(block):
     return list(reversed(path))
 
 
-def _find_by_id(data, search_id):
-    """Return index. data is array"""
-    for index, item in enumerate(data):
-        if item.get('id') == search_id:
-            return index
-    return None
+CATEGORY_TO_LEVEL_MAP = {
+    "chapter": "sections",
+    "sequential": "subsections",
+    "vertical": "units"
+}
 
+def _create_dto_from_node_tree_recursive(xblock_node, xblock_dictionary):
+    """
+    Returns the Data Transfer Object shown in generate_broken_links_descriptor
+    using node tree structure and data from xblock dictionary. 
+    """
+    # exit condition when there are no more child nodes (at block level)
+    if not xblock_node:
+        return None
 
-def _create_node_tree(result, block, link):
-    """TODO"""
-    # hierarchy = []
-    # current = block
-    # while current:
-    #     hierarchy.append(current)
-    #     current = current.get_parent()
+    level = None
+    xblock_children = []
 
-    path = _get_node_path(block)
-    
-    current_dict = result
-    for xblock in path:
-        current_dict = current_dict.setdefault(
-            str(xblock.location.block_id),
-            { 
-                'display_name': xblock.display_name,
-                'category': getattr(xblock, 'category', ''),
-            }
-        )
-    
-    current_dict['url'] = f'/course/{block.course_id}/editor/{block.category}/{block.location}'
-    current_dict.setdefault('broken_links', []).append(link)
+    for xblock_id, node in xblock_node.items():
+        child_blocks = _create_dto_from_node_tree_recursive(node, xblock_dictionary)
+        xblock_data = xblock_dictionary.get(xblock_id, {})
 
-
-def _transform_from_dict_to_list_format_recursive(data, parent_level=None):
-    """TODO"""
-    if parent_level is None:
-        parent_level = 'subsections'
-
-    transformed = []
-    for key, value in data.items():
-        if key == 'category':
-            continue
-        
-        print('VALUE', value)
-        display_name = value.get('display_name', '')
-        category = value.get('category')
-        level = CATEGORY_TO_LEVEL[category] if category in CATEGORY_TO_LEVEL else 'blocks'
-
-        entry = {
-            'id': key,
-            'displayName': display_name,
+        xblock_entry = {
+            'id': xblock_id,
+            'displayName': xblock_data.get('display_name', ''),
         }
-        if level == 'blocks':
-            entry.update({
-                'url': value.get('url'),
-                'brokenLinks': value.get('broken_links', []),
-                'lockedLinks': value.get('locked_links', []),
+        if child_blocks == None:
+            level = 'blocks'
+            xblock_entry.update({
+                'url': xblock_data.get('url', ''),
+                'brokenLinks': xblock_data.get('broken_links', []),
+                'lockedLinks': xblock_data.get('locked_links', []),
             })
         else:
-            child_key = level
-            child_data = {k: v for k, v in value.items() if k not in {'display_name', 'category'}}
-            child_blocks = _transform_from_dict_to_list_format_recursive(
-                child_data,
-                parent_level=level
-            )
-            entry.update(child_blocks)
-        
-        transformed.append(entry)
-    
-    return { level: transformed }
-            
+            category = xblock_data.get('category', None)
+            level = CATEGORY_TO_LEVEL_MAP[category] if category in CATEGORY_TO_LEVEL_MAP else None
+            xblock_entry.update(child_blocks)
+            print('TEST', category, level)
+
+        xblock_children.append(xblock_entry)
+
+    if level:
+        return { level: xblock_children }
+    return
