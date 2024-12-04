@@ -2,11 +2,14 @@
 Tests for the views in the notifications app.
 """
 import json
+from copy import deepcopy
 from datetime import datetime, timedelta
 from unittest import mock
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -27,18 +30,20 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.email.utils import encrypt_object, encrypt_string
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
     get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
-from openedx.core.djangoapps.notifications.email.utils import encrypt_object, encrypt_string
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager
 from ..utils import get_notification_types_with_visibility_settings
+
+User = get_user_model()
 
 
 @ddt.ddt
@@ -903,6 +908,7 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
     """
     Tests if preference is updated when encrypted url is hit
     """
+
     def setUp(self):
         """
         Setup test case
@@ -968,3 +974,310 @@ def remove_notifications_with_visibility_settings(expected_response):
                     notification_type
                 )
     return expected_response
+
+
+class UpdateAllNotificationPreferencesViewTests(APITestCase):
+    """
+    Tests for the UpdateAllNotificationPreferencesView.
+    """
+
+    def setUp(self):
+        # Create test user
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse('update-all-notification-preferences')
+
+        # Complex notification config structure
+        self.base_config = {
+            "grading": {
+                "enabled": True,
+                "non_editable": {},
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "ora_staff_notification": {
+                        "web": False,
+                        "push": False,
+                        "email": False,
+                        "email_cadence": "Daily"
+                    }
+                },
+                "core_notification_types": []
+            },
+            "updates": {
+                "enabled": True,
+                "non_editable": {},
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "course_updates": {
+                        "web": True,
+                        "push": True,
+                        "email": False,
+                        "email_cadence": "Daily"
+                    }
+                },
+                "core_notification_types": []
+            },
+            "discussion": {
+                "enabled": True,
+                "non_editable": {
+                    "core": ["web"]
+                },
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "content_reported": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "new_question_post": {
+                        "web": True,
+                        "push": False,
+                        "email": False,
+                        "email_cadence": "Daily"
+                    },
+                    "new_discussion_post": {
+                        "web": True,
+                        "push": False,
+                        "email": False,
+                        "email_cadence": "Daily"
+                    }
+                },
+                "core_notification_types": [
+                    "new_comment_on_response",
+                    "new_comment",
+                    "new_response",
+                    "response_on_followed_post",
+                    "comment_on_followed_post",
+                    "response_endorsed_on_thread",
+                    "response_endorsed"
+                ]
+            }
+        }
+
+        # Create test notification preferences
+        self.preferences = []
+        for i in range(3):
+            pref = CourseNotificationPreference.objects.create(
+                user=self.user,
+                course_id=f'course-v1:TestX+Test{i}+2024',
+                notification_preference_config=deepcopy(self.base_config),
+                is_active=True
+            )
+            self.preferences.append(pref)
+
+        # Create an inactive preference
+        self.inactive_pref = CourseNotificationPreference.objects.create(
+            user=self.user,
+            course_id='course-v1:TestX+Inactive+2024',
+            notification_preference_config=deepcopy(self.base_config),
+            is_active=False
+        )
+
+    def test_update_discussion_notification(self):
+        """
+        Test updating discussion notification settings
+        """
+        data = {
+            'notification_app': 'discussion',
+            'notification_type': 'content_reported',
+            'notification_channel': 'push',
+            'value': False
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        self.assertEqual(response.data['data']['total_updated'], 3)
+
+        # Verify database updates
+        for pref in CourseNotificationPreference.objects.filter(is_active=True):
+            self.assertFalse(
+                pref.notification_preference_config['discussion']['notification_types']['content_reported']['push']
+            )
+
+    def test_update_non_editable_field(self):
+        """
+        Test attempting to update a non-editable field
+        """
+        data = {
+            'notification_app': 'discussion',
+            'notification_type': 'core',
+            'notification_channel': 'web',
+            'value': False
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        # Should fail because 'web' is non-editable for 'core' in discussion
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['status'], 'error')
+
+        # Verify database remains unchanged
+        for pref in CourseNotificationPreference.objects.filter(is_active=True):
+            self.assertTrue(
+                pref.notification_preference_config['discussion']['notification_types']['core']['web']
+            )
+
+    def test_update_email_cadence(self):
+        """
+        Test updating email cadence setting
+        """
+        data = {
+            'notification_app': 'discussion',
+            'notification_type': 'content_reported',
+            'email_cadence': 'Weekly'
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+
+        # Verify database updates
+        for pref in CourseNotificationPreference.objects.filter(is_active=True):
+            notification_type = pref.notification_preference_config['discussion']['notification_types'][
+                'content_reported']
+            self.assertEqual(
+                notification_type['email_cadence'],
+                'Weekly'
+            )
+
+    @patch.dict('openedx.core.djangoapps.notifications.serializers.COURSE_NOTIFICATION_APPS', {
+        **COURSE_NOTIFICATION_APPS,
+        'grading': {
+            'enabled': False,
+            'core_info': 'Notifications for submission grading.',
+            'core_web': True,
+            'core_email': True,
+            'core_push': True,
+            'core_email_cadence': 'Daily',
+            'non_editable': []
+        }
+    })
+    def test_update_disabled_app(self):
+        """
+        Test updating notification for a disabled app
+        """
+        # Disable the grading app in all preferences
+        for pref in self.preferences:
+            config = pref.notification_preference_config
+            config['grading']['enabled'] = False
+            pref.notification_preference_config = config
+            pref.save()
+
+        data = {
+            'notification_app': 'grading',
+            'notification_type': 'core',
+            'notification_channel': 'email',
+            'value': False
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['status'], 'error')
+
+    def test_invalid_serializer_data(self):
+        """
+        Test handling of invalid input data
+        """
+        test_cases = [
+            {
+                'notification_app': 'invalid_app',
+                'notification_type': 'core',
+                'notification_channel': 'push',
+                'value': False
+            },
+            {
+                'notification_app': 'discussion',
+                'notification_type': 'invalid_type',
+                'notification_channel': 'push',
+                'value': False
+            },
+            {
+                'notification_app': 'discussion',
+                'notification_type': 'core',
+                'notification_channel': 'invalid_channel',
+                'value': False
+            },
+            {
+                'notification_app': 'discussion',
+                'notification_type': 'core',
+                'notification_channel': 'email_cadence',
+                'value': 'Invalid_Cadence'
+            }
+        ]
+
+        for test_case in test_cases:
+            response = self.client.post(self.url, test_case, format='json')
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class GetAggregateNotificationPreferencesTest(APITestCase):
+    """
+    Tests for the GetAggregateNotificationPreferences API view.
+    """
+
+    def setUp(self):
+        # Set up a user and API client
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse('notification-preferences-aggregated')  # Adjust with the actual name
+
+    def test_no_active_notification_preferences(self):
+        """
+        Test case: No active notification preferences found for the user
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['status'], 'error')
+        self.assertEqual(response.data['message'], 'No active notification preferences found')
+
+    @patch('openedx.core.djangoapps.notifications.views.aggregate_notification_configs')
+    def test_with_active_notification_preferences(self, mock_aggregate):
+        """
+        Test case: Active notification preferences found for the user
+        """
+        # Mock aggregate_notification_configs for a controlled output
+        mock_aggregate.return_value = {'mocked': 'data'}
+
+        # Create active notification preferences for the user
+        CourseNotificationPreference.objects.create(
+            user=self.user,
+            is_active=True,
+            notification_preference_config={'example': 'config'}
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        self.assertEqual(response.data['message'], 'Notification preferences retrieved')
+        self.assertEqual(response.data['data'], {'mocked': 'data'})
+
+    def test_unauthenticated_user(self):
+        """
+        Test case: Request without authentication
+        """
+        # Test case: Request without authentication
+        self.client.logout()  # Remove authentication
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

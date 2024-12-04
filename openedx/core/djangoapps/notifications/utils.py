@@ -1,11 +1,12 @@
 """
 Utils function for notifications app
 """
-from typing import Dict, List
+import copy
+from typing import Dict, List, Set
 
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NEW_NOTIFICATION_VIEW
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NEW_NOTIFICATION_VIEW, ENABLE_NOTIFICATIONS
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -158,3 +159,123 @@ def clean_arguments(kwargs):
     if kwargs.get('created', {}):
         clean_kwargs.update(kwargs.get('created'))
     return clean_kwargs
+
+
+def update_notification_types(
+    app_config: Dict,
+    user_app_config: Dict,
+    default_config: Dict,
+    app: str
+) -> None:
+    """
+    Update notification types for a specific category configuration.
+    """
+    if "notification_types" not in user_app_config:
+        return
+
+    for type_key, type_config in user_app_config["notification_types"].items():
+        if type_key not in app_config["notification_types"]:
+            continue
+
+        update_notification_fields(
+            app_config["notification_types"][type_key],
+            type_config,
+            default_config[app]["notification_types"][type_key]
+        )
+
+
+def update_notification_fields(
+    target_config: Dict,
+    source_config: Dict,
+    default_type_config: Dict
+) -> None:
+    """
+    Update individual notification fields (web, push, email) and email_cadence.
+    """
+    for field in ["web", "push", "email"]:
+        if field in source_config:
+            target_config[field] |= source_config[field]
+
+
+def update_core_notification_types(app_config: Dict, user_config: Dict) -> None:
+    """
+    Update core notification types by merging existing and new types.
+    """
+    if "core_notification_types" not in user_config:
+        return
+
+    existing_types: Set = set(app_config.get("core_notification_types", []))
+    existing_types.update(user_config["core_notification_types"])
+    app_config["core_notification_types"] = list(existing_types)
+
+
+def process_app_config(
+    app_config: Dict,
+    user_config: Dict,
+    app: str,
+    default_config: Dict,
+    email_cadences: Set[str]
+) -> None:
+    """
+    Process a single category configuration against another config.
+    """
+    if app not in user_config:
+        return
+
+    user_app_config = user_config[app]
+
+    # Update enabled status
+    app_config["enabled"] |= user_app_config.get("enabled", False)
+
+    # Update core notification types
+    update_core_notification_types(app_config, user_app_config)
+
+    # Update notification types
+    update_notification_types(app_config, user_app_config, default_config, app)
+
+    # Collect email cadences
+    for type_key in app_config["notification_types"]:
+        if "email_cadence" in user_app_config.get("notification_types", {}).get(type_key, {}):
+            email_cadences.add(
+                user_app_config["notification_types"][type_key]["email_cadence"]
+            )
+
+
+def aggregate_notification_configs(default_config: Dict, existing_user_configs: List[Dict]) -> Dict:
+    """
+    Update default notification config with values from other configs.
+    Rules:
+    1. Start with default config as base
+    2. If any value is True in other configs, make it True
+    3. Set email_cadence to "Mixed" if different cadences found, else use default
+
+    Args:
+        default_config: Base configuration to start with
+        existing_user_configs: List of notification config dictionaries to apply
+
+    Returns:
+        Updated config following the same structure
+    """
+    if not existing_user_configs:
+        return default_config
+
+    result_config = copy.deepcopy(default_config)
+    apps = result_config.keys()
+
+    for app in apps:
+        app_config = result_config[app]
+        email_cadences: Set[str] = set()
+
+        for user_config in existing_user_configs:
+            process_app_config(app_config, user_config, app, default_config, email_cadences)
+
+        # Determine email cadence
+        for type_key in app_config["notification_types"]:
+            email_cadence = default_config[app]["notification_types"][type_key]["email_cadence"]
+            if len(email_cadences) > 1:
+                email_cadence = "Mixed"
+            elif email_cadences:
+                email_cadence = list(email_cadences)[0]
+            app_config["notification_types"][type_key]["email_cadence"] = email_cadence
+
+    return result_config
