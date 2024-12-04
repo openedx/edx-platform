@@ -48,6 +48,8 @@ function($, _, Backbone, gettext, BasePage,
             clipboardData: { content: null },
         },
 
+        targetXBlock: null,
+
         view: 'container_preview',
 
         defaultViewClass: ContainerView,
@@ -131,10 +133,26 @@ function($, _, Backbone, gettext, BasePage,
 
             if (this.options.isIframeEmbed) {
                 window.addEventListener('message', (event) => {
-                  if (event.data && event.data.type === 'refreshXBlock') {
-                      this.render();
-                  }
-               });
+                    const { data } = event;
+
+                    if (!data) return;
+
+                    const xblockElement = this.findXBlockElement(this.targetXBlock);
+
+                    switch (data.type) {
+                    case 'refreshXBlock':
+                        this.render();
+                        break;
+                    case 'completeManageXBlockAccess':
+                        this.refreshXBlock(xblockElement, false);
+                        break;
+                    case 'addXBlock':
+                        this.createComponent(this, xblockElement, event.data);
+                        break;
+                    default:
+                        console.warn('Unhandled message type:', data.type);
+                    }
+                });
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
@@ -395,8 +413,18 @@ function($, _, Backbone, gettext, BasePage,
             const isAccessButton = event.currentTarget.className === 'access-button';
             const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
             const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
+
+            this.targetXBlock = event.target;
+
             try {
                 if (this.options.isIframeEmbed && isAccessButton) {
+                    window.parent.postMessage(
+                        {
+                            type: 'toggleCourseXBlockDropdown',
+                            message: 'Adjust the height of the dropdown menu',
+                            payload: { courseXBlockDropdownHeight: 0 }
+                        }, document.referrer
+                    );
                     return window.parent.postMessage(
                         {
                             type: 'manageXBlockAccess',
@@ -735,11 +763,18 @@ function($, _, Backbone, gettext, BasePage,
             const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
             try {
                 if (this.options.isIframeEmbed) {
-                    return window.parent.postMessage(
+                    window.parent.postMessage(
                         {
                             type: 'duplicateXBlock',
                             message: 'Duplicate the XBlock',
                             payload: { blockType, usageId }
+                        }, document.referrer
+                    );
+                    window.parent.postMessage(
+                        {
+                            type: 'toggleCourseXBlockDropdown',
+                            message: 'Adjust the height of the dropdown menu',
+                            payload: { courseXBlockDropdownHeight: 0 }
                         }, document.referrer
                     );
                 }
@@ -779,6 +814,13 @@ function($, _, Backbone, gettext, BasePage,
                             },
                         }, document.referrer
                     );
+                    window.parent.postMessage(
+                        {
+                            type: 'toggleCourseXBlockDropdown',
+                            message: 'Adjust the height of the dropdown menu',
+                            payload: { courseXBlockDropdownHeight: 0 }
+                        }, document.referrer
+                    );
                     return true;
                 }
             } catch (e) {
@@ -795,11 +837,18 @@ function($, _, Backbone, gettext, BasePage,
             const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
             try {
                 if (this.options.isIframeEmbed) {
-                    return window.parent.postMessage(
+                    window.parent.postMessage(
                         {
                             type: 'deleteXBlock',
                             message: 'Delete the XBlock',
                             payload: { usageId }
+                        }, document.referrer
+                    );
+                    window.parent.postMessage(
+                        {
+                            type: 'toggleCourseXBlockDropdown',
+                            message: 'Adjust the height of the dropdown menu',
+                            payload: { courseXBlockDropdownHeight: 0 }
                         }, document.referrer
                     );
                 }
@@ -809,21 +858,42 @@ function($, _, Backbone, gettext, BasePage,
             this.deleteComponent(this.findXBlockElement(event.target));
         },
 
-        createComponent: function(template, target) {
+        createPlaceholderElement: function() {
+            return $('<div/>', {class: 'studio-xblock-wrapper'});
+        },
+
+        createComponent: function(template, target, iframeMessageData) {
             // A placeholder element is created in the correct location for the new xblock
             // and then onNewXBlock will replace it with a rendering of the xblock. Note that
             // for xblocks that can't be replaced inline, the entire parent will be refreshed.
             var parentElement = this.findXBlockElement(target),
                 parentLocator = parentElement.data('locator'),
-                buttonPanel = target.closest('.add-xblock-component'),
-                listPanel = buttonPanel.prev(),
-                scrollOffset = ViewUtils.getScrollOffset(buttonPanel),
+                buttonPanel = target?.closest('.add-xblock-component'),
+                listPanel = buttonPanel?.prev(),
                 $placeholderEl = $(this.createPlaceholderElement()),
                 requestData = _.extend(template, {
                     parent_locator: parentLocator
                 }),
-                placeholderElement;
-            placeholderElement = $placeholderEl.appendTo(listPanel);
+                scrollOffset,
+                placeholderElement,
+                $container;
+
+            if (this.options.isIframeEmbed) {
+                $container = $('ol.reorderable-container.ui-sortable');
+                scrollOffset = 0;
+            } else {
+                $container = listPanel;
+                scrollOffset = ViewUtils.getScrollOffset(buttonPanel);
+            }
+
+            placeholderElement = $placeholderEl.appendTo($container);
+
+            if (this.options.isIframeEmbed) {
+                if (iframeMessageData.payload.data && iframeMessageData.type === 'addXBlock') {
+                    return this.onNewXBlock(placeholderElement, scrollOffset, false, iframeMessageData.payload.data);
+                }
+            }
+
             return $.postJSON(this.getURLRoot() + '/', requestData,
                 _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false))
                 .fail(function() {
@@ -843,6 +913,26 @@ function($, _, Backbone, gettext, BasePage,
                 placeholderElement;
 
             placeholderElement = $placeholderEl.insertAfter(xblockElement);
+
+            if (this.options.isIframeEmbed) {
+                try {
+                    window.parent.postMessage(
+                        {
+                            type: 'scrollToXBlock',
+                            message: 'Scroll to XBlock',
+                            payload: { scrollOffset }
+                        }, document.referrer
+                    );
+                } catch (e) {
+                    console.error(e);
+                }
+                return window.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'completeXBlockDuplicating') {
+                        return self.onNewXBlock(placeholderElement, scrollOffset, true, event.data.payload);
+                    }
+                });
+            }
+
             XBlockUtils.duplicateXBlock(xblockElement, parentElement)
                 .done(function(data) {
                     self.onNewXBlock(placeholderElement, scrollOffset, true, data);
@@ -858,6 +948,15 @@ function($, _, Backbone, gettext, BasePage,
                 xblockInfo = new XBlockInfo({
                     id: xblockElement.data('locator')
                 });
+
+            if (this.options.isIframeEmbed) {
+                return window.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'completeXBlockDeleting') {
+                        return self.onDelete(xblockElement);
+                    }
+                });
+            }
+
             XBlockUtils.deleteXBlock(xblockInfo).done(function() {
                 self.onDelete(xblockElement);
             });
@@ -986,7 +1085,9 @@ function($, _, Backbone, gettext, BasePage,
                 window.location.href = destinationUrl;
                 return;
             }
-            ViewUtils.setScrollOffset(xblockElement, scrollOffset);
+            if (!this.options.isIframeEmbed) {
+                ViewUtils.setScrollOffset(xblockElement, scrollOffset);
+            }
             xblockElement.data('locator', data.locator);
             return this.refreshXBlock(xblockElement, true, is_duplicate);
         },
@@ -1003,7 +1104,9 @@ function($, _, Backbone, gettext, BasePage,
                 parentElement = xblockElement.parent(),
                 rootLocator = this.xblockView.model.id;
             if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
-                this.render({refresh: true, block_added: block_added});
+                if (block_added) {
+                  this.render({refresh: true, block_added: block_added});
+                }
             } else if (parentElement.hasClass('reorderable-container')) {
                 this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
             } else {
