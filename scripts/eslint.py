@@ -13,7 +13,7 @@ def fail_quality(name, message):
     Fail the specified quality check.
     """
     print(name)
-    print(message)
+    # print(message)
     raise BuildFailure(message)
 
 
