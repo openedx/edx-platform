@@ -39,7 +39,7 @@ annotated-types==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
-anyio==4.6.2.post1
+anyio==4.7.0
     # via starlette
 appdirs==1.4.4
     # via
@@ -982,8 +982,7 @@ multidict==6.1.0
     #   aiohttp
     #   yarl
 mysqlclient==2.2.6
-    # via
-    #   -r requirements/edx/base.txt
+    # via -r requirements/edx/base.txt
 newrelic==10.3.1
     # via
     #   -r requirements/edx/base.txt
@@ -1019,8 +1018,7 @@ openai==0.28.1
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 openedx-atlas==0.6.2
-    # via
-    #   -r requirements/edx/base.txt
+    # via -r requirements/edx/base.txt
 openedx-calc==4.0.1
     # via -r requirements/edx/base.txt
 openedx-django-pyfs==3.7.0
@@ -1578,6 +1576,7 @@ tqdm==4.67.1
 typing-extensions==4.12.2
     # via
     #   -r requirements/edx/base.txt
+    #   anyio
     #   django-countries
     #   edx-opaque-keys
     #   faker
