@@ -54,6 +54,7 @@ class HomePageViewTest(CourseTestCase):
             "request_course_creator_url": "/request_course_creator",
             "rerun_creator_status": True,
             "show_new_library_button": True,
+            "show_new_library_v2_button": True,
             "split_studio_home": False,
             "studio_name": settings.STUDIO_NAME,
             "studio_short_name": settings.STUDIO_SHORT_NAME,
