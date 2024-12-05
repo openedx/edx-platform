@@ -202,7 +202,7 @@ class DiscussionNotificationSender:
 
         while has_more_subscribers:
 
-            subscribers = Subscription.fetch(self.thread.id, self.course.id, query_params={'page': page})
+            subscribers = Subscription.fetch(self.thread.id, query_params={'page': page})
             if page <= subscribers.num_pages:
                 for subscriber in subscribers.collection:
                     # Check if the subscriber is not the thread creator or response creator

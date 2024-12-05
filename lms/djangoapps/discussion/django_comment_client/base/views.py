@@ -562,6 +562,7 @@ def create_thread(request, course_id, commentable_id):
         params['context'] = ThreadContext.STANDALONE
     else:
         params['context'] = ThreadContext.COURSE
+
     thread = cc.Thread(**params)
 
     # Divide the thread if required

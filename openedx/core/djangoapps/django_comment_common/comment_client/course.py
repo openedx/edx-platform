@@ -7,10 +7,8 @@ from typing import Dict, Optional
 from edx_django_utils.monitoring import function_trace
 from opaque_keys.edx.keys import CourseKey
 
-from forum import api as forum_api
 from openedx.core.djangoapps.django_comment_common.comment_client import settings
 from openedx.core.djangoapps.django_comment_common.comment_client.utils import perform_request
-from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled
 
 
 def get_course_commentable_counts(course_key: CourseKey) -> Dict[str, Dict[str, int]]:
@@ -31,20 +29,17 @@ def get_course_commentable_counts(course_key: CourseKey) -> Dict[str, Dict[str, 
             }
 
     """
-    if is_forum_v2_enabled(course_key):
-        commentable_stats = forum_api.get_commentables_stats(str(course_key))
-    else:
-        url = f"{settings.PREFIX}/commentables/{course_key}/counts"
-        commentable_stats = perform_request(
-            'get',
-            url,
-            metric_tags=[
-                f"course_key:{course_key}",
-                "function:get_course_commentable_counts",
-            ],
-            metric_action='commentable_stats.retrieve',
-        )
-    return commentable_stats
+    url = f"{settings.PREFIX}/commentables/{course_key}/counts"
+    response = perform_request(
+        'get',
+        url,
+        metric_tags=[
+            f"course_key:{course_key}",
+            "function:get_course_commentable_counts",
+        ],
+        metric_action='commentable_stats.retrieve',
+    )
+    return response
 
 
 @function_trace("get_course_user_stats")
@@ -81,21 +76,17 @@ def get_course_user_stats(course_key: CourseKey, params: Optional[Dict] = None) 
     """
     if params is None:
         params = {}
-    if is_forum_v2_enabled(course_key):
-        course_stats = forum_api.get_user_course_stats(str(course_key), **params)
-    else:
-        url = f"{settings.PREFIX}/users/{course_key}/stats"
-        course_stats = perform_request(
-            'get',
-            url,
-            params,
-            metric_action='user.course_stats',
-            metric_tags=[
-                f"course_key:{course_key}",
-                "function:get_course_user_stats",
-            ],
-        )
-    return course_stats
+    url = f"{settings.PREFIX}/users/{course_key}/stats"
+    return perform_request(
+        'get',
+        url,
+        params,
+        metric_action='user.course_stats',
+        metric_tags=[
+            f"course_key:{course_key}",
+            "function:get_course_user_stats",
+        ],
+    )
 
 
 @function_trace("update_course_users_stats")
@@ -109,17 +100,13 @@ def update_course_users_stats(course_key: CourseKey) -> Dict:
     Returns:
         dict: data returned by API. Contains count of users updated.
     """
-    if is_forum_v2_enabled(course_key):
-        course_stats = forum_api.update_users_in_course(str(course_key))
-    else:
-        url = f"{settings.PREFIX}/users/{course_key}/update_stats"
-        course_stats = perform_request(
-            'post',
-            url,
-            metric_action='user.update_course_stats',
-            metric_tags=[
-                f"course_key:{course_key}",
-                "function:update_course_users_stats",
-            ],
-        )
-    return course_stats
+    url = f"{settings.PREFIX}/users/{course_key}/update_stats"
+    return perform_request(
+        'post',
+        url,
+        metric_action='user.update_course_stats',
+        metric_tags=[
+            f"course_key:{course_key}",
+            "function:update_course_users_stats",
+        ],
+    )
