@@ -16,9 +16,9 @@ def fail_quality(name, message):
     """
     Fail the specified quality check.
     """
+
     print(name)
-    print(message)
-    sys.exit(1)
+    raise BuildFailure(message)
 
 
 def run_eslint():
@@ -37,16 +37,16 @@ def run_eslint():
         "--format=compact",
         "."
     ]
-    print(shlex.join(command))
+    print("Running command:", shlex.join(command))
     result = subprocess.run(
         command,
         text=True,
         check=False,
         capture_output=True
     )
-
-    last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
+    
     print(result.stdout)
+    last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
     regex = r'^\d+'
     try:
         num_violations = int(re.search(regex, last_line).group(0)) if last_line else 0
@@ -64,4 +64,8 @@ def run_eslint():
 
 
 if __name__ == "__main__":
-    run_eslint()
+    try:
+        run_eslint()
+    except BuildFailure as e:
+        print(e)
+        sys.exit(1)    
