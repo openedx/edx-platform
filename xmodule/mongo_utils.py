@@ -30,11 +30,8 @@ def connect_to_mongodb(
     handles AutoReconnect errors by retrying read operations, since these exceptions
     typically indicate a temporary step-down condition for MongoDB.
     """
-    # If the MongoDB server uses a separate authentication database that should be specified here.
-    # Convert the lowercased authsource parameter to the camel-cased authSource expected by MongoClient.
-    auth_source = db
-    if auth_source_key := {'authSource', 'authsource'}.intersection(set(kwargs.keys())):
-        auth_source = kwargs.pop(auth_source_key.pop()) or db
+    # If the MongoDB server uses a separate authentication database that should be specified here
+    auth_source = kwargs.get('authsource', '') or None
 
     # sanitize a kwarg which may be present and is no longer expected
     # AED 2020-03-02 TODO: Remove this when 'auth_source' will no longer exist in kwargs
@@ -66,7 +63,7 @@ def connect_to_mongodb(
     }
 
     if user is not None and password is not None and not db.startswith('test_'):
-        connection_params.update({'username': user, 'password': password, 'authSource': auth_source})
+        connection_params.update({'username': user, 'password': password, 'authSource': db})
 
     mongo_conn = pymongo.MongoClient(**connection_params)
 
