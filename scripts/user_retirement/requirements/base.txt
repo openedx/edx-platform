@@ -10,9 +10,9 @@ attrs==24.2.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.35.50
+boto3==1.35.76
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.35.50
+botocore==1.35.76
     # via
     #   boto3
     #   s3transfer
@@ -33,9 +33,9 @@ click==8.1.6
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==43.0.3
+cryptography==44.0.0
     # via pyjwt
-django==4.2.16
+django==4.2.17
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
@@ -44,24 +44,24 @@ django==4.2.16
     #   edx-django-utils
 django-crum==0.7.9
     # via edx-django-utils
-django-waffle==4.1.0
+django-waffle==4.2.0
     # via edx-django-utils
-edx-django-utils==7.0.0
+edx-django-utils==7.1.0
     # via edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.22.0
+google-api-core==2.23.0
     # via google-api-python-client
-google-api-python-client==2.149.0
+google-api-python-client==2.154.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.35.0
+google-auth==2.36.0
     # via
     #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
 google-auth-httplib2==0.2.0
     # via google-api-python-client
-googleapis-common-protos==1.65.0
+googleapis-common-protos==1.66.0
     # via google-api-core
 httplib2==0.22.0
     # via
@@ -81,7 +81,7 @@ lxml==5.3.0
     # via zeep
 more-itertools==10.5.0
     # via simple-salesforce
-newrelic==10.2.0
+newrelic==10.3.1
     # via edx-django-utils
 pbr==6.1.0
     # via stevedore
@@ -89,7 +89,7 @@ platformdirs==4.3.6
     # via zeep
 proto-plus==1.25.0
     # via google-api-core
-protobuf==5.28.3
+protobuf==5.29.1
     # via
     #   google-api-core
     #   googleapis-common-protos
@@ -104,7 +104,7 @@ pyasn1-modules==0.4.1
     # via google-auth
 pycparser==2.22
     # via cffi
-pyjwt[crypto]==2.9.0
+pyjwt[crypto]==2.10.1
     # via
     #   edx-rest-api-client
     #   simple-salesforce
@@ -136,19 +136,19 @@ requests-toolbelt==1.0.0
     # via zeep
 rsa==4.9
     # via google-auth
-s3transfer==0.10.3
+s3transfer==0.10.4
     # via boto3
 simple-salesforce==1.12.6
     # via -r scripts/user_retirement/requirements/base.in
 simplejson==3.19.3
     # via -r scripts/user_retirement/requirements/base.in
-six==1.16.0
+six==1.17.0
     # via
     #   jenkinsapi
     #   python-dateutil
-sqlparse==0.5.1
+sqlparse==0.5.2
     # via django
-stevedore==5.3.0
+stevedore==5.4.0
     # via edx-django-utils
 typing-extensions==4.12.2
     # via simple-salesforce
