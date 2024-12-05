@@ -24,6 +24,8 @@ from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from django.shortcuts import render
+
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -32,6 +34,7 @@ from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
@@ -465,3 +468,20 @@ def _latest_task_status(request, course_key_string, view_func=None):
     for status_filter in STATUS_FILTERS:
         task_status = status_filter().filter_queryset(request, task_status, view_func)
     return task_status.order_by('-created').first()
+
+
+def upload_zip_view(request, course_key_string):
+    courselike_key = CourseKey.from_string(course_key_string)
+
+    successful_url = reverse_course_url('upload_zip_endpoint', courselike_key)
+    context_name = 'context_course'
+    courselike_block = modulestore().get_course(courselike_key)
+
+    if request.method == 'POST':
+        breakpoint()
+        return _write_chunk(request, courselike_key)
+
+    return render(request, 'uploadcourse.html', {
+        'upload_zip_endpoint': successful_url,
+        context_name: courselike_block,
+    })

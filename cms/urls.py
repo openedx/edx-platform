@@ -23,6 +23,7 @@ from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
+from cms.djangoapps.contentstore.views.import_export import upload_zip_view
 
 
 django_autodiscover()
@@ -240,12 +241,12 @@ if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
 
 # The password pages in the admin tool are disabled so that all password
 # changes go through our user portal and follow complexity requirements.
-if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
-    urlpatterns.append(re_path(r'^admin/auth/user/\d+/password/$', handler404))
-urlpatterns.append(path('admin/password_change/', handler404))
-urlpatterns.append(
-    path('admin/login/', contentstore_views.redirect_to_lms_login_for_admin, name='redirect_to_lms_login_for_admin')
-)
+# if not settings.FEATURES.get('ENABLE_CHANGE_USER_PASSWORD_ADMIN'):
+#     urlpatterns.append(re_path(r'^admin/auth/user/\d+/password/$', handler404))
+# urlpatterns.append(path('admin/password_change/', handler404))
+# urlpatterns.append(
+#     path('admin/login/', contentstore_views.redirect_to_lms_login_for_admin, name='redirect_to_lms_login_for_admin')
+# )
 urlpatterns.append(path('admin/', admin.site.urls))
 
 # enable entrance exams
@@ -359,4 +360,5 @@ urlpatterns += [
 urlpatterns += [
     re_path('^authoring-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     re_path('^authoring-api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    re_path(fr'^uploadcourse/{settings.COURSE_KEY_PATTERN}?$', upload_zip_view, name='upload_zip_endpoint'),
 ]
