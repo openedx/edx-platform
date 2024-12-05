@@ -33,9 +33,11 @@ from ..api import (
     get_handler_url as _get_handler_url,
     load_block,
     render_block_view as _render_block_view,
+    get_block_olx,
 )
 from ..utils import validate_secure_token_for_xblock_handler
 from .url_converters import VersionConverter
+from .serializers import XBlockOlxSerializer
 
 User = get_user_model()
 
@@ -211,6 +213,23 @@ def xblock_handler(
     response_webob = block.handle(handler_name, request_webob, suffix)
     response = webob_to_django_response(response_webob)
     return response
+
+
+@api_view(['GET'])
+@view_auth_classes(is_authenticated=False)
+def get_block_olx_view(
+    request,
+    usage_key: UsageKeyV2,
+    version: LatestVersion | int = LatestVersion.AUTO,
+):
+    """
+    Get the OLX (XML serialization) of the specified XBlock
+    """
+    context_impl = get_learning_context_impl(usage_key)
+    if not context_impl.can_view_block_for_editing(request.user, usage_key):
+        raise PermissionDenied(f"You don't have permission to access the OLX of component '{usage_key}'.")
+    olx = get_block_olx(usage_key, version=version)
+    return Response(XBlockOlxSerializer({"olx": olx}).data)
 
 
 def cors_allow_xblock_handler(sender, request, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
