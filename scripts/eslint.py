@@ -14,7 +14,7 @@ def fail_quality(name, message):
     """
     print(name)
     print(message)
-    sys.exit()
+    raise BuildFailure(message)
 
 
 class BuildFailure(Exception):
@@ -26,7 +26,7 @@ def run_eslint():
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-    violations_limit = 1303
+    violations_limit = 1213
 
     command = [
         "node",
@@ -52,10 +52,10 @@ def run_eslint():
         num_violations = int(re.search(regex, last_line).group(0)) if last_line else 0
         # Fail if number of violations is greater than the limit
         if num_violations > violations_limit:
-            raise BuildFailure("FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
-            # fail_quality(
-            #     'eslint',
-            #     "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
+            # raise BuildFailure("FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
+            fail_quality(
+                'eslint',
+                "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
         else:
             print(f"successfully run eslint with '{num_violations}' violations")
 
