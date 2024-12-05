@@ -15,8 +15,8 @@ def fail_quality(name, message):
     """
     Fail the specified quality check.
     """
-    # print(name)
-    # print(message)
+    print(name)
+    print(message)
     sys.exit(1)
 
 
