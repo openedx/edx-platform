@@ -8,17 +8,19 @@ import shlex
 import sys
 
 
+class BuildFailure(Exception):
+    """Custom exception for build quality check failures."""
+    def __init__(self, message):
+        super().__init__(message)
+
+
 def fail_quality(name, message):
     """
     Fail the specified quality check.
     """
-    print(name)
+    # print(name)
     # print(message)
     raise BuildFailure(message)
-
-
-class BuildFailure(Exception):
-    pass
 
 
 def run_eslint():
@@ -41,7 +43,7 @@ def run_eslint():
     result = subprocess.run(
         command,
         text=True,
-        check=False,
+        check=True,
         capture_output=True
     )
 
@@ -52,7 +54,6 @@ def run_eslint():
         num_violations = int(re.search(regex, last_line).group(0)) if last_line else 0
         # Fail if number of violations is greater than the limit
         if num_violations > violations_limit:
-            # raise BuildFailure("FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
             fail_quality(
                 'eslint',
                 "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
