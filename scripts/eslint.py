@@ -43,7 +43,7 @@ def run_eslint():
     result = subprocess.run(
         command,
         text=True,
-        check=True,
+        check=False,
         capture_output=True
     )
 
