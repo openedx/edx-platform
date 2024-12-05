@@ -66,6 +66,7 @@ class HomePageView(APIView):
             "request_course_creator_url": "/request_course_creator",
             "rerun_creator_status": true,
             "show_new_library_button": true,
+            "show_new_library_v2_button": true,
             "split_studio_home": false,
             "studio_name": "Studio",
             "studio_short_name": "Studio",
