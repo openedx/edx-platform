@@ -73,9 +73,13 @@ class Comment(models.Model):
         course_key = get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
             if voteable.type == 'thread':
-                response = forum_api.update_thread_flag(voteable.id, "flag", user.id, str(course_key))
+                response = forum_api.update_thread_flag(
+                    voteable.id, "flag", user_id=user.id, course_id=str(course_key)
+                )
             else:
-                response = forum_api.update_comment_flag(voteable.id, "flag", user.id, str(course_key))
+                response = forum_api.update_comment_flag(
+                    voteable.id, "flag", user_id=user.id, course_id=str(course_key)
+                )
         else:
             params = {'user_id': user.id}
             response = perform_request(
