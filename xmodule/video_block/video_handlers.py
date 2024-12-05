@@ -467,6 +467,7 @@ class VideoStudioViewHandlers:
 
         return error
 
+    # pylint: disable=too-many-statements
     @XBlock.handler
     def studio_transcript(self, request, dispatch):
         """
@@ -534,6 +535,10 @@ class VideoStudioViewHandlers:
                             'edx_video_id': edx_video_id,
                             'language_code': new_language_code
                         }
+                        # If a new transcript is added, then both new_language_code and
+                        # language_code fields will have the same value.
+                        if language_code != new_language_code:
+                            self.transcripts.pop(language_code, None)
                         self.transcripts[new_language_code] = f'{edx_video_id}-{new_language_code}.srt'
                         response = Response(json.dumps(payload), status=201)
                     except (TranscriptsGenerationException, UnicodeDecodeError):

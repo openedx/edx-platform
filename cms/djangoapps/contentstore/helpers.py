@@ -7,6 +7,7 @@ import pathlib
 import urllib
 from lxml import etree
 from mimetypes import guess_type
+import re
 
 from attrs import frozen, Factory
 from django.conf import settings
@@ -446,6 +447,10 @@ def _import_xml_node_to_parent(
         node_without_children = etree.Element(node.tag, **node.attrib)
         temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys)
         child_nodes = list(node)
+
+    if issubclass(xblock_class, XmlMixin) and "x-is-pointer-node" in getattr(temp_xblock, "data", ""):
+        # Undo the "pointer node" hack if needed (e.g. for capa problems)
+        temp_xblock.data = re.sub(r'([^>]+) x-is-pointer-node="no"', r'\1', temp_xblock.data, count=1)
 
     # Restore the original id_generator
     runtime.id_generator = original_id_generator

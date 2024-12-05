@@ -155,7 +155,6 @@ class DiscussionNotificationSender:
                 "author_name": str(author_name),
                 "author_pronoun": str(author_pronoun),
                 "email_content": clean_thread_html_body(self.comment.body),
-                "group_by_id": self.parent_response.id
             }
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
@@ -203,7 +202,7 @@ class DiscussionNotificationSender:
 
         while has_more_subscribers:
 
-            subscribers = Subscription.fetch(self.thread.id, query_params={'page': page})
+            subscribers = Subscription.fetch(self.thread.id, self.course.id, query_params={'page': page})
             if page <= subscribers.num_pages:
                 for subscriber in subscribers.collection:
                     # Check if the subscriber is not the thread creator or response creator

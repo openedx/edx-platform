@@ -6,18 +6,19 @@ If student does not yet anwered - Question with set of choices.
 If student have answered - Question with statistics for each answers.
 """
 
-
 import html
 import json
 import logging
-from collections import OrderedDict
 from copy import deepcopy
 
-from web_fragments.fragment import Fragment
-
+from collections import OrderedDict
+from django.conf import settings
 from lxml import etree
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, pylint: disable=wrong-import-order
+from xblocks_contrib.poll import PollBlock as _ExtractedPollBlock
+
 from openedx.core.djangolib.markup import Text, HTML
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.stringify import stringify_children
@@ -30,13 +31,12 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin
 
-
 log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
 @XBlock.needs('mako')
-class PollBlock(
+class _BuiltInPollBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
@@ -44,6 +44,9 @@ class PollBlock(
     XModuleMixin,
 ):  # pylint: disable=abstract-method
     """Poll Block"""
+
+    is_extracted = False
+
     # Name of poll to use in links to this poll
     display_name = String(
         help=_("The display name for this component."),
@@ -244,3 +247,10 @@ class PollBlock(
             add_child(xml_object, answer)
 
         return xml_object
+
+
+PollBlock = (
+    _ExtractedPollBlock if settings.USE_EXTRACTED_POLL_QUESTION_BLOCK
+    else _BuiltInPollBlock
+)
+PollBlock.__name__ = "PollBlock"
