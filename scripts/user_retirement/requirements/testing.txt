@@ -14,11 +14,11 @@ attrs==24.2.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.35.50
+boto3==1.35.76
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.35.50
+botocore==1.35.76
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -45,14 +45,14 @@ click==8.1.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-cryptography==43.0.3
+cryptography==44.0.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
     #   pyjwt
 ddt==1.7.2
     # via -r scripts/user_retirement/requirements/testing.in
-django==4.2.16
+django==4.2.17
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django-crum
@@ -62,23 +62,23 @@ django-crum==0.7.9
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-django-waffle==4.1.0
+django-waffle==4.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-edx-django-utils==7.0.0
+edx-django-utils==7.1.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-api-core==2.22.0
+google-api-core==2.23.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.149.0
+google-api-python-client==2.154.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.35.0
+google-auth==2.36.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -88,7 +88,7 @@ google-auth-httplib2==0.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-googleapis-common-protos==1.65.0
+googleapis-common-protos==1.66.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -132,11 +132,11 @@ more-itertools==10.5.0
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==10.2.0
+newrelic==10.3.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-packaging==24.1
+packaging==24.2
     # via pytest
 pbr==6.1.0
     # via
@@ -152,7 +152,7 @@ proto-plus==1.25.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==5.28.3
+protobuf==5.29.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -175,7 +175,7 @@ pycparser==2.22
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   cffi
-pyjwt[crypto]==2.9.0
+pyjwt[crypto]==2.10.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client
@@ -188,7 +188,7 @@ pyparsing==3.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
-pytest==8.3.3
+pytest==8.3.4
     # via -r scripts/user_retirement/requirements/testing.in
 python-dateutil==2.9.0.post0
     # via
@@ -235,7 +235,7 @@ rsa==4.9
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-s3transfer==0.10.3
+s3transfer==0.10.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -243,16 +243,16 @@ simple-salesforce==1.12.6
     # via -r scripts/user_retirement/requirements/base.txt
 simplejson==3.19.3
     # via -r scripts/user_retirement/requirements/base.txt
-six==1.16.0
+six==1.17.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   jenkinsapi
     #   python-dateutil
-sqlparse==0.5.1
+sqlparse==0.5.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
-stevedore==5.3.0
+stevedore==5.4.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -272,7 +272,7 @@ urllib3==1.26.20
     #   botocore
     #   requests
     #   responses
-werkzeug==3.0.6
+werkzeug==3.1.3
     # via moto
 xmltodict==0.14.2
     # via moto
