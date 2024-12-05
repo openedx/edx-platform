@@ -60,7 +60,7 @@ annotated-types==0.7.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pydantic
-anyio==4.6.2.post1
+anyio==4.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   starlette
@@ -2136,6 +2136,7 @@ typing-extensions==4.12.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   anyio
     #   django-countries
     #   django-stubs
     #   django-stubs-ext

@@ -774,8 +774,7 @@ multidict==6.1.0
     #   aiohttp
     #   yarl
 mysqlclient==2.2.6
-    # via
-    #   -r requirements/edx/kernel.in
+    # via -r requirements/edx/kernel.in
 newrelic==10.3.1
     # via edx-django-utils
 nh3==0.2.19
@@ -805,8 +804,7 @@ openai==0.28.1
     #   -c requirements/edx/../constraints.txt
     #   edx-enterprise
 openedx-atlas==0.6.2
-    # via
-    #   -r requirements/edx/kernel.in
+    # via -r requirements/edx/kernel.in
 openedx-calc==4.0.1
     # via -r requirements/edx/kernel.in
 openedx-django-pyfs==3.7.0
