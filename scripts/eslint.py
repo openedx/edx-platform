@@ -44,7 +44,7 @@ def run_eslint():
         check=False,
         capture_output=True
     )
-    
+
     print(result.stdout)
     last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
     regex = r'^\d+'
@@ -68,4 +68,4 @@ if __name__ == "__main__":
         run_eslint()
     except BuildFailure as e:
         print(e)
-        sys.exit(1)    
+        sys.exit(1)
