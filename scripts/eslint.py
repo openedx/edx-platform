@@ -7,6 +7,7 @@ import subprocess
 import shlex
 import sys
 
+
 class BuildFailure(Exception):
     pass
 
