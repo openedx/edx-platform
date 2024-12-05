@@ -1248,22 +1248,6 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
-        )
-        self.mock_get_course_id_by_comment = patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -1888,12 +1872,6 @@ class CreateThreadTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
@@ -2220,22 +2198,6 @@ class CreateCommentTest(
         self.course = CourseFactory.create()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
-        )
-        self.mock_get_course_id_by_comment = patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
@@ -2627,17 +2589,6 @@ class UpdateThreadTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
 
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -3202,22 +3153,6 @@ class UpdateCommentTest(
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
 
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
-        )
-        self.mock_get_course_id_by_comment = patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
@@ -3735,22 +3670,6 @@ class DeleteThreadTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
-        )
-        self.mock_get_course_id_by_comment = patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
@@ -3904,22 +3823,6 @@ class DeleteCommentTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
-        )
-        self.mock_get_course_id_by_comment = patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
@@ -4088,17 +3991,6 @@ class RetrieveThreadTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
-        )
-        self.mock_get_course_id_by_thread = patcher.start()
-        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
