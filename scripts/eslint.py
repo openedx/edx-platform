@@ -7,11 +7,8 @@ import subprocess
 import shlex
 import sys
 
-
 class BuildFailure(Exception):
-    """Custom exception for build quality check failures."""
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 
 def fail_quality(name, message):
@@ -20,7 +17,7 @@ def fail_quality(name, message):
     """
     # print(name)
     # print(message)
-    raise BuildFailure(message)
+    sys.exit(1)
 
 
 def run_eslint():
@@ -62,7 +59,7 @@ def run_eslint():
 
     # An AttributeError will occur if the regex finds no matches.
     except (AttributeError, ValueError):
-        raise BuildFailure(f"FAILURE: Number of eslint violations could not be found in '{last_line}'")
+        fail_quality(f"FAILURE: Number of eslint violations could not be found in '{last_line}'")
 
 
 if __name__ == "__main__":
