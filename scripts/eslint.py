@@ -16,8 +16,10 @@ def fail_quality(name, message):
     print(message)
     sys.exit()
 
+
 class BuildFailure(Exception):
     pass
+
 
 def run_eslint():
     """
