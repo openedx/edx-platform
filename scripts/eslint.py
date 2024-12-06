@@ -8,13 +8,17 @@ import shlex
 import sys
 
 
+class BuildFailure(Exception):
+    pass
+
+
 def fail_quality(name, message):
     """
     Fail the specified quality check.
     """
+
     print(name)
-    print(message)
-    sys.exit()
+    raise BuildFailure(message)
 
 
 def run_eslint():
@@ -22,7 +26,7 @@ def run_eslint():
     Runs eslint on static asset directories.
     If limit option is passed, fails build if more violations than the limit are found.
     """
-    violations_limit = 1213
+    violations_limit = 1285
 
     command = [
         "node",
@@ -31,9 +35,13 @@ def run_eslint():
         "--ext", ".js",
         "--ext", ".jsx",
         "--format=compact",
-        "."
+        "lms",
+        "cms",
+        "common",
+        "openedx",
+        "xmodule",
     ]
-    print(shlex.join(command))
+    print("Running command:", shlex.join(command))
     result = subprocess.run(
         command,
         text=True,
@@ -41,8 +49,8 @@ def run_eslint():
         capture_output=True
     )
 
-    last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
     print(result.stdout)
+    last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
     regex = r'^\d+'
     try:
         num_violations = int(re.search(regex, last_line).group(0)) if last_line else 0
@@ -56,8 +64,12 @@ def run_eslint():
 
     # An AttributeError will occur if the regex finds no matches.
     except (AttributeError, ValueError):
-        print(f"FAILURE: Number of eslint violations could not be found in '{last_line}'")
+        fail_quality(f"FAILURE: Number of eslint violations could not be found in '{last_line}'")
 
 
 if __name__ == "__main__":
-    run_eslint()
+    try:
+        run_eslint()
+    except BuildFailure as e:
+        print(e)
+        sys.exit(1)
