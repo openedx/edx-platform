@@ -39,7 +39,7 @@ def run_eslint():
         "cms",
         "common",
         "openedx",
-        "xmodule", 
+        "xmodule",
     ]
     print("Running command:", shlex.join(command))
     result = subprocess.run(
