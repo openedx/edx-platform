@@ -5,10 +5,13 @@ The main function for the XSS linter.
 
 import argparse
 import importlib
+import json
 import os
+import re
 import sys
-from functools import reduce
 
+from functools import reduce
+from io import StringIO
 from xsslint.reporting import SummaryResults
 from xsslint.rules import RuleSet
 from xsslint.utils import is_skip_dir
@@ -102,6 +105,107 @@ def _process_os_dirs(starting_dir, template_linters, options, summary_results, o
         _process_os_dir(root, files, template_linters, options, summary_results, out)
 
 
+def _get_xsslint_counts(result_contents):
+    """
+    This returns a dict of violations from the xsslint report.
+
+    Arguments:
+        filename: The name of the xsslint report.
+
+    Returns:
+        A dict containing the following:
+            rules: A dict containing the count for each rule as follows:
+                violation-rule-id: N, where N is the number of violations
+            total: M, where M is the number of total violations
+
+    """
+
+    rule_count_regex = re.compile(r"^(?P<rule_id>[a-z-]+):\s+(?P<count>\d+) violations", re.MULTILINE)
+    total_count_regex = re.compile(r"^(?P<count>\d+) violations total", re.MULTILINE)
+    violations = {'rules': {}}
+    for violation_match in rule_count_regex.finditer(result_contents):
+        try:
+            violations['rules'][violation_match.group('rule_id')] = int(violation_match.group('count'))
+        except ValueError:
+            violations['rules'][violation_match.group('rule_id')] = None
+    try:
+        violations['total'] = int(total_count_regex.search(result_contents).group('count'))
+    # An AttributeError will occur if the regex finds no matches.
+    # A ValueError will occur if the returned regex cannot be cast as a float.
+    except (AttributeError, ValueError):
+        violations['total'] = None
+    return violations
+
+
+def _check_violations(options, results):
+    try:
+        thresholds_option = options['thresholds']
+        # Read the JSON file
+        with open(thresholds_option, 'r') as file:
+            violation_thresholds = json.load(file)
+
+    except ValueError:
+        violation_thresholds = None
+    if isinstance(violation_thresholds, dict) is False or \
+            any(key not in ("total", "rules") for key in violation_thresholds.keys()):
+        print('xsslint')
+        print("""FAILURE: Thresholds option "{thresholds_option}" was not supplied using proper format.\n"""
+              """Here is a properly formatted example, '{{"total":100,"rules":{{"javascript-escape":0}}}}' """
+              """with property names in double-quotes.""".format(thresholds_option=thresholds_option))
+    xsslint_script = "xss_linter.py"
+
+    try:
+        metrics_str = "Number of {xsslint_script} violations: {num_violations}\n".format(
+            xsslint_script=xsslint_script, num_violations=int(results['total'])
+        )
+        if 'rules' in results and any(results['rules']):
+            metrics_str += "\n"
+            rule_keys = sorted(results['rules'].keys())
+            for rule in rule_keys:
+                metrics_str += "{rule} violations: {count}\n".format(
+                    rule=rule,
+                    count=int(results['rules'][rule])
+                )
+    except TypeError:
+        print('xsslint')
+        print("FAILURE: Number of {xsslint_script} violations could not be found".format(
+            xsslint_script=xsslint_script
+        ))
+
+    error_message = ""
+    # Test total violations against threshold.
+    if 'total' in list(violation_thresholds.keys()):
+        if violation_thresholds['total'] < results['total']:
+            error_message = "Too many violations total ({count}).\nThe limit is {violations_limit}.".format(
+                count=results['total'], violations_limit=violation_thresholds['total']
+            )
+
+    # Test rule violations against thresholds.
+    if 'rules' in violation_thresholds:
+        threshold_keys = sorted(violation_thresholds['rules'].keys())
+        for threshold_key in threshold_keys:
+            if threshold_key not in results['rules']:
+                error_message += (
+                    "\nNumber of {xsslint_script} violations for {rule} could not be found"
+                ).format(
+                    xsslint_script=xsslint_script, rule=threshold_key
+                )
+            elif violation_thresholds['rules'][threshold_key] < results['rules'][threshold_key]:
+                error_message += \
+                    "\nToo many {rule} violations ({count}).\nThe {rule} limit is {violations_limit}.".format(
+                        rule=threshold_key, count=results['rules'][threshold_key],
+                        violations_limit=violation_thresholds['rules'][threshold_key],
+                    )
+
+    if error_message:
+        print('xsslint')
+        print("FAILURE: XSSLinter Failed.\n{error_message}\n"
+              "run the following command to hone in on the problem:\n"
+              "  ./scripts/xss-commit-linter.sh -h".format(error_message=error_message))
+    else:
+        print("successfully run xsslint")
+
+
 def _lint(file_or_dir, template_linters, options, summary_results, out):
     """
     For each linter, lints the provided file or directory.
@@ -127,6 +231,8 @@ def _lint(file_or_dir, template_linters, options, summary_results, out):
         _process_os_dirs(directory, template_linters, options, summary_results, out)
 
     summary_results.print_results(options, out)
+    result_output = _get_xsslint_counts(out.getvalue())
+    _check_violations(options, result_output)
 
 
 def main():
@@ -167,6 +273,10 @@ def main():
         '--config', dest='config', action='store', default='xsslint.default_config',
         help='Specifies the config module to use. The config module should be in Python package syntax.'
     )
+    parser.add_argument(
+        '--thresholds', dest='thresholds', action='store',
+        help='Specifies the config module to use. The config module should be in Python package syntax.'
+    )
     parser.add_argument('path', nargs="?", default=None, help='A file to lint or directory to recursively lint.')
 
     args = parser.parse_args()
@@ -176,7 +286,8 @@ def main():
         'rule_totals': args.rule_totals,
         'summary_format': args.summary_format,
         'verbose': args.verbose,
-        'skip_dirs': getattr(config, 'SKIP_DIRS', ())
+        'skip_dirs': getattr(config, 'SKIP_DIRS', ()),
+        'thresholds': args.thresholds
     }
     template_linters = getattr(config, 'LINTERS', ())
     if not template_linters:
@@ -184,4 +295,4 @@ def main():
 
     ruleset = _build_ruleset(template_linters)
     summary_results = SummaryResults(ruleset)
-    _lint(args.path, template_linters, options, summary_results, out=sys.stdout)
+    _lint(args.path, template_linters, options, summary_results, out=StringIO())
