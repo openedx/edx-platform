@@ -35,7 +35,11 @@ def run_eslint():
         "--ext", ".js",
         "--ext", ".jsx",
         "--format=compact",
-        "."
+        "lms",
+        "cms",
+        "common",
+        "openedx",
+        "xmodule", 
     ]
     print("Running command:", shlex.join(command))
     result = subprocess.run(
