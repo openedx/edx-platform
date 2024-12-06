@@ -710,6 +710,9 @@ class LibraryBlockOlxView(APIView):
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
+        DEPRECATED. Use get_block_olx_view() in xblock REST-API.
+        Can be removed post-Teak.
+
         Get the block's OLX
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
