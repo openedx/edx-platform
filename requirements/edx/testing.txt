@@ -39,7 +39,7 @@ annotated-types==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
-anyio==4.6.2.post1
+anyio==4.7.0
     # via starlette
 appdirs==1.4.4
     # via
@@ -87,7 +87,6 @@ beautifulsoup4==4.12.3
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
-    #   openedx-forum
     #   pynliner
 billiard==4.2.1
     # via
@@ -319,7 +318,6 @@ django==4.2.17
     #   openedx-django-wiki
     #   openedx-events
     #   openedx-filters
-    #   openedx-forum
     #   openedx-learning
     #   ora2
     #   social-auth-app-django
@@ -485,7 +483,6 @@ djangorestframework==3.14.0
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
-    #   openedx-forum
     #   openedx-learning
     #   ora2
     #   super-csv
@@ -627,9 +624,7 @@ edx-rest-api-client==6.0.0
     #   edx-enterprise
     #   edx-proctoring
 edx-search==4.1.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   openedx-forum
+    # via -r requirements/edx/base.txt
 edx-sga==0.25.0
     # via -r requirements/edx/base.txt
 edx-submissions==3.8.3
@@ -665,7 +660,6 @@ elasticsearch==7.9.1
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-search
-    #   openedx-forum
 enmerkar==0.7.1
     # via
     #   -r requirements/edx/base.txt
@@ -988,9 +982,7 @@ multidict==6.1.0
     #   aiohttp
     #   yarl
 mysqlclient==2.2.6
-    # via
-    #   -r requirements/edx/base.txt
-    #   openedx-forum
+    # via -r requirements/edx/base.txt
 newrelic==10.3.1
     # via
     #   -r requirements/edx/base.txt
@@ -1026,9 +1018,7 @@ openai==0.28.1
     #   -r requirements/edx/base.txt
     #   edx-enterprise
 openedx-atlas==0.6.2
-    # via
-    #   -r requirements/edx/base.txt
-    #   openedx-forum
+    # via -r requirements/edx/base.txt
 openedx-calc==4.0.1
     # via -r requirements/edx/base.txt
 openedx-django-pyfs==3.7.0
@@ -1055,8 +1045,6 @@ openedx-filters==1.11.0
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.1.4
-    # via -r requirements/edx/base.txt
 openedx-learning==0.18.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1263,7 +1251,6 @@ pymongo==4.4.0
     #   edx-opaque-keys
     #   event-tracking
     #   mongoengine
-    #   openedx-forum
     #   openedx-mongodbproxy
 pynacl==1.5.0
     # via
@@ -1420,7 +1407,6 @@ requests==2.32.3
     #   mailsnake
     #   meilisearch
     #   openai
-    #   openedx-forum
     #   optimizely-sdk
     #   pact-python
     #   pyjwkest
@@ -1590,6 +1576,7 @@ tqdm==4.67.1
 typing-extensions==4.12.2
     # via
     #   -r requirements/edx/base.txt
+    #   anyio
     #   django-countries
     #   edx-opaque-keys
     #   faker
