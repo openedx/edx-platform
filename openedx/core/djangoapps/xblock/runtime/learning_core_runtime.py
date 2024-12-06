@@ -24,6 +24,7 @@ from openedx.core.djangoapps.xblock.api import get_xblock_app_config
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from openedx.core.lib.xblock_serializer.data import StaticFile
 from ..data import AuthoredDataMode, LatestVersion
+from ..utils import get_auto_latest_version
 from ..learning_context.manager import get_learning_context_impl
 from .runtime import XBlockRuntime
 
@@ -178,11 +179,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         # just get it the easy way.
         component = self._get_component_from_usage_key(usage_key)
 
-        if version == LatestVersion.AUTO:
-            if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
-                version = LatestVersion.DRAFT
-            else:
-                version = LatestVersion.PUBLISHED
+        version = get_auto_latest_version(version)
         if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
             raise ValidationError("This runtime only allows accessing the published version of components")
         if version == LatestVersion.DRAFT:
