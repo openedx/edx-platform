@@ -7,6 +7,8 @@ import json
 import os
 import shutil
 import tarfile
+import re
+import requests
 from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
@@ -53,8 +55,10 @@ from cms.djangoapps.contentstore.utils import (
     translation_language,
     delete_course
 )
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_block_info
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from common.djangoapps.course_action_state.models import CourseRerunState
+from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.monitoring import monitor_import_failure
@@ -1066,3 +1070,148 @@ def undo_all_library_source_blocks_ids_for_course(course_key_string, v1_to_v2_li
             store.update_item(draft_library_source_block, None)
     # return success
     return
+
+
+class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
+    """
+    Base class for course link check tasks.
+    """
+
+    @staticmethod
+    def calculate_total_steps(arguments_dict):
+        """
+        Get the number of in-progress steps in the link check process, as shown in the UI.
+
+        For reference, these are:
+        1. Scanning
+        """
+        return 1
+
+    @classmethod
+    def generate_name(cls, arguments_dict):
+        """
+        Create a name for this particular task instance.
+
+        Arguments:
+            arguments_dict (dict): The arguments given to the task function
+
+        Returns:
+            str: The generated name
+        """
+        key = arguments_dict['course_key_string']
+        return f'Broken link check of {key}'
+
+
+@shared_task(base=CourseLinkCheckTask, bind=True)
+def check_broken_links(self, user_id, course_key_string, language):
+    """
+    Checks for broken links in a course. Store the results in a file.
+    """
+    def validate_user():
+        """Validate if the user exists. Otherwise log error. """
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist as exc:
+            with translation_language(language):
+                self.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
+            return
+
+    def get_urls(content):
+        """Returns all urls after href and src in content."""
+        regex = r'\s+(?:href|src)=["\']([^"\']*)["\']'
+        urls = re.findall(regex, content)
+        return urls
+
+    def convert_to_standard_url(url, course_key):
+        """
+        Returns standard urls when given studio urls.
+        Example urls:
+          /assets/courseware/v1/506da5d6f866e8f0be44c5df8b6e6b2a/asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
+          /static/getting-started_x250.png
+          /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
+        """
+        if not url.startswith('http://') and not url.startswith('https://'):
+            if url.startswith('/static/'):
+                processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
+                return 'http://' + settings.CMS_BASE + processed_url
+            elif url.startswith('/'):
+                return 'http://' + settings.CMS_BASE + url
+            else:
+                return 'http://' + settings.CMS_BASE + '/container/' + url
+
+    def check_url(url):
+        """Returns SUCCESS, ACCESS_DENIED, or FAILURE after checking url request"""
+        try:
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                return "SUCCESS"
+            elif response.status_code == 403:
+                return "ACCESS_DENIED"
+            else:
+                return "FAILURE"
+        except requests.exceptions.RequestException as e:
+            return "FAILURE"
+
+    def verify_url(url):
+        """Returns true if url request returns 200"""
+        try:
+            response = requests.get(url, timeout=5)
+            return response.status_code == 200
+        except requests.exceptions.RequestException as e:
+            return False
+
+    def scan_course(course_key):
+        """
+        Scans the course and returns broken link tuples.
+          [<block_id>, <broken_link>]
+        """
+        broken_links = []
+        verticals = modulestore().get_items(course_key, qualifiers={'category': 'vertical'}, revision=ModuleStoreEnum.RevisionOption.published_only)
+        print('verticals: ', verticals)
+        blocks = []
+
+        for vertical in verticals:
+            blocks.extend(vertical.get_children())
+
+        for block in blocks:
+            usage_key = block.usage_key
+            block_info = get_block_info(block)
+            block_data = block_info['data']
+            urls = get_urls(block_data)
+
+            for url in urls:
+                if url == '#':
+                    break
+                standardized_url = convert_to_standard_url(url, course_key)
+                # TODO if check_url ACCESS_DENIED and is studio link, it's locked
+                if not verify_url(standardized_url):
+                    broken_links.append([str(usage_key), url])
+
+        return broken_links
+
+    user = validate_user()
+
+    self.status.set_state('Scanning')
+    courselike_key = CourseKey.from_string(course_key_string)
+    data = scan_course(courselike_key)
+
+    try:
+        self.status.increment_completed_steps()
+
+        file_name = str(courselike_key)
+        links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')
+        LOGGER.debug('json file being generated at %s', links_file.name)
+
+        with open(links_file.name, 'w') as file:
+            json.dump(data, file, indent=4)
+
+        artifact = UserTaskArtifact(status=self.status, name='BrokenLinks')
+        artifact.file.save(name=os.path.basename(links_file.name), content=File(links_file))
+        artifact.save()
+    
+    # catch all exceptions so we can record useful error messages
+    except Exception as exception:  # pylint: disable=broad-except
+        LOGGER.exception('Error checking links for course %s', courselike_key, exc_info=True)
+        if self.status.state != UserTaskStatus.FAILED:
+            self.status.fail({'raw_error_msg': str(exception)})
+        return
