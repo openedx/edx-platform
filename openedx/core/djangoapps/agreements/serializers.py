@@ -38,6 +38,6 @@ class UserAgreementsSerializer(serializers.Serializer):
     """
     Serializer for UserAgreementRecord model
     """
-    accepted_at = serializers.DateTimeField()
-    agreement_type = serializers.CharField(read_only=True)
     username = serializers.CharField(read_only=True)
+    agreement_type = serializers.CharField(read_only=True)
+    accepted_at = serializers.DateTimeField()

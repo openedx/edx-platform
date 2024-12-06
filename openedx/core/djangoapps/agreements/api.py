@@ -248,10 +248,10 @@ def get_user_agreements(user: User) -> Iterable[UserAgreementRecordData]:
         yield UserAgreementRecordData.from_model(agreement_record)
 
 
-def get_user_agreement_record(
+def get_latest_user_agreement_record(
     user: User,
     agreement_type: str,
-    agreement_update_timestamp: datetime = None,
+    agreed_after: datetime = None,
 ) -> Optional[UserAgreementRecordData]:
     """
     Retrieve the user agreement record for the specified user and agreement type.
@@ -264,9 +264,9 @@ def get_user_agreement_record(
             user=user,
             agreement_type=agreement_type,
         )
-        if agreement_update_timestamp:
-            record_query = record_query.filter(timestamp__gte=agreement_update_timestamp)
-        record = record_query.get()
+        if agreed_after:
+            record_query = record_query.filter(timestamp__gte=agreed_after)
+        record = record_query.latest("timestamp")
         return UserAgreementRecordData.from_model(record)
     except UserAgreementRecord.DoesNotExist:
         return None
@@ -277,11 +277,9 @@ def create_user_agreement_record(user: User, agreement_type: str) -> UserAgreeme
     Creates a user agreement record if one doesn't already exist, or updates existing
     record to current timestamp.
     """
-    record, _ = UserAgreementRecord.objects.update_or_create(
+    record = UserAgreementRecord.objects.create(
         user=user,
         agreement_type=agreement_type,
-        defaults={
-            "timestamp": datetime.now(),
-        },
+        timestamp=datetime.now(),
     )
     return UserAgreementRecordData.from_model(record)

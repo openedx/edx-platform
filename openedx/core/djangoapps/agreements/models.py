@@ -77,7 +77,7 @@ class UserAgreementRecord(models.Model):
     This model stores the agreements a user has accepted or acknowledged.
 
     Each record here represents a user agreeing to the agreement type represented
-    by `agreement_type`.
+    by `agreement_type` at a particular time.
 
     .. no_pii:
     """
@@ -87,5 +87,3 @@ class UserAgreementRecord(models.Model):
 
     class Meta:
         app_label = 'agreements'
-        # A user can only have a single record for a single agreement type.
-        unique_together = [['user', 'agreement_type']]

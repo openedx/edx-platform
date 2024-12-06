@@ -21,7 +21,7 @@ from ..api import (
     get_integrity_signatures_for_course,
     get_lti_pii_signature,
     get_pii_receiving_lti_tools,
-    get_user_agreement_record,
+    get_latest_user_agreement_record,
     get_user_agreements
 )
 from ..models import LTIPIITool
@@ -214,11 +214,11 @@ class UserAgreementsTests(TestCase):
 
     def test_get_user_agreement_record(self):
         record = create_user_agreement_record(self.user, 'test_type')
-        result = get_user_agreement_record(self.user, 'test_type')
+        result = get_latest_user_agreement_record(self.user, 'test_type')
 
         assert result == record
 
-        result = get_user_agreement_record(self.user, 'test_type', datetime.now() + timedelta(days=1))
+        result = get_latest_user_agreement_record(self.user, 'test_type', datetime.now() + timedelta(days=1))
 
         assert result is None
 

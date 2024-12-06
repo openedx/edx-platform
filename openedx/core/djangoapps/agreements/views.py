@@ -20,9 +20,10 @@ from .api import (
     create_lti_pii_signature,
     create_user_agreement_record,
     get_integrity_signature,
-    get_user_agreement_record
+    get_latest_user_agreement_record
 )
 from .serializers import IntegritySignatureSerializer, LTIPIISignatureSerializer, UserAgreementsSerializer
+from ...lib.api.view_utils import view_auth_classes
 
 
 def is_user_course_or_global_staff(user, course_id):
@@ -167,7 +168,8 @@ class LTIPIISignatureView(AuthenticatedAPIView):
         return Response(data=serializer.data, status=statusStr)
 
 
-class UserAgreementsView(AuthenticatedAPIView):
+@view_auth_classes(is_authenticated=True)
+class UserAgreementsView(APIView):
     """
     Endpoint for the user agreements API.
     """
@@ -207,7 +209,7 @@ class UserAgreementsView(AuthenticatedAPIView):
         params = UserAgreementsView.QueryFilterForm(request.query_params)
         if not params.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        record = get_user_agreement_record(request.user, agreement_type, params.cleaned_data.get('after'))
+        record = get_latest_user_agreement_record(request.user, agreement_type, params.cleaned_data.get('after'))
         if record is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = UserAgreementsSerializer(record)

@@ -301,8 +301,11 @@ class UserAgreementsViewTests(APITestCase):
 
     def setUp(self):
         self.user = UserFactory(username="testuser", password="password")
-        self.client.login(username="testuser", password="password")
         self.url = reverse('user_agreements', kwargs={'agreement_type': 'sample_agreement'})
+        self.login()
+
+    def login(self):
+        self.client.login(username="testuser", password="password")
 
     def test_get_user_agreement_record_no_data(self):
         response = self.client.get(self.url)
@@ -325,6 +328,8 @@ class UserAgreementsViewTests(APITestCase):
         with freeze_time("2024-11-21 12:00:00"):
             response = self.client.post(self.url)
         assert response.status_code == status.HTTP_201_CREATED
+
+        self.login()
 
         response = self.client.get(self.url)
         assert response.status_code == status.HTTP_200_OK
