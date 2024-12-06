@@ -1107,6 +1107,13 @@ def check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results in a file.
     """
+    URL_STATUS = {
+        'success': '200 OK',
+        'forbidden': '403 Forbidden',
+        'failure': 'Request Failed',
+        'error': 'Request Error'
+    }
+
     def validate_user():
         """Validate if the user exists. Otherwise log error. """
         try:
@@ -1121,16 +1128,20 @@ def check_broken_links(self, user_id, course_key_string, language):
         regex = r'\s+(?:href|src)=["\']([^"\']*)["\']'
         urls = re.findall(regex, content)
         return urls
+    
+    def is_studio_url(url):
+        """Returns True if url is a studio url."""
+        return not url.startswith('http://') and not url.startswith('https://')
 
     def convert_to_standard_url(url, course_key):
         """
-        Returns standard urls when given studio urls.
+        Returns standard urls when given studio urls. Otherwise return url as is.
         Example urls:
           /assets/courseware/v1/506da5d6f866e8f0be44c5df8b6e6b2a/asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
           /static/getting-started_x250.png
           /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
         """
-        if not url.startswith('http://') and not url.startswith('https://'):
+        if is_studio_url(url):
             if url.startswith('/static/'):
                 processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
                 return 'http://' + settings.CMS_BASE + processed_url
@@ -1138,36 +1149,29 @@ def check_broken_links(self, user_id, course_key_string, language):
                 return 'http://' + settings.CMS_BASE + url
             else:
                 return 'http://' + settings.CMS_BASE + '/container/' + url
+        else:
+            return url
 
-    def check_url(url):
-        """Returns SUCCESS, ACCESS_DENIED, or FAILURE after checking url request"""
+    def validate_url_access(url):
+        """Returns status of a url request."""
         try:
             response = requests.get(url, timeout=5)
             if response.status_code == 200:
-                return "SUCCESS"
+                return URL_STATUS['success']
             elif response.status_code == 403:
-                return "ACCESS_DENIED"
+                return URL_STATUS['forbidden']
             else:
-                return "FAILURE"
+                return URL_STATUS['failure']
         except requests.exceptions.RequestException as e:
-            return "FAILURE"
+            return URL_STATUS['error']
 
-    def verify_url(url):
-        """Returns true if url request returns 200"""
-        try:
-            response = requests.get(url, timeout=5)
-            return response.status_code == 200
-        except requests.exceptions.RequestException as e:
-            return False
-
-    def scan_course(course_key):
+    def scan_course_for_links(course_key):
         """
-        Scans the course and returns broken link tuples.
-          [<block_id>, <broken_link>]
+        Returns a list of links that are broken or locked.
+          [block_id, link, is_locked]
         """
-        broken_links = []
+        links = []
         verticals = modulestore().get_items(course_key, qualifiers={'category': 'vertical'}, revision=ModuleStoreEnum.RevisionOption.published_only)
-        print('verticals: ', verticals)
         blocks = []
 
         for vertical in verticals:
@@ -1180,20 +1184,24 @@ def check_broken_links(self, user_id, course_key_string, language):
             urls = get_urls(block_data)
 
             for url in urls:
-                if url == '#':
+                if url == '#':  # do not evaluate these 'url'
                     break
-                standardized_url = convert_to_standard_url(url, course_key)
-                # TODO if check_url ACCESS_DENIED and is studio link, it's locked
-                if not verify_url(standardized_url):
-                    broken_links.append([str(usage_key), url])
 
-        return broken_links
+                standardized_url = convert_to_standard_url(url, course_key)
+                status = validate_url_access(standardized_url)
+
+                if status == URL_STATUS['failure']:
+                    links.append([str(usage_key), url, False])
+                if status == URL_STATUS['forbidden'] and is_studio_url(url):
+                    links.append([str(usage_key), url, True])
+
+        return links
 
     user = validate_user()
 
     self.status.set_state('Scanning')
     courselike_key = CourseKey.from_string(course_key_string)
-    data = scan_course(courselike_key)
+    data = scan_course_for_links(courselike_key)
 
     try:
         self.status.increment_completed_steps()
