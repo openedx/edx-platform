@@ -1,13 +1,10 @@
-// eslint-disable-next-line no-redeclare
 /* global jest,test,describe,expect */
-import { Button } from '@edx/paragon';
-import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
-import { Provider } from 'react-redux';
-import { shallow } from 'enzyme';
 import React from 'react';
+import { Provider } from 'react-redux';
+import { act, create } from 'react-test-renderer';
 import renderer from 'react-test-renderer';
+import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import store from '../../data/store';
-
 import Main from './Main';
 
 describe('ProblemBrowser Main component', () => {
@@ -29,7 +26,7 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock={null}
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
         const tree = component.toJSON();
         expect(tree).toMatchSnapshot();
@@ -48,7 +45,7 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
         const tree = component.toJSON();
         expect(tree).toMatchSnapshot();
@@ -68,29 +65,46 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
-        // eslint-disable-next-line prefer-destructuring
-        const instance = component.root.children[0].instance;
-        instance.handleToggleDropdown();
+        const root = component.root;
+
+        const button = root.findByProps({ label: 'Select a section or problem' });
+        act(() => {
+            button.props.onClick();
+        });
+
         expect(fetchCourseBlocksMock.mock.calls.length).toBe(1);
     });
 
     test('display dropdown on toggling dropdown', () => {
-        const component = shallow(
-            <Main
-                courseId={courseId}
-                createProblemResponsesReportTask={jest.fn()}
-                excludeBlockTypes={excludedBlockTypes}
-                fetchCourseBlocks={jest.fn()}
-                problemResponsesEndpoint={problemResponsesEndpoint}
-                onSelectBlock={jest.fn()}
-                selectedBlock="some-selected-block"
-                taskStatusEndpoint={taskStatusEndpoint}
-            />,
-        );
-        expect(component.find(BlockBrowserContainer).length).toBeFalsy();
-        component.find(Button).find({ label: 'Select a section or problem' }).simulate('click');
-        expect(component.find(BlockBrowserContainer).length).toBeTruthy();
+        let component;
+        act(() => {
+            component = create(
+                <Provider store={store}>
+                    <Main
+                        courseId={courseId}
+                        createProblemResponsesReportTask={jest.fn()}
+                        excludeBlockTypes={excludedBlockTypes}
+                        fetchCourseBlocks={jest.fn()}
+                        problemResponsesEndpoint={problemResponsesEndpoint}
+                        onSelectBlock={jest.fn()}
+                        selectedBlock="some-selected-block"
+                        taskStatusEndpoint={taskStatusEndpoint}
+                    />
+                </Provider>
+            );
+        });
+
+        const root = component.root;
+
+        expect(() => root.findByType(BlockBrowserContainer)).toThrow();
+
+        const button = root.findByProps({ label: 'Select a section or problem' });
+        act(() => {
+            button.props.onClick();
+        });
+
+        expect(() => root.findByType(BlockBrowserContainer)).not.toThrow();
     });
 });
