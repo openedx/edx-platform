@@ -53,7 +53,6 @@ def run_eslint():
         print(f"ESLint failed with exit code {result.returncode}")
         print(result.stderr)  # Log errors reported by ESLint
 
-
     print(result.stdout)
     last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
     regex = r'^\d+'
