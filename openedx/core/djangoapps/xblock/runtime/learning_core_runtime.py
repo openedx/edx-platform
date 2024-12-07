@@ -6,6 +6,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from datetime import datetime, timezone
+from urllib.parse import unquote
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.transaction import atomic
@@ -446,9 +447,20 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 .get(key=f"static/{asset_path}")
             )
         except ObjectDoesNotExist:
-            # This means we see a path that _looks_ like it should be a static
-            # asset for this Component, but that static asset doesn't really
-            # exist.
-            return None
+            try:
+                # Retry with unquoted path. We don't always unquote because it would not
+                # be backwards-compatible, but we need to try both.
+                asset_path = unquote(asset_path)
+                content = (
+                    component_version
+                    .componentversioncontent_set
+                    .filter(content__has_file=True)
+                    .get(key=f"static/{asset_path}")
+                )
+            except ObjectDoesNotExist:
+                # This means we see a path that _looks_ like it should be a static
+                # asset for this Component, but that static asset doesn't really
+                # exist.
+                return None
 
         return self._absolute_url_for_asset(component_version, asset_path)
