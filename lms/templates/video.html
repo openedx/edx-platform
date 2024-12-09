@@ -83,21 +83,33 @@ from openedx.core.djangolib.js_utils import (
                                     <span style="color: black" class="icon fa fa-close" />
                                 </div>
 
-                                <br />
                                 % for sharing_site_info in sharing_sites_info:
-                                <a
-                                    class="btn-link social-share-link"
-                                    data-source="${sharing_site_info['name']}"
-                                    href="${sharing_site_info['sharing_url']}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style="font-size: 1.5rem"
-                                >
-                                    <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
-                                    <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
-                                </a>
+                                    <a
+                                        class="btn-link social-share-link"
+                                        data-source="${sharing_site_info['name']}"
+                                        href="${sharing_site_info['sharing_url']}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style="font-size: 1.5rem"
+                                    >
+                                        % if (sharing_site_info['name'] == 'twitter'):
+                                            <!--
+                                                Twitter now uses the X brand icon, but Font Awesome does not include fa-x-twitter until 6.0
+                                                Upgrading to 6.0 would require lots of leg work becuase all square icons have new name patterns
+                                                ex: fa-facebook-square is now fa-square-facebook
+                                            -->
+                                            <span style="display: inline-block; vertical-align: middle; padding-left: 1px;">
+                                                <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" height="15" width="12.86" viewBox="0 0 448 512">
+                                                    <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                                                    <path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm297.1 84L257.3 234.6 379.4 396H283.8L209 298.1 123.3 396H75.8l111-126.9L69.7 116h98l67.7 89.5L313.6 116h47.5zM323.3 367.6L153.4 142.9H125.1L296.9 367.6h26.3z"/>
+                                                </svg>
+                                            </span>
+                                        % else:
+                                            <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
+                                        % endif
+                                        <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
+                                    </a>
                                 % endfor
-                                <br />
                                 <div style="background-color: #F2F0EF" class="public-video-url-container p-2">
                                     <a href=${public_video_url} class="d-inline-block align-middle" style="width: 200px">
                                         <div
