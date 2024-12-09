@@ -16,7 +16,7 @@ from gettext import ngettext, gettext
 
 import nh3
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocatorV2
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -103,6 +103,91 @@ class LegacyLibraryContentBlock(ItemBankMixin, XModuleToXBlockMixin, XBlock):
         values=_get_capa_types(),
         scope=Scope.settings,
     )
+
+    def get_migrated_upstream_for_child(self, child_block_id: str) -> LibraryUsageLocatorV2:
+        """
+        Return the key of the V2 library block to which the indicated child's source block was migrated.
+
+        May raise UpstreamLink for a variety of reasons (@@TODO -- describe here).
+        """
+        # @@TODO Move these imports up to the top.
+        # @@TODO Factor the ContentLibraryMigration fetching into a nice Python API with data objects.
+        from openedx.core.djangoapps.content_libraries.models import ContentLibraryMigration
+        from cms.lib.xblock.upstream_sync import NoUpstream, BadUpstream
+        from xmodule.util.keys import BlockKey, derive_key
+        from opaque_keys import InvalidKeyError
+
+        if not self.source_library_id:
+            raise NoUpstream()
+        try:
+            source_library_key = self.source_library_key
+        except InvalidKeyError as exc:
+            # Source v1 library key is malformed.
+            # The legacy library content block UI will inform the user of this, so we don't need to.
+            # @@TODO Should we actually move error messaging here, so that we can remove that bit of the legacy UI?
+            raise NoUpstream() from exc
+        try:
+            library_migration = ContentLibraryMigration.objects.get(source_key=source_library_key)
+        except ContentLibraryMigration.DoesNotExist as exc:
+            # Source v1 library has not (yet?) been migrated to a v2 library.
+            # Alternatively, we are on an instance that doesn't have the source v1 library-- in that case, the legacy
+            # library content block UI will tell the user such.
+            # @@TODO Should we actually move error messaging here, so that we can remove that bit of the legacy UI?
+            raise NoUpstream() from exc
+
+        # In order identify the new v2 library block, we need to know the v1 library block that this child came from.
+        # Unfortunately, there's no straightforward mapping from these children back to their v1 library source blocks.
+        # (ModuleStore does have a get_original_usage function that inspects edit_info, but we can't count on
+        #  that always working, particularly if this block's course was imported from another instance.)
+        # However, we can work around this by just looping through every block in the legacy library, and testing to see
+        # if it's our source block.
+
+        logger.info(
+            "Within context '%s'...\n"
+            "  we are searching for the new upstream of block '%s'\n"
+            "  by looking at its parent legacy library_content block at '%s',\n"
+            "  which points at source library %s,\n"
+            "  and whose children are: %s.",
+            self.usage_key.context_key, child_block_id, self.usage_key.block_id, source_library_key,
+            ' '.join(child_key.block_id for child_key in self.children),
+        )
+
+        # So, for each block in the migrated legacy library...
+        for block_migration in library_migration.block_migrations.all():
+
+            # IF we were to have used the legacy library block as a legacy library_content block child,
+            # then what would its block_id be?
+            derived_child_block_id = derive_key(
+                source=block_migration.source_usage_key.for_branch("library"),
+                dest_parent=BlockKey.from_usage_key(self.usage_key),
+            ).id
+            logger.info(
+                "Within legacy library '%s'...\n"
+                "  there is a block at '%s',\n"
+                "  whose child would be '%s'.",
+                library_migration.source_key,
+                block_migration.source_block_id,
+                derived_child_block_id,
+            )
+
+            # If that derived block_id matches the child_block_id we're after, then we've found our legacy library
+            # source block! So, just return the usage key of the v2 library block that it's been migrated to.
+            if child_block_id == derived_child_block_id:
+                logger.info(
+                    "Within context '%s'....\n"
+                    "  we have MATCHED block '%s'"
+                    "  with upstream '%s'",
+                    self.usage_key.context_key,
+                    child_block_id,
+                    block_migration.target_usage_key,
+                )
+                return block_migration.target_usage_key
+
+        # The v1 library was migrated to a v2 library, but this particular child was never migrated to said v2 library.
+        # This can happen if a legacy LC block child was derived from a v1 library block which was later deleted from
+        # said v1 library, and the legacy LC block never synced the update which deleted said child.
+        logger.info("Did not find matching upstream for %s", child_block_id)
+        raise NoUpstream()
 
     @property
     def source_library_key(self):

@@ -46,17 +46,19 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import (
+    BlockUsageLocator, LibraryUsageLocatorV2, LibraryLocatorV2, LibraryCollectionLocator
+)
 from pylti1p3.contrib.django import DjangoDbToolConf
 from pylti1p3.contrib.django import DjangoMessageLaunch
 from pylti1p3.contrib.django.lti1p3_tool_config.models import LtiTool
 from pylti1p3.grade import Grade
 
-from opaque_keys.edx.django.models import UsageKeyField
 from openedx.core.djangoapps.content_libraries.constants import (
     LICENSE_OPTIONS, ALL_RIGHTS_RESERVED,
 )
-from openedx_learning.api.authoring_models import LearningPackage
+from opaque_keys.edx.django.models import LearningContextKeyField, UsageKeyField
+from openedx_learning.api.authoring_models import LearningPackage, Collection
 from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .apps import ContentLibrariesConfig
@@ -225,6 +227,60 @@ class ContentLibraryPermission(models.Model):
     def __str__(self):
         who = self.user.username if self.user else self.group.name
         return f"ContentLibraryPermission ({self.access_level} for {who})"
+
+
+class ContentLibraryMigration(models.Model):
+    """
+    Record of a legacy (v1) content library that has been migrated into a new (v2) content library.
+    """
+    source_key = LearningContextKeyField(unique=True, max_length=255)
+    target = models.ForeignKey(ContentLibrary, on_delete=models.CASCADE)
+    target_collection = models.ForeignKey(Collection, on_delete=models.SET_NULL, null=True)
+
+    @property
+    def target_key(self) -> LibraryLocatorV2:
+        return self.target.library_key
+
+    @property
+    def target_library_collection_key(self) -> LibraryCollectionLocator | None:
+        return (
+            LibraryCollectionLocator(self.target_key, self.target_collection.key)
+            if self.target_collection
+            else None
+        )
+
+    def __str__(self) -> str:
+        return f"{self.source_key} -> {self.target_library_collection_key or self.target_key}"
+
+
+class ContentLibraryBlockMigration(models.Model):
+    """
+    Record of a legacy (v1) content library block that has been migrated into a new (v) content library block.
+    """
+    library_migration = models.ForeignKey(
+        ContentLibraryMigration, on_delete=models.CASCADE, related_name="block_migrations"
+    )
+    block_type = models.SlugField()
+    source_block_id = models.SlugField()
+    target_block_id = models.SlugField()
+
+    @property
+    def source_usage_key(self) -> BlockUsageLocator:
+        return self.library_migration.source_key.make_usage_key(self.block_type, self.source_block_id)
+
+    @property
+    def target_usage_key(self) -> LibraryUsageLocatorV2:
+        return LibraryUsageLocatorV2(  # type: ignore[abstract]  # (we are missing an annotation in opaque-keys)
+            lib_key=self.library_migration.target_key,
+            usage_id=self.target_block_id,
+            block_type=self.block_type,
+        )
+
+    def __str__(self):
+        return f"{self.source_usage_key} -> {self.target_usage_key}"
+
+    class Meta:
+        unique_together = [('library_migration', 'block_type', 'source_block_id')]
 
 
 class ContentLibraryBlockImportTask(models.Model):
