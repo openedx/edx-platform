@@ -12,12 +12,11 @@ class BuildFailure(Exception):
     pass
 
 
-def fail_quality(name, message):
+def fail_quality(message):
     """
     Fail the specified quality check.
     """
 
-    print(name)
     raise BuildFailure(message)
 
 
@@ -57,7 +56,6 @@ def run_eslint():
         # Fail if number of violations is greater than the limit
         if num_violations > violations_limit:
             fail_quality(
-                'eslint',
                 "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
         else:
             print(f"successfully run eslint with '{num_violations}' violations")
