@@ -59,7 +59,8 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
                     "core": {
                         "web": True,
                         "push": True,
-                        "email": True
+                        "email": True,
+                        "email_cadence": "Weekly"
                     }
                 }
             }
@@ -120,7 +121,8 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
                     "enabled": True,
                     "notification_types": {
                         "course_updates": {
-                            "web": True
+                            "web": True,
+                            "email_cadence": "Weekly"
                         }
                     }
                 }
@@ -129,7 +131,8 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
                 "updates": {
                     "notification_types": {
                         "course_updates": {
-                            "push": True
+                            "push": True,
+                            "email_cadence": "Weekly"
                         }
                     }
                 }
