@@ -14,7 +14,9 @@ from organizations.models import Organization
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from openedx.core.djangoapps.content_libraries.api import create_library, create_library_block, delete_library_block
+from openedx.core.djangoapps.content_libraries.api import (
+    create_library, create_library_block, delete_library_block, restore_library_block
+)
 
 from .. import api
 from ..models.base import TaxonomyOrg
@@ -267,7 +269,7 @@ class TestAutoTagging(  # type: ignore[misc]
         # Still no tags
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
 
-    def test_create_delete_library_block(self):
+    def test_create_delete_restore_library_block(self):
         # Create library
         library = create_library(
             org=self.orgA,
@@ -293,6 +295,13 @@ class TestAutoTagging(  # type: ignore[misc]
         # Check if the tags are deleted
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
 
+        # Restore the XBlock
+        with patch('crum.get_current_request', return_value=fake_request):
+            restore_library_block(library_block.usage_key)
+
+        # Check if the tags are restored in the Library Block with the user's preferred language
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, 'Português (Brasil)')
+
     @override_waffle_flag(CONTENT_TAGGING_AUTO, active=False)
     def test_waffle_disabled_create_delete_library_block(self):
         # Create library
@@ -316,6 +325,13 @@ class TestAutoTagging(  # type: ignore[misc]
 
         # Delete the XBlock
         delete_library_block(library_block.usage_key)
+
+        # Still no tags
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
+
+        # Restore the XBlock
+        with patch('crum.get_current_request', return_value=fake_request):
+            restore_library_block(library_block.usage_key)
 
         # Still no tags
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
