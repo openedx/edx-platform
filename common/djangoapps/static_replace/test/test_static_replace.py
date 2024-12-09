@@ -86,6 +86,16 @@ def test_process_url_no_match():
     assert process_static_urls(STATIC_SOURCE, processor) == '"test/static/file.png"'
 
 
+def test_process_url_no_match_starts_with_xblock():
+    def processor(original, prefix, quote, rest):  # pylint: disable=unused-argument, redefined-outer-name
+        return quote + 'test' + prefix + rest + quote
+    assert process_static_urls(
+        '"/static/xblock-file.png"',
+        processor,
+        data_dir=DATA_DIRECTORY
+    ) == '"test/static/xblock-file.png"'
+
+
 @patch('django.http.HttpRequest', autospec=True)
 def test_static_urls(mock_request):
     mock_request.build_absolute_uri = lambda url: 'http://' + url
