@@ -2,10 +2,11 @@
 
 
 import logging
+import typing as t
 
 from .utils import CommentClientRequestError, extract, perform_request, get_course_key
 from forum import api as forum_api
-from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled
+from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled, is_forum_v2_disabled_globally
 
 log = logging.getLogger(__name__)
 
@@ -72,13 +73,14 @@ class Model:
 
     def _retrieve(self, *args, **kwargs):
         course_id = self.attributes.get("course_id") or kwargs.get("course_id")
-        if not course_id:
-            course_id = forum_api.get_course_id_by_comment(self.id)
-        course_key = get_course_key(course_id)
+        if course_id:
+            use_forumv2 = is_forum_v2_enabled(course_id)
+        else:
+            use_forumv2, course_id = is_forum_v2_enabled_for_comment(self.id)
         response = None
-        if is_forum_v2_enabled(course_key):
+        if use_forumv2:
             if self.type == "comment":
-                response = forum_api.get_parent_comment(comment_id=self.attributes["id"], course_id=str(course_key))
+                response = forum_api.get_parent_comment(comment_id=self.attributes["id"], course_id=course_id)
             if response is None:
                 raise CommentClientRequestError("Forum v2 API call is missing")
         else:
@@ -369,3 +371,22 @@ class Model:
             context=request_data.get("context", None),
         )
         return response
+
+
+def is_forum_v2_enabled_for_comment(comment_id: str) -> tuple[bool, t.Optional[str]]:
+    """
+    Figure out whether we use forum v2 for a given comment.
+
+    See is_forum_v2_enabled_for_thread.
+
+    Return:
+
+        enabled (bool)
+        course_id (str or None)
+    """
+    if is_forum_v2_disabled_globally():
+        return False, None
+
+    course_id = forum_api.get_course_id_by_comment(comment_id)
+    course_key = get_course_key(course_id)
+    return is_forum_v2_enabled(course_key), course_id
