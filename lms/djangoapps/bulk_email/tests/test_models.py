@@ -15,7 +15,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, StaffFactory
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import (
     SEND_TO_COHORT,
@@ -25,8 +25,10 @@ from lms.djangoapps.bulk_email.models import (
     CourseAuthorization,
     CourseEmail,
     CourseEmailTemplate,
+    CourseModeTarget,
     DisabledCourse,
-    Optout
+    Optout,
+    Target,
 )
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_disabled_for_course
 from lms.djangoapps.bulk_email.tests.factories import TargetFactory
@@ -366,6 +368,7 @@ class TargetFilterTest(ModuleStoreTestCase):
             course_id=self.course.id,
             user=self.user3
         )
+        self.staff_user = StaffFactory.create(course_key=self.course.id)
         self.target = TargetFactory()
 
     @override_settings(BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD=None)
@@ -391,3 +394,40 @@ class TargetFilterTest(ModuleStoreTestCase):
 
         assert result.count() == 1
         assert result.filter(id=self.user1.id).exists()
+
+    def test_filtering_of_recipients_target_for_audit_track(self):
+        """
+        Verifies the default behavior.
+
+        This test ensures that when the `BULK_COURSE_EMAIL_LAST_LOGIN_ELIGIBILITY_PERIOD`
+        setting is not defined, all users enrolled in the course are included in the results.
+        """
+        target = Target.objects.create(target_type=SEND_TO_TRACK)
+        course_mode = CourseMode.objects.create(
+            mode_slug=CourseMode.AUDIT,
+            mode_display_name=CourseMode.AUDIT.capitalize(),
+            course_id=self.course.id,
+        )
+        course_mode_target = CourseModeTarget.objects.create(track=course_mode)
+        target.coursemodetarget = course_mode_target
+        result = target.get_users(self.course.id)
+
+        assert result.count() == 1
+        assert result.filter(id=self.user2.id).exists()
+
+        # Ensure staff user is not included
+        assert not result.filter(id=self.staff_user.id).exists()
+
+    def test_filtering_of_recipients_target_for_staff(self):
+        """
+        Test filtering of recipients for a target of type SEND_TO_STAFF.
+
+        This test verifies that only staff users are returned for the given target.
+        It creates a target of type SEND_TO_STAFF and ensures that the correct users
+        are retrieved.
+        """
+        self.target = TargetFactory(target_type=SEND_TO_STAFF)
+        result = self.target.get_users(self.course.id)
+
+        assert result.count() == 1
+        assert result.filter(id=self.staff_user.id).exists()
