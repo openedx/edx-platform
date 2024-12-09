@@ -645,7 +645,7 @@ edx-rest-api-client==5.5.0
     #   edx-proctoring
 edx-search==3.4.0
     # via -r requirements/edx/testing.txt
-git+https://github.com/Pearson-Advance/edx-sga.git@v0.20.0.post1#egg=edx-sga==0.20.0.post1
+git+https://github.com/Pearson-Advance/edx-sga.git@v0.20.0.post2#egg=edx-sga==0.20.0.post2
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.0.0
     # via -r requirements/edx/development.in
