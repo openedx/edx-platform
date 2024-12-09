@@ -194,7 +194,7 @@ def update_notification_fields(
         if field in source_config:
             target_config[field] |= source_config[field]
     if "email_cadence" in source_config:
-        if type(target_config["email_cadence"]) == str:
+        if isinstance(target_config["email_cadence"], str):
             target_config["email_cadence"] = set()
 
         target_config["email_cadence"].add(source_config["email_cadence"])
