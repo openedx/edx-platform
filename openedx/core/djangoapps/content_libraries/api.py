@@ -1133,6 +1133,38 @@ def delete_library_block(usage_key, remove_from_parent=True):
         )
 
 
+def restore_library_block(usage_key):
+    """
+    Restore the specified library block.
+    """
+    component = get_component_from_usage_key(usage_key)
+    library_key = usage_key.context_key
+    affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
+
+    # Set draft version back to the latest available component version id.
+    authoring_api.set_draft_version(component.pk, component.versioning.latest.pk)
+
+    LIBRARY_BLOCK_CREATED.send_event(
+        library_block=LibraryBlockData(
+            library_key=library_key,
+            usage_key=usage_key
+        )
+    )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    #
+    # To delete the component on collections
+    for collection in affected_collections:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                library_key=library_key,
+                collection_key=collection.key,
+                background=True,
+            )
+        )
+
+
 def get_library_block_static_asset_files(usage_key) -> list[LibraryXBlockStaticFile]:
     """
     Given an XBlock in a content library, list all the static asset files
