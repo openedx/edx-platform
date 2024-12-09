@@ -137,6 +137,7 @@ function($, _, Backbone, gettext, BasePage,
                     if (!data) return;
 
                     const xblockElement = this.findXBlockElement(this.targetXBlock);
+                    const xblockWrapper = $("li.studio-xblock-wrapper[data-locator='" + data.payload.locator + "']");
 
                     switch (data.type) {
                     case 'refreshXBlock':
@@ -145,6 +146,13 @@ function($, _, Backbone, gettext, BasePage,
                     case 'completeManageXBlockAccess':
                         this.refreshXBlock(xblockElement, false);
                         break;
+                    case 'completeXBlockMoving':
+                      xblockWrapper.hide()
+                      break;
+                    case 'rollbackMovedXBlock':
+                      xblockWrapper.show()
+                      break;
+                    case 'updateXBlockName':
                     case 'addXBlock':
                         this.createComponent(this, xblockElement, event.data);
                         break;
@@ -216,6 +224,25 @@ function($, _, Backbone, gettext, BasePage,
                         target.scrollIntoView({ behavior: 'smooth', inline: 'center' });
                     }
 
+                    if (self.options.isIframeEmbed) {
+                        const scrollOffset = parseInt(localStorage.getItem('modalEditLastYPosition'));
+                        if (localStorage.getItem('modalEditLastYPosition')) {
+                        try {
+                            setTimeout(() => {
+                                window.parent.postMessage(
+                                    {
+                                        type: 'scrollToXBlock',
+                                        message: 'Scroll to XBlock',
+                                        payload: {scrollOffset}
+                                    }, document.referrer
+                                );
+                            localStorage.removeItem('modalEditLastYPosition');
+                            }, 1000);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+                  }
                 },
                 block_added: options && options.block_added
             });
@@ -454,6 +481,7 @@ function($, _, Backbone, gettext, BasePage,
 
                     try {
                         if (this.options.isIframeEmbed) {
+                            localStorage.setItem('modalEditLastYPosition', event.clientY.toString());
                             return window.parent.postMessage(
                                 {
                                     type: 'newXBlockEditor',
