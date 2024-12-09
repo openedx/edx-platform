@@ -2,9 +2,10 @@
 URLs for the notifications API.
 """
 from django.conf import settings
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from rest_framework import routers
 
+from .mobile_notifications.urls import urlpatterns as mobile_notifications_urlpatterns
 from .views import (
     CourseEnrollmentListView,
     MarkNotificationsSeenAPIView,
@@ -16,7 +17,6 @@ from .views import (
 )
 
 router = routers.DefaultRouter()
-
 
 urlpatterns = [
     path('enrollments/', CourseEnrollmentListView.as_view(), name='enrollment-list'),
@@ -35,6 +35,10 @@ urlpatterns = [
     path('read/', NotificationReadAPIView.as_view(), name='notifications-read'),
     path('preferences/update/<str:username>/<str:patch>/', preference_update_from_encrypted_username_view,
          name='preference_update_from_encrypted_username_view'),
+]
+
+urlpatterns += [
+    path('mobile/', include(mobile_notifications_urlpatterns)),
 ]
 
 urlpatterns += router.urls
