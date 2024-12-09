@@ -1552,6 +1552,9 @@ def get_library_context(request, request_is_json=False):
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
     )
+    from openedx.core.djangoapps.content_libraries.api import (
+        user_can_create_library,
+    )
 
     libraries = _accessible_libraries_iter(request.user) if libraries_v1_enabled() else []
     data = {
@@ -1565,6 +1568,7 @@ def get_library_context(request, request_is_json=False):
             'courses': [],
             'libraries_enabled': libraries_v1_enabled(),
             'show_new_library_button': user_can_view_create_library_button(request.user) and request.user.is_active,
+            'show_new_library_v2_button': user_can_create_library(request.user),
             'user': request.user,
             'request_course_creator_url': reverse('request_course_creator'),
             'course_creator_status': _get_course_creator_status(request.user),
@@ -1686,6 +1690,9 @@ def get_home_context(request, no_course=False):
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
     )
+    from openedx.core.djangoapps.content_libraries.api import (
+        user_can_create_library,
+    )
 
     active_courses = []
     archived_courses = []
@@ -1714,6 +1721,7 @@ def get_home_context(request, no_course=False):
         'taxonomy_list_mfe_url': get_taxonomy_list_url(),
         'libraries': libraries,
         'show_new_library_button': user_can_view_create_library_button(user),
+        'show_new_library_v2_button': user_can_create_library(user),
         'user': user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),

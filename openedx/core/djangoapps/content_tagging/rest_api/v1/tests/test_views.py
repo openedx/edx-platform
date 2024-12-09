@@ -13,6 +13,7 @@ from urllib.parse import parse_qs, urlparse
 import ddt
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryCollectionLocator
 from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
@@ -34,7 +35,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_library, set_library_user_permissions
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
-from openedx.core.djangoapps.content_tagging.utils import rules_cache
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 from ....tests.test_objecttag_export_helpers import TaggedCourseMixin
@@ -289,8 +289,8 @@ class TestTaxonomyObjectsMixin:
         self._setUp_taxonomies()
         self._setUp_collection()
 
-        # Clear the rules cache in between test runs to keep query counts consistent.
-        rules_cache.clear()
+        # Clear all request caches in between test runs to keep query counts consistent.
+        RequestCache.clear_all_namespaces()
 
 
 @skip_unless_cms
@@ -510,12 +510,12 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         ('staff', 11),
-        ("content_creatorA", 16),
-        ("library_staffA", 16),
-        ("library_userA", 16),
-        ("instructorA", 16),
-        ("course_instructorA", 16),
-        ("course_staffA", 16),
+        ("content_creatorA", 17),
+        ("library_staffA", 17),
+        ("library_userA", 17),
+        ("instructorA", 17),
+        ("course_instructorA", 17),
+        ("course_staffA", 17),
     )
     @ddt.unpack
     def test_list_taxonomy_query_count(self, user_attr: str, expected_queries: int):
@@ -1879,16 +1879,16 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         ('staff', 'courseA', 8),
         ('staff', 'libraryA', 8),
         ('staff', 'collection_key', 8),
-        ("content_creatorA", 'courseA', 11, False),
-        ("content_creatorA", 'libraryA', 11, False),
-        ("content_creatorA", 'collection_key', 11, False),
-        ("library_staffA", 'libraryA', 11, False),  # Library users can only view objecttags, not change them?
-        ("library_staffA", 'collection_key', 11, False),
-        ("library_userA", 'libraryA', 11, False),
-        ("library_userA", 'collection_key', 11, False),
-        ("instructorA", 'courseA', 11),
-        ("course_instructorA", 'courseA', 11),
-        ("course_staffA", 'courseA', 11),
+        ("content_creatorA", 'courseA', 12, False),
+        ("content_creatorA", 'libraryA', 12, False),
+        ("content_creatorA", 'collection_key', 12, False),
+        ("library_staffA", 'libraryA', 12, False),  # Library users can only view objecttags, not change them?
+        ("library_staffA", 'collection_key', 12, False),
+        ("library_userA", 'libraryA', 12, False),
+        ("library_userA", 'collection_key', 12, False),
+        ("instructorA", 'courseA', 12),
+        ("course_instructorA", 'courseA', 12),
+        ("course_staffA", 'courseA', 12),
     )
     @ddt.unpack
     def test_object_tags_query_count(

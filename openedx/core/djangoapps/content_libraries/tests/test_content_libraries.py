@@ -259,6 +259,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         Tests with some non-ASCII chars in slugs, titles, descriptions.
         """
+        admin = UserFactory.create(username="Admin", email="admin@example.com", is_staff=True)
+
         lib = self._create_library(slug="téstlꜟط", title="A Tést Lꜟطrary", description="Tésting XBlocks")
         lib_id = lib["id"]
         assert lib['has_unpublished_changes'] is False
@@ -531,7 +533,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         Learning Core data models.
         """
         # Create a few users to use for all of these tests:
-        admin = UserFactory.create(username="Admin", email="admin@example.com")
+        admin = UserFactory.create(username="Admin", email="admin@example.com", is_staff=True)
         author = UserFactory.create(username="Author", email="author@example.com")
         reader = UserFactory.create(username="Reader", email="reader@example.com")
         group = Group.objects.create(name="group1")
@@ -653,14 +655,15 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._get_library_block_asset(block3_key, file_name="static/whatever.png", expect_response=403)
             # Nor can they preview the block:
             self._render_block_view(block3_key, view_name="student_view", expect_response=403)
-        # But if we grant allow_public_read, then they can:
+        # Even if we grant allow_public_read, then they can't:
         with self.as_user(admin):
             self._update_library(lib_id, allow_public_read=True)
             self._set_library_block_asset(block3_key, "static/whatever.png", b"data")
         with self.as_user(random_user):
-            self._get_library_block_olx(block3_key)
+            self._get_library_block_olx(block3_key, expect_response=403)
+            self._get_library_block_fields(block3_key, expect_response=403)
+            # But he can preview the block:
             self._render_block_view(block3_key, view_name="student_view")
-            f = self._get_library_block_fields(block3_key)
             # self._get_library_block_assets(block3_key)
             # self._get_library_block_asset(block3_key, file_name="whatever.png")
 
@@ -702,7 +705,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         """
         Test that administrators cannot be removed if they are the only administrator granted access.
         """
-        admin = UserFactory.create(username="Admin", email="admin@example.com")
+        admin = UserFactory.create(username="Admin", email="admin@example.com", is_staff=True)
         successor = UserFactory.create(username="Successor", email="successor@example.com")
         with self.as_user(admin):
             lib = self._create_library(slug="permtest", title="Permission Test Library", description="Testing")
@@ -1026,7 +1029,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         from openedx.core.djangoapps.content_staging.api import save_xblock_to_user_clipboard
 
         # Create user to perform tests on
-        author = UserFactory.create(username="Author", email="author@example.com")
+        author = UserFactory.create(username="Author", email="author@example.com", is_staff=True)
         with self.as_user(author):
             lib = self._create_library(
                 slug="test_lib_paste_clipboard",
