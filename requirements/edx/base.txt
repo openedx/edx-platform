@@ -37,6 +37,8 @@ asgiref==3.8.1
     #   django-countries
 asn1crypto==1.5.1
     # via snowflake-connector-python
+async-timeout==5.0.1
+    # via redis
 attrs==24.2.0
     # via
     #   -r requirements/edx/kernel.in

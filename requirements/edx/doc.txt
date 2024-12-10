@@ -61,6 +61,10 @@ astroid==2.13.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   sphinx-autoapi
+async-timeout==5.0.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   redis
 attrs==24.2.0
     # via
     #   -r requirements/edx/base.txt
