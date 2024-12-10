@@ -164,8 +164,8 @@ def _check_violations(options, results):
             any(key not in ("total", "rules") for key in violation_thresholds.keys()):
         print('xsslint')
         fail_quality("""FAILURE: Thresholds option "{thresholds_option}" was not supplied using proper format.\n"""
-              """Here is a properly formatted example, '{{"total":100,"rules":{{"javascript-escape":0}}}}' """
-              """with property names in double-quotes.""".format(thresholds_option=thresholds_option))
+                     """Here is a properly formatted example, '{{"total":100,"rules":{{"javascript-escape":0}}}}' """
+                     """with property names in double-quotes.""".format(thresholds_option=thresholds_option))
 
     try:
         metrics_str = "Number of {xsslint_script} violations: {num_violations}\n".format(
@@ -213,8 +213,8 @@ def _check_violations(options, results):
     if error_message:
         print('xsslint')
         fail_quality("FAILURE: XSSLinter Failed.\n{error_message}\n"
-              "run the following command to hone in on the problem:\n"
-              "  ./scripts/xss-commit-linter.sh -h".format(error_message=error_message))
+                     "run the following command to hone in on the problem:\n"
+                     "./scripts/xss-commit-linter.sh -h".format(error_message=error_message))
     else:
         print("successfully run xsslint")
 
@@ -317,4 +317,4 @@ if __name__ == "__main__":
     except BuildFailure as e:
         print(e)
         sys.exit(1)
-    
+ 
