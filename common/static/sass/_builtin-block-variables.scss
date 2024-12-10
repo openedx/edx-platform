@@ -16,7 +16,6 @@
 
 :root {
     --action-primary-active-bg: $action-primary-active-bg;
-    --all-text-inputs: $all-text-inputs;
     --base-font-size: $base-font-size;
     --base-line-height: $base-line-height;
     --baseline: $baseline;
@@ -26,6 +25,7 @@
     --blue-d1: $blue-d1;
     --blue-d2: $blue-d2;
     --blue-d4: $blue-d4;
+    --blue-s1: $blue-s1;
     --body-color: $body-color;
     --border-color: $border-color;
     --bp-screen-lg: $bp-screen-lg;
@@ -34,6 +34,8 @@
     --danger: $danger;
     --darkGrey: $darkGrey;
     --error-color: $error-color;
+    --error-color-dark: darken($error-color, 11%);
+    --error-color-light: lighten($error-color, 25%);
     --font-bold: $font-bold;
     --font-family-sans-serif: $font-family-sans-serif;
     --general-color-accent: $general-color-accent;
@@ -44,6 +46,12 @@
     --gray-l3: $gray-l3;
     --gray-l4: $gray-l4;
     --gray-l6: $gray-l6;
+    --icon-correct: url($static-path + '/images/correct-icon.png');
+    --icon-incorrect: url($static-path + '/images/incorrect-icon.png');
+    --icon-info: url($static-path + '/images/info-icon.png');
+    --icon-partially-correct: url($static-path + '/images/partially-correct-icon.png');
+    --icon-spinner: url($static-path + '/images/spinner.gif');
+    --icon-unanswered: url($static-path + '/images/unanswered-icon.png');
     --incorrect: $incorrect;
     --lightGrey: $lightGrey;
     --lighter-base-font-color: $lighter-base-font-color;

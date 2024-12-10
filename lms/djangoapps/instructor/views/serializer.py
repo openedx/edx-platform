@@ -4,9 +4,11 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from .tools import get_student_from_identifier
 
+from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.instructor.access import ROLES
+
+from .tools import get_student_from_identifier
 
 
 class RoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -228,3 +230,49 @@ class BlockDueDateSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         if disable_due_datetime:
             self.fields['due_datetime'].required = False
+
+
+class CertificateStatusesSerializer(serializers.Serializer):
+    """
+    Serializer for validating and serializing certificate status inputs.
+
+    This serializer is used to ensure that the provided certificate statuses
+    conform to the predefined set of valid statuses defined in the
+    `CertificateStatuses` enumeration.
+    """
+    certificate_statuses = serializers.ListField(
+        child=serializers.ChoiceField(choices=[
+            CertificateStatuses.downloadable,
+            CertificateStatuses.error,
+            CertificateStatuses.notpassing,
+            CertificateStatuses.audit_passing,
+            CertificateStatuses.audit_notpassing,
+        ]),
+        allow_empty=False  # Set to True if you want to allow empty lists
+    )
+
+
+class CertificateSerializer(serializers.Serializer):
+    """
+    Serializer for multiple operations related with certificates.
+    resetting a students attempts counter or starts a task to reset all students
+    attempts counters
+    Also Add/Remove students to/from the certificate allowlist.
+    Also For resetting a students attempts counter or starts a task to reset all students
+    attempts counters.
+    """
+    user = serializers.CharField(
+        help_text="Email or username of student.", required=True
+    )
+    notes = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    def validate_user(self, value):
+        """
+        Validate that the user corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user

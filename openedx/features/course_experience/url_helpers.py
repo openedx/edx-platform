@@ -15,6 +15,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves.urllib.parse import urlencode, urlparse
 
 from lms.djangoapps.courseware.toggles import courseware_mfe_is_active
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.search import navigation_index, path_to_location  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -24,6 +25,7 @@ User = get_user_model()
 def get_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        is_staff: bool = False,
 ) -> str:
     """
     Return the URL to the canonical learning experience for a given block.
@@ -44,12 +46,13 @@ def get_courseware_url(
         get_url_fn = _get_new_courseware_url
     else:
         get_url_fn = _get_legacy_courseware_url
-    return get_url_fn(usage_key=usage_key, request=request)
+    return get_url_fn(usage_key=usage_key, request=request, is_staff=is_staff)
 
 
 def _get_legacy_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        is_staff: bool = None
 ) -> str:
     """
     Return the URL to Legacy (LMS-rendered) courseware content.
@@ -90,6 +93,7 @@ def _get_legacy_courseware_url(
 def _get_new_courseware_url(
         usage_key: UsageKey,
         request: Optional[HttpRequest] = None,
+        is_staff: bool = None,
 ) -> str:
     """
     Return the URL to the "new" (Learning Micro-Frontend) experience for a given block.
@@ -99,7 +103,13 @@ def _get_new_courseware_url(
         * NoPathToItem if we cannot build a path to the `usage_key`.
     """
     course_key = usage_key.course_key.replace(version_guid=None, branch=None)
-    path = path_to_location(modulestore(), usage_key, request, full_path=True)
+    preview = request.GET.get('preview') if request and request.GET else False
+    branch_type = (
+        ModuleStoreEnum.Branch.draft_preferred
+    ) if preview and is_staff else ModuleStoreEnum.Branch.published_only
+
+    path = path_to_location(modulestore(), usage_key, request, full_path=True, branch_type=branch_type)
+
     if len(path) <= 1:
         # Course-run-level block:
         # We have no Sequence or Unit to return.
@@ -120,6 +130,7 @@ def _get_new_courseware_url(
         course_key=course_key,
         sequence_key=sequence_key,
         unit_key=unit_key,
+        preview=preview,
         params=request.GET if request and request.GET else None,
     )
 
@@ -129,6 +140,7 @@ def make_learning_mfe_courseware_url(
         sequence_key: Optional[UsageKey] = None,
         unit_key: Optional[UsageKey] = None,
         params: Optional[QueryDict] = None,
+        preview: bool = None,
 ) -> str:
     """
     Return a str with the URL for the specified courseware content in the Learning MFE.
@@ -160,6 +172,16 @@ def make_learning_mfe_courseware_url(
     `params` is an optional QueryDict object (e.g. request.GET)
     """
     mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/course/{course_key}'
+    get_params = params.copy() if params else None
+
+    if preview:
+        if len(get_params.keys()) > 1:
+            get_params.pop('preview')
+        else:
+            get_params = None
+
+        if (unit_key or sequence_key):
+            mfe_link = f'{settings.LEARNING_MICROFRONTEND_URL}/preview/course/{course_key}'
 
     if sequence_key:
         mfe_link += f'/{sequence_key}'
@@ -167,8 +189,8 @@ def make_learning_mfe_courseware_url(
         if unit_key:
             mfe_link += f'/{unit_key}'
 
-    if params:
-        mfe_link += f'?{params.urlencode()}'
+    if get_params:
+        mfe_link += f'?{get_params.urlencode()}'
 
     return mfe_link
 

@@ -15,7 +15,7 @@ concurrency:
 jobs:
   run-tests:
     name: ${{ matrix.shard_name }}(py=${{ matrix.python-version }},dj=${{ matrix.django-version }},mongo=${{ matrix.mongo-version }})
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os-version }}
     strategy:
       matrix:
         python-version:
@@ -43,22 +43,27 @@ jobs:
           - "xmodule-with-cms"
         mongo-version:
           - "7.0"
+        os-version:
+          - ubuntu-24.04
 
-        # We only need to test older versions of Mongo with modules that directly interface with Mongo (that is: xmodule.modulestore)
-        # This code is left here as an example for future refernce in case we need to reduce the number of shards we're
-        # testing but still have good confidence with older versions of mongo.  We use Mongo 4.4 in the example.
+        # It's useful to run some subset of the tests on the older version of Ubuntu
+        # so that we don't spend too many resources on this but can find major issues quickly
+        # while we're in a situation where we support two versions.  This section may be commented
+        # out when not in use to easily add/drop future support for any given major dependency.
         #
-        # exclude:
-        #   - mongo-version: "4.4"
-        # include:
-        #   - shard_name: "xmodule-with-cms"
-        #     python-version: "3.11"
-        #     django-version: "pinned"
-        #     mongo-version: "4.4"
-        #   - shard_name: "xmodule-with-lms"
-        #     python-version: "3.11"
-        #     django-version: "pinned"
-        #     mongo-version: "4.4"
+        # We're testing the older version of Ubuntu and running the xmodule tests since those rely on many
+        # dependent complex libraries and will hopefully catch most issues quickly.
+        include:
+          - shard_name: "xmodule-with-cms"
+            python-version: "3.11"
+            django-version: "pinned"
+            mongo-version: "7.0"
+            os-version: "ubuntu-22.04"
+          - shard_name: "xmodule-with-lms"
+            python-version: "3.11"
+            django-version: "pinned"
+            mongo-version: "7.0"
+            os-version: "ubuntu-22.04"
 
     steps:
       - name: checkout repo
@@ -90,19 +95,10 @@ jobs:
           activate = 1
           EOF
 
-      - name: install mongo version
-        run: |
-          if [[ "${{ matrix.mongo-version }}" != "4.4" ]]; then
-            wget -qO - https://www.mongodb.org/static/pgp/server-${{ matrix.mongo-version }}.asc | sudo apt-key add -
-            echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${{ matrix.mongo-version }} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${{ matrix.mongo-version }}.list
-            sudo apt-get update && sudo apt-get install -y mongodb-org="${{ matrix.mongo-version }}.*"
-          fi
-
-      - name: start mongod server for tests
-        run: |
-          sudo mkdir -p /data/db
-          sudo chmod -R a+rw /data/db
-          mongod &
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-version: ${{ matrix.mongo-version }}
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -164,7 +160,7 @@ jobs:
           overwrite: true
 
   collect-and-verify:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python
@@ -229,7 +225,7 @@ jobs:
   # https://github.com/orgs/community/discussions/33579
   success:
     name: Unit tests successful
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: always()
     needs: [run-tests]
     steps:
@@ -240,7 +236,7 @@ jobs:
           jobs: ${{ toJSON(needs) }}
 
   compile-warnings-report:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [run-tests]
     steps:
       - uses: actions/checkout@v4
@@ -268,7 +264,7 @@ jobs:
           overwrite: true
 
   merge-artifacts:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [compile-warnings-report]
     steps:
       - name: Merge Pytest Warnings JSON Artifacts
@@ -288,7 +284,7 @@ jobs:
   # Combine and upload coverage reports.
   coverage:
     if: (github.repository == 'edx/edx-platform-private') || (github.repository == 'openedx/edx-platform' && (startsWith(github.base_ref, 'open-release') == false))
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [run-tests]
     strategy:
       matrix:

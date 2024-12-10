@@ -1,0 +1,14 @@
+{% load i18n %}
+{% load django_markup %}
+<div class="insert-new-lib-blocks-here"></div>
+<div class="xblock-header-secondary">
+    {% comment %}
+    How this button works: An event handler in cms/static/js/views/pages/container.js
+    will watch for clicks and then display the SelectV2LibraryContent modal and process
+    the list of selected blocks returned from the modal.
+    {% endcomment %}
+    {% blocktrans trimmed asvar tmsg %}
+    {button_start}Add components{button_end} from a content library to this problem bank.
+    {% endblocktrans %}
+    {% interpolate_html tmsg button_start='<button class="btn btn-primary problem-bank-v2-add-button"><span class="icon fa fa-plus" aria-hidden="true"></span> '|safe button_end='</button>'|safe %}
+</div>

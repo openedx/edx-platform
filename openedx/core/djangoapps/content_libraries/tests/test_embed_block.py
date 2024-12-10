@@ -48,7 +48,7 @@ class LibrariesEmbedViewTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestM
     """
 
     @XBlock.register_temp_plugin(FieldsTestBlock, FieldsTestBlock.BLOCK_TYPE)
-    def test_embed_vew_versions(self):
+    def test_embed_view_versions(self):
         """
         Test that the embed_view renders a block and can render different versions of it.
         """
@@ -177,8 +177,55 @@ class LibrariesEmbedViewTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestM
         html = self._embed_block(block_id)
         check_fields(display_name="DN-01", setting_field="SV-01", content_field="CV-01")
 
-    # TODO: test that any static assets referenced in the student_view html are loaded as the correct version, and not
-    # always loaded as "latest draft".
+    def test_embed_view_versions_static_assets(self):
+        """
+        Test asset substitution and version-awareness.
+        """
+        # Create a library:
+        lib = self._create_library(
+            slug="test-eb-asset-1", title="Asset Test Library", description="",
+        )
+        lib_id = lib["id"]
+
+        # Create an HTMLBlock. This will be the empty version 1:
+        create_response = self._add_block_to_library(lib_id, "html", "asset_block")
+        block_id = create_response["id"]
+
+        # Create version 2 of the block by setting its OLX. This has a reference
+        # to an image, but not the image itself–so it won't get auto-replaced.
+        olx_response = self._set_library_block_olx(block_id, """
+            <html display_name="Asset Test Component"><![CDATA[
+                <p>This is the enemy of our garden:</p>
+                <p><img src="/static/deer.jpg"/></p>
+            ]]></html>
+        """)
+        assert olx_response["version_num"] == 2
+
+        # Create version 3 with some bogus file data
+        self._set_library_block_asset(block_id, "static/deer.jpg", b"This is not a valid JPEG file")
+
+        # Publish the library (making version 3 the published state):
+        self._commit_library_changes(lib_id)
+
+        # Create version 4 by deleting the asset
+        self._delete_library_block_asset(block_id, "static/deer.jpg")
+
+        # Grab version 2, which has the asset reference but not the asset. No
+        # substitution should happen.
+        html = self._embed_block(block_id, version=2)
+        assert 'src="/static/deer.jpg"' in html
+
+        # Grab the published version 3. This has the asset, so the link should
+        # show up.
+        html = self._embed_block(block_id, version='published')
+        # This is the pattern we're looking for:
+        #   <img src="https://{host}/library_assets/component_versions/.../static/deer.jpg"/>
+        assert re.search(r'/library_assets/component_versions/[0-9a-f-]*/static/deer.jpg', html)
+
+        # Now grab the draft version (4), which is going to once again not have
+        # the asset (because we deleted it).
+        html = self._embed_block(block_id, version='draft')
+        assert 'src="/static/deer.jpg"' in html
 
     # TODO: if we are ever able to run these tests in the LMS, test that the LMS only allows accessing the published
     # version.
