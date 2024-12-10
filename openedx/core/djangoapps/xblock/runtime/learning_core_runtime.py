@@ -24,6 +24,7 @@ from openedx.core.djangoapps.xblock.api import get_xblock_app_config
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from openedx.core.lib.xblock_serializer.data import StaticFile
 from ..data import AuthoredDataMode, LatestVersion
+from ..utils import get_auto_latest_version
 from ..learning_context.manager import get_learning_context_impl
 from .runtime import XBlockRuntime
 
@@ -178,11 +179,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         # just get it the easy way.
         component = self._get_component_from_usage_key(usage_key)
 
-        if version == LatestVersion.AUTO:
-            if self.authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT:
-                version = LatestVersion.DRAFT
-            else:
-                version = LatestVersion.PUBLISHED
+        version = get_auto_latest_version(version)
         if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
             raise ValidationError("This runtime only allows accessing the published version of components")
         if version == LatestVersion.DRAFT:
@@ -233,9 +230,16 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         return block
 
-    def get_block_assets(self, block):
+    def get_block_assets(self, block, fetch_asset_data):
         """
         Return a list of StaticFile entries.
+
+        If ``fetch_data`` is True, we will read the actual asset file data from
+        storage and return it as part of the ``StaticFiles``. This is expensive,
+        and not necessary for something like writing a new version of the OLX in
+        response to a "Save" in the editor. But it is necessary for something
+        like serializing to the clipboard, where we make full copies of the
+        assets.
 
         TODO: When we want to copy a whole Section at a time, doing these
         lookups one by one is going to get slow. At some point we're going to
@@ -248,6 +252,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             component_version
             .componentversioncontent_set
             .filter(content__has_file=True)
+            .select_related('content')
             .order_by('key')
         )
 
@@ -255,7 +260,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
             StaticFile(
                 name=cvc.key,
                 url=self._absolute_url_for_asset(component_version, cvc.key),
-                data=None,
+                data=cvc.content.read_file().read() if fetch_asset_data else None,
             )
             for cvc in cvc_list
         ]
@@ -377,7 +382,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         then this method will be called with asset_path="test.png" and should
         return a URL like:
 
-          http://studio.local.openedx.io:8001/library_assets/cd31871e-a342-4c3f-ba2f-a661bf630996/static/test.png
+          http://studio.local.openedx.io:8001/library_assets/component_versions/cd31871e-a342-4c3f-ba2f-a661bf630996/static/test.png
 
         If the asset file is not recognized, return None
 

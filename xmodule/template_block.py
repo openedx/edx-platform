@@ -9,7 +9,7 @@ from lxml import etree
 from web_fragments.fragment import Fragment
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
@@ -69,7 +69,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_sass_to_fragment(fragment, 'CustomTagBlockEditor.scss')
+        add_css_to_fragment(fragment, 'CustomTagBlockEditor.css')
         add_webpack_js_to_fragment(fragment, 'CustomTagBlockEditor')
         shim_xmodule_js(fragment, 'XMLEditingDescriptor')
         return fragment

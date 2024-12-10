@@ -16,7 +16,6 @@ from openedx.core.djangoapps.notifications.base_notification import (
     COURSE_NOTIFICATION_TYPES,
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.email.utils import (
     add_additional_attributes_to_notifications,
@@ -149,8 +148,18 @@ class TestContextFunctions(ModuleStoreTestCase):
             {'title': 'Updates', 'count': 1},
         ]
         expected_email_content = [
-            {'title': 'Discussion', 'help_text': '', 'help_text_url': '', 'notifications': [discussion_notification]},
-            {'title': 'Updates', 'help_text': '', 'help_text_url': '', 'notifications': [update_notification]}
+            {
+                'title': 'Discussion', 'help_text': '', 'help_text_url': '',
+                'notifications': [discussion_notification],
+                'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
+                'url': 'http://learner-home-mfe/?showNotifications=true&app=discussion'
+            },
+            {
+                'title': 'Updates', 'help_text': '', 'help_text_url': '',
+                'notifications': [update_notification],
+                'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
+                'url': 'http://learner-home-mfe/?showNotifications=true&app=updates'
+            }
         ]
         assert context['start_date'] == expected_start_date
         assert context['end_date'] == 'Sunday, Mar 24'
@@ -320,9 +329,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
                         if channel == param_channel:
                             assert type_prefs[channel] == new_value
                             if channel == 'email':
-                                cadence_value = EmailCadence.NEVER
-                                if new_value:
-                                    cadence_value = self.get_default_cadence_value(app_name, noti_type)
+                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
                                 assert type_prefs['email_cadence'] == cadence_value
                         else:
                             default_app_json = self.default_json[app_name]
@@ -381,9 +388,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
                         if app_name == param_app_name:
                             assert type_prefs[channel] == new_value
                             if channel == 'email':
-                                cadence_value = EmailCadence.NEVER
-                                if new_value:
-                                    cadence_value = self.get_default_cadence_value(app_name, noti_type)
+                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
                                 assert type_prefs['email_cadence'] == cadence_value
                         else:
                             default_app_json = self.default_json[app_name]
@@ -415,9 +420,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
                         if noti_type == param_notification_type:
                             assert type_prefs[channel] == new_value
                             if channel == 'email':
-                                cadence_value = EmailCadence.NEVER
-                                if new_value:
-                                    cadence_value = self.get_default_cadence_value(app_name, noti_type)
+                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
                                 assert type_prefs['email_cadence'] == cadence_value
                         else:
                             default_app_json = self.default_json[app_name]

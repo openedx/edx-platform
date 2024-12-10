@@ -66,6 +66,7 @@ class StudioHomeSerializer(serializers.Serializer):
     request_course_creator_url = serializers.CharField()
     rerun_creator_status = serializers.BooleanField()
     show_new_library_button = serializers.BooleanField()
+    show_new_library_v2_button = serializers.BooleanField()
     split_studio_home = serializers.BooleanField()
     studio_name = serializers.CharField()
     studio_short_name = serializers.CharField()

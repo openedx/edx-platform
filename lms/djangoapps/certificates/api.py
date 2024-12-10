@@ -82,6 +82,7 @@ def _format_certificate_for_user(username, cert):
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
+            "uuid": cert.verify_uuid,
         }
 
     return None

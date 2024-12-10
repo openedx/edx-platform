@@ -362,7 +362,6 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
             'email_content': self.comment.body,
-            'group_by_id': self.thread_2.id,
             'author_name': 'dummy\'s',
             'author_pronoun': 'dummy\'s',
             'course_name': self.course.display_name,
@@ -439,7 +438,6 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         expected_context = {
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
-            'group_by_id': self.thread_2.id,
             'author_name': 'dummy\'s',
             'author_pronoun': 'your',
             'course_name': self.course.display_name,

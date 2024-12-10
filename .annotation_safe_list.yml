@@ -9,13 +9,13 @@
 
 # Via Django
 auth.Group:
-  ".. no_pii:" : "No PII"
+  ".. no_pii:": "No PII"
 auth.Permission:
-  ".. no_pii:" : "No PII"
+  ".. no_pii:": "No PII"
 auth.User:
   ".. pii:": "Contains username, password, and email address, retired in AccountRetirementView"
-  ".. pii_types:" : username, email_address, password
-  ".. pii_retirement:" : local_api
+  ".. pii_types:": username, email_address, password
+  ".. pii_retirement:": local_api
 contenttypes.ContentType:
   ".. no_pii:": "No PII"
 admin.LogEntry:
@@ -26,6 +26,66 @@ sessions.Session:
   ".. no_pii:": "No PII"
 sites.Site:
   ".. no_pii:": "No PII"
+
+# Automatically generated edx-platform models that can't be annotated
+calendar_sync.HistoricalUserCalendarSyncConfig:
+  ".. no_pii:": "No PII"
+certificates.HistoricalCertificateAllowlist:
+  ".. no_pii:": "No PII"
+certificates.HistoricalCertificateDateOverride:
+  ".. no_pii:": "No PII"
+certificates.HistoricalCertificateInvalidation:
+  ".. no_pii:": "No PII"
+certificates.HistoricalGeneratedCertificate:
+  ".. pii:": "PII can exist in the generated certificate linked to in this model. Certificate data is currently retained."
+  ".. pii_types:": "name, username"
+  ".. pii_retirement:": "retained"
+course_apps.HistoricalCourseAppStatus:
+  ".. no_pii:": "No PII"
+course_goals.HistoricalCourseGoal:
+  ".. no_pii:": "No PII"
+course_live.HistoricalCourseLiveConfiguration:
+  ".. no_pii:": "No PII"
+course_modes.HistoricalCourseMode:
+  ".. no_pii:": "No PII"
+course_overviews.HistoricalCourseOverview:
+  ".. no_pii:": "No PII"
+discussions.HistoricalDiscussionsConfiguration:
+  ".. no_pii:": "No PII"
+entitlements.HistoricalCourseEntitlement:
+  ".. no_pii:": "No PII"
+entitlements.HistoricalCourseEntitlementSupportDetail:
+  ".. no_pii:": "No PII"
+experiments.HistoricalExperimentKeyValue:
+  ".. no_pii:": "No PII"
+external_user_ids.HistoricalExternalId:
+  ".. no_pii:": "We store external_user_id here, but do not consider that PII under OEP-30."
+external_user_ids.HistoricalExternalIdType:
+  ".. no_pii:": "No PII"
+grades.HistoricalPersistentSubsectionGradeOverride:
+  ".. no_pii:": "No PII"
+instructor_task.HistoricalInstructorTaskSchedule:
+  ".. no_pii:": "No PII"
+program_enrollments.HistoricalProgramCourseEnrollment:
+  ".. no_pii:": "No PII"
+program_enrollments.HistoricalProgramEnrollment:
+  ".. pii:": "PII is found in the external key for a program enrollment"
+  ".. pii_types:": "other"
+  ".. pii_retirement:": "local_api"
+programs.HistoricalProgramDiscussionsConfiguration:
+  ".. no_pii:": "No PII"
+programs.HistoricalProgramLiveConfiguration:
+  ".. no_pii:": "No PII"
+schedules.HistoricalSchedule:
+  ".. no_pii:": "No PII"
+split_modulestore_django.HistoricalSplitModulestoreCourseIndex:
+  ".. no_pii:": "No PII"
+student.HistoricalCourseEnrollment:
+  ".. no_pii:": "No PII"
+student.HistoricalManualEnrollmentAudit:
+  ".. pii:": "Contains enrolled_email, retired in LMSAccountRetirementView"
+  ".. pii_types:": "email_address"
+  ".. pii_retirement:": "local_api"
 
 # Automatically generated models in edx-enterprise that can't be annotated there
 consent.HistoricalDataSharingConsent:
@@ -45,7 +105,7 @@ enterprise.HistoricalEnterpriseCustomerCatalog:
 enterprise.HistoricalEnterpriseCustomerEntitlement:
   ".. no_pii:": "No PII"
 
-# Via ORA2
+# Via edx-ora2, these can be removed once the models are annotated for real
 assessment.Assessment:
   ".. no_pii:": "No PII"
 assessment.AssessmentFeedback:
@@ -127,9 +187,23 @@ djcelery.TaskState:
 djcelery.WorkerState:
   ".. no_pii:": "No PII"
 
+# Via django-celery-results
+django_celery_results.ChordCounter:
+  ".. no_pii:": "No PII"
+django_celery_results.GroupResult:
+  ".. no_pii:": "No PII"
+django_celery_results.TaskResult:
+  ".. no_pii:": "No PII"
+
 # Via edx-oauth2-provider https://github.com/edx/edx-oauth2-provider
 edx_oauth2_provider.TrustedClient:
   ".. no_pii:": "No PII"
+
+# Via edx-name-affirmation, not part of the openedx org
+edx_name_affirmation.HistoricalVerifiedName:
+  ".. pii:": "Contains name fields."
+  ".. pii_types:": "name"
+  ".. pii_retirement:": "local_api"
 
 # Via VAL
 edxval.CourseVideo:
@@ -147,6 +221,12 @@ edxval.Video:
 edxval.VideoImage:
   ".. no_pii:": "No PII"
 edxval.VideoTranscript:
+  ".. no_pii:": "No PII"
+
+# Via PyLTI1p3
+lti1p3_tool_config.LtiTool:
+  ".. no_pii:": "No PII"
+lti1p3_tool_config.LtiToolKey:
   ".. no_pii:": "No PII"
 
 # Via Milestones
@@ -190,6 +270,10 @@ oauth2_provider.Grant:
   ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
   ".. pii_types:": password, other
   ".. pii_retirement:": local_api
+oauth2_provider.IDToken:
+  ".. pii:": "Contains 3rd party authentication secrets, currently this is retained until the token times out, but should be retired explicitly with the other models from this package."
+  ".. pii_types:": password, other
+  ".. pii_retirement:": retained
 oauth2_provider.RefreshToken:
   ".. pii:": "Contains 3rd party authentication secrets. Retired in DeactivateLogoutView."
   ".. pii_types:": password, other
@@ -249,6 +333,8 @@ submissions.ScoreSummary:
 submissions.StudentItem:
   ".. no_pii:": "No PII"
 submissions.Submission:
+  ".. no_pii:": "No PII"
+submissions.TeamSubmission:
   ".. no_pii:": "No PII"
 
 # Via sorl-thumbnail https://github.com/jazzband/sorl-thumbnail

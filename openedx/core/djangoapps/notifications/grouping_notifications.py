@@ -77,11 +77,33 @@ class NewCommentGrouper(BaseNotificationGrouper):
         if not context.get('grouped'):
             context['replier_name_list'] = [context['replier_name']]
             context['grouped_count'] = 1
-            context['grouped'] = True
+        context['grouped'] = True
         context['replier_name_list'].append(new_notification.content_context['replier_name'])
         context['grouped_count'] += 1
         context['email_content'] = new_notification.content_context.get('email_content', '')
         return context
+
+
+@NotificationRegistry.register('new_discussion_post')
+class NewPostGrouper(BaseNotificationGrouper):
+    """
+    Groups new post notifications based on the author name.
+    """
+
+    def group(self, new_notification, old_notification):
+        """
+        Groups new post notifications based on the author name.
+        """
+        if (
+            old_notification.content_context['username'] == new_notification.content_context['username']
+            and not old_notification.content_context.get('grouped', False)
+        ):
+            return {**new_notification.content_context}
+        return {
+            **old_notification.content_context,
+            "grouped": True,
+            "replier_name": new_notification.content_context["replier_name"]
+        }
 
 
 def group_user_notifications(new_notification: Notification, old_notification: Notification):
@@ -93,9 +115,9 @@ def group_user_notifications(new_notification: Notification, old_notification: N
 
     if grouper_class:
         old_notification.content_context = grouper_class.group(new_notification, old_notification)
-        old_notification.content_context['grouped'] = True
         old_notification.web = old_notification.web or new_notification.web
         old_notification.email = old_notification.email or new_notification.email
+        old_notification.content_url = new_notification.content_url
         old_notification.last_read = None
         old_notification.last_seen = None
         old_notification.created = utc.localize(datetime.datetime.now())

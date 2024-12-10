@@ -43,7 +43,7 @@
     .wrapper-xblock .header-actions .actions-list .action-item .action-button {
       @extend %button-styles;
 
-      color: $black;
+      color: $primary;
 
       .fa-ellipsis-v {
         font-size: $base-font-size;
@@ -51,6 +51,7 @@
 
       &:hover {
         background-color: $primary;
+        color: $white;
         border-color: $transparent;
       }
 
@@ -370,6 +371,12 @@
         background-color: $primary;
       }
     }
+  }
+}
+
+.library-sync-button {
+  .action-button-text {
+    display: none;
   }
 }
 

@@ -53,13 +53,11 @@ def cache_if_anonymous(*get_parameters):
             # specifically the branding index, to do authentication.
             # If that page is cached the authentication doesn't
             # happen, so we disable the cache when that feature is enabled.
-            if (
-                not request.user.is_authenticated
-            ):
+            if not request.user.is_authenticated:
                 # Use the cache. The same view accessed through different domain names may
                 # return different things, so include the domain name in the key.
-                domain = str(request.META.get('HTTP_HOST')) + '.'
-                cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
+                domain = request.META.get('HTTP_HOST', '') + '.'
+                cache_key = f"{domain}cache_if_anonymous.{get_language()}.{request.path}"
 
                 # Include the values of GET parameters in the cache key.
                 for get_parameter in get_parameters:
@@ -67,24 +65,20 @@ def cache_if_anonymous(*get_parameters):
                     if parameter_value is not None:
                         # urlencode expects data to be of type str, and doesn't deal well with Unicode data
                         # since it doesn't provide a way to specify an encoding.
-                        cache_key = cache_key + '.' + urlencode({
-                            get_parameter: str(parameter_value).encode('utf-8')
-                        })
+                        cache_key += '.' + urlencode({get_parameter: str(parameter_value).encode('utf-8')})
 
                 response = cache.get(cache_key)
-
                 if response:
-                    # A hack to ensure that the response data is a valid text type for both Python 2 and 3.
-                    response_content = list(response._container)  # lint-amnesty, pylint: disable=bad-option-value, protected-access, protected-member
-                    response.content = b''
-                    for item in response_content:
-                        response.write(item)
+                    # Ensure that response content is properly handled for caching
+                    response.content = (
+                        # pylint: disable=protected-access
+                        b''.join(response._container) if hasattr(response, '_container') else response.content
+                    )
                 else:
                     response = view_func(request, *args, **kwargs)
                     cache.set(cache_key, response, 60 * 3)
 
                 return response
-
             else:
                 # Don't use the cache.
                 return view_func(request, *args, **kwargs)

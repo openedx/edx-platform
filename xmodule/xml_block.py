@@ -123,7 +123,11 @@ class XmlMixin:
                          # places in the platform rely on it.
                          'course', 'org', 'url_name', 'filename',
                          # Used for storing xml attributes between import and export, for roundtrips
-                         'xml_attributes')
+                         'xml_attributes',
+                         # Used by _import_xml_node_to_parent in cms/djangoapps/contentstore/helpers.py to prevent
+                         # XmlMixin from treating some XML nodes as "pointer nodes".
+                         "x-is-pointer-node",
+                         )
 
     # This is a categories to fields map that contains the block category specific fields which should not be
     # cleaned and/or override while adding xml to node.

@@ -408,7 +408,6 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         self.store = modulestore()
 
         self.library = library_api.create_library(
-            library_type=library_api.COMPLEX,
             org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
             slug="lib",
             title="Library",
@@ -456,26 +455,6 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         self.lib_block_tags = ['tag_1', 'tag_5']
         tagging_api.tag_object(str(self.lib_block_key), taxonomy_all_org, self.lib_block_tags)
 
-    def test_paste_from_library_creates_link(self):
-        """
-        When we copy a v2 lib block into a course, the dest block should be linked up to the lib block.
-        """
-        copy_response = self.client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(self.lib_block_key)}, format="json")
-        assert copy_response.status_code == 200
-
-        paste_response = self.client.post(XBLOCK_ENDPOINT, {
-            "parent_locator": str(self.course.usage_key),
-            "staged_content": "clipboard",
-        }, format="json")
-        assert paste_response.status_code == 200
-
-        new_block_key = UsageKey.from_string(paste_response.json()["locator"])
-        new_block = modulestore().get_item(new_block_key)
-        assert new_block.upstream == str(self.lib_block_key)
-        assert new_block.upstream_version == 3
-        assert new_block.upstream_display_name == "MCQ-draft"
-        assert new_block.upstream_max_attempts == 5
-
     def test_paste_from_library_read_only_tags(self):
         """
         When we copy a v2 lib block into a course, the dest block should have read-only copied tags.
@@ -497,6 +476,92 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         for object_tag in object_tags:
             assert object_tag.value in self.lib_block_tags
             assert object_tag.is_copied
+
+    def test_paste_from_library_copies_asset(self):
+        """
+        Assets from a library component copied into a subdir of Files & Uploads.
+        """
+        # This is the binary for a real, 1px webp file – we need actual image
+        # data because contentstore will try to make a thumbnail and grab
+        # metadata.
+        webp_raw_data = b'RIFF\x16\x00\x00\x00WEBPVP8L\n\x00\x00\x00/\x00\x00\x00\x00E\xff#\xfa\x1f'
+
+        # First add the asset.
+        library_api.add_library_block_static_asset_file(
+            self.lib_block_key,
+            "static/1px.webp",
+            webp_raw_data,
+        )  # v==4
+
+        # Now add the reference to the asset
+        library_api.set_library_block_olx(self.lib_block_key, """
+        <problem display_name="MCQ-draft" max_attempts="5">
+            <p>Including this totally real image: <img src="/static/1px.webp" /></p>
+            <multiplechoiceresponse>
+                <label>Q</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">Wrong</choice>
+                    <choice correct="true">Right</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """)  # v==5
+
+        copy_response = self.client.post(
+            CLIPBOARD_ENDPOINT,
+            {"usage_key": str(self.lib_block_key)},
+            format="json"
+        )
+        assert copy_response.status_code == 200
+
+        paste_response = self.client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(self.course.usage_key),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+
+        new_block_key = UsageKey.from_string(paste_response.json()["locator"])
+        new_block = modulestore().get_item(new_block_key)
+
+        # Check that the substitution worked.
+        expected_import_path = f"components/{new_block_key.block_type}/{new_block_key.block_id}/1px.webp"
+        assert f"/static/{expected_import_path}" in new_block.data
+
+        # Check that the asset was copied over properly
+        image_asset = contentstore().find(
+            self.course.id.make_asset_key("asset", expected_import_path.replace('/', '_'))
+        )
+        assert image_asset.import_path == expected_import_path
+        assert image_asset.name == "1px.webp"
+        assert image_asset.length == len(webp_raw_data)
+
+    def test_paste_from_course_block_imported_from_library_creates_link(self):
+        """
+        When we copy a course xblock which was imported or copied from v2 lib block into a course,
+        the dest block should be linked up to the original lib block.
+        """
+        def _copy_paste_and_assert_link(key_to_copy):
+            copy_response = self.client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(key_to_copy)}, format="json")
+            assert copy_response.status_code == 200
+
+            paste_response = self.client.post(XBLOCK_ENDPOINT, {
+                "parent_locator": str(self.course.usage_key),
+                "staged_content": "clipboard",
+            }, format="json")
+            assert paste_response.status_code == 200
+
+            new_block_key = UsageKey.from_string(paste_response.json()["locator"])
+            new_block = modulestore().get_item(new_block_key)
+            assert new_block.upstream == str(self.lib_block_key)
+            assert new_block.upstream_version == 3
+            assert new_block.upstream_display_name == "MCQ-draft"
+            assert new_block.upstream_max_attempts == 5
+            return new_block_key
+
+        # first verify link for copied block from library
+        new_block_key = _copy_paste_and_assert_link(self.lib_block_key)
+        # next verify link for copied block from the pasted block
+        _copy_paste_and_assert_link(new_block_key)
 
 
 class ClipboardPasteFromV1LibraryTestCase(ModuleStoreTestCase):

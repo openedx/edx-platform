@@ -18,7 +18,6 @@ class ResourceTemplatesTests(unittest.TestCase):
     def test_templates(self):
         expected = {
             'latex_html.yaml',
-            'zooming_image.yaml',
             'announcement.yaml',
             'anon_user_id.yaml'}
         got = {t['template_id'] for t in TestClass.templates()}
@@ -38,7 +37,6 @@ class ResourceTemplatesTests(unittest.TestCase):
     def test_custom_templates(self):
         expected = {
             'latex_html.yaml',
-            'zooming_image.yaml',
             'announcement.yaml',
             'anon_user_id.yaml'}
         got = {t['template_id'] for t in TestClassResourceTemplate.templates()}

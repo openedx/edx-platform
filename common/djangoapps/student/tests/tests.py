@@ -440,28 +440,19 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         assert response.status_code == 200
         self.assertContains(response, 'Add Certificate to LinkedIn')
 
-        # We can switch to this and the commented out assertContains once edx-platform reaches Python 3.8
-        # expected_url = (
-        #     'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-        #     'name={platform}+Honor+Code+Certificate+for+Omega&certUrl={cert_url}&'
-        #     'organizationId={company_identifier}'
-        # ).format(
-        #     platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
-        #     cert_url=quote(cert.download_url, safe=''),
-        #     company_identifier=linkedin_config.company_identifier,
-        # )
-
-        # self.assertContains(response, escape(expected_url))
-
-        # These can be removed (in favor of the above) once we are on Python 3.8. Fails in 3.5 because of dict ordering
-        self.assertContains(response, escape('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'))
-        self.assertContains(response, escape('&name={platform}+Honor+Code+Certificate+for+Omega'.format(
-            platform=quote(settings.PLATFORM_NAME.encode('utf-8'))
-        )))
-        self.assertContains(response, escape('&certUrl={cert_url}'.format(cert_url=quote(cert.download_url, safe=''))))
-        self.assertContains(response, escape('&organizationId={company_identifier}'.format(
+        expected_url = (
+            'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+            'name={platform}+Honor+Code+Certificate+for+Omega&'
+            'certUrl={cert_url}&'
+            'organizationId={company_identifier}'
+        ).format(
+            platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+            cert_url=quote(cert.download_url, safe=''),
             company_identifier=linkedin_config.company_identifier
-        )))
+        )
+
+        # Single assertion for the expected LinkedIn URL
+        self.assertContains(response, escape(expected_url))
 
     @skip_unless_lms
     def test_dashboard_metadata_caching(self):

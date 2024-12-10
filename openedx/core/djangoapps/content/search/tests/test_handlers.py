@@ -176,6 +176,7 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
         with freeze_time(published_date):
             library_api.publish_changes(library.key)
         doc_problem["last_published"] = published_date.timestamp()
+        doc_problem["published"] = {"display_name": "Blank Problem"}
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
 
         # Delete the Library Block

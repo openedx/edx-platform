@@ -32,9 +32,20 @@
         },
 
         getCoords: function(pageX, pageY) {
+            let left = pageX - 0.5 * this.tooltip.outerWidth();
+            const top = pageY - (this.tooltip.outerHeight() + 15);
+            // Check if the tooltip is going off the right edge of the screen
+            if (left + this.tooltip.outerWidth() > window.innerWidth) {
+                left = window.innerWidth - this.tooltip.outerWidth();
+            }
+            // Check if the tooltip is going off the left edge of the screen
+            if (left < 0) {
+                left = 0;
+            }
+
             return {
-                left: pageX - 0.5 * this.tooltip.outerWidth(),
-                top: pageY - (this.tooltip.outerHeight() + 15)
+                left,
+                top,
             };
         },
 

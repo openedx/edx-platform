@@ -715,8 +715,18 @@ def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs)
     """ Sends login info to Segment """
 
     event_name = None
+    anonymous_id = ""
+    additional_params = {}
+
+    try:
+        request = kwargs['request']
+        anonymous_id = request.COOKIES.get('ajs_anonymous_id', "")
+    except:  # pylint: disable=bare-except
+        pass
+
     if auth_entry == AUTH_ENTRY_LOGIN:
         event_name = 'edx.bi.user.account.authenticated'
+        additional_params['anonymous_id'] = anonymous_id
     elif auth_entry in [AUTH_ENTRY_ACCOUNT_SETTINGS]:
         event_name = 'edx.bi.user.account.linked'
 
@@ -724,7 +734,8 @@ def login_analytics(strategy, auth_entry, current_partial=None, *args, **kwargs)
         segment.track(kwargs['user'].id, event_name, {
             'category': "conversion",
             'label': None,
-            'provider': kwargs['backend'].name
+            'provider': kwargs['backend'].name,
+            **additional_params
         })
 
 

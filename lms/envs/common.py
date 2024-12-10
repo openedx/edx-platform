@@ -50,6 +50,7 @@ from path import Path as path
 from django.utils.translation import gettext_lazy as _
 from enterprise.constants import (
     ENTERPRISE_ADMIN_ROLE,
+    ENTERPRISE_LEARNER_ROLE,
     ENTERPRISE_CATALOG_ADMIN_ROLE,
     ENTERPRISE_DASHBOARD_ADMIN_ROLE,
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
@@ -60,6 +61,7 @@ from enterprise.constants import (
     SYSTEM_ENTERPRISE_PROVISIONING_ADMIN_ROLE,
     PROVISIONING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
     PROVISIONING_PENDING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
+    DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
 )
 
 from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
@@ -1932,6 +1934,10 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
     NODE_MODULES_ROOT / "@edx",
+    # Temporarily adding the following static path as we are migrating the built-in blocks' Sass to vanilla CSS.
+    # Once all of the built-in blocks are extracted from edx-platform, we can remove this static path.
+    # Relevant ticket: https://github.com/openedx/edx-platform/issues/35300
+    XMODULE_ROOT / "static",
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
@@ -3815,6 +3821,16 @@ ORA_WORKFLOW_UPDATE_ROUTING_KEY = "edx.lms.core.ora_workflow_update"
 # By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
 
+# .. setting_name: ORA_PEER_LEASE_EXPIRATION_HOURS
+# .. setting_default: 8
+# .. setting_description: Amount of time before a lease on a peer submission expires
+ORA_PEER_LEASE_EXPIRATION_HOURS = 8
+
+# .. setting_name: ORA_STAFF_LEASE_EXPIRATION_HOURS
+# .. setting_default: 8
+# .. setting_description: Amount of time before a lease on a staff submission expires
+ORA_STAFF_LEASE_EXPIRATION_HOURS = 8
+
 # Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
 FILE_UPLOAD_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
 FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
@@ -4718,11 +4734,15 @@ ENTERPRISE_READONLY_ACCOUNT_FIELDS = [
 ENTERPRISE_CUSTOMER_COOKIE_NAME = 'enterprise_customer_uuid'
 BASE_COOKIE_DOMAIN = 'localhost'
 SYSTEM_TO_FEATURE_ROLE_MAPPING = {
+    ENTERPRISE_LEARNER_ROLE: [
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
+    ],
     ENTERPRISE_ADMIN_ROLE: [
         ENTERPRISE_DASHBOARD_ADMIN_ROLE,
         ENTERPRISE_CATALOG_ADMIN_ROLE,
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
     ],
     ENTERPRISE_OPERATOR_ROLE: [
         ENTERPRISE_DASHBOARD_ADMIN_ROLE,
@@ -4731,6 +4751,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
         ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
         ENTERPRISE_SSO_ORCHESTRATOR_OPERATOR_ROLE,
+        DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
     ],
     SYSTEM_ENTERPRISE_PROVISIONING_ADMIN_ROLE: [
         PROVISIONING_ENTERPRISE_CUSTOMER_ADMIN_ROLE,
@@ -5351,12 +5372,6 @@ COOL_OFF_DAYS = 14
 ############ Settings for externally hosted executive education courses ############
 EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
-############## PLOTLY ##############
-
-ENTERPRISE_PLOTLY_SECRET = "I am a secret"
-
-############## PLOTLY ##############
-
 ############ Internal Enterprise Settings ############
 ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
 ############ Internal Enterprise Settings ############
@@ -5537,3 +5552,91 @@ DISABLED_COUNTRIES = []
 
 
 LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
+
+
+####################### Setting for built-in Blocks Extraction #######################
+# The following Django settings flags have been introduced temporarily to facilitate
+# the rollout of the extracted built-in Blocks. Flags will use to toggle between
+# the old and new block quickly without putting course content or user state at risk.
+#
+# Ticket: https://github.com/openedx/edx-platform/issues/35308
+
+# .. toggle_name: USE_EXTRACTED_WORD_CLOUD_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted Word Cloud XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34840 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_WORD_CLOUD_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_ANNOTATABLE_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted annotatable XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34841 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_ANNOTATABLE_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_POLL_QUESTION_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted poll question XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34839 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_POLL_QUESTION_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_LTI_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted LTI XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_LTI_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_HTML_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted HTML XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_HTML_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_DISCUSSION_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted Discussion XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_DISCUSSION_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_PROBLEM_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted Problem XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_PROBLEM_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_VIDEO_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted Video XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_VIDEO_BLOCK = False

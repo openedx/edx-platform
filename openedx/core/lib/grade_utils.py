@@ -48,11 +48,9 @@ def is_score_higher_or_equal(earned1, possible1, earned2, possible2, treat_undef
 def round_away_from_zero(number, digits=0):
     """
     Round numbers using the 'away from zero' strategy as opposed to the
-    'Banker's rounding strategy.'  The strategy refers to how we round when
-    a number is half way between two numbers.  eg. 0.5, 1.5, etc. In python 2
-    positive numbers in this category would be rounded up and negative numbers
-    would be rounded down. ie. away from zero.  In python 3 numbers round
-    towards even.  So 0.5 would round to 0 but 1.5 would round to 2.
+    'Banker's rounding strategy.' The strategy refers to how we round when
+    a number is half way between two numbers.  eg. 0.5, 1.5, etc. In python 3
+    numbers round towards even. So 0.5 would round to 0 but 1.5 would round to 2.
 
     See here for more on floating point rounding strategies:
     https://en.wikipedia.org/wiki/IEEE_754#Rounding_rules

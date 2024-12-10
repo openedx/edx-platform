@@ -506,9 +506,13 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         },
 
         renderTagElements: function(tags, depth, parentId) {
+            /* This function displays the tags in the sidebar of the legacy Unit Outline Page.
+             * It is not used when the Authoring MFE iframes a component in the Unit Outline. */
+            const parentElement = document.querySelector(`.content-tags-${parentId}`);
+            if (!parentElement) return;
+
             const tagListElement = this;
             tags.forEach(function(tag) {
-                const parentElement = document.querySelector(`.content-tags-${parentId}`);
                 var tagContentElement = document.createElement('div'),
                     tagValueElement = document.createElement('span');
 

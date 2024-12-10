@@ -88,15 +88,19 @@ class Env:
         KARMA_BROWSER = 'FirefoxNoUpdates'
 
     # Files used to run each of the js test suites
-    # TODO:  Store this as a dict. Order seems to matter for some
-    # reason. See issue TE-415.
+    # TODO: We have [temporarily disabled] the three Webpack-based tests suites. They have been silently
+    #       broken for a long time; after noticing they were broken, we added the DieHardPlugin to
+    #       webpack.common.config.js to prevent future silent breakage, but have not yet been able to
+    #       fix and re-enable the suites. Note that the LMS suite is all Webpack-based even though it's
+    #       not in the name.
+    #       Issue: https://github.com/openedx/edx-platform/issues/35956
     KARMA_CONFIG_FILES = [
         REPO_ROOT / 'cms/static/karma_cms.conf.js',
         REPO_ROOT / 'cms/static/karma_cms_squire.conf.js',
-        REPO_ROOT / 'cms/static/karma_cms_webpack.conf.js',
-        REPO_ROOT / 'lms/static/karma_lms.conf.js',
+        ## [temporarily disabled] REPO_ROOT / 'cms/static/karma_cms_webpack.conf.js',
+        ## [temporarily disabled] REPO_ROOT / 'lms/static/karma_lms.conf.js',
         REPO_ROOT / 'xmodule/js/karma_xmodule.conf.js',
-        REPO_ROOT / 'xmodule/js/karma_xmodule_webpack.conf.js',
+        ## [temporarily disabled] REPO_ROOT / 'xmodule/js/karma_xmodule_webpack.conf.js',
         REPO_ROOT / 'common/static/karma_common.conf.js',
         REPO_ROOT / 'common/static/karma_common_requirejs.conf.js',
     ]
@@ -104,10 +108,10 @@ class Env:
     JS_TEST_ID_KEYS = [
         'cms',
         'cms-squire',
-        'cms-webpack',
-        'lms',
+        ## [temporarily-disabled] 'cms-webpack',
+        ## [temporarily-disabled] 'lms',
         'xmodule',
-        'xmodule-webpack',
+        ## [temporarily-disabled] 'xmodule-webpack',
         'common',
         'common-requirejs',
         'jest-snapshot'

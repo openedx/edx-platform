@@ -967,26 +967,38 @@ def get_course_youtube_edx_video_ids(course_id):
     """
     Get a list of youtube edx_video_ids
     """
-    error_msg = "Invalid course_key: '%s'." % course_id
-    try:
+    invalid_key_error_msg = "Invalid course_key: '%s'." % course_id
+    unexpected_error_msg = "Unexpected error occurred for course_id: '%s'." % course_id
+
+    try:  # lint-amnesty, pylint: disable=too-many-nested-blocks
         course_key = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_key)
-    except InvalidKeyError:
-        return JsonResponse({'error': error_msg}, status=500)
-    blocks = []
-    block_yt_field = 'youtube_id_1_0'
-    block_edx_id_field = 'edx_video_id'
-    if hasattr(course, 'get_children'):
-        for section in course.get_children():
-            for subsection in section.get_children():
-                for vertical in subsection.get_children():
-                    for block in vertical.get_children():
-                        blocks.append(block)
 
-    edx_video_ids = []
-    for block in blocks:
-        if hasattr(block, block_yt_field) and getattr(block, block_yt_field):
-            if getattr(block, block_edx_id_field):
-                edx_video_ids.append(getattr(block, block_edx_id_field))
+        blocks = []
+        block_yt_field = 'youtube_id_1_0'
+        block_edx_id_field = 'edx_video_id'
+        if hasattr(course, 'get_children'):
+            for section in course.get_children():
+                for subsection in section.get_children():
+                    for vertical in subsection.get_children():
+                        for block in vertical.get_children():
+                            blocks.append(block)
+
+        edx_video_ids = []
+        for block in blocks:
+            if hasattr(block, block_yt_field) and getattr(block, block_yt_field):
+                if getattr(block, block_edx_id_field):
+                    edx_video_ids.append(getattr(block, block_edx_id_field))
+
+    except InvalidKeyError as error:
+        LOGGER.exception(
+            f"InvalidKeyError occurred while getting YouTube video IDs for course_id: {course_id}: {error}"
+        )
+        return JsonResponse({'error': invalid_key_error_msg}, status=500)
+    except Exception as error:
+        LOGGER.exception(
+            f"Unexpected error occurred while getting YouTube video IDs for course_id: {course_id}: {error}"
+        )
+        return JsonResponse({'error': unexpected_error_msg}, status=500)
 
     return JsonResponse({'edx_video_ids': edx_video_ids}, status=200)

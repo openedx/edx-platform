@@ -433,13 +433,13 @@ class TestCourseIndexArchived(CourseTestCase):
     @override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API)
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 0, 21),
-        (False, 'staff', None, 0, 21),
+        (True, 'staff', None, 0, 23),
+        (False, 'staff', None, 0, 23),
         # Base user has global staff access
-        (True, 'user', ORG, 2, 21),
-        (False, 'user', ORG, 2, 21),
-        (True, 'user', None, 2, 21),
-        (False, 'user', None, 2, 21),
+        (True, 'user', ORG, 2, 23),
+        (False, 'user', ORG, 2, 23),
+        (True, 'user', None, 2, 23),
+        (False, 'user', None, 2, 23),
     )
     @ddt.unpack
     def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
@@ -464,13 +464,13 @@ class TestCourseIndexArchived(CourseTestCase):
     @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 0, 21),
-        (False, 'staff', None, 0, 21),
+        (True, 'staff', None, 0, 23),
+        (False, 'staff', None, 0, 23),
         # Base user has global staff access
-        (True, 'user', ORG, 0, 21),
-        (False, 'user', ORG, 0, 21),
-        (True, 'user', None, 0, 21),
-        (False, 'user', None, 0, 21),
+        (True, 'user', ORG, 0, 23),
+        (False, 'user', ORG, 0, 23),
+        (True, 'user', None, 0, 23),
+        (False, 'user', None, 0, 23),
     )
     @ddt.unpack
     def test_separate_archived_courses_with_home_page_course_v2_api(

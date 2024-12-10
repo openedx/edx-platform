@@ -1,4 +1,4 @@
-name: CI
+name: Verify Dunder __init__.py Files
 
 on:
   pull_request:

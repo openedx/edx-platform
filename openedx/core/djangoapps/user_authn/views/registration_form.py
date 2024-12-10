@@ -148,6 +148,7 @@ class AccountCreationForm(forms.Form):
 
     _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
     _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of one character long")
+    _NAME_TOO_LONG_MSG = _("Your legal name is too long. It must not exceed %(max_length)s characters")
 
     # TODO: Resolve repetition
 
@@ -167,9 +168,11 @@ class AccountCreationForm(forms.Form):
 
     name = forms.CharField(
         min_length=accounts.NAME_MIN_LENGTH,
+        max_length=accounts.NAME_MAX_LENGTH,
         error_messages={
             "required": _NAME_TOO_SHORT_MSG,
             "min_length": _NAME_TOO_SHORT_MSG,
+            "max_length": _NAME_TOO_LONG_MSG % {"max_length": accounts.NAME_MAX_LENGTH},
         },
         validators=[validate_name]
     )

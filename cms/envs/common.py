@@ -122,6 +122,16 @@ from lms.envs.common import (
     # Password Validator Settings
     AUTH_PASSWORD_VALIDATORS
 )
+from lms.envs.common import (
+    USE_EXTRACTED_WORD_CLOUD_BLOCK,
+    USE_EXTRACTED_ANNOTATABLE_BLOCK,
+    USE_EXTRACTED_POLL_QUESTION_BLOCK,
+    USE_EXTRACTED_LTI_BLOCK,
+    USE_EXTRACTED_HTML_BLOCK,
+    USE_EXTRACTED_DISCUSSION_BLOCK,
+    USE_EXTRACTED_PROBLEM_BLOCK,
+    USE_EXTRACTED_VIDEO_BLOCK,
+)
 from path import Path as path
 from django.urls import reverse_lazy
 
@@ -566,6 +576,14 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2024-04-10
     'BADGES_ENABLED': False,
+
+    # .. toggle_name: FEATURES['IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Set to False to disable in-context discussion for units by default.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-09-02
+    'IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT': True,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -664,6 +682,7 @@ CMS_ROOT = REPO_ROOT / "cms"
 LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
+XMODULE_ROOT = REPO_ROOT / "xmodule"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
@@ -1270,6 +1289,10 @@ STATIC_ROOT = os.environ.get('STATIC_ROOT_CMS', ENV_ROOT / 'staticfiles' / 'stud
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    # Temporarily adding the following static path as we are migrating the built-in blocks' Sass to vanilla CSS.
+    # Once all of the built-in blocks are extracted from edx-platform, we can remove this static path.
+    # Relevant ticket: https://github.com/openedx/edx-platform/issues/35300
+    XMODULE_ROOT / "static",
 ]
 
 # Locale/Internationalization
@@ -1648,6 +1671,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'openedx.core.djangoapps.cors_csrf',
 
+    # Provides the 'django_markup' template library so we can use 'interpolate_html' in django templates
+    'xss_utils',
+
     # History tables
     'simple_history',
 
@@ -1679,8 +1705,6 @@ INSTALLED_APPS = [
     # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
 
-    # Maintenance tools
-    'cms.djangoapps.maintenance',
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
@@ -2718,7 +2742,7 @@ PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 ######################## Setting for content libraries ########################
-MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
+MAX_BLOCKS_PER_CONTENT_LIBRARY = 100_000
 
 ################# Student Verification #################
 VERIFY_STUDENT = {

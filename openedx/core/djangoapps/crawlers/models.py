@@ -42,16 +42,14 @@ class CrawlersConfig(ConfigurationModel):
 
         # If there was no user agent detected or no crawler agents configured,
         # then just return False.
-        if (not req_user_agent) or (not crawler_agents):
+        if not req_user_agent or not crawler_agents:
             return False
 
-        # The crawler_agents list we pull from our model always has unicode objects, but the
-        # req_user_agent we get from HTTP headers ultimately comes to us via WSGI. That
-        # value is an ISO-8859-1 encoded byte string in Python 2.7 (and in the HTTP spec), but
-        # it will be a unicode str when we move to Python 3.x. This code should work under
-        # either version.
+        # Decode req_user_agent if it's bytes, so we can work with consistent string types.
         if isinstance(req_user_agent, bytes):
-            crawler_agents = [crawler_agent.encode('iso-8859-1') for crawler_agent in crawler_agents]
+            req_user_agent = req_user_agent.decode('iso-8859-1')
+
+        crawler_agents = [crawler_agent.strip() for crawler_agent in crawler_agents]
 
         # We perform prefix matching of the crawler agent here so that we don't
         # have to worry about version bumps.
