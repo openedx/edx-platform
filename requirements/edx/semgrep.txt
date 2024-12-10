@@ -34,17 +34,17 @@ colorama==0.4.6
     # via semgrep
 defusedxml==0.7.1
     # via semgrep
-deprecated==1.2.14
+deprecated==1.2.15
     # via
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-http
 exceptiongroup==1.2.2
     # via semgrep
-face==22.0.0
+face==24.0.0
     # via glom
 glom==22.1.0
     # via semgrep
-googleapis-common-protos==1.65.0
+googleapis-common-protos==1.66.0
     # via opentelemetry-exporter-otlp-proto-http
 idna==3.10
     # via requests
@@ -88,9 +88,9 @@ opentelemetry-semantic-conventions==0.46b0
     #   opentelemetry-sdk
 opentelemetry-util-http==0.46b0
     # via opentelemetry-instrumentation-requests
-packaging==24.1
+packaging==24.2
     # via semgrep
-peewee==3.17.7
+peewee==3.17.8
     # via semgrep
 protobuf==4.25.5
     # via
@@ -108,7 +108,7 @@ requests==2.32.3
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.20.0
+rpds-py==0.22.3
     # via
     #   jsonschema
     #   referencing
@@ -116,7 +116,7 @@ ruamel-yaml==0.17.40
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.93.0
+semgrep==1.97.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
@@ -130,11 +130,11 @@ urllib3==2.2.3
     #   semgrep
 wcmatch==8.5.2
     # via semgrep
-wrapt==1.16.0
+wrapt==1.17.0
     # via
     #   deprecated
     #   opentelemetry-instrumentation
-zipp==3.20.2
+zipp==3.21.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
