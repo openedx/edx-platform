@@ -10,7 +10,7 @@ acid-xblock==0.4.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.4.4
     # via aiohttp
-aiohttp==3.11.9
+aiohttp==3.11.10
     # via
     #   geoip2
     #   openai
@@ -70,13 +70,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.35.76
+boto3==1.35.77
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.76
+botocore==1.35.77
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -318,7 +318,7 @@ django-oauth-toolkit==1.7.1
     #   edx-enterprise
 django-object-actions==4.3.0
     # via edx-enterprise
-django-pipeline==3.1.0
+django-pipeline==4.0.0
     # via -r requirements/edx/kernel.in
 django-push-notifications==3.1.0
     # via edx-ace
@@ -586,7 +586,7 @@ geoip2==4.8.1
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
-google-api-core[grpc]==2.23.0
+google-api-core[grpc]==2.24.0
     # via
     #   firebase-admin
     #   google-api-python-client
@@ -727,7 +727,7 @@ lxml-html-clean==0.4.1
     # via lxml
 mailsnake==1.6.4
     # via -r requirements/edx/bundled.in
-mako==1.3.7
+mako==1.3.8
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock
@@ -1048,7 +1048,7 @@ random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==3.0.0
     # via -r requirements/edx/bundled.in
-redis==5.2.0
+redis==5.2.1
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1264,6 +1264,8 @@ webob==1.8.9
     # via
     #   -r requirements/edx/kernel.in
     #   xblock
+wheel==0.45.1
+    # via django-pipeline
 wrapt==1.17.0
     # via -r requirements/edx/paver.txt
 xblock[django]==5.1.0
