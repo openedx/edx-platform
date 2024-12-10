@@ -1154,7 +1154,7 @@ def restore_library_block(usage_key):
     # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
     # collection indexing asynchronously.
     #
-    # To delete the component on collections
+    # To restore the component in the collections
     for collection in affected_collections:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
