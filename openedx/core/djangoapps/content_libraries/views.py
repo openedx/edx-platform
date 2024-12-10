@@ -644,6 +644,22 @@ class LibraryBlockView(APIView):
         return Response({})
 
 
+@view_auth_classes()
+class LibraryBlockRestore(APIView):
+    """
+    View to restore soft-deleted library xblocks.
+    """
+    @convert_exceptions
+    def post(self, request, usage_key_str) -> Response:
+        """
+        Restores a soft-deleted library block that belongs to a Content Library
+        """
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        api.restore_library_block(key)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockCollectionsView(APIView):
