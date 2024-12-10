@@ -60,51 +60,76 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
     Provides test cases to verify that views pass the correct `group_id` to
     the comments service when requesting content in cohorted discussions.
     """
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+    def call_view(self, mock_is_forum_v2_enabled, mock_request, commentable_id, user, group_id, pass_group_id=True):
         """
         Call the view for the implementing test class, constructing a request
         from the parameters.
         """
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
-    def test_cohorted_topic_student_without_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.student, '', pass_group_id=False)
+    def test_cohorted_topic_student_without_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(mock_is_forum_v2_enabled, mock_request, "cohorted_topic", self.student, '', pass_group_id=False)
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
-    def test_cohorted_topic_student_none_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.student, "")
+    def test_cohorted_topic_student_none_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(mock_is_forum_v2_enabled, mock_request, "cohorted_topic", self.student, "")
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
-    def test_cohorted_topic_student_with_own_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.student, self.student_cohort.id)
+    def test_cohorted_topic_student_with_own_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(mock_is_forum_v2_enabled, mock_request, "cohorted_topic", self.student, self.student_cohort.id)
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
-    def test_cohorted_topic_student_with_other_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.student, self.moderator_cohort.id)
+    def test_cohorted_topic_student_with_other_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.moderator_cohort.id
+        )
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
-    def test_cohorted_topic_moderator_without_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.moderator, '', pass_group_id=False)
+    def test_cohorted_topic_moderator_without_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "cohorted_topic",
+            self.moderator,
+            '',
+            pass_group_id=False
+        )
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_cohorted_topic_moderator_none_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.moderator, "")
+    def test_cohorted_topic_moderator_none_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(mock_is_forum_v2_enabled, mock_request, "cohorted_topic", self.moderator, "")
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_cohorted_topic_moderator_with_own_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.moderator, self.moderator_cohort.id)
+    def test_cohorted_topic_moderator_with_own_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "cohorted_topic",
+            self.moderator,
+            self.moderator_cohort.id
+        )
         self._assert_comments_service_called_with_group_id(mock_request, self.moderator_cohort.id)
 
-    def test_cohorted_topic_moderator_with_other_group_id(self, mock_request):
-        self.call_view(mock_request, "cohorted_topic", self.moderator, self.student_cohort.id)
+    def test_cohorted_topic_moderator_with_other_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "cohorted_topic",
+            self.moderator,
+            self.student_cohort.id
+        )
         self._assert_comments_service_called_with_group_id(mock_request, self.student_cohort.id)
 
-    def test_cohorted_topic_moderator_with_invalid_group_id(self, mock_request):
+    def test_cohorted_topic_moderator_with_invalid_group_id(self, mock_is_forum_v2_enabled, mock_request):
         invalid_id = self.student_cohort.id + self.moderator_cohort.id
-        response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
+        response = self.call_view(mock_is_forum_v2_enabled, mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
         assert response.status_code == 500
 
-    def test_cohorted_topic_enrollment_track_invalid_group_id(self, mock_request):
+    def test_cohorted_topic_enrollment_track_invalid_group_id(self, mock_is_forum_v2_enabled, mock_request):
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.AUDIT)
         CourseModeFactory.create(course_id=self.course.id, mode_slug=CourseMode.VERIFIED)
         discussion_settings = CourseDiscussionSettings.get(self.course.id)
@@ -115,7 +140,7 @@ class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
         })
 
         invalid_id = -1000
-        response = self.call_view(mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
+        response = self.call_view(mock_is_forum_v2_enabled, mock_request, "cohorted_topic", self.moderator, invalid_id)  # lint-amnesty, pylint: disable=assignment-from-no-return
         assert response.status_code == 500
 
 
@@ -124,57 +149,95 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
     Provides test cases to verify that views pass the correct `group_id` to
     the comments service when requesting content in non-cohorted discussions.
     """
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+    def call_view(self, mock_is_forum_v2_enabled, mock_request, commentable_id, user, group_id, pass_group_id=True):
         """
         Call the view for the implementing test class, constructing a request
         from the parameters.
         """
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
-    def test_non_cohorted_topic_student_without_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.student, '', pass_group_id=False)
+    def test_non_cohorted_topic_student_without_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "non_cohorted_topic",
+            self.student,
+            '',
+            pass_group_id=False
+        )
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_non_cohorted_topic_student_none_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.student, '')
+    def test_non_cohorted_topic_student_none_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(mock_is_forum_v2_enabled, mock_request, "non_cohorted_topic", self.student, '')
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_non_cohorted_topic_student_with_own_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.student, self.student_cohort.id)
+    def test_non_cohorted_topic_student_with_own_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "non_cohorted_topic",
+            self.student,
+            self.student_cohort.id
+        )
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_non_cohorted_topic_student_with_other_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.student, self.moderator_cohort.id)
+    def test_non_cohorted_topic_student_with_other_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "non_cohorted_topic",
+            self.student,
+            self.moderator_cohort.id
+        )
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_non_cohorted_topic_moderator_without_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, '', pass_group_id=False)
+    def test_non_cohorted_topic_moderator_without_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "non_cohorted_topic",
+            self.moderator,
+            "",
+            pass_group_id=False,
+        )
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_non_cohorted_topic_moderator_none_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, '')
+    def test_non_cohorted_topic_moderator_none_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(mock_is_forum_v2_enabled, mock_request, "non_cohorted_topic", self.moderator, '')
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_non_cohorted_topic_moderator_with_own_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, self.moderator_cohort.id)
+    def test_non_cohorted_topic_moderator_with_own_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "non_cohorted_topic",
+            self.moderator,
+            self.moderator_cohort.id,
+        )
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_non_cohorted_topic_moderator_with_other_group_id(self, mock_request):
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, self.student_cohort.id)
+    def test_non_cohorted_topic_moderator_with_other_group_id(self, mock_is_forum_v2_enabled, mock_request):
+        self.call_view(
+            mock_is_forum_v2_enabled,
+            mock_request,
+            "non_cohorted_topic",
+            self.moderator,
+            self.student_cohort.id,
+        )
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_non_cohorted_topic_moderator_with_invalid_group_id(self, mock_request):
+    def test_non_cohorted_topic_moderator_with_invalid_group_id(self, mock_is_forum_v2_enabled, mock_request):
         invalid_id = self.student_cohort.id + self.moderator_cohort.id
-        self.call_view(mock_request, "non_cohorted_topic", self.moderator, invalid_id)
+        self.call_view(mock_is_forum_v2_enabled, mock_request, "non_cohorted_topic", self.moderator, invalid_id)
         self._assert_comments_service_called_without_group_id(mock_request)
 
-    def test_team_discussion_id_not_cohorted(self, mock_request):
+    def test_team_discussion_id_not_cohorted(self, mock_is_forum_v2_enabled, mock_request):
         team = CourseTeamFactory(
             course_id=self.course.id,
             topic_id='topic-id'
         )
 
         team.add_user(self.student)
-        self.call_view(mock_request, team.discussion_topic_id, self.student, '')
+        self.call_view(mock_is_forum_v2_enabled, mock_request, team.discussion_topic_id, self.student, '')
 
         self._assert_comments_service_called_without_group_id(mock_request)
