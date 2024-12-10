@@ -146,16 +146,47 @@ class UpstreamLink:
         If link exists, is supported, and is followable, returns UpstreamLink.
         Otherwise, raises an UpstreamLinkException.
         """
-        if not downstream.upstream:
+        if downstream.upstream:
+            if not isinstance(downstream.usage_key.context_key, CourseKey):
+                raise BadDownstream(_("Cannot update content because it does not belong to a course."))
+            if downstream.has_children:
+                raise BadDownstream(_("Updating content with children is not yet supported."))
+
+        # We need to determine the usage key of this block's upstream.
+        upstream_key: LibraryUsageLocatorV2
+        version_synced: int | None
+        version_available: int | None
+        # A few different scenarios...
+
+        # Do we have an upstream explicitly defined on the block? If so, use that.
+        if downstream.upstream:
+            try:
+                upstream_key = LibraryUsageLocatorV2.from_string(downstream.upstream)
+            except InvalidKeyError as exc:
+                raise BadUpstream(_("Reference to linked library item is malformed")) from exc
+            version_synced = downstream.upstream_version
+            version_declined = downstream.upstream_version_declined
+
+        # Otherwise, is this the child of a LegacyLibraryContentBlock?
+        # If so, then we know that this block was derived from block in a legacy (v1) content library.
+        # Try to get that block's migrated (v2) content library equivalent and use it as our upstream.
+        elif downstream.parent and downstream.parent.block_type == "library_content":
+            from xmodule.library_content_block import LegacyLibraryContentBlock
+            parent: LegacyLibraryContentBlock = downstream.get_parent()
+            # Next line will raise UpstreamLinkException if no matching V2 library block.
+            upstream_key = parent.get_migrated_upstream_for_child(downstream.usage_key.block_id)
+            # If we are here, then there is indeed a migrated V2 library block, but we have not yet synced from it
+            # (otherwise `.upstream` would have been explicitly set). So, it is fair to set the version information
+            # to "None". That way, as soon as an updated version of the migrated upstream is published, it will be
+            # available to the course author.
+            version_synced = None
+            version_declined = None
+
+        # Otherwise, we don't have an upstream. Raise.
+        else:
             raise NoUpstream()
-        if not isinstance(downstream.usage_key.context_key, CourseKey):
-            raise BadDownstream(_("Cannot update content because it does not belong to a course."))
-        if downstream.has_children:
-            raise BadDownstream(_("Updating content with children is not yet supported."))
-        try:
-            upstream_key = LibraryUsageLocatorV2.from_string(downstream.upstream)
-        except InvalidKeyError as exc:
-            raise BadUpstream(_("Reference to linked library item is malformed")) from exc
+
+        # Ensure that the upstream block is of a compatible type.
         downstream_type = downstream.usage_key.block_type
         if upstream_key.block_type != downstream_type:
             # Note: Currently, we strictly enforce that the downstream and upstream block_types must exactly match.
@@ -178,8 +209,8 @@ class UpstreamLink:
         except XBlockNotFoundError as exc:
             raise BadUpstream(_("Linked library item was not found in the system")) from exc
         return cls(
-            upstream_ref=downstream.upstream,
-            version_synced=downstream.upstream_version,
+            upstream_ref=str(upstream_key),
+            version_synced=downstream.upstream_version if downstream.upstream else 0,
             version_available=(lib_meta.published_version_num if lib_meta else None),
             version_declined=downstream.upstream_version_declined,
             error_message=None,
@@ -201,6 +232,13 @@ def sync_from_upstream(downstream: XBlock, user: User) -> None:
     _update_tags(upstream=upstream, downstream=downstream)
     downstream.upstream_version = link.version_available
 
+    # Explicitly set the `upstream` setting of the downstream block from the upstream's usage key.
+    # In most cases, this is a no-op, since that is normally how we'd spefically an upstream.
+    # However, it is also possible for a block to have implicitly-defined upstream-- particularly, if it is the child of
+    # a LegacyLibraryContentBlock, whose source library was recently migrated from a V1 library to a V2 library.
+    # In that case, we want to "migrate" the downstream to the new schema by explicitly setting its `upstream` setting.
+    downstream.upstream = str(upstream.usage_key)
+
 
 def fetch_customizable_fields(*, downstream: XBlock, user: User, upstream: XBlock | None = None) -> None:
     """
@@ -212,6 +250,9 @@ def fetch_customizable_fields(*, downstream: XBlock, user: User, upstream: XBloc
     if not upstream:
         _link, upstream = _load_upstream_link_and_block(downstream, user)
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
+
+    # (see comment in sync_from_upstream)
+    downstream.upstream = str(upstream.usage_key)
 
 
 def _load_upstream_link_and_block(downstream: XBlock, user: User) -> tuple[UpstreamLink, XBlock]:
@@ -227,14 +268,16 @@ def _load_upstream_link_and_block(downstream: XBlock, user: User) -> tuple[Upstr
     # We import load_block here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
     from openedx.core.djangoapps.xblock.api import load_block, CheckPerm, LatestVersion  # pylint: disable=wrong-import-order
     try:
+        # We know that upstream_ref cannot be None, since get_for_block returned successfully.
+        upstream_ref: str = link.upstream_ref  # type: ignore[assignment]
         lib_block: XBlock = load_block(
-            LibraryUsageLocatorV2.from_string(downstream.upstream),
+            LibraryUsageLocatorV2.from_string(upstream_ref),
             user,
             check_permission=CheckPerm.CAN_READ_AS_AUTHOR,
             version=LatestVersion.PUBLISHED,
         )
     except (NotFound, PermissionDenied) as exc:
-        raise BadUpstream(_("Linked library item could not be loaded: {}").format(downstream.upstream)) from exc
+        raise BadUpstream(_("Linked library item could not be loaded: {}").format(link.upstream_ref)) from exc
     return link, lib_block
 
 
