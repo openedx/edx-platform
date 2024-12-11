@@ -1160,16 +1160,24 @@ def check_broken_links(self, user_id, course_key_string, language):
                 result.update({'status': response.status})
         except Exception as e:
             result.update({'status': None})
-            print('error', type(e), e, url)
+            print('[Validate url error]', type(e), e, url)
         return result
 
-    async def validate_urls_access(url_list, course_key):
+    async def validate_urls_access_in_batches(url_list, course_key, batch_size=100):
         """Returns the statuses of a list of url requests.
         url_list is [block_id, url]"""
-        async with aiohttp.ClientSession() as session:
-            tasks = [validate_url_access(session, url_data, course_key) for url_data in url_list]
-            responses = await asyncio.gather(*tasks)
-            return responses
+        responses = []
+        url_count = len(url_list)
+
+        for i in range(0, url_count, batch_size):
+            batch = url_list[i:i + batch_size]
+            async with aiohttp.ClientSession() as session:
+                tasks = [validate_url_access(session, url_data, course_key) for url_data in batch]
+                batch_results = await asyncio.gather(*tasks)
+                responses.extend(batch_results)
+                print(f'batch {i // batch_size+1} of {url_count // batch_size + 1}')
+        
+        return responses
 
     def scan_course_for_links(course_key):
         """
@@ -1198,7 +1206,7 @@ def check_broken_links(self, user_id, course_key_string, language):
     self.status.set_state('Scanning')
     course_key = CourseKey.from_string(course_key_string)
     links_list = scan_course_for_links(course_key)
-    results = asyncio.run(validate_urls_access(links_list, course_key))
+    results = asyncio.run(validate_urls_access_in_batches(links_list, course_key, batch_size=100))
 
     final_results = []
     for result in results:
