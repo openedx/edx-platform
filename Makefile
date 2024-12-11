@@ -204,3 +204,37 @@ migrate: migrate-lms migrate-cms
 # Part of https://github.com/openedx/wg-developer-experience/issues/136
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
+
+xsslint: ## check xss for quality issuest
+	python scripts/xsslint/xss_linter.py \
+	--rule-totals \
+	--config=scripts.xsslint_config \
+	--thresholds=scripts/xsslint_thresholds.json
+
+pycodestyle: ## check python files for quality issues 
+	pycodestyle .
+
+## Re-enable --lint flag when this issue https://github.com/openedx/edx-platform/issues/35775 is resolved
+pii_check: ## check django models for pii annotations
+	DJANGO_SETTINGS_MODULE=cms.envs.test \
+	code_annotations django_find_annotations \
+		--config_file .pii_annotations.yml \
+		--app_name cms \
+		--coverage \
+		--lint
+	
+	DJANGO_SETTINGS_MODULE=lms.envs.test \
+	code_annotations django_find_annotations \
+		--config_file .pii_annotations.yml \
+		--app_name lms \
+		--coverage \
+		--lint	
+
+check_keywords: ## check django models for reserve keywords
+	DJANGO_SETTINGS_MODULE=cms.envs.test \
+	python manage.py cms check_reserved_keywords \
+	--override_file db_keyword_overrides.yml
+
+	DJANGO_SETTINGS_MODULE=lms.envs.test \
+	python manage.py lms check_reserved_keywords \
+	--override_file db_keyword_overrides.yml
