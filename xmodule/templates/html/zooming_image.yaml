@@ -1,0 +1,239 @@
+---
+metadata:
+    display_name: Zooming Image Tool
+data: |
+      <p>Use the Zooming Image Tool to enable learners to see details of large, complex images. With the tool, the learner can move the mouse pointer over a part of the image to enlarge it and see more detail.</p>
+      <p>To set it up, first upload the regular image file and, optionally, a magnified image file to your course. Then refer to them with the following HTML code, replacing the values in <i>italics</i> accordingly:</p>
+      <pre>
+      &lt;div class="zooming-image"&gt;
+        &lt;a <strong>data-src</strong>="<i style="color: blue">(Optional) URL to the magnified image</i>"&gt;
+          &lt;img <strong>src</strong>="<i style="color: blue">URL to the regular image</i>" /&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+      </pre>
+      <p>If a magnified image is not provided, the regular one will be used at its native size.</p>
+      <p>Feel free to modify the example below for your own use, but take care not to remove the included Javascript.</p>
+      <div class="zooming-image">
+        <a data-src="">
+          <!-- The following sample image is in the public domain.  Source: https://commons.wikimedia.org/wiki/File:12-Color-SVG.svg -->
+          <img alt="A color wheel." src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiCiB3aWR0aD0iMTMwMCIgaGVpZ2h0PSIxMzAwIiB2aWV3Qm94PSItNjUwIC02NTAgMTMwMCAxMzAwIj4KIDxkZWZzPgogPHBhdGggaWQ9ImsiIHN0cm9rZT0iYmx1ZSIgc3Ryb2tlLXdpZHRoPSIzIgogZD0iTTAsMCBoMjAwIGEyMDAsMjAwIDAgMSwwIC00MCwtMTUwIHoiIC8+CgogPGZpbHRlciBpZD0icyIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjMzIiBpbj0iU291cmNlR3JhcGhpYyIgLz4KIDwvZmlsdGVyPgogIDxmaWx0ZXIgaWQ9InMxOSIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjgiIGluPSJTb3VyY2VHcmFwaGljIiAvPgogPC9maWx0ZXI+CiA8ZmlsdGVyIGlkPSJzMSIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjY0IiBpbj0iU291cmNlR3JhcGhpYyIgLz4KIDwvZmlsdGVyPgogPGZpbHRlciBpZD0iczI3IiBmaWx0ZXJVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giCiAgICAgICAgICB4PSItMC4yNSIgeT0iLTAuMjUiIHdpZHRoPSIxLjUiIGhlaWdodD0iMS41Ij4KICAgIDxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAuNTEiIGluPSJTb3VyY2VHcmFwaGljIiAvPgogPC9maWx0ZXI+CiA8ZmlsdGVyIGlkPSJzMiIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjQxIiBpbj0iU291cmNlR3JhcGhpYyIgLz4KIDwvZmlsdGVyPgogPGZpbHRlciBpZD0iczMiIGZpbHRlclVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIKICAgICAgICAgIHg9Ii0wLjI1IiB5PSItMC4yNSIgd2lkdGg9IjEuNSIgaGVpZ2h0PSIxLjUiPgogICAgPGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMC4yNiIgaW49IlNvdXJjZUdyYXBoaWMiIC8+CiA8L2ZpbHRlcj4KIDxmaWx0ZXIgaWQ9InM0MyIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjMiIGluPSJTb3VyY2VHcmFwaGljIiAvPgogPC9maWx0ZXI+CiA8ZmlsdGVyIGlkPSJzNCIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjE3IiBpbj0iU291cmNlR3JhcGhpYyIgLz4KIDwvZmlsdGVyPgoKIDxmaWx0ZXIgaWQ9InM0MSIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjEzIiBpbj0iU291cmNlR3JhcGhpYyIgLz4KIDwvZmlsdGVyPgogPGZpbHRlciBpZD0iczUiIGZpbHRlclVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIKICAgICAgICAgIHg9Ii0wLjI1IiB5PSItMC4yNSIgd2lkdGg9IjEuNSIgaGVpZ2h0PSIxLjUiPgogICAgPGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMC4xMSIgaW49IlNvdXJjZUdyYXBoaWMiIC8+CiA8L2ZpbHRlcj4KIDxmaWx0ZXIgaWQ9InM2IiBmaWx0ZXJVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giCiAgICAgICAgICB4PSItMC4yNSIgeT0iLTAuMjUiIHdpZHRoPSIxLjUiIGhlaWdodD0iMS41Ij4KICAgIDxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAuMDkiIGluPSJTb3VyY2VHcmFwaGljIiAvPgogPC9maWx0ZXI+CiA8ZmlsdGVyIGlkPSJzNjg3IiBmaWx0ZXJVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giCiAgICAgICAgICB4PSItMC4yNSIgeT0iLTAuMjUiIHdpZHRoPSIxLjUiIGhlaWdodD0iMS41Ij4KICAgIDxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAuMDY4NyIgaW49IlNvdXJjZUdyYXBoaWMiIC8+CiA8L2ZpbHRlcj4KIDxmaWx0ZXIgaWQ9InM1NSIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjA1NSIgaW49IlNvdXJjZUdyYXBoaWMiIC8+CiA8L2ZpbHRlcj4KIDxmaWx0ZXIgaWQ9InM0NCIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjA0NCIgaW49IlNvdXJjZUdyYXBoaWMiIC8+CiA8L2ZpbHRlcj4KIDxmaWx0ZXIgaWQ9InMzNSIgZmlsdGVyVW5pdHM9Im9iamVjdEJvdW5kaW5nQm94IgogICAgICAgICAgeD0iLTAuMjUiIHk9Ii0wLjI1IiB3aWR0aD0iMS41IiBoZWlnaHQ9IjEuNSI+CiAgICA8ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwLjAzNSIgaW49IlNvdXJjZUdyYXBoaWMiIC8+CiA8L2ZpbHRlcj4KIDxmaWx0ZXIgaWQ9InMwIiBmaWx0ZXJVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giCiAgICAgICAgICB4PSItMC4yNSIgeT0iLTAuMjUiIHdpZHRoPSIxLjUiIGhlaWdodD0iMS41Ij4KICAgIDxmZUNvbG9yTWF0cml4IHR5cGU9InNhdHVyYXRlIiB2YWx1ZXM9IjAiIGluPSJTb3VyY2VHcmFwaGljIiAvPgogPC9maWx0ZXI+CgogIDxtYXNrIGlkPSJtYXNrZSI+CiAgIDxyZWN0IHg9Ii01MDAiIHk9Ii01MDAiIHdpZHRoPSIxNjAwIiBoZWlnaHQ9IjE2MDAiIGZpbGw9IiNmZmYiIC8+CiAgIDx1c2UgeGxpbms6aHJlZj0iI2siIGZpbGw9IiMwMDAiIC8+CiAgIDwhLS11c2UgeGxpbms6aHJlZj0iI2siIHg9IjAiIHk9IjAiIHRyYW5zZm9ybT0icm90YXRlKC0zMCkiIGZpbGw9IiMwMDAiIC8tLT4KICAgPHVzZSB4bGluazpocmVmPSIjayIgdHJhbnNmb3JtPSJyb3RhdGUoLTMwKSIgZmlsbD0iIzAwMCIgLz4KICA8L21hc2s+CiA8L2RlZnM+CiA8ZyBpZD0ic2NoaXJtIiB0cmFuc2Zvcm09InNjYWxlKDEpIj4KICA8dXNlIGZpbGw9InJlZCIgeGxpbms6aHJlZj0iI2siIC8+CiAgPHVzZSB0cmFuc2Zvcm09InJvdGF0ZSgtMzApIiBmaWxsPSIjZmY3ZjAwIiB4bGluazpocmVmPSIjayIgLz4KICA8dXNlIHRyYW5zZm9ybT0icm90YXRlKC02MCkiIGZpbGw9IiNmZjAiIHhsaW5rOmhyZWY9IiNrIiAvPgogIDx1c2UgdHJhbnNmb3JtPSJyb3RhdGUoLTkwKSIgZmlsbD0iIzdmZmYwMCIgeGxpbms6aHJlZj0iI2siIC8+CiAgPHVzZSB0cmFuc2Zvcm09InJvdGF0ZSgtMTIwKSIgZmlsbD0iIzBmMCIgeGxpbms6aHJlZj0iI2siIC8+CiAgPHVzZSB0cmFuc2Zvcm09InJvdGF0ZSgtMTUwKSIgZmlsbD0iIzAwZmY3ZiIgeGxpbms6aHJlZj0iI2siIC8+CiAgPHVzZSB0cmFuc2Zvcm09InJvdGF0ZSgtMTgwKSIgZmlsbD0iIzBmZiIgeGxpbms6aHJlZj0iI2siIC8+CiAgPHVzZSB0cmFuc2Zvcm09InJvdGF0ZSgtMjEwKSIgZmlsbD0iIzAwN2ZmZiIgeGxpbms6aHJlZj0iI2siIC8+CiAgPHVzZSB0cmFuc2Zvcm09InJvdGF0ZSgtMjQwKSIgZmlsbD0iIzAwZiIgeGxpbms6aHJlZj0iI2siIC8+CiAgPHVzZSB0cmFuc2Zvcm09InJvdGF0ZSgtMjcwKSIgZmlsbD0iIzdmMDBmZiIgeGxpbms6aHJlZj0iI2siIC8+CiAgPGcgbWFzaz0idXJsKCNtYXNrZSkiPgogIDx1c2UgdHJhbnNmb3JtPSJyb3RhdGUoNjApIiBmaWxsPSIjZjBmIiB4bGluazpocmVmPSIjayIgLz4KICA8dXNlIHRyYW5zZm9ybT0icm90YXRlKDMwKSIgZmlsbD0iI2ZmMDA3ZiIgeGxpbms6aHJlZj0iI2siIG9wYWNpdHk9IjEiLz4KIDwvZz48L2c+CiA8ZyBpZD0ic2NoaXJtZSIgb3BhY2l0eT0iMSI+CiA8dXNlIHRyYW5zZm9ybT0ic2NhbGUoMC44KSIgZmlsdGVyPSJ1cmwoI3MxOSkiIHhsaW5rOmhyZWY9IiNzY2hpcm0iIC8+CiA8dXNlIHRyYW5zZm9ybT0ic2NhbGUoMC42NCkiIGZpbHRlcj0idXJsKCNzMSkiIHhsaW5rOmhyZWY9IiNzY2hpcm0iIC8+CiA8dXNlIHRyYW5zZm9ybT0ic2NhbGUoMC41MTIpIiBmaWx0ZXI9InVybCgjczI3KSIgeGxpbms6aHJlZj0iI3NjaGlybSIgLz4KIDx1c2UgdHJhbnNmb3JtPSJzY2FsZSgwLjQwOTYpIiBmaWx0ZXI9InVybCgjczIpIiB4bGluazpocmVmPSIjc2NoaXJtIiAvPgogPHVzZSB0cmFuc2Zvcm09InNjYWxlKDAuMzI3NykiIGZpbHRlcj0idXJsKCNzKSIgeGxpbms6aHJlZj0iI3NjaGlybSIgLz4KIDx1c2UgdHJhbnNmb3JtPSJzY2FsZSgwLjI2MjEpIiBmaWx0ZXI9InVybCgjczMpIiB4bGluazpocmVmPSIjc2NoaXJtIiAvPgogPHVzZSB0cmFuc2Zvcm09InNjYWxlKDAuMjA5NykiIGZpbHRlcj0idXJsKCNzNDMpIiB4bGluazpocmVmPSIjc2NoaXJtIiAvPgogPHVzZSB0cmFuc2Zvcm09InNjYWxlKDAuMTY3OCkiIGZpbHRlcj0idXJsKCNzNCkiIHhsaW5rOmhyZWY9IiNzY2hpcm0iIC8+CiA8dXNlIHRyYW5zZm9ybT0ic2NhbGUoMC4xMzQyKSIgZmlsdGVyPSJ1cmwoI3M0MSkiIHhsaW5rOmhyZWY9IiNzY2hpcm0iIC8+CiA8dXNlIHRyYW5zZm9ybT0ic2NhbGUoMC4xMDc0KSIgZmlsdGVyPSJ1cmwoI3M1KSIgeGxpbms6aHJlZj0iI3NjaGlybSIgLz4KIDx1c2UgdHJhbnNmb3JtPSJzY2FsZSgwLjA4NTkpIiBmaWx0ZXI9InVybCgjczYpIiB4bGluazpocmVmPSIjc2NoaXJtIiAvPgogPHVzZSB0cmFuc2Zvcm09InNjYWxlKDAuMDY4NykiIGZpbHRlcj0idXJsKCNzNjg3KSIgeGxpbms6aHJlZj0iI3NjaGlybSIgLz4KIDx1c2UgdHJhbnNmb3JtPSJzY2FsZSgwLjA1NSkiIGZpbHRlcj0idXJsKCNzNTUpIiB4bGluazpocmVmPSIjc2NoaXJtIiAvPgogPHVzZSB0cmFuc2Zvcm09InNjYWxlKDAuMDQ0KSIgZmlsdGVyPSJ1cmwoI3M0NCkiIHhsaW5rOmhyZWY9IiNzY2hpcm0iIC8+CiA8dXNlIHRyYW5zZm9ybT0ic2NhbGUoMC4wMzUpIiBmaWx0ZXI9InVybCgjczM1KSIgeGxpbms6aHJlZj0iI3NjaGlybSIgLz4KIDx1c2UgdHJhbnNmb3JtPSJzY2FsZSgwLjAyOCkiIGZpbHRlcj0idXJsKCNzMCkiIHhsaW5rOmhyZWY9IiNzY2hpcm0iIC8+CiA8L2c+Cjwvc3ZnPg==" />
+        </a>
+      </div>
+      <script type="text/javascript">//<![CDATA[
+        /*
+        jQuery loupeAndLightbox Plugin
+        * Version 1.1
+        * 12-11-2024
+        * Authors: M.Biscan, Adolfo R. Brandes
+        * requires jQuery 1.4.2
+        Copyright (c) 2010 M.Biscan
+
+        Permission is hereby granted, free of charge, to any person obtaining
+        a copy of this software and associated documentation files (the
+        "Software"), to deal in the Software without restriction, including
+        without limitation the rights to use, copy, modify, merge, publish,
+        distribute, sublicense, and/or sell copies of the Software, and to
+        permit persons to whom the Software is furnished to do so, subject to
+        the following conditions:
+
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+        LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+        OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+        WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+        */
+        (function($) {
+          if ('loupe' in $.fn)
+            return;
+
+          $.fn.loupe = function(options) {
+            var settings = $.extend({}, $.fn.loupe.defaults, options);
+
+            return this.each(function() {
+              var $this = $(this);
+
+              if ($this.hasClass('loupe')) {
+                return;
+              } else {
+                $this.addClass('loupe').css({
+                  position: 'relative'
+                });
+              }
+
+              var $targetAnchor = $this.find('> a');
+              var $targetImage = $targetAnchor.find('> img');
+              var $magnifiedImage = $('<img />');
+              var $loupe = $('<div class="larger" style="overflow: hidden;">');
+              var $errorMessage = $('<div class="lal_errorMessage">');
+              var $loader = $('<div class="lal_loader">Loading...</div>');
+
+              $targetAnchor.css({
+                cursor: 'default'
+              });
+
+              $targetImage.css({
+                cursor: 'pointer'
+              });
+
+              $magnifiedImage.css({
+                position: 'absolute',
+                maxWidth: 'none'
+              });
+
+              $loupe.css({
+                cursor: 'none',
+                display: 'none',
+                border: settings.border,
+                height: settings.height,
+                overflow: 'hidden',
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: settings.width,
+                zIndex: settings.zIndex,
+                borderRadius: '50%',
+                background: '#FFF',
+              });
+
+              $errorMessage
+                .text(settings.errorMessage)
+                .css({
+                  height:settings.height,
+                  width:settings.width
+                });
+
+              $loader.css({
+                  height:settings.height,
+                  width:settings.width
+                });
+
+              $targetAnchor.click(function(event) {
+                event.preventDefault();
+              });
+
+              $targetImage.click(function(event) {
+                if(!$loupe.hasClass('visible')) {
+                  var left = event.pageX;
+                  var top = event.pageY;
+
+                  if(!$magnifiedImage.hasClass('appended')) {
+                    getMagnifiedImage();
+                  }
+
+                  setTimeout(function() {
+                    appendLoupe();
+                    magnify(left, top);
+                  }, 100);
+                }
+              });
+
+              $targetImage.mousemove(function(event) {
+                var left = event.pageX;
+                var top = event.pageY;
+                var offsetTop = $targetImage.offset().top-($loupe.width()/2);
+                var offsetLeft = $targetImage.offset().left-($loupe.height()/2);
+                var offsetBottom = $targetImage.offset().top+$targetImage.height()+($loupe.height()/2);
+                var offsetRight = $targetImage.offset().left+$targetImage.width()+($loupe.width()/2);
+
+                if(left < offsetLeft || left > offsetRight || top < offsetTop || top > offsetBottom) {
+                  $targetImage.css({cursor:'default'});
+                } else {
+                  $targetImage.css({cursor:'crosshair'});
+                  magnify(left, top);
+                }
+              }).click(function() {
+                detachLoupe();
+              }).mouseleave(function() {
+                pulseLoupe();
+              });
+
+              // Detach when clicking outside of the loupe
+              $(document).click(function(event) {
+                if($loupe.hasClass('visible')) {
+                  detachLoupe();
+                }
+              });
+
+              // Resize with window
+              $(window).resize(function() {
+                if($loupe.is(':visible')) {
+                  $magnifiedImage.css({
+                    left: -($magnifiedImage.width() / 2) + ($loupe.width() / 2),
+                    top: -($magnifiedImage.height() / 2) + ($loupe.height() / 2)
+                  });
+                }
+              });
+
+              function magnify(left, top) {
+                var heightDiff = $magnifiedImage.height() / $targetImage.height();
+                var widthDiff = $magnifiedImage.width() / $targetImage.width();
+                var magnifierTop = (-(top - $targetImage.offset().top) * heightDiff) + (settings.height / 2);
+                var magnifierLeft = (-(left - $targetImage.offset().left) * widthDiff) + (settings.width / 2);
+
+                $magnifiedImage.css({
+                    top: magnifierTop,
+                    left: magnifierLeft
+                });
+              };
+
+              function appendLoupe() {
+                $loupe
+                  .appendTo($this)
+                  .append($magnifiedImage)
+                  .fadeIn(settings.fadeSpeed, function() {
+                    $(this).addClass('visible');
+                  });
+              };
+
+              function getMagnifiedImage() {
+                var src = $targetAnchor.data('src') ? $targetAnchor.data('src') : $targetImage.attr('src');
+                $loader.appendTo($loupe);
+
+                $magnifiedImage
+                  .load(function() {
+                    $(this).addClass('appended');
+                    $loader.detach();
+                  })
+                  .error(function () {
+                    $(this).hide();
+                    $loupe
+                      .append($errorMessage)
+                      .addClass('lal_loadError');
+                    $loader.detach();
+                  })
+                  .attr('src', src);
+              };
+
+              function detachLoupe() {
+                $loupe.fadeOut(settings.fadeSpeed, function() {
+                  $(this)
+                    .removeClass('visible')
+                    .detach();
+                });
+              };
+
+              function pulseLoupe() {
+                $loupe.fadeTo(150, 0.25, function() {
+                  $(this).fadeTo(150, 1.0);
+                });
+              };
+            });
+          };
+
+          $.fn.loupe.defaults = {
+            zIndex: 1000,
+            width: 350,
+            height: 350,
+            border: '2px solid #ccc',
+            fadeSpeed: 250,
+            errorMessage: 'Image load error'
+          };
+        })(jQuery);
+
+        $('.zooming-image').loupe();
+      //]]></script>
