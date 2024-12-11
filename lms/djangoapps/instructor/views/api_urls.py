@@ -88,7 +88,7 @@ urlpatterns = [
     path('certificate_exception_view/', api.CertificateExceptionView.as_view(), name='certificate_exception_view'),
     re_path(r'^generate_certificate_exceptions/(?P<generate_for>[^/]*)', api.GenerateCertificateExceptions.as_view(),
             name='generate_certificate_exceptions'),
-    path('generate_bulk_certificate_exceptions', api.generate_bulk_certificate_exceptions,
+    path('generate_bulk_certificate_exceptions', api.GenerateBulkCertificateExceptions.as_view(),
          name='generate_bulk_certificate_exceptions'),
     path(
         'certificate_invalidation_view/',
