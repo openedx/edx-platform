@@ -1,16 +1,17 @@
 Options for Extending the edX Platform
 --------------------------------------
 
-Open edX platform development follows the `Open-Closed Principle`_: we want Open edX to be an extensible platform that allows developers to build extensions that integrate with the core of the platform. This allows the core to remain small, while volatile extensions remain in the periphery.
+Open edX platform development aims to follow the `Open-Closed Principle`_: developers should be able to extend the platform to suit their needs ("open") without relying upon the details of the platform's internal implementation ("closed"). This makes it easier to maintain and refactor the platform's core, while enabling experimentation and volitility in its extensions.
 
-As you can see in this document, there are many different ways to integrate with Open edX. However, we know that there are still some features/integrations that are not possible today without modifying the core. If you have such a need, please consider proposing a new extension point in the core that would make possible the functionality you have in mind. When you submit a pull request for a new extension point, be sure to include a change to this file to document your new extension point. (Doing so will also notify reviewers that want to help with making the platform more extensible.)
+There are many different ways to integrate with Open edX. If you would like to build a feature or integration that does **not** seem to be supported by these integration methods, consider proposing a new extension point in the core that would make possible the functionality you have in mind. When you submit a pull request for a new extension point, be sure to include a change to this file to document your new extension point. (Doing so will also notify reviewers that want to help with making the platform more extensible.)
 
-Throughout this document, we will refer to the **Status** (**Adoption** and **Completion**) of each specific integration point. The Completion refers to how complete and stable an integration point is: either "Limited" (incomplete, or unstable) or "Stable" (complete and stable enough for general use in some or all cases). Adoption shows how the integration point is currently being used, and whether or not it should be used in the future:
+Throughout this document, we will refer to the **Status** of each specific extension point:
 
-* **Adopt**: Technologies we have high confidence in to serve our purpose, also in large scale. Technologies with a usage culture in our production environment, low risk and recommended to be widely used.
-* **Trial**: Technologies that we have seen work with success in project work to solve a real problem; first serious usage experience that confirm benefits and can uncover limitations. Trial technologies are slightly more risky.
-* **Assess**: Technologies that we are considering using; to be listed on this page, they must exist as a prototype in the codebase.
-* **Hold**: Technologies not recommended to be used for new projects. Technologies that we think are not (yet) worth to (further) invest in. They should not be used for new projects, but usually can be continued for existing projects.
+* ✅ **Stable**: We actively recommend that developers use these. Core developers strive to avoid breaking these type extensions. When breaking changes are necessary, they will go through the `standard deprecation process <https://open-edx-proposals.readthedocs.io/en/latest/processes/oep-0021-proc-deprecation.html>`_.
+* ⚠️ **Provisional**: We cautiously recommend these for use when Stable extension points are not sufficient. They may or may not be as well-documented. Core deevlopers may need to introduce breaking changes from time to time, but will ensure that these changes are communicated via the deprecation process, the named release notes, or both.
+* 🕰️ **Legacy**: We preserve these for backwards compatibility with existing extensions, but not recommended for newer projects. In the future, they may be deprecated, with ample notice and migration recommendations.
+* ❌ **Discouraged**: We do not encourage or support these. Core platform changes may break these extensions at any time. New extensions should avoid them, and existing extensions should migrate off of them.
+
 
 .. _Open-Closed Principle: https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle
 
@@ -20,7 +21,7 @@ Throughout this document, we will refer to the **Status** (**Adoption** and **Co
 REST API Integration with External Applications
 ===============================================
 
-*Status: Adopt, Limited*
+⚠️ **Provisional**
 
 The Open edX platform provides a suite of REST APIs that any type of external application can use. Auto-generated API documentation for the main LMS and Studio APIs is available at (LMS URL)/api-docs/ and (Studio URL)/api-docs/ .
 
@@ -52,19 +53,19 @@ If you want to provide learners with new content experiences within courses, opt
      - Status
      - Details
    * - **XBlocks**
-     - Adopt, Stable
+     - ✅ **Stable**
      - XBlocks are python plugins specific to Open edX that get installed into edx-platform and can be used to build courses. An XBlock defines a new *type* of interactive component, and authors can then create many instances of that content type in their courses (each with different settings and content). If you only need to support Open edX, XBlocks provide the best user experience. Open edX operators must install an XBlock into their Open edX instance before it can be used. See the `XBlock tutorial`_ to learn more about XBlocks.
    * - **LTI**
-     - Adopt, Stable
+     - ✅ **Stable**
      - Learning Tools Interoperability is a standard that allows an individual piece of learnable/interactive content (the "tool") to be embedded via an IFrame in a host Learning Platform (the "consumer") such as Open edX. Open edX supports LTI content in both directions: `as a consumer`_ (external content appearing in an Open edX course) and `as a provider`_ (Open edX course content appearing in an external Learning Platform). If you need to support multiple Learning Platforms, and not just Open edX, LTI is usually the best way to integrate your content. Note that not all LTI versions/features are supported, however.
    * - **Custom JavaScript Applications**
-     - Adopt, Stable
+     - ✅ **Stable**
      - If you have a single piece of content, such as a single interactive HTML5 animation or problem, and you want to use it in an Open edX course, you can create it as a `custom JavaScript application`_. Unlike XBlocks, these applications can be implemented without intervention by the Open edX operator.
    * - **External Graders**
-     - Hold, Stable
+     - 🕰️ **Legacy**
      - An external grader is a service that receives learner responses to a problem, processes those responses, and returns feedback and a problem grade to the edX platform. You build and deploy an external grader separately from the edX platform. An external grader is particularly useful for software programming courses where learners are asked to submit complex code. See the `external grader documentation`_ for details.
    * - **TinyMCE (Visual Text/HTML Editor) Plugins**
-     - Trial, Limited
+     - ⚠️ **Provisional**
      - TinyMCE's functionality can be extended with so-called Plugins. Custom TinyMCE plugins can be particularly useful for serving certain content in courses that isn't available yet; they can also be used to facilitate the educator's work. `You can follow this guide to install and enable custom TinyMCE plugins`_.
 
 For a more detailed comparison of content integration options, see `Options for Extending the edX Platform`_ in the *Open edX Developer's Guide*.
@@ -76,9 +77,6 @@ For a more detailed comparison of content integration options, see `Options for 
 .. _custom JavaScript application: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/javascript.html
 .. _external grader documentation: https://edx.readthedocs.io/projects/open-edx-ca/en/latest/exercises_tools/external_graders.html
 .. _You can follow this guide to install and enable custom TinyMCE plugins: extensions/tinymce_plugins.rst
-
-
-
 
 Platform Features (Integrating Python Code)
 ===========================================
@@ -105,44 +103,65 @@ Here are the different integration points that python plugins can use:
      - Status
      - Details
    * - Django App Plugin (``lms.djangoapp`` and ``cms.djangoapp``)
-     - Adopt, Stable
+     - ⚠️ **Provisional**
      - A "Django app plugin" is a self-contained Django `Application`_ that can define models (MySQL tables), new REST APIs, signal listeners, asynchronous tasks, and more. Even some parts of the core platform are implemented as Django app plugins, for better separation of concerns (``announcements``, ``credentials``, ``grades``, etc.) Read the `Django app plugin documentation`_ to learn more.
 
        Plugins can also inject custom data into django template contexts, to affect standard pages delivered by the core platform. See `Plugin Contexts`_ to learn more.
    * - Course tab (``openedx.course_tab``)
-     - Hold, Stable
+     - 🕰️ **Legacy**
      - A course tab plugin adds a new tab shown to learners within a course. ``courseware``, ``course_info``, and ``discussion`` are examples of built-in tab plugins. Read the `course tabs documentation`_ to learn more.
 
        This API may be changing soon with the new Courseware microfrontend implementation.
    * - Course tool (``openedx.course_tool``)
-     - Hold, Stable
+     - 🕰️ **Legacy**
      - The course home page (the landing page for the course) includes a "Course Tools" section that provides links to "tools" associated with the course. Examples of course tool plugins included in the core are reviews, updates, and bookmarks. See |course_tools.py|_ to learn more.
 
        This API may be changing soon with the new Courseware microfrontend implementation.
    * - Custom registration form app (``REGISTRATION_EXTENSION_FORM`` Django setting in the LMS)
-     - Trial, Stable
+     - ⚠️ **Provisional**
      - By default, the registration page for each instance of Open edX has fields that ask for information such as a user’s name, country, and highest level of education completed. You can add custom fields to the registration page for your own Open edX instance. These fields can be different types, including text entry fields and drop-down lists. See `Adding Custom Fields to the Registration Page`_.
    * - Learning Context (``openedx.learning_context``)
-     - Trial, Limited
+     - ⚠️ **Provisional**
      - A "Learning Context" is a course, a library, a program, a blog, an external site, or some other collection of content where learning happens. If you are trying to build a totally new learning experience that's not a type of course, you may need to implement a new learning context. Learning contexts are a new abstraction and are only supported in the nascent Learning-Core-based XBlock runtime. Since existing courses use modulestore instead of Learning Core, they are not yet implemented as learning contexts. However, Learning-Core-based content libraries are. See |learning_context.py|_ to learn more.
    * - User partition scheme (``openedx.user_partition_scheme`` and ``openedx.dynamic_partition_generator``)
-     - Unknown, Stable
+     - ⚠️ **Provisional**
      - A user partition scheme is a named way for dividing users in a course into groups, usually to show different content to different users or to run experiments. Partitions may be added to a course manually, or automatically added by a "dynamic partition generator." The core platform includes partition scheme plugins like ``random``, ``cohort``, and ``enrollment_track``. See the |UserPartition docstring|_ to learn more.
    * - XBlock (``xblock.v1``)
-     - Adopt, Stable
+     - ✅ **Stable**
      - An XBlock provides a new type of learnable content that can be used in courses, content libraries, etc. See `Content Integrations`_.
    * - XBlock unit tests (``xblock.test.v0``)
-     - Assess, Limited
+     - ⚠️ **Provisional**
      - XBlocks can also install test code that will then be run alongside the platform's usual python unit tests. It's unclear how well-supported this is at the moment.
    * - Pluggable override (``edx_django_utils.plugins.pluggable_override.pluggable_override``)
-     - Trial, Stable
+     - ⚠️ **Provisional**
      - This decorator allows overriding any function or method by pointing to an alternative implementation in settings. Read the |pluggable_override docstring|_ to learn more.
    * - Open edX Events
-     - Adopt, Stable
+     - ✅ **Stable**
      - Events are part of the greater Hooks Extension Framework for open extension of edx-platform. Events are a stable way for plugin developers to react to learner or author events. They are defined by a `separate events library`_ that developers can include in their requirements to develop and test the code without creating a dependency on this large repo. For more information see the `hooks guide`_.
    * - Open edX Filters
-     - Adopt, Stable
+     - ✅ **Stable**
      - Filters are also part of Hooks Extension Framework for open extension of edx-platform. Filters are a flexible way for plugin developers to modify learner or author application flows. They are defined by a `separate filters library`_ that developers can include in their requirements to develop and test the code without creating a dependency on this large repo. For more information see the `hooks guide`_.
+
+Methods for integration Python code that are ❌ **Discouraged**
+**************************************************************
+
+In any of the Python integrations listed above, it is technically possible to import and reference code from the core edx-platform repository. Several existing plugins use this pattern::
+
+  try:
+      from lms import some_module
+  except ImportError:
+      # In unit tests, edx-platform isn't available, so all code used
+      # by tests must handle this case. Alternatively, some plugins
+      # clone the entirety of edx-platform into their repository,
+      # making it so the try-catch isn't necessary.
+      some_module = None
+
+Despite its current usage, this pattern is discouraged. *Why?*
+
+* **Upstream changes may fail silently**. Imagine that upstream developers, unaware of this plugin, rename ``some_module`` to ``some_module_improved``. This would cause the import to silently fail, causing ``some_module`` to be set to ``None``, causing leading to bugs or confusing errors elsewhere in the program's logic.
+* **It makes the core platform harder to maintain**. As mentioned in the previous point, plugins using this pattern make it harder for core developers to maintain and refactor edx-platform, as any core change has the potential to break such plugins.
+* **It creates bidirectional dependency**. Core edx-platform code depends on a handful of plugins. This "Core imports" pattern causes the plugin to also depend on core edx-platform code, forming a circular dependency. In general, circular dependencies make code harder to test, refactor, package, and reason about.
+* **It avoids usage of better extension points**. This extension points listed in this document as Stable and Provisional do not suffer any of the drawbacks above. However, their learning curves may seem slightly steeper, since any extension point is by nature more abstract than a direct code import. That said, even if core imports are easier to use in the short term, they take time away from extension developers & core maintainers that could be used to learn, document, and improve the Stable and Provisional extension points.
 
 .. _Application: https://docs.djangoproject.com/en/3.0/ref/applications/
 .. _Django app plugin documentation: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/plugins/README.rst
@@ -167,14 +186,14 @@ Platform Look & Feel
 Themes ("Comprehensive Theming")
 ********************************
 
-*Status: Hold, Stable*
+🕰️ **Legacy**
 
 Changing the look and feel of the edX platform is generally done by creating a new "theme". See `Changing Themes for an Open edX Site`_ for documentation. Note that most theming documentation applies to the legacy UI components used in edX, which are .html files (django/mako templates) rendered by the backend and styled using either the "v1" or "v2" (a.k.a. "Pattern Library") stylesheets. However, the platform UI is slowly being replaced by new React-based "MicroFrontEnds" (MFEs), and a different approach is required for theming MFEs (see `Theming Microfrontends`_).
 
 Theming Microfrontends
 **********************
 
-*Status: Trial, Limited*
+⚠️ **Provisional**
 
 Methods for theming MFEs are still being developed. It is likely to involve:
 
@@ -193,6 +212,6 @@ In addition, Open edX operators will be able to replace entire MFEs with complet
 Custom frontends
 ****************
 
-*Status: Trial, Limited*
+⚠️ **Provisional**
 
 If you need a *very* custom look and feel for your users, and you have the time and resources required for a huge project, you can consider creating a custom frontend for Open edX, which is a completely separate application that runs on its own domain and integrates with Open edX using REST APIs. The edX Mobile App can be thought of as an example of a separate frontend that connects to Open edX using only REST APIs. Another example is `LabXchange <https://www.labxchange.org/>`_. If you develop your custom frontend using Django, you may wish to use the `auth-backends <https://github.com/openedx/auth-backends>`_ django plugin for user authentication.
