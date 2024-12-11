@@ -9,6 +9,9 @@ import shutil
 import tarfile
 import re
 import requests
+import aiohttp
+import asyncio
+import time
 from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
@@ -1117,20 +1120,25 @@ def check_broken_links(self, user_id, course_key_string, language):
             return
 
     def get_urls(content):
-        """Returns all urls after href and src in content."""
-        regex = r'\s+(?:href|src)=["\']([^"\']*)["\']'
-        urls = re.findall(regex, content)
-        return urls
+        """Returns all urls foundafter href and src in content.
+        Excludes urls that are only '#'."""
+        regex = r'\s+(?:href|src)=["\'](?!#)([^"\']*)["\']'
+        url_list = re.findall(regex, content)
+        return url_list
+    
+    def is_studio_url(url):
+        """Returns True if url is a studio url."""
+        return not url.startswith('http://') and not url.startswith('https://')
 
     def convert_to_standard_url(url, course_key):
         """
-        Returns standard urls when given studio urls.
+        Returns standard urls when given studio urls. Otherwise return url as is.
         Example urls:
           /assets/courseware/v1/506da5d6f866e8f0be44c5df8b6e6b2a/asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
           /static/getting-started_x250.png
           /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
         """
-        if not url.startswith('http://') and not url.startswith('https://'):
+        if is_studio_url(url):
             if url.startswith('/static/'):
                 processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
                 return 'http://' + settings.CMS_BASE + processed_url
@@ -1138,72 +1146,80 @@ def check_broken_links(self, user_id, course_key_string, language):
                 return 'http://' + settings.CMS_BASE + url
             else:
                 return 'http://' + settings.CMS_BASE + '/container/' + url
+        else:
+            return url
 
-    def check_url(url):
-        """Returns SUCCESS, ACCESS_DENIED, or FAILURE after checking url request"""
+    async def validate_url_access(session, url_data, course_key):
+        """Returns status of a url request.
+        url_list is [id, url]"""
+        block_id, url = url_data
+        result = {'block_id': block_id, 'url': url}
+        standardized_url = convert_to_standard_url(url, course_key)
         try:
-            response = requests.get(url, timeout=5)
-            if response.status_code == 200:
-                return "SUCCESS"
-            elif response.status_code == 403:
-                return "ACCESS_DENIED"
-            else:
-                return "FAILURE"
-        except requests.exceptions.RequestException as e:
-            return "FAILURE"
+            async with session.get(standardized_url, timeout=5) as response:
+                result.update({'status': response.status})
+        except Exception as e:
+            result.update({'status': None})
+            print('error', type(e), e, url)
+        return result
 
-    def verify_url(url):
-        """Returns true if url request returns 200"""
-        try:
-            response = requests.get(url, timeout=5)
-            return response.status_code == 200
-        except requests.exceptions.RequestException as e:
-            return False
+    async def validate_urls_access(url_list, course_key):
+        """Returns the statuses of a list of url requests.
+        url_list is [block_id, url]"""
+        async with aiohttp.ClientSession() as session:
+            tasks = [validate_url_access(session, url_data, course_key) for url_data in url_list]
+            responses = await asyncio.gather(*tasks)
+            return responses
 
-    def scan_course(course_key):
+    def scan_course_for_links(course_key):
         """
-        Scans the course and returns broken link tuples.
-          [<block_id>, <broken_link>]
+        Returns a list of links that are broken or locked.
+          [block_id, link, is_locked]
         """
-        broken_links = []
         verticals = modulestore().get_items(course_key, qualifiers={'category': 'vertical'}, revision=ModuleStoreEnum.RevisionOption.published_only)
-        print('verticals: ', verticals)
         blocks = []
+        links_to_validate = []
 
         for vertical in verticals:
             blocks.extend(vertical.get_children())
 
         for block in blocks:
-            usage_key = block.usage_key
+            block_id = str(block.usage_key)
             block_info = get_block_info(block)
             block_data = block_info['data']
-            urls = get_urls(block_data)
 
-            for url in urls:
-                if url == '#':
-                    break
-                standardized_url = convert_to_standard_url(url, course_key)
-                # TODO if check_url ACCESS_DENIED and is studio link, it's locked
-                if not verify_url(standardized_url):
-                    broken_links.append([str(usage_key), url])
+            url_list = get_urls(block_data)
+            links_to_validate += [[block_id, url] for url in url_list]
 
-        return broken_links
+        return links_to_validate
 
     user = validate_user()
 
     self.status.set_state('Scanning')
-    courselike_key = CourseKey.from_string(course_key_string)
-    data = scan_course(courselike_key)
+    course_key = CourseKey.from_string(course_key_string)
+    links_list = scan_course_for_links(course_key)
+    results = asyncio.run(validate_urls_access(links_list, course_key))
+
+    final_results = []
+    for result in results:
+        if result['status'] == None: # Request error
+            print('retry') # TODO retry
+        if result['status'] == 200: # OK
+            print('remove from list') # TODO remove
+        elif result['status'] == 403 and is_studio_url(result['url']):
+            final_results.append([result['block_id'], result['url'], True])
+        else:
+            final_results.append([result['block_id'], result['url'], False])
 
     try:
         self.status.increment_completed_steps()
 
-        file_name = str(courselike_key)
+        file_name = str(course_key)
         links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')
         LOGGER.debug('json file being generated at %s', links_file.name)
 
         with open(links_file.name, 'w') as file:
-            json.dump(data, file, indent=4)
+            json.dump(final_results, file, indent=4)
 
         artifact = UserTaskArtifact(status=self.status, name='BrokenLinks')
         artifact.file.save(name=os.path.basename(links_file.name), content=File(links_file))
@@ -1211,7 +1227,7 @@ def check_broken_links(self, user_id, course_key_string, language):
     
     # catch all exceptions so we can record useful error messages
     except Exception as exception:  # pylint: disable=broad-except
-        LOGGER.exception('Error checking links for course %s', courselike_key, exc_info=True)
+        LOGGER.exception('Error checking links for course %s', course_key, exc_info=True)
         if self.status.state != UserTaskStatus.FAILED:
             self.status.fail({'raw_error_msg': str(exception)})
         return
