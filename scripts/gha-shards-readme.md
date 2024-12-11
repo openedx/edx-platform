@@ -32,4 +32,4 @@ You'd have to update the `unit-test-shards.json` file manually to fix this.
 ```
 pytest --collect-only --ds=cms.envs.test cms/
 ```
-For more details on how this check collects and compares the unit tests count please take a look at [verify unit tests count](../.github/workflows/verify-gha-unit-tests-count.yml)
+For more details on how this check collects and compares the unit tests count please take a look at [verify unit tests count](../.github/workflows/unit-tests.yml)

@@ -128,6 +128,14 @@ function($, _, Backbone, gettext, BasePage,
 
             }
 
+            if (this.options.isIframeEmbed) {
+                window.addEventListener('message', (event) => {
+                  if (event.data && event.data.type === 'refreshXBlock') {
+                      this.render();
+                  }
+               });
+            }
+
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
         },
 
@@ -434,15 +442,43 @@ function($, _, Backbone, gettext, BasePage,
 
         /** Show the modal for previewing changes before syncing a library-sourced XBlock. */
         showXBlockLibraryChangesPreview: function(event, options) {
+            const xblockElement = this.findXBlockElement(event.target);
+            const self = this;
+            const xblockInfo = XBlockUtils.findXBlockInfo(xblockElement, this.model);
+            const courseAuthoringMfeUrl = this.model.attributes.course_authoring_url;
+            const headerElement = xblockElement.find('.xblock-header-primary');
+            const upstreamBlockId = headerElement.data('upstream-ref');
+            const upstreamBlockVersionSynced = headerElement.data('version-synced');
+
+            try {
+                if (this.options.isIframeEmbed) {
+                    window.parent.postMessage(
+                        {
+                            type: 'showXBlockLibraryChangesPreview',
+                            payload: {
+                                downstreamBlockId: xblockInfo.get('id'),
+                                displayName: xblockInfo.get('display_name'),
+                                isVertical: xblockInfo.isVertical(),
+                                upstreamBlockId,
+                                upstreamBlockVersionSynced,
+                            }
+                        }, document.referrer
+                    );
+                    return true;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
             event.preventDefault();
-
-            var xblockElement = this.findXBlockElement(event.target),
-                self = this,
-                modal = new PreviewLibraryChangesModal(options);
-
-            modal.showPreviewFor(xblockElement, this.model, function() {
-                self.refreshXBlock(xblockElement, false);
-            });
+            var modal = new PreviewLibraryChangesModal(options);
+            modal.showPreviewFor(
+                xblockInfo,
+                courseAuthoringMfeUrl,
+                upstreamBlockId,
+                upstreamBlockVersionSynced,
+                function() { self.refreshXBlock(xblockElement, false); }
+            );
         },
 
         /** Show the multi-select library content picker, for adding to a Problem Bank (itembank) Component */
@@ -488,7 +524,7 @@ function($, _, Backbone, gettext, BasePage,
                 ViewUtils.runOperationShowingMessage(gettext('Adding'), () => {
                     return lastAdded.done(() => { doneAddingAllBlocks() });
                 });
-            });
+            }, this.options.isIframeEmbed);
         },
 
         /**
@@ -625,26 +661,40 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         showMoveXBlockModal: function(event) {
+            var xblockElement = this.findXBlockElement(event.target),
+                parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
+                sourceXBlockInfo = XBlockUtils.findXBlockInfo(xblockElement, this.model),
+                sourceParentXBlockInfo = XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
+                modal = new MoveXBlockModal({
+                    sourceXBlockInfo: sourceXBlockInfo,
+                    sourceParentXBlockInfo: sourceParentXBlockInfo,
+                    XBlockURLRoot: this.getURLRoot(),
+                    outlineURL: this.options.outlineURL
+                });
+
             try {
                 if (this.options.isIframeEmbed) {
                     window.parent.postMessage(
                         {
                             type: 'showMoveXBlockModal',
-                            payload: {}
+                            payload: {
+                                sourceXBlockInfo: {
+                                  id: sourceXBlockInfo.attributes.id,
+                                  displayName: sourceXBlockInfo.attributes.display_name,
+                                },
+                                sourceParentXBlockInfo: {
+                                  id: sourceParentXBlockInfo.attributes.id,
+                                  category: sourceParentXBlockInfo.attributes.category,
+                                  hasChildren: sourceParentXBlockInfo.attributes.has_children,
+                                },
+                            },
                         }, document.referrer
                     );
+                    return true;
                 }
             } catch (e) {
                 console.error(e);
             }
-            var xblockElement = this.findXBlockElement(event.target),
-                parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
-                modal = new MoveXBlockModal({
-                    sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
-                    sourceParentXBlockInfo: XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
-                    XBlockURLRoot: this.getURLRoot(),
-                    outlineURL: this.options.outlineURL
-                });
 
             event.preventDefault();
             modal.show();

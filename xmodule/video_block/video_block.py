@@ -29,6 +29,7 @@ from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
+from xblocks_contrib.video import VideoBlock as _ExtractedVideoBlock
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE, ATTR_KEY_USER_ID
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
@@ -47,8 +48,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
+from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
@@ -56,7 +57,6 @@ from xmodule.x_module import (
     XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
-
 from .bumper_utils import bumperize
 from .sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
@@ -119,7 +119,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 
 @XBlock.wants('settings', 'completion', 'i18n', 'request_cache')
 @XBlock.needs('mako', 'user')
-class VideoBlock(
+class _BuiltInVideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
@@ -134,6 +134,7 @@ class VideoBlock(
             <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
         </video>
     """
+    is_extracted = False
     has_custom_completion = True
     completion_mode = XBlockCompletionMode.COMPLETABLE
 
@@ -1260,3 +1261,10 @@ class VideoBlock(
                 edx_video_id=self.edx_video_id.strip()
             )
         return None
+
+
+VideoBlock = (
+    _ExtractedVideoBlock if settings.USE_EXTRACTED_VIDEO_BLOCK
+    else _BuiltInVideoBlock
+)
+VideoBlock.__name__ = "VideoBlock"

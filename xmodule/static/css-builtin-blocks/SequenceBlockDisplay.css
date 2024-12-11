@@ -1,10 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
-.xmodule_display.xmodule_SequenceBlock {
-    /* stylelint-disable-line */
-    /* stylelint-disable-line */
-}
-
 .xmodule_display.xmodule_SequenceBlock .block-link {
     border-left: 1px solid var(--border-color);
     display: block;

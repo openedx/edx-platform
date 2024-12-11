@@ -45,6 +45,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             org=archived_course_key.org,
             end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
         )
+        self.non_staff_client, _ = self.create_non_staff_authed_user_client()
 
     def test_home_page_response(self):
         """Get list of courses available to the logged in user.
@@ -247,3 +248,100 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         mock_modulestore().get_course_summaries.assert_called_once()
         mock_course_overview.get_all_courses.assert_not_called()
+
+    @ddt.data(
+        ("active_only", "true"),
+        ("archived_only", "true"),
+        ("search", "sample"),
+        ("order", "org"),
+        ("page", 1),
+    )
+    @ddt.unpack
+    def test_if_empty_list_of_courses(self, query_param, value):
+        """Get list of courses when no courses are available.
+
+        Expected result:
+        - An empty list of courses available to the logged in user.
+        """
+        self.active_course.delete()
+        self.archived_course.delete()
+
+        response = self.client.get(self.api_v2_url, {query_param: value})
+
+        self.assertEqual(len(response.data['results']['courses']), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
+    @ddt.data(
+        ("active_only", "true", 2, 0),
+        ("archived_only", "true", 0, 1),
+        ("search", "foo", 1, 0),
+        ("search", "demo", 0, 1),
+        ("order", "org", 2, 1),
+        ("order", "display_name", 2, 1),
+        ("order", "number", 2, 1),
+        ("order", "run", 2, 1)
+    )
+    @ddt.unpack
+    def test_filter_and_ordering_courses(
+        self,
+        filter_key,
+        filter_value,
+        expected_active_length,
+        expected_archived_length
+    ):
+        """Get list of courses when filter and ordering are applied.
+
+        This test creates two courses besides the default courses created in the setUp method.
+        Then filters and orders them based on the filter_key and filter_value passed as query parameters.
+
+        Expected result:
+        - A list of courses available to the logged in user for the specified filter and order.
+        """
+        archived_course_key = self.store.make_course_key("demo-org", "demo-number", "demo-run")
+        CourseOverviewFactory.create(
+            display_name="Course (Demo)",
+            id=archived_course_key,
+            org=archived_course_key.org,
+            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
+        )
+        active_course_key = self.store.make_course_key("foo-org", "foo-number", "foo-run")
+        CourseOverviewFactory.create(
+            display_name="Course (Foo)",
+            id=active_course_key,
+            org=active_course_key.org,
+        )
+
+        response = self.client.get(self.api_v2_url, {filter_key: filter_value})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            len([course for course in response.data["results"]["courses"] if course["is_active"]]),
+            expected_active_length
+        )
+        self.assertEqual(
+            len([course for course in response.data["results"]["courses"] if not course["is_active"]]),
+            expected_archived_length
+        )
+
+    @ddt.data(
+        ("active_only", "true"),
+        ("archived_only", "true"),
+        ("search", "sample"),
+        ("order", "org"),
+        ("page", 1),
+    )
+    @ddt.unpack
+    def test_if_empty_list_of_courses_non_staff(self, query_param, value):
+        """Get list of courses when no courses are available for non-staff users.
+
+        Expected result:
+        - An empty list of courses available to the logged in user.
+        """
+        self.active_course.delete()
+        self.archived_course.delete()
+
+        response = self.non_staff_client.get(self.api_v2_url, {query_param: value})
+
+        self.assertEqual(len(response.data["results"]["courses"]), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

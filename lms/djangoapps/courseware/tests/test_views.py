@@ -3777,7 +3777,7 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
     def test_is_mfe_search_waffle_disabled(self):
         """
-        Courseware search is only available when the waffle flag is enabled.
+        Courseware search is only available when the waffle flag is enabled, if no inclusion date is provided.
         """
         user_admin = UserFactory(is_staff=True, is_superuser=True)
         CourseEnrollmentFactory.create(user=user_admin, course_id=self.course.id, mode=CourseMode.VERIFIED)
@@ -3789,6 +3789,7 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
         self.assertEqual(body, {'enabled': False})
 
     @patch.dict('django.conf.settings.FEATURES', {'COURSEWARE_SEARCH_INCLUSION_DATE': '2020'})
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
     @ddt.data(
         (datetime(2013, 9, 18, 11, 30, 00), False),
         (None, False),
