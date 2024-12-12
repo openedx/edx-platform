@@ -56,7 +56,7 @@ ENABLE_NEW_STRUCTURE_DISCUSSIONS = CourseWaffleFlag(
 ENABLE_FORUM_V2 = CourseWaffleFlag(f"{WAFFLE_FLAG_NAMESPACE}.enable_forum_v2", __name__)
 
 
-def is_forum_v2_enabled(course_id):
+def is_forum_v2_enabled(course_key):
     """
     Returns whether forum V2 is enabled on the course. This is a 2-step check:
 
@@ -65,7 +65,7 @@ def is_forum_v2_enabled(course_id):
     """
     if is_forum_v2_disabled_globally():
         return False
-    return ENABLE_FORUM_V2.is_enabled(course_id)
+    return ENABLE_FORUM_V2.is_enabled(course_key)
 
 
 def is_forum_v2_disabled_globally() -> bool:

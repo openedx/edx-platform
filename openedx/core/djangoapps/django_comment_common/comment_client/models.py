@@ -74,7 +74,8 @@ class Model:
     def _retrieve(self, *args, **kwargs):
         course_id = self.attributes.get("course_id") or kwargs.get("course_id")
         if course_id:
-            use_forumv2 = is_forum_v2_enabled(course_id)
+            course_key = get_course_key(course_id)
+            use_forumv2 = is_forum_v2_enabled(course_key)
         else:
             use_forumv2, course_id = is_forum_v2_enabled_for_comment(self.id)
         response = None
