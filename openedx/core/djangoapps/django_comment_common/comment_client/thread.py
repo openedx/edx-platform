@@ -174,7 +174,8 @@ class Thread(models.Model):
         request_params = utils.strip_none(request_params)
         course_id = kwargs.get("course_id")
         if course_id:
-            use_forumv2 = is_forum_v2_enabled(course_id)
+            course_key = utils.get_course_key(course_id)
+            use_forumv2 = is_forum_v2_enabled(course_key)
         else:
             use_forumv2, course_id = is_forum_v2_enabled_for_thread(self.id)
         if use_forumv2:
