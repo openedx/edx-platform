@@ -23,6 +23,7 @@ from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
+from cms.djangoapps.contentstore.views.import_export import course_templates
 
 
 django_autodiscover()
@@ -359,4 +360,6 @@ urlpatterns += [
 urlpatterns += [
     re_path('^authoring-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     re_path('^authoring-api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    re_path(fr'^course_templates/{settings.COURSE_KEY_PATTERN}?$', course_templates, name='course_templates'),
+
 ]
