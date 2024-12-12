@@ -155,12 +155,9 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
 
         schedules = self.filter_by_org(schedules)
 
-        try:
-            # .. filter_implemented_name: ScheduleQuerySetRequested
-            # .. filter_type: org.openedx.learning.schedule.queryset.requested.v1
-            schedules = ScheduleQuerySetRequested.run_filter(schedules)
-        except ScheduleQuerySetRequested.PreventScheduleQuerysetRequest as exc:
-            schedules = exc.schedules
+        # .. filter_implemented_name: ScheduleQuerySetRequested
+        # .. filter_type: org.openedx.learning.schedule.queryset.requested.v1
+        schedules = ScheduleQuerySetRequested.run_filter(schedules)
 
         if "read_replica" in settings.DATABASES:
             schedules = schedules.using("read_replica")
