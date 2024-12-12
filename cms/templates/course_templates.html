@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ organization }} Templates List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .courses-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .course-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-color: #fff;
+        }
+
+        .course-thumbnail img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .course-info {
+            margin-top: 12px;
+        }
+
+        .course-name {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .course-id {
+            color: #555;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .course-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .course-description {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .page-header {
+            text-align: center; /* Center the text horizontally */
+            margin: 20px 0; /* Add some spacing above and below the header */
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h2>{{ organization }} Templates List</h2>
+</div>
+
+<div class="courses-container">
+    {% for course in courses %}
+    <div class="course-card">
+        <div class="course-thumbnail">
+            <img src="{{ course.metadata.thumbnail }}" alt="{{ course.metadata.title }}" width="354" height="218" />
+        </div>
+        <div class="course-info">
+            <h3 class="course-name">{{ course.courses_name }}</h3>
+            <p class="course-id">Course ID: {{ course.metadata.course_id }}</p>
+            <h4 class="course-title">{{ course.metadata.title }}</h4>
+            <p class="course-description">{{ course.metadata.description }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+</body>
+</html>
