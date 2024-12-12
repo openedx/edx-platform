@@ -306,7 +306,10 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
 
     If the object is in no collections, returns:
         {
-            "collections":  {},
+            "collections":  {
+                "display_name": [],
+                "key": [],
+            },
         }
 
     """
@@ -398,6 +401,8 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
 
     # Add the breadcrumbs. In v2 libraries, the library itself is not a "parent" of the XBlocks so we add it here:
     doc[Fields.breadcrumbs] = [{"display_name": library_name}]
+    # Add collections data to index if this block is part of any collection
+    doc.update(_collections_for_content_object(xblock_metadata.usage_key))
 
     return doc
 
