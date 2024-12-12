@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import re
+import requests
 import shutil
 from wsgiref.util import FileWrapper
 
@@ -25,6 +26,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from django.shortcuts import render
+from django.urls import reverse
 
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from opaque_keys.edx.keys import CourseKey
@@ -474,7 +476,7 @@ def course_templates(request, course_key_string):
     courselike_key = CourseKey.from_string(course_key_string)
     organization = courselike_key.org
     successful_url = f"http://localhost:18010/api/contentstore/v1/course_templates/{course_key_string}"
-    import requests
+
     courses = []
     resp = requests.get(successful_url)
     if resp.status_code == 200:
