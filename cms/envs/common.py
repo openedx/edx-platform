@@ -2959,3 +2959,14 @@ MEILISEARCH_API_KEY = "devkey"
 # .. for now it wil impact country listing in auth flow and user profile.
 # .. eg ['US', 'CA']
 DISABLED_COUNTRIES = []
+
+
+OPEN_EDX_FILTERS_CONFIG = {
+    "org.openedx.templates.fetch.requested.v1": {
+        "pipeline": [
+            "openedx_filters.course_authoring.course_templates_pipeline.GithubTemplatesPipeline",
+            "openedx_filters.course_authoring.course_templates_pipeline.S3TemplatesPipeline",
+        ],
+        "fail_silently": False,
+    },
+}
