@@ -119,7 +119,11 @@ def send_ace_message(goal, session_id):
 
     with emulate_http_request(site, user):
         try:
+            start_time = datetime.now()
             ace.send(msg)
+            end_time = datetime.now()
+            log.info(f"Goal Reminder for {user.id} for course {goal.course_key} sent in {end_time - start_time} "
+                     f"using {'SES' if is_ses_enabled else 'others'}")
         except Exception as exc:  # pylint: disable=broad-except
             log.error(f"Goal Reminder for {user.id} for course {goal.course_key} could not send: {exc}")
             tracker.emit(
