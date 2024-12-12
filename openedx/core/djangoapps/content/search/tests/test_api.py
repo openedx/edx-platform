@@ -10,8 +10,10 @@ from unittest.mock import MagicMock, Mock, call, patch
 from opaque_keys.edx.keys import UsageKey
 
 import ddt
+import pytest
 from django.test import override_settings
 from freezegun import freeze_time
+from meilisearch.errors import MeilisearchApiError
 from openedx_learning.api import authoring as authoring_api
 from organizations.tests.factories import OrganizationFactory
 
@@ -26,7 +28,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 try:
     # This import errors in the lms because content.search is not an installed app there.
     from .. import api
-    from ..models import SearchAccess
+    from ..models import SearchAccess, IncrementalIndexCompleted
 except RuntimeError:
     SearchAccess = {}
 
@@ -238,6 +240,87 @@ class TestSearchApi(ModuleStoreTestCase):
             ],
             any_order=True,
         )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_reindex_meilisearch_incremental(self, mock_meilisearch):
+
+        # Add tags field to doc, since reindex calls includes tags
+        doc_sequential = copy.deepcopy(self.doc_sequential)
+        doc_sequential["tags"] = {}
+        doc_vertical = copy.deepcopy(self.doc_vertical)
+        doc_vertical["tags"] = {}
+        doc_problem1 = copy.deepcopy(self.doc_problem1)
+        doc_problem1["tags"] = {}
+        doc_problem1["collections"] = {"display_name": [], "key": []}
+        doc_problem2 = copy.deepcopy(self.doc_problem2)
+        doc_problem2["tags"] = {}
+        doc_problem2["collections"] = {"display_name": [], "key": []}
+        doc_collection = copy.deepcopy(self.collection_dict)
+        doc_collection["tags"] = {}
+
+        api.rebuild_index(incremental=True)
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 3
+        mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
+            [
+                call([doc_sequential, doc_vertical]),
+                call([doc_problem1, doc_problem2]),
+                call([doc_collection]),
+            ],
+            any_order=True,
+        )
+
+        # Now we simulate interruption by passing this function to the status_cb argument
+        def simulated_interruption(message):
+            # this exception prevents courses from being indexed
+            if "Indexing courses" in message:
+                raise Exception("Simulated interruption")
+
+        with pytest.raises(Exception, match="Simulated interruption"):
+            api.rebuild_index(simulated_interruption, incremental=True)
+
+        # two more calls due to collections
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 5
+        assert IncrementalIndexCompleted.objects.all().count() == 1
+        api.rebuild_index(incremental=True)
+        assert IncrementalIndexCompleted.objects.all().count() == 0
+        # one missing course indexed
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 6
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_reset_meilisearch_index(self, mock_meilisearch):
+        api.reset_index()
+        mock_meilisearch.return_value.swap_indexes.assert_called_once()
+        mock_meilisearch.return_value.create_index.assert_called_once()
+        mock_meilisearch.return_value.delete_index.call_count = 2
+        api.reset_index()
+        mock_meilisearch.return_value.delete_index.call_count = 4
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_init_meilisearch_index(self, mock_meilisearch):
+        # Test index already exists
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_not_called()
+        mock_meilisearch.return_value.create_index.assert_not_called()
+        mock_meilisearch.return_value.delete_index.assert_not_called()
+
+        # Test index already exists and has no documents
+        mock_meilisearch.return_value.get_stats.return_value = 0
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_not_called()
+        mock_meilisearch.return_value.create_index.assert_not_called()
+        mock_meilisearch.return_value.delete_index.assert_not_called()
+
+        mock_meilisearch.return_value.get_index.side_effect = [
+            MeilisearchApiError("Testing reindex", Mock(text='{"code":"index_not_found"}')),
+            MeilisearchApiError("Testing reindex", Mock(text='{"code":"index_not_found"}')),
+            Mock(created_at=1),
+            Mock(created_at=1),
+            Mock(created_at=1),
+        ]
+        api.init_index()
+        mock_meilisearch.return_value.swap_indexes.assert_called_once()
+        mock_meilisearch.return_value.create_index.assert_called_once()
+        mock_meilisearch.return_value.delete_index.call_count = 2
 
     @override_settings(MEILISEARCH_ENABLED=True)
     @patch(

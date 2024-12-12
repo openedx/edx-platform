@@ -5847,7 +5847,7 @@ paths:
       operationId: grades_v1_submission_history_read
       description: |-
         Get submission history details. This submission history is related to only
-        ProblemBlock and it doesn't support LibraryContentBlock or ContentLibraries
+        ProblemBlock and it doesn't support LegacyLibraryContentBlock or ContentLibraries
         as of now.
 
         **Usecases**:
@@ -7044,6 +7044,25 @@ paths:
       required: true
       type: string
     - name: course_id
+      in: path
+      required: true
+      type: string
+  /mobile/{api_version}/users/{username}/enrollments_status/:
+    get:
+      operationId: mobile_users_enrollments_status_list
+      description: Gets user's enrollments status.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - mobile
+    parameters:
+    - name: api_version
+      in: path
+      required: true
+      type: string
+    - name: username
       in: path
       required: true
       type: string
@@ -9868,7 +9887,7 @@ paths:
       required: true
       type: string
       pattern: ^[a-zA-Z0-9\-_]*$
-  /xblock/v2/xblocks/{usage_key_str}/:
+  /xblock/v2/xblocks/{usage_key}/:
     get:
       operationId: xblock_v2_xblocks_read
       summary: Get metadata about the specified block.
@@ -9884,11 +9903,11 @@ paths:
       tags:
       - xblock
     parameters:
-    - name: usage_key_str
+    - name: usage_key
       in: path
       required: true
       type: string
-  /xblock/v2/xblocks/{usage_key_str}/fields/:
+  /xblock/v2/xblocks/{usage_key}/fields/:
     get:
       operationId: xblock_v2_xblocks_fields_list
       description: retrieves the xblock, returning display_name, data, and metadata
@@ -9909,11 +9928,11 @@ paths:
       tags:
       - xblock
     parameters:
-    - name: usage_key_str
+    - name: usage_key
       in: path
       required: true
       type: string
-  /xblock/v2/xblocks/{usage_key_str}/handler_url/{handler_name}/:
+  /xblock/v2/xblocks/{usage_key}/handler_url/{handler_name}/:
     get:
       operationId: xblock_v2_xblocks_handler_url_read
       summary: |-
@@ -9928,7 +9947,7 @@ paths:
       tags:
       - xblock
     parameters:
-    - name: usage_key_str
+    - name: usage_key
       in: path
       required: true
       type: string
@@ -9936,7 +9955,7 @@ paths:
       in: path
       required: true
       type: string
-  /xblock/v2/xblocks/{usage_key_str}/view/{view_name}/:
+  /xblock/v2/xblocks/{usage_key}/view/{view_name}/:
     get:
       operationId: xblock_v2_xblocks_view_read
       description: Get the HTML, JS, and CSS needed to render the given XBlock.
@@ -9947,7 +9966,110 @@ paths:
       tags:
       - xblock
     parameters:
-    - name: usage_key_str
+    - name: usage_key
+      in: path
+      required: true
+      type: string
+    - name: view_name
+      in: path
+      required: true
+      type: string
+  /xblock/v2/xblocks/{usage_key}@{version}/:
+    get:
+      operationId: xblock_v2_xblocks_read
+      summary: Get metadata about the specified block.
+      description: |-
+        Accepts the following query parameters:
+
+        * "include": a comma-separated list of keys to include.
+          Valid keys are "index_dictionary" and "student_view_data".
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
+    - name: version
+      in: path
+      required: true
+      type: string
+  /xblock/v2/xblocks/{usage_key}@{version}/fields/:
+    get:
+      operationId: xblock_v2_xblocks_fields_list
+      description: retrieves the xblock, returning display_name, data, and metadata
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    post:
+      operationId: xblock_v2_xblocks_fields_create
+      description: edits the xblock, saving changes to data and metadata only (display_name
+        included in metadata)
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
+    - name: version
+      in: path
+      required: true
+      type: string
+  /xblock/v2/xblocks/{usage_key}@{version}/handler_url/{handler_name}/:
+    get:
+      operationId: xblock_v2_xblocks_handler_url_read
+      summary: |-
+        Get an absolute URL which can be used (without any authentication) to call
+        the given XBlock handler.
+      description: The URL will expire but is guaranteed to be valid for a minimum
+        of 2 days.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
+    - name: version
+      in: path
+      required: true
+      type: string
+    - name: handler_name
+      in: path
+      required: true
+      type: string
+  /xblock/v2/xblocks/{usage_key}@{version}/view/{view_name}/:
+    get:
+      operationId: xblock_v2_xblocks_view_read
+      description: Get the HTML, JS, and CSS needed to render the given XBlock.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
+    - name: version
       in: path
       required: true
       type: string
@@ -10158,6 +10280,7 @@ definitions:
     - can_view_certificate
     - course_modes
     - is_new_discussion_sidebar_view_enabled
+    - has_course_author_access
     type: object
     properties:
       can_show_upgrade_sock:
@@ -10236,6 +10359,9 @@ definitions:
           $ref: '#/definitions/CourseModeSerrializer'
       is_new_discussion_sidebar_view_enabled:
         title: Is new discussion sidebar view enabled
+        type: boolean
+      has_course_author_access:
+        title: Has course author access
         type: boolean
   DateSummary:
     required:

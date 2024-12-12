@@ -15,6 +15,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldError, PermissionDenied, ValidationError as DjangoValidationError
+from django.db.models import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -575,6 +576,10 @@ def _accessible_courses_list_from_groups(request):
 
     if course_keys:
         courses_list = CourseOverview.get_all_courses(filter_={'id__in': course_keys})
+    else:
+        # If no course keys are found for the current user, then return without filtering
+        # or ordering the courses list.
+        return courses_list, []
 
     search_query, order, active_only, archived_only = get_query_params_if_present(request)
     courses_list = get_filtered_and_ordered_courses(
@@ -588,7 +593,11 @@ def _accessible_courses_list_from_groups(request):
     return courses_list, []
 
 
-def get_courses_by_status(active_only, archived_only, course_overviews):
+def get_courses_by_status(
+    active_only: bool,
+    archived_only: bool,
+    course_overviews: QuerySet[CourseOverview]
+) -> QuerySet[CourseOverview]:
     """
     Return course overviews based on a base queryset filtered by a status.
 
@@ -602,7 +611,10 @@ def get_courses_by_status(active_only, archived_only, course_overviews):
     return CourseOverview.get_courses_by_status(active_only, archived_only, course_overviews)
 
 
-def get_courses_by_search_query(search_query, course_overviews):
+def get_courses_by_search_query(
+    search_query: str | None,
+    course_overviews: QuerySet[CourseOverview]
+) -> QuerySet[CourseOverview]:
     """Return course overviews based on a base queryset filtered by a search query.
 
     Args:
@@ -614,7 +626,10 @@ def get_courses_by_search_query(search_query, course_overviews):
     return CourseOverview.get_courses_matching_query(search_query, course_overviews=course_overviews)
 
 
-def get_courses_order_by(order_query, course_overviews):
+def get_courses_order_by(
+    order_query: str | None,
+    course_overviews: QuerySet[CourseOverview]
+) -> QuerySet[CourseOverview]:
     """Return course overviews based on a base queryset ordered by a query.
 
     Args:

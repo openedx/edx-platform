@@ -71,7 +71,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
 
     def setUp(self):
         super().setUp()
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx", is_staff=True)
         # Create an organization
         self.organization, _ = Organization.objects.get_or_create(
             short_name="CL-TEST",

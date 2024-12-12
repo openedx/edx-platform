@@ -308,6 +308,13 @@ class LibraryXBlockType:
 # ============
 
 
+def user_can_create_library(user: AbstractUser) -> bool:
+    """
+    Check if the user has permission to create a content library.
+    """
+    return user.has_perm(permissions.CAN_CREATE_CONTENT_LIBRARY)
+
+
 def get_libraries_for_user(user, org=None, text_search=None, order=None):
     """
     Return content libraries that the user has permission to view.

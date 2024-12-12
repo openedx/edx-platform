@@ -67,19 +67,22 @@ extensions = [
     'sphinx_design',
     'code_annotations.contrib.sphinx.extensions.featuretoggles',
     'code_annotations.contrib.sphinx.extensions.settings',
-    'autoapi.extension',
+    # 'autoapi.extension',  # Temporarily disabled
+    'sphinx_reredirects',
 ]
 
-autoapi_type = 'python'
-autoapi_dirs = ['../lms', '../openedx']
-
-autoapi_ignore = [
-    '*/migrations/*',
-    '*/tests/*',
-    '*.pyc',
-    '__init__.py',
-    '**/xblock_serializer/data.py',
-]
+# Temporarily disabling autoapi_dirs and the AutoAPI extension due to performance issues.
+# This will unblock ReadTheDocs builds and will be revisited for optimization.
+# autoapi_type = 'python'
+# autoapi_dirs = ['../lms/djangoapps', '../openedx/core/djangoapps', "../openedx/features"]
+#
+# autoapi_ignore = [
+#     '*/migrations/*',
+#     '*/tests/*',
+#     '*.pyc',
+#     '__init__.py',
+#     '**/xblock_serializer/data.py',
+# ]
 
 # Rediraffe related settings.
 rediraffe_redirects = "redirects.txt"
@@ -285,7 +288,7 @@ if os.environ.get("READTHEDOCS", "") == "True":
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
+    'django': ('https://docs.djangoproject.com/en/4.2/', 'https://docs.djangoproject.com/en/4.2/_objects/'),
 }
 
 # Start building a map of the directories relative to the repository root to
@@ -300,6 +303,16 @@ modules = {
     # 'cms': 'references/docstrings/cms',
     # 'common': 'references/docstrings/common',
     # 'xmodule': 'references/docstrings/xmodule',
+}
+
+# Mapping permanently moved pages to appropriate new location outside of edx-platform
+# with by sphinx-reredirects extension redirects.
+# More information: https://documatt.com/sphinx-reredirects/usage.html
+
+redirects = {
+    'hooks/events': 'https://docs.openedx.org/projects/openedx-events/en/latest/',
+    'hooks/filters': 'https://docs.openedx.org/projects/openedx-filters/en/latest/',
+    'hooks/index': 'https://docs.openedx.org/en/latest/developers/concepts/hooks_extension_framework.html',
 }
 
 

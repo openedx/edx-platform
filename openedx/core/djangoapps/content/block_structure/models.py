@@ -41,8 +41,7 @@ def _directory_name(data_usage_key):
     # .. setting_description: Specifies the path in storage where block structures would be saved,
     #   for storage-backed block structure cache.
     #   For more information, check https://github.com/openedx/edx-platform/pull/14571.
-    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']` and on
-    #   `block_structure.storage_backing_for_cache`.
+    # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']`
     directory_prefix = settings.BLOCK_STRUCTURES_SETTINGS.get('DIRECTORY_PREFIX', '')
 
     # replace any '/' in the usage key so they aren't interpreted
