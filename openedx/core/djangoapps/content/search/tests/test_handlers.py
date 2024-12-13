@@ -185,3 +185,13 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
         meilisearch_client.return_value.index.return_value.delete_document.assert_called_with(
             "lborgalib_aproblemproblem1-ca3186e9"
         )
+
+        # Restore the Library Block
+        library_api.restore_library_block(problem.usage_key)
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call([doc_problem])
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call(
+            [{'id': doc_problem['id'], 'collections': {'display_name': [], 'key': []}}]
+        )
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call(
+            [{'id': doc_problem['id'], 'tags': {}}]
+        )
