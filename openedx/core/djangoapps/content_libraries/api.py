@@ -1151,6 +1151,14 @@ def restore_library_block(usage_key):
         )
     )
 
+    # Add tags and collections back to index
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+        content_object=ContentObjectChangedData(
+            object_id=str(usage_key),
+            changes=["collections", "tags"],
+        ),
+    )
+
     # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
     # collection indexing asynchronously.
     #
