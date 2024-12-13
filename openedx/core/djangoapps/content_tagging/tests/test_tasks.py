@@ -289,17 +289,16 @@ class TestAutoTagging(  # type: ignore[misc]
         # Check if the tags are created in the Library Block with the user's preferred language
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, 'Português (Brasil)')
 
-        # Delete the XBlock
+        # Soft delete the XBlock
         delete_library_block(library_block.usage_key)
 
-        # Check if the tags are deleted
-        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, None)
+        # Check that the tags are not deleted
+        assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, 'Português (Brasil)')
 
         # Restore the XBlock
-        with patch('crum.get_current_request', return_value=fake_request):
-            restore_library_block(library_block.usage_key)
+        restore_library_block(library_block.usage_key)
 
-        # Check if the tags are restored in the Library Block with the user's preferred language
+        # Check if the tags are still present in the Library Block with the user's preferred language
         assert self._check_tag(usage_key_str, LANGUAGE_TAXONOMY_ID, 'Português (Brasil)')
 
     @override_waffle_flag(CONTENT_TAGGING_AUTO, active=False)
