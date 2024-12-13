@@ -13,10 +13,13 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.views import exception_handler
 
+from openedx.core.constants import CAPTURED_CLEAN_COURSE_ID_PATTERN, POSTFIXED_PATTERNS_TO_NEGATE
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.courses import clean_course_id
 
 # accommodates course api urls, excluding any course api routes that do not fall under v*/courses, such as v1/blocks.
 COURSE_REGEX = re.compile(fr'^(.*?/course(s)?/)(?!v[0-9]+/[^/]+){settings.COURSE_ID_PATTERN}')
+CLEANED_COURSE_ID_REGEX = re.compile(f'{CAPTURED_CLEAN_COURSE_ID_PATTERN}{POSTFIXED_PATTERNS_TO_NEGATE}')
 
 log = logging.getLogger(__name__)
 
@@ -77,14 +80,18 @@ def course_id_from_url(url):
 
     if match is None:
         return None
-
     course_id = match.group('course_id')
 
     if course_id is None:
         return None
 
+    print(course_id, 'unclean')
+    cleaned_course_id = CLEANED_COURSE_ID_REGEX.match(course_id)
+    cleaned_course_id = cleaned_course_id.group('clean_course_id') if cleaned_course_id else course_id
+    print(cleaned_course_id, 'clean')
+
     try:
-        return CourseKey.from_string(course_id)
+        return CourseKey.from_string(cleaned_course_id)
     except InvalidKeyError:
         return None
 
