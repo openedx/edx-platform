@@ -119,22 +119,6 @@ def auto_tag_library_block(**kwargs):
     )
 
 
-@receiver(LIBRARY_BLOCK_DELETED)
-def delete_tag_library_block(**kwargs):
-    """
-    Delete tags associated with a Library XBlock whenever the block is deleted.
-    """
-    library_block_data = kwargs.get("library_block", None)
-    if not library_block_data or not isinstance(library_block_data, LibraryBlockData):
-        log.error("Received null or incorrect data for event")
-        return
-
-    try:
-        delete_library_block_tags(str(library_block_data.usage_key))
-    except Exception as err:  # pylint: disable=broad-except
-        log.error(f"Failed to delete library block tags: {err}")
-
-
 @receiver(XBLOCK_DUPLICATED)
 def duplicate_tags(**kwargs):
     """
