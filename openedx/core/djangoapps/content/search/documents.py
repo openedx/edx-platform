@@ -306,7 +306,10 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
 
     If the object is in no collections, returns:
         {
-            "collections":  {},
+            "collections":  {
+                "display_name": [],
+                "key": [],
+            },
         }
 
     """
