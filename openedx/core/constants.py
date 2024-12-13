@@ -6,9 +6,14 @@ Constants that are relevant to all of Open edX
 # Note: these intentionally greedily grab all chars up to the next slash includingny pluses
 # DHM: I really wanted to ensure the separators were the same (+ or /) but all patts tried had
 # too many inadvertent side effects :-(
-
 COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)'
 COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
 COURSE_KEY_REGEX = COURSE_KEY_PATTERN.replace('P<course_key_string>', ':')
+
+# This constant can be extended to take into account future urls to negate with the following pattern
+# (?=\/(enroll|unenroll|other_patterns)$)
+POSTFIXED_PATTERNS_TO_NEGATE = r'(?=\/enroll)$'
+CAPTURED_CLEAN_COURSE_ID_PATTERN = r'^(?P<course_id>.*?)'
+
 COURSE_PUBLISHED = 'published'
 COURSE_UNPUBLISHED = 'unpublished'
