@@ -5,18 +5,20 @@ Test cases for the Open edX Filters associated with the schedule app.
 import datetime
 from unittest.mock import Mock
 
-from django.test import TestCase, override_settings
+from django.db.models.query import QuerySet
+from django.test import override_settings
 from openedx_filters import PipelineStep
 
 from openedx.core.djangoapps.schedules.resolvers import BinnedSchedulesBaseResolver
 from openedx.core.djangoapps.schedules.tests.test_resolvers import SchedulesResolverTestMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestScheduleQuerySetRequestedPipelineStep(PipelineStep):
     """Pipeline step class to test a configured pipeline step"""
 
-    filtered_schedules = Mock()
+    filtered_schedules = Mock(spec=QuerySet)
 
     def run_filter(self, schedules):  # pylint: disable=arguments-differ
         """Pipeline step to filter the schedules"""
@@ -26,7 +28,7 @@ class TestScheduleQuerySetRequestedPipelineStep(PipelineStep):
 
 
 @skip_unless_lms
-class ScheduleQuerySetRequestedFiltersTest(SchedulesResolverTestMixin, TestCase):
+class ScheduleQuerySetRequestedFiltersTest(SchedulesResolverTestMixin, ModuleStoreTestCase):
     """
     Tests for the Open edX Filters associated with the schedule queryset requested.
 
@@ -41,7 +43,7 @@ class ScheduleQuerySetRequestedFiltersTest(SchedulesResolverTestMixin, TestCase)
             site=self.site,
             target_datetime=datetime.datetime.now(),
             day_offset=3,
-            bin_num=2,
+            bin_num=1,
         )
 
     @override_settings(
