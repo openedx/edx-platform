@@ -1206,6 +1206,22 @@ def check_broken_links(self, user_id, course_key_string, language):
                 LOGGER.debug(f'[Link Check] request batch {i // batch_size+1} of {url_count // batch_size + 1}')
         
         return responses
+    
+    def retry_validation(url_list, course_key, retry_count=3):
+        """Retry urls that failed due to connection error."""
+        results = []
+        retry_list = url_list
+        for i in range(0, retry_count):
+            if retry_list:
+                LOGGER.debug(f'[Link Check] retry attempt #{i+1}')
+                validated_url_list = asyncio.run(validate_urls_access_in_batches(retry_list, course_key, batch_size=100))
+                filetered_url_list, retry_list = filter_by_status(validated_url_list)
+                results.extend(filetered_url_list)
+    
+        if retry_list:
+            LOGGER.debug(f'[Link Check] {len(retry_list)} requests failed due to connection error')
+
+        return results
 
     def filter_by_status(results):
         """
@@ -1239,18 +1255,10 @@ def check_broken_links(self, user_id, course_key_string, language):
     url_list = scan_course_for_links(course_key)
     validated_url_list = asyncio.run(validate_urls_access_in_batches(url_list, course_key, batch_size=100))
     broken_or_locked_urls, retry_list = filter_by_status(validated_url_list)
-
-    # Retry urls that failed due to connection error
-    retry_count = 3
-    for i in range(0, retry_count):
-        if retry_list:
-            LOGGER.debug(f'[Link Check] retry attempt #{i+1}')
-            retry_validated_url_list = asyncio.run(validate_urls_access_in_batches(retry_list, course_key, batch_size=100))
-            retry_results, retry_list = filter_by_status(retry_validated_url_list)
-            broken_or_locked_urls.extend(retry_results)
     
     if retry_list:
-        LOGGER.debug(f'[Link Check] {len(retry_list)} requests failed due to connection error')
+        retry_results = retry_validation(retry_list, course_key, retry_count=3)
+        broken_or_locked_urls.extend(retry_results)
 
     try:
         self.status.increment_completed_steps()
