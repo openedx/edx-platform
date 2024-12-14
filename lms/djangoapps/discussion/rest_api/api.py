@@ -199,7 +199,7 @@ def _get_course(course_key: CourseKey, user: User, check_tab: bool = True) -> Co
     return course
 
 
-def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
+def _get_thread_and_context(request, thread_id, retrieve_kwargs=None, course_id=None):
     """
     Retrieve the given thread and build a serializer context for it, returning
     both. This function also enforces access control for the thread (checking
@@ -213,7 +213,7 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
             retrieve_kwargs["with_responses"] = False
         if "mark_as_read" not in retrieve_kwargs:
             retrieve_kwargs["mark_as_read"] = False
-        cc_thread = Thread(id=thread_id).retrieve(**retrieve_kwargs)
+        cc_thread = Thread(id=thread_id).retrieve(course_id=course_id, **retrieve_kwargs)
         course_key = CourseKey.from_string(cc_thread["course_id"])
         course = _get_course(course_key, request.user)
         context = get_context(course, request, cc_thread)
@@ -1645,7 +1645,8 @@ def get_thread(request, thread_id, requested_fields=None, course_id=None):
         retrieve_kwargs={
             "with_responses": True,
             "user_id": str(request.user.id),
-        }
+        },
+        course_id=course_id,
     )
     if course_id and course_id != cc_thread.course_id:
         raise ThreadNotFoundError("Thread not found.")
