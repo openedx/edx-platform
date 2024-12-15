@@ -54,8 +54,8 @@ def generate_broken_links_descriptor(json_content, request_user):
     xblock_dictionary = {}  # dictionary of xblock attributes
 
     for item in json_content:
-        block_id, link, *is_locked = item
-        is_locked_flag = bool(is_locked)
+        block_id, link, *rest = item
+        is_locked_flag = bool(rest[0])
 
         usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
