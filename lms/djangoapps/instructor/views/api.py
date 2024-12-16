@@ -109,7 +109,7 @@ from lms.djangoapps.instructor.views.serializer import (
     CertificateSerializer,
     CertificateStatusesSerializer,
     ListInstructorTaskInputSerializer,
-    ModifyAccessSerializer
+    ModifyAccessSerializer,
     RoleNameSerializer,
     SendEmailSerializer,
     ShowStudentExtensionSerializer,
