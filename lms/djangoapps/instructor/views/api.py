@@ -1024,7 +1024,6 @@ class ModifyAccess(APIView):
         course = get_course_with_access(
             request.user, 'instructor', course_id, depth=None
         )
-
         serializer_data = AccessSerializer(data=request.data)
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)

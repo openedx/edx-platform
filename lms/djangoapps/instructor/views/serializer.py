@@ -234,9 +234,7 @@ class ModifyAccessSerializer(serializers.Serializer):
     """
     serializers for enroll or un-enroll users in beta testing program.
     """
-    identifiers = serializers.ListField(
-        child=serializers.CharField(),
-        allow_empty=False,
+    identifiers = serializers.CharField(
         help_text="A comma separated list of emails or usernames.",
         required=True
     )
@@ -261,12 +259,7 @@ class ModifyAccessSerializer(serializers.Serializer):
         Validate the 'identifiers' field which is now a list of strings.
         """
         # Iterate over the list of identifiers and validate each one
-        validated_list = []
-        for identifier in value:
-            identifier = identifier.strip()  # Strip leading/trailing whitespace
-            if identifier:  # Skip empty identifiers
-                validated_list.append(identifier)
-
+        validated_list = _split_input_list(value)
         if not validated_list:
             raise serializers.ValidationError("The identifiers list cannot be empty.")
 
@@ -287,3 +280,21 @@ class ModifyAccessSerializer(serializers.Serializer):
         if isinstance(value, str):
             return value.lower() == 'true'
         return bool(value)
+
+def _split_input_list(str_list):
+    """
+    Separate out individual student email from the comma, or space separated string.
+
+    e.g.
+    in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
+    out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
+
+    `str_list` is a string coming from an input text area
+    returns a list of separated values
+    """
+    import re
+    new_list = re.split(r'[,\s\n\r]+', str_list)
+    new_list = [s.strip() for s in new_list]
+    new_list = [s for s in new_list if s != '']
+
+    return new_list
