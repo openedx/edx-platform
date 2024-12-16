@@ -284,6 +284,7 @@ class ModifyAccessSerializer(serializers.Serializer):
             return value.lower() == 'true'
         return bool(value)
 
+
 def _split_input_list(str_list):
     """
     Separate out individual student email from the comma, or space separated string.
@@ -300,6 +301,7 @@ def _split_input_list(str_list):
     new_list = [s for s in new_list if s != '']
 
     return new_list
+
 
  class CertificateStatusesSerializer(serializers.Serializer):
     """
