@@ -154,6 +154,7 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
         
         task_status = _latest_task_status(request, course_id)
         status = None
+        created_at = None
         broken_links_dto = None
         error = None
         if task_status is None:
@@ -165,6 +166,7 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
                 status = 'Uninitiated'
         else:
             status = task_status.state
+            created_at = task_status.created
             if task_status.state == UserTaskStatus.SUCCEEDED:
                 artifact = UserTaskArtifact.objects.get(status=task_status, name='BrokenLinks')
                 with artifact.file as file:
@@ -218,6 +220,7 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
         # }
         data = {
             'LinkCheckStatus': status,
+            'LinkCheckCreatedAt': created_at,
             **({'LinkCheckOutput': broken_links_dto} if broken_links_dto else {}),
             **({'LinkCheckError': error} if error else {})
         }
