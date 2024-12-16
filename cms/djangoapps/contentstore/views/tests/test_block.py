@@ -312,12 +312,12 @@ class GetItemTest(ItemTest):
         resp = self.create_xblock(
             parent_usage_key=split_test_usage_key,
             category="html",
-            boilerplate="zooming_image.yaml",
+            boilerplate="latex_html.yaml",
         )
         self.assertEqual(resp.status_code, 200)
         html, __ = self._get_container_preview(split_test_usage_key)
         self.assertIn("Announcement", html)
-        self.assertIn("Zooming", html)
+        self.assertIn("LaTeX", html)
 
     def test_split_test_edited(self):
         """
@@ -982,7 +982,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
 
     def test_duplicate_library_content_block(self):  # pylint: disable=too-many-statements
         """
-        Test the LibraryContentBlock's special duplication process.
+        Test the LegacyLibraryContentBlock's special duplication process.
         """
         store = modulestore()
 
@@ -3184,13 +3184,13 @@ class TestComponentTemplates(CourseTestCase):
         templates = get_component_templates(self.course)
         button_names = [template["display_name"] for template in templates]
         self.assertIn("Advanced", button_names)
-        self.assertEqual(len(templates[0]["templates"]), len(expected_xblocks))
+        self.assertEqual(len(templates[-1]["templates"]), len(expected_xblocks))
         template_display_names = [
-            template["display_name"] for template in templates[0]["templates"]
+            template["display_name"] for template in templates[-1]["templates"]
         ]
         self.assertEqual(template_display_names, expected_xblocks)
         template_support_levels = [
-            template["support_level"] for template in templates[0]["templates"]
+            template["support_level"] for template in templates[-1]["templates"]
         ]
         self.assertEqual(template_support_levels, expected_support_levels)
 

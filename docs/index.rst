@@ -20,6 +20,7 @@ locations.
 .. _Developer Documentation Index: https://openedx.atlassian.net/wiki/spaces/DOC/overview
 .. _Open edX Development space: https://openedx.atlassian.net/wiki/spaces/COMM/overview
 .. _Open edX ReadTheDocs: http://docs.edx.org/
+.. _Hooks Extensions Framework: https://docs.openedx.org/en/latest/developers/concepts/hooks_extension_framework.html
 
 .. toctree::
     :maxdepth: 1
@@ -32,7 +33,6 @@ locations.
     how-tos/index
     references/index
     concepts/index
-    hooks/index
     extensions/tinymce_plugins
 
 .. grid:: 1 2 2 2
@@ -80,13 +80,15 @@ locations.
       :class-card: sd-shadow-md sd-p-2
       :class-footer: sd-border-0
 
-      * :doc:`hooks/index`
+      * `Hooks Extensions Framework`_
       * :doc:`extensions/tinymce_plugins`
       +++
-      .. button-ref:: hooks/index
+      .. button-link:: https://docs.openedx.org/en/latest/developers/concepts/hooks_extension_framework.html
          :color: primary
          :outline:
          :expand:
+
+         Hooks Extensions Framework
 
 
 Change History

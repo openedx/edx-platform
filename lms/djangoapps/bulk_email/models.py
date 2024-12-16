@@ -146,7 +146,7 @@ class Target(models.Model):
                 User.objects.filter(
                     models.Q(courseenrollment__mode=self.coursemodetarget.track.mode_slug)
                     & enrollment_query
-                )
+                ).exclude(id__in=staff_instructor_qset)
             )
         else:
             raise ValueError(f"Unrecognized target type {self.target_type}")

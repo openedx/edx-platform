@@ -2,7 +2,9 @@
 Unit tests for home page view.
 """
 import ddt
+import pytz
 from collections import OrderedDict
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
@@ -33,12 +35,7 @@ class HomePageViewTest(CourseTestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("cms.djangoapps.contentstore:v1:home")
-
-    def test_home_page_courses_response(self):
-        """Check successful response content"""
-        response = self.client.get(self.url)
-
-        expected_response = {
+        self.expected_response = {
             "allow_course_reruns": True,
             "allow_to_create_new_org": False,
             "allow_unicode_course_id": False,
@@ -51,14 +48,15 @@ class HomePageViewTest(CourseTestCase):
             "in_process_course_actions": [],
             "libraries": [],
             "libraries_enabled": True,
+            "libraries_v1_enabled": True,
+            "libraries_v2_enabled": False,
             "taxonomies_enabled": True,
-            "library_authoring_mfe_url": settings.LIBRARY_AUTHORING_MICROFRONTEND_URL,
             "taxonomy_list_mfe_url": 'http://course-authoring-mfe/taxonomies',
             "optimization_enabled": False,
-            "redirect_to_library_authoring_mfe": False,
             "request_course_creator_url": "/request_course_creator",
             "rerun_creator_status": True,
             "show_new_library_button": True,
+            "show_new_library_v2_button": True,
             "split_studio_home": False,
             "studio_name": settings.STUDIO_NAME,
             "studio_short_name": settings.STUDIO_SHORT_NAME,
@@ -67,6 +65,21 @@ class HomePageViewTest(CourseTestCase):
             "platform_name": settings.PLATFORM_NAME,
             "user_is_active": True,
         }
+
+    def test_home_page_studio_response(self):
+        """Check successful response content"""
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(self.expected_response, response.data)
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_home_page_studio_with_meilisearch_enabled(self):
+        """Check response content when Meilisearch is enabled"""
+        response = self.client.get(self.url)
+
+        expected_response = self.expected_response
+        expected_response["libraries_v2_enabled"] = True
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
@@ -90,12 +103,13 @@ class HomePageCoursesViewTest(CourseTestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("cms.djangoapps.contentstore:v1:courses")
-        CourseOverviewFactory.create(
+        self.course_overview = CourseOverviewFactory.create(
             id=self.course.id,
             org=self.course.org,
             display_name=self.course.display_name,
             display_number_with_default=self.course.number,
         )
+        self.non_staff_client, _ = self.create_non_staff_authed_user_client()
 
     def test_home_page_response(self):
         """Check successful response content"""
@@ -107,7 +121,7 @@ class HomePageCoursesViewTest(CourseTestCase):
             "courses": [{
                 "course_key": course_id,
                 "display_name": self.course.display_name,
-                "lms_link": f'//{settings.LMS_BASE}/courses/{course_id}/jump_to/{self.course.location}',
+                "lms_link": f'{settings.LMS_ROOT_URL}/courses/{course_id}/jump_to/{self.course.location}',
                 "number": self.course.number,
                 "org": self.course.org,
                 "rerun_link": f'/course_rerun/{course_id}',
@@ -121,6 +135,7 @@ class HomePageCoursesViewTest(CourseTestCase):
         print(response.data)
         self.assertDictEqual(expected_response, response.data)
 
+    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
     def test_home_page_response_with_api_v2(self):
         """Check successful response content with api v2 modifications.
 
@@ -134,7 +149,7 @@ class HomePageCoursesViewTest(CourseTestCase):
                 OrderedDict([
                     ("course_key", course_id),
                     ("display_name", self.course.display_name),
-                    ("lms_link", f'//{settings.LMS_BASE}/courses/{course_id}/jump_to/{self.course.location}'),
+                    ("lms_link", f'{settings.LMS_ROOT_URL}/courses/{course_id}/jump_to/{self.course.location}'),
                     ("number", self.course.number),
                     ("org", self.course.org),
                     ("rerun_link", f'/course_rerun/{course_id}'),
@@ -145,11 +160,87 @@ class HomePageCoursesViewTest(CourseTestCase):
             "in_process_course_actions": [],
         }
 
-        with override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API):
-            response = self.client.get(self.url)
+        response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
+
+    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
+    @ddt.data(
+        ("active_only", "true", 2, 0),
+        ("archived_only", "true", 0, 1),
+        ("search", "sample", 1, 0),
+        ("search", "demo", 0, 1),
+        ("order", "org", 2, 1),
+        ("order", "display_name", 2, 1),
+        ("order", "number", 2, 1),
+        ("order", "run", 2, 1)
+    )
+    @ddt.unpack
+    def test_filter_and_ordering_courses(
+        self,
+        filter_key,
+        filter_value,
+        expected_active_length,
+        expected_archived_length
+    ):
+        """Test home page with org filter and ordering for a staff user.
+
+        The test creates an active/archived course, and then filters/orders them using the query parameters.
+        """
+        archived_course_key = self.store.make_course_key("demo-org", "demo-number", "demo-run")
+        CourseOverviewFactory.create(
+            display_name="Course (Demo)",
+            id=archived_course_key,
+            org=archived_course_key.org,
+            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
+        )
+        active_course_key = self.store.make_course_key("sample-org", "sample-number", "sample-run")
+        CourseOverviewFactory.create(
+            display_name="Course (Sample)",
+            id=active_course_key,
+            org=active_course_key.org,
+        )
+
+        response = self.client.get(self.url, {filter_key: filter_value})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["archived_courses"]), expected_archived_length)
+        self.assertEqual(len(response.data["courses"]), expected_active_length)
+
+    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
+    @ddt.data(
+        ("active_only", "true"),
+        ("archived_only", "true"),
+        ("search", "sample"),
+        ("order", "org"),
+    )
+    @ddt.unpack
+    def test_filter_and_ordering_no_courses_staff(self, filter_key, filter_value):
+        """Test home page with org filter and ordering when there are no courses for a staff user."""
+        self.course_overview.delete()
+
+        response = self.client.get(self.url, {filter_key: filter_value})
+
+        self.assertEqual(len(response.data["courses"]), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
+    @ddt.data(
+        ("active_only", "true"),
+        ("archived_only", "true"),
+        ("search", "sample"),
+        ("order", "org"),
+    )
+    @ddt.unpack
+    def test_home_page_response_no_courses_non_staff(self, filter_key, filter_value):
+        """Test home page with org filter and ordering when there are no courses for a non-staff user."""
+        self.course_overview.delete()
+
+        response = self.non_staff_client.get(self.url)
+
+        self.assertEqual(len(response.data["courses"]), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     @override_waffle_switch(ENABLE_GLOBAL_STAFF_OPTIMIZATION, True)
     def test_org_query_if_passed(self):
