@@ -303,7 +303,7 @@ def _split_input_list(str_list):
     return new_list
 
 
- class CertificateStatusesSerializer(serializers.Serializer):
+class CertificateStatusesSerializer(serializers.Serializer):
     """
     Serializer for validating and serializing certificate status inputs.
 
