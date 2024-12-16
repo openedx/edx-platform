@@ -1992,7 +1992,10 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
 
     def test_add_notenrolled_username_autoenroll_with_multiple_users(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
-        identifiers = f"Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed, {self.notenrolled_student.username}"
+        identifiers = (f"Lorem@ipsum.dolor, "
+                       f"sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed, "
+                       f"{self.notenrolled_student.username}"
+                       )
         response = self.client.post(url, {'identifiers': identifiers, 'action': 'add', 'email_students': False, 'auto_enroll': True})  # lint-amnesty, pylint: disable=line-too-long
         assert 6, len(json.loads(response.content.decode())['results'])
 
