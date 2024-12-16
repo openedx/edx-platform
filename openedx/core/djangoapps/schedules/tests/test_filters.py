@@ -18,9 +18,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 class TestScheduleQuerySetRequestedPipelineStep(PipelineStep):
     """Pipeline step class to test a configured pipeline step"""
 
-    filtered_schedules = Mock(spec=QuerySet)
+    filtered_schedules = Mock(spec=QuerySet, __len__=Mock(return_value=0))
 
-    def run_filter(self, schedules):  # pylint: disable=arguments-differ
+    def run_filter(self, schedules: QuerySet):  # pylint: disable=arguments-differ
         """Pipeline step to filter the schedules"""
         return {
             "schedules": self.filtered_schedules,
@@ -43,8 +43,9 @@ class ScheduleQuerySetRequestedFiltersTest(SchedulesResolverTestMixin, ModuleSto
             site=self.site,
             target_datetime=datetime.datetime.now(),
             day_offset=3,
-            bin_num=1,
+            bin_num=2,
         )
+        self.resolver.schedule_date_field = "created"
 
     @override_settings(
         OPEN_EDX_FILTERS_CONFIG={
@@ -56,8 +57,15 @@ class ScheduleQuerySetRequestedFiltersTest(SchedulesResolverTestMixin, ModuleSto
             },
         },
     )
-    def test_schedule_queryset_requested_filter(self) -> None:
+    def test_schedule_with_queryset_requested_filter_enabled(self) -> None:
         """Test to verify the schedule queryset was modified by the pipeline step."""
         schedules = self.resolver.get_schedules_with_target_date_by_bin_and_orgs()
 
         self.assertEqual(TestScheduleQuerySetRequestedPipelineStep.filtered_schedules, schedules)
+
+    @override_settings(OPEN_EDX_FILTERS_CONFIG={})
+    def test_schedule_with_queryset_requested_filter_disabled(self) -> None:
+        """Test to verify the schedule queryset was not modified when the pipeline step is not configured."""
+        schedules = self.resolver.get_schedules_with_target_date_by_bin_and_orgs()
+
+        self.assertNotEqual(TestScheduleQuerySetRequestedPipelineStep.filtered_schedules, schedules)
