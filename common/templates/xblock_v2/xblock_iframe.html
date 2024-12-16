@@ -215,6 +215,13 @@
                 }
                 return url;
             },
+            notify: () => {
+              /** 
+               * Used in `studio_view`
+               * 
+               * TODO: Do nothing for now
+               *  **/
+            }
         };
 
         /**
@@ -327,6 +334,10 @@
     document.querySelector('.cancel-button').addEventListener('click', function() {
       event.preventDefault();
       window.parent.postMessage('cancel-clicked', '*');
+    });
+    document.querySelector('.save-button').addEventListener('click', function() {
+      event.preventDefault();
+      window.parent.postMessage('save-clicked', '*');
     });
   </script>
 </body>
