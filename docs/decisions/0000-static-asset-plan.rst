@@ -1,6 +1,22 @@
-#######################################
-edx-platform Static Asset Pipeline Plan
-#######################################
+0. edx-platform Static Asset Pipeline Plan
+##########################################
+
+Status
+******
+
+Accepted ~2017
+Partially adopted 2017-2024
+
+This was an old plan for modernizing Open edX's frontend assets. We've
+retroactively turned it into an ADR because it has some valuable insights.
+Although most of these improvements weren't applied as written, these ideas
+(particularly, separating Python concerns from frontend tooling concerns) were
+applied to both legacy edx-platform assets as well as the Micro-Frontend
+framework that was developed 2017-2019.
+
+Context, Decision, Consequences
+*******************************
+
 
 Static asset handling in edx-platform has evolved in a messy way over the years.
 This has led to a lot of complexity and inconsistencies. This is a proposal for
@@ -9,20 +25,9 @@ this is not a detailed guide for how to write React or Bootstrap code. This is
 instead going to talk about conventions for how we arrange, extract, and compile
 static assets.
 
-Big Open Questions (TODO)
-*************************
-
-This document is a work in progress, as the design for some of this is still in
-flux, particularly around extensibility.
-
-* Pluggable third party apps and Webpack packaging.
-* Keep the Django i18n mechanism?
-* Stance on HTTP/2 and bundling granularity.
-* Optimizing theme assets.
-* Tests
 
 Requirements
-************
+============
 
 Any proposed solution must support:
 
@@ -35,7 +40,7 @@ Any proposed solution must support:
 * Other kinds of pluggability???
 
 Assumptions
-***********
+===========
 
 Some assumptions/opinions that this proposal is based on:
 
@@ -54,8 +59,8 @@ Some assumptions/opinions that this proposal is based on:
 * It should be possible to pre-build static assets and deploy them onto S3 or
   similar.
 
-Where We Are Today
-******************
+Where We Are Today (2017)
+=========================
 
 We have a static asset pipeline that is mostly driven by Django's built-in
 staticfiles finders and the collectstatic process. We use the popular
@@ -95,9 +100,9 @@ places (typically ``/edx/var/edxapp/staticfiles`` for LMS and
 ``/edx/var/edxapp/staticfiles/studio`` for Studio) and can be collected
 separately. However in practice they're always run together because we deploy
 them from the same commits and to the same servers.
- 
+
 Django vs. Webpack Conventions
-******************************
+==============================
 
 The Django convention for having an app with bundled assets is to namespace them
 locally with the app name so that they get their own directories when they are
@@ -112,7 +117,7 @@ the root of edx-platform, which would specify all bundles in the project.
 TODO: The big, "pluggable Webpack components" question.
 
 Proposed Repo Structure
-***********************
+=======================
 
 All assets that are in common spaces like ``common/static``, ``lms/static``,
 and ``cms/static`` would be moved to be under the Django apps that they are a
@@ -122,7 +127,7 @@ part of and follow the Django naming convention (e.g.
 any client-side templates will be put in ``static/{appname}/templates``.
 
 Proposed Compiled Structure
-***************************
+===========================
 
 This is meant to be a sample of the different types of things we'd have, not a
 full list:
@@ -150,14 +155,14 @@ full list:
   /theming/themes/open-edx
                  /red-theme
                  /edx.org
-  
+
   # XBlocks still collect their assets into a common space (/xmodule goes away)
   # We consider this to be the XBlock Runtime's app, and it collects static
   # assets from installed XBlocks.
   /xblock
 
 Django vs. Webpack Roles
-************************
+========================
 
 Rule of thumb: Django/Python still serves static assets, Webpack processes and
 optimizes them.
