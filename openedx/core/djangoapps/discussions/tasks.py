@@ -201,7 +201,10 @@ def update_unit_discussion_state_from_discussion_blocks(
     """
     store = modulestore()
     course = store.get_course(course_key)
-    provider = course.discussions_settings.get('provider', None)
+    provider = course.discussions_settings.get(
+        'provider_type',
+        course.discussions_settings.get('provider', None),
+    )
     # Only migrate to the new discussion provider if the current provider is the legacy provider.
     log.info(f"Current provider for {course_key} is {provider}")
     if provider is not None and provider != Provider.LEGACY and not force:
