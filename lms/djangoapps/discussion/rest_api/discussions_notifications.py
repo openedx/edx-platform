@@ -68,7 +68,8 @@ class DiscussionNotificationSender:
                 "sender_id": self.creator.id,
                 'thread_id': self.thread.id,
                 'parent_id': self.parent_id,
-                'comment_id': self.comment_id
+                'comment_id': self.comment_id,
+                'topic_id': self.thread.commentable_id,
                 **extra_context,
             },
             notification_type=notification_type,
