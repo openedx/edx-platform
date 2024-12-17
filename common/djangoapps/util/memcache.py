@@ -9,6 +9,7 @@ from urllib.parse import quote_plus
 
 from django.conf import settings
 from django.utils.encoding import smart_str
+from edx_django_utils.monitoring.utils import increment
 
 
 def fasthash(string):
@@ -48,9 +49,18 @@ def safe_key(key, key_prefix, version):
     # Attempt to combine the prefix, version, and key
     combined = ":".join([key_prefix, version, key])
 
+    # Temporary: Add observability to large-key hashing to help us
+    # understand the safety of a cutover from md4 to blake2b hashing.
+    # See https://github.com/edx/edx-arch-experiments/issues/872
+    increment('memcache.safe_key.called')
+
     # If the total length is too long for memcache, hash it
     if len(combined) > 250:
         combined = fasthash(combined)
+        # Temporary: See
+        # https://github.com/edx/edx-arch-experiments/issues/872 and
+        # previous comment.
+        increment('memcache.safe_key.hash_large')
 
     # Return the result
     return combined
