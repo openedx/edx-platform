@@ -29,7 +29,7 @@ def test_get_python_locale_with_bundled_translations(mock_modern_xblock):
     Ensure that get_python_locale() falls back to XBlock internal translations if atlas translations weren't pulled.
 
     Pre-OEP-58 translations were stored in the `translations` directory of the XBlock which is
-    accessible via the `pkg_resources.resource_filename` function.
+    accessible via the `importlib.resources.files` function.
     """
     i18n_service = XBlockI18nService()
     block = mock_modern_xblock['legacy_xblock']
