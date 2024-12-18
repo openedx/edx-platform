@@ -226,6 +226,55 @@ import '../helper.js';
                 destroy: plugin.destroy
             });
         });
+
+        describe('getCurrentTime method', function() {
+            it('returns current time adjusted by startTime if video starts from a subsection', function() {
+                spyOn(state.videoPlayer, 'currentTime', 'get').and.returnValue(120);
+                state.config.startTime = 30;
+                expect(state.videoEventsPlugin.getCurrentTime()).toBe(90); // 120 - 30 = 90
+            });
+
+            it('returns 0 if currentTime is undefined', function() {
+                spyOn(state.videoPlayer, 'currentTime', 'get').and.returnValue(undefined);
+                state.config.startTime = 30; // Start time is irrelevant since current time is undefined
+                expect(state.videoEventsPlugin.getCurrentTime()).toBe(0);
+            });
+
+            it('returns unadjusted current time if startTime is not defined', function() {
+                spyOn(state.videoPlayer, 'currentTime', 'get').and.returnValue(60);
+                expect(state.videoEventsPlugin.getCurrentTime()).toBe(60); // Returns current time as is
+            });
+        });
+
+        describe('log method', function() {
+            it('logs event with adjusted duration when startTime and endTime are defined', function() {
+                state.config.startTime = 30;
+                state.config.endTime = 150;
+                state.duration = 200;
+
+                state.videoEventsPlugin.log('test_event', {});
+
+                expect(Logger.log).toHaveBeenCalledWith('test_event', {
+                    id: 'id',
+                    code: this.code,
+                    duration: 120, // 150 - 30 = 120
+                });
+            });
+
+            it('logs event with full duration when startTime and endTime are not defined', function() {
+                state.config.startTime = undefined;
+                state.config.endTime = undefined;
+                state.duration = 200;
+
+                state.videoEventsPlugin.log('test_event', {});
+
+                expect(Logger.log).toHaveBeenCalledWith('test_event', {
+                    id: 'id',
+                    code: this.code,
+                    duration: 200 // Full duration as no start/end time adjustment is needed
+                });
+            });
+        });
     });
 
     describe('VideoPlayer Events plugin', function() {

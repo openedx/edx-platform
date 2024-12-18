@@ -186,6 +186,26 @@
         });
 
         describe('constructor with end-time', function() {
+            it('displays the correct time when startTime and endTime are specified', function(done) {
+                state = jasmine.initializePlayer({
+                    start: 10,
+                    end: 20
+                });
+                spyOn(state.videoPlayer, 'duration').and.returnValue(60);
+
+                state.videoControl.updateVcrVidTime({
+                    time: 15,
+                    duration: 60
+                });
+
+                jasmine.waitUntil(function() {
+                    var expectedValue = $('.video-controls').find('.vidtime');
+                    return expectedValue.text().indexOf('0:05 / 0:20') !== -1; // Expecting 15 seconds - 10 seconds = 5 seconds
+                }).then(function() {
+                    expect($('.video-controls').find('.vidtime')).toHaveText('0:05 / 0:20');
+                }).always(done);
+            });
+
             it(
                 'saved position is 0, timer slider and VCR set to 0:00 '
                 + 'and ending at specified end-time',
