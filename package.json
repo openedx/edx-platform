@@ -33,6 +33,9 @@
     "test-suite": "${NODE_WRAPPER:-xvfb-run --auto-servernum} node --max_old_space_size=4096 node_modules/.bin/karma start --single-run=true --capture-timeout=60000 --browsers=FirefoxNoUpdates",
     "test-jest": "jest"
   },
+  "browserslist": [
+    "extends @edx/browserslist-config"
+  ],
   "dependencies": {
     "@babel/core": "7.26.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
