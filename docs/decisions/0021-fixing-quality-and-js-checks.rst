@@ -104,7 +104,7 @@ We have stopped running these Webpack-based suites in CI:
 * ``npm run test-cms-webpack``
 * ``npm run test-xmodule-webpack``
 
-We have created a an edx-platform backlog issue for
+We have created a new edx-platform backlog issue for
 `fixing and re-enabling these suites`_.
 It is not clear whether we will prioritize that issue, or instead prioritize
 deprecation and removal of the code that those suites were supposed to be
