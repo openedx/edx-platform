@@ -10,7 +10,7 @@ from django.contrib.staticfiles.finders import BaseFinder
 from django.contrib.staticfiles.storage import FileSystemStorage
 from django.core.files.storage import Storage
 from django.utils import timezone
-from importlib.resources import files, isdir, exists, listdir
+from importlib.resources import files, exists, listdir
 from xblock.core import XBlock
 
 from openedx.core.lib.xblock_utils import xblock_resource_pkg
@@ -54,15 +54,15 @@ class XBlockPackageStorage(Storage):
         Lists the directories beneath the specified path.
         """
         directories = []
-        files = []
+        dir_files = []
         for item in listdir(self.module, os.path.join(self.base_dir, path)):
             __, file_extension = os.path.splitext(item)
             if file_extension not in [".py", ".pyc", ".scss"]:
-                if isdir(self.module, os.path.join(self.base_dir, path, item)):
+                if os.path.isdir(os.path.join(self.base_dir, path, item)):
                     directories.append(item)
                 else:
-                    files.append(item)
-        return directories, files
+                    dir_files.append(item)
+        return directories, dir_files
 
     def open(self, name, mode='rb'):
         """

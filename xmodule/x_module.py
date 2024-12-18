@@ -855,16 +855,14 @@ class ResourceTemplates:
     @classmethod
     def get_template_dir(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
         if getattr(cls, 'template_dir_name', None):
-            dirname = files(__name__).joinpath('templates', cls.template_dir_name)
-            if not dirname.is_dir():
-                log.warning(
-                    "No resource directory {dir} found when loading {cls_name} templates".format(
-                        dir=f'templates/{cls.template_dir_name}',
-                        cls_name=cls.__name__,
-                    )
-                )
+            dirname = os.path.join('templates', cls.template_dir_name)
+            if not os.path.isdir(os.path.join(os.path.dirname(__file__), dirname)):
+                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                    dir=dirname,
+                    cls_name=cls.__name__,
+                ))
                 return None
-            return f'templates/{cls.template_dir_name}'
+            return dirname
         return None
 
     @classmethod
