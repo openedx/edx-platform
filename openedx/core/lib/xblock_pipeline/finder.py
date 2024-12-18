@@ -10,7 +10,7 @@ from django.contrib.staticfiles.finders import BaseFinder
 from django.contrib.staticfiles.storage import FileSystemStorage
 from django.core.files.storage import Storage
 from django.utils import timezone
-from pkg_resources import resource_exists, resource_filename, resource_isdir, resource_listdir
+from importlib.resources import files, isdir, exists, listdir
 from xblock.core import XBlock
 
 from openedx.core.lib.xblock_utils import xblock_resource_pkg
@@ -38,7 +38,7 @@ class XBlockPackageStorage(Storage):
         """
         Returns a file system filename for the specified file name.
         """
-        return resource_filename(self.module, os.path.join(self.base_dir, name))
+        return str(files(self.module).joinpath(self.base_dir, name))
 
     def exists(self, path):  # lint-amnesty, pylint: disable=arguments-differ
         """
@@ -47,7 +47,7 @@ class XBlockPackageStorage(Storage):
         if self.base_dir is None:
             return False
 
-        return resource_exists(self.module, os.path.join(self.base_dir, path))
+        return exists(self.module, os.path.join(self.base_dir, path))
 
     def listdir(self, path):
         """
@@ -55,10 +55,10 @@ class XBlockPackageStorage(Storage):
         """
         directories = []
         files = []
-        for item in resource_listdir(self.module, os.path.join(self.base_dir, path)):
+        for item in listdir(self.module, os.path.join(self.base_dir, path)):
             __, file_extension = os.path.splitext(item)
             if file_extension not in [".py", ".pyc", ".scss"]:
-                if resource_isdir(self.module, os.path.join(self.base_dir, path, item)):
+                if isdir(self.module, os.path.join(self.base_dir, path, item)):
                     directories.append(item)
                 else:
                     files.append(item)

@@ -5,7 +5,7 @@ import contextlib
 import hashlib
 import os
 
-import pkg_resources
+from importlib.resources import files
 from django.conf import settings
 from mako.exceptions import TopLevelLookupException
 from mako.lookup import TemplateLookup
@@ -120,11 +120,10 @@ def clear_lookups(namespace):
 
 def add_lookup(namespace, directory, package=None, prepend=False):
     """
-    Adds a new mako template lookup directory to the given namespace.
+    Adds a new Mako template lookup directory to the given namespace.
 
-    If `package` is specified, `pkg_resources` is used to look up the directory
-    inside the given package.  Otherwise `directory` is assumed to be a path
-    in the filesystem.
+    If `package` is specified, `importlib.resources` is used to look up the directory
+    inside the given package. Otherwise, `directory` is assumed to be a path in the filesystem.
     """
     templates = LOOKUP.get(namespace)
     if not templates:
@@ -136,7 +135,7 @@ def add_lookup(namespace, directory, package=None, prepend=False):
             encoding_errors='replace',
         )
     if package:
-        directory = pkg_resources.resource_filename(package, directory)
+        directory = str(files(package).joinpath(directory))
     templates.add_directory(directory, prepend=prepend)
 
 
