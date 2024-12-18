@@ -22,7 +22,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
+from django.http import QueryDict, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -30,7 +30,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_POST
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from edx_when.api import get_date_for_block
@@ -77,9 +77,6 @@ from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadReq
 from common.djangoapps.util.views import require_global_staff  # pylint: disable=unused-import
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled, create_course_email
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import (
-    CertificateStatuses
-)
 from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
@@ -107,8 +104,18 @@ from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, Queue
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
 from lms.djangoapps.instructor_task.models import ReportStore
 from lms.djangoapps.instructor.views.serializer import (
-    AccessSerializer, BlockDueDateSerializer, RoleNameSerializer, ShowStudentExtensionSerializer, UserSerializer,
-    SendEmailSerializer, StudentAttemptsSerializer, ListInstructorTaskInputSerializer, UniqueStudentIdentifierSerializer
+    AccessSerializer,
+    BlockDueDateSerializer,
+    CertificateSerializer,
+    CertificateStatusesSerializer,
+    ListInstructorTaskInputSerializer,
+    ModifyAccessSerializer,
+    RoleNameSerializer,
+    SendEmailSerializer,
+    ShowStudentExtensionSerializer,
+    StudentAttemptsSerializer,
+    UserSerializer,
+    UniqueStudentIdentifierSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -908,88 +915,91 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_BETATEST)
-@common_exceptions_400
-@require_post_params(
-    identifiers="stringified list of emails and/or usernames",
-    action="add or remove",
-)
-def bulk_beta_modify_access(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class BulkBetaModifyAccess(DeveloperErrorViewMixin, APIView):
     """
     Enroll or unenroll users in beta testing program.
-
-    Query parameters:
-    - identifiers is string containing a list of emails and/or usernames separated by
-      anything split_input_list can handle.
-    - action is one of ['add', 'remove']
     """
-    course_id = CourseKey.from_string(course_id)
-    action = request.POST.get('action')
-    identifiers_raw = request.POST.get('identifiers')
-    identifiers = _split_input_list(identifiers_raw)
-    email_students = _get_boolean_param(request, 'email_students')
-    auto_enroll = _get_boolean_param(request, 'auto_enroll')
-    results = []
-    rolename = 'beta'
-    course = get_course_by_id(course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_BETATEST
+    serializer_class = ModifyAccessSerializer
 
-    email_params = {}
-    if email_students:
-        secure = request.is_secure()
-        email_params = get_email_params(course, auto_enroll=auto_enroll, secure=secure)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Query parameters:
+        - identifiers is string containing a list of emails and/or usernames separated by
+          anything split_input_list can handle.
+        - action is one of ['add', 'remove']
+        """
+        course_id = CourseKey.from_string(course_id)
+        serializer = self.serializer_class(data=request.data)
+        if not serializer.is_valid():
+            return JsonResponse({'message': serializer.errors}, status=400)
 
-    for identifier in identifiers:
-        try:
-            error = False
-            user_does_not_exist = False
-            user = get_student_from_identifier(identifier)
-            user_active = user.is_active
+        action = serializer.validated_data['action']
+        identifiers = serializer.validated_data['identifiers']
+        email_students = serializer.validated_data['email_students']
+        auto_enroll = serializer.validated_data['auto_enroll']
 
-            if action == 'add':
-                allow_access(course, user, rolename)
-            elif action == 'remove':
-                revoke_access(course, user, rolename)
+        results = []
+        rolename = 'beta'
+        course = get_course_by_id(course_id)
+
+        email_params = {}
+        if email_students:
+            secure = request.is_secure()
+            email_params = get_email_params(course, auto_enroll=auto_enroll, secure=secure)
+
+        for identifier in identifiers:
+            try:
+                error = False
+                user_does_not_exist = False
+                user = get_student_from_identifier(identifier)
+                user_active = user.is_active
+
+                if action == 'add':
+                    allow_access(course, user, rolename)
+                elif action == 'remove':
+                    revoke_access(course, user, rolename)
+                else:
+                    return HttpResponseBadRequest(strip_tags(
+                        f"Unrecognized action '{action}'"
+                    ))
+            except User.DoesNotExist:
+                error = True
+                user_does_not_exist = True
+                user_active = None
+            # catch and log any unexpected exceptions
+            # so that one error doesn't cause a 500.
+            except Exception as exc:  # pylint: disable=broad-except
+                log.exception("Error while #{}ing student")
+                log.exception(exc)
+                error = True
             else:
-                return HttpResponseBadRequest(strip_tags(
-                    f"Unrecognized action '{action}'"
-                ))
-        except User.DoesNotExist:
-            error = True
-            user_does_not_exist = True
-            user_active = None
-        # catch and log any unexpected exceptions
-        # so that one error doesn't cause a 500.
-        except Exception as exc:  # pylint: disable=broad-except
-            log.exception("Error while #{}ing student")
-            log.exception(exc)
-            error = True
-        else:
-            # If no exception thrown, see if we should send an email
-            if email_students:
-                send_beta_role_email(action, user, email_params)
-            # See if we should autoenroll the student
-            if auto_enroll:
-                # Check if student is already enrolled
-                if not is_user_enrolled_in_course(user, course_id):
-                    CourseEnrollment.enroll(user, course_id)
+                # If no exception thrown, see if we should send an email
+                if email_students:
+                    send_beta_role_email(action, user, email_params)
+                # See if we should autoenroll the student
+                if auto_enroll:
+                    # Check if student is already enrolled
+                    if not is_user_enrolled_in_course(user, course_id):
+                        CourseEnrollment.enroll(user, course_id)
 
-        finally:
-            # Tabulate the action result of this email address
-            results.append({
-                'identifier': identifier,
-                'error': error,  # pylint: disable=used-before-assignment
-                'userDoesNotExist': user_does_not_exist,  # pylint: disable=used-before-assignment
-                'is_active': user_active  # pylint: disable=used-before-assignment
-            })
+            finally:
+                # Tabulate the action result of this email address
+                results.append({
+                    'identifier': identifier,
+                    'error': error,  # pylint: disable=used-before-assignment
+                    'userDoesNotExist': user_does_not_exist,  # pylint: disable=used-before-assignment
+                    'is_active': user_active  # pylint: disable=used-before-assignment
+                })
 
-    response_payload = {
-        'action': action,
-        'results': results,
-    }
-    return JsonResponse(response_payload)
+        response_payload = {
+            'action': action,
+            'results': results,
+        }
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -1019,7 +1029,6 @@ class ModifyAccess(APIView):
         course = get_course_with_access(
             request.user, 'instructor', course_id, depth=None
         )
-
         serializer_data = AccessSerializer(data=request.data)
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
@@ -1376,53 +1385,64 @@ class GetGradingConfig(APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_ISSUED_CERTIFICATES)
-def get_issued_certificates(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetIssuedCertificates(APIView):
     """
     Responds with JSON if CSV is not required. contains a list of issued certificates.
-    Arguments:
-        course_id
-    Returns:
-        {"certificates": [{course_id: xyz, mode: 'honor'}, ...]}
-
     """
-    course_key = CourseKey.from_string(course_id)
-    csv_required = request.GET.get('csv', 'false')
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.VIEW_ISSUED_CERTIFICATES
 
-    query_features = ['course_id', 'mode', 'total_issued_certificate', 'report_run_date']
-    query_features_names = [
-        ('course_id', _('CourseID')),
-        ('mode', _('Certificate Type')),
-        ('total_issued_certificate', _('Total Certificates Issued')),
-        ('report_run_date', _('Date Report Run'))
-    ]
-    certificates_data = instructor_analytics_basic.issued_certificates(course_key, query_features)
-    if csv_required.lower() == 'true':
-        __, data_rows = instructor_analytics_csvs.format_dictlist(certificates_data, query_features)
-        return instructor_analytics_csvs.create_csv_response(
-            'issued_certificates.csv',
-            [col_header for __, col_header in query_features_names],
-            data_rows
-        )
-    else:
-        response_payload = {
-            'certificates': certificates_data,
-            'queried_features': query_features,
-            'feature_names': dict(query_features_names)
-        }
-        return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Arguments: course_id
+        Returns:
+            {"certificates": [{course_id: xyz, mode: 'honor'}, ...]}
+        """
+        return self.all_issued_certificates(request, course_id)
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def get(self, request, course_id):
+        return self.all_issued_certificates(request, course_id)
+
+    def all_issued_certificates(self, request, course_id):
+        """
+        common method for both post and get. This method will return all issued certificates.
+        """
+        course_key = CourseKey.from_string(course_id)
+        csv_required = request.GET.get('csv', 'false')
+
+        query_features = ['course_id', 'mode', 'total_issued_certificate', 'report_run_date']
+        query_features_names = [
+            ('course_id', _('CourseID')),
+            ('mode', _('Certificate Type')),
+            ('total_issued_certificate', _('Total Certificates Issued')),
+            ('report_run_date', _('Date Report Run'))
+        ]
+        certificates_data = instructor_analytics_basic.issued_certificates(course_key, query_features)
+        if csv_required.lower() == 'true':
+            __, data_rows = instructor_analytics_csvs.format_dictlist(certificates_data, query_features)
+            return instructor_analytics_csvs.create_csv_response(
+                'issued_certificates.csv',
+                [col_header for __, col_header in query_features_names],
+                data_rows
+            )
+        else:
+            response_payload = {
+                'certificates': certificates_data,
+                'queried_features': query_features,
+                'feature_names': dict(query_features_names)
+            }
+            return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -1431,86 +1451,108 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
 
     TO DO accept requests for different attribute sets.
     """
-    course_key = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_key)
-    report_type = _('enrolled learner profile')
-    available_features = instructor_analytics_basic.AVAILABLE_FEATURES
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    # Allow for sites to be able to define additional columns.
-    # Note that adding additional columns has the potential to break
-    # the student profile report due to a character limit on the
-    # asynchronous job input which in this case is a JSON string
-    # containing the list of columns to include in the report.
-    # TODO: Refactor the student profile report code to remove the list of columns
-    # that should be included in the report from the asynchronous job input.
-    # We need to clone the list because we modify it below
-    query_features = list(configuration_helpers.get_value('student_profile_download_fields', []))
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id, csv=False):  # pylint: disable=redefined-outer-name
+        """
+        Handle POST requests to retrieve student profile information for a specific course.
 
-    if not query_features:
-        query_features = [
-            'id', 'username', 'name', 'email', 'language', 'location',
-            'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-            'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
-        ]
-    keep_field_private(query_features, 'year_of_birth')  # protected information
+        Args:
+            request: The HTTP request object.
+            course_id: The ID of the course for which to retrieve student information.
+            csv: Optional; if 'csv' is present in the URL, it indicates that the response should be in CSV format.
+            Defaults to None.
 
-    # Provide human-friendly and translatable names for these features. These names
-    # will be displayed in the table generated in data_download.js. It is not (yet)
-    # used as the header row in the CSV, but could be in the future.
-    query_features_names = {
-        'id': _('User ID'),
-        'username': _('Username'),
-        'name': _('Name'),
-        'email': _('Email'),
-        'language': _('Language'),
-        'location': _('Location'),
-        #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683, not to go in reports
-        'gender': _('Gender'),
-        'level_of_education': _('Level of Education'),
-        'mailing_address': _('Mailing Address'),
-        'goals': _('Goals'),
-        'enrollment_mode': _('Enrollment Mode'),
-        'last_login': _('Last Login'),
-        'date_joined': _('Date Joined'),
-        'external_user_key': _('External User Key'),
-    }
+        Returns:
+            Response: A JSON response containing student profile information, or CSV if the `csv` parameter is provided.
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+        report_type = _('enrolled learner profile')
+        available_features = instructor_analytics_basic.AVAILABLE_FEATURES
 
-    if is_course_cohorted(course.id):
-        # Translators: 'Cohort' refers to a group of students within a course.
-        query_features.append('cohort')
-        query_features_names['cohort'] = _('Cohort')
+        # Allow for sites to be able to define additional columns.
+        # Note that adding additional columns has the potential to break
+        # the student profile report due to a character limit on the
+        # asynchronous job input which in this case is a JSON string
+        # containing the list of columns to include in the report.
+        # TODO: Refactor the student profile report code to remove the list of columns
+        # that should be included in the report from the asynchronous job input.
+        # We need to clone the list because we modify it below
+        query_features = list(configuration_helpers.get_value('student_profile_download_fields', []))
 
-    if course.teams_enabled:
-        query_features.append('team')
-        query_features_names['team'] = _('Team')
+        if not query_features:
+            query_features = [
+                'id', 'username', 'name', 'email', 'language', 'location',
+                'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
+                'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
+            ]
+        keep_field_private(query_features, 'year_of_birth')  # protected information
 
-    # For compatibility reasons, city and country should always appear last.
-    query_features.append('city')
-    query_features_names['city'] = _('City')
-    query_features.append('country')
-    query_features_names['country'] = _('Country')
-
-    if not csv:
-        student_data = instructor_analytics_basic.enrolled_students_features(course_key, query_features)
-        response_payload = {
-            'course_id': str(course_key),
-            'students': student_data,
-            'students_count': len(student_data),
-            'queried_features': query_features,
-            'feature_names': query_features_names,
-            'available_features': available_features,
+        # Provide human-friendly and translatable names for these features. These names
+        # will be displayed in the table generated in data_download.js. It is not (yet)
+        # used as the header row in the CSV, but could be in the future.
+        query_features_names = {
+            'id': _('User ID'),
+            'username': _('Username'),
+            'name': _('Name'),
+            'email': _('Email'),
+            'language': _('Language'),
+            'location': _('Location'),
+            #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683,
+            #  not to go in reports
+            'gender': _('Gender'),
+            'level_of_education': _('Level of Education'),
+            'mailing_address': _('Mailing Address'),
+            'goals': _('Goals'),
+            'enrollment_mode': _('Enrollment Mode'),
+            'last_login': _('Last Login'),
+            'date_joined': _('Date Joined'),
+            'external_user_key': _('External User Key'),
         }
-        return JsonResponse(response_payload)
 
-    else:
-        task_api.submit_calculate_students_features_csv(
-            request,
-            course_key,
-            query_features
-        )
-        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        if is_course_cohorted(course.id):
+            # Translators: 'Cohort' refers to a group of students within a course.
+            query_features.append('cohort')
+            query_features_names['cohort'] = _('Cohort')
 
-        return JsonResponse({"status": success_status})
+        if course.teams_enabled:
+            query_features.append('team')
+            query_features_names['team'] = _('Team')
+
+        # For compatibility reasons, city and country should always appear last.
+        query_features.append('city')
+        query_features_names['city'] = _('City')
+        query_features.append('country')
+        query_features_names['country'] = _('Country')
+
+        if not csv:
+            student_data = instructor_analytics_basic.enrolled_students_features(course_key, query_features)
+            response_payload = {
+                'course_id': str(course_key),
+                'students': student_data,
+                'students_count': len(student_data),
+                'queried_features': query_features,
+                'feature_names': query_features_names,
+                'available_features': available_features,
+            }
+            return JsonResponse(response_payload)
+
+        else:
+            try:
+                task_api.submit_calculate_students_features_csv(
+                    request,
+                    course_key,
+                    query_features
+                )
+                success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            except Exception as e:
+                raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'Requested task is already running')
+
+            return JsonResponse({"status": success_status})
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -1637,6 +1679,7 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
             task_api.submit_cohort_students(request, course_key, file_name)
         except (FileValidationException, ValueError) as e:
             raise self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'failed-validation')
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -3244,106 +3287,157 @@ class MarkStudentCanSkipEntranceExam(APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.START_CERTIFICATE_GENERATION)
-@require_POST
-@common_exceptions_400
-def start_certificate_generation(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class StartCertificateGeneration(DeveloperErrorViewMixin, APIView):
     """
     Start generating certificates for all students enrolled in given course.
     """
-    course_key = CourseKey.from_string(course_id)
-    task = task_api.generate_certificates_for_students(request, course_key)
-    message = _('Certificate generation task for all students of this course has been started. '
-                'You can view the status of the generation task in the "Pending Tasks" section.')
-    response_payload = {
-        'message': message,
-        'task_id': task.task_id
-    }
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.START_CERTIFICATE_GENERATION
 
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+         Generating certificates for all students enrolled in given course.
+        """
+        course_key = CourseKey.from_string(course_id)
+        task = task_api.generate_certificates_for_students(request, course_key)
+        message = _('Certificate generation task for all students of this course has been started. '
+                    'You can view the status of the generation task in the "Pending Tasks" section.')
+        response_payload = {
+            'message': message,
+            'task_id': task.task_id
+        }
+
+        return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.START_CERTIFICATE_REGENERATION)
-@require_POST
-@common_exceptions_400
-def start_certificate_regeneration(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
     """
     Start regenerating certificates for students whose certificate statuses lie with in 'certificate_statuses'
     entry in POST data.
     """
-    course_key = CourseKey.from_string(course_id)
-    certificates_statuses = request.POST.getlist('certificate_statuses', [])
-    if not certificates_statuses:
-        return JsonResponse(
-            {'message': _('Please select one or more certificate statuses that require certificate regeneration.')},
-            status=400
-        )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.START_CERTIFICATE_REGENERATION
+    serializer_class = CertificateStatusesSerializer
+    http_method_names = ['post']
 
-    # Check if the selected statuses are allowed
-    allowed_statuses = [
-        CertificateStatuses.downloadable,
-        CertificateStatuses.error,
-        CertificateStatuses.notpassing,
-        CertificateStatuses.audit_passing,
-        CertificateStatuses.audit_notpassing,
-    ]
-    if not set(certificates_statuses).issubset(allowed_statuses):
-        return JsonResponse(
-            {'message': _('Please select certificate statuses from the list only.')},
-            status=400
-        )
+    @method_decorator(transaction.non_atomic_requests, name='dispatch')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        certificate_statuses 'certificate_statuses' in POST data.
+        """
+        course_key = CourseKey.from_string(course_id)
+        serializer = self.serializer_class(data=request.data)
 
-    task_api.regenerate_certificates(request, course_key, certificates_statuses)
-    response_payload = {
-        'message': _('Certificate regeneration task has been started. '
-                     'You can view the status of the generation task in the "Pending Tasks" section.'),
-        'success': True
-    }
-    return JsonResponse(response_payload)
+        if not serializer.is_valid():
+            return JsonResponse(
+                {'message': _('Please select certificate statuses from the list only.')},
+                status=400
+            )
+
+        certificates_statuses = serializer.validated_data['certificate_statuses']
+        task_api.regenerate_certificates(request, course_key, certificates_statuses)
+        response_payload = {
+            'message': _('Certificate regeneration task has been started. '
+                         'You can view the status of the generation task in the "Pending Tasks" section.'),
+            'success': True
+        }
+        return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CERTIFICATE_EXCEPTION_VIEW)
-@require_http_methods(['POST', 'DELETE'])
-def certificate_exception_view(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CertificateExceptionView(DeveloperErrorViewMixin, APIView):
     """
     Add/Remove students to/from the certificate allowlist.
-
-    :param request: HttpRequest object
-    :param course_id: course identifier of the course for whom to add/remove certificates exception.
-    :return: JsonResponse object with success/error message or certificate exception data.
     """
-    course_key = CourseKey.from_string(course_id)
-    # Validate request data and return error response in case of invalid data
-    try:
-        certificate_exception, student = parse_request_data_and_get_user(request)
-    except ValueError as error:
-        return JsonResponse({'success': False, 'message': str(error)}, status=400)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CERTIFICATE_EXCEPTION_VIEW
+    serializer_class = CertificateSerializer
+    http_method_names = ['post', 'delete']
 
-    # Add new Certificate Exception for the student passed in request data
-    if request.method == 'POST':
+    @method_decorator(transaction.non_atomic_requests, name='dispatch')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Add certificate exception for a student.
+        """
+        return self._handle_certificate_exception(request, course_id, action="post")
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def delete(self, request, course_id):
+        """
+        Remove certificate exception for a student.
+        """
+        return self._handle_certificate_exception(request, course_id, action="delete")
+
+    def _handle_certificate_exception(self, request, course_id, action):
+        """
+        Handles adding or removing certificate exceptions.
+        """
+        course_key = CourseKey.from_string(course_id)
         try:
-            exception = add_certificate_exception(course_key, student, certificate_exception)
+            data = request.data
+        except Exception:  # pylint: disable=broad-except
+            return JsonResponse(
+                {
+                    'success': False,
+                    'message':
+                        _('The record is not in the correct format. Please add a valid username or email address.')},
+                status=400
+            )
+
+        # Extract and validate the student information
+        student, error_response = self._get_and_validate_user(data)
+
+        if error_response:
+            return error_response
+
+        try:
+            if action == "post":
+                exception = add_certificate_exception(course_key, student, data)
+                return JsonResponse(exception)
+            elif action == "delete":
+                remove_certificate_exception(course_key, student)
+                return JsonResponse({}, status=204)
         except ValueError as error:
             return JsonResponse({'success': False, 'message': str(error)}, status=400)
-        return JsonResponse(exception)
 
-    # Remove Certificate Exception for the student passed in request data
-    elif request.method == 'DELETE':
+    def _get_and_validate_user(self, raw_data):
+        """
+        Extracts the user data from the request and validates the student.
+        """
+        # This is only happening in case of delete.
+        # because content-type is coming as x-www-form-urlencoded from front-end.
+        if isinstance(raw_data, QueryDict):
+            raw_data = list(raw_data.keys())[0]
+            try:
+                raw_data = json.loads(raw_data)
+            except Exception as error:  # pylint: disable=broad-except
+                return None, JsonResponse({'success': False, 'message': str(error)}, status=400)
+
         try:
-            remove_certificate_exception(course_key, student)
+            user_data = raw_data.get('user_name', '') or raw_data.get('user_email', '')
         except ValueError as error:
-            return JsonResponse({'success': False, 'message': str(error)}, status=400)
+            return None, JsonResponse({'success': False, 'message': str(error)}, status=400)
 
-        return JsonResponse({}, status=204)
+        serializer_data = self.serializer_class(data={'user': user_data})
+        if not serializer_data.is_valid():
+            return None, JsonResponse({'success': False, 'message': serializer_data.errors}, status=400)
+
+        student = serializer_data.validated_data.get('user')
+        if not student:
+            response_payload = f'{user_data} does not exist in the LMS. Please check your spelling and retry.'
+            return None, JsonResponse({'success': False, 'message': response_payload}, status=400)
+
+        return student, None
 
 
 def add_certificate_exception(course_key, student, certificate_exception):
@@ -3470,48 +3564,52 @@ def get_student(username_or_email):
     return student
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GENERATE_CERTIFICATE_EXCEPTIONS)
-@require_POST
-@common_exceptions_400
-def generate_certificate_exceptions(request, course_id, generate_for=None):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GenerateCertificateExceptions(DeveloperErrorViewMixin, APIView):
     """
     Generate Certificate for students on the allowlist.
-
-    :param request: HttpRequest object,
-    :param course_id: course identifier of the course for whom to generate certificates
-    :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
-            additions to the allowlist
-    :return: JsonResponse object containing success/failure message and certificate exception data
     """
-    course_key = CourseKey.from_string(course_id)
 
-    if generate_for == 'all':
-        # Generate Certificates for all allowlisted students
-        students = 'all_allowlisted'
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.GENERATE_CERTIFICATE_EXCEPTIONS
 
-    elif generate_for == 'new':
-        students = 'allowlisted_not_generated'
+    @method_decorator(transaction.non_atomic_requests)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id, generate_for=None):
+        """
+        :param request: HttpRequest object,
+        :param course_id: course identifier of the course for whom to generate certificates
+        :param generate_for: string to identify whether to generate certificates for 'all' or 'new'
+                additions to the allowlist
+        :return: JsonResponse object containing success/failure message and certificate exception data
+        """
+        course_key = CourseKey.from_string(course_id)
 
-    else:
-        # Invalid data, generate_for must be present for all certificate exceptions
-        return JsonResponse(
-            {
-                'success': False,
-                'message': _('Invalid data, generate_for must be "new" or "all".'),
-            },
-            status=400
-        )
+        if generate_for == 'all':
+            # Generate Certificates for all allowlisted students
+            students = 'all_allowlisted'
 
-    task_api.generate_certificates_for_students(request, course_key, student_set=students)
-    response_payload = {
-        'success': True,
-        'message': _('Certificate generation started for students on the allowlist.'),
-    }
+        elif generate_for == 'new':
+            students = 'allowlisted_not_generated'
 
-    return JsonResponse(response_payload)
+        else:
+            # Invalid data, generate_for must be present for all certificate exceptions
+            return JsonResponse(
+                {
+                    'success': False,
+                    'message': _('Invalid data, generate_for must be "new" or "all".'),
+                },
+                status=400
+            )
+
+        task_api.generate_certificates_for_students(request, course_key, student_set=students)
+        response_payload = {
+            'success': True,
+            'message': _('Certificate generation started for students on the allowlist.'),
+        }
+
+        return JsonResponse(response_payload)
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -3619,12 +3717,9 @@ def generate_bulk_certificate_exceptions(request, course_id):
     return JsonResponse(results)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CERTIFICATE_INVALIDATION_VIEW)
-@require_http_methods(['POST', 'DELETE'])
-def certificate_invalidation_view(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CertificateInvalidationView(APIView):
     """
     Invalidate/Re-Validate students to/from certificate.
 
@@ -3632,17 +3727,39 @@ def certificate_invalidation_view(request, course_id):
     :param course_id: course identifier of the course for whom to add/remove certificates exception.
     :return: JsonResponse object with success/error message or certificate invalidation data.
     """
-    course_key = CourseKey.from_string(course_id)
-    # Validate request data and return error response in case of invalid data
-    try:
-        certificate_invalidation_data = parse_request_data(request)
-        student = _get_student_from_request_data(certificate_invalidation_data)
-        certificate = _get_certificate_for_user(course_key, student)
-    except ValueError as error:
-        return JsonResponse({'message': str(error)}, status=400)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CERTIFICATE_INVALIDATION_VIEW
+    serializer_class = CertificateSerializer
+    http_method_names = ['post', 'delete']
 
-    # Invalidate certificate of the given student for the course course
-    if request.method == 'POST':
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+         Invalidate/Re-Validate students to/from certificate.
+        """
+        course_key = CourseKey.from_string(course_id)
+        # Validate request data and return error response in case of invalid data
+        serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            # return HttpResponseBadRequest(reason=serializer_data.errors)
+            return JsonResponse({'message': serializer_data.errors}, status=400)
+
+        student = serializer_data.validated_data.get('user')
+        notes = serializer_data.validated_data.get('notes')
+
+        if not student:
+            invalid_user = request.data.get('user')
+            response_payload = f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
+
+            return JsonResponse({'message': response_payload}, status=400)
+
+        try:
+            certificate = _get_certificate_for_user(course_key, student)
+        except Exception as ex:  # pylint: disable=broad-except
+            return JsonResponse({'message': str(ex)}, status=400)
+
+        # Invalidate certificate of the given student for the course course
         try:
             if certs_api.is_on_allowlist(student, course_key):
                 log.warning(f"Invalidating certificate for student {student.id} in course {course_key} failed. "
@@ -3655,15 +3772,39 @@ def certificate_invalidation_view(request, course_id):
             certificate_invalidation = invalidate_certificate(
                 request,
                 certificate,
-                certificate_invalidation_data,
+                notes,
                 student
             )
+
         except ValueError as error:
             return JsonResponse({'message': str(error)}, status=400)
         return JsonResponse(certificate_invalidation)
 
-    # Re-Validate student certificate for the course course
-    elif request.method == 'DELETE':
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def delete(self, request, course_id):
+        """
+        Invalidate/Re-Validate students to/from certificate.
+        """
+        # Re-Validate student certificate for the course course
+        course_key = CourseKey.from_string(course_id)
+        try:
+            data = json.loads(self.request.body.decode('utf8') or '{}')
+        except Exception:  # pylint: disable=broad-except
+            data = {}
+
+        serializer_data = self.serializer_class(data=data)
+
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        student = serializer_data.validated_data.get('user')
+
+        try:
+            certificate = _get_certificate_for_user(course_key, student)
+        except Exception as ex:  # pylint: disable=broad-except
+            return JsonResponse({'message': str(ex)}, status=400)
+
         try:
             re_validate_certificate(request, course_key, certificate, student)
         except ValueError as error:
@@ -3672,13 +3813,13 @@ def certificate_invalidation_view(request, course_id):
         return JsonResponse({}, status=204)
 
 
-def invalidate_certificate(request, generated_certificate, certificate_invalidation_data, student):
+def invalidate_certificate(request, generated_certificate, notes, student):
     """
     Invalidate given GeneratedCertificate and add CertificateInvalidation record for future reference or re-validation.
 
     :param request: HttpRequest object
     :param generated_certificate: GeneratedCertificate object, the certificate we want to invalidate
-    :param certificate_invalidation_data: dict object containing data for CertificateInvalidation.
+    :param notes: notes values.
     :param student: User object, this user is tied to the generated_certificate we are going to invalidate
     :return: dict object containing updated certificate invalidation data.
     """
@@ -3701,7 +3842,7 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
     certificate_invalidation = certs_api.create_certificate_invalidation_entry(
         generated_certificate,
         request.user,
-        certificate_invalidation_data.get("notes", ""),
+        notes,
     )
 
     # Invalidate the certificate
@@ -3712,7 +3853,7 @@ def invalidate_certificate(request, generated_certificate, certificate_invalidat
         'user': student.username,
         'invalidated_by': certificate_invalidation.invalidated_by.username,
         'created': certificate_invalidation.created.strftime("%B %d, %Y"),
-        'notes': certificate_invalidation.notes,
+        'notes': notes,
     }
 
 

@@ -103,7 +103,7 @@ importlib_metadata                  # Used to access entry_points in i18n_api pl
 jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 importlib_metadata                  # Used to access entry_points in i18n_api plugin
-lxml                                # XML parser
+lxml[html_clean]                    # XML parser
 lti-consumer-xblock>=7.3.0
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
@@ -119,6 +119,7 @@ openedx-calc                        # Library supporting mathematical calculatio
 openedx-django-require
 openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
+openedx-forum                       # Open edX forum v2 application
 openedx-learning                    # Open edX Learning core (experimental)
 openedx-mongodbproxy
 openedx-django-wiki

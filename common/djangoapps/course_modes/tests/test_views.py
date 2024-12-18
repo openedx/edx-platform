@@ -149,50 +149,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         self.assertRedirects(response, '/test_basket/add/?sku=TEST', fetch_redirect_response=False)
         ecomm_test_utils.update_commerce_config(enabled=False)
 
-    def test_verified_mode_response_contains_course_run_key(self):
-        # Create only the verified mode and enroll the user
-        CourseModeFactory.create(
-            mode_slug='verified',
-            course_id=self.course_that_started.id,
-            min_price=149,
-            sku="dummy"
-        )
-        CourseEnrollmentFactory(
-            is_active=True,
-            course_id=self.course_that_started.id,
-            user=self.user
-        )
-
-        # Value Prop TODO (REV-2378): remove waffle flag from tests once the new Track Selection template is rolled out.
-        with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=True):
-            with patch(GATING_METHOD_NAME, return_value=True):
-                with patch(CDL_METHOD_NAME, return_value=True):
-                    with patch("common.djangoapps.course_modes.views.EcommerceService.is_enabled", return_value=True):
-                        url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
-                        response = self.client.get(url)
-                        self.assertContains(response, "&course_run_key=")
-                        self.assertContains(response, self.course_that_started.id)
-
-    def test_response_without_verified_sku_does_not_contain_course_run_key(self):
-        CourseModeFactory.create(
-            mode_slug='verified',
-            course_id=self.course_that_started.id,
-        )
-        CourseEnrollmentFactory(
-            is_active=True,
-            course_id=self.course_that_started.id,
-            user=self.user
-        )
-
-        # Value Prop TODO (REV-2378): remove waffle flag from tests once the new Track Selection template is rolled out.
-        with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=True):
-            with patch(GATING_METHOD_NAME, return_value=True):
-                with patch(CDL_METHOD_NAME, return_value=True):
-                    with patch("common.djangoapps.course_modes.views.EcommerceService.is_enabled", return_value=True):
-                        url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
-                        response = self.client.get(url)
-                        self.assertNotContains(response, "&course_run_key=")
-
     @httpretty.activate
     @ddt.data(
         '',

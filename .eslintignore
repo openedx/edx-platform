@@ -20,9 +20,21 @@ test_root/staticfiles
 common/static/xmodule
 
 
-# Symlinks into xmodule/js
+# Various intra-repo symlinks that we've added over the years to duct-tape the JS build together.
+# Ignore them so that we're not double-counting these violations.
+cms/static/edx-ui-toolkit
 cms/static/xmodule_js
+lms/static/common
+lms/static/course_bookmarks
+lms/static/course_experience
+lms/static/course_search
+lms/static/discussion
+lms/static/edx-ui-toolkit
+lms/static/learner_profile
+lms/static/support
+lms/static/teams
 lms/static/xmodule_js
+xmodule/js/common_static
 
 
 # Mako templates that generate .js files

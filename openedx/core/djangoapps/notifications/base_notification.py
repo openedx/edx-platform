@@ -65,6 +65,8 @@ COURSE_NOTIFICATION_TYPES = {
         'push': False,
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{username}</{strong}> posted <{strong}>{post_title}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> and others started new discussions'
+                                      '</{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'username': 'Post author name',
