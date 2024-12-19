@@ -1,6 +1,7 @@
 """
 Serializers for the notifications API.
 """
+
 from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
@@ -9,9 +10,12 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
-    get_notification_channels, get_additional_notification_channel_settings
+    get_additional_notification_channel_settings,
+    get_notification_channels
 )
+
 from .base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, EmailCadence
+from .email.utils import is_notification_type_channel_editable
 from .utils import remove_preferences_with_no_access
 
 
@@ -202,3 +206,113 @@ class NotificationSerializer(serializers.ModelSerializer):
             'last_seen',
             'created',
         )
+
+
+def validate_email_cadence(email_cadence: str) -> str:
+    """
+    Validate email cadence value.
+    """
+    if EmailCadence.get_email_cadence_value(email_cadence) is None:
+        raise ValidationError(f'{email_cadence} is not a valid email cadence.')
+    return email_cadence
+
+
+def validate_notification_app(notification_app: str) -> str:
+    """
+    Validate notification app value.
+    """
+    if not COURSE_NOTIFICATION_APPS.get(notification_app):
+        raise ValidationError(f'{notification_app} is not a valid notification app.')
+    return notification_app
+
+
+def validate_notification_app_enabled(notification_app: str) -> str:
+    """
+    Validate notification app is enabled.
+    """
+
+    if COURSE_NOTIFICATION_APPS.get(notification_app) and COURSE_NOTIFICATION_APPS.get(notification_app)['enabled']:
+        return notification_app
+    raise ValidationError(f'{notification_app} is not a valid notification app.')
+
+
+def validate_notification_type(notification_type: str) -> str:
+    """
+    Validate notification type value.
+    """
+    if not COURSE_NOTIFICATION_TYPES.get(notification_type):
+        raise ValidationError(f'{notification_type} is not a valid notification type.')
+    return notification_type
+
+
+def validate_notification_channel(notification_channel: str) -> str:
+    """
+    Validate notification channel value.
+    """
+    valid_channels = set(get_notification_channels()) | set(get_additional_notification_channel_settings())
+    if notification_channel not in valid_channels:
+        raise ValidationError(f'{notification_channel} is not a valid notification channel setting.')
+    return notification_channel
+
+
+class UserNotificationPreferenceUpdateAllSerializer(serializers.Serializer):
+    """
+    Serializer for user notification preferences update with custom field validators.
+    """
+    notification_app = serializers.CharField(
+        required=True,
+        validators=[validate_notification_app, validate_notification_app_enabled]
+    )
+    value = serializers.BooleanField(required=False)
+    notification_type = serializers.CharField(
+        required=True,
+    )
+    notification_channel = serializers.CharField(
+        required=False,
+        validators=[validate_notification_channel]
+    )
+    email_cadence = serializers.CharField(
+        required=False,
+        validators=[validate_email_cadence]
+    )
+
+    def validate(self, attrs):
+        """
+        Cross-field validation for notification preference update.
+        """
+        notification_app = attrs.get('notification_app')
+        notification_type = attrs.get('notification_type')
+        notification_channel = attrs.get('notification_channel')
+        email_cadence = attrs.get('email_cadence')
+
+        # Validate email_cadence requirements
+        if email_cadence and not notification_type:
+            raise ValidationError({
+                'notification_type': 'notification_type is required for email_cadence.'
+            })
+
+        # Validate notification_channel requirements
+        if not email_cadence and notification_type and not notification_channel:
+            raise ValidationError({
+                'notification_channel': 'notification_channel is required for notification_type.'
+            })
+
+        # Validate notification type
+        if all([not COURSE_NOTIFICATION_TYPES.get(notification_type), notification_type != "core"]):
+            raise ValidationError(f'{notification_type} is not a valid notification type.')
+
+        # Validate notification type and channel is editable
+        if notification_channel and notification_type:
+            if not is_notification_type_channel_editable(
+                notification_app,
+                notification_type,
+                notification_channel
+            ):
+                raise ValidationError({
+                    'notification_channel': (
+                        f'{notification_channel} is not editable for notification type '
+                        f'{notification_type}.'
+                    )
+                })
+
+        return attrs
