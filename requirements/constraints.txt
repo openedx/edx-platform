@@ -60,6 +60,13 @@ django-webpack-loader==0.7.0
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
 
+# Date: 2023-07-19
+# The version of django-stubs we can use depends on which Django release we're using
+# 1.16.0 works with Django 3.2 through 4.1
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35275
+django-stubs==1.16.0
+djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this when we can remove the above pin.
+
 # Date: 2024-07-23
 # django-storages==1.14.4 breaks course imports
 # Two lines were added in 1.14.4 that make file_exists_in_storage function always return False,
