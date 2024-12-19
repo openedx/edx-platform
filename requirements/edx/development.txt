@@ -623,8 +623,7 @@ djangorestframework==3.14.0
     #   ora2
     #   super-csv
 djangorestframework-stubs==3.15.1
-    # via
-    #   -r requirements/edx/development.in
+    # via -r requirements/edx/development.in
 djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1295,7 +1294,6 @@ mypy==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
-    #   djangorestframework-stubs
 mypy-extensions==1.0.0
     # via mypy
 mysqlclient==2.2.5
