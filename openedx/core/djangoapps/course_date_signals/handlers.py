@@ -14,6 +14,8 @@ from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable
 from xmodule.modulestore.django import SignalHandler, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.util.misc import is_xblock_an_assignment  # lint-amnesty, pylint: disable=wrong-import-order
 
+from openedx.core.djangoapps.course_date_signals.waffle import DISABLE_SPACED_OUT_SECTIONS
+
 from .models import SelfPacedRelativeDatesConfig
 from .utils import spaced_out_sections
 
@@ -118,6 +120,63 @@ def _get_custom_pacing_children(subsection, num_weeks):
     return section_date_items
 
 
+def extract_dates_from_course_spaced_out_sections(course):
+    """
+    Extract all dates from the supplied course. Apply PLS to subsections that
+    don't have custom relative_weeks_due set, by spacing them out evenly based
+    on the estimated course duration.
+    """
+    date_items = []
+    # Apply the same relative due date to all content inside a section,
+    # unless that item already has a relative date set
+    for _, section, weeks_to_complete in spaced_out_sections(course):
+        section_date_items = []
+        # section_due_date will end up being the max of all due dates of its subsections
+        section_due_date = timedelta(weeks=1)
+        for subsection in section.get_children():
+            # If custom pacing is set on a subsection, apply the set relative
+            # date to all the content inside the subsection. Otherwise
+            # apply the default Personalized Learner Schedules (PLS)
+            # logic for self paced courses.
+            relative_weeks_due = subsection.fields['relative_weeks_due'].read_from(subsection)
+            if (CUSTOM_RELATIVE_DATES.is_enabled(course.id) and relative_weeks_due):
+                section_due_date = max(section_due_date, timedelta(weeks=relative_weeks_due))
+                section_date_items.extend(_get_custom_pacing_children(subsection, relative_weeks_due))
+            else:
+                section_due_date = max(section_due_date, weeks_to_complete)
+                section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
+        if section_date_items and (section.graded or CUSTOM_RELATIVE_DATES.is_enabled(course.id)):
+            date_items.append((section.location, {'due': section_due_date}))
+        date_items.extend(section_date_items)
+    return date_items
+
+
+def extract_dates_from_course_custom_dates_only(course):
+    """
+    Extract all dates from the supplied course. Only considers subsections that
+    have relative_weeks_due set, either custom or through Advanced Settings.
+    """
+    date_items = []
+    # Apply relative due date only to content inside a section,
+    # that already has a relative date set. Also inherits relative
+    # due date set in the advanced settings.
+    for section in course.get_children():
+        if section.visible_to_staff_only:
+            continue
+        section_date_items = []
+        for subsection in section.get_children():
+            # If custom pacing is set on a subsection, apply the set relative
+            # date to all the content inside the subsection.
+            relative_weeks_due = subsection.fields['relative_weeks_due'].read_from(subsection)
+            if relative_weeks_due:
+                section_due_date = timedelta(weeks=relative_weeks_due)
+                section_date_items.extend(_get_custom_pacing_children(subsection, relative_weeks_due))
+        if section_date_items:
+            date_items.append((section.location, {'due': section_due_date}))
+        date_items.extend(section_date_items)
+    return date_items
+
+
 def extract_dates_from_course(course):
     """
     Extract all dates from the supplied course.
@@ -129,28 +188,16 @@ def extract_dates_from_course(course):
         metadata.pop('due', None)
         date_items = [(course.location, metadata)]
 
-        if SelfPacedRelativeDatesConfig.current(course_key=course.id).enabled:
-            # Apply the same relative due date to all content inside a section,
-            # unless that item already has a relative date set
-            for _, section, weeks_to_complete in spaced_out_sections(course):
-                section_date_items = []
-                # section_due_date will end up being the max of all due dates of its subsections
-                section_due_date = timedelta(weeks=1)
-                for subsection in section.get_children():
-                    # If custom pacing is set on a subsection, apply the set relative
-                    # date to all the content inside the subsection. Otherwise
-                    # apply the default Personalized Learner Schedules (PLS)
-                    # logic for self paced courses.
-                    relative_weeks_due = subsection.fields['relative_weeks_due'].read_from(subsection)
-                    if (CUSTOM_RELATIVE_DATES.is_enabled(course.id) and relative_weeks_due):
-                        section_due_date = max(section_due_date, timedelta(weeks=relative_weeks_due))
-                        section_date_items.extend(_get_custom_pacing_children(subsection, relative_weeks_due))
-                    else:
-                        section_due_date = max(section_due_date, weeks_to_complete)
-                        section_date_items.extend(_gather_graded_items(subsection, weeks_to_complete))
-                if section_date_items and (section.graded or CUSTOM_RELATIVE_DATES.is_enabled(course.id)):
-                    date_items.append((section.location, {'due': section_due_date}))
-                date_items.extend(section_date_items)
+        self_paced_relative_dates_config = SelfPacedRelativeDatesConfig.current(course_key=course.id)
+        if self_paced_relative_dates_config.enabled:
+            if not DISABLE_SPACED_OUT_SECTIONS.is_enabled(course.id):
+                date_items.extend(
+                    extract_dates_from_course_spaced_out_sections(course)
+                )
+            elif CUSTOM_RELATIVE_DATES.is_enabled(course.id):
+                date_items.extend(
+                    extract_dates_from_course_custom_dates_only(course)
+                )
     else:
         date_items = []
         store = modulestore()
