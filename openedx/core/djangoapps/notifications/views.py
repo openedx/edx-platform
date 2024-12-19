@@ -577,7 +577,6 @@ class AggregatedNotificationPreferences(APIView):
             }, status=status.HTTP_404_NOT_FOUND)
         notification_configs = notification_preferences.values_list('notification_preference_config', flat=True)
         notification_configs = aggregate_notification_configs(
-            notification_preferences.first().notification_preference_config,
             notification_configs
         )
 

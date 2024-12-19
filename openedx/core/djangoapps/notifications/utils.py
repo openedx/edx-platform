@@ -164,8 +164,6 @@ def clean_arguments(kwargs):
 def update_notification_types(
     app_config: Dict,
     user_app_config: Dict,
-    default_config: Dict,
-    app: str
 ) -> None:
     """
     Update notification types for a specific category configuration.
@@ -233,10 +231,10 @@ def process_app_config(
     update_core_notification_types(app_config, user_app_config)
 
     # Update notification types
-    update_notification_types(app_config, user_app_config, default_config, app)
+    update_notification_types(app_config, user_app_config)
 
 
-def aggregate_notification_configs(default_config: Dict, existing_user_configs: List[Dict]) -> Dict:
+def aggregate_notification_configs(existing_user_configs: List[Dict]) -> Dict:
     """
     Update default notification config with values from other configs.
     Rules:
@@ -245,23 +243,22 @@ def aggregate_notification_configs(default_config: Dict, existing_user_configs: 
     3. Set email_cadence to "Mixed" if different cadences found, else use default
 
     Args:
-        default_config: Base configuration to start with
         existing_user_configs: List of notification config dictionaries to apply
 
     Returns:
         Updated config following the same structure
     """
     if not existing_user_configs:
-        return default_config
+        return {}
 
-    result_config = copy.deepcopy(default_config)
+    result_config = copy.deepcopy(existing_user_configs[0])
     apps = result_config.keys()
 
     for app in apps:
         app_config = result_config[app]
 
         for user_config in existing_user_configs:
-            process_app_config(app_config, user_config, app, default_config)
+            process_app_config(app_config, user_config, app, existing_user_configs[0])
 
     # if email_cadence is mixed, set it to "Mixed"
     for app in result_config:
