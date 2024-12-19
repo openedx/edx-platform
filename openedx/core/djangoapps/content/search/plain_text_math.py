@@ -45,9 +45,15 @@ class PlainTextMath:
         if start_index == -1:
             return equation
         mid_index = equation.find("}{")
+        if mid_index == -1:
+            return equation
+
         numerator = equation[start_index + 6:mid_index]
+        # shift mid_index by length of }{ chars i.e., 2
+        mid_index += 2
         open_count = 0
-        for i, char in enumerate(equation[mid_index + 2:]):
+
+        for i, char in enumerate(equation[mid_index:]):
             if char == "{":
                 open_count += 1
             if char == "}":
@@ -57,8 +63,10 @@ class PlainTextMath:
         else:
             # Invalid `\frac` format
             return equation
-        denominator = equation[mid_index + 2:mid_index + 2 + i]
-        equation = equation[:start_index] + f"({numerator}/{denominator})" + equation[mid_index + 2 + i + 1:]
+
+        denominator = equation[mid_index:mid_index + i]
+        # Now re-create the equation with `(numerator / denominator)`
+        equation = equation[:start_index] + f"({numerator}/{denominator})" + equation[mid_index + i + 1:]
         return equation
 
     def _handle_replacements(self, equation: str) -> str:
