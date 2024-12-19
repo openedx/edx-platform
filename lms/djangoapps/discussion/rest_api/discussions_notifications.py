@@ -373,7 +373,7 @@ class DiscussionNotificationSender:
         ]}
         self._send_course_wide_notification("content_reported", audience_filters, context)
 
-    def _populate_context_with_ids_for_mobile(self, context, additional_context=False):
+    def _populate_context_with_ids_for_mobile(self, context):
         context['thread_id'] = self.thread.id
         context['topic_id'] = self.thread.commentable_id
         context['comment_id'] = self.comment_id
