@@ -15,7 +15,7 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
         """
         If the configs list is empty, the default config should be returned.
         """
-        default_config = {
+        default_config = [{
             "grading": {
                 "enabled": False,
                 "non_editable": {},
@@ -28,45 +28,46 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
                     }
                 }
             }
-        }
+        }]
 
-        result = aggregate_notification_configs(default_config, [])
-        assert result == default_config
+        result = aggregate_notification_configs(default_config)
+        assert result == default_config[0]
 
     def test_enable_notification_type(self):
         """
         If a config enables a notification type, it should be enabled in the result.
         """
-        default_config = {
-            "grading": {
-                "enabled": False,
-                "non_editable": {},
-                "notification_types": {
-                    "core": {
-                        "web": False,
-                        "push": False,
-                        "email": False,
-                        "email_cadence": "Weekly"
+
+        config_list = [
+            {
+                "grading": {
+                    "enabled": False,
+                    "non_editable": {},
+                    "notification_types": {
+                        "core": {
+                            "web": False,
+                            "push": False,
+                            "email": False,
+                            "email_cadence": "Weekly"
+                        }
                     }
                 }
-            }
-        }
-
-        config_list = [{
-            "grading": {
-                "enabled": True,
-                "notification_types": {
-                    "core": {
-                        "web": True,
-                        "push": True,
-                        "email": True,
-                        "email_cadence": "Weekly"
+            },
+            {
+                "grading": {
+                    "enabled": True,
+                    "notification_types": {
+                        "core": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Weekly"
+                        }
                     }
                 }
-            }
-        }]
+            }]
 
-        result = aggregate_notification_configs(default_config, config_list)
+        result = aggregate_notification_configs(config_list)
         assert result["grading"]["enabled"] is True
         assert result["grading"]["notification_types"]["core"]["web"] is True
         assert result["grading"]["notification_types"]["core"]["push"] is True
@@ -78,21 +79,23 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
         """
         Core notification types should be merged across configs.
         """
-        default_config = {
-            "discussion": {
-                "enabled": True,
-                "core_notification_types": ["new_comment"],
-                "notification_types": {}
-            }
-        }
 
-        config_list = [{
-            "discussion": {
-                "core_notification_types": ["new_response", "new_comment"]
-            }
-        }]
+        config_list = [
+            {
+                "discussion": {
+                    "enabled": True,
+                    "core_notification_types": ["new_comment"],
+                    "notification_types": {}
+                }
+            },
+            {
+                "discussion": {
+                    "core_notification_types": ["new_response", "new_comment"]
+                }
 
-        result = aggregate_notification_configs(default_config, config_list)
+            }]
+
+        result = aggregate_notification_configs(config_list)
         assert set(result["discussion"]["core_notification_types"]) == {
             "new_comment", "new_response"
         }
@@ -101,21 +104,21 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
         """
         Multiple configs should be aggregated together.
         """
-        default_config = {
-            "updates": {
-                "enabled": False,
-                "notification_types": {
-                    "course_updates": {
-                        "web": False,
-                        "push": False,
-                        "email": False,
-                        "email_cadence": "Weekly"
-                    }
-                }
-            }
-        }
 
         config_list = [
+            {
+                "updates": {
+                    "enabled": False,
+                    "notification_types": {
+                        "course_updates": {
+                            "web": False,
+                            "push": False,
+                            "email": False,
+                            "email_cadence": "Weekly"
+                        }
+                    }
+                }
+            },
             {
                 "updates": {
                     "enabled": True,
@@ -139,7 +142,7 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
             }
         ]
 
-        result = aggregate_notification_configs(default_config, config_list)
+        result = aggregate_notification_configs(config_list)
         assert result["updates"]["enabled"] is True
         assert result["updates"]["notification_types"]["course_updates"]["web"] is True
         assert result["updates"]["notification_types"]["course_updates"]["push"] is True
@@ -151,33 +154,33 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
         """
         Unknown notification types should be ignored.
         """
-        default_config = {
-            "grading": {
-                "enabled": False,
-                "notification_types": {
-                    "core": {
-                        "web": False,
-                        "push": False,
-                        "email": False,
-                        "email_cadence": "Daily"
+        config_list = [
+            {
+                "grading": {
+                    "enabled": False,
+                    "notification_types": {
+                        "core": {
+                            "web": False,
+                            "push": False,
+                            "email": False,
+                            "email_cadence": "Daily"
+                        }
                     }
                 }
-            }
-        }
-
-        config_list = [{
-            "grading": {
-                "notification_types": {
-                    "unknown_type": {
-                        "web": True,
-                        "push": True,
-                        "email": True
+            },
+            {
+                "grading": {
+                    "notification_types": {
+                        "unknown_type": {
+                            "web": True,
+                            "push": True,
+                            "email": True
+                        }
                     }
                 }
-            }
-        }]
+            }]
 
-        result = aggregate_notification_configs(default_config, config_list)
+        result = aggregate_notification_configs(config_list)
         assert "unknown_type" not in result["grading"]["notification_types"]
         assert result["grading"]["notification_types"]["core"]["web"] is False
 
@@ -185,21 +188,22 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
         """
         Unknown categories should be ignored.
         """
-        default_config = {
-            "grading": {
-                "enabled": False,
-                "notification_types": {}
-            }
-        }
 
-        config_list = [{
-            "unknown_category": {
-                "enabled": True,
-                "notification_types": {}
-            }
-        }]
+        config_list = [
+            {
+                "grading": {
+                    "enabled": False,
+                    "notification_types": {}
+                }
+            },
+            {
+                "unknown_category": {
+                    "enabled": True,
+                    "notification_types": {}
+                }
+            }]
 
-        result = aggregate_notification_configs(default_config, config_list)
+        result = aggregate_notification_configs(config_list)
         assert "unknown_category" not in result
         assert result["grading"]["enabled"] is False
 
@@ -207,30 +211,32 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
         """
         The resulting config should have the same structure as the default config.
         """
-        default_config = {
-            "discussion": {
-                "enabled": False,
-                "non_editable": {"core": ["web"]},
-                "notification_types": {
-                    "core": {
-                        "web": False,
-                        "push": False,
-                        "email": False,
-                        "email_cadence": "Weekly"
-                    }
-                },
-                "core_notification_types": []
-            }
-        }
 
-        config_list = [{
-            "discussion": {
-                "enabled": True,
-                "extra_field": "should_not_appear"
+        config_list = [
+            {
+                "discussion": {
+                    "enabled": False,
+                    "non_editable": {"core": ["web"]},
+                    "notification_types": {
+                        "core": {
+                            "web": False,
+                            "push": False,
+                            "email": False,
+                            "email_cadence": "Weekly"
+                        }
+                    },
+                    "core_notification_types": []
+                }
+            },
+            {
+                "discussion": {
+                    "enabled": True,
+                    "extra_field": "should_not_appear"
+                }
             }
-        }]
+        ]
 
-        result = aggregate_notification_configs(default_config, config_list)
+        result = aggregate_notification_configs(config_list)
         assert set(result["discussion"].keys()) == {
             "enabled", "non_editable", "notification_types", "core_notification_types"
         }
@@ -240,21 +246,20 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
         """
         If email_cadence is different in the configs, set it to "Mixed".
         """
-        default_config = {
-            "grading": {
-                "enabled": False,
-                "notification_types": {
-                    "core": {
-                        "web": False,
-                        "push": False,
-                        "email": False,
-                        "email_cadence": "Daily"
+        config_list = [
+            {
+                "grading": {
+                    "enabled": False,
+                    "notification_types": {
+                        "core": {
+                            "web": False,
+                            "push": False,
+                            "email": False,
+                            "email_cadence": "Daily"
+                        }
                     }
                 }
-            }
-        }
-
-        config_list = [
+            },
             {
                 "grading": {
                     "enabled": True,
@@ -279,5 +284,5 @@ class TestAggregateNotificationConfigs(unittest.TestCase):
             }
         ]
 
-        result = aggregate_notification_configs(default_config, config_list)
+        result = aggregate_notification_configs(config_list)
         assert result["grading"]["notification_types"]["core"]["email_cadence"] == "Mixed"
