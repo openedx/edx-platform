@@ -39,4 +39,5 @@ class LinkCheckSerializer(serializers.Serializer):
     """ Serializer for broken links """
     LinkCheckStatus = serializers.CharField(required=True)
     LinkCheckCreatedAt = serializers.DateTimeField(required=False)
-    LinkCheckOutput = LinkCheckOutputSerializer(required=True)
+    LinkCheckOutput = LinkCheckOutputSerializer(required=False)
+    LinkCheckError = serializers.CharField(required=False)
