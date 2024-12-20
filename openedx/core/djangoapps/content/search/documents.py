@@ -3,7 +3,6 @@ Utilities related to indexing content for search
 """
 from __future__ import annotations
 
-import re
 import logging
 from hashlib import blake2b
 
