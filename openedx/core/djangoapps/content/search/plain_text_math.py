@@ -1,3 +1,7 @@
+"""
+Helper class to convert mathjax equations to plain text.
+"""
+
 import re
 
 import unicodeit
@@ -21,7 +25,7 @@ class PlainTextMath:
         ("\\cot", "cot"),
         ("\\sec", "sec"),
         ("\\csc", "csc"),
-        # Is used for matching brackets in mathjax, should be required in plain text.
+        # Is used for matching brackets in mathjax, should not be required in plain text.
         ("\\left", ""),
         ("\\right", ""),
     )
@@ -31,15 +35,15 @@ class PlainTextMath:
 
     def _fraction_handler(self, equation: str) -> str:
         """
-        Converts `\frac{x}{y}` to `(x/y)` while handling nested `{}`.
+        Converts `\\frac{x}{y}` to `(x/y)` while handling nested `{}`.
 
-        For example: `\frac{2}{\sqrt{1+y}}` is converted to `(2/\sqrt{1+y})`.
+        For example: `\\frac{2}{\\sqrt{1+y}}` is converted to `(2/\\sqrt{1+y})`.
 
         Args:
             equation: string
 
         Returns:
-            String with `\frac` replaced by normal `/` symbol.
+            String with `\\frac` replaced by normal `/` symbol.
         """
         start_index = equation.find("\\frac{")
         if start_index == -1:
