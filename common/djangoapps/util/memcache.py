@@ -7,7 +7,6 @@ so that we can cache any keys, not just ones that memcache would ordinarily acce
 import hashlib
 from urllib.parse import quote_plus
 
-from django.conf import settings
 from django.utils.encoding import smart_str
 
 
