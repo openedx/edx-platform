@@ -577,7 +577,7 @@ django-storages==1.14.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-stubs==1.16.0
+django-stubs==4.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
@@ -625,10 +625,8 @@ djangorestframework==3.14.0
     #   openedx-learning
     #   ora2
     #   super-csv
-djangorestframework-stubs==3.14.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/development.in
+djangorestframework-stubs==3.14.5
+    # via -r requirements/edx/development.in
 djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1301,8 +1299,6 @@ mypy==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
-    #   django-stubs
-    #   djangorestframework-stubs
 mypy-extensions==1.0.0
     # via mypy
 mysqlclient==2.2.6
@@ -2121,8 +2117,6 @@ tinycss2==1.4.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   bleach
-tomli==2.2.1
-    # via django-stubs
 tomlkit==0.13.2
     # via
     #   -r requirements/edx/doc.txt
