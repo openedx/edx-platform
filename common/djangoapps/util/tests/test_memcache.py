@@ -3,9 +3,8 @@ Tests for memcache in util app
 """
 
 
-from django.conf import settings
 from django.core.cache import caches
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from common.djangoapps.util.memcache import safe_key
 
