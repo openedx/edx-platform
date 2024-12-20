@@ -14,6 +14,7 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from rest_framework.exceptions import NotFound
 
 from openedx.core.djangoapps.content.search.models import SearchAccess
+from openedx.core.djangoapps.content.search.plain_text_math import process_mathjax
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
@@ -220,7 +221,7 @@ def _fields_from_block(block) -> dict:
         # Generate description from the content
         description = _get_description_from_block_content(block_type, content_data)
         if description:
-            block_data[Fields.description] = description
+            block_data[Fields.description] = process_mathjax(description)
 
     except Exception as err:  # pylint: disable=broad-except
         log.exception(f"Failed to process index_dictionary for {block.usage_key}: {err}")
