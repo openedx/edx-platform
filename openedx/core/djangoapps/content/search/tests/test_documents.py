@@ -490,16 +490,16 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             editor="raw",
             use_latex_compiler=True,
             data=(
-                "Simple addition: \( 2 + 3 \) |||"
-                " Simple subtraction: \( 5 - 2 \) |||"
-                " Simple multiplication: \( 4 * 6 \) |||"
-                " Simple division: \( 8 / 2 \) |||"
-                " Mixed arithmetic: \( 2 + 3  4 \) |||"
-                " Simple exponentiation: \[ 2^3 \] |||"
-                " Root extraction: \[ 16^{1/2} \] |||"
-                " Exponent with multiple terms: \[ (2 + 3)^2 \] |||"
-                " Nested exponents: \[ 2^(3^2) \] |||"
-                " Mixed roots: \[ 8^{1/2}  3^2 \] |||"
+                "Simple addition: \\( 2 + 3 \\) |||"
+                " Simple subtraction: \\( 5 - 2 \\) |||"
+                " Simple multiplication: \\( 4 * 6 \\) |||"
+                " Simple division: \\( 8 / 2 \\) |||"
+                " Mixed arithmetic: \\( 2 + 3  4 \\) |||"
+                " Simple exponentiation: \\[ 2^3 \\] |||"
+                " Root extraction: \\[ 16^{1/2} \\] |||"
+                " Exponent with multiple terms: \\[ (2 + 3)^2 \\] |||"
+                " Nested exponents: \\[ 2^(3^2) \\] |||"
+                " Mixed roots: \\[ 8^{1/2}  3^2 \\] |||"
                 " Simple fraction: [mathjaxinline] 3/4 [/mathjaxinline] |||"
                 " Decimal to fraction conversion: [mathjaxinline] 0.75 = 3/4 [/mathjaxinline] |||"
                 " Mixed fractions: [mathjaxinline] 1 1/2 = 3/2 [/mathjaxinline] |||"
@@ -508,15 +508,15 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 " Trig identities: [mathjaxinline] \\sin(x + y) = \\sin(x)  \\cos(y) + \\cos(x)  \\sin(y) [/mathjaxinline] |||"
                 " Hyperbolic trig functions: [mathjaxinline] \\sinh(x) [/mathjaxinline] [mathjaxinline] \\cosh(x) [/mathjaxinline] |||"
                 " Simple derivative: [mathjax] f(x) = x^2, f'(x) = 2x [/mathjax] |||"
-                " Double integral: [mathjax] int\int (x + y) dxdy [/mathjax] |||"
-                " Partial derivatives: [mathjax] f(x,y) = xy, \frac{\partial f}{\partial x} = y [/mathjax] [mathjax] \frac{\partial f}{\partial y} = x [/mathjax] |||"
-                " Mean and standard deviation: [mathjax] mu = 2, \sigma = 1 [/mathjax] |||"
-                " Binomial probability: [mathjax] P(X = k) = (\binom{n}{k} p^k (1-p)^{n-k}) [/mathjax] |||"
-                " Gaussian distribution: [mathjax] N(\mu, \sigma^2) [/mathjax] |||"
+                " Double integral: [mathjax] int\\int (x + y) dxdy [/mathjax] |||"
+                " Partial derivatives: [mathjax] f(x,y) = xy, \\frac{\\partial f}{\\partial x} = y [/mathjax] [mathjax] \\frac{\\partial f}{\\partial y} = x [/mathjax] |||"
+                " Mean and standard deviation: [mathjax] mu = 2, \\sigma = 1 [/mathjax] |||"
+                " Binomial probability: [mathjax] P(X = k) = (\\binom{n}{k} p^k (1-p)^{n-k}) [/mathjax] |||"
+                " Gaussian distribution: [mathjax] N(\\mu, \\sigma^2) [/mathjax] |||"
                 " Greek letters: [mathjaxinline] \\alpha [/mathjaxinline] [mathjaxinline] \\beta [/mathjaxinline] [mathjaxinline] \\gamma [/mathjaxinline] |||"
                 " Subscripted variables: [mathjaxinline] x_i [/mathjaxinline] [mathjaxinline] y_j [/mathjaxinline] |||"
                 " Superscripted variables: [mathjaxinline] x^{i} [/mathjaxinline] |||"
-                " Not supported: \( \\begin{bmatrix} 1 & 0 \\ 0 & 1 \\end{bmatrix} = I \)"
+                " Not supported: \\( \\begin{bmatrix} 1 & 0 \\ 0 & 1 \\end{bmatrix} = I \\)"
             ),
         )
         # pylint: enable=line-too-long
@@ -543,9 +543,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             'Hyperbolic trig functions:  sinh(x)   cosh(x)',
             "Simple derivative:  f(x) = x², f'(x) = 2x",
             'Double integral:  int∫ (x + y) dxdy',
-            'Partial derivatives:  f(x,y) = xy, rac{∂ f}{∂ x} = y   rac{∂ f}{∂ y} = x',
+            'Partial derivatives:  f(x,y) = xy, (∂ f/∂ x) = y   (∂ f/∂ y) = x',
             'Mean and standard deviation:  mu = 2, σ = 1',
-            'Binomial probability:  P(X = k) = (inom{n}{k} pᵏ (1−p)ⁿ⁻ᵏ)',
+            'Binomial probability:  P(X = k) = (\\binom{n}{k} pᵏ (1−p)ⁿ⁻ᵏ)',
             'Gaussian distribution:  N(μ, σ²)',
             'Greek letters:  α   β   γ',
             'Subscripted variables:  xᵢ   yⱼ',
