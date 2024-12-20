@@ -13,7 +13,6 @@ import os
 import warnings
 import yaml
 
-import django
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from edx_django_utils.plugins import add_plugins
@@ -238,11 +237,6 @@ SHARED_COOKIE_DOMAIN = ENV_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOM
 # but it is highly recommended that this is True for environments accessed
 # by end users.
 CSRF_COOKIE_SECURE = ENV_TOKENS.get('CSRF_COOKIE_SECURE', False)
-
-# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
-# case of new django version these values will override.
-if django.VERSION[0] >= 4:  # for greater than django 3.2 use schemes.
-    CSRF_TRUSTED_ORIGINS = ENV_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 #Email overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
