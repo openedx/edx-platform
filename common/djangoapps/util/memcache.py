@@ -14,7 +14,7 @@ from django.utils.encoding import smart_str
 def fasthash(string):
     """
     Hashes `string` into a string representation of a 128-bit digest.
-    """    
+    """
     hash_obj = hashlib.new("blake2b", digest_size=16)
     hash_obj.update(string.encode('utf-8'))
     return hash_obj.hexdigest()
