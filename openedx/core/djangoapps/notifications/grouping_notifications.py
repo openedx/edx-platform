@@ -128,15 +128,12 @@ def get_user_existing_notifications(user_ids, notification_type, group_by_id, co
     """
     Returns user last group able notification
     """
-    notification_type_params = {
-        'new_discussion_post': {'last_seen__isnull': True},
-    }
     notifications = Notification.objects.filter(
         user__in=user_ids,
         notification_type=notification_type,
         group_by_id=group_by_id,
         course_id=course_id,
-        **notification_type_params.get(notification_type, {})
+        last_seen__isnull=True,
     )
     notifications_mapping = {user_id: [] for user_id in user_ids}
     for notification in notifications:

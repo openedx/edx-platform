@@ -106,8 +106,7 @@ class TestNewCommentGrouper(unittest.TestCase):
         self.assertEqual(content_context['email_content'], 'new content')
 
 
-@ddt.ddt
-class TestNewPostGrouper(ModuleStoreTestCase):
+class TestNewPostGrouper(unittest.TestCase):
     """
     Tests for the NewPostGrouper class
     """
@@ -147,38 +146,9 @@ class TestNewPostGrouper(ModuleStoreTestCase):
 
         self.assertFalse(updated_context.get('grouped', False))
 
-    @ddt.data(datetime(2023, 1, 1, tzinfo=utc), None)
-    def test_not_grouped_when_notification_is_seen(self, last_seen):
-        """
-        Notification is not grouped if the notification is marked as seen
-        """
-        course = CourseFactory()
-        user = UserFactory()
-        notification_params = {
-            'app_name': 'discussion',
-            'notification_type': 'new_discussion_post',
-            'course_id': course.id,
-            'group_by_id': course.id,
-            'content_url': 'http://example.com',
-            'user': user,
-            'last_seen': last_seen,
-        }
-        Notification.objects.create(content_context={
-            'username': 'User1',
-            'post_title': ' Post title',
-            'replier_name': 'User 1',
 
-        }, **notification_params)
-        existing_notifications = get_user_existing_notifications(
-            [user.id], 'new_discussion_post', course.id, course.id
-        )
-        if last_seen is None:
-            assert existing_notifications[user.id] is not None
-        else:
-            assert existing_notifications[user.id] is None
-
-
-class TestGroupUserNotifications(unittest.TestCase):
+@ddt.ddt
+class TestGroupUserNotifications(ModuleStoreTestCase):
     """
     Tests for the group_user_notifications function
     """
@@ -213,6 +183,36 @@ class TestGroupUserNotifications(unittest.TestCase):
         group_user_notifications(new_notification, old_notification)
 
         self.assertFalse(old_notification.save.called)
+
+    @ddt.data(datetime(2023, 1, 1, tzinfo=utc), None)
+    def test_not_grouped_when_notification_is_seen(self, last_seen):
+        """
+        Notification is not grouped if the notification is marked as seen
+        """
+        course = CourseFactory()
+        user = UserFactory()
+        notification_params = {
+            'app_name': 'discussion',
+            'notification_type': 'new_discussion_post',
+            'course_id': course.id,
+            'group_by_id': course.id,
+            'content_url': 'http://example.com',
+            'user': user,
+            'last_seen': last_seen,
+        }
+        Notification.objects.create(content_context={
+            'username': 'User1',
+            'post_title': ' Post title',
+            'replier_name': 'User 1',
+
+        }, **notification_params)
+        existing_notifications = get_user_existing_notifications(
+            [user.id], 'new_discussion_post', course.id, course.id
+        )
+        if last_seen is None:
+            assert existing_notifications[user.id] is not None
+        else:
+            assert existing_notifications[user.id] is None
 
 
 class TestGetUserExistingNotifications(unittest.TestCase):
