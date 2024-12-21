@@ -305,6 +305,8 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
                 "username": thread.username,
                 "thread_type": 'discussion',
                 "title": thread.title,
+                "commentable_id": thread.commentable_id,
+
             })
         self._register_subscriptions_endpoint()
 
@@ -354,7 +356,11 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'post_title': 'test thread',
             'email_content': self.comment.body,
             'course_name': self.course.display_name,
-            'sender_id': self.user_2.id
+            'sender_id': self.user_2.id,
+            'parent_id': None,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(
@@ -400,7 +406,11 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'author_name': 'dummy\'s',
             'author_pronoun': 'dummy\'s',
             'course_name': self.course.display_name,
-            'sender_id': self.user_3.id
+            'sender_id': self.user_3.id,
+            'parent_id': 2,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -417,7 +427,11 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'post_title': self.thread.title,
             'email_content': self.comment.body,
             'course_name': self.course.display_name,
-            'sender_id': self.user_3.id
+            'sender_id': self.user_3.id,
+            'parent_id': 2,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         self.assertDictEqual(args_comment_on_response.context, expected_context)
         self.assertEqual(
@@ -477,7 +491,11 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'author_pronoun': 'your',
             'course_name': self.course.display_name,
             'sender_id': self.user_3.id,
-            'email_content': self.comment.body
+            'email_content': self.comment.body,
+            'parent_id': 2,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -522,6 +540,10 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'email_content': self.comment.body,
             'course_name': self.course.display_name,
             'sender_id': self.user_2.id,
+            'parent_id': parent_id,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         if parent_id:
             expected_context['author_name'] = 'dummy\'s'
@@ -624,6 +646,8 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
             "username": thread.username,
             "thread_type": 'discussion',
             "title": thread.title,
+            "commentable_id": thread.commentable_id,
+
         })
         self.register_get_comment_response({
             'id': response.id,
@@ -707,6 +731,7 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             "username": thread.username,
             "thread_type": 'discussion',
             "title": thread.title,
+            "commentable_id": thread.commentable_id,
         })
         self.register_get_comment_response({
             'id': 1,
@@ -734,7 +759,11 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             'post_title': 'test thread',
             'course_name': self.course.display_name,
             'sender_id': int(self.user_2.id),
-            'email_content': 'dummy'
+            'email_content': 'dummy',
+            'parent_id': None,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 2,
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))
@@ -752,7 +781,11 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             'post_title': 'test thread',
             'course_name': self.course.display_name,
             'sender_id': int(response.user_id),
-            'email_content': 'dummy'
+            'email_content': 'dummy',
+            'parent_id': None,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 2,
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))
