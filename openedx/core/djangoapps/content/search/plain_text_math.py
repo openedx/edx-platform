@@ -30,7 +30,9 @@ class PlainTextMath:
         ("\\right", ""),
     )
     regex_replacements = (
+        # Makes text bold, so not required in plain text.
         (re.compile(r'\\mathbf{(.*?)}'), r"\1"),
+        (re.compile(r'{\\bf (.*?)}'), r"\1"),
     )
 
     def _fraction_handler(self, equation: str) -> str:
