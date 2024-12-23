@@ -516,7 +516,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 " Greek letters: [mathjaxinline] \\alpha [/mathjaxinline] [mathjaxinline] \\beta [/mathjaxinline] [mathjaxinline] \\gamma [/mathjaxinline] |||"
                 " Subscripted variables: [mathjaxinline] x_i [/mathjaxinline] [mathjaxinline] y_j [/mathjaxinline] |||"
                 " Superscripted variables: [mathjaxinline] x^{i} [/mathjaxinline] |||"
-                " Not supported: \\( \\begin{bmatrix} 1 & 0 \\ 0 & 1 \\end{bmatrix} = I \\)"
+                " Not supported: \\( \\begin{bmatrix} 1 & 0 \\ 0 & 1 \\end{bmatrix} = I \\) |||"
+                " Bold text: \\( {\\bf a} \\cdot {\\bf b} = |{\\bf a}| |{\\bf b}| \\cos(\\theta) \\) |||"
+                " Bold text: \\( \\frac{\\sqrt{\\mathbf{2}+3}}{\\sqrt{4}} \\)"
             ),
         )
         # pylint: enable=line-too-long
@@ -551,6 +553,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             'Subscripted variables:  xᵢ   yⱼ',
             'Superscripted variables:  xⁱ',
             'Not supported:  \\begin{bmatrix} 1 & 0 \\ 0 & 1 \\end{bmatrix} = I',
+            'Bold text:  a ⋅ b = |a| |b| cos(θ)',
+            'Bold text:  (√{2+3}/√{4})',
         ]
         eqns = doc['description'].split('|||')
         for i, eqn in enumerate(eqns):
