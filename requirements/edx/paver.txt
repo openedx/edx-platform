@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-certifi==2024.8.30
+certifi==2024.12.14
     # via requests
 charset-normalizer==2.0.12
     # via
@@ -34,7 +34,7 @@ paver==1.3.4
     # via -r requirements/edx/paver.in
 pbr==6.1.0
     # via stevedore
-psutil==6.1.0
+psutil==6.1.1
     # via -r requirements/edx/paver.in
 pymemcache==4.0.0
     # via -r requirements/edx/paver.in
@@ -57,7 +57,7 @@ stevedore==5.4.0
     #   edx-opaque-keys
 typing-extensions==4.12.2
     # via edx-opaque-keys
-urllib3==2.2.3
+urllib3==2.3.0
     # via requests
 watchdog==6.0.0
     # via -r requirements/edx/paver.in
