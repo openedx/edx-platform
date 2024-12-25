@@ -508,6 +508,8 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                 )
             except TranscriptException:
                 pass
+            except AttributeError:
+                pass        
         if reraised_message:
             item.save_with_metadata(user)
             raise TranscriptException(reraised_message)
