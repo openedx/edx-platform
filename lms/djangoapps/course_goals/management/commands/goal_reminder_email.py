@@ -284,7 +284,7 @@ class Command(BaseCommand):
                     'uuid': session_id,
                     'timestamp': datetime.now(),
                     'reason': 'User time zone',
-                    'user_timezone': user_timezone,
+                    'user_timezone': str(user_timezone),
                     'now_in_users_timezone': now_in_users_timezone,
                 }
             )
