@@ -82,9 +82,30 @@
             <p class="course-id">Course ID: {{ course.metadata.course_id }}</p>
             <h4 class="course-title">{{ course.metadata.title }}</h4>
             <p class="course-description">{{ course.metadata.description }}</p>
+            <p class="course-description"><a href="#" onclick="postToImportCourse()">Import Course</a></p>
+
         </div>
     </div>
     {% endfor %}
 </div>
+
+<form action="{{post_url}}" method="POST" style="display: inline;">
+    <input type="text" id="csrf_token" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+    <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer;">
+        Import Course
+    </button>
+</form>
+
+<script>
+    function postToImportCourse() {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{post_url}}';
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+
 </body>
 </html>

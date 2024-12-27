@@ -475,15 +475,21 @@ def _latest_task_status(request, course_key_string, view_func=None):
 def course_templates(request, course_key_string):
     courselike_key = CourseKey.from_string(course_key_string)
     organization = courselike_key.org
-    successful_url = f"http://localhost:18010/api/contentstore/v1/course_templates/{course_key_string}"
+    # successful_url = f"http://localhost:18010/api/contentstore/v1/course_templates/{course_key_string}"
 
     courses = []
-    resp = requests.get(successful_url)
-    if resp.status_code == 200:
-        courses = json.loads(resp._content.decode('utf-8'))
+    from openedx_filters.course_authoring.filters import CourseTemplateRequested
+    courses = CourseTemplateRequested.run_filter(
+        source_type="github",
+        source_config="https://raw.githubusercontent.com/awais786/courses/refs/heads/main/edly_courses.json",
+        templates_data={}
+    )
+    if courses:
+        courses = courses['templates_data']
 
     return render(request, 'course_templates.html', {
-        'upload_zip_endpoint': successful_url,
+        # 'upload_zip_endpoint': successful_url,
         'courses': courses,
-        'organization': organization
+        'organization': organization,
+        "post_url": reverse_course_url('import_handler', courselike_key),
     })
