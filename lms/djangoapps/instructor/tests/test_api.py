@@ -1990,6 +1990,15 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         self.add_notenrolled(response, self.notenrolled_student.username)
         assert CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id)
 
+    def test_add_notenrolled_username_autoenroll_with_multiple_users(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
+        identifiers = (f"Lorem@ipsum.dolor, "
+                       f"sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed, "
+                       f"{self.notenrolled_student.username}"
+                       )
+        response = self.client.post(url, {'identifiers': identifiers, 'action': 'add', 'email_students': False, 'auto_enroll': True})  # lint-amnesty, pylint: disable=line-too-long
+        assert 6, len(json.loads(response.content.decode())['results'])
+
     @ddt.data('http', 'https')
     def test_add_notenrolled_with_email(self, protocol):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})

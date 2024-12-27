@@ -1,9 +1,11 @@
 """
 Views for the notifications API.
 """
+import copy
 from datetime import datetime, timedelta
 
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
@@ -17,10 +19,7 @@ from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch
-from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference,
-    get_course_notification_preference_config_version
-)
+from openedx.core.djangoapps.notifications.models import get_course_notification_preference_config_version
 from openedx.core.djangoapps.notifications.permissions import allow_any_authenticated_user
 
 from .base_notification import COURSE_NOTIFICATION_APPS
@@ -32,14 +31,15 @@ from .events import (
     notification_tray_opened_event,
     notifications_app_all_read_event
 )
-from .models import Notification
+from .models import CourseNotificationPreference, Notification
 from .serializers import (
     NotificationCourseEnrollmentSerializer,
     NotificationSerializer,
     UserCourseNotificationPreferenceSerializer,
-    UserNotificationPreferenceUpdateSerializer,
+    UserNotificationPreferenceUpdateAllSerializer,
+    UserNotificationPreferenceUpdateSerializer
 )
-from .utils import get_show_notifications_tray, get_is_new_notification_view_enabled
+from .utils import get_is_new_notification_view_enabled, get_show_notifications_tray, aggregate_notification_configs
 
 
 @allow_any_authenticated_user()
@@ -444,3 +444,144 @@ def preference_update_from_encrypted_username_view(request, username, patch):
     """
     update_user_preferences_from_patch(username, patch)
     return Response({"result": "success"}, status=status.HTTP_200_OK)
+
+
+@allow_any_authenticated_user()
+class UpdateAllNotificationPreferencesView(APIView):
+    """
+    API view for updating all notification preferences for the current user.
+    """
+
+    def post(self, request):
+        """
+        Update all notification preferences for the current user.
+        """
+        # check if request have required params
+        serializer = UserNotificationPreferenceUpdateAllSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                'status': 'error',
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        # check if required config is not editable
+        try:
+            with transaction.atomic():
+                # Get all active notification preferences for the current user
+                notification_preferences = (
+                    CourseNotificationPreference.objects
+                    .select_for_update()
+                    .filter(
+                        user=request.user,
+                        is_active=True
+                    )
+                )
+
+                if not notification_preferences.exists():
+                    return Response({
+                        'status': 'error',
+                        'message': 'No active notification preferences found'
+                    }, status=status.HTTP_404_NOT_FOUND)
+
+                data = serializer.validated_data
+                app = data['notification_app']
+                email_cadence = data.get('email_cadence', None)
+                channel = data.get('notification_channel', 'email_cadence' if email_cadence else None)
+                notification_type = data['notification_type']
+                value = data.get('value', email_cadence if email_cadence else None)
+
+                updated_courses = []
+                errors = []
+
+                # Update each preference
+                for preference in notification_preferences:
+                    try:
+                        # Create a deep copy of the current config
+                        updated_config = copy.deepcopy(preference.notification_preference_config)
+
+                        # Check if the path exists and update the value
+                        if (
+                            updated_config.get(app, {})
+                                .get('notification_types', {})
+                                .get(notification_type, {})
+                                .get(channel)
+                        ) is not None:
+
+                            # Update the specific setting in the config
+                            updated_config[app]['notification_types'][notification_type][channel] = value
+
+                            # Update the notification preference
+                            preference.notification_preference_config = updated_config
+                            preference.save()
+
+                            updated_courses.append({
+                                'course_id': str(preference.course_id),
+                                'current_setting': updated_config[app]['notification_types'][notification_type]
+                            })
+                        else:
+                            errors.append({
+                                'course_id': str(preference.course_id),
+                                'error': f'Invalid path: {app}.notification_types.{notification_type}.{channel}'
+                            })
+
+                    except Exception as e:
+                        errors.append({
+                            'course_id': str(preference.course_id),
+                            'error': str(e)
+                        })
+
+                response_data = {
+                    'status': 'success' if updated_courses else 'partial_success' if errors else 'error',
+                    'message': 'Notification preferences update completed',
+                    'data': {
+                        'updated_value': value,
+                        'notification_type': notification_type,
+                        'channel': channel,
+                        'app': app,
+                        'successfully_updated_courses': updated_courses,
+                        'total_updated': len(updated_courses),
+                        'total_courses': notification_preferences.count()
+                    }
+                }
+
+                if errors:
+                    response_data['errors'] = errors
+
+                return Response(
+                    response_data,
+                    status=status.HTTP_200_OK if updated_courses else status.HTTP_400_BAD_REQUEST
+                )
+
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@allow_any_authenticated_user()
+class AggregatedNotificationPreferences(APIView):
+    """
+    API view for getting the aggregate notification preferences for the current user.
+    """
+
+    def get(self, request):
+        """
+        API view for getting the aggregate notification preferences for the current user.
+        """
+        notification_preferences = CourseNotificationPreference.objects.filter(user=request.user, is_active=True)
+
+        if not notification_preferences.exists():
+            return Response({
+                'status': 'error',
+                'message': 'No active notification preferences found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        notification_configs = notification_preferences.values_list('notification_preference_config', flat=True)
+        notification_configs = aggregate_notification_configs(
+            notification_configs
+        )
+
+        return Response({
+            'status': 'success',
+            'message': 'Notification preferences retrieved',
+            'data': notification_configs
+        }, status=status.HTTP_200_OK)
