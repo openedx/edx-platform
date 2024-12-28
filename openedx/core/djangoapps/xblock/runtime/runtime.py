@@ -124,8 +124,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
             id_reader=id_reader or OpaqueKeyReader(),
             mixins=(
                 LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
-                XBlockShim,  # Adds deprecated LMS/Studio functionality / backwards compatibility
                 InheritanceMixin,
+                XBlockShim,  # Adds deprecated LMS/Studio functionality / backwards compatibility
             ),
             default_class=None,
             select=None,
