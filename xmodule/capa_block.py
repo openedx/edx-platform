@@ -787,18 +787,6 @@ class _BuiltInProblemBlock(
                 }
                 yield (user_state.username, report)
 
-    @property
-    def course_end_date(self):
-        """
-        Return the end date of the problem's course
-        """
-
-        try:
-            course_block_key = self.runtime.course_entry.structure['root']
-            return self.runtime.course_entry.structure['blocks'][course_block_key].fields['end']
-        except (AttributeError, KeyError):
-            return None
-
     def get_seed(self):
         """
         Generate the seed if not set and return it.
