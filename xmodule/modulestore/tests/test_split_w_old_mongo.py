@@ -10,7 +10,7 @@ import pytest
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
@@ -46,7 +46,7 @@ class SplitWMongoCourseBootstrapper(unittest.TestCase):
         'default_class': 'xmodule.hidden_block.HiddenBlock',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
-        'xblock_mixins': (InheritanceMixin, XModuleMixin)
+        'xblock_mixins': (InheritableFieldsMixin, XModuleMixin)
     }
 
     split_course_key = CourseLocator('test_org', 'test_course', 'runid', branch=ModuleStoreEnum.BranchName.draft)

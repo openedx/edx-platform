@@ -50,7 +50,7 @@ from xmodule.modulestore.exceptions import (
     ItemNotFoundError,
     NoPathToItem,
 )
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import navigation_index, path_to_location
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
@@ -91,7 +91,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         'default_class': DEFAULT_CLASS,
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin, XModuleMixin),
+        'xblock_mixins': (EditInfoMixin, InheritableFieldsMixin, LocationMixin, XModuleMixin),
     }
     DOC_STORE_CONFIG = {
         'host': HOST,

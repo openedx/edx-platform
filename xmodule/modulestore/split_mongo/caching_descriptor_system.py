@@ -18,7 +18,7 @@ from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore.inheritance import InheritanceMixin, inheriting_field_data
+from xmodule.modulestore.inheritance import InheritableFieldsMixin, inheriting_field_data
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.split_mongo.definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
@@ -303,7 +303,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             field_decorator=field_decorator,
         )
 
-        if InheritanceMixin in self.modulestore.xblock_mixins:
+        if InheritableFieldsMixin in self.modulestore.xblock_mixins:
             field_data = inheriting_field_data(kvs)
         else:
             field_data = KvsFieldData(kvs)

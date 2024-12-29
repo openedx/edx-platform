@@ -13,7 +13,7 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from xmodule.course_block import CourseBlock
 from xmodule.fields import Date, RelativeTime, Timedelta
-from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritanceMixin, InheritingFieldData
+from xmodule.modulestore.inheritance import InheritanceKeyValueStore, InheritableFieldsMixin, InheritingFieldData
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 from xmodule.seq_block import SequenceBlock
 from xmodule.tests import get_test_descriptor_system
@@ -49,7 +49,7 @@ class TestFields:
         values=[{'display_name': 'first', 'value': 'value a'},
                 {'display_name': 'second', 'value': 'value b'}]
     )
-    showanswer = InheritanceMixin.showanswer
+    showanswer = InheritableFieldsMixin.showanswer
     # Used for testing select type
     float_select = Float(scope=Scope.settings, default=.999, values=[1.23, 0.98])
     # Used for testing float type
@@ -277,7 +277,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         block = self.get_block(model_data)
         editable_fields = block.editable_metadata_fields
         self.assert_field_values(
-            editable_fields, 'showanswer', InheritanceMixin.showanswer,
+            editable_fields, 'showanswer', InheritableFieldsMixin.showanswer,
             explicitly_set=False, value='inherited', default_value='inherited'
         )
 
@@ -290,7 +290,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         block = self.get_block(model_data)
         editable_fields = block.editable_metadata_fields
         self.assert_field_values(
-            editable_fields, 'showanswer', InheritanceMixin.showanswer,
+            editable_fields, 'showanswer', InheritableFieldsMixin.showanswer,
             explicitly_set=True, value='explicit', default_value='inheritable value'
         )
 
@@ -612,7 +612,7 @@ class TestXmlAttributes(XModuleXmlImportTest):
 
         seq = self.process_xml(root)
 
-        # Rerandomize is added to the constructed sequence via the InheritanceMixin
+        # Rerandomize is added to the constructed sequence via the InheritableFieldsMixin
         assert seq.rerandomize == 'never'
 
         # Rerandomize is a known value coming from policy, and shouldn't appear
@@ -629,7 +629,7 @@ class TestXmlAttributes(XModuleXmlImportTest):
         seq = self.process_xml(root)
 
         # attempts isn't added to the constructed sequence, because
-        # it's not in the InheritanceMixin
+        # it's not in the InheritableFieldsMixin
         assert not hasattr(seq, 'attempts')
 
         # attempts is an unknown attribute, so we should include it
@@ -641,14 +641,14 @@ class TestXmlAttributes(XModuleXmlImportTest):
         # `attribute` isn't a basic attribute of Sequence
         assert not hasattr(SequenceBlock, attribute)
 
-        # `attribute` is added by InheritanceMixin
-        assert hasattr(InheritanceMixin, attribute)
+        # `attribute` is added by InheritableFieldsMixin
+        assert hasattr(InheritableFieldsMixin, attribute)
 
         root = SequenceFactory.build(policy={attribute: str(value)})
         ProblemFactory.build(parent=root)
 
-        # InheritanceMixin will be used when processing the XML
-        assert InheritanceMixin in root.xblock_mixins
+        # InheritableFieldsMixin will be used when processing the XML
+        assert InheritableFieldsMixin in root.xblock_mixins
 
         seq = self.process_xml(root)
 
@@ -656,7 +656,7 @@ class TestXmlAttributes(XModuleXmlImportTest):
         assert not seq.__class__ == SequenceBlock
 
         # `attribute` is added to the constructed sequence, because
-        # it's in the InheritanceMixin
+        # it's in the InheritableFieldsMixin
         assert getattr(seq, attribute) == value
 
         # `attribute` is a known attribute, so we shouldn't include it

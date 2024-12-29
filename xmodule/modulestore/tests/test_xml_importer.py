@@ -16,7 +16,7 @@ from xblock.fields import List, Scope, ScopeIds, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.modulestore.tests.mongo_connection import MONGO_HOST, MONGO_PORT_NUM
 from xmodule.modulestore.xml_importer import StaticContentImporter, _update_block_location
 from xmodule.tests import DATA_DIR
@@ -107,7 +107,7 @@ def render_to_template_mock(*args):
     pass
 
 
-class StubXBlock(XModuleMixin, InheritanceMixin):
+class StubXBlock(XModuleMixin, InheritableFieldsMixin):
     """
     Stub XBlock used for testing.
     """
