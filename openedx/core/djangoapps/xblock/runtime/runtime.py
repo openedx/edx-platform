@@ -25,7 +25,7 @@ from xblock.runtime import IdReader, KvsFieldData, MemoryIdManager, Runtime
 from xmodule.errortracker import make_error_tracker
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import XBlockI18nService
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.services import EventPublishingService, RebindUserService, ProblemFeedbackService
 from xmodule.util.sandboxing import SandboxService
 from common.djangoapps.edxmako.services import MakoService
@@ -124,7 +124,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             id_reader=id_reader or OpaqueKeyReader(),
             mixins=(
                 LmsBlockMixin,  # Adds Non-deprecated LMS/Studio functionality
-                InheritanceMixin,
+                InheritableFieldsMixin,
                 XBlockShim,  # Adds deprecated LMS/Studio functionality / backwards compatibility
             ),
             default_class=None,

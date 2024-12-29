@@ -30,8 +30,12 @@ class UserPartitionList(List):
                 for user_partition in values]
 
 
-class InheritanceMixin(XBlockMixin):
-    """Field definitions for inheritable fields."""
+class InheritableFieldsMixin(XBlockMixin):
+    """
+    Field definitions for inheritable fields.
+
+    Defines fields which the modulestore runtime treats as inheritable.
+    """
 
     graded = Boolean(
         help="Whether this block contributes to the final course grade",
@@ -306,7 +310,7 @@ def compute_inherited_metadata(block):
         else:
             parent_metadata = {}
         # add any of block's explicitly set fields to the inheriting list
-        for field in InheritanceMixin.fields.values():  # lint-amnesty, pylint: disable=no-member
+        for field in InheritableFieldsMixin.fields.values():  # lint-amnesty, pylint: disable=no-member
             if field.is_set_on(block):
                 # inherited_settings values are json repr
                 parent_metadata[field.name] = field.read_json(block)
@@ -413,9 +417,9 @@ class InheritingFieldData(KvsFieldData):
 
 
 def inheriting_field_data(kvs):
-    """Create an InheritanceFieldData that inherits the names in InheritanceMixin."""
+    """Create an InheritanceFieldData that inherits the names in InheritableFieldsMixin."""
     return InheritingFieldData(
-        inheritable_names=InheritanceMixin.fields.keys(),  # lint-amnesty, pylint: disable=no-member
+        inheritable_names=InheritableFieldsMixin.fields.keys(),  # lint-amnesty, pylint: disable=no-member
         kvs=kvs,
     )
 

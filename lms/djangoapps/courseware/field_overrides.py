@@ -24,7 +24,7 @@ from django.conf import settings
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 from xblock.field_data import FieldData
 
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 
 NOTSET = object()
 ENABLED_OVERRIDE_PROVIDERS_KEY = 'lms.djangoapps.courseware.field_overrides.enabled_providers.{course_id}'
@@ -234,7 +234,7 @@ class OverrideFieldData(FieldData):
             # If this is an inheritable field and an override is set above,
             # then we want to return False here, so the field_data uses the
             # override and not the original value for this block.
-            inheritable = list(InheritanceMixin.fields.keys())  # pylint: disable=no-member
+            inheritable = list(InheritableFieldsMixin.fields.keys())  # pylint: disable=no-member
             if name in inheritable:
                 for ancestor in _lineage(block):
                     if self.get_override(ancestor, name) is not NOTSET:
@@ -249,7 +249,7 @@ class OverrideFieldData(FieldData):
         # The `default` method is overloaded by the field storage system to
         # also handle inheritance.
         if self.providers and not overrides_disabled():
-            inheritable = list(InheritanceMixin.fields.keys())  # pylint: disable=no-member
+            inheritable = list(InheritableFieldsMixin.fields.keys())  # pylint: disable=no-member
             if name in inheritable:
                 for ancestor in _lineage(block):
                     value = self.get_override(ancestor, name)
