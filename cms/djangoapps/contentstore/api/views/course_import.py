@@ -6,6 +6,8 @@ APIs related to Course Import.
 import base64
 import logging
 import os
+from urllib.parse import urlparse
+import requests
 
 from django.conf import settings
 from django.core.files import File
@@ -116,49 +118,88 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
         """
         set_custom_attribute('course_import_init', True)
         set_custom_attributes_for_course_key(course_key)
+
+        course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(
+            repr(course_key).encode('utf-8')
+        ).decode('utf-8')
+        if not course_dir.isdir():
+            os.makedirs(course_dir)
+
         try:
-            if 'course_data' not in request.FILES:
+            # Check for input source
+            if 'course_data' not in request.FILES and 'file_url' not in request.data:
                 raise self.api_error(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    developer_message='Missing required parameter',
-                    error_code='internal_error',
+                    developer_message='Missing required parameter: course_data or file_url',
+                    error_code='missing_parameter',
                 )
 
-            filename = request.FILES['course_data'].name
-            if not filename.endswith(IMPORTABLE_FILE_TYPES):
-                raise self.api_error(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    developer_message='Parameter in the wrong format',
-                    error_code='internal_error',
-                )
-            course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(
-                repr(course_key).encode('utf-8')
-            ).decode('utf-8')
-            temp_filepath = course_dir / filename
-            if not course_dir.isdir():
-                os.mkdir(course_dir)
+            if 'course_data' in request.FILES:
+                uploaded_file = request.FILES['course_data']
+                filename = uploaded_file.name
+                if not filename.endswith(IMPORTABLE_FILE_TYPES):
+                    raise self.api_error(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        developer_message=f'File type not supported: {filename}',
+                        error_code='invalid_file_type',
+                    )
+                temp_filepath = course_dir / filename
 
-            log.debug(f'importing course to {temp_filepath}')
-            with open(temp_filepath, "wb+") as temp_file:
-                for chunk in request.FILES['course_data'].chunks():
-                    temp_file.write(chunk)
+                log.info(f"Course import {course_key}: Upload complete, file: {filename}")
+                with open(temp_filepath, "wb") as temp_file:
+                    for chunk in uploaded_file.chunks():
+                        temp_file.write(chunk)
 
-            log.info("Course import %s: Upload complete", course_key)
+            # Handle file URL
+            elif 'file_url' in request.data:
+                file_url = request.data['file_url']
+                filename = os.path.basename(urlparse(file_url).path)
+                if not filename.endswith(IMPORTABLE_FILE_TYPES):
+                    raise self.api_error(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        developer_message=f'File type not supported: {filename}',
+                        error_code='invalid_file_type',
+                    )
+                response = requests.get(file_url, stream=True)
+                if response.status_code != 200:
+                    raise self.api_error(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        developer_message='Failed to download file from URL',
+                        error_code='download_error',
+                    )
+                temp_filepath = course_dir / filename
+                total_size = 0  # Track total size in bytes
+                with open(temp_filepath, "wb") as temp_file:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        if chunk:
+                            chunk_size = len(chunk)
+                            total_size += chunk_size
+                            temp_file.write(chunk)
+                log.info(f"Course import {course_key}: File downloaded from URL, file: {filename}")
+
+            # Save file to storage
             with open(temp_filepath, 'rb') as local_file:
                 django_file = File(local_file)
-                storage_path = course_import_export_storage.save('olx_import/' + filename, django_file)
+                storage_path = course_import_export_storage.save(f'olx_import/{filename}', django_file)
 
+            # Start asynchronous task
             async_result = import_olx.delay(
-                request.user.id, str(course_key), storage_path, filename, request.LANGUAGE_CODE)
-            return Response({
-                'task_id': async_result.task_id
-            })
+                request.user.id, str(course_key), storage_path, filename, request.LANGUAGE_CODE
+            )
+            return Response(
+                {
+                    'task_id': async_result.task_id,
+                    'filename': filename,
+                    'storage_path': storage_path,
+                },
+                status=status.HTTP_200_OK
+            )
         except Exception as e:
-            log.exception(f'Course import {course_key}: Unknown error in import')
+            log.exception(f"Course import {course_key}: Error during import")
             raise self.api_error(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 developer_message=str(e),
-                error_code='internal_error'
+                error_code='internal_error',
             )
 
     @course_author_access_required
