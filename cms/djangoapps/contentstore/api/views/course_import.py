@@ -124,8 +124,8 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
             if 'course_data' not in request.FILES and 'file_url' not in request.data:
                 raise self.api_error(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    developer_message='Missing required parameter: course_data or file_url',
-                    error_code='missing_parameter',
+                    developer_message='Missing required parameter',
+                    error_code='internal_error',
                 )
 
             course_dir = path(settings.GITHUB_REPO_ROOT) / base64.urlsafe_b64encode(
@@ -187,12 +187,9 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
             async_result = import_olx.delay(
                 request.user.id, str(course_key), storage_path, filename, request.LANGUAGE_CODE
             )
-            return Response(
-                {
-                    'task_id': async_result.task_id,
-                },
-                status=status.HTTP_200_OK
-            )
+            return Response({
+                    'task_id': async_result.task_id
+            })
         except Exception as e:
             log.exception(f'Course import {course_key}: Unknown error in import')
             raise self.api_error(
