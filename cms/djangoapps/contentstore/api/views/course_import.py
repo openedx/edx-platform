@@ -141,8 +141,8 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
                 if not filename.endswith(IMPORTABLE_FILE_TYPES):
                     raise self.api_error(
                         status_code=status.HTTP_400_BAD_REQUEST,
-                        developer_message=f'File type not supported: {filename}',
-                        error_code='invalid_file_type',
+                        developer_message='Missing required parameter',
+                        error_code='internal_error',
                     )
                 temp_filepath = course_dir / filename
 
@@ -181,7 +181,7 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
             # Save file to storage
             with open(temp_filepath, 'rb') as local_file:
                 django_file = File(local_file)
-                storage_path = course_import_export_storage.save(f'olx_import/{filename}', django_file)
+                storage_path = course_import_export_storage.save('olx_import/' + filename, django_file)
 
             # Start asynchronous task
             async_result = import_olx.delay(
@@ -190,13 +190,11 @@ class CourseImportView(CourseImportExportViewMixin, GenericAPIView):
             return Response(
                 {
                     'task_id': async_result.task_id,
-                    'filename': filename,
-                    'storage_path': storage_path,
                 },
                 status=status.HTTP_200_OK
             )
         except Exception as e:
-            log.exception(f"Course import {course_key}: Error during import")
+            log.exception(f'Course import {course_key}: Unknown error in import')
             raise self.api_error(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 developer_message=str(e),
