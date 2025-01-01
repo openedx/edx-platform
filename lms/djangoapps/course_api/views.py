@@ -172,7 +172,7 @@ class LazyPageNumberPagination(NamespacedPageNumberPagination):
 
     The paginator cache uses ``@cached_property`` to cache the property values for
     count and num_pages.  It assumes these won't change, but in the case of a
-    LazySquence, its count gets updated as we move through it.  This class clears
+    LazySequence, its count gets updated as we move through it.  This class clears
     the cached property values before reporting results so they will be recalculated.
 
     """
