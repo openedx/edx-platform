@@ -10,11 +10,11 @@ acid-xblock==0.4.1
     # via -r requirements/edx/kernel.in
 aiohappyeyeballs==2.4.4
     # via aiohttp
-aiohttp==3.11.9
+aiohttp==3.11.11
     # via
     #   geoip2
     #   openai
-aiosignal==1.3.1
+aiosignal==1.3.2
     # via aiohttp
 algoliasearch==3.0.0
     # via
@@ -37,7 +37,7 @@ asgiref==3.8.1
     #   django-countries
 asn1crypto==1.5.1
     # via snowflake-connector-python
-attrs==24.2.0
+attrs==24.3.0
     # via
     #   -r requirements/edx/kernel.in
     #   aiohttp
@@ -72,13 +72,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.35.76
+boto3==1.35.90
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.76
+botocore==1.35.90
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -101,7 +101,7 @@ celery==5.4.0
     #   edx-enterprise
     #   event-tracking
     #   openedx-learning
-certifi==2024.8.30
+certifi==2024.12.14
     # via
     #   -r requirements/edx/paver.txt
     #   elasticsearch
@@ -140,7 +140,7 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-code-annotations==2.0.0
+code-annotations==2.1.0
     # via
     #   edx-enterprise
     #   edx-toggles
@@ -245,7 +245,7 @@ django==4.2.17
     #   xss-utils
 django-appconf==1.0.6
     # via django-statici18n
-django-cache-memoize==0.2.0
+django-cache-memoize==0.2.1
     # via edx-enterprise
 django-celery-results==2.5.1
     # via -r requirements/edx/kernel.in
@@ -284,7 +284,7 @@ django-ipware==7.0.1
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-proctoring
-django-js-asset==2.2.0
+django-js-asset==3.0.1
     # via django-mptt
 django-method-override==1.0.4
     # via -r requirements/edx/kernel.in
@@ -321,7 +321,7 @@ django-oauth-toolkit==1.7.1
     #   edx-enterprise
 django-object-actions==4.3.0
     # via edx-enterprise
-django-pipeline==3.1.0
+django-pipeline==4.0.0
     # via -r requirements/edx/kernel.in
 django-push-notifications==3.1.0
     # via edx-ace
@@ -331,7 +331,7 @@ django-sekizai==4.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-wiki
-django-ses==4.3.0
+django-ses==4.3.1
     # via -r requirements/edx/bundled.in
 django-simple-history==3.4.0
     # via
@@ -434,7 +434,7 @@ edx-celeryutils==1.3.0
     #   super-csv
 edx-codejail==3.5.2
     # via -r requirements/edx/kernel.in
-edx-completion==4.7.6
+edx-completion==4.7.8
     # via -r requirements/edx/kernel.in
 edx-django-release-util==1.4.0
     # via
@@ -508,7 +508,7 @@ edx-opaque-keys[django]==2.11.0
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/kernel.in
-edx-proctoring==4.18.4
+edx-proctoring==5.0.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring-proctortrack
@@ -525,7 +525,7 @@ edx-search==4.1.1
     #   openedx-forum
 edx-sga==0.25.0
     # via -r requirements/edx/bundled.in
-edx-submissions==3.8.3
+edx-submissions==3.8.4
     # via
     #   -r requirements/edx/kernel.in
     #   ora2
@@ -567,7 +567,7 @@ event-tracking==3.0.0
     #   edx-completion
     #   edx-proctoring
     #   edx-search
-fastavro==1.9.7
+fastavro==1.10.0
     # via openedx-events
 filelock==3.16.1
     # via snowflake-connector-python
@@ -593,16 +593,16 @@ geoip2==4.8.1
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
-google-api-core[grpc]==2.23.0
+google-api-core[grpc]==2.24.0
     # via
     #   firebase-admin
     #   google-api-python-client
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-api-python-client==2.154.0
+google-api-python-client==2.156.0
     # via firebase-admin
-google-auth==2.36.0
+google-auth==2.37.0
     # via
     #   google-api-core
     #   google-api-python-client
@@ -669,7 +669,7 @@ ipaddress==1.0.23
     # via -r requirements/edx/kernel.in
 isodate==0.7.2
     # via python3-saml
-jinja2==3.1.4
+jinja2==3.1.5
     # via code-annotations
 jmespath==1.0.1
     # via
@@ -715,7 +715,7 @@ libsass==0.10.0
     #   -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.12.0
+lti-consumer-xblock==9.12.1
     # via -r requirements/edx/kernel.in
 lxml[html-clean,html_clean]==5.3.0
     # via
@@ -734,7 +734,7 @@ lxml-html-clean==0.4.1
     # via lxml
 mailsnake==1.6.4
     # via -r requirements/edx/bundled.in
-mako==1.3.7
+mako==1.3.8
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock
@@ -784,9 +784,9 @@ mysqlclient==2.2.6
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-forum
-newrelic==10.3.1
+newrelic==10.4.0
     # via edx-django-utils
-nh3==0.2.19
+nh3==0.2.20
     # via -r requirements/edx/kernel.in
 nltk==3.9.1
     # via chem
@@ -853,7 +853,7 @@ optimizely-sdk==4.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
-ora2==6.14.1
+ora2==6.14.3
     # via -r requirements/edx/bundled.in
 packaging==24.2
     # via
@@ -908,14 +908,14 @@ proto-plus==1.25.0
     # via
     #   google-api-core
     #   google-cloud-firestore
-protobuf==5.29.1
+protobuf==5.29.2
     # via
     #   google-api-core
     #   google-cloud-firestore
     #   googleapis-common-protos
     #   grpcio-status
     #   proto-plus
-psutil==6.1.0
+psutil==6.1.1
     # via
     #   -r requirements/edx/paver.txt
     #   edx-django-utils
@@ -940,9 +940,9 @@ pycryptodomex==3.21.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.10.3
+pydantic==2.10.4
     # via camel-converter
-pydantic-core==2.27.1
+pydantic-core==2.27.2
     # via pydantic
 pygments==2.18.0
     # via
@@ -1062,7 +1062,7 @@ random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==3.0.0
     # via -r requirements/edx/bundled.in
-redis==5.2.0
+redis==5.2.1
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1187,7 +1187,7 @@ sortedcontainers==2.4.0
     #   snowflake-connector-python
 soupsieve==2.6
     # via beautifulsoup4
-sqlparse==0.5.2
+sqlparse==0.5.3
     # via django
 staff-graded-xblock==2.3.0
     # via -r requirements/edx/bundled.in
@@ -1240,7 +1240,7 @@ uritemplate==4.1.1
     #   drf-spectacular
     #   drf-yasg
     #   google-api-python-client
-urllib3==2.2.3
+urllib3==2.3.0
     # via
     #   -r requirements/edx/paver.txt
     #   botocore
@@ -1279,6 +1279,8 @@ webob==1.8.9
     # via
     #   -r requirements/edx/kernel.in
     #   xblock
+wheel==0.45.1
+    # via django-pipeline
 wrapt==1.17.0
     # via -r requirements/edx/paver.txt
 xblock[django]==5.1.0
