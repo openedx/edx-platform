@@ -10,7 +10,6 @@ import pytz
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_switch
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase

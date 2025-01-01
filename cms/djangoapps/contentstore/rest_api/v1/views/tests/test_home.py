@@ -8,15 +8,11 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import (
-    override_waffle_switch,
-)
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
