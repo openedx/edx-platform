@@ -50,7 +50,7 @@ def run_eslint():
 
     print(result.stdout)
     if result.returncode == 0:
-        print("No eslint violations found.")
+        fail_quality("No eslint violations found. This is unexpected... are you sure eslint is running correctly?")
     elif result.returncode == 1:
         last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
         regex = r'^\d+'
