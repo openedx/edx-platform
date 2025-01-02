@@ -163,3 +163,4 @@ web-fragments                       # Provides the ability to render fragments o
 wrapt                               # Better functools.wrapped. TODO: functools has since improved, maybe we can switch?
 XBlock[django]                      # Courseware component architecture
 xss-utils                           # https://github.com/openedx/edx-platform/pull/20633 Fix XSS via Translations
+unicodeit                           # Converts mathjax equation to plain text by using unicode symbols
