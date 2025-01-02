@@ -6,12 +6,15 @@ Tests for the course import API views
 import os
 import tarfile
 import tempfile
+from unittest.mock import Mock, patch
 
 from django.urls import reverse
 from path import Path as path
 from rest_framework import status
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskStatus
+
+from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -93,6 +96,47 @@ class CourseImportViewTest(SharedModuleStoreTestCase, APITestCase):
         with open(self.good_tar_fullpath, 'rb') as fp:
             resp = self.client.post(self.get_url(self.course_key), {'course_data': fp}, format='multipart')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_staff_with_access_import_course_by_url_succeeds(self):
+        """
+        Test that a staff user can access the API and successfully import a course using a URL
+        """
+        self.client.login(username=self.staff.username, password=self.password)
+
+        # Mocked URL and file content
+        file_url = "https://example.com/test-course.tar.gz"
+        with open(self.good_tar_fullpath, 'rb') as fp:
+            file_content = fp.read()
+
+        # Mock requests.get
+        with patch('requests.get') as mock_get:
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.iter_content = lambda chunk_size: (file_content[i:i + chunk_size] for i in
+                                                             range(0, len(file_content), chunk_size))
+            mock_get.return_value = mock_response
+
+            # Make the API request for course import
+            import_response = self.client.post(
+                self.get_url(self.course_key),
+                {'file_url': file_url},
+                format='json'
+            )
+
+            # Assertions for import response
+            self.assertEqual(import_response.status_code, status.HTTP_200_OK)
+            self.assertIn('task_id', import_response.data)
+
+            # Verify task status
+            task_id = import_response.data['task_id']
+            status_response = self.client.get(
+                self.get_url(self.course_key),
+                {'task_id': task_id, 'filename': 'test-course.tar.gz'}
+            )
+
+            # Assertions for task status
+            self.assertEqual(status_response.status_code, status.HTTP_200_OK)
+            self.assertEqual(status_response.data['state'], UserTaskStatus.SUCCEEDED)
 
     def test_staff_has_no_access_import_fails(self):
         """
