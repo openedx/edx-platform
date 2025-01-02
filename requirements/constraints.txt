@@ -112,12 +112,6 @@ markdown<3.4.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35270
 moto<5.0
 
-# Date: 2024-10-16
-# MyPY 1.12.0 fails on all PRs with the following error:
-# openedx/core/djangoapps/content_libraries/api.py:732: error: INTERNAL ERROR
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35667
-mypy<1.12.0
-
 # Date: 2024-07-16
 # We need to upgrade the version of elasticsearch to atleast 7.15 before we can upgrade to Numpy 2.0.0
 # Otherwise we see a failure while running the following command:
