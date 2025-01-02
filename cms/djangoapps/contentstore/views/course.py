@@ -137,8 +137,6 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'group_configurations_list_handler', 'group_configurations_detail_handler',
            'get_course_and_check_access']
 
-WAFFLE_NAMESPACE = 'studio_home'
-
 
 class AccessListFallback(Exception):
     """
