@@ -12,7 +12,7 @@ from path import Path as path
 
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
@@ -425,7 +425,7 @@ COMMON_DOCSTORE_CONFIG = {
 DATA_DIR = path(__file__).dirname().parent.parent / "tests" / "data" / "xml-course-root"
 TEST_DATA_DIR = 'common/test/data/'
 
-XBLOCK_MIXINS = (InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (InheritableFieldsMixin, XModuleMixin)
 
 
 MIXED_MODULESTORE_BOTH_SETUP = MixedModulestoreBuilder([

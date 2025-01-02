@@ -33,7 +33,7 @@ from xmodule.modulestore.exceptions import (
     ItemNotFoundError,
     VersionConflictError
 )
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.modulestore.split_mongo.mongo_connection import CourseStructureCache
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
@@ -71,7 +71,7 @@ class SplitModuleTest(unittest.TestCase):
     modulestore_options = {
         'default_class': 'xmodule.hidden_block.HiddenBlock',
         'fs_root': tempdir.mkdtemp_clean(),
-        'xblock_mixins': (InheritanceMixin, XModuleMixin, EditInfoMixin)
+        'xblock_mixins': (InheritableFieldsMixin, XModuleMixin, EditInfoMixin)
     }
 
     MODULESTORE = {

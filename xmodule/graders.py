@@ -9,9 +9,7 @@ import logging
 import random
 import sys
 from collections import OrderedDict
-from datetime import datetime
 
-from pytz import UTC
 from django.utils.translation import gettext_lazy as _
 
 from xmodule.util.misc import get_short_labeler
@@ -472,7 +470,7 @@ def _min_or_none(itr):
 
 class ShowCorrectness:
     """
-    Helper class for determining whether correctness is currently hidden for a block.
+    Helper class for determining the possible status of correctness.
 
     When correctness is hidden, this limits the user's access to the correct/incorrect flags, messages, problem scores,
     and aggregate subsection and course grades.
@@ -483,21 +481,24 @@ class ShowCorrectness:
     PAST_DUE = "past_due"
     NEVER = "never"
 
-    @classmethod
-    def correctness_available(cls, show_correctness='', due_date=None, has_staff_access=False):
-        """
-        Returns whether correctness is available now, for the given attributes.
-        """
-        if show_correctness == cls.NEVER:
-            return False
-        elif has_staff_access:
-            # This is after the 'never' check because course staff can see correctness
-            # unless the sequence/problem explicitly prevents it
-            return True
-        elif show_correctness == cls.PAST_DUE:
-            # Is it now past the due date?
-            return (due_date is None or
-                    due_date < datetime.now(UTC))
 
-        # else: show_correctness == cls.ALWAYS
-        return True
+class ShowAnswer:
+    """
+    Helper class for determining the possible status for showing the answer.
+
+    When an answer is hidden, this limits the user's access to it.
+    """
+
+    # Constants used to indicate when to show an answer
+    ALWAYS = "always"
+    ANSWERED = "answered"
+    ATTEMPTED = "attempted"
+    CLOSED = "closed"
+    FINISHED = "finished"
+    CORRECT_OR_PAST_DUE = "correct_or_past_due"
+    PAST_DUE = "past_due"
+    NEVER = "never"
+    AFTER_SOME_NUMBER_OF_ATTEMPTS = "after_attempts"
+    AFTER_ALL_ATTEMPTS = "after_all_attempts"
+    AFTER_ALL_ATTEMPTS_OR_CORRECT = "after_all_attempts_or_correct"
+    ATTEMPTED_NO_PAST_DUE = "attempted_no_past_due"

@@ -12,7 +12,7 @@ from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.test.tools import TestRuntime
 
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 
 
 class TestXBlock(XBlock):
@@ -23,9 +23,9 @@ class TestXBlock(XBlock):
 
 
 @ddt.ddt
-class TestInheritanceMixin(unittest.TestCase):
+class TestInheritableFieldsMixin(unittest.TestCase):
     """
-    Test Suite to verify various methods of the InheritanceMixin
+    Test Suite to verify various methods of the InheritableFieldsMixin
     """
 
     def setUp(self):
@@ -33,7 +33,7 @@ class TestInheritanceMixin(unittest.TestCase):
         Create a test xblock with mock runtime.
         """
         runtime = TestRuntime(
-            Mock(entry_point=XBlock.entry_point), mixins=[InheritanceMixin], services={'field-data': {}}
+            Mock(entry_point=XBlock.entry_point), mixins=[InheritableFieldsMixin], services={'field-data': {}}
         )
         self.xblock = runtime.construct_xblock_from_class(
             TestXBlock, ScopeIds('user', 'TestXBlock', 'def_id', 'usage_id')
