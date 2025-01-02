@@ -1292,7 +1292,7 @@ multidict==6.1.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==1.11.2
+mypy==1.14.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
