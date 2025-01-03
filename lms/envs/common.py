@@ -5376,6 +5376,9 @@ NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
 
+############## NUDGE EMAILS ###############
+DISABLED_ORGS_FOR_PROGRAM_NUDGE = []
+
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
