@@ -8,8 +8,8 @@ to the templates without having to append every view file.
 import string
 
 from django.utils.translation import get_language
-from pytz import timezone
-from pytz.exceptions import UnknownTimeZoneError
+from zoneinfo import ZoneInfo
+
 
 from edx_django_utils.cache import TieredCache
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
@@ -97,6 +97,6 @@ def get_user_timezone_or_last_seen_timezone_or_utc(user):
     user_timezone = filter(lambda l: l in string.printable, user_timezone)
     user_timezone = ''.join(user_timezone)
     try:
-        return timezone(user_timezone)
-    except UnknownTimeZoneError as err:
-        return timezone('UTC')
+        return ZoneInfo(user_timezone)
+    except KeyError:
+        return ZoneInfo('UTC')

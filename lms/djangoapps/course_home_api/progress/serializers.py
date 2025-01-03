@@ -5,7 +5,7 @@ from datetime import datetime
 
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from lms.djangoapps.course_home_api.serializers import ReadOnlySerializer, VerifiedModeSerializer
 
@@ -68,7 +68,7 @@ class SubsectionScoresSerializer(ReadOnlySerializer):
         """
         hide_url_date = subsection.end if subsection.self_paced else subsection.due
         if (not self.context['staff_access'] and subsection.hide_after_due and hide_url_date
-                and datetime.now(UTC) > hide_url_date):
+                and datetime.now(ZoneInfo("UTC")) > hide_url_date):
             return None
 
         relative_path = reverse('jump_to', args=[self.context['course_key'], subsection.location])

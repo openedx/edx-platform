@@ -15,7 +15,7 @@ import dateutil.parser
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.credentials.tasks.v1.tasks import handle_notify_credentials
@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 def parsetime(timestr):
     dt = dateutil.parser.parse(timestr)
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=UTC)
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     return dt
 
 

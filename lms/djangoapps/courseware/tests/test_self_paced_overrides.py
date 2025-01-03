@@ -3,7 +3,7 @@
 import datetime
 
 from unittest.mock import patch
-import pytz
+from zoneinfo import ZoneInfo
 from django.test.utils import override_settings
 
 from common.djangoapps.student.tests.factories import BetaTesterFactory
@@ -31,7 +31,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         super().setUp()
 
         self.non_staff_user, __ = self.create_non_staff_user()
-        self.now = datetime.datetime.now(pytz.UTC).replace(microsecond=0)
+        self.now = datetime.datetime.now(ZoneInfo("UTC")).replace(microsecond=0)
         self.future = self.now + datetime.timedelta(days=30)
 
     def tearDown(self):
@@ -88,7 +88,7 @@ class SelfPacedDateOverrideTest(ModuleStoreTestCase):
         """
         Test that beta testers can access `self_paced` course prior to start date.
         """
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
         one_month_from_now = now + datetime.timedelta(days=30)
         course_options = {
             'days_early_for_beta': 100,

@@ -11,7 +11,7 @@ import ddt
 from django.test.client import RequestFactory
 from lxml import etree
 from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.fields import ScopeIds
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
@@ -56,21 +56,21 @@ class StructuredTagsAsideTestCase(ModuleStoreTestCase):
             category='chapter',
             display_name="Week 1",
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         self.sequential = BlockFactory.create(
             parent_location=self.chapter.location,
             category='sequential',
             display_name="Lesson 1",
             publish_item=True,
-            start=datetime(2015, 3, 1, tzinfo=UTC),
+            start=datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
         )
         self.vertical = BlockFactory.create(
             parent_location=self.sequential.location,
             category='vertical',
             display_name='Subsection 1',
             publish_item=True,
-            start=datetime(2015, 4, 1, tzinfo=UTC),
+            start=datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
         )
         self.problem = BlockFactory.create(
             category="problem",

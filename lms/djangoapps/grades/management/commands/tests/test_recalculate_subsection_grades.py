@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import ddt
 from opaque_keys.edx.keys import CourseKey
-from pytz import utc
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id
 from common.djangoapps.util.date_utils import to_timestamp
@@ -40,7 +40,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
             course_id=CourseKey.from_string('course-v1:x+y+z'),
             item_id='abc',
         )
-        submission.created_at = utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))
+        submission.created_at = datetime.strptime('2016-08-23 16:43', DATE_FORMAT).replace(tzinfo=ZoneInfo("UTC"))
         subs_mock.objects.filter.return_value = [submission]
         id_mock.return_value = MagicMock()
         id_mock.return_value.id = "ID"
@@ -54,7 +54,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         csm_record.student_id = "ID"
         csm_record.course_id = CourseKey.from_string('course-v1:x+y+z')
         csm_record.module_state_key = "abc"
-        csm_record.modified = utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))
+        csm_record.modified = datetime.strptime('2016-08-23 16:43', DATE_FORMAT).replace(tzinfo=ZoneInfo("UTC"))
         csm_mock.objects.filter.return_value = [csm_record]
         id_mock.return_value = MagicMock()
         id_mock.return_value.id = "ID"
@@ -67,7 +67,11 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
             "course_id": 'course-v1:x+y+z',
             "usage_id": 'abc',
             "only_if_higher": False,
-            "expected_modified_time": to_timestamp(utc.localize(datetime.strptime('2016-08-23 16:43', DATE_FORMAT))),
+            "expected_modified_time": to_timestamp(
+                datetime.strptime('2016-08-23 16:43', DATE_FORMAT).replace(
+                    tzinfo=ZoneInfo("UTC")
+                )
+            ),
             "score_deleted": False,
             "event_transaction_id": str(get_event_transaction_id()),
             "event_transaction_type": 'edx.grades.problem.submitted',

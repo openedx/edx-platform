@@ -5,7 +5,7 @@ import datetime
 import json
 import logging
 
-import pytz
+from zoneinfo import ZoneInfo
 from ccx_keys.locator import CCXLocator
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.db import transaction
@@ -465,7 +465,7 @@ class CCXListView(GenericAPIView):
             ccx_course_object.save()
 
             # Make sure start/due are overridden for entire course
-            start = TODAY().replace(tzinfo=pytz.UTC)
+            start = TODAY().replace(tzinfo=ZoneInfo("UTC"))
             override_field_for_ccx(ccx_course_object, master_course_object, 'start', start)
             override_field_for_ccx(ccx_course_object, master_course_object, 'due', None)
 

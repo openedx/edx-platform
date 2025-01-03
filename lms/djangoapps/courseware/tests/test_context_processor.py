@@ -2,7 +2,7 @@
 Unit tests for courseware context_processor
 """
 
-from pytz import timezone
+from zoneinfo import ZoneInfo
 from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -60,20 +60,20 @@ class UserPrefContextProcessorUnitTest(ModuleStoreTestCase):
         # We default to UTC
         course = CourseFactory()
         time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
-        assert time_zone == timezone('UTC')
+        assert time_zone == ZoneInfo('UTC')
 
         # We record the timezone when a user hits the courseware api. Also sanitize input test
         self.client.login(username=self.user.username, password='foo')
         self.client.get(f'/api/courseware/course/{course.id}?browser_timezone=America/New_York\x00')
         time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
-        assert time_zone == timezone('America/New_York')
+        assert time_zone == ZoneInfo('America/New_York')
 
         # If a user has their timezone set, then we use that setting
         set_user_preference(self.user, 'time_zone', 'Asia/Tokyo')
         time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
-        assert time_zone == timezone('Asia/Tokyo')
+        assert time_zone == ZoneInfo('Asia/Tokyo')
 
         # If we do not recognize the user's timezone, we default to UTC
         with patch('lms.djangoapps.courseware.context_processor.get_user_preference', return_value='Unknown/Timezone'):
             time_zone = get_user_timezone_or_last_seen_timezone_or_utc(self.user)
-        assert time_zone == timezone('UTC')
+        assert time_zone == ZoneInfo('UTC')

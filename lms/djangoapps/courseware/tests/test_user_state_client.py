@@ -3,7 +3,7 @@ Black-box tests of the DjangoUserStateClient against the semantics
 defined in edx_user_state_client.
 """
 
-import pytz
+from zoneinfo import ZoneInfo
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.fields import Scope
 from datetime import datetime
@@ -339,9 +339,9 @@ class _UserStateClientTestCRUD(_UserStateClientTestUtils):
         self.assertCountEqual(self.get_many(user=0, blocks=[0, 1]), [])
 
     def test_get_mod_date(self):
-        start_time = datetime.now(pytz.utc)
+        start_time = datetime.now(ZoneInfo("UTC"))
         self.set_many(user=0, block_to_state={0: {'a': 'b'}, 1: {'b': 'c'}})
-        end_time = datetime.now(pytz.utc)
+        end_time = datetime.now(ZoneInfo("UTC"))
 
         mod_dates = self.get(user=0, block=0)
 
@@ -350,15 +350,15 @@ class _UserStateClientTestCRUD(_UserStateClientTestUtils):
         self.assertLess(mod_dates.updated, end_time)
 
     def test_get_many_mod_date(self):
-        start_time = datetime.now(pytz.utc)
+        start_time = datetime.now(ZoneInfo("UTC"))
         self.set_many(
             user=0,
             block_to_state={0: {'a': 'b'}, 1: {'a': 'd'}})
-        mid_time = datetime.now(pytz.utc)
+        mid_time = datetime.now(ZoneInfo("UTC"))
         self.set_many(
             user=0,
             block_to_state={1: {'a': 'c'}})
-        end_time = datetime.now(pytz.utc)
+        end_time = datetime.now(ZoneInfo("UTC"))
 
         mod_dates = list(self.get_many(
             user=0,
@@ -607,7 +607,7 @@ class DictUserStateClient(XBlockUserStateClient):
         Add the specified state to the state history of this block.
         """
         history_list = self._history.setdefault((username, block_key, scope), [])
-        history_list.insert(0, XBlockUserState(username, block_key, state, datetime.now(pytz.utc), scope))
+        history_list.insert(0, XBlockUserState(username, block_key, state, datetime.now(ZoneInfo("UTC")), scope))
 
     def get_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         for key in block_keys:
