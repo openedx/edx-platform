@@ -1,11 +1,7 @@
-// eslint-disable-next-line no-redeclare
-/* global jest,test,describe,expect */
-import { Button } from '@edx/paragon';
-import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
+/* global jest, test, describe, expect */
 import { Provider } from 'react-redux';
-import { shallow } from 'enzyme';
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { render, screen, fireEvent } from '@testing-library/react';  // Importa render y fireEvent
 import store from '../../data/store';
 
 import Main from './Main';
@@ -17,7 +13,7 @@ describe('ProblemBrowser Main component', () => {
     const excludedBlockTypes = [];
 
     test('render with basic parameters', () => {
-        const component = renderer.create(
+        const { asFragment } = render(
             <Provider store={store}>
                 <Main
                     courseId={courseId}
@@ -29,14 +25,13 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock={null}
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
-        const tree = component.toJSON();
-        expect(tree).toMatchSnapshot();
+        expect(asFragment()).toMatchSnapshot();
     });
 
     test('render with selected block', () => {
-        const component = renderer.create(
+        const { asFragment } = render(
             <Provider store={store}>
                 <Main
                     courseId={courseId}
@@ -48,15 +43,14 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
-        const tree = component.toJSON();
-        expect(tree).toMatchSnapshot();
+        expect(asFragment()).toMatchSnapshot();
     });
 
     test('fetch course block on toggling dropdown', () => {
         const fetchCourseBlocksMock = jest.fn();
-        const component = renderer.create(
+        render(
             <Provider store={store}>
                 <Main
                     courseId={courseId}
@@ -68,29 +62,33 @@ describe('ProblemBrowser Main component', () => {
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
-            </Provider>,
+            </Provider>
         );
-        // eslint-disable-next-line prefer-destructuring
-        const instance = component.root.children[0].instance;
-        instance.handleToggleDropdown();
-        expect(fetchCourseBlocksMock.mock.calls.length).toBe(1);
+
+        const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
+        fireEvent.click(toggleButton);
+        expect(fetchCourseBlocksMock).toHaveBeenCalledTimes(1);
     });
 
     test('display dropdown on toggling dropdown', () => {
-        const component = shallow(
-            <Main
-                courseId={courseId}
-                createProblemResponsesReportTask={jest.fn()}
-                excludeBlockTypes={excludedBlockTypes}
-                fetchCourseBlocks={jest.fn()}
-                problemResponsesEndpoint={problemResponsesEndpoint}
-                onSelectBlock={jest.fn()}
-                selectedBlock="some-selected-block"
-                taskStatusEndpoint={taskStatusEndpoint}
-            />,
+        render(
+            <Provider store={store}>
+                <Main
+                    courseId={courseId}
+                    createProblemResponsesReportTask={jest.fn()}
+                    excludeBlockTypes={excludedBlockTypes}
+                    fetchCourseBlocks={jest.fn()}
+                    problemResponsesEndpoint={problemResponsesEndpoint}
+                    onSelectBlock={jest.fn()}
+                    selectedBlock="some-selected-block"
+                    taskStatusEndpoint={taskStatusEndpoint}
+                />
+            </Provider>
         );
-        expect(component.find(BlockBrowserContainer).length).toBeFalsy();
-        component.find(Button).find({ label: 'Select a section or problem' }).simulate('click');
-        expect(component.find(BlockBrowserContainer).length).toBeTruthy();
+
+        expect(screen.queryByTestId('block-browser-container')).toBeNull();
+        const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
+        fireEvent.click(toggleButton);
+        expect(screen.getByTestId('block-browser-container')).toBeInTheDocument();
     });
 });
