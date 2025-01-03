@@ -566,9 +566,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
     'ENABLE_GRADING_METHOD_IN_PROBLEMS': False,
 
-    # See annotations in lms/envs/common.py for details.
-    'ENABLE_BLAKE2B_HASHING': False,
-
     # .. toggle_name: FEATURES['BADGES_ENABLED']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
