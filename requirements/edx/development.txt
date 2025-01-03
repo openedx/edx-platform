@@ -577,7 +577,7 @@ django-storages==1.14.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-stubs==1.16.0
+django-stubs==4.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
@@ -625,10 +625,8 @@ djangorestframework==3.14.0
     #   openedx-learning
     #   ora2
     #   super-csv
-djangorestframework-stubs==3.14.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/development.in
+djangorestframework-stubs==3.14.5
+    # via -r requirements/edx/development.in
 djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1184,8 +1182,6 @@ libsass==0.10.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/assets.txt
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 loremipsum==1.0.5
     # via
     #   -r requirements/edx/doc.txt
@@ -1263,9 +1259,7 @@ mistune==3.0.2
     #   -r requirements/edx/doc.txt
     #   sphinx-mdinclude
 mock==5.1.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
+    # via -r requirements/edx/testing.txt
 mongoengine==0.29.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1301,8 +1295,6 @@ mypy==1.11.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
-    #   django-stubs
-    #   djangorestframework-stubs
 mypy-extensions==1.0.0
     # via mypy
 mysqlclient==2.2.6
@@ -1458,10 +1450,6 @@ path-py==12.5.0
     #   edx-enterprise
     #   ora2
     #   staff-graded-xblock
-paver==1.3.4
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 pbr==6.1.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1764,10 +1752,6 @@ python-ipware==3.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-ipware
-python-memcached==1.62
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 python-slugify==8.0.4
     # via
     #   -r requirements/edx/doc.txt
@@ -1962,7 +1946,6 @@ six==1.17.0
     #   libsass
     #   optimizely-sdk
     #   pact-python
-    #   paver
     #   py2neo
     #   pyjwkest
     #   python-dateutil
@@ -2121,8 +2104,6 @@ tinycss2==1.4.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   bleach
-tomli==2.2.1
-    # via django-stubs
 tomlkit==0.13.2
     # via
     #   -r requirements/edx/doc.txt
@@ -2228,10 +2209,7 @@ walrus==0.9.4
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-redis
 watchdog==6.0.0
-    # via
-    #   -r requirements/edx/development.in
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
+    # via -r requirements/edx/development.in
 wcwidth==0.2.13
     # via
     #   -r requirements/edx/doc.txt
