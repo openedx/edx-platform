@@ -49,20 +49,25 @@ def run_eslint():
     )
 
     print(result.stdout)
-    last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
-    regex = r'^\d+'
-    try:
-        num_violations = int(re.search(regex, last_line).group(0)) if last_line else 0
-        # Fail if number of violations is greater than the limit
-        if num_violations > violations_limit:
-            fail_quality(
-                "FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
-        else:
-            print(f"successfully run eslint with '{num_violations}' violations")
+    if result.returncode == 0:
+        fail_quality("No eslint violations found. This is unexpected... are you sure eslint is running correctly?")
+    elif result.returncode == 1:
+        last_line = result.stdout.strip().splitlines()[-1] if result.stdout.strip().splitlines() else ""
+        regex = r'^\d+'
+        try:
+            num_violations = int(re.search(regex, last_line).group(0)) if last_line else 0
+            # Fail if number of violations is greater than the limit
+            if num_violations > violations_limit:
+                fail_quality("FAILURE: Too many eslint violations ({count}).\nThe limit is {violations_limit}.".format(count=num_violations, violations_limit=violations_limit))
+            else:
+                print(f"successfully run eslint with '{num_violations}' violations")
 
-    # An AttributeError will occur if the regex finds no matches.
-    except (AttributeError, ValueError):
-        fail_quality(f"FAILURE: Number of eslint violations could not be found in '{last_line}'")
+        # An AttributeError will occur if the regex finds no matches.
+        except (AttributeError, ValueError):
+            fail_quality(f"FAILURE: Number of eslint violations could not be found in '{last_line}'")
+    else:
+        print(f"Unexpected ESLint failure with exit code {result.returncode}.")
+        fail_quality(f"Unexpected error: {result.stderr.strip()}")
 
 
 if __name__ == "__main__":

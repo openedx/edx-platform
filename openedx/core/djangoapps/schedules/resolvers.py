@@ -382,6 +382,13 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 language,
                 context,
             )
+            LOG.info(
+                'Sending email to user: {} for Instructor-paced course with course-key: {} and language: {}'.format(
+                    user.username,
+                    self.course_id,
+                    language
+                )
+            )
             with function_trace('enqueue_send_task'):
                 self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)  # pylint: disable=no-member
 
@@ -467,6 +474,13 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
                 'Sending email to user: {} for course-key: {}'.format(
                     user.username,
                     self.course_id
+                )
+            )
+            LOG.info(
+                'Sending email to user: {} for Self-paced course with course-key: {} and language: {}'.format(
+                    user.username,
+                    self.course_id,
+                    language
                 )
             )
             with function_trace('enqueue_send_task'):

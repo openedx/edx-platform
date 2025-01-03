@@ -192,7 +192,7 @@ def update_notification_fields(
         if field in source_config:
             target_config[field] |= source_config[field]
     if "email_cadence" in source_config:
-        if isinstance(target_config["email_cadence"], str) or not target_config["email_cadence"]:
+        if not target_config.get("email_cadence") or isinstance(target_config.get("email_cadence"), str):
             target_config["email_cadence"] = set()
 
         target_config["email_cadence"].add(source_config["email_cadence"])
@@ -263,7 +263,7 @@ def aggregate_notification_configs(existing_user_configs: List[Dict]) -> Dict:
     # if email_cadence is mixed, set it to "Mixed"
     for app in result_config:
         for type_key, type_config in result_config[app]["notification_types"].items():
-            if len(type_config["email_cadence"]) > 1:
+            if len(type_config.get("email_cadence", [])) > 1:
                 result_config[app]["notification_types"][type_key]["email_cadence"] = "Mixed"
             else:
                 result_config[app]["notification_types"][type_key]["email_cadence"] = (

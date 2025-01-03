@@ -185,6 +185,9 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                 )
                 if grouping_enabled and existing_notifications.get(user_id, None):
                     group_user_notifications(new_notification, existing_notifications[user_id])
+                    if not notifications_generated:
+                        notifications_generated = True
+                        notification_content = new_notification.content
                 else:
                     notifications.append(new_notification)
                 generated_notification_audience.append(user_id)

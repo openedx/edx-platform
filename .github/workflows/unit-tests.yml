@@ -71,29 +71,7 @@ jobs:
 
       - name: install system requirements
         run: |
-          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx openssl
-
-      # This is needed until the ENABLE_BLAKE2B_HASHING can be removed and we
-      # can stop using MD4 by default.
-      - name: enable md4 hashing in libssl
-        run: |
-          cat <<EOF | sudo tee /etc/ssl/openssl.cnf
-          # Use this in order to automatically load providers.
-          openssl_conf = openssl_init
-
-          [openssl_init]
-          providers = provider_sect
-
-          [provider_sect]
-          default = default_sect
-          legacy = legacy_sect
-
-          [default_sect]
-          activate = 1
-
-          [legacy_sect]
-          activate = 1
-          EOF
+          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.11.0
@@ -180,7 +158,7 @@ jobs:
         shell: bash
         run: |
           echo "root_cms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=cms.envs.test cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-          echo "root_lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ xmodule/ pavelib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "root_lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ xmodule/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
 
       - name: get GHA unit test paths
         shell: bash
