@@ -252,6 +252,9 @@
                     <a href="${reverse('export_git', kwargs=dict(course_key_string=str(course_key)))}">${_("Export to Git")}</a>
                   </li>
                   % endif
+                      <li class="nav-item nav-course-tools-export-git">
+                        <a href="${reverse('course_templates', args=[str(course_key)])}">${_("Course Templates")}</a>
+                      </li>
                   <li class="nav-item nav-course-tools-checklists">
                     <a href="${checklists_url}">${_("Checklists")}</a>
                   </li>

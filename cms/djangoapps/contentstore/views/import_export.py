@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import re
+import requests
 import shutil
 from wsgiref.util import FileWrapper
 
@@ -24,6 +25,9 @@ from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from django.shortcuts import render
+from django.urls import reverse
+
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
@@ -32,6 +36,7 @@ from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse
@@ -465,3 +470,26 @@ def _latest_task_status(request, course_key_string, view_func=None):
     for status_filter in STATUS_FILTERS:
         task_status = status_filter().filter_queryset(request, task_status, view_func)
     return task_status.order_by('-created').first()
+
+
+def course_templates(request, course_key_string):
+    courselike_key = CourseKey.from_string(course_key_string)
+    organization = courselike_key.org
+    # successful_url = f"http://localhost:18010/api/contentstore/v1/course_templates/{course_key_string}"
+
+    courses = []
+    from openedx_filters.course_authoring.filters import CourseTemplateRequested
+    courses = CourseTemplateRequested.run_filter(
+        source_type="github",
+        source_config="https://raw.githubusercontent.com/awais786/courses/refs/heads/main/edly_courses.json",
+        templates_data={}
+    )
+    if courses:
+        courses = courses['templates_data']
+
+    return render(request, 'course_templates.html', {
+        # 'upload_zip_endpoint': successful_url,
+        'courses': courses,
+        'organization': organization,
+        "post_url": reverse_course_url('import_handler', courselike_key),
+    })
