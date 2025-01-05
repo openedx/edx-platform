@@ -72,18 +72,20 @@
 </div>
 
 <div class="courses-container">
+
     {% for course in courses %}
+
     <div class="course-card">
         <div class="course-thumbnail">
             <img src="{{ course.metadata.thumbnail }}" alt="{{ course.metadata.title }}" width="354" height="218" />
         </div>
         <div class="course-info">
             <h3 class="course-name">{{ course.courses_name }}</h3>
-            <p class="course-id">Course ID: {{ course.metadata.course_id }}</p>
             <h4 class="course-title">{{ course.metadata.title }}</h4>
             <p class="course-description">{{ course.metadata.description }}</p>
-            <p class="course-description"><a href="#" onclick="postToImportCourse()">Import Course</a></p>
-
+             <p class="course-import">
+                <a href="#" onclick="postToImportCourse('{{ course_id }}', '{{ course.zip_url }}')">Import Course</a>
+            </p>
         </div>
     </div>
     {% endfor %}
@@ -97,13 +99,34 @@
 </form>
 
 <script>
-    function postToImportCourse() {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{post_url}}';
+    function postToImportCourse(courseId, importUrl) {
+        const csrfToken = document.getElementById('csrf_token').value;
+        const apiUrl = `/api/courses/v0/import/${courseId}/`; // Construct the API URL dynamically
 
-        document.body.appendChild(form);
-        form.submit();
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                file_url: importUrl
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            window.location.href = '/course/'+ courseId;
+        })
+        .catch(error => {
+            console.error('Error importing course:', error);
+            alert('Failed to import the course. Please try again.');
+        });
     }
 </script>
 
