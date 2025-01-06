@@ -485,11 +485,12 @@ def course_templates(request, course_key_string):
         templates_data={}
     )
     if courses:
-        courses = courses['templates_data']
+        courses = courses['source_config']
 
     return render(request, 'course_templates.html', {
         # 'upload_zip_endpoint': successful_url,
         'courses': courses,
         'organization': organization,
         "post_url": reverse_course_url('import_handler', courselike_key),
+        'course_id': course_key_string
     })
