@@ -72,7 +72,6 @@
 </div>
 
 <div class="courses-container">
-
     {% for course in courses %}
 
     <div class="course-card">
@@ -92,10 +91,7 @@
 </div>
 
 <form action="{{post_url}}" method="POST" style="display: inline;">
-    <input type="text" id="csrf_token" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-    <button type="submit" style="background: none; border: none; color: blue; text-decoration: underline; cursor: pointer;">
-        Import Course
-    </button>
+    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="{{csrf_token}}">
 </form>
 
 <script>
