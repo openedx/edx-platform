@@ -306,7 +306,6 @@ django==4.2.17
     #   edx-search
     #   edx-submissions
     #   edx-toggles
-    #   edx-token-utils
     #   edx-when
     #   edxval
     #   enmerkar
@@ -652,15 +651,13 @@ edx-toggles==5.2.0
     #   edxval
     #   event-tracking
     #   ora2
-edx-token-utils==0.2.1
-    # via -r requirements/edx/base.txt
 edx-when==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
 edxval==2.8.0
     # via -r requirements/edx/base.txt
-elasticsearch==7.9.1
+elasticsearch==7.13.4
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -1213,7 +1210,6 @@ pygments==2.19.1
 pyjwkest==1.4.2
     # via
     #   -r requirements/edx/base.txt
-    #   edx-token-utils
     #   lti-consumer-xblock
 pyjwt[crypto]==2.10.1
     # via
@@ -1615,7 +1611,7 @@ uritemplate==4.1.1
     #   drf-spectacular
     #   drf-yasg
     #   google-api-python-client
-urllib3==2.2.3
+urllib3==1.26.20
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
