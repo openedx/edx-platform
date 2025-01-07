@@ -10,6 +10,7 @@ Along with it, we moved the business logic of the other views in that file, sinc
 """
 import logging
 from datetime import datetime
+import bleach
 
 from attrs import asdict
 from django.conf import settings
@@ -529,6 +530,19 @@ def create_item(request):
 
 @login_required
 @expect_json
+def sanitize_html(user_input):
+    """Sanitize HTML input to allow only safe tags and attributes."""
+    allowed_tags = ['p', 'b', 'i', 'u', 'em', 'strong', 'a']
+    allowed_attributes = {
+        '*': ['class', 'id'],  # Allow class and id attributes on all elements
+        'a': ['href', 'title'],  # Allow href and title attributes on <a> tags
+    }
+
+    # Sanitize the HTML input to allow only the specified tags and attributes
+    sanitized_input = bleach.clean(user_input, tags=allowed_tags, attributes=allowed_attributes)
+
+    return sanitized_input
+
 def _create_block(request):
     """View for create blocks."""
     parent_locator = request.json["parent_locator"]
@@ -536,6 +550,7 @@ def _create_block(request):
     if not has_studio_write_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
+    # Handle clipboard-based content staging
     if request.json.get("staged_content") == "clipboard":
         # Paste from the user's clipboard (content_staging app clipboard, not browser clipboard) into 'usage_key':
         try:
@@ -562,6 +577,8 @@ def _create_block(request):
         })
 
     category = request.json["category"]
+    
+    # Check if the component is part of a library
     if isinstance(usage_key, LibraryUsageLocator):
         # Only these categories are supported at this time.
         if category not in ["html", "problem", "video"]:
@@ -580,23 +597,33 @@ def _create_block(request):
                 status=400,
             )
 
+    # Get the display_name and boilerplate fields
+    display_name = request.json.get("display_name", "")
+    boilerplate = request.json.get("boilerplate", "")
+
+    # Apply HTML sanitization only for the "html" component type
+    if category == "html":
+        display_name = sanitize_html(display_name)
+        boilerplate = sanitize_html(boilerplate)
+
+    # Create the block using sanitized or raw content
     created_block = create_xblock(
         parent_locator=parent_locator,
         user=request.user,
         category=category,
-        display_name=request.json.get("display_name"),
-        boilerplate=request.json.get("boilerplate"),
+        display_name=display_name,
+        boilerplate=boilerplate,
     )
 
     response = {
         "locator": str(created_block.location),
         "courseKey": str(created_block.location.course_key),
     }
-    # If it contains library_content_key, the block is being imported from a v2 library
-    # so it needs to be synced with upstream block.
+
+    # If it contains library_content_key, sync the block with the upstream block.
     if upstream_ref := request.json.get("library_content_key"):
         try:
-            # Set `created_block.upstream` and then sync this with the upstream (library) version.
+            # Set `created_block.upstream` and then sync with the upstream (library) version.
             created_block.upstream = upstream_ref
             sync_from_upstream(downstream=created_block, user=request.user)
         except BadUpstream as exc:
@@ -606,10 +633,13 @@ def _create_block(request):
                 f"using provided library_content_key='{upstream_ref}'"
             )
             return JsonResponse({"error": str(exc)}, status=400)
+        
+        # Update the item in the store
         modulestore().update_item(created_block, request.user.id)
         response['upstreamRef'] = upstream_ref
 
     return JsonResponse(response)
+
 
 
 def _get_source_index(source_usage_key, source_parent):

@@ -5,8 +5,12 @@ import json
 import logging
 import math
 import re
+import magic
+from django.http import HttpResponse
+from django.core.exceptions import ValidationError
 from functools import partial
 from urllib.parse import urljoin
+
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -558,16 +562,37 @@ def _get_error_if_course_does_not_exist(course_key):  # lint-amnesty, pylint: di
 
 
 def _get_file_metadata_as_dictionary(upload_file):  # lint-amnesty, pylint: disable=missing-function-docstring
-    # compute a 'filename' which is similar to the location formatting; we're
-    # using the 'filename' nomenclature since we're using a FileSystem paradigm
-    # here; we're just imposing the Location string formatting expectations to
-    # keep things a bit more consistent
+    '''
+    This function retrieves metadata about the uploaded file and validates
+    the file type to prevent insecure files (e.g., HTML) from being processed.
+    '''
+    # Use python-magic to get the MIME type of the uploaded file
+    mime = magic.Magic(mime=True)
+    mime_type = mime.from_buffer(upload_file.read(1024))  # Read first 1024 bytes to detect MIME type
+    upload_file.seek(0)  # Reset file pointer after reading
+
+    # Allowed MIME types (for security, restrict file types)
+    allowed_mime_types = ['image/jpeg', 'image/png', 'application/pdf', 'application/zip'] # add any other files type you want 
+
+    # If the uploaded file's MIME type is HTML, treat it as a dangerous file
+    if mime_type == 'text/html':
+        # Force the file to be downloaded by setting 'Content-Disposition'
+        response = HttpResponse(upload_file, content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename={upload_file.name}'
+        return response
+
+    # Validate the file's MIME type
+    if mime_type not in allowed_mime_types:
+        raise ValidationError(f"Invalid file type: {mime_type}. Only image, PDF, and zip files are allowed.")
+
+    # Return file metadata
     return {
         'upload_file': upload_file,
         'filename': upload_file.name,
-        'mime_type': upload_file.content_type,
+        'mime_type': mime_type,
         'upload_file_size': get_file_size(upload_file)
     }
+
 
 
 def get_file_size(upload_file):
