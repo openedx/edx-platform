@@ -1,5 +1,8 @@
 """ Course run serializers. """
 import logging
+import magic
+from rest_framework import serializers
+
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -82,10 +85,28 @@ class CourseRunTeamSerializerMixin(serializers.Serializer):  # lint-amnesty, pyl
 
 
 def image_is_jpeg_or_png(value):
-    content_type = value.content_type
-    if content_type not in list(IMAGE_TYPES.keys()):  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+    # Use python-magic to detect the actual MIME type based on file content
+    mime = magic.Magic(mime=True)
+    content_type = mime.from_buffer(value.read(1024))  # Read the first 1024 bytes to determine MIME type
+    value.seek(0)  # Reset the file pointer after reading
+    
+    # Allowed MIME types for images
+    allowed_mime_types = ['image/jpeg', 'image/png']
+
+    # Validate the content type by checking the MIME type
+    if content_type not in allowed_mime_types:
         raise serializers.ValidationError(
-            f'Only JPEG and PNG image types are supported. {content_type} is not valid')
+            f'Only JPEG and PNG image types are supported. {content_type} is not valid.')
+
+    # Optional: Validate the file extension if needed
+    # Note: This step is extra security to ensure the file extension matches the content
+    file_extension = value.name.split('.')[-1].lower()
+    if content_type == 'image/jpeg' and file_extension not in ['jpg', 'jpeg']:
+        raise serializers.ValidationError('File extension does not match MIME type for JPEG.')
+    elif content_type == 'image/png' and file_extension != 'png':
+        raise serializers.ValidationError('File extension does not match MIME type for PNG.')
+
+    # If it passes both the MIME type and extension checks, the file is valid
 
 
 class CourseRunImageField(serializers.ImageField):  # lint-amnesty, pylint: disable=missing-class-docstring
