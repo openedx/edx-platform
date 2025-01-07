@@ -91,6 +91,7 @@ from lms.djangoapps.courseware.courses import (
 )
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
+from lms.djangoapps.courseware.jwt import unpack_jwt
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
@@ -105,7 +106,7 @@ from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateCli
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
     create_financial_assistance_application,
-    is_eligible_for_financial_aid, unpack_jwt
+    is_eligible_for_financial_aid
 )
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context

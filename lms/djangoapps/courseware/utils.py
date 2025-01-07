@@ -234,36 +234,3 @@ def _use_new_financial_assistance_flow(course_id):
     ):
         return True
     return False
-
-
-
-def unpack_jwt(token, lms_user_id, now=None):
-    """
-    Unpack and verify an encoded JWT.
-
-    Validate the user and expiration.
-
-    Arguments:
-        token (string): The token to be unpacked and verified.
-        lms_user_id (int): LMS user ID this token should match with.
-        now (int): Optional now value for testing.
-
-    Returns a valid, decoded json payload (string).
-    """
-    now = now or int(time())
-
-    # Unpack and verify token
-    keys = jwk.KEYS()
-    keys.load_jwks(settings.TOKEN_SIGNING['JWT_PUBLIC_SIGNING_JWK_SET'])
-    payload = JWS().verify_compact(token.encode('utf-8'), keys)
-
-    if "lms_user_id" not in payload:
-        raise MissingKey("LMS user id is missing")
-    if "exp" not in payload:
-        raise MissingKey("Expiration is missing")
-    if payload["lms_user_id"] != lms_user_id:
-        raise Invalid("User does not match")
-    if payload["exp"] < now:
-        raise Expired("Token is expired")
-
-    return payload
