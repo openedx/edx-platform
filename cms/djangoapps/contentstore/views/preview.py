@@ -332,6 +332,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         }
 
         add_webpack_js_to_fragment(frag, "js/factories/xblock_validation")
+        add_webpack_js_to_fragment(frag, "js/factories/tag_count")
 
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)
