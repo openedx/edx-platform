@@ -9,9 +9,6 @@ from jwkest.jws import JWS
 
 from lms.djangoapps.courseware.jwt import _encode_and_sign, create_jwt, unpack_jwt
 
-import unittest
-from unittest.mock import patch
-
 
 test_user_id = 121
 invalid_test_user_id = 120
@@ -28,6 +25,10 @@ expected_full_token = {
 
 
 class TestSign(unittest.TestCase):
+    """
+    Tests for JWT creation and signing.
+    """
+
     def test_create_jwt(self):
         token = create_jwt(test_user_id, test_timeout, {}, test_now)
 
@@ -53,6 +54,7 @@ class TestSign(unittest.TestCase):
         with self.assertRaises(BadSignature):
             _verify_jwt(token)
 
+
 def _verify_jwt(jwt_token):
     """
     Helper function which verifies the signature and decodes the token
@@ -65,6 +67,10 @@ def _verify_jwt(jwt_token):
 
 
 class TestUnpack(unittest.TestCase):
+    """
+    Tests for JWT unpacking.
+    """
+
     def test_unpack_jwt(self):
         token = create_jwt(test_user_id, test_timeout, {}, test_now)
         decoded = unpack_jwt(token, test_user_id, test_now)
