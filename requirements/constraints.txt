@@ -61,11 +61,13 @@ django-webpack-loader==0.7.0
 djangorestframework<3.15.0
 
 # Date: 2024-07-19
-# Generally speaking, the major version of django-stubs should match the major version of django.
-# Specifically, we need to perpetually constrain django-stubs to a compatible version based on:
+# Generally speaking, the major version of django-stubs must either match the major version
+# of django, or exceed it by 1. So, we will need to perpetually constrain django-stubs and
+# update it as we perform django upgrades. For more details, see:
 # https://github.com/typeddjango/django-stubs?tab=readme-ov-file#version-compatibility
+# including the note on "Partial Support".
 # Issue: https://github.com/openedx/edx-platform/issues/35275
-django-stubs<5
+django-stubs<6
 
 # Date: 2024-07-23
 # django-storages==1.14.4 breaks course imports
