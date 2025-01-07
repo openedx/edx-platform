@@ -46,7 +46,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
-from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
 from xmodule.course_block import (
     COURSE_VISIBILITY_PUBLIC,
@@ -106,7 +105,7 @@ from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateCli
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
     create_financial_assistance_application,
-    is_eligible_for_financial_aid
+    is_eligible_for_financial_aid, unpack_jwt
 )
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
@@ -1535,7 +1534,7 @@ def _check_sequence_exam_access(request, location):
         try:
             # unpack will validate both expiration and the requesting user matches the
             # token user
-            exam_access_unpacked = unpack_token_for(exam_access_token, request.user.id)
+            exam_access_unpacked = unpack_jwt(exam_access_token, request.user.id)
         except:  # pylint: disable=bare-except
             log.exception(f"Failed to validate exam access token. user_id={request.user.id} location={location}")
             return False
