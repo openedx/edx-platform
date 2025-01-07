@@ -125,7 +125,7 @@ typing-extensions==4.12.2
     #   opentelemetry-sdk
     #   referencing
     #   semgrep
-urllib3==2.3.0
+urllib3==2.2.3
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   requests
