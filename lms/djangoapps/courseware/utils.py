@@ -5,8 +5,6 @@ import datetime
 import hashlib
 import logging
 
-from time import time
-
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
 from edx_rest_api_client.client import OAuthAPIClient
@@ -16,9 +14,6 @@ from rest_framework import status
 from xmodule.partitions.partitions import \
     ENROLLMENT_TRACK_PARTITION_ID  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
-
-from jwkest import Expired, Invalid, MissingKey, jwk
-from jwkest.jws import JWS
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
