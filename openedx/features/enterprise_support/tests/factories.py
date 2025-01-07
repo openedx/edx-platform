@@ -8,12 +8,16 @@ from uuid import UUID
 import factory
 from faker import Factory as FakerFactory
 
+from common.djangoapps.student.tests.factories import UserFactory
 from enterprise.models import (
     EnterpriseCourseEnrollment,
     EnterpriseCustomer,
     EnterpriseCustomerBrandingConfiguration,
     EnterpriseCustomerIdentityProvider,
     EnterpriseCustomerUser,
+    EnterpriseGroup,
+    EnterpriseGroupMembership,
+    PendingEnterpriseCustomerUser,
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 
@@ -61,7 +65,11 @@ class EnterpriseCustomerUserFactory(factory.django.DjangoModelFactory):
         model = EnterpriseCustomerUser
 
     enterprise_customer = factory.SubFactory(EnterpriseCustomerFactory)
-    user_id = factory.LazyAttribute(lambda x: FAKER.pyint())  # pylint: disable=no-member
+    user_id = factory.LazyAttribute(lambda x: UserFactory.create().id)
+    active = True
+    linked = True
+    is_relinkable = True
+    invite_key = None
 
 
 class EnterpriseCourseEnrollmentFactory(factory.django.DjangoModelFactory):
@@ -116,3 +124,61 @@ class EnterpriseCustomerIdentityProviderFactory(factory.django.DjangoModelFactor
 
     enterprise_customer = factory.SubFactory(EnterpriseCustomerFactory)
     provider_id = factory.LazyAttribute(lambda x: FAKER.slug())  # pylint: disable=no-member
+
+
+class EnterpriseGroupFactory(factory.django.DjangoModelFactory):
+    """
+    EnterpriseGroup factory.
+
+    Creates an instance of EnterpriseGroup with minimal boilerplate.
+    """
+
+    class Meta:
+        """
+        Meta for EnterpriseGroupFactory.
+        """
+
+        model = EnterpriseGroup
+
+    uuid = factory.LazyAttribute(lambda x: UUID(FAKER.uuid4()))
+    enterprise_customer = factory.SubFactory(EnterpriseCustomerFactory)
+    name = factory.LazyAttribute(lambda x: FAKER.company())
+
+
+class PendingEnterpriseCustomerUserFactory(factory.django.DjangoModelFactory):
+    """
+    PendingEnterpriseCustomerUser factory.
+
+    Creates an instance of PendingEnterpriseCustomerUser with minimal boilerplate - uses
+    this class' attributes as default parameters for PendingEnterpriseCustomerUser constructor.
+    """
+
+    class Meta:
+        """
+        Meta for PendingEnterpriseCustomerUserFactory.
+        """
+
+        model = PendingEnterpriseCustomerUser
+
+    enterprise_customer = factory.SubFactory(EnterpriseCustomerFactory)
+    user_email = factory.LazyAttribute(lambda x: FAKER.email())
+
+
+class EnterpriseGroupMembershipFactory(factory.django.DjangoModelFactory):
+    """
+    EnterpriseGroupMembership factory.
+
+    Creates an instance of EnterpriseGroupMembership with minimal boilerplate.
+    """
+
+    class Meta:
+        """
+        Meta for EnterpriseGroupMembershipFactory.
+        """
+
+        model = EnterpriseGroupMembership
+
+    uuid = factory.LazyAttribute(lambda x: UUID(FAKER.uuid4()))
+    group = factory.SubFactory(EnterpriseGroupFactory)
+    enterprise_customer_user = factory.SubFactory(EnterpriseCustomerUserFactory)
+    pending_enterprise_customer_user = factory.SubFactory(PendingEnterpriseCustomerUserFactory)

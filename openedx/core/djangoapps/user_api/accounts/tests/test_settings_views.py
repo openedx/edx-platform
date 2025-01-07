@@ -31,6 +31,12 @@ from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTest
 
 
 @skip_unless_lms
+@mock.patch.dict(
+    'django.conf.settings.FEATURES',
+    {
+        'ENABLE_ENTERPRISE_INTEGRATION': False,
+    }
+)
 class AccountSettingsViewTest(ThirdPartyAuthTestMixin, SiteMixin, ProgramsApiConfigMixin, TestCase):
     """ Tests for the account settings view. """
 
