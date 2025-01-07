@@ -276,7 +276,7 @@ class ContentLibraryCollectionUpdateSerializer(serializers.Serializer):
     description = serializers.CharField(allow_blank=True)
 
 
-class UsageKeyV2Serializer(serializers.Serializer):
+class UsageKeyV2Serializer(serializers.BaseSerializer):
     """
     Serializes a UsageKeyV2.
     """

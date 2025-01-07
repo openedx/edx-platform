@@ -1059,18 +1059,6 @@ FEATURES = {
     # .. toggle_creation_date: 2024-04-24
     'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': False,
 
-    # .. toggle_name: FEATURES['ENABLE_BLAKE2B_HASHING']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Enables the memcache to use the blake2b hash algorithm instead of depreciated md4 for keys
-    #   exceeding 250 characters
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-04-02
-    # .. toggle_target_removal_date: 2024-12-09
-    # .. toggle_warning: For consistency, keep the value in sync with the setting of the same name in the LMS and CMS.
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34442
-    'ENABLE_BLAKE2B_HASHING': False,
-
     # .. toggle_name: FEATURES['BADGES_ENABLED']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -5372,12 +5360,6 @@ COOL_OFF_DAYS = 14
 ############ Settings for externally hosted executive education courses ############
 EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
-############## PLOTLY ##############
-
-ENTERPRISE_PLOTLY_SECRET = "I am a secret"
-
-############## PLOTLY ##############
-
 ############ Internal Enterprise Settings ############
 ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
 ############ Internal Enterprise Settings ############
@@ -5558,3 +5540,91 @@ DISABLED_COUNTRIES = []
 
 
 LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
+
+
+####################### Setting for built-in Blocks Extraction #######################
+# The following Django settings flags have been introduced temporarily to facilitate
+# the rollout of the extracted built-in Blocks. Flags will use to toggle between
+# the old and new block quickly without putting course content or user state at risk.
+#
+# Ticket: https://github.com/openedx/edx-platform/issues/35308
+
+# .. toggle_name: USE_EXTRACTED_WORD_CLOUD_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted Word Cloud XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34840 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_WORD_CLOUD_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_ANNOTATABLE_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted annotatable XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34841 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_ANNOTATABLE_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_POLL_QUESTION_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted poll question XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until https://github.com/openedx/edx-platform/issues/34839 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_POLL_QUESTION_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_LTI_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted LTI XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_LTI_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_HTML_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted HTML XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_HTML_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_DISCUSSION_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted Discussion XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_DISCUSSION_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_PROBLEM_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted Problem XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_PROBLEM_BLOCK = False
+
+# .. toggle_name: USE_EXTRACTED_VIDEO_BLOCK
+# .. toggle_default: False
+# .. toggle_implementation: DjangoSetting
+# .. toggle_description: Enables the use of the extracted Video XBlock, which has been shifted to the 'openedx/xblocks-contrib' repo.
+# .. toggle_use_cases: temporary
+# .. toggle_warning: Not production-ready until relevant subtask https://github.com/openedx/edx-platform/issues/34827 is done.
+# .. toggle_creation_date: 2024-11-10
+# .. toggle_target_removal_date: 2025-06-01
+USE_EXTRACTED_VIDEO_BLOCK = False

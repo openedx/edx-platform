@@ -1,12 +1,15 @@
 """ Instructor apis serializers. """
+import re
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from .tools import get_student_from_identifier
 
+from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.instructor.access import ROLES
+
+from .tools import get_student_from_identifier
 
 
 class RoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -230,9 +233,103 @@ class BlockDueDateSerializer(serializers.Serializer):
             self.fields['due_datetime'].required = False
 
 
+class ModifyAccessSerializer(serializers.Serializer):
+    """
+    serializers for enroll or un-enroll users in beta testing program.
+    """
+    identifiers = serializers.CharField(
+        help_text="A comma separated list of emails or usernames.",
+        required=True
+    )
+    action = serializers.ChoiceField(
+        choices=["add", "remove"],
+        help_text="Action to perform: add or remove.",
+        required=True
+    )
+
+    email_students = serializers.BooleanField(
+        default=False,
+        help_text="Boolean flag to indicate if students should be emailed."
+    )
+
+    auto_enroll = serializers.BooleanField(
+        default=False,
+        help_text="Boolean flag to indicate if the user should be auto-enrolled."
+    )
+
+    def validate_identifiers(self, value):
+        """
+        Validate the 'identifiers' field which is now a list of strings.
+        """
+        # Iterate over the list of identifiers and validate each one
+        validated_list = _split_input_list(value)
+        if not validated_list:
+            raise serializers.ValidationError("The identifiers list cannot be empty.")
+
+        return validated_list
+
+    def validate_email_students(self, value):
+        """
+        handle string values like 'true' or 'false'.
+        """
+        if isinstance(value, str):
+            return value.lower() == 'true'
+        return bool(value)
+
+    def validate_auto_enroll(self, value):
+        """
+        handle string values like 'true' or 'false'.
+        """
+        if isinstance(value, str):
+            return value.lower() == 'true'
+        return bool(value)
+
+
+def _split_input_list(str_list):
+    """
+    Separate out individual student email from the comma, or space separated string.
+
+    e.g.
+    in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
+    out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
+
+    `str_list` is a string coming from an input text area
+    returns a list of separated values
+    """
+    new_list = re.split(r'[,\s\n\r]+', str_list)
+    new_list = [s.strip() for s in new_list]
+    new_list = [s for s in new_list if s != '']
+
+    return new_list
+
+
+class CertificateStatusesSerializer(serializers.Serializer):
+    """
+    Serializer for validating and serializing certificate status inputs.
+
+    This serializer is used to ensure that the provided certificate statuses
+    conform to the predefined set of valid statuses defined in the
+    `CertificateStatuses` enumeration.
+    """
+    certificate_statuses = serializers.ListField(
+        child=serializers.ChoiceField(choices=[
+            CertificateStatuses.downloadable,
+            CertificateStatuses.error,
+            CertificateStatuses.notpassing,
+            CertificateStatuses.audit_passing,
+            CertificateStatuses.audit_notpassing,
+        ]),
+        allow_empty=False  # Set to True if you want to allow empty lists
+    )
+
+
 class CertificateSerializer(serializers.Serializer):
     """
-    Serializer for resetting a students attempts counter or starts a task to reset all students
+    Serializer for multiple operations related with certificates.
+    resetting a students attempts counter or starts a task to reset all students
+    attempts counters
+    Also Add/Remove students to/from the certificate allowlist.
+    Also For resetting a students attempts counter or starts a task to reset all students
     attempts counters.
     """
     user = serializers.CharField(

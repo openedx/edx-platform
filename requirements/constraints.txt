@@ -60,12 +60,12 @@ django-webpack-loader==0.7.0
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
 
-# Date: 2023-07-19
-# The version of django-stubs we can use depends on which Django release we're using
-# 1.16.0 works with Django 3.2 through 4.1
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35275
-django-stubs==1.16.0
-djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this when we can remove the above pin.
+# Date: 2024-07-19
+# Generally speaking, the major version of django-stubs should match the major version of django.
+# Specifically, we need to perpetually constrain django-stubs to a compatible version based on:
+# https://github.com/typeddjango/django-stubs?tab=readme-ov-file#version-compatibility
+# Issue: https://github.com/openedx/edx-platform/issues/35275
+django-stubs<5
 
 # Date: 2024-07-23
 # django-storages==1.14.4 breaks course imports
@@ -78,7 +78,7 @@ django-storages<1.14.4
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==4.33.0
+edx-enterprise==5.5.2
 
 # Date: 2024-05-09
 # This has to be constrained as well because newer versions of edx-i18n-tools need the
@@ -135,7 +135,7 @@ optimizely-sdk<5.0
 # Date: 2023-09-18
 # pinning this version to avoid updates while the library is being developed
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35269
-openedx-learning==0.18.0
+openedx-learning==0.18.1
 
 # Date: 2023-11-29
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.

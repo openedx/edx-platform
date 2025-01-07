@@ -644,6 +644,22 @@ class LibraryBlockView(APIView):
         return Response({})
 
 
+@view_auth_classes()
+class LibraryBlockRestore(APIView):
+    """
+    View to restore soft-deleted library xblocks.
+    """
+    @convert_exceptions
+    def post(self, request, usage_key_str) -> Response:
+        """
+        Restores a soft-deleted library block that belongs to a Content Library
+        """
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        api.restore_library_block(key)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockCollectionsView(APIView):
@@ -710,6 +726,9 @@ class LibraryBlockOlxView(APIView):
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
+        DEPRECATED. Use get_block_olx_view() in xblock REST-API.
+        Can be removed post-Teak.
+
         Get the block's OLX
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
@@ -780,6 +799,7 @@ class LibraryBlockAssetView(APIView):
         """
         Replace a static asset file belonging to this block.
         """
+        file_path = file_path.replace(" ", "_")  # Messes up url/name correspondence due to URL encoding.
         usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(
             usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,

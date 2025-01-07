@@ -22,7 +22,7 @@ openedx/core/djangoapps/enrollments/                                @openedx/2U-
 openedx/core/djangoapps/heartbeat/
 openedx/core/djangoapps/oauth_dispatch
 openedx/core/djangoapps/user_api/                                   @openedx/2U-aperture
-openedx/core/djangoapps/user_authn/                                 @openedx/2U-vanguards                                 
+openedx/core/djangoapps/user_authn/                                 @openedx/2U-infinity
 openedx/core/djangoapps/verified_track_content/                     @openedx/2u-infinity
 openedx/features/course_experience/
 xmodule/
