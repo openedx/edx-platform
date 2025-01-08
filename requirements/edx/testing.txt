@@ -658,7 +658,7 @@ edx-when==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.7.0
+edxval==2.8.0
     # via -r requirements/edx/base.txt
 elasticsearch==7.9.1
     # via
