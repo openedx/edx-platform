@@ -7,6 +7,11 @@ import re
 import unicodeit
 
 
+class InvalidMathEquation(Exception):
+    """Raised when converting mathjax equations to plain text fails"""
+    pass
+
+
 class PlainTextMath:
     """
     Converts mathjax equations to plain text using unicodeit and some preprocessing.
@@ -34,6 +39,41 @@ class PlainTextMath:
         (re.compile(r'\\mathbf{(.*?)}'), r"\1"),
         (re.compile(r'{\\bf (.*?)}'), r"\1"),
     )
+    extract_inner_texts = (
+        # Replaces any eqn: `\name{inner_text}` with `inner_text`
+        "\\mathbf{",
+    )
+    frac_open_close_pattern = re.compile(r"}\s*{")
+
+    @staticmethod
+    def _nested_bracket_matcher(equation: str, opening_pattern: str) -> str:
+        """
+        Matches opening and closing brackets in given string.
+
+        Args:
+            equation: string
+            opening_pattern: for example, \mathbf{
+
+        Returns:
+            String inside the eqn brackets
+        """
+        start = equation.find(opening_pattern)
+        if start == -1:
+            raise InvalidMathEquation()
+        open_count = 0
+        inner_start = start + len(opening_pattern)
+        for i, char in enumerate(equation[inner_start:]):
+            if char == "{":
+                open_count += 1
+            if char == "}":
+                if open_count == 0:
+                    break
+                open_count -= 1
+        else:
+            raise InvalidMathEquation()
+        # In below example `|` symbol is used to denote index position
+        # |\mathbf{, \mathbf{|, \mathbf{some_text|}, \mathbf{some_text}|
+        return (start, inner_start, inner_start + i, inner_start + i + 1)
 
     def _fraction_handler(self, equation: str) -> str:
         """
@@ -50,16 +90,14 @@ class PlainTextMath:
         start_index = equation.find("\\frac{")
         if start_index == -1:
             return equation
-        mid_index = equation.find("}{")
-        if mid_index == -1:
+        mid_index = re.search(self.frac_open_close_pattern, equation)
+        if not mid_index:
             return equation
 
-        numerator = equation[start_index + 6:mid_index]
-        # shift mid_index by length of }{ chars i.e., 2
-        mid_index += 2
+        numerator = equation[start_index + 6:mid_index.start()]
         open_count = 0
 
-        for i, char in enumerate(equation[mid_index:]):
+        for i, char in enumerate(equation[mid_index.end():]):
             if char == "{":
                 open_count += 1
             if char == "}":
@@ -70,9 +108,9 @@ class PlainTextMath:
             # Invalid `\frac` format
             return equation
 
-        denominator = equation[mid_index:mid_index + i]
+        denominator = equation[mid_index.end():mid_index.end() + i]
         # Now re-create the equation with `(numerator / denominator)`
-        equation = equation[:start_index] + f"({numerator}/{denominator})" + equation[mid_index + i + 1:]
+        equation = equation[:start_index] + f"({numerator}/{denominator})" + equation[mid_index.end() + i + 1:]
         return equation
 
     def _handle_replacements(self, equation: str) -> str:
@@ -81,6 +119,12 @@ class PlainTextMath:
         """
         for q, replacement in self.eqn_replacements:
             equation = equation.replace(q, replacement)
+        for pattern in self.extract_inner_texts:
+            try:
+                start, inner_start, inner_end, end = self._nested_bracket_matcher(equation, pattern)
+                equation = equation[:start] + equation[inner_start:inner_end] + equation[end:]
+            except InvalidMathEquation:
+                continue
         for pattern, replacement in self.regex_replacements:
             equation = re.sub(pattern, replacement, equation)
         return equation
@@ -92,8 +136,8 @@ class PlainTextMath:
         groups = eqn_matches.groups()
         for group in groups:
             if group:
-                group = self._fraction_handler(group)
                 group = self._handle_replacements(group)
+                group = self._fraction_handler(group)
                 return unicodeit.replace(group)
         return None
 
