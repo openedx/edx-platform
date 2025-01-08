@@ -181,3 +181,10 @@ social-auth-app-django<=5.4.1
 # # Date: 2024-10-14
 # # The edx-enterprise is currently using edx-rest-api-client==5.7.1, which needs to be updated first.
 # edx-rest-api-client==5.7.1
+
+# Date 2025-01-08
+# elasticsearch==7.13.x is downgrading urllib3 from 2.2.3 to 1.26.20
+# https://github.com/elastic/elasticsearch-py/blob/v7.13.4/setup.py#L42
+# We are pinning this until we can upgrade to a version of elasticsearch that uses a more recent version of urllib3.
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35126
+elasticsearch==7.9.1
