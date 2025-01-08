@@ -559,6 +559,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             ('Sqrt test 3: [mathjaxinline]x^2 + \\sqrt(y)[/mathjaxinline]', 'Sqrt test 3: x² + √(y)'),
             ('Fraction test 1: \\( \\frac{2} {3} \\)', 'Fraction test 1:  (2/3)'),
             ('Fraction test 2: \\( \\frac{2}{3} \\)', 'Fraction test 2:  (2/3)'),
+            ('Fraction test 3: \\( \\frac{\\frac{2}{3}}{4} \\)', 'Fraction test 3:  ((2/3)/4)'),
+            ('Fraction test 4: \\( \\frac{\\frac{2} {3}}{4} \\)', 'Fraction test 4:  ((2/3)/4)'),
+            ('Fraction test 5: \\( \\frac{\\frac{2} {3}}{\\frac{4}{3}} \\)', 'Fraction test 5:  ((2/3)/(4/3))'),
         ]
         # pylint: enable=line-too-long
         block = BlockFactory.create(
