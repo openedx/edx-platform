@@ -553,9 +553,12 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 'Bold text:  a ⋅ b = |a| |b| cos(θ)',
             ),
             ('Bold text: \\( \\frac{\\sqrt{\\mathbf{2}+3}}{\\sqrt{4}} \\)', 'Bold text:  (√{2+3}/√{4})'),
+            ('Nested Bold text: \\( \\mathbf{ \\frac{1}{2} } \\)', 'Nested Bold text:   (1/2)'),
             ('Sqrt test 1: \\(\\sqrt\\)', 'Sqrt test 1: √'),
             ('Sqrt test 2: \\(x^2 + \\sqrt(y)\\)', 'Sqrt test 2: x² + √(y)'),
             ('Sqrt test 3: [mathjaxinline]x^2 + \\sqrt(y)[/mathjaxinline]', 'Sqrt test 3: x² + √(y)'),
+            ('Fraction test 1: \\( \\frac{2} {3} \\)', 'Fraction test 1:  (2/3)'),
+            ('Fraction test 2: \\( \\frac{2}{3} \\)', 'Fraction test 2:  (2/3)'),
         ]
         # pylint: enable=line-too-long
         block = BlockFactory.create(
