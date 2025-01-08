@@ -87,30 +87,25 @@ class PlainTextMath:
         Returns:
             String with `\\frac` replaced by normal `/` symbol.
         """
-        start_index = equation.find("\\frac{")
-        if start_index == -1:
-            return equation
-        mid_index = re.search(self.frac_open_close_pattern, equation)
-        if not mid_index:
+        try:
+            n_start, n_inner_start, n_inner_end, n_end = self._nested_bracket_matcher(equation, "\\frac{")
+        except InvalidMathEquation:
             return equation
 
-        numerator = equation[start_index + 6:mid_index.start()]
-        open_count = 0
+        numerator = equation[n_inner_start:n_inner_end]
+        # Handle nested fractions
+        numerator = self._fraction_handler(numerator)
 
-        for i, char in enumerate(equation[mid_index.end():]):
-            if char == "{":
-                open_count += 1
-            if char == "}":
-                if open_count == 0:
-                    break
-                open_count -= 1
-        else:
-            # Invalid `\frac` format
+        try:
+            _, d_inner_start, d_inner_end, d_end = self._nested_bracket_matcher(equation[n_end:], "{")
+        except InvalidMathEquation:
             return equation
 
-        denominator = equation[mid_index.end():mid_index.end() + i]
+        denominator = equation[n_end + d_inner_start:n_end + d_inner_end]
+        # Handle nested fractions
+        denominator = self._fraction_handler(denominator)
         # Now re-create the equation with `(numerator / denominator)`
-        equation = equation[:start_index] + f"({numerator}/{denominator})" + equation[mid_index.end() + i + 1:]
+        equation = equation[:n_start] + f"({numerator}/{denominator})" + equation[n_end + d_end:]
         return equation
 
     def _handle_replacements(self, equation: str) -> str:
