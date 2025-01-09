@@ -553,7 +553,15 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 'Bold text:  a ⋅ b = |a| |b| cos(θ)',
             ),
             ('Bold text: \\( \\frac{\\sqrt{\\mathbf{2}+3}}{\\sqrt{4}} \\)', 'Bold text:  (√{2+3}/√{4})'),
-            ('Nested Bold text: \\( \\mathbf{ \\frac{1}{2} } \\)', 'Nested Bold text:   (1/2)'),
+            ('Nested Bold text 1: \\( \\mathbf{ \\frac{1}{2} } \\)', 'Nested Bold text 1:   (1/2)'),
+            (
+                'Nested Bold text 2: \\( \\mathbf{a \\cdot (a \\mathbf{\\times} b)} \\)',
+                'Nested Bold text 2:  a ⋅ (a × b)'
+            ),
+            (
+                'Nested Bold text 3: \\( \\mathbf{a \\cdot (a \\bm{\\times} b)} \\)',
+                'Nested Bold text 3:  a ⋅ (a × b)'
+            ),
             ('Sqrt test 1: \\(\\sqrt\\)', 'Sqrt test 1: √'),
             ('Sqrt test 2: \\(x^2 + \\sqrt(y)\\)', 'Sqrt test 2: x² + √(y)'),
             ('Sqrt test 3: [mathjaxinline]x^2 + \\sqrt(y)[/mathjaxinline]', 'Sqrt test 3: x² + √(y)'),
