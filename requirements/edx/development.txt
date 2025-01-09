@@ -76,6 +76,7 @@ asgiref==3.8.1
     #   django
     #   django-cors-headers
     #   django-countries
+    #   django-stubs
 asn1crypto==1.5.1
     # via
     #   -r requirements/edx/doc.txt
@@ -577,7 +578,7 @@ django-storages==1.14.3
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-stubs==4.2.7
+django-stubs==5.1.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
@@ -625,7 +626,7 @@ djangorestframework==3.14.0
     #   openedx-learning
     #   ora2
     #   super-csv
-djangorestframework-stubs==3.14.5
+djangorestframework-stubs==3.15.2
     # via -r requirements/edx/development.in
 djangorestframework-xml==2.0.0
     # via
@@ -1188,7 +1189,7 @@ loremipsum==1.0.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.12.1
+lti-consumer-xblock==9.13.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1292,10 +1293,8 @@ multidict==6.1.0
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==1.11.2
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/development.in
+mypy==1.14.1
+    # via -r requirements/edx/development.in
 mypy-extensions==1.0.0
     # via mypy
 mysqlclient==2.2.6
@@ -1611,6 +1610,7 @@ pyjwt[crypto]==2.10.1
     #   edx-proctoring
     #   edx-rest-api-client
     #   firebase-admin
+    #   lti-consumer-xblock
     #   pylti1p3
     #   snowflake-connector-python
     #   social-auth-core
@@ -2119,8 +2119,6 @@ tqdm==4.67.1
     #   -r requirements/edx/testing.txt
     #   nltk
     #   openai
-types-pytz==2024.2.0.20241221
-    # via django-stubs
 types-pyyaml==6.0.12.20241230
     # via
     #   django-stubs

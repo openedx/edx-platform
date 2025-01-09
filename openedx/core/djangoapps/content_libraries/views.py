@@ -122,6 +122,7 @@ import openedx.core.djangoapps.site_configuration.helpers as configuration_helpe
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.types.http import RestRequest
 
 from .models import ContentLibrary, LtiGradedResource, LtiProfile
 
@@ -667,7 +668,7 @@ class LibraryBlockCollectionsView(APIView):
     View to set collections for a component.
     """
     @convert_exceptions
-    def patch(self, request, usage_key_str) -> Response:
+    def patch(self, request: RestRequest, usage_key_str) -> Response:
         """
         Sets Collections for a Component.
 
@@ -688,7 +689,7 @@ class LibraryBlockCollectionsView(APIView):
             library_key=key.lib_key,
             component=component,
             collection_keys=collection_keys,
-            created_by=self.request.user.id,
+            created_by=request.user.id,
             content_library=content_library,
         )
 
