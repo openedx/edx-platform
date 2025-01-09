@@ -1214,12 +1214,13 @@ def check_broken_links(self, user_id, course_key_string, language):
         for i in range(0, retry_count):
             if retry_list:
                 LOGGER.debug(f'[Link Check] retry attempt #{i+1}')
-                validated_url_list = asyncio.run(validate_urls_access_in_batches(retry_list, course_key, batch_size=100))
+                validated_url_list = asyncio.run(
+                    validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
+                )
                 filetered_url_list, retry_list = filter_by_status(validated_url_list)
                 results.extend(filetered_url_list)
-    
-        if retry_list:
-            LOGGER.debug(f'[Link Check] {len(retry_list)} requests failed due to connection error')
+
+        results.extend(retry_list)
 
         return results
 
@@ -1237,7 +1238,7 @@ def check_broken_links(self, user_id, course_key_string, language):
         filtered_results = []
         retry_list = []
         for result in results:
-            if result['status'] == None:
+            if result['status'] is None:
                 retry_list.append([result['block_id'], result['url']])
             elif result['status'] == 200:
                 continue
