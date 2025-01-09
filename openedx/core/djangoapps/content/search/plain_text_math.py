@@ -46,12 +46,12 @@ class PlainTextMath:
 
     @staticmethod
     def _nested_bracket_matcher(equation: str, opening_pattern: str) -> str:
-        """
+        r"""
         Matches opening and closing brackets in given string.
 
         Args:
             equation: string
-            opening_pattern: for example, `\\mathbf{`
+            opening_pattern: for example, `\mathbf{`
 
         Returns:
             String inside the eqn brackets
@@ -75,16 +75,16 @@ class PlainTextMath:
         return (start, inner_start, inner_start + i, inner_start + i + 1)
 
     def _fraction_handler(self, equation: str) -> str:
-        """
-        Converts `\\frac{x}{y}` to `(x/y)` while handling nested `{}`.
+        r"""
+        Converts `\frac{x}{y}` to `(x/y)` while handling nested `{}`.
 
-        For example: `\\frac{2}{\\sqrt{1+y}}` is converted to `(2/\\sqrt{1+y})`.
+        For example: `\frac{2}{\sqrt{1+y}}` is converted to `(2/\sqrt{1+y})`.
 
         Args:
             equation: string
 
         Returns:
-            String with `\\frac` replaced by normal `/` symbol.
+            String with `\frac` replaced by normal `/` symbol.
         """
         try:
             n_start, n_inner_start, n_inner_end, n_end = self._nested_bracket_matcher(equation, "\\frac{")
