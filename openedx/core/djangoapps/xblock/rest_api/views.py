@@ -122,6 +122,7 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
         'fragment': fragment,
         'handler_urls_json': json.dumps(handler_urls),
         'lms_root_url': lms_root_url,
+        'view_name': view_name,
         'is_development': settings.DEBUG,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
