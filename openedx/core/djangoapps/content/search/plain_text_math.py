@@ -9,7 +9,6 @@ import unicodeit
 
 class InvalidMathEquation(Exception):
     """Raised when converting mathjax equations to plain text fails"""
-    pass
 
 
 class PlainTextMath:
@@ -36,12 +35,12 @@ class PlainTextMath:
     )
     regex_replacements = (
         # Makes text bold, so not required in plain text.
-        (re.compile(r'\\mathbf{(.*?)}'), r"\1"),
         (re.compile(r'{\\bf (.*?)}'), r"\1"),
     )
     extract_inner_texts = (
         # Replaces any eqn: `\name{inner_text}` with `inner_text`
         "\\mathbf{",
+        "\\bm{",
     )
     frac_open_close_pattern = re.compile(r"}\s*{")
 
@@ -52,7 +51,7 @@ class PlainTextMath:
 
         Args:
             equation: string
-            opening_pattern: for example, \mathbf{
+            opening_pattern: for example, `\\mathbf{`
 
         Returns:
             String inside the eqn brackets
@@ -108,6 +107,19 @@ class PlainTextMath:
         equation = equation[:n_start] + f"({numerator}/{denominator})" + equation[n_end + d_end:]
         return equation
 
+    def _nested_text_extractor(self, equation: str, pattern: str) -> str:
+        """
+        Recursively extracts text from equation for given pattern
+        """
+        try:
+            start, inner_start, inner_end, end = self._nested_bracket_matcher(equation, pattern)
+            inner_text = equation[inner_start:inner_end]
+            inner_text = self._nested_text_extractor(inner_text, pattern)
+            equation = equation[:start] + inner_text + equation[end:]
+        except InvalidMathEquation:
+            pass
+        return equation
+
     def _handle_replacements(self, equation: str) -> str:
         """
         Makes a bunch of replacements in equation string.
@@ -115,11 +127,7 @@ class PlainTextMath:
         for q, replacement in self.eqn_replacements:
             equation = equation.replace(q, replacement)
         for pattern in self.extract_inner_texts:
-            try:
-                start, inner_start, inner_end, end = self._nested_bracket_matcher(equation, pattern)
-                equation = equation[:start] + equation[inner_start:inner_end] + equation[end:]
-            except InvalidMathEquation:
-                continue
+            equation = self._nested_text_extractor(equation, pattern)
         for pattern, replacement in self.regex_replacements:
             equation = re.sub(pattern, replacement, equation)
         return equation
