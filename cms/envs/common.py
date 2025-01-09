@@ -995,7 +995,7 @@ P3P_HEADER = 'CP="Open EdX does not have a P3P policy."'
 ############# XBlock Configuration ##########
 
 # Import after sys.path fixup
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.x_module import XModuleMixin
 
 # These are the Mixins that will be added to every Blocklike upon instantiation.
@@ -1008,7 +1008,7 @@ XBLOCK_MIXINS = (
     #  (a) merge their functionality into the base Blocklike class, or
     #  (b) refactor their functionality out of the Blocklike objects and into the edx-platform block runtimes.
     LmsBlockMixin,
-    InheritanceMixin,
+    InheritableFieldsMixin,
     XModuleMixin,
     EditInfoMixin,
     AuthoringMixin,

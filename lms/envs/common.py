@@ -1636,7 +1636,7 @@ COURSE_LISTINGS = {}
 
 # Import after sys.path fixup
 from xmodule.modulestore.edit_info import EditInfoMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
-from xmodule.modulestore.inheritance import InheritanceMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
+from xmodule.modulestore.inheritance import InheritableFieldsMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order, wrong-import-position
 
 # These are the Mixins that will be added to every Blocklike upon instantiation.
@@ -1649,7 +1649,7 @@ XBLOCK_MIXINS = (
     #  (a) merge their functionality into the base Blocklike class, or
     #  (b) refactor their functionality out of the Blocklike objects and into the edx-platform block runtimes.
     LmsBlockMixin,
-    InheritanceMixin,
+    InheritableFieldsMixin,
     XModuleMixin,
     EditInfoMixin,
 )

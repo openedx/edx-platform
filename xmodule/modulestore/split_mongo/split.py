@@ -2103,7 +2103,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         else:
             inherited_settings = parent_xblock.xblock_kvs.inherited_settings.copy()
             if fields is not None:
-                for field_name in inheritance.InheritanceMixin.fields:  # lint-amnesty, pylint: disable=not-an-iterable
+                for field_name in inheritance.InheritableFieldsMixin.fields:  # lint-amnesty, pylint: disable=not-an-iterable
                     if field_name in fields:
                         inherited_settings[field_name] = fields[field_name]
 
@@ -2644,7 +2644,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # update the inheriting w/ what should pass to children
         inheriting_settings = inherited_settings_map[block_key].copy()
         block_fields = block_data.fields
-        for field_name in inheritance.InheritanceMixin.fields:  # lint-amnesty, pylint: disable=not-an-iterable
+        for field_name in inheritance.InheritableFieldsMixin.fields:  # lint-amnesty, pylint: disable=not-an-iterable
             if field_name in block_fields:
                 inheriting_settings[field_name] = block_fields[field_name]
 

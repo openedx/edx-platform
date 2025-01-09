@@ -6,6 +6,9 @@ Module contains various XModule/XBlock services
 import inspect
 import logging
 from functools import partial
+from datetime import datetime
+
+from pytz import UTC
 
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -17,6 +20,7 @@ from xblock.runtime import KvsFieldData
 from common.djangoapps.track import contexts
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student
 from xmodule.modulestore.django import modulestore
+from xmodule.graders import ShowCorrectness, ShowAnswer
 
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
@@ -308,3 +312,147 @@ class EventPublishingService(Service):
         # in order to avoid duplicate work and possibly conflicting semantics.
         if not getattr(block, 'has_custom_completion', False):
             self.completion_service.submit_completion(block.scope_ids.usage_id, 1.0)
+
+
+class ProblemFeedbackService(Service):
+    """
+    An XBlock Service that allows XModules to define:
+
+    * If the answers are visible.
+    * Whether correctness is currently hidden. When correctness is hidden, this
+      limits the user's access to the correct/incorrect flags, messages, problem
+      scores, and aggregate subsection and course grades.
+    """
+    def __init__(self, block=None, user_is_staff=False, **kwargs):
+        super().__init__(**kwargs)
+        self._user_is_staff = user_is_staff
+        # This is needed because the `Service` class initialization expects the XBlock passed as an `xblock` keyword
+        #  argument, but the `service` method from the `DescriptorSystem` passes a `block`.
+        self._xblock = self.xblock() or block
+
+    def is_past_due(self):
+        """
+        Returns if the problem is past its due date.
+
+        This method returns True when an XBlock doesn't have a due date. That
+        is because if an XBlock doesn't have a due date, and we are trying to
+        assess whether we can display a correct answer to a learner, we want to
+        treat an answered problem without a due date as past due. Otherwise, we
+        can never show the answer to a learner, since there is no due date.
+
+        There are scenarios where you would want is_past_due to return False
+        when an XBlock doesn't have a due date, for example, when determining
+        whether a learner should still be able to submit their answer.
+        """
+        if not self._xblock:
+            return False
+
+        due_date = getattr(self._xblock, 'close_date', None) or getattr(self._xblock, 'due', None)
+        return (due_date is None or datetime.now(UTC) > due_date)
+
+    def is_attempted(self):
+        """
+        Has the problem been attempted?
+        """
+        if not self._xblock:
+            return False
+
+        return self._xblock.attempts > 0
+
+    def used_all_attempts(self):
+        """ All attempts have been used """
+        if not self._xblock:
+            return False
+
+        return (self._xblock.max_attempts is not None and
+                self._xblock.attempts >= self._xblock.max_attempts)
+
+    def closed(self):
+        """
+        Is the student still allowed to submit answers?
+        """
+        if not self._xblock:
+            return False
+
+        if self.used_all_attempts():
+            return True
+        # Using XBlock's is_past_due method, as it's suited for checking the
+        # submission deadline, unlike the is_past_due method of this service.
+        elif self._xblock.is_past_due():
+            return True
+        return False
+
+    def answer_available(self):
+        """
+        Returns whether correctness is available now, for the given attributes.
+        """
+        if not self._xblock:
+            return False
+
+        show_answer = self._xblock.showanswer
+        max_attempts = self._xblock.max_attempts
+        attempts = self._xblock.attempts
+        is_correct = self._xblock.is_correct()
+        required_attempts = self._xblock.attempts_before_showanswer_button
+        has_due_date = getattr(self._xblock, 'close_date', None) is not None
+        past_due = self.is_past_due()
+        is_attempted = self.is_attempted()
+        used_all_attempts = self.used_all_attempts()
+        closed = self.closed()
+
+        if not self.correctness_available():
+            # If correctness is being withheld, then don't show answers either.
+            return False
+        elif show_answer == ShowAnswer.NEVER:
+            return False
+        elif self._user_is_staff:
+            # This is after the 'never' check because course staff can see correctness
+            # unless the sequence/problem explicitly prevents it
+            return True
+        elif show_answer == ShowAnswer.ATTEMPTED:
+            return is_attempted or (has_due_date and past_due)
+        elif show_answer == ShowAnswer.ANSWERED:
+            # NOTE: this is slightly different from 'attempted' -- resetting the problems
+            # makes lcp.done False, but leaves attempts unchanged.
+            return is_correct
+        elif show_answer == ShowAnswer.CLOSED:
+            return closed
+        elif show_answer == ShowAnswer.FINISHED:
+            return closed or is_correct
+        elif show_answer == ShowAnswer.CORRECT_OR_PAST_DUE:
+            return is_correct or (has_due_date and past_due)
+        elif show_answer == ShowAnswer.PAST_DUE:
+            return past_due
+        elif show_answer == ShowAnswer.AFTER_SOME_NUMBER_OF_ATTEMPTS:
+            if max_attempts and required_attempts >= max_attempts:
+                required_attempts = max_attempts
+            return attempts >= required_attempts
+        elif show_answer == ShowAnswer.ALWAYS:
+            return True
+        elif show_answer == ShowAnswer.AFTER_ALL_ATTEMPTS:
+            return used_all_attempts
+        elif show_answer == ShowAnswer.AFTER_ALL_ATTEMPTS_OR_CORRECT:
+            return used_all_attempts or is_correct
+        elif show_answer == ShowAnswer.ATTEMPTED_NO_PAST_DUE:
+            return is_attempted
+        return False
+
+    def correctness_available(self):
+        """
+        Returns whether correctness is available now, for the given attributes.
+        """
+        if not self._xblock:
+            return False
+
+        show_correctness = self._xblock.show_correctness
+
+        if show_correctness == ShowCorrectness.NEVER:
+            return False
+        elif self._user_is_staff:
+            # This is after the 'never' check because course staff can see correctness
+            # unless the sequence/problem explicitly prevents it
+            return True
+        elif show_correctness == ShowCorrectness.PAST_DUE:
+            # Is it now past the due date?
+            return self.is_past_due()
+        return True

@@ -17,7 +17,7 @@ from xblock.fields import Integer, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from xmodule.fields import Date
-from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_metadata
+from xmodule.modulestore.inheritance import InheritableFieldsMixin, compute_inherited_metadata
 from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
 from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
@@ -47,7 +47,7 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             course_dir=course_dir,
             error_tracker=error_tracker,
             load_error_blocks=load_error_blocks,
-            mixins=(InheritanceMixin, XModuleMixin),
+            mixins=(InheritableFieldsMixin, XModuleMixin),
             services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
 
@@ -67,7 +67,7 @@ class BaseCourseTestCase(TestCase):
         modulestore = XMLModuleStore(
             DATA_DIR,
             source_dirs=[name],
-            xblock_mixins=(InheritanceMixin,),
+            xblock_mixins=(InheritableFieldsMixin,),
         )
         courses = modulestore.get_courses()
         assert len(courses) == 1
