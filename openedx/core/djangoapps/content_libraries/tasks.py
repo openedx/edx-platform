@@ -17,6 +17,8 @@ Architecture note:
 from __future__ import annotations
 
 import logging
+import re
+from datetime import datetime, timezone
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
@@ -29,6 +31,7 @@ from xblock.fields import Scope
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib import ensure_cms
+from openedx_learning.api.authoring import get_or_create_entity_link
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
 from xmodule.modulestore import ModuleStoreEnum
@@ -167,6 +170,29 @@ def duplicate_children(
             TASK_LOGGER.exception('Error Copying Overrides from %s to %s', source_block_id, dest_block_id)
             if self.status.state != UserTaskStatus.FAILED:
                 self.status.fail({'raw_error_msg': str(exception)})
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def create_or_update_upstream_links(course_key_str: str):
+    """
+    A Celery task to create or update upstream downstream links in database from course xblock content.
+    """
+    ensure_cms("create_or_update_upstream_links may only be executed in a CMS context")
+
+    store = modulestore()
+    course_key = CourseKey.from_string(course_key_str)
+    xblocks = store.get_items(course_key, settings={"upstream": re.compile(r".*")})
+    created = datetime.now(timezone.utc)
+    for xblock in xblocks:
+        get_or_create_entity_link(
+            upstream_usage_key=xblock.upstream,
+            upstream_context_key=course_key,
+            downstream_usage_key=str(xblock.usage_key),
+            version_synced=xblock.upstream_version,
+            version_declined=xblock.upstream_version_declined,
+            created=created,
+        )
 
 
 def _sync_children(
