@@ -37,7 +37,7 @@ class HomePageViewTest(CourseTestCase):
         self.url = reverse("cms.djangoapps.contentstore:v1:home")
         self.expected_response = {
             "allow_course_reruns": True,
-            "allow_to_create_new_org": False,
+            "allow_to_create_new_org": True,
             "allow_unicode_course_id": False,
             "allowed_organizations": [],
             "archived_courses": [],
@@ -80,6 +80,17 @@ class HomePageViewTest(CourseTestCase):
 
         expected_response = self.expected_response
         expected_response["libraries_v2_enabled"] = True
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(expected_response, response.data)
+
+    @override_settings(ORGANIZATIONS_AUTOCREATE=False)
+    def test_home_page_studio_with_org_autocreate_disabled(self):
+        """Check response content when Organization autocreate is disabled"""
+        response = self.client.get(self.url)
+
+        expected_response = self.expected_response
+        expected_response["allow_to_create_new_org"] = False
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
