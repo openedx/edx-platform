@@ -574,6 +574,11 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             ('Fraction error: \\( \\frac{2} \\)', 'Fraction error:  \\frac{2}'),
             ('Fraction error 2: \\( \\frac{\\frac{2}{3}{4} \\)', 'Fraction error 2:  \\frac{\\frac{2}{3}{4}'),
             ('Unclosed: [mathjaxinline]x^2', 'Unclosed: [mathjaxinline]x^2'),
+            (
+                'Missing closing bracket: \\( \\frac{\\frac{2} {3}{\\frac{4}{3}} \\)',
+                'Missing closing bracket:  \\frac{\\frac{2} {3}{\\frac{4}{3}}'
+            ),
+            ('No equation: normal text', 'No equation: normal text'),
         ]
         # pylint: enable=line-too-long
         block = BlockFactory.create(
