@@ -1521,6 +1521,8 @@ unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
+unicodeit==0.7.5
+    # via -r requirements/edx/base.txt
 uritemplate==4.1.1
     # via
     #   -r requirements/edx/base.txt

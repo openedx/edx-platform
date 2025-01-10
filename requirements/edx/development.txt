@@ -2160,6 +2160,10 @@ unicodecsv==0.14.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
+unicodeit==0.7.5
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 unidiff==0.7.5
     # via -r requirements/edx/testing.txt
 uritemplate==4.1.1
