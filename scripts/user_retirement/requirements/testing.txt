@@ -8,17 +8,17 @@ asgiref==3.8.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
-attrs==24.2.0
+attrs==24.3.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.35.76
+boto3==1.35.93
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.35.76
+botocore==1.35.93
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -28,7 +28,7 @@ cachetools==5.5.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-certifi==2024.8.30
+certifi==2024.12.14
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests
@@ -72,13 +72,13 @@ edx-django-utils==7.1.0
     #   edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-api-core==2.23.0
+google-api-core==2.24.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.154.0
+google-api-python-client==2.157.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.36.0
+google-auth==2.37.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -109,7 +109,7 @@ isodate==0.7.2
     #   zeep
 jenkinsapi==0.3.13
     # via -r scripts/user_retirement/requirements/base.txt
-jinja2==3.1.4
+jinja2==3.1.5
     # via moto
 jmespath==1.0.1
     # via
@@ -132,7 +132,7 @@ more-itertools==10.5.0
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==10.3.1
+newrelic==10.4.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -152,13 +152,13 @@ proto-plus==1.25.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==5.29.1
+protobuf==5.29.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==6.1.0
+psutil==6.1.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -184,7 +184,7 @@ pynacl==1.5.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-pyparsing==3.2.0
+pyparsing==3.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
@@ -248,7 +248,7 @@ six==1.17.0
     #   -r scripts/user_retirement/requirements/base.txt
     #   jenkinsapi
     #   python-dateutil
-sqlparse==0.5.2
+sqlparse==0.5.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
