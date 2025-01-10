@@ -122,6 +122,7 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
         'fragment': fragment,
         'handler_urls_json': json.dumps(handler_urls),
         'lms_root_url': lms_root_url,
+        'view_name': view_name,
         'is_development': settings.DEBUG,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
@@ -211,6 +212,12 @@ def xblock_handler(
     block = load_block(usage_key, user, version=version)
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
+
+    if handler_name == "studio_submit":
+        # Signal that we've modified this block
+        context_impl = get_learning_context_impl(usage_key)
+        context_impl.send_block_updated_event(usage_key)
+
     response = webob_to_django_response(response_webob)
     return response
 
