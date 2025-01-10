@@ -8,7 +8,11 @@ import unicodeit
 
 
 class InvalidMathEquation(Exception):
-    """Raised when converting mathjax equations to plain text fails"""
+    """Raised when mathjax equation is invalid. This is used to skip all transformations."""
+
+
+class EqnPatternNotFound(Exception):
+    """Raised when a pattern is not found in equation. This is used to skip a specific transformation."""
 
 
 class PlainTextMath:
@@ -58,7 +62,7 @@ class PlainTextMath:
         """
         start = equation.find(opening_pattern)
         if start == -1:
-            raise InvalidMathEquation()
+            raise EqnPatternNotFound()
         open_count = 0
         inner_start = start + len(opening_pattern)
         for i, char in enumerate(equation[inner_start:]):
@@ -88,7 +92,7 @@ class PlainTextMath:
         """
         try:
             n_start, n_inner_start, n_inner_end, n_end = self._nested_bracket_matcher(equation, "\\frac{")
-        except InvalidMathEquation:
+        except EqnPatternNotFound:
             return equation
 
         numerator = equation[n_inner_start:n_inner_end]
@@ -97,7 +101,7 @@ class PlainTextMath:
 
         try:
             _, d_inner_start, d_inner_end, d_end = self._nested_bracket_matcher(equation[n_end:], "{")
-        except InvalidMathEquation:
+        except EqnPatternNotFound:
             return equation
 
         denominator = equation[n_end + d_inner_start:n_end + d_inner_end]
@@ -116,7 +120,7 @@ class PlainTextMath:
             inner_text = equation[inner_start:inner_end]
             inner_text = self._nested_text_extractor(inner_text, pattern)
             equation = equation[:start] + inner_text + equation[end:]
-        except InvalidMathEquation:
+        except EqnPatternNotFound:
             pass
         return equation
 
@@ -138,10 +142,15 @@ class PlainTextMath:
         """
         groups = eqn_matches.groups()
         for group in groups:
-            if group:
+            if not group:
+                continue
+            original = group
+            try:
                 group = self._handle_replacements(group)
                 group = self._fraction_handler(group)
                 return unicodeit.replace(group)
+            except Exception:  # pylint: disable=broad-except
+                return original
         return None
 
 
