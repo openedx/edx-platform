@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-attrs==24.2.0
+attrs==24.3.0
     # via
     #   glom
     #   jsonschema
@@ -17,7 +17,7 @@ boltons==21.0.0
     #   semgrep
 bracex==2.5.post1
     # via wcmatch
-certifi==2024.8.30
+certifi==2024.12.14
     # via requests
 charset-normalizer==2.0.12
     # via
@@ -96,7 +96,7 @@ protobuf==4.25.5
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
-pygments==2.18.0
+pygments==2.19.1
     # via rich
 referencing==0.35.1
     # via
@@ -112,11 +112,11 @@ rpds-py==0.22.3
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.17.40
+ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.97.0
+semgrep==1.101.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
@@ -126,6 +126,7 @@ typing-extensions==4.12.2
     #   semgrep
 urllib3==2.2.3
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   requests
     #   semgrep
 wcmatch==8.5.2

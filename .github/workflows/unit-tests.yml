@@ -71,29 +71,17 @@ jobs:
 
       - name: install system requirements
         run: |
-          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx openssl
+          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
 
-      # This is needed until the ENABLE_BLAKE2B_HASHING can be removed and we
-      # can stop using MD4 by default.
-      - name: enable md4 hashing in libssl
-        run: |
-          cat <<EOF | sudo tee /etc/ssl/openssl.cnf
-          # Use this in order to automatically load providers.
-          openssl_conf = openssl_init
-
-          [openssl_init]
-          providers = provider_sect
-
-          [provider_sect]
-          default = default_sect
-          legacy = legacy_sect
-
-          [default_sect]
-          activate = 1
-
-          [legacy_sect]
-          activate = 1
-          EOF
+      # Try to log into DockerHub so that we're less likely to be rate-limited when pulling certain images.
+      # This will fail on any edx-platform fork which doesn't explicitly define its own DockerHub creds.
+      # That's OK--if we fail to log in, we'll proceed anonymously, and hope we don't get rate-limited.
+      - name: Try to log into Docker Hub
+        uses: docker/login-action@v3.3.0
+        continue-on-error: true
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.11.0
@@ -180,7 +168,7 @@ jobs:
         shell: bash
         run: |
           echo "root_cms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=cms.envs.test cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-          echo "root_lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ xmodule/ pavelib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "root_lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ xmodule/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
 
       - name: get GHA unit test paths
         shell: bash
@@ -218,7 +206,6 @@ jobs:
           workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows
           to add any missing apps and match the count. for more details please take a look at scripts/gha-shards-readme.md"
           exit 1
-
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
