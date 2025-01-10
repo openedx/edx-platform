@@ -188,4 +188,4 @@ elasticsearch==7.9.1
 # Date 2025-01-10
 # Cause: https://github.com/openedx/edx-platform/issues/36095
 # Issue for unpinning https://github.com/openedx/edx-platform/issues/36096
-lti-consumer-xblock==9.12.0
+lti-consumer-xblock==9.12.1
