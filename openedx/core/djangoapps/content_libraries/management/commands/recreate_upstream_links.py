@@ -13,8 +13,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx_learning.api.authoring import get_or_create_course_link_status
-from openedx_learning.api.authoring_models import CourseLinksStatusChoices
 
 from ...tasks import create_or_update_upstream_links
 
@@ -59,15 +57,6 @@ class Command(BaseCommand):
             ),
         )
 
-    def handle_course(self, course_key: str, force: bool = False):
-        course_status = get_or_create_course_link_status(course_key, self.time_now)
-        if course_status.status in [
-            CourseLinksStatusChoices.COMPLETED,
-            CourseLinksStatusChoices.PROCESSING
-        ] and not force:
-            return
-        create_or_update_upstream_links(course_key)
-
     def handle(self, *args, **options):
         """
         Handle command
@@ -85,4 +74,4 @@ class Command(BaseCommand):
         if should_process_all:
             courses = CourseOverview.get_all_course_keys()
         for course in courses:
-            self.handle_course(course, force)
+            create_or_update_upstream_links.delay(course, force)
