@@ -259,7 +259,6 @@ enable =
 	useless-suppression,
 disable =
 	bad-indentation,
-	broad-exception-raised,
 	consider-using-f-string,
 	duplicate-code,
 	file-ignored,

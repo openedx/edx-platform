@@ -6,7 +6,7 @@ from unittest import mock
 from urllib import parse
 
 import pytest
-import pytz
+from zoneinfo import ZoneInfo
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -44,10 +44,10 @@ class APIsTestCase(SharedModuleStoreTestCase):
 
         # Create a course outline
         start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
+            2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC")
         )
         due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=pytz.UTC
+            2010, 7, 7, 0, 0, tzinfo=ZoneInfo("UTC")
         )
 
         cls.chapters = [

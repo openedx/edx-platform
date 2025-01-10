@@ -7,7 +7,7 @@ from datetime import datetime
 
 import ddt
 from django.urls import reverse
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
@@ -149,8 +149,8 @@ class GradingPolicyTestMixin:
         The view should be addressable by course-keys from both module stores.
         """
         course = CourseFactory.create(
-            start=datetime(2014, 6, 16, 14, 30, tzinfo=UTC),
-            end=datetime(2015, 1, 16, tzinfo=UTC),
+            start=datetime(2014, 6, 16, 14, 30, tzinfo=ZoneInfo("UTC")),
+            end=datetime(2015, 1, 16, tzinfo=ZoneInfo("UTC")),
             org="MTD",
             default_store=modulestore_type,
         )

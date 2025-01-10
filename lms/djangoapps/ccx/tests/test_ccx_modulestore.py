@@ -7,7 +7,7 @@ import datetime
 from collections import deque
 from itertools import chain
 
-import pytz
+from zoneinfo import ZoneInfo
 from ccx_keys.locator import CCXLocator
 from six.moves import zip_longest
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -24,8 +24,8 @@ class TestCCXModulestoreWrapper(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
-        due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=pytz.UTC)
+        start = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC"))
+        due = datetime.datetime(2010, 7, 7, 0, 0, tzinfo=ZoneInfo("UTC"))
         # Create a course outline
         cls.chapters = chapters = [
             BlockFactory.create(start=start, parent=cls.course) for _ in range(2)

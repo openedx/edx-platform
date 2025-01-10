@@ -4,7 +4,7 @@ Tests for the `clean_stale_certificate_available_dates` management command.
 from datetime import datetime, timedelta
 
 from django.core.management import CommandError, call_command
-import pytz
+from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.models import CleanStaleCertificateAvailabilityDatesConfig
 from openedx.core.lib.courses import get_course_by_id
@@ -26,7 +26,7 @@ class CleanStaleCertAvailableDateTests(ModuleStoreTestCase):
         self.instructor_paced_course1 = CourseFactory()
 
         # set the self-paced courses to self-paced, create and insert an invalid certificate available date for them
-        self.certificate_available_date = datetime.now(pytz.UTC) + timedelta(days=30)
+        self.certificate_available_date = datetime.now(ZoneInfo("UTC")) + timedelta(days=30)
         self.self_paced_course1.self_paced = True
         self.self_paced_course1.certificate_available_date = self.certificate_available_date
         self.self_paced_course2.self_paced = True

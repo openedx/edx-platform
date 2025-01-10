@@ -13,7 +13,7 @@ from operator import itemgetter  # lint-amnesty, pylint: disable=wrong-import-or
 from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.runtime import DictKeyValueStore
 
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory
@@ -48,7 +48,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase, Mas
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC)})
+        cls.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(ZoneInfo("UTC"))})
         cls.info_page = BlockFactory.create(
             category="course_info", parent_location=cls.course.location,
             data="OOGIE BLOOGIE", display_name="updates"
@@ -549,7 +549,8 @@ class SetupMasqueradeTests(SharedModuleStoreTestCase, ):
 
     def setUp(self):
         super().setUp()
-        self.course = CourseFactory.create(number='setup-masquerade-test', metadata={'start': datetime.now(UTC)})
+        self.course = CourseFactory.create(
+            number='setup-masquerade-test', metadata={'start': datetime.now(ZoneInfo("UTC"))})
         self.request = RequestFactory().request()
         self.staff = StaffFactory(course_key=self.course.id)
         self.student = UserFactory()

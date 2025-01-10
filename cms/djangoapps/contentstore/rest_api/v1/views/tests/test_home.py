@@ -2,7 +2,6 @@
 Unit tests for home page view.
 """
 import ddt
-import pytz
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -12,6 +11,7 @@ from edx_toggles.toggles.testutils import (
     override_waffle_switch,
 )
 from rest_framework import status
+from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
@@ -193,7 +193,7 @@ class HomePageCoursesViewTest(CourseTestCase):
             display_name="Course (Demo)",
             id=archived_course_key,
             org=archived_course_key.org,
-            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
+            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=ZoneInfo("UTC")),
         )
         active_course_key = self.store.make_course_key("sample-org", "sample-number", "sample-run")
         CourseOverviewFactory.create(

@@ -12,7 +12,7 @@ from django.test import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
-from pytz import utc
+from zoneinfo import ZoneInfo
 from rest_framework import status
 
 from common.djangoapps.student.tests.factories import UserFactory  # pylint: disable=unused-import
@@ -534,7 +534,7 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
             'is_downloadable': True,
             'download_url': certificate_url,
         }
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         course_not_started = CourseFactory.create(
             mobile_available=True,
             static_asset_path="needed_for_split",
@@ -561,7 +561,7 @@ class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin
             'is_downloadable': True,
             'download_url': certificate_url,
         }
-        now = datetime.now(utc)
+        now = datetime.now(ZoneInfo("UTC"))
         course_closed = CourseFactory.create(
             mobile_available=True,
             static_asset_path="needed_for_split",
