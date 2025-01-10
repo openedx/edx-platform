@@ -78,12 +78,12 @@ jobs:
       # That's OK--if we fail to log in, we'll proceed anonymously, and hope we don't get rate-limited.
       - name: Try to log into Docker Hub
         uses: docker/login-action@v3.3.0
+        continue-on-error: true
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Start MongoDB
-        if: always()  # Continue even if the previous step (log into DockerHub) failed.
         uses: supercharge/mongodb-github-action@1.11.0
         with:
           mongodb-version: ${{ matrix.mongo-version }}
