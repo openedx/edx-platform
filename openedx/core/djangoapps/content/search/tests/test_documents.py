@@ -570,6 +570,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             ('Fraction test 3: \\( \\frac{\\frac{2}{3}}{4} \\)', 'Fraction test 3:  ((2/3)/4)'),
             ('Fraction test 4: \\( \\frac{\\frac{2} {3}}{4} \\)', 'Fraction test 4:  ((2/3)/4)'),
             ('Fraction test 5: \\( \\frac{\\frac{2} {3}}{\\frac{4}{3}} \\)', 'Fraction test 5:  ((2/3)/(4/3))'),
+            # Invalid equations.
+            ('Fraction error: \\( \\frac{2} \\)', 'Fraction error:  \\frac{2}'),
+            ('Fraction error 2: \\( \\frac{\\frac{2}{3}{4} \\)', 'Fraction error 2:  \\frac{\\frac{2}{3}{4}'),
+            ('Unclosed: [mathjaxinline]x^2', 'Unclosed: [mathjaxinline]x^2'),
         ]
         # pylint: enable=line-too-long
         block = BlockFactory.create(
