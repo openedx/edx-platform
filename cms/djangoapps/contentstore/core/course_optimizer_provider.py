@@ -59,7 +59,7 @@ def generate_broken_links_descriptor(json_content, request_user):
 
         usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
-        _update_node_tree_and_dictionary(
+        xblock_node_tree, xblock_dictionary = _update_node_tree_and_dictionary(
             block=block,
             link=link,
             is_locked=is_locked_flag,
@@ -103,14 +103,16 @@ def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictiona
         ...,
     }
     """
+    updated_tree, updated_dictionary = node_tree, dictionary
+
     path = _get_node_path(block)
-    current_node = node_tree
+    current_node = updated_tree
     xblock_id = ''
 
     # Traverse the path and build the tree structure
     for xblock in path:
         xblock_id = xblock.location.block_id
-        dictionary.setdefault(xblock_id,
+        updated_dictionary.setdefault(xblock_id,
             { 
                 'display_name': xblock.display_name,
                 'category': getattr(xblock, 'category', ''),
@@ -120,18 +122,20 @@ def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictiona
         current_node = current_node.setdefault(xblock_id, {})
     
     # Add block-level details for the last xblock in the path (URL and broken/locked links)
-    dictionary[xblock_id].setdefault('url',
+    updated_dictionary[xblock_id].setdefault('url',
         f'/course/{block.course_id}/editor/{block.category}/{block.location}'
     )
     if is_locked:
-        dictionary[xblock_id].setdefault('locked_links', []).append(link)
+        updated_dictionary[xblock_id].setdefault('locked_links', []).append(link)
     else:
-        dictionary[xblock_id].setdefault('broken_links', []).append(link)
+        updated_dictionary[xblock_id].setdefault('broken_links', []).append(link)
+
+    return updated_tree, updated_dictionary
 
 
 def _get_node_path(block):
     """
-    Retrieves the path frmo the course root node to a specific block, excluding the root.
+    Retrieves the path from the course root node to a specific block, excluding the root.
 
     ** Example Path structure **
     [chapter_node, sequential_node, vertical_node, html_node]

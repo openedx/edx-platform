@@ -1110,13 +1110,6 @@ def check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results in a file.
     """
-    URL_STATUS = {
-        'success': '200 OK',
-        'forbidden': '403 Forbidden',
-        'failure': 'Request Failed',
-        'error': 'Request Error'
-    }
-
     def validate_user():
         """Validate if the user exists. Otherwise log error. """
         try:
