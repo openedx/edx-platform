@@ -46,7 +46,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
-from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
 from xmodule.course_block import (
     COURSE_VISIBILITY_PUBLIC,
@@ -92,6 +91,7 @@ from lms.djangoapps.courseware.courses import (
 )
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
+from lms.djangoapps.courseware.jwt import unpack_jwt
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
@@ -1535,7 +1535,7 @@ def _check_sequence_exam_access(request, location):
         try:
             # unpack will validate both expiration and the requesting user matches the
             # token user
-            exam_access_unpacked = unpack_token_for(exam_access_token, request.user.id)
+            exam_access_unpacked = unpack_jwt(exam_access_token, request.user.id)
         except:  # pylint: disable=bare-except
             log.exception(f"Failed to validate exam access token. user_id={request.user.id} location={location}")
             return False
