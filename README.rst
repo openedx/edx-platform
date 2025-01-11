@@ -41,7 +41,7 @@ recommend that you use a service provider to run the software for you.  They
 have free trials that make it easy to get started:
 https://openedx.org/get-started/
 
-However, if you have the time and expertise, then it is is possible to
+However, if you have the time and expertise, then it is possible to
 self-manage a production Open edX instance. To help you build, customize,
 upgrade, and scale your instance, we recommend using `Tutor`_, the
 community-supported, Docker-based Open edX distribution.
