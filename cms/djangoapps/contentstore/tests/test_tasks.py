@@ -8,6 +8,7 @@ import json
 from unittest import mock, TestCase
 from uuid import uuid4
 
+import pytest as pytest
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
@@ -17,7 +18,12 @@ from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from cms.djangoapps.contentstore.tasks import export_olx, update_special_exams_and_publish, rerun_course
+from cms.djangoapps.contentstore.tasks import (
+    export_olx,
+    update_special_exams_and_publish,
+    rerun_course,
+    _convert_to_standard_url
+)
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from common.djangoapps.course_action_state.models import CourseRerunState
@@ -202,6 +208,8 @@ class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-clas
 
 
 class CourseOptimizerTestCase(TestCase):
+
+
     def test_user_does_not_exist_raises_exception(self):
         raise NotImplementedError
 
@@ -220,8 +228,11 @@ class CourseOptimizerTestCase(TestCase):
     def test_file_not_recognized_as_studio_url_scheme(self):
         raise NotImplementedError
 
-    def test_url_substitution_on_static_prefixes(self):
-        raise NotImplementedError
+    @pytest.mark.parametrize("url, course_key, post_substitution_url",
+                             ["/static/anything_goes_here?raw", "1", "2"])
+    def test_url_substitution_on_static_prefixes(self, url, course_key, post_substitution_url):
+        with_substitution = _convert_to_standard_url(url, course_key)
+        assert with_substitution == post_substitution_url
 
     def test_url_substitution_on_forward_slash_prefixes(self):
         raise NotImplementedError
