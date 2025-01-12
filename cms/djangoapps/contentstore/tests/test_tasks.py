@@ -5,7 +5,7 @@ Unit tests for course import and export Celery tasks
 
 import copy
 import json
-from unittest import mock
+from unittest import mock, TestCase
 from uuid import uuid4
 
 from django.conf import settings
@@ -201,7 +201,7 @@ class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-clas
             course_publish.assert_called()
 
 
-class CourseOptimizerTestCase():
+class CourseOptimizerTestCase(TestCase):
     def test_user_does_not_exist_raises_exception(self):
         raise NotImplementedError
 
@@ -254,4 +254,4 @@ class CourseOptimizerTestCase():
         raise NotImplementedError
 
     def test_scan_generates_file_named_by_course_key(self):
-        raise NotImplementedError
+        raise NotImplementedErro
