@@ -232,7 +232,7 @@ class CourseOptimizerTestCase(TestCase):
                              ["/static/anything_goes_here?raw", "1", "2"])
     def test_url_substitution_on_static_prefixes(self, url, course_key, post_substitution_url):
         with_substitution = _convert_to_standard_url(url, course_key)
-        assert with_substitution == post_substitution_url
+        assert with_substitution == post_substitution_url, f'{with_substitution} expected to be {post_substitution_url}'
 
     def test_url_substitution_on_forward_slash_prefixes(self):
         raise NotImplementedError
