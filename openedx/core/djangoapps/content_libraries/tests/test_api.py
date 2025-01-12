@@ -13,8 +13,22 @@ from opaque_keys.edx.keys import (
     UsageKey,
 )
 from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_events.content_authoring.data import (
+    ContentObjectChangedData,
+    LibraryCollectionData,
+)
+from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_DELETED,
+    LIBRARY_COLLECTION_UPDATED,
+)
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from openedx_learning.api import authoring as authoring_api
 
 from .. import api
+from ..models import ContentLibrary
+from .base import ContentLibrariesRestApiTest
 
 
 class EdxModulestoreImportClientTest(TestCase):
@@ -241,3 +255,490 @@ class EdxApiImportClientTest(TestCase):
             block_olx
         )
         mock_publish_changes.assert_not_called()
+
+
+class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+    """
+    Tests for Content Library API collections methods.
+
+    Same guidelines as ContentLibrariesTestCase.
+    """
+    ENABLED_OPENEDX_EVENTS = [
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.event_type,
+        LIBRARY_COLLECTION_CREATED.event_type,
+        LIBRARY_COLLECTION_DELETED.event_type,
+        LIBRARY_COLLECTION_UPDATED.event_type,
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
+              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
+              so we're following a pattern here. But that pattern doesn't really make sense.
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
+    def setUp(self):
+        super().setUp()
+
+        # Create Content Libraries
+        self._create_library("test-lib-col-1", "Test Library 1")
+        self._create_library("test-lib-col-2", "Test Library 2")
+
+        # Fetch the created ContentLibrare objects so we can access their learning_package.id
+        self.lib1 = ContentLibrary.objects.get(slug="test-lib-col-1")
+        self.lib2 = ContentLibrary.objects.get(slug="test-lib-col-2")
+
+        # Create Content Library Collections
+        self.col1 = api.create_library_collection(
+            self.lib1.library_key,
+            collection_key="COL1",
+            title="Collection 1",
+            description="Description for Collection 1",
+            created_by=self.user.id,
+        )
+        self.col2 = api.create_library_collection(
+            self.lib2.library_key,
+            collection_key="COL2",
+            title="Collection 2",
+            description="Description for Collection 2",
+            created_by=self.user.id,
+        )
+        self.col3 = api.create_library_collection(
+            self.lib2.library_key,
+            collection_key="COL3",
+            title="Collection 3",
+            description="Description for Collection 3",
+            created_by=self.user.id,
+        )
+
+        # Create some library blocks in lib1
+        self.lib1_problem_block = self._add_block_to_library(
+            self.lib1.library_key, "problem", "problem1",
+        )
+        self.lib1_html_block = self._add_block_to_library(
+            self.lib1.library_key, "html", "html1",
+        )
+        # Create some library blocks in lib2
+        self.lib2_problem_block = self._add_block_to_library(
+            self.lib2.library_key, "problem", "problem2",
+        )
+
+    def test_create_library_collection(self):
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_CREATED.connect(event_receiver)
+
+        collection = api.create_library_collection(
+            self.lib2.library_key,
+            collection_key="COL4",
+            title="Collection 4",
+            description="Description for Collection 4",
+            created_by=self.user.id,
+        )
+        assert collection.key == "COL4"
+        assert collection.title == "Collection 4"
+        assert collection.description == "Description for Collection 4"
+        assert collection.created_by == self.user
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_CREATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib2.library_key,
+                    collection_key="COL4",
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
+    def test_create_library_collection_invalid_library(self):
+        library_key = LibraryLocatorV2.from_string("lib:INVALID:test-lib-does-not-exist")
+        with self.assertRaises(api.ContentLibraryNotFound) as exc:
+            api.create_library_collection(
+                library_key,
+                collection_key="COL4",
+                title="Collection 3",
+            )
+
+    def test_update_library_collection(self):
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
+
+        self.col1 = api.update_library_collection(
+            self.lib1.library_key,
+            self.col1.key,
+            title="New title for Collection 1",
+        )
+        assert self.col1.key == "COL1"
+        assert self.col1.title == "New title for Collection 1"
+        assert self.col1.description == "Description for Collection 1"
+        assert self.col1.created_by == self.user
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key="COL1",
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
+    def test_update_library_collection_wrong_library(self):
+        with self.assertRaises(api.ContentLibraryCollectionNotFound) as exc:
+            api.update_library_collection(
+                self.lib1.library_key,
+                self.col2.key,
+            )
+
+    def test_delete_library_collection(self):
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_DELETED.connect(event_receiver)
+
+        authoring_api.delete_collection(
+            self.lib1.learning_package_id,
+            self.col1.key,
+            hard_delete=True,
+        )
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_DELETED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key="COL1",
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
+    def test_update_library_collection_components(self):
+        assert not list(self.col1.entities.all())
+
+        self.col1 = api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+        )
+        assert len(self.col1.entities.all()) == 2
+
+        self.col1 = api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+            remove=True,
+        )
+        assert len(self.col1.entities.all()) == 1
+
+    def test_update_library_collection_components_event(self):
+        """
+        Check that a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event is raised for each added/removed component.
+        """
+        event_receiver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_receiver)
+        LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
+
+        api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+        )
+
+        assert event_receiver.call_count == 3
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=self.lib1_problem_block["id"],
+                    changes=["collections"],
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=self.lib1_html_block["id"],
+                    changes=["collections"],
+                ),
+            },
+            event_receiver.call_args_list[1].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key="COL1",
+                ),
+            },
+            event_receiver.call_args_list[2].kwargs,
+        )
+
+    def test_update_collection_components_from_wrong_library(self):
+        with self.assertRaises(api.ContentLibraryBlockNotFound) as exc:
+            api.update_library_collection_components(
+                self.lib2.library_key,
+                self.col2.key,
+                usage_keys=[
+                    UsageKey.from_string(self.lib1_problem_block["id"]),
+                    UsageKey.from_string(self.lib1_html_block["id"]),
+                ],
+            )
+            assert self.lib1_problem_block["id"] in str(exc.exception)
+
+    def test_set_library_component_collections(self):
+        event_receiver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_receiver)
+        collection_update_event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(collection_update_event_receiver)
+        assert not list(self.col2.entities.all())
+        component = api.get_component_from_usage_key(UsageKey.from_string(self.lib2_problem_block["id"]))
+
+        api.set_library_component_collections(
+            self.lib2.library_key,
+            component,
+            collection_keys=[self.col2.key, self.col3.key],
+        )
+
+        assert len(authoring_api.get_collection(self.lib2.learning_package_id, self.col2.key).entities.all()) == 1
+        assert len(authoring_api.get_collection(self.lib2.learning_package_id, self.col3.key).entities.all()) == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=self.lib2_problem_block["id"],
+                    changes=["collections"],
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib2.library_key,
+                    collection_key=self.col2.key,
+                    background=True,
+                ),
+            },
+            collection_update_event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib2.library_key,
+                    collection_key=self.col3.key,
+                    background=True,
+                ),
+            },
+            collection_update_event_receiver.call_args_list[1].kwargs,
+        )
+
+    def test_delete_library_block(self):
+        api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+        )
+
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
+
+        api.delete_library_block(UsageKey.from_string(self.lib1_problem_block["id"]))
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key=self.col1.key,
+                    background=True,
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
+    def test_restore_library_block(self):
+        api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+        )
+
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
+
+        api.restore_library_block(UsageKey.from_string(self.lib1_problem_block["id"]))
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key=self.col1.key,
+                    background=True,
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
+    def test_add_component_and_revert(self):
+        # Add component and publish
+        api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+            ],
+        )
+        api.publish_changes(self.lib1.library_key)
+
+        # Add component and revert
+        api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+        )
+
+        event_receiver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_receiver)
+        collection_update_event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(collection_update_event_receiver)
+
+        api.revert_changes(self.lib1.library_key)
+
+        assert collection_update_event_receiver.call_count == 1
+        assert event_receiver.call_count == 2
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key=self.col1.key,
+                    background=True,
+                ),
+            },
+            collection_update_event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(self.lib1_problem_block["id"]),
+                    changes=["collections"],
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(self.lib1_html_block["id"]),
+                    changes=["collections"],
+                ),
+            },
+            event_receiver.call_args_list[1].kwargs,
+        )
+
+    def test_delete_component_and_revert(self):
+        # Add components and publish
+        api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+                UsageKey.from_string(self.lib1_html_block["id"])
+            ],
+        )
+        api.publish_changes(self.lib1.library_key)
+
+        # Delete component and revert
+        api.delete_library_block(UsageKey.from_string(self.lib1_problem_block["id"]))
+
+        event_receiver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_receiver)
+        collection_update_event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(collection_update_event_receiver)
+
+        api.revert_changes(self.lib1.library_key)
+
+        assert collection_update_event_receiver.call_count == 1
+        assert event_receiver.call_count == 2
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key=self.col1.key,
+                    background=True,
+                ),
+            },
+            collection_update_event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(self.lib1_problem_block["id"]),
+                    changes=["collections"],
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(self.lib1_html_block["id"]),
+                    changes=["collections"],
+                ),
+            },
+            event_receiver.call_args_list[1].kwargs,
+        )

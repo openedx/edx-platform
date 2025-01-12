@@ -1,7 +1,8 @@
 """
 Signal handlers for the bulk_email app
 """
-from django.contrib.auth import get_user_model
+import logging
+
 from django.dispatch import receiver
 from eventtracking import tracker
 
@@ -10,6 +11,8 @@ from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILIN
 from edx_ace.signals import ACE_MESSAGE_SENT
 
 from .models import Optout
+
+log = logging.getLogger(__name__)
 
 
 @receiver(USER_RETIRE_MAILINGS)
@@ -32,28 +35,26 @@ def ace_email_sent_handler(sender, **kwargs):
     """
     When an email is sent using ACE, this method will create an event to detect ace email success status
     """
-    # Fetch the message object from kwargs, defaulting to None if not present
-    message = kwargs.get('message', None)
-
-    user_model = get_user_model()
-    try:
-        user_id = user_model.objects.get(email=message.recipient.email_address).id
-    except user_model.DoesNotExist:
-        user_id = None
-    course_email = message.context.get('course_email', None)
-    course_id = message.context.get('course_id')
+    # Fetch the message dictionary from kwargs, defaulting to {} if not present
+    message = kwargs.get('message', {})
+    recipient = message.get('recipient', {})
+    message_name = message.get('name', None)
+    context = message.get('context', {})
+    email_address = recipient.get('email', None)
+    user_id = recipient.get('user_id', None)
+    channel = message.get('channel', None)
+    course_id = context.get('course_id', None)
     if not course_id:
+        course_email = context.get('course_email', None)
         course_id = course_email.course_id if course_email else None
-    try:
-        channel = sender.__class__.__name__
-    except AttributeError:
-        channel = 'Other'
+    log.info(f'Email sent for {message_name} for course {course_id} using channel {channel}')
     tracker.emit(
         'edx.ace.message_sent',
         {
-            'message_type': message.name,
+            'message_type': message_name,
             'channel': channel,
             'course_id': course_id,
             'user_id': user_id,
+            'user_email': email_address,
         }
     )

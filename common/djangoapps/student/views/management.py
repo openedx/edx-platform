@@ -70,6 +70,7 @@ from common.djangoapps.student.message_types import AccountActivation, EmailChan
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollment,
+    EnrollmentNotAllowed,
     PendingEmailChange,  # unimport:skip
     PendingSecondaryEmailChange,
     Registration,
@@ -422,6 +423,8 @@ def change_enrollment(request, check_access=True):
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
                     CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+            except EnrollmentNotAllowed as exc:
+                return HttpResponseBadRequest(str(exc))
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 

@@ -68,35 +68,35 @@ class TestCourseGradeFactory(GradeTestBase):
                 self.sequence2.display_name
             ]
 
-        with self.assertNumQueries(4), mock_get_score(1, 2):
+        with self.assertNumQueries(5), mock_get_score(1, 2):
             _assert_read(expected_pass=False, expected_percent=0)  # start off with grade of 0
 
-        num_queries = 42
+        num_queries = 43
         with self.assertNumQueries(num_queries), mock_get_score(1, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             _assert_read(expected_pass=True, expected_percent=0.5)  # updated to grade of .5
 
-        num_queries = 6
+        num_queries = 7
         with self.assertNumQueries(num_queries), mock_get_score(1, 4):
             grade_factory.update(self.request.user, self.course, force_update_subsections=False)
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             _assert_read(expected_pass=True, expected_percent=0.5)  # NOT updated to grade of .25
 
-        num_queries = 18
+        num_queries = 19
         with self.assertNumQueries(num_queries), mock_get_score(2, 2):
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             _assert_read(expected_pass=True, expected_percent=1.0)  # updated to grade of 1.0
 
-        num_queries = 28
+        num_queries = 29
         with self.assertNumQueries(num_queries), mock_get_score(0, 0):  # the subsection now is worth zero
             grade_factory.update(self.request.user, self.course, force_update_subsections=True)
 
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             _assert_read(expected_pass=False, expected_percent=0.0)  # updated to grade of 0.0
 
     @ddt.data((True, False))
@@ -185,26 +185,26 @@ class TestCourseGradeFactory(GradeTestBase):
             'section_breakdown': [
                 {
                     'category': 'Homework',
-                    'detail': 'Homework 1 - Test Sequential X with an & Ampersand - 50% (1/2)',
+                    'detail': 'Homework 1 - Test Sequential X with an & Ampersand - 50.00% (1/2)',
                     'label': 'HW 01',
                     'percent': 0.5
                 },
                 {
                     'category': 'Homework',
-                    'detail': 'Homework 2 - Test Sequential A - 0% (0/1)',
+                    'detail': 'Homework 2 - Test Sequential A - 0.00% (0/1)',
                     'label': 'HW 02',
                     'percent': 0.0
                 },
                 {
                     'category': 'Homework',
-                    'detail': 'Homework Average = 25%',
+                    'detail': 'Homework Average = 25.00%',
                     'label': 'HW Avg',
                     'percent': 0.25,
                     'prominent': True
                 },
                 {
                     'category': 'NoCredit',
-                    'detail': 'NoCredit Average = 0%',
+                    'detail': 'NoCredit Average = 0.00%',
                     'label': 'NC Avg',
                     'percent': 0,
                     'prominent': True
@@ -286,7 +286,7 @@ class TestGradeIteration(SharedModuleStoreTestCase):
             else mock_course_grade.return_value
             for student in self.students
         ]
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(20):
             all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         assert {student: str(all_errors[student]) for student in all_errors} == {
             student3: 'Error for student3.',

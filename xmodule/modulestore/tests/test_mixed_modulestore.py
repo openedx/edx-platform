@@ -1752,7 +1752,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             for location, expected in should_work:
                 # each iteration has different find count, pop this iter's find count
                 with check_mongo_calls(num_finds.pop(0), num_sends), self.assertNumQueries(num_mysql.pop(0)):
-                    path = path_to_location(self.store, location)
+                    path = path_to_location(self.store, location, branch_type=ModuleStoreEnum.Branch.published_only)
                     assert path == expected
 
         not_found = (

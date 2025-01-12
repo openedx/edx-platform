@@ -3,7 +3,7 @@ Discussion notifications sender util.
 """
 import re
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from django.conf import settings
 from django.utils.text import Truncator
 
@@ -89,6 +89,7 @@ class DiscussionNotificationSender:
                 "post_title": getattr(self.thread, 'title', ''),
                 "course_name": self.course.display_name,
                 "sender_id": self.creator.id,
+                "group_by_id": str(self.course.id),
                 **extra_context,
             },
             notification_type=notification_type,
@@ -116,6 +117,7 @@ class DiscussionNotificationSender:
             context = {
                 'email_content': clean_thread_html_body(self.comment.body),
             }
+            self._populate_context_with_ids_for_mobile(context)
             self._send_notification([self.thread.user_id], "new_response", extra_context=context)
 
     def _response_and_thread_has_same_creator(self) -> bool:
@@ -155,6 +157,7 @@ class DiscussionNotificationSender:
                 "author_pronoun": str(author_pronoun),
                 "email_content": clean_thread_html_body(self.comment.body),
             }
+            self._populate_context_with_ids_for_mobile(context)
             self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
 
     def send_new_comment_on_response_notification(self):
@@ -170,6 +173,7 @@ class DiscussionNotificationSender:
             context = {
                 "email_content": clean_thread_html_body(self.comment.body),
             }
+            self._populate_context_with_ids_for_mobile(context)
             self._send_notification(
                 [self.parent_response.user_id],
                 "new_comment_on_response",
@@ -201,7 +205,7 @@ class DiscussionNotificationSender:
 
         while has_more_subscribers:
 
-            subscribers = Subscription.fetch(self.thread.id, query_params={'page': page})
+            subscribers = Subscription.fetch(self.thread.id, self.course.id, query_params={'page': page})
             if page <= subscribers.num_pages:
                 for subscriber in subscribers.collection:
                     # Check if the subscriber is not the thread creator or response creator
@@ -215,12 +219,15 @@ class DiscussionNotificationSender:
         # Remove duplicate users from the list of users to send notification
         users = list(set(users))
         if not self.parent_id:
+            context = {
+                "email_content": clean_thread_html_body(self.comment.body),
+            }
+            self._populate_context_with_ids_for_mobile(context)
             self._send_notification(
                 users,
                 "response_on_followed_post",
-                extra_context={
-                    "email_content": clean_thread_html_body(self.comment.body),
-                })
+                extra_context=context
+            )
         else:
             author_name = f"{self.parent_response.username}'s"
             # use 'their' if comment author is also response author.
@@ -230,14 +237,16 @@ class DiscussionNotificationSender:
                 if self._response_and_comment_has_same_creator()
                 else f"{self.parent_response.username}'s"
             )
+            context = {
+                "author_name": str(author_name),
+                "author_pronoun": str(author_pronoun),
+                "email_content": clean_thread_html_body(self.comment.body),
+            }
+            self._populate_context_with_ids_for_mobile(context)
             self._send_notification(
                 users,
                 "comment_on_followed_post",
-                extra_context={
-                    "author_name": str(author_name),
-                    "author_pronoun": str(author_pronoun),
-                    "email_content": clean_thread_html_body(self.comment.body),
-                }
+                extra_context=context
             )
 
     def _create_cohort_course_audience(self):
@@ -289,6 +298,7 @@ class DiscussionNotificationSender:
             context = {
                 "email_content": clean_thread_html_body(self.comment.body)
             }
+            self._populate_context_with_ids_for_mobile(context)
             self._send_notification([self.thread.user_id], "response_endorsed_on_thread", extra_context=context)
 
     def send_response_endorsed_notification(self):
@@ -298,6 +308,7 @@ class DiscussionNotificationSender:
         context = {
             "email_content": clean_thread_html_body(self.comment.body)
         }
+        self._populate_context_with_ids_for_mobile(context)
         self._send_notification([self.creator.id], "response_endorsed", extra_context=context)
 
     def send_new_thread_created_notification(self):
@@ -329,6 +340,7 @@ class DiscussionNotificationSender:
             'post_title': self.thread.title,
             "email_content": clean_thread_html_body(self.thread.body),
         }
+        self._populate_context_with_ids_for_mobile(context)
         self._send_course_wide_notification(notification_type, audience_filters, context)
 
     def send_reported_content_notification(self):
@@ -361,6 +373,12 @@ class DiscussionNotificationSender:
         ]}
         self._send_course_wide_notification("content_reported", audience_filters, context)
 
+    def _populate_context_with_ids_for_mobile(self, context):
+        context['thread_id'] = self.thread.id
+        context['topic_id'] = self.thread.commentable_id
+        context['comment_id'] = self.comment_id
+        context['parent_id'] = self.parent_id
+
 
 def is_discussion_cohorted(course_key_str):
     """
@@ -379,6 +397,30 @@ def remove_html_tags(text):
     return re.sub(clean, '', text)
 
 
+def strip_empty_tags(soup):
+    """
+    Strip starting and ending empty tags from the soup object
+    """
+    def strip_tag(element, reverse=False):
+        """
+        Checks if element is empty and removes it
+        """
+        if not element.get_text(strip=True):
+            element.extract()
+            return True
+        if isinstance(element, Tag):
+            child_list = element.contents[::-1] if reverse else element.contents
+            for child in child_list:
+                if not strip_tag(child):
+                    break
+        return False
+
+    while soup.contents:
+        if not (strip_tag(soup.contents[0]) or strip_tag(soup.contents[-1], reverse=True)):
+            break
+    return soup
+
+
 def clean_thread_html_body(html_body):
     """
     Get post body with tags removed and limited to 500 characters
@@ -391,7 +433,8 @@ def clean_thread_html_body(html_body):
         "video", "track",  # Video Tags
         "audio",  # Audio Tags
         "embed", "object", "iframe",  # Embedded Content
-        "script"
+        "script",
+        "b", "strong", "i", "em", "u", "s", "strike", "del", "ins", "mark", "sub", "sup",  # Text Formatting
     ]
 
     # Remove the specified tags while keeping their content
@@ -399,4 +442,29 @@ def clean_thread_html_body(html_body):
         for match in html_body.find_all(tag):
             match.unwrap()
 
+    if not html_body.find():
+        return str(html_body)
+
+    # Replace tags that are not allowed in email
+    tags_to_update = [
+        {"source": "button", "target": "span"},
+        *[
+            {"source": tag, "target": "p"}
+            for tag in ["div", "section", "article", "h1", "h2", "h3", "h4", "h5", "h6"]
+        ],
+    ]
+    for tag_dict in tags_to_update:
+        for source_tag in html_body.find_all(tag_dict['source']):
+            target_tag = html_body.new_tag(tag_dict['target'], **source_tag.attrs)
+            if source_tag.contents:
+                for content in list(source_tag.contents):
+                    target_tag.append(content)
+            source_tag.insert_before(target_tag)
+            source_tag.extract()
+
+    for tag in html_body.find_all(True):
+        tag.attrs = {}
+        tag['style'] = 'margin: 0'
+
+    html_body = strip_empty_tags(html_body)
     return str(html_body)

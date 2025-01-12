@@ -10,11 +10,15 @@ from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagView, Taxono
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from openedx_events.content_authoring.data import ContentObjectData
-from openedx_events.content_authoring.signals import CONTENT_OBJECT_TAGS_CHANGED
+from openedx_events.content_authoring.data import ContentObjectData, ContentObjectChangedData
+from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    CONTENT_OBJECT_TAGS_CHANGED,
+)
+
+from openedx.core.types.http import RestRequest
 
 from ...auth import has_view_object_tags_access
 from ...api import (
@@ -28,7 +32,12 @@ from ...api import (
 )
 from ...rules import get_admin_orgs
 from .filters import ObjectTagTaxonomyOrgFilterBackend, UserOrgFilterBackend
-from .serializers import TaxonomyOrgListQueryParamsSerializer, TaxonomyOrgSerializer, TaxonomyUpdateOrgBodySerializer
+from .serializers import (
+    ObjectTagCopiedMinimalSerializer,
+    TaxonomyOrgListQueryParamsSerializer,
+    TaxonomyOrgSerializer,
+    TaxonomyUpdateOrgBodySerializer,
+)
 
 
 class TaxonomyOrgView(TaxonomyView):
@@ -91,7 +100,7 @@ class TaxonomyOrgView(TaxonomyView):
         serializer.instance = create_taxonomy(**serializer.validated_data, orgs=user_admin_orgs)
 
     @action(detail=False, url_path="import", methods=["post"])
-    def create_import(self, request: Request, **kwargs) -> Response:  # type: ignore
+    def create_import(self, request: RestRequest, **kwargs) -> Response:  # type: ignore
         """
         Creates a new taxonomy with the given orgs and imports the tags from the uploaded file.
         """
@@ -145,18 +154,29 @@ class ObjectTagOrgView(ObjectTagView):
 
     Refer to ObjectTagView docstring for usage details.
     """
+    minimal_serializer_class = ObjectTagCopiedMinimalSerializer
     filter_backends = [ObjectTagTaxonomyOrgFilterBackend]
 
     def update(self, request, *args, **kwargs) -> Response:
         """
-        Extend the update method to fire CONTENT_OBJECT_TAGS_CHANGED event
+        Extend the update method to fire CONTENT_OBJECT_ASSOCIATIONS_CHANGED event
         """
         response = super().update(request, *args, **kwargs)
         if response.status_code == 200:
             object_id = kwargs.get('object_id')
+
+            CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                content_object=ContentObjectChangedData(
+                    object_id=object_id,
+                    changes=["tags"],
+                )
+            )
+
+            # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
             CONTENT_OBJECT_TAGS_CHANGED.send_event(
                 content_object=ContentObjectData(object_id=object_id)
             )
+
         return response
 
 
@@ -164,7 +184,7 @@ class ObjectTagExportView(APIView):
     """"
     View to export a CSV with all children and tags for a given course/context.
     """
-    def get(self, request: Request, **kwargs) -> StreamingHttpResponse:
+    def get(self, request: RestRequest, **kwargs) -> StreamingHttpResponse:
         """
         Export a CSV with all children and tags for a given course/context.
         """
