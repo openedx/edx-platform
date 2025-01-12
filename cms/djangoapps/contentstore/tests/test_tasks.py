@@ -199,3 +199,59 @@ class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-clas
             _mock_register_exams_proctoring.side_effect = Exception('boom!')
             update_special_exams_and_publish(str(self.course.id))
             course_publish.assert_called()
+
+
+class CourseOptimizerTestCase():
+    def test_user_does_not_exist_raises_exception(self):
+        raise NotImplementedError
+
+    def test_no_course_access_raises_exception(self):
+        raise NotImplementedError
+
+    def test_hash_tags_stripped_from_url_lists(self):
+        raise NotImplementedError
+
+    def test_urls_out_count_equals_urls_in_count_when_no_hashtags(self):
+        raise NotImplementedError
+
+    def test_http_and_https_recognized_as_studio_url_schemes(self):
+        raise NotImplementedError
+
+    def test_file_not_recognized_as_studio_url_scheme(self):
+        raise NotImplementedError
+
+    def test_url_substitution_on_static_prefixes(self):
+        raise NotImplementedError
+
+    def test_url_substitution_on_forward_slash_prefixes(self):
+        raise NotImplementedError
+
+    def test_url_subsitution_on_containers(self):
+        raise NotImplementedError
+
+    def test_optimization_occurs_on_published_version(self):
+        raise NotImplementedError
+
+    def test_number_of_scanned_blocks_equals_blocks_in_course(self):
+        raise NotImplementedError
+
+    def test_every_detected_link_is_validated(self):
+        raise NotImplementedError
+
+    def test_link_validation_is_batched(self):
+        raise NotImplementedError
+
+    def test_all_links_in_link_list_longer_than_batch_size_are_validated(self):
+        raise NotImplementedError
+
+    def test_no_retries_on_403_access_denied_links(self):
+        raise NotImplementedError
+
+    def test_retries_attempted_on_connection_errors(self):
+        raise NotImplementedError
+
+    def test_max_number_of_retries_is_respected(self):
+        raise NotImplementedError
+
+    def test_scan_generates_file_named_by_course_key(self):
+        raise NotImplementedError
