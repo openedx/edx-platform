@@ -1,8 +1,10 @@
 """
 Typing utilities for the User models.
 """
-from typing import Union
+from __future__ import annotations
+
+import typing as t
 
 import django.contrib.auth.models
 
-User = Union[django.contrib.auth.models.User, django.contrib.auth.models.AnonymousUser]
+User: t.TypeAlias = django.contrib.auth.models.User | django.contrib.auth.models.AnonymousUser

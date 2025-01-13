@@ -25,6 +25,7 @@ from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryCollectionComponentsUpdateSerializer,
     ContentLibraryCollectionUpdateSerializer,
 )
+from openedx.core.types.http import RestRequest
 
 
 class LibraryCollectionsView(ModelViewSet):
@@ -89,7 +90,7 @@ class LibraryCollectionsView(ModelViewSet):
         return collection
 
     @convert_exceptions
-    def retrieve(self, request, *args, **kwargs) -> Response:
+    def retrieve(self, request: RestRequest, *args, **kwargs) -> Response:
         """
         Retrieve the Content Library Collection
         """
@@ -97,7 +98,7 @@ class LibraryCollectionsView(ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     @convert_exceptions
-    def list(self, request, *args, **kwargs) -> Response:
+    def list(self, request: RestRequest, *args, **kwargs) -> Response:
         """
         List Collections that belong to Content Library
         """
@@ -105,7 +106,7 @@ class LibraryCollectionsView(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
     @convert_exceptions
-    def create(self, request, *args, **kwargs) -> Response:
+    def create(self, request: RestRequest, *args, **kwargs) -> Response:
         """
         Create a Collection that belongs to a Content Library
         """
@@ -139,7 +140,7 @@ class LibraryCollectionsView(ModelViewSet):
         return Response(serializer.data)
 
     @convert_exceptions
-    def partial_update(self, request, *args, **kwargs) -> Response:
+    def partial_update(self, request: RestRequest, *args, **kwargs) -> Response:
         """
         Update a Collection that belongs to a Content Library
         """
@@ -161,7 +162,7 @@ class LibraryCollectionsView(ModelViewSet):
         return Response(serializer.data)
 
     @convert_exceptions
-    def destroy(self, request, *args, **kwargs) -> Response:
+    def destroy(self, request: RestRequest, *args, **kwargs) -> Response:
         """
         Soft-deletes a Collection that belongs to a Content Library
         """
@@ -176,7 +177,7 @@ class LibraryCollectionsView(ModelViewSet):
 
     @convert_exceptions
     @action(detail=True, methods=['post'], url_path='restore', url_name='collection-restore')
-    def restore(self, request, *args, **kwargs) -> Response:
+    def restore(self, request: RestRequest, *args, **kwargs) -> Response:
         """
         Restores a soft-deleted Collection that belongs to a Content Library
         """
@@ -191,7 +192,7 @@ class LibraryCollectionsView(ModelViewSet):
 
     @convert_exceptions
     @action(detail=True, methods=['delete', 'patch'], url_path='components', url_name='components-update')
-    def update_components(self, request, *args, **kwargs) -> Response:
+    def update_components(self, request: RestRequest, *args, **kwargs) -> Response:
         """
         Adds (PATCH) or removes (DELETE) Components to/from a Collection.
 
@@ -209,7 +210,7 @@ class LibraryCollectionsView(ModelViewSet):
             content_library=content_library,
             collection_key=collection_key,
             usage_keys=usage_keys,
-            created_by=self.request.user.id,
+            created_by=request.user.id,
             remove=(request.method == "DELETE"),
         )
 

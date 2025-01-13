@@ -585,13 +585,16 @@
 // cms/static/js/views/components/add_library_content_with_picker.js
 .modal-add-component-picker {
   top: 10%;
+  padding: 0px !important;
   .modal-content {
     padding: 0 !important;
+    border-radius: ($baseline/5);
 
     & > iframe {
       width: 100%;
       min-height: 80vh;
       background: url('#{$static-path}/images/spinner.gif') center center no-repeat;
+      border-radius: ($baseline/5);
     }
   }
 }

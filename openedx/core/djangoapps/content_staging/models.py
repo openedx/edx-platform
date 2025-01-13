@@ -67,7 +67,9 @@ class StagedContent(models.Model):
     version_num = models.PositiveIntegerField(default=0)
 
     # Tags applied to the original source block(s) will be copied to the new block(s) on paste.
-    tags = models.JSONField(null=True, help_text=_("Content tags applied to these blocks"))
+    tags: models.JSONField[dict | None, dict | None] = models.JSONField(
+        null=True, help_text=_("Content tags applied to these blocks")
+    )
 
     @property
     def olx_filename(self) -> str:
