@@ -13,20 +13,25 @@ from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
     LibraryCollectionData,
+    XBlockData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     LIBRARY_COLLECTION_CREATED,
     LIBRARY_COLLECTION_DELETED,
     LIBRARY_COLLECTION_UPDATED,
+    XBLOCK_CREATED,
+    XBLOCK_DELETED,
+    XBLOCK_UPDATED,
 )
-from openedx_learning.api.authoring import get_component, get_components
+from openedx_learning.api.authoring import get_component, get_components, delete_entity_link
 from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, Component, PublishableEntity
 
 from lms.djangoapps.grades.api import signals as grades_signals
 
 from .api import library_component_usage_key
 from .models import ContentLibrary, LtiGradedResource
+from .tasks import create_or_update_xblock_upstream_link
 
 
 log = logging.getLogger(__name__)
@@ -203,3 +208,30 @@ def library_collection_entities_changed(sender, instance, action, pk_set, **kwar
 
     for component in components.all():
         _library_collection_component_changed(component, library.library_key)
+
+
+@receiver(XBLOCK_CREATED)
+@receiver(XBLOCK_UPDATED)
+def create_or_update_upstream_downstream_link_handler(**kwargs):
+    """
+    Automatically create or update upstream->downstream link in database.
+    """
+    xblock_info = kwargs.get("xblock_info", None)
+    if not xblock_info or not isinstance(xblock_info, XBlockData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    create_or_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
+
+
+@receiver(XBLOCK_DELETED)
+def delete_upstream_downstream_link_handler(**kwargs):
+    """
+    Delete upstream->downstream link from database on xblock delete.
+    """
+    xblock_info = kwargs.get("xblock_info", None)
+    if not xblock_info or not isinstance(xblock_info, XBlockData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    delete_entity_link(str(xblock_info.usage_key))

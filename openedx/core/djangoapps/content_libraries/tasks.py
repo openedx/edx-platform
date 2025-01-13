@@ -25,7 +25,7 @@ from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
 from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
-from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.keys import UsageKey
 
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
@@ -179,6 +179,22 @@ def duplicate_children(
 
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
+def create_or_update_xblock_upstream_link(usage_key):
+    ensure_cms("create_or_update_xblock_upstream_link may only be executed in a CMS context")
+    xblock = modulestore().get_item(UsageKey.from_string(usage_key))
+    if not xblock.upstream:
+        TASK_LOGGER.info(f"No upstream found for xblock: {xblock.usage_key}")
+        return
+    try:
+        course_name = CourseOverview.get_from_id(xblock.course_id).display_name_with_default
+    except CourseOverview.DoesNotExist:
+        TASK_LOGGER.exception(f'Could not find course: {xblock.course_id}')
+        return
+    api.create_or_update_xblock_upstream_link(xblock, xblock.course_id, course_name)
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
 def create_or_update_upstream_links(course_key_str: str, force: bool = False):
     """
     A Celery task to create or update upstream downstream links in database from course xblock content.
@@ -200,24 +216,10 @@ def create_or_update_upstream_links(course_key_str: str, force: bool = False):
         course_name = CourseOverview.get_from_id(course_key).display_name_with_default
     except CourseOverview.DoesNotExist:
         TASK_LOGGER.exception(f'Could not find course: {course_key_str}')
+        return
     xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
     for xblock in xblocks:
-        upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
-        try:
-            lib_component = get_component_from_usage_key(upstream_usage_key)
-        except ObjectDoesNotExist:
-            TASK_LOGGER.exception('Library block not found!')
-            lib_component = None
-        update_or_create_entity_link(
-            lib_component,
-            upstream_usage_key=xblock.upstream,
-            downstream_context_key=course_key,
-            downstream_context_title=course_name,
-            downstream_usage_key=str(xblock.usage_key),
-            version_synced=xblock.upstream_version,
-            version_declined=xblock.upstream_version_declined,
-            created=created,
-        )
+        api.create_or_update_xblock_upstream_link(xblock, course_key, course_name, created)
     course_status.status = CourseLinksStatusChoices.COMPLETED
     course_status.save()
 
