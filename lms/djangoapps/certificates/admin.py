@@ -113,6 +113,9 @@ class CertificateHtmlViewConfigurationAdmin(ConfigurationModelAdmin):
     list_display = ('id', 'configuration',)
     search_fields = ('configuration',) 
 
+    def has_delete_permission(self, request, obj=None):
+        return True  # Ensure this returns True for allowing delete
+
     def get_actions(self, request):
         """
         This method removes the "delete selected" action from the actions dropdown.
