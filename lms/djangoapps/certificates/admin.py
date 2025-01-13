@@ -109,10 +109,28 @@ class CertificateDateOverrideAdmin(admin.ModelAdmin):
         obj.overridden_by = request.user
         super().save_model(request, obj, form, change)
 
+class CertificateHtmlViewConfigurationAdmin(ConfigurationModelAdmin):
+    list_display = ('id', 'configuration',)
+    search_fields = ('configuration',) 
+
+    def get_actions(self, request):
+        """
+        This method removes the "delete selected" action from the actions dropdown.
+        The delete button on individual model instances remains intact.
+        """
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+
+
+admin.site.register(CertificateHtmlViewConfiguration, CertificateHtmlViewConfigurationAdmin)
+
+
 
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateGenerationCourseSetting, CertificateGenerationCourseSettingAdmin)
-admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)
 admin.site.register(GeneratedCertificate, GeneratedCertificateAdmin)
