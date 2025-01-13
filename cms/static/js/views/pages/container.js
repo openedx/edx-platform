@@ -138,7 +138,13 @@ function($, _, Backbone, gettext, BasePage,
                     if (!data) return;
 
                     const xblockElement = this.findXBlockElement(this.targetXBlock);
-                    const xblockWrapper = $("li.studio-xblock-wrapper[data-locator='" + data.payload.locator + "']");
+                    let xblockWrapper;
+
+                    if (data.payload && data.payload.locator) {
+                        xblockWrapper = $("li.studio-xblock-wrapper[data-locator='" + data.payload.locator + "']");
+                    } else {
+                        xblockWrapper = $();
+                    }
 
                     switch (data.type) {
                     case 'refreshXBlock':
@@ -148,11 +154,11 @@ function($, _, Backbone, gettext, BasePage,
                         this.refreshXBlock(xblockElement, false);
                         break;
                     case 'completeXBlockMoving':
-                      xblockWrapper.hide()
-                      break;
+                        xblockWrapper.hide()
+                        break;
                     case 'rollbackMovedXBlock':
-                      xblockWrapper.show()
-                      break;
+                        xblockWrapper.show()
+                        break;
                     case 'updateXBlockName':
                     case 'addXBlock':
                         this.createComponent(this, xblockElement, event.data);
@@ -226,24 +232,24 @@ function($, _, Backbone, gettext, BasePage,
                     }
 
                     if (self.options.isIframeEmbed) {
-                        const scrollOffset = parseInt(localStorage.getItem('modalEditLastYPosition'));
-                        if (localStorage.getItem('modalEditLastYPosition')) {
-                        try {
-                            setTimeout(() => {
-                                window.parent.postMessage(
-                                    {
-                                        type: 'scrollToXBlock',
-                                        message: 'Scroll to XBlock',
-                                        payload: {scrollOffset}
-                                    }, document.referrer
-                                );
-                            localStorage.removeItem('modalEditLastYPosition');
-                            }, 1000);
-                        } catch (e) {
-                            console.error(e);
+                        const scrollOffsetString = localStorage.getItem('modalEditLastYPosition');
+                        const scrollOffset = scrollOffsetString ? parseInt(scrollOffsetString, 10) : 0;
+
+                        if (scrollOffset) {
+                            try {
+                                    window.parent.postMessage(
+                                        {
+                                            type: 'scrollToXBlock',
+                                            message: 'Scroll to XBlock',
+                                            payload: { scrollOffset }
+                                        }, document.referrer
+                                    );
+                                    localStorage.removeItem('modalEditLastYPosition');
+                            } catch (e) {
+                                console.error(e);
+                            }
                         }
                     }
-                  }
                 },
                 block_added: options && options.block_added
             });
@@ -477,8 +483,8 @@ function($, _, Backbone, gettext, BasePage,
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
                     var destinationUrl = primaryHeader.attr('authoring_MFE_base_url')
-                      + '/' + blockType
-                      + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
+                        + '/' + blockType
+                        + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
 
                     try {
                         if (this.options.isIframeEmbed) {
@@ -671,7 +677,7 @@ function($, _, Backbone, gettext, BasePage,
                                 type: 'toggleCourseXBlockDropdown',
                                 message: 'Adjust the height of the dropdown menu',
                                 payload: {
-                                  courseXBlockDropdownHeight: courseXBlockDropdownHeight / 2,
+                                    courseXBlockDropdownHeight: courseXBlockDropdownHeight / 2,
                                 },
                             }, document.referrer
                         );
@@ -805,6 +811,10 @@ function($, _, Backbone, gettext, BasePage,
                             payload: { courseXBlockDropdownHeight: 0 }
                         }, document.referrer
                     );
+                    if (['html', 'problem', 'video'].includes(blockType)) {
+                        const scrollHeight = event.clientY + this.findXBlockElement(event.target).height();
+                        localStorage.setItem('modalEditLastYPosition', scrollHeight.toString());
+                    }
                 }
             } catch (e) {
                 console.error(e);
@@ -831,13 +841,13 @@ function($, _, Backbone, gettext, BasePage,
                             type: 'showMoveXBlockModal',
                             payload: {
                                 sourceXBlockInfo: {
-                                  id: sourceXBlockInfo.attributes.id,
-                                  displayName: sourceXBlockInfo.attributes.display_name,
+                                    id: sourceXBlockInfo.attributes.id,
+                                    displayName: sourceXBlockInfo.attributes.display_name,
                                 },
                                 sourceParentXBlockInfo: {
-                                  id: sourceParentXBlockInfo.attributes.id,
-                                  category: sourceParentXBlockInfo.attributes.category,
-                                  hasChildren: sourceParentXBlockInfo.attributes.has_children,
+                                    id: sourceParentXBlockInfo.attributes.id,
+                                    category: sourceParentXBlockInfo.attributes.category,
+                                    hasChildren: sourceParentXBlockInfo.attributes.has_children,
                                 },
                             },
                         }, document.referrer
@@ -948,7 +958,7 @@ function($, _, Backbone, gettext, BasePage,
                         {
                             type: 'scrollToXBlock',
                             message: 'Scroll to XBlock',
-                            payload: { scrollOffset }
+                            payload: { scrollOffset: xblockElement.height() }
                         }, document.referrer
                     );
                 } catch (e) {
@@ -956,7 +966,7 @@ function($, _, Backbone, gettext, BasePage,
                 }
                 return window.addEventListener('message', (event) => {
                     if (event.data && event.data.type === 'completeXBlockDuplicating') {
-                        return self.onNewXBlock(placeholderElement, scrollOffset, true, event.data.payload);
+                        return self.onNewXBlock(placeholderElement, null, true, event.data.payload);
                     }
                 });
             }
@@ -1133,7 +1143,7 @@ function($, _, Backbone, gettext, BasePage,
                 rootLocator = this.xblockView.model.id;
             if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
                 if (block_added) {
-                  this.render({refresh: true, block_added: block_added});
+                    this.render({refresh: true, block_added: block_added});
                 }
             } else if (parentElement.hasClass('reorderable-container')) {
                 this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
