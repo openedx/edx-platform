@@ -5,9 +5,10 @@ Unit tests for course import and export Celery tasks
 
 import copy
 import json
-from unittest import mock
+from unittest import mock, TestCase
 from uuid import uuid4
 
+import pytest as pytest
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
@@ -17,7 +18,12 @@ from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from cms.djangoapps.contentstore.tasks import export_olx, update_special_exams_and_publish, rerun_course
+from cms.djangoapps.contentstore.tasks import (
+    export_olx,
+    update_special_exams_and_publish,
+    rerun_course,
+    _convert_to_standard_url
+)
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from common.djangoapps.course_action_state.models import CourseRerunState
@@ -221,8 +227,11 @@ class CourseLinkCheckTestCase(CourseTestCase):
     def test_file_not_recognized_as_studio_url_scheme(self):
         raise NotImplementedError
 
-    def test_url_substitution_on_static_prefixes(self):
-        raise NotImplementedError
+    @pytest.mark.parametrize("url, course_key, post_substitution_url",
+                             ["/static/anything_goes_here?raw", "1", "2"])
+    def test_url_substitution_on_static_prefixes(self, url, course_key, post_substitution_url):
+        with_substitution = _convert_to_standard_url(url, course_key)
+        assert with_substitution == post_substitution_url, f'{with_substitution} expected to be {post_substitution_url}'
 
     def test_url_substitution_on_forward_slash_prefixes(self):
         raise NotImplementedError
@@ -232,27 +241,27 @@ class CourseLinkCheckTestCase(CourseTestCase):
 
     def test_optimization_occurs_on_published_version(self):
         raise NotImplementedError
-    
+
     def test_number_of_scanned_blocks_equals_blocks_in_course(self):
         raise NotImplementedError
-    
+
     def test_every_detected_link_is_validated(self):
         raise NotImplementedError
-    
+
     def test_link_validation_is_batched(self):
         raise NotImplementedError
-    
+
     def test_all_links_in_link_list_longer_than_batch_size_are_validated(self):
         raise NotImplementedError
-    
+
     def test_no_retries_on_403_access_denied_links(self):
         raise NotImplementedError
-    
+
     def test_retries_attempted_on_connection_errors(self):
         raise NotImplementedError
-    
+
     def test_max_number_of_retries_is_respected(self):
         raise NotImplementedError
-    
+
     def test_scan_generates_file_named_by_course_key(self):
         raise NotImplementedError
