@@ -74,4 +74,4 @@ class Command(BaseCommand):
         if should_process_all:
             courses = CourseOverview.get_all_course_keys()
         for course in courses:
-            create_or_update_upstream_links.delay(course, force)
+            create_or_update_upstream_links.delay(str(course), force)

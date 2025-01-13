@@ -32,7 +32,8 @@ from xblock.fields import Scope
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
-from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.content_libraries.api import get_component_from_usage_key
 from openedx.core.lib import ensure_cms
 from openedx_learning.api.authoring import update_or_create_entity_link, get_or_create_course_link_status
 from openedx_learning.api.authoring_models import CourseLinksStatusChoices
@@ -195,7 +196,11 @@ def create_or_update_upstream_links(course_key_str: str, force: bool = False):
     course_key = CourseKey.from_string(course_key_str)
     course_status.status = CourseLinksStatusChoices.PROCESSING
     course_status.save()
-    xblocks = store.get_items(course_key, settings={"upstream": re.compile(r".*")})
+    try:
+        course_name = CourseOverview.get_from_id(course_key).display_name_with_default
+    except CourseOverview.DoesNotExist:
+        TASK_LOGGER.exception(f'Could not find course: {course_key_str}')
+    xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
     for xblock in xblocks:
         upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
         try:
@@ -204,9 +209,10 @@ def create_or_update_upstream_links(course_key_str: str, force: bool = False):
             TASK_LOGGER.exception('Library block not found!')
             lib_component = None
         update_or_create_entity_link(
-            upstream_block=lib_component,
+            lib_component,
             upstream_usage_key=xblock.upstream,
             downstream_context_key=course_key,
+            downstream_context_title=course_name,
             downstream_usage_key=str(xblock.usage_key),
             version_synced=xblock.upstream_version,
             version_declined=xblock.upstream_version_declined,
