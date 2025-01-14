@@ -8,16 +8,11 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import (
-    override_waffle_switch,
-)
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
-from cms.djangoapps.contentstore.views.course import ENABLE_GLOBAL_STAFF_OPTIMIZATION
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 
 
 FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
@@ -52,7 +47,6 @@ class HomePageViewTest(CourseTestCase):
             "libraries_v2_enabled": False,
             "taxonomies_enabled": True,
             "taxonomy_list_mfe_url": 'http://course-authoring-mfe/taxonomies',
-            "optimization_enabled": False,
             "request_course_creator_url": "/request_course_creator",
             "rerun_creator_status": True,
             "show_new_library_button": True,
@@ -240,27 +234,6 @@ class HomePageCoursesViewTest(CourseTestCase):
         response = self.non_staff_client.get(self.url)
 
         self.assertEqual(len(response.data["courses"]), 0)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    @override_waffle_switch(ENABLE_GLOBAL_STAFF_OPTIMIZATION, True)
-    def test_org_query_if_passed(self):
-        """Test home page when org filter passed as a query param"""
-        foo_course = self.store.make_course_key('foo-org', 'bar-number', 'baz-run')
-        test_course = CourseFactory.create(
-            org=foo_course.org,
-            number=foo_course.course,
-            run=foo_course.run
-        )
-        CourseOverviewFactory.create(id=test_course.id, org='foo-org')
-        response = self.client.get(self.url, {"org": "foo-org"})
-        self.assertEqual(len(response.data['courses']), 1)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    @override_waffle_switch(ENABLE_GLOBAL_STAFF_OPTIMIZATION, True)
-    def test_org_query_if_empty(self):
-        """Test home page with an empty org query param"""
-        response = self.client.get(self.url)
-        self.assertEqual(len(response.data['courses']), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
