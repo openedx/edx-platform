@@ -1595,7 +1595,6 @@ def get_course_context(request):
     from cms.djangoapps.contentstore.views.course import (
         get_courses_accessible_to_user,
         _process_courses_list,
-        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
     )
 
     def format_in_process_course_view(uca):
@@ -1619,10 +1618,7 @@ def get_course_context(request):
             ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
-    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
-
-    org = request.GET.get('org', '') if optimization_enabled else None
-    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request)
     split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
     active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
@@ -1637,7 +1633,6 @@ def get_course_context_v2(request):
     # 'cms.djangoapps.contentstore.utils' (most likely due to a circular import)
     from cms.djangoapps.contentstore.views.course import (
         get_courses_accessible_to_user,
-        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
     )
 
     def format_in_process_course_view(uca):
@@ -1664,10 +1659,7 @@ def get_course_context_v2(request):
             ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
-    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
-
-    org = request.GET.get('org', '') if optimization_enabled else None
-    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
     return courses_iter, in_process_course_actions
 
@@ -1685,7 +1677,6 @@ def get_home_context(request, no_course=False):
         _accessible_libraries_iter,
         _get_course_creator_status,
         _format_library_for_view,
-        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
     )
     from cms.djangoapps.contentstore.views.library import (
         user_can_view_create_library_button,
@@ -1697,8 +1688,6 @@ def get_home_context(request, no_course=False):
     active_courses = []
     archived_courses = []
     in_process_course_actions = []
-
-    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
 
     user = request.user
     libraries = []
@@ -1728,7 +1717,6 @@ def get_home_context(request, no_course=False):
         'rerun_creator_status': GlobalStaff().has_user(user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-        'optimization_enabled': optimization_enabled,
         'active_tab': 'courses',
         'allowed_organizations': get_allowed_organizations(user),
         'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(user),

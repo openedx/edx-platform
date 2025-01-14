@@ -10,12 +10,10 @@ import pytz
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_switch
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from cms.djangoapps.contentstore.views.course import ENABLE_GLOBAL_STAFF_OPTIMIZATION
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
@@ -103,30 +101,6 @@ class HomePageCoursesViewV2Test(CourseTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
-
-    @override_waffle_switch(ENABLE_GLOBAL_STAFF_OPTIMIZATION, True)
-    def test_org_query_if_passed(self):
-        """Get list of courses when org filter passed as a query param.
-
-        Expected result:
-        - A list of courses available to the logged in user for the specified org.
-        """
-        response = self.client.get(self.api_v2_url, {"org": "demo-org"})
-
-        self.assertEqual(len(response.data['results']['courses']), 1)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    @override_waffle_switch(ENABLE_GLOBAL_STAFF_OPTIMIZATION, True)
-    def test_org_query_if_empty(self):
-        """Get home page with an empty org query param.
-
-        Expected result:
-        - An empty list of courses available to the logged in user.
-        """
-        response = self.client.get(self.api_v2_url)
-
-        self.assertEqual(len(response.data['results']['courses']), 0)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_active_only_query_if_passed(self):
         """Get list of active courses only.

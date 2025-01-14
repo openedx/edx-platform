@@ -400,6 +400,37 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         block = CourseStartDate(course, user)
         assert block.date == course.start
 
+    @ddt.data(
+        # Instructor-paced course: Use course start date
+        (False, datetime(2025, 1, 10, tzinfo=utc), datetime(2025, 1, 12, tzinfo=utc),
+            datetime(2025, 1, 10, tzinfo=utc), 'Course starts'),
+
+        # Self-paced course: Enrollment created later than course start
+        (True, datetime(2025, 1, 10, tzinfo=utc), datetime(2025, 1, 12), datetime(2025, 1, 12, tzinfo=utc),
+            'Enrollment Date'),
+
+        # Self-paced course: Enrollment created earlier than course start
+        (True, datetime(2025, 1, 10, tzinfo=utc), datetime(2025, 1, 8), datetime(2025, 1, 10, tzinfo=utc),
+            'Course starts'),
+
+        # Self-paced course: No enrollment
+        (True, datetime(2025, 1, 10, tzinfo=utc), None, datetime(2025, 1, 10, tzinfo=utc), 'Course starts'),
+    )
+    @ddt.unpack
+    def test_course_start_date_label(self, self_paced, course_start, enrollment_created, expected_date, expected_title):
+        """
+        Test the CourseStartDate class has correct label for course start date
+        """
+        course = CourseFactory(self_paced=self_paced, start=course_start)
+        user = create_user()
+        if enrollment_created:
+            enrollment = CourseEnrollmentFactory(course_id=course.id, user=user, mode=CourseMode.VERIFIED)
+            enrollment.created = enrollment_created
+            enrollment.save()
+        date_summary = CourseStartDate(user=user, course=course)
+        self.assertEqual(date_summary.date, expected_date)
+        self.assertEqual(str(date_summary.title), expected_title)
+
     ## Tests Course End Date Block
     def test_course_end_date_for_certificate_eligible_mode(self):
         course = create_course_run(days_till_start=-1)
