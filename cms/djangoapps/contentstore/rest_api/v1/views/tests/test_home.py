@@ -40,6 +40,7 @@ class HomePageViewTest(CourseTestCase):
             "allow_to_create_new_org": True,
             "allow_unicode_course_id": False,
             "allowed_organizations": [],
+            "allowed_organizations_for_libraries": [],
             "archived_courses": [],
             "can_access_advanced_settings": True,
             "can_create_organizations": True,
