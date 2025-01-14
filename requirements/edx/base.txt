@@ -24,7 +24,7 @@ amqp==5.3.1
     # via kombu
 analytics-python==1.4.post1
     # via -r requirements/edx/kernel.in
-aniso8601==9.0.1
+aniso8601==10.0.0
     # via edx-tincan-py35
 annotated-types==0.7.0
     # via pydantic
@@ -72,20 +72,20 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.35.93
+boto3==1.35.98
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.35.93
+botocore==1.35.98
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
-cachecontrol==0.14.1
+cachecontrol==0.14.2
     # via firebase-admin
 cachetools==5.5.0
     # via google-auth
@@ -329,7 +329,7 @@ django-sekizai==4.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-wiki
-django-ses==4.3.1
+django-ses==4.3.2
     # via -r requirements/edx/bundled.in
 django-simple-history==3.4.0
     # via
@@ -596,7 +596,7 @@ google-api-core[grpc]==2.24.0
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-api-python-client==2.157.0
+google-api-python-client==2.158.0
     # via firebase-admin
 google-auth==2.37.0
     # via
@@ -612,7 +612,7 @@ google-cloud-core==2.4.1
     # via
     #   google-cloud-firestore
     #   google-cloud-storage
-google-cloud-firestore==2.19.0
+google-cloud-firestore==2.20.0
     # via firebase-admin
 google-cloud-storage==2.19.0
     # via firebase-admin
@@ -747,9 +747,9 @@ markupsafe==3.0.2
     #   mako
     #   openedx-calc
     #   xblock
-maxminddb==2.6.2
+maxminddb==2.6.3
     # via geoip2
-meilisearch==0.33.0
+meilisearch==0.33.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-search
@@ -769,7 +769,7 @@ multidict==6.1.0
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.2.6
+mysqlclient==2.2.7
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-forum
@@ -816,7 +816,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.15.0
+openedx-events==9.15.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -892,7 +892,7 @@ proto-plus==1.25.0
     # via
     #   google-api-core
     #   google-cloud-firestore
-protobuf==5.29.2
+protobuf==5.29.3
     # via
     #   google-api-core
     #   google-cloud-firestore
@@ -924,7 +924,7 @@ pycryptodomex==3.21.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.10.4
+pydantic==2.10.5
     # via camel-converter
 pydantic-core==2.27.2
     # via pydantic
@@ -1098,7 +1098,7 @@ s3transfer==0.10.4
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
-scipy==1.15.0
+scipy==1.15.1
     # via
     #   chem
     #   openedx-calc
@@ -1254,7 +1254,7 @@ webob==1.8.9
     #   xblock
 wheel==0.45.1
     # via django-pipeline
-wrapt==1.17.0
+wrapt==1.17.1
     # via -r requirements/edx/kernel.in
 xblock[django]==5.1.0
     # via
