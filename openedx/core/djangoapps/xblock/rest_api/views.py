@@ -212,12 +212,6 @@ def xblock_handler(
     block = load_block(usage_key, user, version=version)
     # Run the handler, and save any resulting XBlock field value changes:
     response_webob = block.handle(handler_name, request_webob, suffix)
-
-    if handler_name == "studio_submit":
-        # Signal that we've modified this block
-        context_impl = get_learning_context_impl(usage_key)
-        context_impl.send_block_updated_event(usage_key)
-
     response = webob_to_django_response(response_webob)
     return response
 
@@ -328,10 +322,6 @@ class BlockFieldsView(APIView):
 
         # Save after the callback so any changes made in the callback will get persisted.
         block.save()
-
-        # Signal that we've modified this block
-        context_impl = get_learning_context_impl(usage_key)
-        context_impl.send_block_updated_event(usage_key)
 
         block_dict = {
             "id": str(block.usage_key),
