@@ -1126,6 +1126,14 @@ def _get_urls(content):
 
 def _is_studio_url(url):
     """Returns True if url is a studio url."""
+    return _is_studio_url_with_base(url) or _is_studio_url_without_base(url)
+
+def _is_studio_url_with_base(url):
+    """Returns True if url is a studio url with cms base."""
+    return url.startswith('http://' + settings.CMS_BASE) or url.startswith('https://' + settings.CMS_BASE)
+
+def _is_studio_url_without_base(url):
+    """Returns True if url is a studio url without cms base."""
     return not url.startswith('http://') and not url.startswith('https://')
 
 def _convert_to_standard_url(url, course_key):
@@ -1136,14 +1144,14 @@ def _convert_to_standard_url(url, course_key):
       /static/getting-started_x250.png
       /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
     """
-    if _is_studio_url(url):
+    if _is_studio_url_without_base(url):
         if url.startswith('/static/'):
             processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
-            return 'http://' + settings.CMS_BASE + processed_url
+            return 'https://' + settings.CMS_BASE + processed_url
         elif url.startswith('/'):
-            return 'http://' + settings.CMS_BASE + url
+            return 'https://' + settings.CMS_BASE + url
         else:
-            return 'http://' + settings.CMS_BASE + '/container/' + url
+            return 'https://' + settings.CMS_BASE + '/container/' + url
     else:
         return url
 
@@ -1235,14 +1243,15 @@ def _filter_by_status(results):
     filtered_results = []
     retry_list = []
     for result in results:
-        if result['status'] is None:
-            retry_list.append([result['block_id'], result['url']])
-        elif result['status'] == 200:
+        status, block_id, url = result['status'], result['block_id'], result['url']
+        if status is None:
+            retry_list.append([block_id, url])
+        elif status == 200:
             continue
-        elif result['status'] == 403 and _is_studio_url(result['url']):
-            filtered_results.append([result['block_id'], result['url'], True])
+        elif status == 403 and _is_studio_url(url):
+            filtered_results.append([block_id, url, True])
         else:
-            filtered_results.append([result['block_id'], result['url'], False])
+            filtered_results.append([block_id, url, False])
 
     return filtered_results, retry_list
 
