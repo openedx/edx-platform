@@ -219,11 +219,11 @@
                 /** 
                  * Used in `studio_view` to notify events and errors
                  **/
-                if (eventName == 'save' && data.state == 'end') {
-                  window.parent.postMessage('save-end', '*');
-                } else if (eventName == 'error') {
-                  window.parent.postMessage('error', '*');
-                }
+                window.parent.postMessage({
+                    type: 'xblock-event',
+                    eventName,
+                    data,
+                }, '*');
             }
         };
 
@@ -273,7 +273,10 @@
               // Used when rendering the `studio_view`, in order to intercept and handle the cancel button event
               document.querySelector('.cancel-button').addEventListener('click', function() {
                 event.preventDefault();
-                window.parent.postMessage('cancel-clicked', '*');
+                window.parent.postMessage({
+                    type: 'xblock-event',
+                    eventName: 'cancel-clicked',
+                }, '*');
               });
             }
         }
