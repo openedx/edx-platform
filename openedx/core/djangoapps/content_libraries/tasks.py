@@ -187,7 +187,7 @@ def create_or_update_xblock_upstream_link(usage_key):
     except CourseOverview.DoesNotExist:
         TASK_LOGGER.exception(f'Could not find course: {xblock.course_id}')
         return
-    api.create_or_update_xblock_upstream_link(xblock, xblock.course_id, course_name)
+    api.create_or_update_xblock_upstream_link(xblock, str(xblock.course_id), course_name)
 
 
 @shared_task(base=LoggedTask)
@@ -216,7 +216,7 @@ def create_or_update_upstream_links(course_key_str: str, force: bool = False):
         return
     xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
     for xblock in xblocks:
-        api.create_or_update_xblock_upstream_link(xblock, course_key, course_name, created)
+        api.create_or_update_xblock_upstream_link(xblock, course_key_str, course_name, created)
     course_status.status = CourseLinksStatusChoices.COMPLETED
     course_status.save()
 

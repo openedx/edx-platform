@@ -5,7 +5,7 @@ Content library signal handlers.
 import logging
 
 from django.conf import settings
-from django.db.models.signals import post_save, post_delete, m2m_changed
+from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
 from opaque_keys import InvalidKeyError
@@ -24,7 +24,7 @@ from openedx_events.content_authoring.signals import (
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
 )
-from openedx_learning.api.authoring import get_component, get_components, delete_entity_link
+from openedx_learning.api.authoring import delete_entity_link, get_component, get_components
 from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, Component, PublishableEntity
 
 from lms.djangoapps.grades.api import signals as grades_signals
@@ -32,7 +32,6 @@ from lms.djangoapps.grades.api import signals as grades_signals
 from .api import library_component_usage_key
 from .models import ContentLibrary, LtiGradedResource
 from .tasks import create_or_update_xblock_upstream_link
-
 
 log = logging.getLogger(__name__)
 

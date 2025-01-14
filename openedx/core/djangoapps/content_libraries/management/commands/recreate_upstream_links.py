@@ -52,18 +52,16 @@ class Command(BaseCommand):
         parser.add_argument(
             '--force',
             action='store_true',
-            help=_(
-                'Recreate links even for completely processed courses.'
-            ),
+            help=_('Recreate links even for completely processed courses.'),
         )
 
     def handle(self, *args, **options):
         """
         Handle command
         """
-        courses = options["course"]
-        should_process_all = options["all"]
-        force = options["force"]
+        courses = options['course']
+        should_process_all = options['all']
+        force = options['force']
         self.time_now = datetime.now(tz=timezone.utc)
         if not courses and not should_process_all:
             raise CommandError('Either --course or --all argument should be provided.')

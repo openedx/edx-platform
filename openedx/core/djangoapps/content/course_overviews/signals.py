@@ -10,8 +10,8 @@ from django.db.models.signals import post_save
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
-from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from openedx.core.djangoapps.content_libraries.tasks import update_course_name_in_upstream_links
+from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import SignalHandler
 
