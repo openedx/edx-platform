@@ -1,6 +1,8 @@
 """
 Signal handlers for the bulk_email app
 """
+import logging
+
 from django.dispatch import receiver
 from eventtracking import tracker
 
@@ -9,6 +11,8 @@ from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_MAILIN
 from edx_ace.signals import ACE_MESSAGE_SENT
 
 from .models import Optout
+
+log = logging.getLogger(__name__)
 
 
 @receiver(USER_RETIRE_MAILINGS)
@@ -43,7 +47,7 @@ def ace_email_sent_handler(sender, **kwargs):
     if not course_id:
         course_email = context.get('course_email', None)
         course_id = course_email.course_id if course_email else None
-
+    log.info(f'Email sent for {message_name} for course {course_id} using channel {channel}')
     tracker.emit(
         'edx.ace.message_sent',
         {

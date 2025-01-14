@@ -61,11 +61,13 @@ django-webpack-loader==0.7.0
 djangorestframework<3.15.0
 
 # Date: 2024-07-19
-# Generally speaking, the major version of django-stubs should match the major version of django.
-# Specifically, we need to perpetually constrain django-stubs to a compatible version based on:
+# Generally speaking, the major version of django-stubs must either match the major version
+# of django, or exceed it by 1. So, we will need to perpetually constrain django-stubs and
+# update it as we perform django upgrades. For more details, see:
 # https://github.com/typeddjango/django-stubs?tab=readme-ov-file#version-compatibility
+# including the note on "Partial Support".
 # Issue: https://github.com/openedx/edx-platform/issues/35275
-django-stubs<5
+django-stubs<6
 
 # Date: 2024-07-23
 # django-storages==1.14.4 breaks course imports
@@ -111,12 +113,6 @@ markdown<3.4.0
 # moto==5.0 contains breaking changes. Needs to be updated separately.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35270
 moto<5.0
-
-# Date: 2024-10-16
-# MyPY 1.12.0 fails on all PRs with the following error:
-# openedx/core/djangoapps/content_libraries/api.py:732: error: INTERNAL ERROR
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35667
-mypy<1.12.0
 
 # Date: 2024-07-16
 # We need to upgrade the version of elasticsearch to atleast 7.15 before we can upgrade to Numpy 2.0.0
@@ -181,3 +177,15 @@ social-auth-app-django<=5.4.1
 # # Date: 2024-10-14
 # # The edx-enterprise is currently using edx-rest-api-client==5.7.1, which needs to be updated first.
 # edx-rest-api-client==5.7.1
+
+# Date 2025-01-08
+# elasticsearch==7.13.x is downgrading urllib3 from 2.2.3 to 1.26.20
+# https://github.com/elastic/elasticsearch-py/blob/v7.13.4/setup.py#L42
+# We are pinning this until we can upgrade to a version of elasticsearch that uses a more recent version of urllib3.
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35126
+elasticsearch==7.9.1
+
+# Date 2025-01-10
+# Cause: https://github.com/openedx/edx-platform/issues/36095
+# Issue for unpinning https://github.com/openedx/edx-platform/issues/36096
+lti-consumer-xblock==9.12.1
