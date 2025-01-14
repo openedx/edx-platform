@@ -57,6 +57,7 @@ class Command(BaseCommand):
         if filename is None:
             fd, filename = mkstemp()
             os.close(fd)
+            os.unlink(filename)
             pipe_results = True
 
         export_course_to_tarfile(course_key, filename)
