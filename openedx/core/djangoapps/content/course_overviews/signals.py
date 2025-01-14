@@ -11,6 +11,7 @@ from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
+from openedx.core.djangoapps.content_libraries.tasks import update_course_name_in_upstream_links
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import SignalHandler
 
@@ -89,6 +90,7 @@ def _check_for_course_changes(previous_course_overview, updated_course_overview)
         _check_for_course_start_date_changes(previous_course_overview, updated_course_overview)
         _check_for_pacing_changes(previous_course_overview, updated_course_overview)
         _check_for_cert_date_changes(previous_course_overview, updated_course_overview)
+        _check_for_display_name_change(previous_course_overview, updated_course_overview)
 
 
 def _check_for_course_start_date_changes(previous_course_overview, updated_course_overview):
@@ -216,3 +218,16 @@ def _check_for_cert_date_changes(previous_course_overview, updated_course_overvi
 
     if send_signal:
         transaction.on_commit(_send_course_cert_date_change_signal)
+
+
+def _check_for_display_name_change(previous_course_overview, updated_course_overview):
+    """
+    Checks for change in display name of course and triggers task to update course name in upstream->downstream entity
+    links table.
+    """
+    if previous_course_overview.display_name_with_default == updated_course_overview.display_name_with_default:
+        return
+    update_course_name_in_upstream_links.delay(
+        str(previous_course_overview.id),
+        updated_course_overview.display_name_with_default
+    )

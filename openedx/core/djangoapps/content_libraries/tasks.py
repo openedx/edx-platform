@@ -17,13 +17,11 @@ Architecture note:
 from __future__ import annotations
 
 import logging
-import re
 from datetime import datetime, timezone
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
-from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
 from opaque_keys.edx.keys import UsageKey
 
@@ -33,9 +31,8 @@ from xblock.fields import Scope
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content_libraries.api import get_component_from_usage_key
 from openedx.core.lib import ensure_cms
-from openedx_learning.api.authoring import update_or_create_entity_link, get_or_create_course_link_status
+from openedx_learning.api.authoring import get_entity_links, get_or_create_course_link_status
 from openedx_learning.api.authoring_models import CourseLinksStatusChoices
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
@@ -222,6 +219,19 @@ def create_or_update_upstream_links(course_key_str: str, force: bool = False):
         api.create_or_update_xblock_upstream_link(xblock, course_key, course_name, created)
     course_status.status = CourseLinksStatusChoices.COMPLETED
     course_status.save()
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def update_course_name_in_upstream_links(course_key_str: str, new_course_name: str):
+    """
+    Celery task to update course name in upstream->downstream entity links.
+    """
+    updated_time = datetime.now(timezone.utc)
+    get_entity_links({"downstream_context_key": course_key_str}).update(
+        downstream_context_title=new_course_name,
+        updated=updated_time
+    )
 
 
 def _sync_children(
