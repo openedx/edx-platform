@@ -161,7 +161,7 @@ class CoursePassingStatusEventsTest(SharedModuleStoreTestCase, OpenEdxEventsTest
                         pii=UserPersonalData(
                             username=self.user.username,
                             email=self.user.email,
-                            name=self.user.get_full_name(),
+                            name=self.user.get_full_name() or self.user.profile.name,
                         ),
                         id=self.user.id,
                         is_active=self.user.is_active,
@@ -234,7 +234,7 @@ class CCXCoursePassingStatusEventsTest(
                         pii=UserPersonalData(
                             username=self.user.username,
                             email=self.user.email,
-                            name=self.user.get_full_name(),
+                            name=self.user.get_full_name() or self.user.profile.name,
                         ),
                         id=self.user.id,
                         is_active=self.user.is_active,
