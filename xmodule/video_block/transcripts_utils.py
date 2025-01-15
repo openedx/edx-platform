@@ -1034,7 +1034,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
         try:
             input_format, base_name, transcript_content = get_transcript_for_video(
                 video.location,
-                subs_id=sub_id,
+                subs_id=None,
                 file_name=other_languages['en'],
                 language=language
             )
