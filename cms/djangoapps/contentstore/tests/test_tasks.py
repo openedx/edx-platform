@@ -304,7 +304,7 @@ class CourseOptimizerTestCase(TestCase):
         url_list = ['1', '2', '3', '4', '5']
         course_key = 'course-v1:edX+DemoX+Demo_Course'
         batch_size=2
-        results = _validate_urls_access_in_batches(url_list, course_key, batch_size)
+        results = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
         print(results)
         assert  15 == 17, "forced fail"
 
