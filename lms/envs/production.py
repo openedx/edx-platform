@@ -66,7 +66,7 @@ CELERY_RESULT_BACKEND = 'django-cache'
 BROKER_HEARTBEAT = 60.0
 BROKER_HEARTBEAT_CHECKRATE = 2
 STATIC_ROOT_BASE = None
-STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
+STATIC_URL_BASE = None
 EMAIL_FILE_PATH = DATA_DIR / "emails" / "lms"
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
@@ -121,8 +121,7 @@ OPENAPI_CACHE_TIMEOUT = 60 * 60
 MAINTENANCE_BANNER_TEXT = None
 DASHBOARD_COURSE_LIMIT = None
 
-# TODO make a note about axing these
-# SSL external authentication settings
+# TODO: We believe these were part of the DEPR'd sysadmin dashboard, and can likely be removed.
 SSL_AUTH_EMAIL_DOMAIN = "MIT.EDU"
 SSL_AUTH_DN_FORMAT_STRING = (
     "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
@@ -136,14 +135,12 @@ CONFIG_FILE = get_env_setting('LMS_CFG')
 with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
     __config__ = yaml.safe_load(f)
 
-    # ENV_TOKENS and AUTH_TOKENS are included for reverse compatibility.
-    # Removing them may break plugins that rely on them.
-    ENV_TOKENS = __config__
-    AUTH_TOKENS = __config__
-
-    # _YAML_TOKENS is used strategically to handle YAML config files in a backwards-compatible way.
-    # Please do not add more references to it.
-    # See: < TODO TICKET LINK >
+    # _YAML_TOKENS contains the exact contents of the LMS_CFG YAML file.
+    # We do splat the entirety of the LMS_CFG YAML file (except KEYS_WITH_MERGED_VALUES) into this module.
+    # However, for precise backwards compatibility, we need to reference _YAML_TOKENS directly a few times,
+    # particularly we need to derive Django setting values from YAML values.
+    # This pattern is confusing and we discourage it. Rather than adding more _YAML_TOKENS references, please
+    # consider just referencing this module's variables directly.
     _YAML_TOKENS = __config__
 
     # Add the key/values from config into the global namespace of this module.
@@ -205,7 +202,8 @@ if STATIC_URL_BASE:
 DATA_DIR = path(DATA_DIR)
 CC_MERCHANT_NAME = _YAML_TOKENS.get('CC_MERCHANT_NAME', PLATFORM_NAME)
 
-# TODO comment about this being for backcompat with yaml
+# TODO: This was for backwards compatibility back when installed django-cookie-samesite (not since 2022).
+#       The DCS_ version of the setting can be DEPR'd at this point.
 SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
 
 LMS_INTERNAL_ROOT_URL = _YAML_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
@@ -221,7 +219,7 @@ ALLOWED_HOSTS = [
 
 # This is the domain that is used to set shared cookies between various sub-domains.
 # By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN, but we want to make it overrideable.
-SHARED_COOKIE_DOMAIN = _YAML_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
+SHARED_COOKIE_DOMAIN = _YAML_TOKENS.get('SHARED_kCOOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
 
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
@@ -251,7 +249,7 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = _YAML_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMA
 # Queue to use for expiring old entitlements
 ENTITLEMENTS_EXPIRATION_ROUTING_KEY = _YAML_TOKENS.get('ENTITLEMENTS_EXPIRATION_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
 
-# Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
+# Build a CELERY_QUEUES dict the way that celery expects, based on a couple lists of queue names from the YAML.
 _YAML_CELERY_QUEUES = _YAML_TOKENS.get('CELERY_QUEUES', None)
 if _YAML_CELERY_QUEUES:
     CELERY_QUEUES = {queue: {} for queue in _YAML_CELERY_QUEUES}
@@ -271,7 +269,6 @@ CELERY_QUEUES.update(
     }
 )
 
-
 MKTG_URL_LINK_MAP.update(_YAML_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
 # Intentional defaults.
@@ -286,7 +283,6 @@ TIME_ZONE = CELERY_TIMEZONE
 # Translation overrides
 LANGUAGE_DICT = dict(LANGUAGES)
 
-# TODO add a comment about LANGUAGE_COOKIE being deprecated / add to notes
 LANGUAGE_COOKIE_NAME = _YAML_TOKENS.get('LANGUAGE_COOKIE') or LANGUAGE_COOKIE_NAME
 
 # Additional installed apps
@@ -308,7 +304,7 @@ if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COO
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = _YAML_TOKENS.get('CORS_ALLOW_INSECURE', False)
-    CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
+    CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = _YAM_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
 
 # PREVIEW DOMAIN must be present in HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS for the preview to show draft changes
 if 'PREVIEW_LMS_BASE' in FEATURES and FEATURES['PREVIEW_LMS_BASE'] != '':
@@ -352,7 +348,7 @@ for name, database in DATABASES.items():
 
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
 # use the one from common.py
-MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
+MODULESTORE = convert_module_store_setting_if_needed(_YAML_TOKENS.get('MODULESTORE', MODULESTORE))
 
 # After conversion above, the modulestore will have a "stores" list with all defined stores, for all stores, add the
 # fs_root entry to derived collection so that if it's a callable it can be resolved.  We need to do this because the
@@ -406,7 +402,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     # The reduced session expiry time during the third party login pipeline. (Value in seconds)
     SOCIAL_AUTH_PIPELINE_TIMEOUT = _YAML_TOKENS.get('SOCIAL_AUTH_PIPELINE_TIMEOUT', 600)
 
-    # TODO: just define this in common.py
+    # TODO: Would it be safe to just set this default in common.py, even if ENABLE_THIRD_PARTY_AUTH is False?
     SOCIAL_AUTH_LTI_CONSUMER_SECRETS = _YAML_TOKENS.get('SOCIAL_AUTH_LTI_CONSUMER_SECRETS', {})
 
     # third_party_auth config moved to ConfigurationModels. This is for data migration only:
@@ -562,6 +558,12 @@ derive_settings(__name__)
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
+# ENV_TOKENS and AUTH_TOKENS are included for reverse compatibility.
+# Removing them may break plugins that rely on them.
+# Please do not add new references to them... just use `django.conf.settings` instead.
+ENV_TOKENS = __config__
+AUTH_TOKENS = __config__
+
 # Load production.py in plugins
 add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
 
@@ -634,7 +636,8 @@ REST_FRAMEWORK.update(_YAML_TOKENS.get('REST_FRAMEWORK', {}))
 CELERY_IMPORTS.extend(_YAML_TOKENS.get('CELERY_EXTRA_IMPORTS', []))
 
 # keys for  big blue button live provider
-# TODO this is bad
+# TODO: This should not be in the core platform. If it has to stay for now, though, then we should move these
+#       defaults into common.py
 COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
     "KEY": _YAML_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_KEY'),
     "SECRET": _YAML_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_SECRET'),
@@ -646,3 +649,9 @@ EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(
     EVENT_BUS_PRODUCER_CONFIG,
     _YAML_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {})
 )
+
+#####################################################################################################
+# HEY! Don't add anything to the end of this file.
+# Add your defaults to common.py instead!
+# If you really need to add post-YAML logic, add it above the "Derive Any Derived Settings" section.
+######################################################################################################
