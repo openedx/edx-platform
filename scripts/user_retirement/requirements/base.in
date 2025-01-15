@@ -10,6 +10,7 @@ jenkinsapi
 unicodecsv
 simplejson
 simple-salesforce
+stevedore
 google-api-python-client
 
 # urllib3 is needed for the user_retirement scripts 
