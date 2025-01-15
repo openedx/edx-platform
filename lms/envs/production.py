@@ -109,10 +109,17 @@ GOOGLE_ANALYTICS_TRACKING_ID = None
 GOOGLE_ANALYTICS_LINKEDIN = None
 GOOGLE_SITE_VERIFICATION_ID = None
 BRANCH_IO_KEY = None
-REGISTRATION_CODE_LENGTH = ENV_TOKENS.get('REGISTRATION_CODE_LENGTH', 8)
+REGISTRATION_CODE_LENGTH = 8
 FACEBOOK_API_VERSION = None
 FACEBOOK_APP_SECRET = None
 FACEBOOK_APP_ID = None
+API_ACCESS_MANAGER_EMAIL = None
+API_ACCESS_FROM_EMAIL = None
+CHAT_COMPLETION_API = ''
+CHAT_COMPLETION_API_KEY = ''
+OPENAPI_CACHE_TIMEOUT = 60 * 60
+MAINTENANCE_BANNER_TEXT = None
+DASHBOARD_COURSE_LIMIT = None
 
 # TODO make a note about axing these
 # SSL external authentication settings
@@ -303,8 +310,6 @@ if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COO
     CORS_ALLOW_INSECURE = _YAML_TOKENS.get('CORS_ALLOW_INSECURE', False)
     CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
 
-FIELD_OVERRIDE_PROVIDERS = tuple(FIELD_OVERRIDE_PROVIDERS)
-
 # PREVIEW DOMAIN must be present in HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS for the preview to show draft changes
 if 'PREVIEW_LMS_BASE' in FEATURES and FEATURES['PREVIEW_LMS_BASE'] != '':
     PREVIEW_DOMAIN = FEATURES['PREVIEW_LMS_BASE'].split(':')[0]
@@ -450,14 +455,16 @@ XBLOCK_SETTINGS.setdefault("VideoBlock", {})["licensing_enabled"] = FEATURES["LI
 XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KEY
 
 ##### Custom Courses for EdX #####
-if FEATURES.get('CUSTOM_COURSES_EDX'):
+if FEATURES['CUSTOM_COURSES_EDX']:
     INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
 
+FIELD_OVERRIDE_PROVIDERS = tuple(FIELD_OVERRIDE_PROVIDERS)
+
 ##### Individual Due Date Extensions #####
-if FEATURES.get('INDIVIDUAL_DUE_DATES'):
+if FEATURES['INDIVIDUAL_DUE_DATES']:
     FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.courseware.student_field_overrides.IndividualStudentOverrideProvider',
     )
@@ -478,51 +485,29 @@ MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
 
 # PROFILE IMAGE CONFIG
 PROFILE_IMAGE_DEFAULT_FILENAME = 'images/profiles/default'
-PROFILE_IMAGE_SIZES_MAP = ENV_TOKENS.get(
-    'PROFILE_IMAGE_SIZES_MAP',
-    PROFILE_IMAGE_SIZES_MAP
-)
 
 ##### Credit Provider Integration #####
 
-CREDIT_PROVIDER_SECRET_KEYS = AUTH_TOKENS.get("CREDIT_PROVIDER_SECRET_KEYS", {})
-
 ##################### LTI Provider #####################
-if FEATURES.get('ENABLE_LTI_PROVIDER'):
+if FEATURES['ENABLE_LTI_PROVIDER']:
     INSTALLED_APPS.append('lms.djangoapps.lti_provider.apps.LtiProviderConfig')
     AUTHENTICATION_BACKENDS.append('lms.djangoapps.lti_provider.users.LtiBackend')
-
-LTI_USER_EMAIL_DOMAIN = ENV_TOKENS.get('LTI_USER_EMAIL_DOMAIN', 'lti.example.com')
-
-# For more info on this, see the notes in common.py
-LTI_AGGREGATE_SCORE_PASSBACK_DELAY = ENV_TOKENS.get(
-    'LTI_AGGREGATE_SCORE_PASSBACK_DELAY', LTI_AGGREGATE_SCORE_PASSBACK_DELAY
-)
 
 ##################### Credit Provider help link ####################
 
 #### JWT configuration ####
-JWT_AUTH.update(ENV_TOKENS.get('JWT_AUTH', {}))
-JWT_AUTH.update(AUTH_TOKENS.get('JWT_AUTH', {}))
-
-# Offset for pk of courseware.StudentModuleHistoryExtended
-STUDENTMODULEHISTORYEXTENDED_OFFSET = ENV_TOKENS.get(
-    'STUDENTMODULEHISTORYEXTENDED_OFFSET', STUDENTMODULEHISTORYEXTENDED_OFFSET
-)
+JWT_AUTH.update(_YAML_TOKENS.get('JWT_AUTH', {}))
 
 ################################ Settings for Credentials Service ################################
 
-CREDENTIALS_GENERATION_ROUTING_KEY = ENV_TOKENS.get('CREDENTIALS_GENERATION_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
+CREDENTIALS_GENERATION_ROUTING_KEY = _YAML_TOKENS.get('CREDENTIALS_GENERATION_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
 
-# Queue to use for award program certificates
-PROGRAM_CERTIFICATES_ROUTING_KEY = ENV_TOKENS.get('PROGRAM_CERTIFICATES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = ENV_TOKENS.get(
+PROGRAM_CERTIFICATES_ROUTING_KEY = _YAML_TOKENS.get('PROGRAM_CERTIFICATES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
+
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = _YAML_TOKENS.get(
     'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY',
     HIGH_PRIORITY_QUEUE
 )
-
-API_ACCESS_MANAGER_EMAIL = ENV_TOKENS.get('API_ACCESS_MANAGER_EMAIL')
-API_ACCESS_FROM_EMAIL = ENV_TOKENS.get('API_ACCESS_FROM_EMAIL')
 
 ############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
 # The Open edX Enterprise service is currently hosted via the LMS container/process.
@@ -531,45 +516,15 @@ API_ACCESS_FROM_EMAIL = ENV_TOKENS.get('API_ACCESS_FROM_EMAIL')
 # not find references to them within the edx-platform project.
 
 # Publicly-accessible enrollment URL, for use on the client side.
-ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = ENV_TOKENS.get(
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = _YAML_TOKENS.get(
     'ENTERPRISE_PUBLIC_ENROLLMENT_API_URL',
     (LMS_ROOT_URL or '') + LMS_ENROLLMENT_API_PATH
 )
 
 # Enrollment URL used on the server-side.
-ENTERPRISE_ENROLLMENT_API_URL = ENV_TOKENS.get(
+ENTERPRISE_ENROLLMENT_API_URL = _YAML_TOKENS.get(
     'ENTERPRISE_ENROLLMENT_API_URL',
     (LMS_INTERNAL_ROOT_URL or '') + LMS_ENROLLMENT_API_PATH
-)
-
-# Enterprise logo image size limit in KB's
-ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = ENV_TOKENS.get(
-    'ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE',
-    ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE
-)
-
-# Course enrollment modes to be hidden in the Enterprise enrollment page
-# if the "Hide audit track" flag is enabled for an EnterpriseCustomer
-ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ENV_TOKENS.get(
-    'ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES',
-    ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES
-)
-
-# A support URL used on Enterprise landing pages for when a warning
-# message goes off.
-ENTERPRISE_SUPPORT_URL = ENV_TOKENS.get(
-    'ENTERPRISE_SUPPORT_URL',
-    ENTERPRISE_SUPPORT_URL
-)
-
-# A default dictionary to be used for filtering out enterprise customer catalog.
-ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = ENV_TOKENS.get(
-    'ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER',
-    ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER
-)
-INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = ENV_TOKENS.get(
-    'INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT',
-    INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT
 )
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
@@ -580,97 +535,24 @@ INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = ENV_TOKENS.get(
 DEFAULT_ENTERPRISE_API_URL = None
 if LMS_INTERNAL_ROOT_URL is not None:
     DEFAULT_ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
-ENTERPRISE_API_URL = ENV_TOKENS.get('ENTERPRISE_API_URL', DEFAULT_ENTERPRISE_API_URL)
+ENTERPRISE_API_URL = _YAML_TOKENS.get('ENTERPRISE_API_URL', DEFAULT_ENTERPRISE_API_URL)
 
 DEFAULT_ENTERPRISE_CONSENT_API_URL = None
 if LMS_INTERNAL_ROOT_URL is not None:
     DEFAULT_ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
-ENTERPRISE_CONSENT_API_URL = ENV_TOKENS.get('ENTERPRISE_CONSENT_API_URL', DEFAULT_ENTERPRISE_CONSENT_API_URL)
-
-ENTERPRISE_SERVICE_WORKER_USERNAME = ENV_TOKENS.get(
-    'ENTERPRISE_SERVICE_WORKER_USERNAME',
-    ENTERPRISE_SERVICE_WORKER_USERNAME
-)
-ENTERPRISE_API_CACHE_TIMEOUT = ENV_TOKENS.get(
-    'ENTERPRISE_API_CACHE_TIMEOUT',
-    ENTERPRISE_API_CACHE_TIMEOUT
-)
-ENTERPRISE_CATALOG_INTERNAL_ROOT_URL = ENV_TOKENS.get(
-    'ENTERPRISE_CATALOG_INTERNAL_ROOT_URL',
-    ENTERPRISE_CATALOG_INTERNAL_ROOT_URL
-)
-
-CHAT_COMPLETION_API = ENV_TOKENS.get('CHAT_COMPLETION_API', '')
-CHAT_COMPLETION_API_KEY = ENV_TOKENS.get('CHAT_COMPLETION_API_KEY', '')
-LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT', '')
-LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get(
-    'LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT',
-    ''
-)
-LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT', '')
-LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ENV_TOKENS.get('LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT', '')
+ENTERPRISE_CONSENT_API_URL = _YAML_TOKENS.get('ENTERPRISE_CONSENT_API_URL', DEFAULT_ENTERPRISE_CONSENT_API_URL)
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
 # which are not provided by the Enterprise service. These settings override the
 # base values for the parameters as defined in common.py
 
-ENTERPRISE_PLATFORM_WELCOME_TEMPLATE = ENV_TOKENS.get(
-    'ENTERPRISE_PLATFORM_WELCOME_TEMPLATE',
-    ENTERPRISE_PLATFORM_WELCOME_TEMPLATE
-)
-ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE = ENV_TOKENS.get(
-    'ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE',
-    ENTERPRISE_SPECIFIC_BRANDED_WELCOME_TEMPLATE
-)
-ENTERPRISE_TAGLINE = ENV_TOKENS.get(
-    'ENTERPRISE_TAGLINE',
-    ENTERPRISE_TAGLINE
-)
-ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = set(
-    ENV_TOKENS.get(
-        'ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS',
-        ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS
-    )
-)
-BASE_COOKIE_DOMAIN = ENV_TOKENS.get(
-    'BASE_COOKIE_DOMAIN',
-    BASE_COOKIE_DOMAIN
-)
-SYSTEM_TO_FEATURE_ROLE_MAPPING = ENV_TOKENS.get(
-    'SYSTEM_TO_FEATURE_ROLE_MAPPING',
-    SYSTEM_TO_FEATURE_ROLE_MAPPING
-)
-
-# Add an ICP license for serving content in China if your organization is registered to do so
-ICP_LICENSE = ENV_TOKENS.get('ICP_LICENSE', None)
-ICP_LICENSE_INFO = ENV_TOKENS.get('ICP_LICENSE_INFO', {})
-
-# How long to cache OpenAPI schemas and UI, in seconds.
-OPENAPI_CACHE_TIMEOUT = ENV_TOKENS.get('OPENAPI_CACHE_TIMEOUT', 60 * 60)
-
-########################## Parental controls config  #######################
-
-# The age at which a learner no longer requires parental consent, or None
-# if parental consent is never required.
-PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
-    'PARENTAL_CONSENT_AGE_LIMIT',
-    PARENTAL_CONSENT_AGE_LIMIT
-)
+ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = set(ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS)
 
 ########################## Extra middleware classes  #######################
 
 # Allow extra middleware classes to be added to the app through configuration.
-MIDDLEWARE.extend(ENV_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
-
-################# Settings for the maintenance banner #################
-MAINTENANCE_BANNER_TEXT = ENV_TOKENS.get('MAINTENANCE_BANNER_TEXT', None)
-
-########################## limiting dashboard courses ######################
-DASHBOARD_COURSE_LIMIT = ENV_TOKENS.get('DASHBOARD_COURSE_LIMIT', None)
-
-######################## Setting for content libraries ########################
-MAX_BLOCKS_PER_CONTENT_LIBRARY = ENV_TOKENS.get('MAX_BLOCKS_PER_CONTENT_LIBRARY', MAX_BLOCKS_PER_CONTENT_LIBRARY)
+MIDDLEWARE.extend(_YAML_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
 ########################## Derive Any Derived Settings  #######################
 
@@ -683,20 +565,6 @@ derive_settings(__name__)
 # Load production.py in plugins
 add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
 
-############## Settings for Completion API #########################
-
-# Once a user has watched this percentage of a video, mark it as complete:
-# (0.0 = 0%, 1.0 = 100%)
-COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get('COMPLETION_VIDEO_COMPLETE_PERCENTAGE',
-                                                      COMPLETION_VIDEO_COMPLETE_PERCENTAGE)
-COMPLETION_BY_VIEWING_DELAY_MS = ENV_TOKENS.get('COMPLETION_BY_VIEWING_DELAY_MS',
-                                                COMPLETION_BY_VIEWING_DELAY_MS)
-
-################# Settings for brand logos. #################
-LOGO_URL = ENV_TOKENS.get('LOGO_URL', LOGO_URL)
-LOGO_URL_PNG = ENV_TOKENS.get('LOGO_URL_PNG', LOGO_URL_PNG)
-LOGO_TRADEMARK_URL = ENV_TOKENS.get('LOGO_TRADEMARK_URL', LOGO_TRADEMARK_URL)
-FAVICON_URL = ENV_TOKENS.get('FAVICON_URL', FAVICON_URL)
 
 ######################## CELERY ROUTING ########################
 
@@ -756,56 +624,25 @@ EXPLICIT_QUEUES = {
 
 }
 
-LOGO_IMAGE_EXTRA_TEXT = ENV_TOKENS.get('LOGO_IMAGE_EXTRA_TEXT', '')
-
 ############## XBlock extra mixins ############################
 XBLOCK_MIXINS += tuple(XBLOCK_EXTRA_MIXINS)
 
-############## Settings for course import olx validation ############################
-COURSE_OLX_VALIDATION_STAGE = ENV_TOKENS.get('COURSE_OLX_VALIDATION_STAGE', COURSE_OLX_VALIDATION_STAGE)
-COURSE_OLX_VALIDATION_IGNORE_LIST = ENV_TOKENS.get(
-    'COURSE_OLX_VALIDATION_IGNORE_LIST',
-    COURSE_OLX_VALIDATION_IGNORE_LIST
-)
-
-################# show account activate cta after register ########################
-SHOW_ACCOUNT_ACTIVATION_CTA = ENV_TOKENS.get('SHOW_ACCOUNT_ACTIVATION_CTA', SHOW_ACCOUNT_ACTIVATION_CTA)
-
-################# Discussions micro frontend URL ########################
-DISCUSSIONS_MICROFRONTEND_URL = ENV_TOKENS.get('DISCUSSIONS_MICROFRONTEND_URL', DISCUSSIONS_MICROFRONTEND_URL)
-
-################### Discussions micro frontend Feedback URL###################
-DISCUSSIONS_MFE_FEEDBACK_URL = ENV_TOKENS.get('DISCUSSIONS_MFE_FEEDBACK_URL', DISCUSSIONS_MFE_FEEDBACK_URL)
-
-############################ AI_TRANSLATIONS URL ##################################
-AI_TRANSLATIONS_API_URL = ENV_TOKENS.get('AI_TRANSLATIONS_API_URL', AI_TRANSLATIONS_API_URL)
-
 ############## DRF overrides ##############
-REST_FRAMEWORK.update(ENV_TOKENS.get('REST_FRAMEWORK', {}))
+REST_FRAMEWORK.update(_YAML_TOKENS.get('REST_FRAMEWORK', {}))
 
 ############################# CELERY ############################
-CELERY_IMPORTS.extend(ENV_TOKENS.get('CELERY_EXTRA_IMPORTS', []))
+CELERY_IMPORTS.extend(_YAML_TOKENS.get('CELERY_EXTRA_IMPORTS', []))
 
 # keys for  big blue button live provider
+# TODO this is bad
 COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
-    "KEY": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_KEY', None),
-    "SECRET": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_SECRET', None),
-    "URL": ENV_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_URL', None),
+    "KEY": _YAML_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_KEY'),
+    "SECRET": _YAML_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_SECRET'),
+    "URL": _YAML_TOKENS.get('BIG_BLUE_BUTTON_GLOBAL_URL'),
 }
 
-AVAILABLE_DISCUSSION_TOURS = ENV_TOKENS.get('AVAILABLE_DISCUSSION_TOURS', [])
-
-############## NOTIFICATIONS EXPIRY ##############
-NOTIFICATIONS_EXPIRY = ENV_TOKENS.get('NOTIFICATIONS_EXPIRY', NOTIFICATIONS_EXPIRY)
-
 ############## Event bus producer ##############
-EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(EVENT_BUS_PRODUCER_CONFIG,
-                                                   ENV_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {}))
-BEAMER_PRODUCT_ID = ENV_TOKENS.get('BEAMER_PRODUCT_ID', BEAMER_PRODUCT_ID)
-
-# .. setting_name: DISABLED_COUNTRIES
-# .. setting_default: []
-# .. setting_description: List of country codes that should be disabled
-# .. for now it wil impact country listing in auth flow and user profile.
-# .. eg ['US', 'CA']
-DISABLED_COUNTRIES = ENV_TOKENS.get('DISABLED_COUNTRIES', [])
+EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(
+    EVENT_BUS_PRODUCER_CONFIG,
+    _YAML_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {})
+)
