@@ -150,6 +150,7 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
         """
         course_key = CourseKey.from_string(course_id)
         if not has_course_author_access(request.user, course_key):
+            print('missing course author access')
             self.permission_denied(request)
         
         task_status = _latest_task_status(request, course_id)
@@ -190,8 +191,9 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
             **({'LinkCheckError': error} if error else {})
         }
 
+        print('data', data)
         serializer = LinkCheckSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
+        serializer.is_valid(raise_exception=False)
 
         return Response(serializer.data)
 

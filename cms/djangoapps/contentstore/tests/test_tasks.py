@@ -268,7 +268,6 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         ### Check that _save_broken_links_file was called with the correct arguments
         mock_save_broken_links_file.assert_called_once_with(mock_user_task_artifact.return_value, mock.ANY)
 
-
     def test_user_does_not_exist_raises_exception(self):
         raise NotImplementedError
 
