@@ -5,6 +5,7 @@ from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from organizations import api as org_api
 from openedx.core.lib.api.view_utils import view_auth_classes
 
 from ....utils import get_home_context, get_course_context, get_library_context
@@ -51,6 +52,7 @@ class HomePageView(APIView):
             "allow_to_create_new_org": true,
             "allow_unicode_course_id": false,
             "allowed_organizations": [],
+            "allowed_organizations_for_libraries": [],
             "archived_courses": [],
             "can_access_advanced_settings": true,
             "can_create_organizations": true,
@@ -80,7 +82,12 @@ class HomePageView(APIView):
 
         home_context = get_home_context(request, True)
         home_context.update({
-            'allow_to_create_new_org': settings.FEATURES.get('ENABLE_CREATOR_GROUP', True) and request.user.is_staff,
+            # 'allow_to_create_new_org' is actually about auto-creating organizations
+            # (e.g. when creating a course or library), so we add an additional test.
+            'allow_to_create_new_org': (
+                home_context['can_create_organizations'] and
+                org_api.is_autocreate_enabled()
+            ),
             'studio_name': settings.STUDIO_NAME,
             'studio_short_name': settings.STUDIO_SHORT_NAME,
             'studio_request_email': settings.FEATURES.get('STUDIO_REQUEST_EMAIL', ''),
