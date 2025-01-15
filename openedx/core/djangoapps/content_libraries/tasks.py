@@ -177,6 +177,9 @@ def duplicate_children(
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
 def create_or_update_xblock_upstream_link(usage_key):
+    """
+    Create or update upstream link for a single xblock.
+    """
     ensure_cms("create_or_update_xblock_upstream_link may only be executed in a CMS context")
     xblock = modulestore().get_item(UsageKey.from_string(usage_key))
     if not xblock.upstream:
@@ -192,13 +195,14 @@ def create_or_update_xblock_upstream_link(usage_key):
 
 @shared_task(base=LoggedTask)
 @set_code_owner_attribute
-def create_or_update_upstream_links(course_key_str: str, force: bool = False):
+def create_or_update_upstream_links(course_key_str: str, force: bool = False, created: datetime | None = None):
     """
     A Celery task to create or update upstream downstream links in database from course xblock content.
     """
     ensure_cms("create_or_update_upstream_links may only be executed in a CMS context")
 
-    created = datetime.now(timezone.utc)
+    if not created:
+        created = datetime.now(timezone.utc)
     course_status = get_or_create_course_link_status(course_key_str, created)
     if course_status.status in [
         CourseLinksStatusChoices.COMPLETED,

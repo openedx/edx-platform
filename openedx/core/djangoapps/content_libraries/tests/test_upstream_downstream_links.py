@@ -42,7 +42,7 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase):
             self.call_command('--all', '--course', 'some-course')
 
     @patch(
-        'openedx.core.djangoapps.content_libraries.management.commands.recreate_upstream_links.create_or_update_upstream_links'
+        'openedx.core.djangoapps.content_libraries.management.commands.recreate_upstream_links.create_or_update_upstream_links'  # pylint: disable=line-too-long
     )
     def test_call_for_single_course(self, mock_task):
         """
@@ -55,7 +55,7 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase):
         mock_task.delay.assert_called_with('some-course', True)
 
     @patch(
-        'openedx.core.djangoapps.content_libraries.management.commands.recreate_upstream_links.create_or_update_upstream_links'
+        'openedx.core.djangoapps.content_libraries.management.commands.recreate_upstream_links.create_or_update_upstream_links'  # pylint: disable=line-too-long
     )
     def test_call_for_multiple_course(self, mock_task):
         """
@@ -66,7 +66,7 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase):
         mock_task.delay.assert_any_call('one-more-course', False)
 
     @patch(
-        'openedx.core.djangoapps.content_libraries.management.commands.recreate_upstream_links.create_or_update_upstream_links'
+        'openedx.core.djangoapps.content_libraries.management.commands.recreate_upstream_links.create_or_update_upstream_links'  # pylint: disable=line-too-long
     )
     def test_call_for_all_courses(self, mock_task):
         """

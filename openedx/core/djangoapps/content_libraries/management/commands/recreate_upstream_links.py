@@ -62,7 +62,7 @@ class Command(BaseCommand):
         courses = options['course']
         should_process_all = options['all']
         force = options['force']
-        self.time_now = datetime.now(tz=timezone.utc)
+        time_now = datetime.now(tz=timezone.utc)
         if not courses and not should_process_all:
             raise CommandError('Either --course or --all argument should be provided.')
 
@@ -73,4 +73,4 @@ class Command(BaseCommand):
             courses = CourseOverview.get_all_course_keys()
         for course in courses:
             log.info(f"Start processing upstream->dowstream links in course: {course}")
-            create_or_update_upstream_links.delay(str(course), force)
+            create_or_update_upstream_links.delay(str(course), force, created=time_now)
