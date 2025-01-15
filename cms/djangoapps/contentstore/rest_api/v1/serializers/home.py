@@ -66,7 +66,6 @@ class StudioHomeSerializer(serializers.Serializer):
     libraries_v2_enabled = serializers.BooleanField()
     taxonomies_enabled = serializers.BooleanField()
     taxonomy_list_mfe_url = serializers.CharField()
-    optimization_enabled = serializers.BooleanField()
     request_course_creator_url = serializers.CharField()
     rerun_creator_status = serializers.BooleanField()
     show_new_library_button = serializers.BooleanField()

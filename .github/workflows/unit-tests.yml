@@ -73,11 +73,13 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3.3.0
+      # We pull this image a lot, and Dockerhub will rate limit us if we pull too often.
+      # This is an attempt to cache the image for better performance and to work around that.
+      # It will cache all pulled images, so if we add new images to this we'll need to update the key.
+      - name: Cache Docker images
+        uses: ScribeMD/docker-cache@0.5.0
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          key: docker-${{ runner.os }}-mongo-${{ matrix.mongo-version }}
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.11.0

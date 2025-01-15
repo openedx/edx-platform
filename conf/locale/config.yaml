@@ -26,7 +26,6 @@ ignore_dirs:
     # Directories that only contain tests.
     - common/test
     - test_root
-    - '*/terrain'
     - '*/spec'
     - '*/tests'
     - '*/djangoapps/*/features'
