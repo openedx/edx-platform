@@ -305,8 +305,8 @@ class CourseOptimizerTestCase(TestCase):
         course_key = 'course-v1:edX+DemoX+Demo_Course'
         batch_size=2
         results = _validate_urls_access_in_batches(url_list, course_key, batch_size)
-        length = len(results)
-        assert  length == 17, f'Got {length=}; expected 17'
+        print(results)
+        assert  15 == 17, "forced fail"
 
     def test_all_links_in_link_list_longer_than_batch_size_are_validated(self):
         raise NotImplementedError
