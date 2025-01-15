@@ -79,7 +79,7 @@ jobs:
       - name: Cache Docker images
         uses: ScribeMD/docker-cache@0.5.0
         with:
-          key: docker-${{ runner.os }}-mongo-${{ hashFiles(matrix.mongo-version) }}
+          key: docker-${{ runner.os }}-mongo-${{ matrix.mongo-version }}
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.11.0
