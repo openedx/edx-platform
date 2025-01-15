@@ -5,14 +5,17 @@ Unit tests for course import and export Celery tasks
 
 import copy
 import json
-from unittest import mock, TestCase
+from unittest import mock
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest as pytest
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.test import TestCase
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
@@ -209,6 +212,52 @@ class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-clas
 
 class CourseOptimizerTestCase(TestCase):
 
+    def test_static_url_substitution(self):
+        '''
+        input URL: /static/name_goes_here
+        URL after static substitution (on localhost):
+           http://localhost:18010/asset-v1:edX+DemoX+Demo_Course+type@asset+block/name_goes_here
+        '''
+        asset_name = "name_goes_here"
+        url = f"/static/{asset_name}"
+        course_name = "edX+DemoX+Demo_Course"
+        course_key = CourseKey.from_string(f"course-v1:{course_name}")
+        post_substitution_url = f"http://{settings.CMS_BASE}/asset-v1:{course_name}+type@asset+block/{asset_name}"
+
+        substitution_result = _convert_to_standard_url(url, course_key)
+        assert substitution_result == post_substitution_url, \
+            f'{substitution_result} expected to be {post_substitution_url}'
+
+    def test_forward_slash_url_substitution(self):
+        '''
+        input URL: /name_goes_here
+        URL after forward slash substitution (on localhost):
+           http://localhost:18010/name_goes_here
+        '''
+        url_body = "name_goes_here"
+        url = '/' + url_body
+        course_name = "edX+DemoX+Demo_Course"
+        course_key = CourseKey.from_string(f"course-v1:{course_name}")
+        post_substitution_url = f"http://{settings.CMS_BASE}/{url_body}"
+
+        substitution_result = _convert_to_standard_url(url, course_key)
+        assert substitution_result == post_substitution_url, \
+            f'{substitution_result} expected to be {post_substitution_url}'
+
+    def test_container_url_substitution(self):
+        '''
+        input URL: name_goes_here
+        URL after container substitution (on localhost):
+           http://localhost:18010/container/name_goes_here
+        '''
+        url = "name_goes_here"
+        course_name = "edX+DemoX+Demo_Course"
+        course_key = CourseKey.from_string(f"course-v1:{course_name}")
+        post_substitution_url = f"http://{settings.CMS_BASE}/container/{url}"
+
+        substitution_result = _convert_to_standard_url(url, course_key)
+        assert substitution_result == post_substitution_url, \
+            f'{substitution_result} expected to be {post_substitution_url}'
 
     def test_user_does_not_exist_raises_exception(self):
         raise NotImplementedError
@@ -229,10 +278,11 @@ class CourseOptimizerTestCase(TestCase):
         raise NotImplementedError
 
     @pytest.mark.parametrize("url, course_key, post_substitution_url",
-                             ["/static/anything_goes_here?raw", "1", "2"])
+                             [("/static/anything_goes_here?raw", "1", "2")])
     def test_url_substitution_on_static_prefixes(self, url, course_key, post_substitution_url):
-        with_substitution = _convert_to_standard_url(url, course_key)
-        assert with_substitution == post_substitution_url, f'{with_substitution} expected to be {post_substitution_url}'
+        substitution_result = _convert_to_standard_url(url, course_key)
+        assert substitution_result == post_substitution_url, \
+            f'{substitution_result} expected to be {post_substitution_url}'
 
     def test_url_substitution_on_forward_slash_prefixes(self):
         raise NotImplementedError
@@ -265,4 +315,4 @@ class CourseOptimizerTestCase(TestCase):
         raise NotImplementedError
 
     def test_scan_generates_file_named_by_course_key(self):
-        raise NotImplementedErro
+        raise NotImplementedError

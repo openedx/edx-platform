@@ -1139,6 +1139,7 @@ def _convert_to_standard_url(url, course_key):
     if _is_studio_url(url):
         if url.startswith('/static/'):
             processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
+            # processed_url = 'directly_altered'
             return 'http://' + settings.CMS_BASE + processed_url
         elif url.startswith('/'):
             return 'http://' + settings.CMS_BASE + url
