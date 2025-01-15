@@ -80,9 +80,6 @@ boto3==1.36.3
     #   ora2
 botocore==1.36.3
     # via
-    #   -r requirements/edx/kernel.in
-    #   boto3
-    #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 cachecontrol==0.14.2
@@ -1213,7 +1210,7 @@ uritemplate==4.1.1
     #   drf-spectacular
     #   drf-yasg
     #   google-api-python-client
-urllib3==1.26.20
+urllib3==2.2.3
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   botocore

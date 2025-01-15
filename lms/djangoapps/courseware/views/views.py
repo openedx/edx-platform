@@ -91,7 +91,6 @@ from lms.djangoapps.courseware.courses import (
 )
 from lms.djangoapps.courseware.date_summary import verified_upgrade_deadline_link
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, Redirect
-from lms.djangoapps.courseware.jwt import unpack_jwt
 from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student, setup_masquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
@@ -138,6 +137,7 @@ from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
+from openedx.core.lib.jwt import unpack_jwt
 from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import course_home_url
