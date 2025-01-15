@@ -72,4 +72,5 @@ class Command(BaseCommand):
         if should_process_all:
             courses = CourseOverview.get_all_course_keys()
         for course in courses:
+            log.info(f"Start processing upstream->dowstream links in course: {course}")
             create_or_update_upstream_links.delay(str(course), force)
