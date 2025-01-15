@@ -12,8 +12,14 @@ def generate_broken_links_descriptor(json_content, request_user):
     """
     Returns a Data Transfer Object for frontend given a list of broken links.
 
-    json_content contains a list of [block_id, link, is_locked]
-        is_locked is true if the link is a studio link and returns 403 on request
+    ** Example json_content structure **
+        Note: is_locked is true if the link is a studio link and returns 403
+    [
+        ['block_id_1', 'link_1', is_locked],
+        ['block_id_1', 'link_2', is_locked],
+        ['block_id_2', 'link_3', is_locked],
+        ...
+    ]
 
     ** Example DTO structure **
     {
@@ -100,9 +106,16 @@ def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictiona
     ** Example dictionary structure **
     {
         'xblock_id: {
-            'display_name': 'xblock name'
-            'category': 'html'
+            'display_name': 'xblock name',
+            'category': 'chapter'
         },
+        'html_block_id': {
+            'display_name': 'xblock name',
+            'category': 'chapter',
+            'url': 'url_1',
+            'locked_links': [...],
+            'broken_links': [...]
+        }
         ...,
     }
     """
