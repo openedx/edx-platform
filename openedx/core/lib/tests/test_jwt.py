@@ -7,7 +7,7 @@ from django.conf import settings
 from jwkest import BadSignature, Expired, Invalid, MissingKey, jwk
 from jwkest.jws import JWS
 
-from lms.djangoapps.courseware.jwt import _encode_and_sign, create_jwt, unpack_jwt
+from openedx.core.lib.jwt import _encode_and_sign, create_jwt, unpack_jwt
 
 
 test_user_id = 121
