@@ -50,6 +50,10 @@ class StudioHomeSerializer(serializers.Serializer):
         child=serializers.CharField(),
         allow_empty=True
     )
+    allowed_organizations_for_libraries = serializers.ListSerializer(
+        child=serializers.CharField(),
+        allow_empty=True
+    )
     archived_courses = CourseCommonSerializer(required=False, many=True)
     can_access_advanced_settings = serializers.BooleanField()
     can_create_organizations = serializers.BooleanField()
