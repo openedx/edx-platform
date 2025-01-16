@@ -265,9 +265,10 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            '"/container/{}" class="action-button">\\s*<span class="action-button-text">View</span>'.format(
-                re.escape(str(wrapper_usage_key))
-            ),
+            (
+                '"/container/{}" class="action-button xblock-view-action-button">'
+                '\\s*<span class="action-button-text">View</span>'
+            ).format(re.escape(str(wrapper_usage_key))),
         )
 
     @patch("cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers.get_object_tag_counts")
