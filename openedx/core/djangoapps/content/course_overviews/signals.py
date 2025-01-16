@@ -10,7 +10,6 @@ from django.db.models.signals import post_save
 from django.dispatch import Signal
 from django.dispatch.dispatcher import receiver
 
-from openedx.core.djangoapps.content_libraries.tasks import update_course_name_in_upstream_links
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_DATE_CHANGE
 from xmodule.data import CertificatesDisplayBehaviors
 from xmodule.modulestore.django import SignalHandler
@@ -27,6 +26,8 @@ COURSE_PACING_CHANGED = Signal()
 IMPORT_COURSE_DETAILS = Signal()
 # providing_args=["courserun_key"]
 DELETE_COURSE_DETAILS = Signal()
+# providing_args=["courserun_key", "old_name", "new_name"]
+COURSE_NAME_CHANGED = Signal()
 
 
 @receiver(SignalHandler.course_published)
@@ -222,12 +223,16 @@ def _check_for_cert_date_changes(previous_course_overview, updated_course_overvi
 
 def _check_for_display_name_change(previous_course_overview, updated_course_overview):
     """
-    Checks for change in display name of course and triggers task to update course name in upstream->downstream entity
-    links table.
+    Checks for change in display name of course and sends COURSE_NAME_CHANGED signal.
     """
-    if previous_course_overview.display_name_with_default == updated_course_overview.display_name_with_default:
-        return
-    update_course_name_in_upstream_links.delay(
-        str(previous_course_overview.id),
-        updated_course_overview.display_name_with_default
-    )
+    if previous_course_overview.display_name_with_default != updated_course_overview.display_name_with_default:
+        COURSE_NAME_CHANGED.send(
+            sender=None,
+            courserun_key=str(previous_course_overview.id),
+            old_name=previous_course_overview.display_name_with_default,
+            new_name=updated_course_overview.display_name_with_default,
+        )
+    # update_course_name_in_upstream_links.delay(
+    #     str(previous_course_overview.id),
+    #     updated_course_overview.display_name_with_default
+    # )

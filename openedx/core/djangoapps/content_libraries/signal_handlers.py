@@ -28,10 +28,11 @@ from openedx_learning.api.authoring import delete_entity_link, get_component, ge
 from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, Component, PublishableEntity
 
 from lms.djangoapps.grades.api import signals as grades_signals
+from openedx.core.djangoapps.content.course_overviews.signals import COURSE_NAME_CHANGED
 
 from .api import library_component_usage_key
 from .models import ContentLibrary, LtiGradedResource
-from .tasks import create_or_update_xblock_upstream_link
+from .tasks import create_or_update_xblock_upstream_link, update_course_name_in_upstream_links
 
 log = logging.getLogger(__name__)
 
@@ -234,3 +235,15 @@ def delete_upstream_downstream_link_handler(**kwargs):
         return
 
     delete_entity_link(str(xblock_info.usage_key))
+
+
+@receiver(COURSE_NAME_CHANGED, dispatch_uid="update_course_name_in_upstream_links_handler")
+def update_course_name_in_upstream_links_handler(courserun_key, old_name, new_name, **kwargs):
+    """
+    Handler to update course names in upstream->downstream links on change.
+    """
+    log.info(f"Updating course name in upstream->downstream links from '{old_name}' to '{new_name}'")
+    update_course_name_in_upstream_links.delay(
+        courserun_key,
+        new_name,
+    )
