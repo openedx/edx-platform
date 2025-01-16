@@ -4,6 +4,7 @@ Unit tests for course import and export Celery tasks
 import asyncio
 import copy
 import json
+import logging
 from unittest import mock
 from unittest.mock import patch
 from uuid import uuid4
@@ -19,6 +20,8 @@ from opaque_keys.edx.locator import CourseLocator
 from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
+
+logging = logging.getLogger(__name__)
 
 from cms.djangoapps.contentstore.tasks import (
     export_olx,
@@ -300,6 +303,7 @@ class CourseOptimizerTestCase(TestCase):
         raise NotImplementedError
 
     def test_link_validation_is_batched(self):
+        logging.info("******** In test_link_validation_is_batched *******")
         url_list = ['1', '2', '3', '4', '5']
         course_key = 'course-v1:edX+DemoX+Demo_Course'
         batch_size=2
