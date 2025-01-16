@@ -190,10 +190,7 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
             **({'LinkCheckOutput': broken_links_dto} if broken_links_dto else {}),
             **({'LinkCheckError': error} if error else {})
         }
-
-        print('data', data)
-        serializer = LinkCheckSerializer(data=data)
-        serializer.is_valid(raise_exception=False)
+        serializer = LinkCheckSerializer(data)
 
         return Response(serializer.data)
 
