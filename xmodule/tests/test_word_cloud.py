@@ -4,6 +4,7 @@ import json
 import os
 from unittest.mock import Mock
 
+from django.conf import settings
 from django.test import TestCase
 from fs.memoryfs import MemoryFS
 from lxml import etree
@@ -38,15 +39,20 @@ class WordCloudBlockTest(TestCase):
         runtime.export_fs = MemoryFS()
 
         original_xml = (
-            '<word_cloud xblock-family="xblock.v1" display_name="Favorite Fruits" display_student_percents="false" '
+            '<word_cloud display_name="Favorite Fruits" display_student_percents="false" '
             'instructions="What are your favorite fruits?" num_inputs="3" num_top_words="100"/>\n'
         )
 
         olx_element = etree.fromstring(original_xml)
         runtime.id_generator = Mock()
-        def_id = runtime.id_generator.create_definition(olx_element.tag, olx_element.get('url_name'))
-        keys = ScopeIds(None, olx_element.tag, def_id, runtime.id_generator.create_usage(def_id))
-        block = WordCloudBlock.parse_xml(olx_element, runtime, keys)
+
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            def_id = runtime.id_generator.create_definition(olx_element.tag, olx_element.get('url_name'))
+            keys = ScopeIds(None, olx_element.tag, def_id, runtime.id_generator.create_usage(def_id))
+            block = WordCloudBlock.parse_xml(olx_element, runtime, keys)
+        else:
+            block = WordCloudBlock.parse_xml(olx_element, runtime, None)
+
         block.location = BlockUsageLocator(
             CourseLocator('org', 'course', 'run', branch='revision'), 'word_cloud', 'block_id'
         )
@@ -57,19 +63,27 @@ class WordCloudBlockTest(TestCase):
         assert block.num_inputs == 3
         assert block.num_top_words == 100
 
-        filepath = 'word_cloud/block_id.xml'
-        runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
-        with runtime.export_fs.open(filepath, 'wb') as fileobj:
-            runtime.export_to_xml(block, fileobj)
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            filepath = 'word_cloud/block_id.xml'
+            runtime.export_fs.makedirs(os.path.dirname(filepath), recreate=True)
+            with runtime.export_fs.open(filepath, 'wb') as fileObj:
+                runtime.export_to_xml(block, fileObj)
+        else:
+            node = etree.Element("unknown_root")
+            # This will export the olx to a separate file.
+            block.add_xml_to_node(node)
 
         with runtime.export_fs.open('word_cloud/block_id.xml') as f:
             exported_xml = f.read()
 
-        exported_xml_tree = etree.fromstring(exported_xml.encode('utf-8'))
-        etree.cleanup_namespaces(exported_xml_tree)
-        exported_xml = etree.tostring(exported_xml_tree, encoding='unicode', pretty_print=True)
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            exported_xml_tree = etree.fromstring(exported_xml.encode('utf-8'))
+            etree.cleanup_namespaces(exported_xml_tree)
+            if 'xblock-family' in exported_xml_tree.attrib:
+                del exported_xml_tree.attrib['xblock-family']
+            exported_xml = etree.tostring(exported_xml_tree, encoding='unicode', pretty_print=True)
 
-        assert original_xml == exported_xml
+        assert exported_xml == original_xml
 
     def test_bad_ajax_request(self):
         """
