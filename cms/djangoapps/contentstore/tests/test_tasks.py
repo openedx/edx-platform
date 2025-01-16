@@ -5,6 +5,8 @@ Unit tests for course import and export Celery tasks
 
 import copy
 import json
+import os
+from tempfile import NamedTemporaryFile
 from unittest import mock, TestCase
 from uuid import uuid4
 
@@ -12,6 +14,7 @@ import pytest as pytest
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.utils import override_settings
+from django.core.files import File
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 from organizations.models import OrganizationCourse
@@ -22,7 +25,8 @@ from cms.djangoapps.contentstore.tasks import (
     export_olx,
     update_special_exams_and_publish,
     rerun_course,
-    _convert_to_standard_url
+    _convert_to_standard_url,
+    _check_broken_links
 )
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -31,7 +35,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from celery import Task
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -207,8 +212,58 @@ class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-clas
             course_publish.assert_called()
 
 
-class CourseOptimizerTestCase(TestCase):
+@pytest.fixture
+def mock_user_task_artifact_fixture():
+    with mock.patch('cms.djangoapps.contentstore.tasks.UserTaskArtifact') as MockUserTaskArtifact:
+        mock_artifact_instance = MockUserTaskArtifact.return_value
+        mock_artifact_instance.file.save.return_value = None
+        mock_artifact_instance.save.return_value = None
+        yield MockUserTaskArtifact
 
+
+class MockCourseLinkCheckTask(Task):
+    def __init__(self):
+        self.status = mock.Mock()
+
+class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
+    @mock.patch('cms.djangoapps.contentstore.tasks.UserTaskArtifact', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks.UserTaskStatus', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks.NamedTemporaryFile', autospec=True)
+    def test_check_broken_links_stores_broken_and_locked_urls(self, mock_named_temp_file, mock_user_task_status, mock_user_task_artifact):
+        '''
+        The test should verify that the check_broken_links task correctly
+        identifies and stores broken or locked URLs in the course.
+        The expected behavior is that the task scans the course,
+        validates the URLs, filters the results, and stores them in a
+        JSON file.
+        '''
+        # Arrange
+        mock_user = UserFactory.create(username='student', password='password')
+        mock_course_key_string = "course-v1:edX+DemoX+Demo_Course"
+
+        # Mock the NamedTemporaryFile
+        mock_broken_links_file = mock.Mock()
+        mock_broken_links_file.name = 'broken_links.json'
+        mock_named_temp_file.return_value.__enter__.return_value = mock_broken_links_file
+        mock_task = MockCourseLinkCheckTask()
+
+        # Act
+        _check_broken_links(mock_task, mock_user.id, mock_course_key_string, 'en')  # pylint: disable=no-value-for-parameter
+
+
+        # Assert
+        # Check that UserTaskArtifact was instantiated
+        assert mock_user_task_artifact.called, "UserTaskArtifact was not instantiated"
+
+        # Check that UserTaskArtifact was called with the correct arguments
+        mock_user_task_artifact.assert_called_once_with(status=mock.ANY, name='BrokenLinks')
+
+        # Check that the file.save method was called with the correct arguments
+        mock_user_task_artifact_instance = mock_user_task_artifact.return_value
+        mock_user_task_artifact_instance.file.save.assert_called_once_with(name='broken_links.json', content=mock.ANY)
+
+        # Check that the save method was called on the artifact instance
+        mock_user_task_artifact_instance.save.assert_called_once()
 
     def test_user_does_not_exist_raises_exception(self):
         raise NotImplementedError
@@ -265,4 +320,4 @@ class CourseOptimizerTestCase(TestCase):
         raise NotImplementedError
 
     def test_scan_generates_file_named_by_course_key(self):
-        raise NotImplementedErro
+        raise NotImplementedError
