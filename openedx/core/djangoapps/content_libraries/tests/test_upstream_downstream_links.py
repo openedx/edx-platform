@@ -10,18 +10,27 @@ from django.core.management.base import CommandError
 from django.utils import timezone
 from freezegun import freeze_time
 
+from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from ..tasks import create_or_update_upstream_links, create_or_update_xblock_upstream_link
 
 
+@skip_unless_cms
 class TestRecreateUpstreamLinks(ModuleStoreTestCase):
     """
     Test recreate_upstream_links management command.
     """
 
     ENABLED_SIGNALS = ['course_deleted', 'course_published']
+
+    def setUp(self):
+        super().setUp()
+        self.now = timezone.now()
+        freezer = freeze_time(self.now)
+        freezer.start()
+        self.addCleanup(freezer.stop)
 
     def call_command(self, *args, **kwargs):
         """
@@ -49,10 +58,10 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase):
         Test command with single course argument
         """
         self.call_command('--course', 'some-course')
-        mock_task.delay.assert_called_with('some-course', False)
+        mock_task.delay.assert_called_with('some-course', False, created=self.now)
         # call with --force
         self.call_command('--course', 'some-course', '--force')
-        mock_task.delay.assert_called_with('some-course', True)
+        mock_task.delay.assert_called_with('some-course', True, created=self.now)
 
     @patch(
         'openedx.core.djangoapps.content_libraries.management.commands.recreate_upstream_links.create_or_update_upstream_links'  # pylint: disable=line-too-long
@@ -62,8 +71,8 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase):
         Test command with multiple course arguments
         """
         self.call_command('--course', 'some-course', '--course', 'one-more-course')
-        mock_task.delay.assert_any_call('some-course', False)
-        mock_task.delay.assert_any_call('one-more-course', False)
+        mock_task.delay.assert_any_call('some-course', False, created=self.now)
+        mock_task.delay.assert_any_call('one-more-course', False, created=self.now)
 
     @patch(
         'openedx.core.djangoapps.content_libraries.management.commands.recreate_upstream_links.create_or_update_upstream_links'  # pylint: disable=line-too-long
@@ -75,10 +84,11 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase):
         course_key_1 = CourseFactory.create(emit_signals=True).id
         course_key_2 = CourseFactory.create(emit_signals=True).id
         self.call_command('--all')
-        mock_task.delay.assert_any_call(str(course_key_1), False)
-        mock_task.delay.assert_any_call(str(course_key_2), False)
+        mock_task.delay.assert_any_call(str(course_key_1), False, created=self.now)
+        mock_task.delay.assert_any_call(str(course_key_2), False, created=self.now)
 
 
+@skip_unless_cms
 class TestUpstreamLinksTasks(ModuleStoreTestCase):
     """
     Test tasks related to managing upstream->downstream links.
@@ -105,12 +115,14 @@ class TestUpstreamLinksTasks(ModuleStoreTestCase):
                 category="html",
                 display_name="An HTML Block",
                 upstream=self.upstream_1,
+                upstream_version=1,
             )
             self.component_2 = BlockFactory.create(
                 parent=self.unit,
                 category="html",
                 display_name="Another HTML Block",
                 upstream=self.upstream_2,
+                upstream_version=1,
             )
             self.component_3 = BlockFactory.create(
                 parent=self.unit,
