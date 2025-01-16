@@ -73,6 +73,14 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
 
+      # We pull this image a lot, and Dockerhub will rate limit us if we pull too often.
+      # This is an attempt to cache the image for better performance and to work around that.
+      # It will cache all pulled images, so if we add new images to this we'll need to update the key.
+      - name: Cache Docker images
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ runner.os }}-mongo-${{ matrix.mongo-version }}
+
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.11.0
         with:
@@ -196,7 +204,6 @@ jobs:
           workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows
           to add any missing apps and match the count. for more details please take a look at scripts/gha-shards-readme.md"
           exit 1
-
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
