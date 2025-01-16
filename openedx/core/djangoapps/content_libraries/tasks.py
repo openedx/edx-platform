@@ -182,8 +182,8 @@ def create_or_update_xblock_upstream_link(usage_key):
     """
     ensure_cms("create_or_update_xblock_upstream_link may only be executed in a CMS context")
     xblock = modulestore().get_item(UsageKey.from_string(usage_key))
-    if not xblock.upstream:
-        TASK_LOGGER.info(f"No upstream found for xblock: {xblock.usage_key}")
+    if not xblock.upstream or not xblock.upstream_version:
+        TASK_LOGGER.info(f"No upstream or upstream_version found for xblock: {xblock.usage_key}")
         return
     try:
         course_name = CourseOverview.get_from_id(xblock.course_id).display_name_with_default
