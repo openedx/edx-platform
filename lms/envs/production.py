@@ -67,7 +67,6 @@ BROKER_HEARTBEAT = 60.0
 BROKER_HEARTBEAT_CHECKRATE = 2
 STATIC_ROOT_BASE = None
 STATIC_URL_BASE = None
-EMAIL_FILE_PATH = DATA_DIR / "emails" / "lms"
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
@@ -201,6 +200,7 @@ if STATIC_URL_BASE:
 
 DATA_DIR = path(DATA_DIR)
 CC_MERCHANT_NAME = _YAML_TOKENS.get('CC_MERCHANT_NAME', PLATFORM_NAME)
+EMAIL_FILE_PATH = _YAML_TOKENS.get('EMAIL_FILE_PATH', DATA_DIR / "emails" / "lms")
 
 # TODO: This was for backwards compatibility back when installed django-cookie-samesite (not since 2022).
 #       The DCS_ version of the setting can be DEPR'd at this point.
