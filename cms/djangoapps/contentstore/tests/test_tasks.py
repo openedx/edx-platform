@@ -309,7 +309,7 @@ class CourseOptimizerTestCase(TestCase):
     async def test_link_validation_is_batched(self):
         logging.info("******** In test_link_validation_is_batched *******")
         with patch("cms.djangoapps.contentstore.tasks._validate_batch", new_callable=AsyncMock) as mock_validate:
-            mock_validate.return_value = "Batch validated"
+            mock_validate.return_value = {"status": 200}
 
             url_list = ['1', '2', '3', '4', '5']
             course_key = 'course-v1:edX+DemoX+Demo_Course'
