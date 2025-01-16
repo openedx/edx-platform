@@ -1255,15 +1255,12 @@ def _filter_by_status(results):
 
     return filtered_results, retry_list
 
-@shared_task(base=CourseLinkCheckTask, bind=True)
-def check_broken_links(self, user_id, course_key_string, language):
-    """
-    Checks for broken links in a course. Store the results in a file.
-    """
-    user = _validate_user(self, user_id, language)
+def _check_broken_links(task_instance, user_id, course_key_string, language):
+    user = _validate_user(task_instance, user_id, language)
 
-    self.status.set_state('Scanning')
+    task_instance.status.set_state('Scanning')
     course_key = CourseKey.from_string(course_key_string)
+
     url_list = _scan_course_for_links(course_key)
     validated_url_list = asyncio.run(_validate_urls_access_in_batches(url_list, course_key, batch_size=100))
     broken_or_locked_urls, retry_list = _filter_by_status(validated_url_list)
@@ -1273,7 +1270,7 @@ def check_broken_links(self, user_id, course_key_string, language):
         broken_or_locked_urls.extend(retry_results)
 
     try:
-        self.status.increment_completed_steps()
+        task_instance.status.increment_completed_steps()
 
         file_name = str(course_key)
         broken_links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')
@@ -1282,13 +1279,23 @@ def check_broken_links(self, user_id, course_key_string, language):
         with open(broken_links_file.name, 'w') as file:
             json.dump(broken_or_locked_urls, file, indent=4)
 
-        artifact = UserTaskArtifact(status=self.status, name='BrokenLinks')
+        artifact = UserTaskArtifact(status=task_instance.status, name='BrokenLinks')
         artifact.file.save(name=os.path.basename(broken_links_file.name), content=File(broken_links_file))
         artifact.save()
 
     # catch all exceptions so we can record useful error messages
     except Exception as e:  # pylint: disable=broad-except
         LOGGER.exception('Error checking links for course %s', course_key, exc_info=True)
-        if self.status.state != UserTaskStatus.FAILED:
-            self.status.fail({'raw_error_msg': str(e)})
-        return
+        if task_instance.status.state != UserTaskStatus.FAILED:
+            task_instance.status.fail({'raw_error_msg': str(e)})
+        return False
+
+    return True
+
+
+@shared_task(base=CourseLinkCheckTask, bind=True)
+def check_broken_links(self, user_id, course_key_string, language):
+    """
+    Checks for broken links in a course. Store the results in a file.
+    """
+    _check_broken_links(self, user_id, course_key_string, language)
