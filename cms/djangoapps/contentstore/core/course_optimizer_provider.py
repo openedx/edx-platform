@@ -76,7 +76,7 @@ def generate_broken_links_descriptor(json_content, request_user):
             dictionary=xblock_dictionary
         )
 
-    return _create_dto_from_node_tree_recursive(xblock_node_tree, xblock_dictionary)
+    return _create_dto_recursive(xblock_node_tree, xblock_dictionary)
 
 
 def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictionary):
@@ -173,9 +173,10 @@ CATEGORY_TO_LEVEL_MAP = {
 }
 
 
-def _create_dto_from_node_tree_recursive(xblock_node, xblock_dictionary):
+def _create_dto_recursive(xblock_node, xblock_dictionary):
     """
-    Recursively build the Data Transfer Object from the node tree and dictionary.
+    Recursively build the Data Transfer Object by using
+    the structure from the node tree and data from the dictionary.
     """
     # Exit condition when there are no more child nodes (at block level)
     if not xblock_node:
@@ -185,7 +186,7 @@ def _create_dto_from_node_tree_recursive(xblock_node, xblock_dictionary):
     xblock_children = []
 
     for xblock_id, node in xblock_node.items():
-        child_blocks = _create_dto_from_node_tree_recursive(node, xblock_dictionary)
+        child_blocks = _create_dto_recursive(node, xblock_dictionary)
         xblock_data = xblock_dictionary.get(xblock_id, {})
 
         xblock_entry = {
