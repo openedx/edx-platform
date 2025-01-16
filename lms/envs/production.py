@@ -440,7 +440,7 @@ if (
    FEATURES['ENABLE_DASHBOARD_SEARCH'] or
    FEATURES['ENABLE_COURSE_DISCOVERY'] or
    FEATURES['ENABLE_TEAMS']
-):
+   ):
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
