@@ -307,7 +307,7 @@ class CourseOptimizerTestCase(TestCase):
     @pytest.mark.asyncio
     async def test_link_validation_is_batched(self):
         logging.info("******** In test_link_validation_is_batched *******")
-        with patch("cms.djangoapps.contenstore.tasks._validate_url_access", new_callable=AsyncMock) as mock_validate:
+        with patch("cms.djangoapps.contentstore.tasks._validate_url_access", new_callable=AsyncMock) as mock_validate:
             mock_validate.return_value = ["Mocked return 1", "Mocked return 2", "Mocked return 3",
                                           "Mocked return 4", "Mocked return 5"]
 
