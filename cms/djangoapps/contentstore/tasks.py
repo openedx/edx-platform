@@ -1255,6 +1255,11 @@ def _filter_by_status(results):
 
     return filtered_results, retry_list
 
+def _save_broken_links_file(artifact, file_to_save):
+    artifact.file.save(name=os.path.basename(file_to_save.name), content=File(file_to_save))
+    artifact.save()
+    return True
+
 def _check_broken_links(task_instance, user_id, course_key_string, language):
     user = _validate_user(task_instance, user_id, language)
 
@@ -1280,17 +1285,14 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
             json.dump(broken_or_locked_urls, file, indent=4)
 
         artifact = UserTaskArtifact(status=task_instance.status, name='BrokenLinks')
-        artifact.file.save(name=os.path.basename(broken_links_file.name), content=File(broken_links_file))
-        artifact.save()
+        _save_broken_links_file(artifact, broken_links_file)
 
     # catch all exceptions so we can record useful error messages
     except Exception as e:  # pylint: disable=broad-except
         LOGGER.exception('Error checking links for course %s', course_key, exc_info=True)
         if task_instance.status.state != UserTaskStatus.FAILED:
             task_instance.status.fail({'raw_error_msg': str(e)})
-        return False
-
-    return True
+        return
 
 
 @shared_task(base=CourseLinkCheckTask, bind=True)
@@ -1298,4 +1300,4 @@ def check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results in a file.
     """
-    _check_broken_links(self, user_id, course_key_string, language)
+    return _check_broken_links(self, user_id, course_key_string, language)
