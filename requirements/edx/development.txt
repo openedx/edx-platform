@@ -1189,9 +1189,8 @@ loremipsum==1.0.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.12.1
+lti-consumer-xblock==9.13.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 lxml[html-clean]==5.3.0
@@ -1611,6 +1610,7 @@ pyjwt[crypto]==2.10.1
     #   edx-proctoring
     #   edx-rest-api-client
     #   firebase-admin
+    #   lti-consumer-xblock
     #   pylti1p3
     #   snowflake-connector-python
     #   social-auth-core
