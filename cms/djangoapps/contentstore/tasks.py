@@ -1199,13 +1199,21 @@ async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100)
 
     for i in range(0, url_count, batch_size):
         batch = url_list[i:i + batch_size]
-        async with aiohttp.ClientSession() as session:
-            tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
-            batch_results = await asyncio.gather(*tasks)
-            responses.extend(batch_results)
-            LOGGER.debug(f'[Link Check] request batch {i // batch_size + 1} of {url_count // batch_size + 1}')
+        batch_results = await _validate_batch(batch, course_key)
+        responses.extend(batch_results)
+        LOGGER.debug(f'[Link Check] request batch {i // batch_size + 1} of {url_count // batch_size + 1}')
 
     return responses
+
+
+async def _validate_batch(batch, course_key):
+    async with aiohttp.ClientSession() as session:
+        tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
+        batch_results = await asyncio.gather(*tasks)
+        return batch_results
+
+
+
 
 def _retry_validation(url_list, course_key, retry_count=3):
     """Retry urls that failed due to connection error."""
