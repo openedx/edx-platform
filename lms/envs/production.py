@@ -22,7 +22,6 @@ import datetime
 import os
 
 import yaml
-import django
 from django.core.exceptions import ImproperlyConfigured
 from edx_django_utils.plugins import add_plugins
 from openedx_events.event_bus import merge_producer_configs
@@ -304,7 +303,7 @@ if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COO
     CORS_ORIGIN_WHITELIST = _YAML_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = _YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = _YAML_TOKENS.get('CORS_ALLOW_INSECURE', False)
-    CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = _YAM_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
+    CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = _YAML_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
 
 # PREVIEW DOMAIN must be present in HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS for the preview to show draft changes
 if 'PREVIEW_LMS_BASE' in FEATURES and FEATURES['PREVIEW_LMS_BASE'] != '':
@@ -410,7 +409,7 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 
     # TODO: This logic is somewhat insane. We're not sure if it's intentional or not. We've left it
     # as-is for strict backwards compatibility, but it's worth revisiting.
-    if hours := _YAML_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD', 24):
+    if hours := _YAML_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24):
         # If we didn't override the value in YAML, OR we overrode it to a truthy value,
         # then update CELERYBEAT_SCHEDULE.
         CELERYBEAT_SCHEDULE['refresh-saml-metadata'] = {
