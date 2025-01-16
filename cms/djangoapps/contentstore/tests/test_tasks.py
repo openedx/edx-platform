@@ -236,7 +236,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     @mock.patch('cms.djangoapps.contentstore.tasks._write_broken_links_to_file', autospec=True)
     def test_check_broken_links_stores_broken_and_locked_urls(
         self,
-        mock_write_links,
+        mock_write_broken_links_to_file,
         mock_save_broken_links_file,
         mock_scan_course_for_links,
         _mock_user_task_status,
@@ -263,7 +263,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         mock_user_task_artifact.assert_called_once_with(status=mock.ANY, name='BrokenLinks')
 
         ### Check that the correct links are written to the file
-        mock_write_links.assert_called_once_with(self.expected_file_contents, mock.ANY)
+        mock_write_broken_links_to_file.assert_called_once_with(self.expected_file_contents, mock.ANY)
 
         ### Check that _save_broken_links_file was called with the correct arguments
         mock_save_broken_links_file.assert_called_once_with(mock_user_task_artifact.return_value, mock.ANY)
