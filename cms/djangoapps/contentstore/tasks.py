@@ -1260,6 +1260,10 @@ def _save_broken_links_file(artifact, file_to_save):
     artifact.save()
     return True
 
+def _write_broken_links_to_file(broken_or_locked_urls, broken_links_file):
+    with open(broken_links_file.name, 'w') as file:
+        json.dump(broken_or_locked_urls, file, indent=4)
+
 def _check_broken_links(task_instance, user_id, course_key_string, language):
     user = _validate_user(task_instance, user_id, language)
 
@@ -1281,8 +1285,7 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
         broken_links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')
         LOGGER.debug(f'[Link Check] json file being generated at {broken_links_file.name}')
 
-        with open(broken_links_file.name, 'w') as file:
-            json.dump(broken_or_locked_urls, file, indent=4)
+        _write_broken_links_to_file(broken_or_locked_urls, broken_links_file)
 
         artifact = UserTaskArtifact(status=task_instance.status, name='BrokenLinks')
         _save_broken_links_file(artifact, broken_links_file)
