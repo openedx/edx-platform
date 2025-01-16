@@ -410,12 +410,8 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 
     # TODO: This logic is somewhat insane. We're not sure if it's intentional or not. We've left it
     # as-is for strict backwards compatibility, but it's worth revisiting.
-    if (
-        # if we didn't override the value in YAML,
-        'THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS' not in _YAML_TOKENS or
-        # OR we overrode it to a truthy value,
-        (hours := _YAML_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERDIOD_HOURS', 24))
-    ):
+    if hours := _YAML_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD', 24):
+        # If we didn't override the value in YAML, OR we overrode it to a truthy value,
         # then update CELERYBEAT_SCHEDULE.
         CELERYBEAT_SCHEDULE['refresh-saml-metadata'] = {
             'task': 'common.djangoapps.third_party_auth.fetch_saml_metadata',
