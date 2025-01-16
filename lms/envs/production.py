@@ -70,6 +70,9 @@ STATIC_URL_BASE = None
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
+# Makes the session timeout explicit, even though 1209600 (2 weeks, in
+# seconds) is Django's default.
+SESSION_COOKIE_AGE: 1209600
 SESSION_COOKIE_DOMAIN = None
 SESSION_COOKIE_HTTPONLY = True
 AWS_SES_REGION_NAME = 'us-east-1'
