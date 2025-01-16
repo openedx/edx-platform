@@ -216,21 +216,21 @@ class MockCourseLinkCheckTask(Task):
     def __init__(self):
         self.status = mock.Mock()
 
-mock_urls = [
-    ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@1", "http://example.com/valid"],
-    ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid"]
-]
-
-expected_file_contents = [
-    ['block-v1:edX+DemoX+Demo_Course+type@vertical+block@1', 'http://example.com/valid', False],
-    ['block-v1:edX+DemoX+Demo_Course+type@vertical+block@2', 'http://example.com/invalid', False]
-]
-
 
 class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
+    def setUp(self):
+        super().setUp()
+        self.mock_urls = [
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@1", "http://example.com/valid"],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid"]
+        ]
+        self.expected_file_contents = [
+            ['block-v1:edX+DemoX+Demo_Course+type@vertical+block@1', 'http://example.com/valid', False],
+            ['block-v1:edX+DemoX+Demo_Course+type@vertical+block@2', 'http://example.com/invalid', False]
+        ]
+
     @mock.patch('cms.djangoapps.contentstore.tasks.UserTaskArtifact', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks.UserTaskStatus', autospec=True)
-    @mock.patch('cms.djangoapps.contentstore.tasks.NamedTemporaryFile', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks._scan_course_for_links')
     @mock.patch('cms.djangoapps.contentstore.tasks._save_broken_links_file', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks._write_broken_links_to_file', autospec=True)
@@ -238,7 +238,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         self,
         mock_write_links,
         mock_save_broken_links_file,
-        mock_scan_course_for_links, mock_named_temp_file,
+        mock_scan_course_for_links,
         _mock_user_task_status,
         mock_user_task_artifact
     ):
@@ -252,13 +252,8 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         # Arrange
         mock_user = UserFactory.create(username='student', password='password')
         mock_course_key_string = "course-v1:edX+DemoX+Demo_Course"
-
-        ### Mock the NamedTemporaryFile
-        mock_broken_links_file = mock.MagicMock()
-        mock_broken_links_file.name = 'broken_links.json'
-        mock_named_temp_file.return_value.__enter__.return_value = mock_broken_links_file
         mock_task = MockCourseLinkCheckTask()
-        mock_scan_course_for_links.return_value = mock_urls
+        mock_scan_course_for_links.return_value = self.mock_urls
 
         # Act
         _check_broken_links(mock_task, mock_user.id, mock_course_key_string, 'en')  # pylint: disable=no-value-for-parameter
@@ -268,10 +263,10 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         mock_user_task_artifact.assert_called_once_with(status=mock.ANY, name='BrokenLinks')
 
         ### Check that the correct links are written to the file
-        mock_write_links.assert_called_once_with(expected_file_contents, mock_named_temp_file.return_value)
+        mock_write_links.assert_called_once_with(self.expected_file_contents, mock.ANY)
 
         ### Check that _save_broken_links_file was called with the correct arguments
-        mock_save_broken_links_file.assert_called_once_with(mock_user_task_artifact.return_value, mock_named_temp_file.return_value)
+        mock_save_broken_links_file.assert_called_once_with(mock_user_task_artifact.return_value, mock.ANY)
 
 
     def test_user_does_not_exist_raises_exception(self):
