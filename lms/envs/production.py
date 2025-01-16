@@ -168,7 +168,7 @@ SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = lambda settings: settings.HIGH_PRIORI
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
 
 # Enrollment URL used on the server-side.
-ENTERPRISE_ENROLLMENT_API_URL = lambda settings: (settisgs.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+ENTERPRISE_ENROLLMENT_API_URL = lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the requests.Session() client
