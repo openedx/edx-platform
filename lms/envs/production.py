@@ -44,7 +44,10 @@ def get_env_setting(setting):
         raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-######################### PRODUCTION DEFAULTS ##############################
+################################################# PRODUCTION DEFAULTS ################################################
+# We configure some defaults (beyond what has already been configured in common.py) before loading the YAML file below.
+# DO NOT ADD NEW DEFAULTS HERE! Put any new setting defaults in common.py instead, along with a setting annotation.
+# TODO: Move all these defaults into common.py.
 
 DEBUG = False
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
@@ -58,8 +61,6 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 # https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
 # for other warnings.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-###################################### MOVED UP  ################################
 
 CELERY_RESULT_BACKEND = 'django-cache'
 BROKER_HEARTBEAT = 60.0
@@ -125,7 +126,7 @@ SSL_AUTH_DN_FORMAT_STRING = (
     "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
-###########################################################################
+#######################################################################################################################
 
 # A file path to a YAML file from which to load all the configuration for the edx platform
 CONFIG_FILE = get_env_setting('LMS_CFG')
