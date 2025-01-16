@@ -5,6 +5,7 @@ import asyncio
 import copy
 import json
 import logging
+import pprint
 from unittest import mock
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
@@ -315,7 +316,9 @@ class CourseOptimizerTestCase(TestCase):
             course_key = 'course-v1:edX+DemoX+Demo_Course'
             batch_size=2
             results = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
-            print("***** Results = " + " + ".join(results) + "*****")
+            print(" ***** results =   ******")
+            pprint.pp(results)
+            # print("***** Results = " + " + ".join(results) + "*****")
             assert  15 == results, f'expected 15 but got {results}'
 
     def test_all_links_in_link_list_longer_than_batch_size_are_validated(self):
