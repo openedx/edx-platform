@@ -308,8 +308,8 @@ class CourseOptimizerTestCase(TestCase):
     @pytest.mark.asyncio
     async def test_link_validation_is_batched(self):
         logging.info("******** In test_link_validation_is_batched *******")
-        with patch("cms.djangoapps.contentstore.tasks._validate_batch", new_callable=AsyncMock) as mock_validate:
-            mock_validate.return_value = {"status": 200}
+        with patch("cms.djangoapps.contentstore.tasks._validate_batch", new_callable=AsyncMock) as mock_validate_batch:
+            mock_validate_batch.return_value = {"status": 200}
 
             url_list = ['1', '2', '3', '4', '5']
             course_key = 'course-v1:edX+DemoX+Demo_Course'
@@ -317,8 +317,9 @@ class CourseOptimizerTestCase(TestCase):
             results = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
             print(" ***** results =   ******")
             pprint.pp(results)
-            # print("***** Results = " + " + ".join(results) + "*****")
-            assert  15 == results, f'expected 15 but got {results}'
+            mock_validate_batch.assert_called()
+            assert mock_validate_batch.call_count == 3 # two full batches and one partial batch
+
 
     def test_all_links_in_link_list_longer_than_batch_size_are_validated(self):
         raise NotImplementedError
