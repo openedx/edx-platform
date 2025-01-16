@@ -1176,7 +1176,7 @@ async def _validate_url_access(session, url_data, course_key):
     Returns the status of a url request
     Returns: {block_id1, url1, status}
     """
-    print(_validate_url_access.__module__)
+    print("In _validate_url_access: module = " + _validate_url_access.__module__)
     block_id, url = url_data
     result = {'block_id': block_id, 'url': url}
     standardized_url = _convert_to_standard_url(url, course_key)
@@ -1193,7 +1193,7 @@ async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100)
     Returns the statuses of a list of url requests.
     Returns: [ {block_id1, url1, status}, {block_id2, url2, status}, ... ]
     """
-    print(_validate_urls_access_in_batches.__module__)
+    print("In _validate_urls_access_in_batches: module = " + _validate_urls_access_in_batches.__module__)
     responses = []
     url_count = len(url_list)
 

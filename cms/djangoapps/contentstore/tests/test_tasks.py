@@ -6,7 +6,7 @@ import copy
 import json
 import logging
 from unittest import mock
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import pytest as pytest
@@ -280,6 +280,7 @@ class CourseOptimizerTestCase(TestCase):
     def test_file_not_recognized_as_studio_url_scheme(self):
         raise NotImplementedError
 
+
     @pytest.mark.parametrize("url, course_key, post_substitution_url",
                              [("/static/anything_goes_here?raw", "1", "2")])
     def test_url_substitution_on_static_prefixes(self, url, course_key, post_substitution_url):
@@ -302,14 +303,20 @@ class CourseOptimizerTestCase(TestCase):
     def test_every_detected_link_is_validated(self):
         raise NotImplementedError
 
-    def test_link_validation_is_batched(self):
+
+    @pytest.mark.asyncio
+    async def test_link_validation_is_batched(self):
         logging.info("******** In test_link_validation_is_batched *******")
-        url_list = ['1', '2', '3', '4', '5']
-        course_key = 'course-v1:edX+DemoX+Demo_Course'
-        batch_size=2
-        results = asyncio.run(_validate_urls_access_in_batches(url_list, course_key, batch_size))
-        print(results)
-        assert  15 == results, f'expected 15 but got {results}'
+        with patch("cms.djangoapps.contenstore.tasks._validate_url_access", new_callable=AsyncMock) as mock_validate:
+            mock_validate.return_value = ["Mocked return 1", "Mocked return 2", "Mocked return 3",
+                                          "Mocked return 4", "Mocked return 5"]
+
+            url_list = ['1', '2', '3', '4', '5']
+            course_key = 'course-v1:edX+DemoX+Demo_Course'
+            batch_size=2
+            results = _validate_urls_access_in_batches(url_list, course_key, batch_size)
+            print("***** Results = " + results + "*****")
+            assert  15 == results, f'expected 15 but got {results}'
 
     def test_all_links_in_link_list_longer_than_batch_size_are_validated(self):
         raise NotImplementedError
