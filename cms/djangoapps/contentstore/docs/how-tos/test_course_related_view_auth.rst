@@ -13,6 +13,10 @@ be tested for the following.
 
 How to test
 -----------
+The `AuthorizeStaffTestCase` class provides a set of tests that can be used to test the authorization
+of a view. If you inherit from this class, these tests will be automatically run. For details,
+please look at the source code of the `AuthorizeStaffTestCase` class.
+
 A lot of these tests can be easily implemented by inheriting from the `AuthorizeStaffTestCase`.
 This parent class assumes that the view is for a specific course and that only users who have access
 to the course can access the view. (They are either staff or instructors for the course, or global admin).
