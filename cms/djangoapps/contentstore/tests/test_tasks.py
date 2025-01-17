@@ -332,7 +332,7 @@ class CourseOptimizerTestCase(TestCase):
             results = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
             print(" ***** results =   ******")
             pprint.pp(results)
-            args_list = mock_validate.call_args_list()
+            args_list = mock_validate.call_args_list
             urls = [call_args.args[1] for call_args in args_list] # The middle argument in each of the function calls
             for i in range(1,len(url_list)+1):
                 assert str(i) in urls, f'{i} not supplied as a url for validation in batches function'
