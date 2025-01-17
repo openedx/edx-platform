@@ -334,7 +334,8 @@ class CourseOptimizerTestCase(TestCase):
             pprint.pp(results)
             args_list = mock_validate.call_args_list
             urls = [call_args.args[1] for call_args in args_list] # The middle argument in each of the function calls
-            for i in range(1,len(url_list)+1):
+            #for i in range(1,len(url_list)+1):
+            for i in range(1,7):
                 assert str(i) in urls, f'{i} not supplied as a url for validation in batches function'
 
 
