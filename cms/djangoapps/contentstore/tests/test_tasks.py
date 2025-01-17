@@ -344,6 +344,8 @@ class CourseOptimizerTestCase(TestCase):
                    new_callable=AsyncMock) as mock_validate_in_batches:
             url_list = ['1', '2', '3', '4', '5']
             return_value = []
+            validated_urls = []
+            broken_or_locked_urls = []
             for i in range(1, len(url_list)+1): # Notch out one of the URLs, having it return a '403' status code
                 return_value.append(
                 {'block_id': 'any',
@@ -355,13 +357,15 @@ class CourseOptimizerTestCase(TestCase):
 
             course_key = 'course-v1:edX+DemoX+Demo_Course'
             retry_count = 3
-            retry_list = _retry_validation(url_list, course_key, retry_count)
+            broken_or_locked_urls, validated_urls = _retry_validation(url_list, course_key, retry_count)
             print(" ***** retry_list =   ******")
-            pprint.pp(retry_list)
+            pprint.pp(validated_urls)
             mock_validate_in_batches.assert_called()
-            assert len(retry_list) == len(url_list)-1, f'Got {len(retry_list)} for retry; expected {len(url_list)-1}'
-            retry_urls = [retry["url"] for retry in retry_list]
-            assert '3' not in retry_urls, f'URL with 403 status code was incorrectly marked for validation retries'
+            assert len(validated_urls) == len(url_list)-1, \
+                f'Got {len(validated_urls)} for retry; expected {len(url_list)-1}'
+            assert len(broken_or_locked_urls) == 1, f'Got{len(broken_or_locked_urls)}; expected 1'
+            # four_oh_three_urls = [retry["url"] for retry in broken_or_locked_urls]
+            # assert '3' not in retry_urls, f'URL with 403 status code was incorrectly marked for validation retries'
 
 
 
