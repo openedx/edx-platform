@@ -19,7 +19,7 @@ import os
 import re
 import shutil
 import tarfile
-from tempfile import mkdtemp, mktemp
+from tempfile import mkdtemp, mkstemp
 from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
@@ -55,7 +55,9 @@ class Command(BaseCommand):
         pipe_results = False
 
         if filename is None:
-            filename = mktemp()
+            fd, filename = mkstemp()
+            os.close(fd)
+            os.unlink(filename)
             pipe_results = True
 
         export_course_to_tarfile(course_key, filename)
