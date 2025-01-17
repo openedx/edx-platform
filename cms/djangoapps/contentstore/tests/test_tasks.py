@@ -340,7 +340,7 @@ class CourseOptimizerTestCase(TestCase):
 
 
     @pytest.mark.asyncio
-    async def test_no_retries_on_403_access_denied_links(self):
+    def test_no_retries_on_403_access_denied_links(self):
         logging.info("******** In test_no_retries_on_403_access_denied_links *******")
         with patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
                    new_callable=AsyncMock) as mock_validate_in_batches:
