@@ -407,8 +407,16 @@ FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.8"
 
 ######### custom courses #########
-INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
+INSTALLED_APPS += [
+    'lms.djangoapps.ccx',
+    'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig',
+    'cms.djangoapps.contentstore.apps.ContentstoreConfig',
+    'openedx.core.djangoapps.content.search',
+    'openedx.core.djangoapps.content_staging',
+]
+
 FEATURES['CUSTOM_COURSES_EDX'] = True
+COURSE_IMPORT_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
