@@ -320,7 +320,7 @@ class CourseOptimizerTestCase(TestCase):
             mock_validate_batch.assert_called()
             assert mock_validate_batch.call_count == 3 # two full batches and one partial batch
 
-
+    @pytest.mark.asyncio
     async def test_all_links_are_validated_with_batch_validation(self):
         logging.info("******** In test_all_links_are_validated_with_batch_validation *******")
         with patch("cms.djangoapps.contentstore.tasks._validate_url_access", new_callable=AsyncMock) as mock_validate:
