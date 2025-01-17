@@ -416,7 +416,7 @@ class CourseOptimizerTestCase(TestCase):
                 assert mock_retry.call_count == 0, \
                     f'_retry_validation() called {mock_retry.call_count} times; expected 0'
 
-
+    @pytest.mark.asyncio
     def test_max_number_of_retries_is_respected(self):
         logging.info("******** In test_max_number_of_retries_is_respected *******")
         '''
@@ -432,7 +432,7 @@ class CourseOptimizerTestCase(TestCase):
                        new_callable=AsyncMock) as mock_retry_validation:
                 mock_retry_validation.side_effect = \
                     lambda course_key, results, retry_list: retry_list
-                
+
                 url_list = ['1', '2', '3', '4', '5']
                 course_key = 'course-v1:edX+DemoX+Demo_Course'
                 batch_size=2
