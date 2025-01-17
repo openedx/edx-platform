@@ -13,13 +13,15 @@ import math
 from django.core.files.base import ContentFile
 from django.utils.timezone import now
 from edxval.api import create_external_video, create_or_update_video_transcript, delete_video_transcript
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocatorV2
+from opaque_keys.edx.keys import UsageKeyV2
 from webob import Response
 from xblock.core import XBlock
 from xblock.exceptions import JsonHandlerError
 
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
+from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from .transcripts_utils import (
     Transcript,
@@ -517,8 +519,9 @@ class VideoStudioViewHandlers:
                     try:
                         # Convert SRT transcript into an SJSON format
                         # and upload it to S3.
+                        content = transcript_file.read()
                         sjson_subs = Transcript.convert(
-                            content=transcript_file.read().decode('utf-8'),
+                            content=content.decode('utf-8'),
                             input_format=Transcript.SRT,
                             output_format=Transcript.SJSON
                         ).encode()
@@ -541,6 +544,17 @@ class VideoStudioViewHandlers:
                             self.transcripts.pop(language_code, None)
                         self.transcripts[new_language_code] = f'{edx_video_id}-{new_language_code}.srt'
                         response = Response(json.dumps(payload), status=201)
+
+                        if isinstance(self.scope_ids.usage_id, UsageKeyV2):
+                            usage_key = self.scope_ids.usage_id
+                            if isinstance(usage_key.context_key, LibraryLocatorV2):
+                                # Save transcript as static asset in Learning Core if is a library component
+                                filename = f"static/{self.transcripts[new_language_code]}"
+                                lib_api.add_library_block_static_asset_file(
+                                    usage_key,
+                                    filename,
+                                    content,
+                                )
                     except (TranscriptsGenerationException, UnicodeDecodeError):
                         response = Response(
                             json={
