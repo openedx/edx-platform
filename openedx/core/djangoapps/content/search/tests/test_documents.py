@@ -298,6 +298,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Normal"],
             },
+            "publish_status": "never",
         }
 
     def test_html_published_library_block(self):
@@ -337,6 +338,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "level0": ["Difficulty > Normal"],
             },
             'published': {'display_name': 'Text'},
+            "publish_status": "published",
         }
 
         # Update library block to create a draft
@@ -378,6 +380,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "level0": ["Difficulty > Normal"],
             },
             "published": {"display_name": "Text"},
+            "publish_status": "published",
         }
 
         # Publish new changes
@@ -420,6 +423,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "display_name": "Text 2",
                 "description": "This is a Test",
             },
+            "publish_status": "published",
         }
 
     def test_collection_with_library(self):
