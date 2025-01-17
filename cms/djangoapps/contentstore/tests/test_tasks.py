@@ -352,22 +352,17 @@ class CourseOptimizerTestCase(TestCase):
                  'url': str(i),
                  'status': 200},
                 )
-            return_value[2]['status'] = 403 # url = '3' gets notched out
+            return_value[2]['status'] = 403 # url = '3' gets notched out as broken
+            return_value[3]['status'] = None # url = '4' gets notched out as unreachable
             mock_validate_in_batches.return_value = return_value
 
             course_key = 'course-v1:edX+DemoX+Demo_Course'
             retry_count = 3
-            broken_or_locked_urls, validated_urls = _retry_validation(url_list, course_key, retry_count)
-            print(" ***** retry_list =   ******")
-            pprint.pp(validated_urls)
+            broken_or_locked_urls = _retry_validation(url_list, course_key, retry_count)
+            print(" ***** broken_or_locked_urls =   ******")
+            pprint.pp(broken_or_locked_urls)
             mock_validate_in_batches.assert_called()
-            assert len(validated_urls) == len(url_list)-1, \
-                f'Got {len(validated_urls)} for retry; expected {len(url_list)-1}'
-            assert len(broken_or_locked_urls) == 1, f'Got{len(broken_or_locked_urls)}; expected 1'
-            # four_oh_three_urls = [retry["url"] for retry in broken_or_locked_urls]
-            # assert '3' not in retry_urls, f'URL with 403 status code was incorrectly marked for validation retries'
-
-
+            assert len(broken_or_locked_urls) == 2, f'Got{len(broken_or_locked_urls)}; expected 2'
 
     def test_retries_attempted_on_connection_errors(self):
         raise NotImplementedError

@@ -1213,7 +1213,9 @@ async def _validate_batch(batch, course_key):
         return batch_results
 
 def _retry_validation(url_list, course_key, retry_count=3):
-    """Retry urls that failed due to connection error."""
+    """Retry urls that failed due to connection error.
+    returns URLs that could not be validated either because locked, or because of persistent connection problems
+    """
     results = []
     retry_list = url_list
     for i in range(0, retry_count):
@@ -1222,8 +1224,8 @@ def _retry_validation(url_list, course_key, retry_count=3):
             validated_url_list = asyncio.run(
                 _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
             )
-            filetered_url_list, retry_list = _filter_by_status(validated_url_list)
-            results.extend(filetered_url_list)
+            filtered_url_list, retry_list = _filter_by_status(validated_url_list)
+            results.extend(filtered_url_list)
 
     results.extend(retry_list)
 
