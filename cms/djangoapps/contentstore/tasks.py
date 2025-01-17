@@ -1212,9 +1212,6 @@ async def _validate_batch(batch, course_key):
         batch_results = await asyncio.gather(*tasks)
         return batch_results
 
-
-
-
 def _retry_validation(url_list, course_key, retry_count=3):
     """Retry urls that failed due to connection error."""
     results = []

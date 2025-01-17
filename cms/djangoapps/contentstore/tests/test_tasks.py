@@ -30,6 +30,7 @@ from cms.djangoapps.contentstore.tasks import (
     rerun_course,
     _convert_to_standard_url,
     _validate_urls_access_in_batches,
+    _retry_validation,
 )
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -334,13 +335,37 @@ class CourseOptimizerTestCase(TestCase):
             pprint.pp(results)
             args_list = mock_validate.call_args_list
             urls = [call_args.args[1] for call_args in args_list] # The middle argument in each of the function calls
-            #for i in range(1,len(url_list)+1):
-            for i in range(1,7):
+            for i in range(1,len(url_list)+1):
                 assert str(i) in urls, f'{i} not supplied as a url for validation in batches function'
 
 
-    def test_no_retries_on_403_access_denied_links(self):
-        raise NotImplementedError
+    @pytest.mark.asyncio
+    async def test_no_retries_on_403_access_denied_links(self):
+        logging.info("******** In test_no_retries_on_403_access_denied_links *******")
+        with patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
+                   new_callable=AsyncMock) as mock_validate_in_batches:
+            url_list = ['1', '2', '3', '4', '5']
+            return_value = []
+            for i in range(1, len(url_list)+1): # Notch out one of the URLs, having it return a '403' status code
+                return_value.append(
+                {'block_id': 'any',
+                 'url': str(i),
+                 'status': 200},
+                )
+            return_value[2]['status'] = 403 # url = '3' gets notched out
+            mock_validate_in_batches.return_value = return_value
+
+            course_key = 'course-v1:edX+DemoX+Demo_Course'
+            retry_count = 3
+            retry_list = await _retry_validation(url_list, course_key, retry_count)
+            print(" ***** retry_list =   ******")
+            pprint.pp(retry_list)
+            mock_validate_in_batches.assert_called()
+            assert len(retry_list) == len(url_list)-1, f'Got {len(retry_list)} for retry; expected {len(url_list)-1}'
+            retry_urls = [retry["url"] for retry in retry_list]
+            assert '3' not in retry_urls, f'URL with 403 status code was incorrectly marked for validation retries'
+
+
 
     def test_retries_attempted_on_connection_errors(self):
         raise NotImplementedError
