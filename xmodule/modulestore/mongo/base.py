@@ -27,7 +27,7 @@ from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from path import Path as path
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope, ScopeIds
 from xblock.runtime import KvsFieldData
@@ -252,7 +252,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                     if raw_metadata.get('published_date'):
                         block._edit_info['published_date'] = datetime(
                             *raw_metadata.get('published_date')[0:6]
-                        ).replace(tzinfo=UTC)
+                        ).replace(tzinfo=ZoneInfo("UTC"))
                     block._edit_info['published_by'] = raw_metadata.get('published_by')
 
                 for wrapper in self.modulestore.xblock_field_data_wrappers:

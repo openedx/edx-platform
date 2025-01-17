@@ -8,7 +8,7 @@ from unittest import TestCase
 from unittest import mock
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -63,7 +63,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         super().setUp()
         course_ids = [str(self.course.id)]
         profiles = ['youtube']
-        created = datetime.now(pytz.utc)
+        created = datetime.now(ZoneInfo("UTC"))
         previous_uploads = [
             {
                 'edx_video_id': 'test1',

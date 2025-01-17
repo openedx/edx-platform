@@ -7,7 +7,7 @@ from typing import Dict, List
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
@@ -372,7 +372,7 @@ def is_posting_allowed(posting_restrictions: str, blackout_schedules: List):
     Returns:
         bool: True if posting is allowed, False otherwise.
     """
-    now = datetime.now(UTC)
+    now = datetime.now(ZoneInfo("UTC"))
     if posting_restrictions == PostingRestriction.DISABLED:
         return True
     elif posting_restrictions == PostingRestriction.SCHEDULED:

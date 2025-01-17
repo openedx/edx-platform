@@ -4,7 +4,7 @@
 import datetime
 import unittest
 import pytest
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from xmodule.fields import Date, RelativeTime, Timedelta
 
@@ -52,10 +52,11 @@ class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-clas
         assert DateTest.date.enforce_type(None) is None
         assert DateTest.date.enforce_type('') is None
         assert DateTest.date.enforce_type('2012-12-31T23:00:01') ==\
-               datetime.datetime(2012, 12, 31, 23, 0, 1, tzinfo=UTC)
-        assert DateTest.date.enforce_type(1234567890000) == datetime.datetime(2009, 2, 13, 23, 31, 30, tzinfo=UTC)
-        assert DateTest.date.enforce_type(datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC)) ==\
-               datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=UTC)
+               datetime.datetime(2012, 12, 31, 23, 0, 1, tzinfo=ZoneInfo("UTC"))
+        assert DateTest.date.enforce_type(1234567890000) == datetime.datetime(
+            2009, 2, 13, 23, 31, 30, tzinfo=ZoneInfo("UTC"))
+        assert DateTest.date.enforce_type(datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=ZoneInfo("UTC"))) ==\
+               datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=ZoneInfo("UTC"))
         with pytest.raises(TypeError):
             DateTest.date.enforce_type([1])
 
@@ -67,18 +68,20 @@ class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-clas
 
     def test_old_due_date_format(self):
         current = datetime.datetime.today()
-        assert datetime.datetime(current.year, 3, 12, 12, tzinfo=UTC) == DateTest.date.from_json('March 12 12:00')
-        assert datetime.datetime(current.year, 12, 4, 16, 30, tzinfo=UTC) == DateTest.date.from_json('December 4 16:30')
+        assert datetime.datetime(current.year, 3, 12, 12, tzinfo=ZoneInfo(
+            "UTC")) == DateTest.date.from_json('March 12 12:00')
+        assert datetime.datetime(current.year, 12, 4, 16, 30, tzinfo=ZoneInfo(
+            "UTC")) == DateTest.date.from_json('December 4 16:30')
         assert DateTest.date.from_json('12 12:00') is None
 
     def test_non_std_from_json(self):
         """
         Test the non-standard args being passed to from_json
         """
-        now = datetime.datetime.now(UTC)
-        delta = now - datetime.datetime.fromtimestamp(0, UTC)
+        now = datetime.datetime.now(ZoneInfo("UTC"))
+        delta = now - datetime.datetime.fromtimestamp(0, ZoneInfo("UTC"))
         assert DateTest.date.from_json(delta.total_seconds() * 1000) == now
-        yesterday = datetime.datetime.now(UTC) - datetime.timedelta(days=-1)
+        yesterday = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=-1)
         assert DateTest.date.from_json(yesterday) == yesterday
 
     def test_to_json(self):

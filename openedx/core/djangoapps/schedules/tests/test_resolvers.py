@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 import crum
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -123,7 +123,7 @@ class TestBinnedSchedulesBaseResolver(SchedulesResolverTestMixin, TestCase):
         # experiment. Note that the experiment waffle is currently inactive, but they should still be excluded because
         # they were bucketed at enrollment time.
         bin_num = BinnedSchedulesBaseResolver.bin_num_for_user_id(user.id)
-        resolver = BinnedSchedulesBaseResolver(None, self.site, datetime.datetime.now(pytz.UTC), 0, bin_num)
+        resolver = BinnedSchedulesBaseResolver(None, self.site, datetime.datetime.now(ZoneInfo("UTC")), 0, bin_num)
         resolver.schedule_date_field = 'created'
         schedules = resolver.get_schedules_with_target_date_by_bin_and_orgs()
 

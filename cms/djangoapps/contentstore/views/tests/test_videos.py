@@ -14,7 +14,7 @@ from unittest.mock import Mock, patch
 import dateutil.parser
 from common.djangoapps.student.tests.factories import UserFactory
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.test import TestCase
 from django.conf import settings
 from django.test.utils import override_settings
@@ -86,7 +86,7 @@ class VideoUploadTestBase:
 
         # course ids for videos
         course_ids = [str(self.course.id), str(self.course2.id)]
-        created = datetime.now(pytz.utc)
+        created = datetime.now(ZoneInfo("UTC"))
 
         self.profiles = ["profile1", "profile2"]
         self.previous_uploads = [
@@ -742,12 +742,12 @@ class VideosHandlerTestCase(
         video = self.previous_uploads[0]
 
         # video status should be failed if it's in upload state for more than 24 hours
-        video['created'] = datetime(2016, 1, 1, 10, 10, 10, 0, pytz.UTC)
+        video['created'] = datetime(2016, 1, 1, 10, 10, 10, 0, ZoneInfo("UTC"))
         status = convert_video_status(video)
         self.assertEqual(status, StatusDisplayStrings.get('upload_failed'))
 
         # `invalid_token` should be converted to `youtube_duplicate`
-        video['created'] = datetime.now(pytz.UTC)
+        video['created'] = datetime.now(ZoneInfo("UTC"))
         video['status'] = 'invalid_token'
         status = convert_video_status(video)
         self.assertEqual(status, StatusDisplayStrings.get('youtube_duplicate'))

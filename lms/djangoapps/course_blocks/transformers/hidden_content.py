@@ -5,14 +5,14 @@ Visibility Transformer implementation.
 
 from datetime import datetime
 
-from pytz import utc
+from zoneinfo import ZoneInfo
 
 from openedx.core.djangoapps.content.block_structure.transformer import BlockStructureTransformer
 from xmodule.seq_block import SequenceBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .utils import collect_merged_boolean_field, collect_merged_date_field
 
-MAXIMUM_DATE = utc.localize(datetime.max)
+MAXIMUM_DATE = datetime.max.replace(tzinfo=ZoneInfo("UTC"))
 
 
 class HiddenContentTransformer(BlockStructureTransformer):

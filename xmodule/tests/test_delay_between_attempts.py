@@ -15,7 +15,7 @@ from unittest.mock import Mock
 
 import pytest
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xblock.scorable import Score
@@ -163,7 +163,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime.now(UTC),
+            last_submission_time=datetime.datetime.now(ZoneInfo("UTC")),
             submission_wait_seconds=0
         )
         # Successfully submitted and answered
@@ -176,7 +176,7 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime.now(UTC),
+            last_submission_time=datetime.datetime.now(ZoneInfo("UTC")),
             submission_wait_seconds=123
         )
         # You should get a dialog that tells you to wait
@@ -189,9 +189,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 18, 36, tzinfo=UTC)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 18, 36, tzinfo=ZoneInfo("UTC"))
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
@@ -203,9 +203,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 20, 35, tzinfo=UTC)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 20, 35, tzinfo=ZoneInfo("UTC"))
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
@@ -217,9 +217,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 20, 36, tzinfo=UTC)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 20, 36, tzinfo=ZoneInfo("UTC"))
         )
         # Successfully submitted and answered
         # Also, the number of attempts should increment by 1
@@ -231,9 +231,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=UTC)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=ZoneInfo("UTC"))
         )
         # Successfully submitted and answered
         # Also, the number of attempts should increment by 1
@@ -247,17 +247,17 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         with pytest.raises(xmodule.exceptions.NotFoundError):
             (block, unused_result) = self.create_and_check(
                 num_attempts=num_attempts,
-                last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+                last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
                 submission_wait_seconds=180,
-                considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=UTC)
+                considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=ZoneInfo("UTC"))
             )
 
         # Now try it without the submit_problem
         (block, unused_result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=180,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=UTC),
+            considered_now=datetime.datetime(2013, 12, 6, 0, 24, 0, tzinfo=ZoneInfo("UTC")),
             skip_submit_problem=True
         )
         # Expect that number of attempts NOT incremented
@@ -268,9 +268,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=60 * 60 * 2,
-            considered_now=datetime.datetime(2013, 12, 6, 2, 15, 35, tzinfo=UTC)
+            considered_now=datetime.datetime(2013, 12, 6, 2, 15, 35, tzinfo=ZoneInfo("UTC"))
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
@@ -282,9 +282,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=60 * 60 * 2 + 63,
-            considered_now=datetime.datetime(2013, 12, 6, 1, 15, 40, tzinfo=UTC)
+            considered_now=datetime.datetime(2013, 12, 6, 1, 15, 40, tzinfo=ZoneInfo("UTC"))
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
@@ -296,9 +296,9 @@ class XModuleQuizAttemptsDelayTest(unittest.TestCase):
         num_attempts = 1
         (block, result) = self.create_and_check(
             num_attempts=num_attempts,
-            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC),
+            last_submission_time=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC")),
             submission_wait_seconds=60,
-            considered_now=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=UTC)
+            considered_now=datetime.datetime(2013, 12, 6, 0, 17, 36, tzinfo=ZoneInfo("UTC"))
         )
         # You should get a dialog that tells you to wait 2 minutes
         # Also, the number of attempts should not be incremented
