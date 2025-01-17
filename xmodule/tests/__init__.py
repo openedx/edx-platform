@@ -27,10 +27,11 @@ from xmodule.contentstore.django import contentstore
 from xmodule.mako_block import MakoDescriptorSystem
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests.helpers import StubReplaceURLService, mock_render_template, StubMakoService, StubUserService
 from xmodule.util.sandboxing import SandboxService
+from xmodule.services import ProblemFeedbackService
 from xmodule.x_module import DoNothingCache, XModuleMixin
 from openedx.core.lib.cache_utils import CacheService
 
@@ -160,6 +161,7 @@ def get_test_system(
         'cache': CacheService(DoNothingCache()),
         'field-data': DictFieldData({}),
         'sandbox': SandboxService(contentstore, course_id),
+        'problem_feedback': ProblemFeedbackService,
     }
 
     descriptor_system.get_block_for_descriptor = get_block  # lint-amnesty, pylint: disable=attribute-defined-outside-init
@@ -215,6 +217,7 @@ def prepare_block_runtime(
         'cache': CacheService(DoNothingCache()),
         'field-data': DictFieldData({}),
         'sandbox': SandboxService(contentstore, course_id),
+        'problem_feedback': ProblemFeedbackService,
     }
 
     if add_overrides:
@@ -232,7 +235,7 @@ def prepare_block_runtime(
     # runtime.resources_fs=Mock(name='get_test_descriptor_system.resources_fs')
     # runtime.error_tracker=Mock(name='get_test_descriptor_system.error_tracker')
     # runtime.render_template=render_template or mock_render_template,
-    # runtime.mixins=(InheritanceMixin, XModuleMixin)
+    # runtime.mixins=(InheritableFieldsMixin, XModuleMixin)
 
     return runtime
 
@@ -248,7 +251,7 @@ def get_test_descriptor_system(render_template=None, **kwargs):
         resources_fs=Mock(name='get_test_descriptor_system.resources_fs'),
         error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
         render_template=render_template or mock_render_template,
-        mixins=(InheritanceMixin, XModuleMixin),
+        mixins=(InheritableFieldsMixin, XModuleMixin),
         services={'field-data': field_data},
         **kwargs
     )

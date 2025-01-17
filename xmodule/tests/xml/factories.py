@@ -10,7 +10,7 @@ from factory import Factory, Sequence, lazy_attribute, post_generation
 from fs.osfs import OSFS
 from lxml import etree
 
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritableFieldsMixin
 from xmodule.x_module import XModuleMixin
 
 
@@ -69,7 +69,7 @@ class XmlImportFactory(Factory):
         model = XmlImportData
 
     filesystem = OSFS(mkdtemp())
-    xblock_mixins = (InheritanceMixin, XModuleMixin)
+    xblock_mixins = (InheritableFieldsMixin, XModuleMixin)
     url_name = Sequence(str)
     attribs = {}
     policy = {}
