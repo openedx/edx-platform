@@ -274,11 +274,11 @@ class CourseOptimizerTestCase(TestCase):
 
     def test_hash_tags_stripped_from_url_lists(self):
         url_list = '''
-        # This is a comment line
-        http://google.com
-        # This, too, is a comment line
-        https://microsoft.com
-        /static/resource_name
+        href='#'
+        href='http://google.com'
+        src='#'
+        href='https://microsoft.com'
+        src="/static/resource_name"
         '''
         processed_url_list = _get_urls(url_list)
         pprint.pp(processed_url_list)
