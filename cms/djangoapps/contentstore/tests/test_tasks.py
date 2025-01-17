@@ -357,7 +357,7 @@ class CourseOptimizerTestCase(TestCase):
         pprint.pp(broken_or_locked_urls)
         assert len(broken_or_locked_urls) == 2  # The inputs with status = 403 and 500
         assert len(retry_list) == 1             # The input with status = None
-        assert retry_list[0]['url'] == '5'      # The only URL fit for a retry operation (status == None)
+        assert retry_list[0][1] == '5'      # The only URL fit for a retry operation (status == None)
 
 
     def test_retries_attempted_on_connection_errors(self):
