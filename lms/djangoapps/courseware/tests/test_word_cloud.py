@@ -1,13 +1,15 @@
 """Word cloud integration tests using mongo modulestore."""
-
+from unittest.mock import patch
 
 import pytest
 
 import json
 from operator import itemgetter
 
+from django.conf import settings
+
 # noinspection PyUnresolvedReferences
-from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
+from xmodule.tests.helpers import override_descriptor_system, mock_render_template  # pylint: disable=unused-import
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
@@ -214,7 +216,8 @@ class TestWordCloud(BaseTestXmodule):
                 }
             )
 
-    def test_word_cloud_constructor(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_word_cloud_constructor(self, mock_render_django_template):
         """
         Make sure that all parameters extracted correctly from xml.
         """
@@ -223,10 +226,15 @@ class TestWordCloud(BaseTestXmodule):
             'ajax_url': self.block.ajax_url,
             'display_name': self.block.display_name,
             'instructions': self.block.instructions,
-            'element_class': self.block.location.block_type,
             'element_id': self.block.location.html_id(),
             'num_inputs': 5,  # default value
             'submitted': False,  # default value,
         }
 
-        assert fragment.content == self.runtime.render_template('word_cloud.html', expected_context)
+        if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK:
+            expected_context['range_num_inputs'] = range(5)
+            mock_render_django_template.assert_called_once()
+            assert fragment.content == self.runtime.render_template('templates/word_cloud.html', expected_context)
+        else:
+            expected_context['element_class'] = self.block.location.block_type
+            assert fragment.content == self.runtime.render_template('word_cloud.html', expected_context)
