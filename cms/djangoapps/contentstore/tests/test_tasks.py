@@ -321,8 +321,22 @@ class CourseOptimizerTestCase(TestCase):
             assert mock_validate_batch.call_count == 3 # two full batches and one partial batch
 
 
-    def test_all_links_in_link_list_longer_than_batch_size_are_validated(self):
-        raise NotImplementedError
+    async def test_all_links_are_validated_with_batch_validation(self):
+        logging.info("******** In test_all_links_are_validated_with_batch_validation *******")
+        with patch("cms.djangoapps.contentstore.tasks._validate_url_access", new_callable=AsyncMock) as mock_validate:
+            mock_validate.return_value = {"status": 200}
+
+            url_list = ['1', '2', '3', '4', '5']
+            course_key = 'course-v1:edX+DemoX+Demo_Course'
+            batch_size=2
+            results = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
+            print(" ***** results =   ******")
+            pprint.pp(results)
+            args_list = mock_validate.call_args_list()
+            urls = [call_args.args[1] for call_args in args_list] # The middle argument in each of the function calls
+            for i in range(1,len(url_list)+1):
+                assert str(i) in urls, f'{i} not supplied as a url for validation in batches function'
+
 
     def test_no_retries_on_403_access_denied_links(self):
         raise NotImplementedError
