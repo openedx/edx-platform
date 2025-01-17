@@ -6,6 +6,8 @@ This file contains helper functions for configuring module_store_setting setting
 import copy
 import warnings
 
+from openedx.core.lib.derived import Derived
+
 
 def convert_module_store_setting_if_needed(module_store_setting):
     """

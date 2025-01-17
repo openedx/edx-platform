@@ -28,7 +28,7 @@ from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
-from openedx.core.lib.derived import derive_settings
+from openedx.core.lib.derived import Derived
 from openedx.core.lib.logsettings import get_logger_config
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -126,37 +126,37 @@ SSL_AUTH_DN_FORMAT_STRING = (
     "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
-## Derived Settings
-CC_MERCHANT_NAME = lambda settings: settings.PLATFORM_NAME
-EMAIL_FILE_PATH = lambda settings: settings.DATA_DIR / "emails" / "lms"
-LMS_INTERNAL_ROOT_URL = lambda settings: settings.LMS_ROOT_URL
+CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
+EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "lms")
+LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
+
 # This is the domain that is used to set shared cookies between various sub-domains.
 # By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN
-SHARED_COOKIE_DOMAIN = lambda settings: settings.SESSION_COOKIE_DOMAIN
+SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
 
 # We want Bulk Email running on the high-priority queue, so we define the
 # routing key that points to it. At the moment, the name is the same.
 # We have to reset the value here, since we have changed the value of the queue name.
-BULK_EMAIL_ROUTING_KEY = lambda settings: settings.HIGH_PRIORITY_QUEUE
+BULK_EMAIL_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
 
 # We can run smaller jobs on the low priority queue. See note above for why
 # we have to reset the value here.
-BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = lambda settings: settings.DEFAULT_PRIORITY_QUEUE
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
 # Queue to use for expiring old entitlements
-ENTITLEMENTS_EXPIRATION_ROUTING_KEY = lambda settings: settings.DEFAULT_PRIORITY_QUEUE
+ENTITLEMENTS_EXPIRATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
 # Intentional defaults.
-ID_VERIFICATION_SUPPORT_LINK = lambda settings: settings.SUPPORT_SITE_LINK
-PASSWORD_RESET_SUPPORT_LINK = lambda settings: settings.SUPPORT_SITE_LINK
-ACTIVATION_EMAIL_SUPPORT_LINK = lambda settings: settings.SUPPORT_SITE_LINK
-LOGIN_ISSUE_SUPPORT_LINK = lambda settings: settings.SUPPORT_SITE_LINK
+ID_VERIFICATION_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+PASSWORD_RESET_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+ACTIVATION_EMAIL_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+LOGIN_ISSUE_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
 
 # Default queues for various routes
-GRADES_DOWNLOAD_ROUTING_KEY = lambda settings: settings.HIGH_MEM_QUEUE
-CREDENTIALS_GENERATION_ROUTING_KEY = lambda settings: settings.DEFAULT_PRIORITY_QUEUE
-PROGRAM_CERTIFICATES_ROUTING_KEY = lambda settings: settings.DEFAULT_PRIORITY_QUEUE
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = lambda settings: settings.HIGH_PRIORITY_QUEUE
+GRADES_DOWNLOAD_ROUTING_KEY = Derived(lambda settings: settings.HIGH_MEM_QUEUE)
+CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+PROGRAM_CERTIFICATES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
 
 ############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
 # The Open edX Enterprise service is currently hosted via the LMS container/process.
@@ -165,10 +165,14 @@ SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = lambda settings: settings.HIGH_PRIORI
 # not find references to them within the edx-platform project.
 
 # Publicly-accessible enrollment URL, for use on the client side.
-ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = Derived(
+    lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+)
 
 # Enrollment URL used on the server-side.
-ENTERPRISE_ENROLLMENT_API_URL = lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+ENTERPRISE_ENROLLMENT_API_URL = Derived(
+    lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+)
 
 ############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
 # The LMS communicates with the Enterprise service via the requests.Session() client
@@ -180,38 +184,13 @@ def _generate_default_enterprise_api_url(settings):
     if settings.LMS_INTERNAL_ROOT_URL is not None:
         default_enterprise_api_url = settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
     return default_enterprise_api_url
-
-ENTERPRISE_API_URL = _generate_default_enterprise_api_url
+ENTERPRISE_API_URL = Derived(_generate_default_enterprise_api_url)
 
 def _generate_default_enterprise_consent_api_url(settings):
     default_enterprise_consent_api_url = None
     if settings.LMS_INTERNAL_ROOT_URL is not None:
         default_enterprise_consent_api_url = settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
-ENTERPRISE_CONSENT_API_URL = lambda settings: _generate_default_enterprise_consent_api_url
-
-# Note the order of this matters, don't sort this list.
-derived(
-    'CC_MERCHANT_NAME',
-    'EMAIL_FILE_PATH',
-    'LMS_INTERNAL_ROOT_URL',
-    'SHARED_COOKIE_DOMAIN',
-    'BULK_EMAIL_ROUTING_KEY',
-    'BULK_EMAIL_ROUTING_KEY_SMALL_JOBS',
-    'ENTITLEMENTS_EXPIRATION_ROUTING_KEY',
-    'ID_VERIFICATION_SUPPORT_LINK',
-    'PASSWORD_RESET_SUPPORT_LINK',
-    'ACTIVATION_EMAIL_SUPPORT_LINK',
-    'LOGIN_ISSUE_SUPPORT_LINK',
-    'GRADES_DOWNLOAD_ROUTING_KEY',
-    'CREDENTIALS_GENERATION_ROUTING_KEY',
-    'PROGRAM_CERTIFICATES_ROUTING_KEY',
-    'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY',
-    'ENTERPRISE_PUBLIC_ENROLLMENT_API_URL',
-    'ENTERPRISE_ENROLLMENT_API_URL',
-    'ENTERPRISE_API_URL',
-    'ENTERPRISE_CONSENT_API_URL',
-)
-
+ENTERPRISE_CONSENT_API_URL = Derived(_generate_default_enterprise_consent_api_url)
 
 
 #######################################################################################################################
@@ -412,17 +391,6 @@ for name, database in DATABASES.items():
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
 # use the one from common.py
 MODULESTORE = convert_module_store_setting_if_needed(_YAML_TOKENS.get('MODULESTORE', MODULESTORE))
-
-# After conversion above, the modulestore will have a "stores" list with all defined stores, for all stores, add the
-# fs_root entry to derived collection so that if it's a callable it can be resolved.  We need to do this because the
-# `derived_collection_entry` takes an exact index value but the config file might have overridden the number of stores
-# and so we can't be sure that the 2 we define in common.py will be there when we try to derive settings.  This could
-# lead to exceptions being thrown when the `derive_settings` call later in this file tries to update settings.  We call
-# the derived_collection_entry function here to ensure that we update the fs_root for any callables that remain after
-# we've updated the MODULESTORE setting from our config file.
-for idx, store in enumerate(MODULESTORE['default']['OPTIONS']['stores']):
-    if 'OPTIONS' in store and 'fs_root' in store["OPTIONS"]:
-        derived_collection_entry('MODULESTORE', 'default', 'OPTIONS', 'stores', idx, 'OPTIONS', 'fs_root')
 
 BROKER_URL = "{}://{}:{}@{}/{}".format(CELERY_BROKER_TRANSPORT,
                                        CELERY_BROKER_USER,

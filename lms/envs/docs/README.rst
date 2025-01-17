@@ -37,6 +37,8 @@ platform, please see `Feature Flags and Settings`_.
 Derived Settings
 ****************
 
+TODO UPDATE THIS
+
 In cases where you need to define one or more settings relative to the value of
 another setting, you can explicitly designate them as derived calculations.
 This can let you override one setting (such as a path or a feature toggle) and
