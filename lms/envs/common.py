@@ -4311,10 +4311,12 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
+############## Settings for JWT token handling ##############
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'http://127.0.0.1:8740',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_SUPPORTED_VERSION': '1.2.0',
+    'JWT_PRIVATE_SIGNING_JWK': None,
     'JWT_PUBLIC_SIGNING_JWK_SET': None,
 }
 
