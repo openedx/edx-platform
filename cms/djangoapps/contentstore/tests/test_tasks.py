@@ -418,7 +418,28 @@ class CourseOptimizerTestCase(TestCase):
 
 
     def test_max_number_of_retries_is_respected(self):
-        raise NotImplementedError
+        logging.info("******** In test_max_number_of_retries_is_respected *******")
+        '''
+        Patch initial validation to show no progress (need retries on everything).
+        Patch retries to behave in an equally non-productive way
+        Assert that the number of retries attempted equals the maximum number allowed
+        '''
+        with patch("cms.djangoapps.contentstore.tasks._validate_url_access",
+                   new_callable=AsyncMock) as mock_validate_url:
+            mock_validate_url.side_effect = \
+                lambda session, url_data, course_key: {'block_id': url_data[0], 'url': url_data[1]}
+            with patch("cms.djangoapps.contentstore.tasks._retry_validation_and_filter",
+                       new_callable=AsyncMock) as mock_retry_validation:
+                mock_retry_validation.side_effect = \
+                    lambda course_key, results, retry_list: retry_list
+                
+                url_list = ['1', '2', '3', '4', '5']
+                course_key = 'course-v1:edX+DemoX+Demo_Course'
+                batch_size=2
+                results = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
+                print(" ***** results =   ******")
+                pprint.pp(results)
+                assert 1 == 0, 'auto fail to print results'
 
     def test_scan_generates_file_named_by_course_key(self):
         raise NotImplementedError

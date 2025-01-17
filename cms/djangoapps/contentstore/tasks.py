@@ -1221,15 +1221,20 @@ def _retry_validation(url_list, course_key, retry_count=3):
     for i in range(0, retry_count):
         if retry_list:
             LOGGER.debug(f'[Link Check] retry attempt #{i + 1}')
-            validated_url_list = asyncio.run(
-                _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
-            )
-            filtered_url_list, retry_list = _filter_by_status(validated_url_list)
-            results.extend(filtered_url_list)
-
+            retry_list = _retry_validation_and_filter(course_key, results, retry_list)
     results.extend(retry_list)
 
     return results
+
+
+def _retry_validation_and_filter(course_key, results, retry_list):
+    validated_url_list = asyncio.run(
+        _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
+    )
+    filtered_url_list, retry_list = _filter_by_status(validated_url_list)
+    results.extend(filtered_url_list)
+    return retry_list
+
 
 def _filter_by_status(results):
     """
