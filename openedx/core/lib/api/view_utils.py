@@ -125,6 +125,7 @@ def view_auth_classes(is_user=False, is_authenticated=True):
             SessionAuthenticationAllowInactiveUser
         )
         func_or_class.permission_classes = ()
+        print('is_authenticated', is_authenticated)
         if is_authenticated:
             func_or_class.permission_classes += (IsAuthenticated,)
         if is_user:
