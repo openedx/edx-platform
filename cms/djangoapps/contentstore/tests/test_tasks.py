@@ -424,6 +424,7 @@ class CourseOptimizerTestCase(TestCase):
         Patch retries to behave in an equally non-productive way
         Assert that the number of retries attempted equals the maximum number allowed
         '''
+        MAX_RETRIES = 3
         with patch("cms.djangoapps.contentstore.tasks._validate_url_access",
                    new_callable=AsyncMock) as mock_validate_url:
             mock_validate_url.side_effect = \
@@ -439,7 +440,8 @@ class CourseOptimizerTestCase(TestCase):
                 results = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
                 print(" ***** results =   ******")
                 pprint.pp(results)
-                assert 1 == 0, 'auto fail to print results'
+                assert mock_retry_validation.call_count == MAX_RETRIES, \
+                  f'Got {mock_retry_validation.call_count} retries; expected {MAX_RETRIES}'
 
     def test_scan_generates_file_named_by_course_key(self):
         raise NotImplementedError
