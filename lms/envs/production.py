@@ -219,7 +219,7 @@ ALLOWED_HOSTS = [
 
 # This is the domain that is used to set shared cookies between various sub-domains.
 # By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN, but we want to make it overrideable.
-SHARED_COOKIE_DOMAIN = _YAML_TOKENS.get('SHARED_kCOOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
+SHARED_COOKIE_DOMAIN = _YAML_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
 
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
