@@ -214,6 +214,7 @@ class GeneratedCertificate(models.Model):
         'executive-education',
         'paid-executive-education',
         'paid-bootcamp',
+        'credit',
     )
 
     VERIFIED_CERTS_MODES = [
