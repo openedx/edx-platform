@@ -445,10 +445,18 @@ XBLOCK_SETTINGS.setdefault("VideoBlock", {})['YOUTUBE_API_KEY'] = YOUTUBE_API_KE
 
 ##### Custom Courses for EdX #####
 if FEATURES['CUSTOM_COURSES_EDX']:
-    INSTALLED_APPS += ['lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig']
+    INSTALLED_APPS += [
+        'lms.djangoapps.ccx',
+        'openedx.core.djangoapps.ccxcon.apps.CCXConnectorConfig',
+        'cms.djangoapps.contentstore.apps.ContentstoreConfig',
+        'openedx.core.djangoapps.content.search',
+        'openedx.core.djangoapps.content_staging',
+    ]
+
     MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
+    COURSE_IMPORT_EXPORT_STORAGE = DEFAULT_FILE_STORAGE
 
 FIELD_OVERRIDE_PROVIDERS = tuple(FIELD_OVERRIDE_PROVIDERS)
 
