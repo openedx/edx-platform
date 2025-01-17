@@ -232,7 +232,3 @@ def _check_for_display_name_change(previous_course_overview, updated_course_over
             old_name=previous_course_overview.display_name_with_default,
             new_name=updated_course_overview.display_name_with_default,
         )
-    # update_course_name_in_upstream_links.delay(
-    #     str(previous_course_overview.id),
-    #     updated_course_overview.display_name_with_default
-    # )

@@ -1959,13 +1959,12 @@ def create_or_update_xblock_upstream_link(xblock, course_key: str, course_name: 
     Create or update upstream->downstream link in database for given xblock.
     """
     if not xblock.upstream:
-        log.info(f"No upstream found for xblock: {xblock.usage_key}")
         return None
     upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
     try:
         lib_component = get_component_from_usage_key(upstream_usage_key)
     except ObjectDoesNotExist:
-        log.exception("Library block not found!")
+        log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
     authoring_api.update_or_create_entity_link(
         lib_component,
