@@ -144,7 +144,8 @@ class TestUpstreamLinksTasks(ModuleStoreTestCase):
         ]
         assert [(x[0][0].usage_key, x[0][1], x[0][2], x[0][3]) for x in mock_api.call_args_list] == expected_calls
         mock_api.reset_mock()
-        # call again with same course, it should not be processed again as its CourseLinksStatusChoices = COMPLETED
+        # call again with same course, it should not be processed again
+        # as its LearningContextLinksStatusChoices = COMPLETED
         create_or_update_upstream_links(str(self.course_key), force=False)
         mock_api.assert_not_called()
         # again with same course but with force=True, it should be processed now

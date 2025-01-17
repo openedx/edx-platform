@@ -32,8 +32,8 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib import ensure_cms
-from openedx_learning.api.authoring import get_entity_links, get_or_create_course_link_status
-from openedx_learning.api.authoring_models import CourseLinksStatusChoices
+from openedx_learning.api.authoring import get_entity_links, get_or_create_learning_context_link_status
+from openedx_learning.api.authoring_models import LearningContextLinksStatusChoices
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
 from xmodule.modulestore import ModuleStoreEnum
@@ -203,15 +203,15 @@ def create_or_update_upstream_links(course_key_str: str, force: bool = False, cr
 
     if not created:
         created = datetime.now(timezone.utc)
-    course_status = get_or_create_course_link_status(course_key_str, created)
+    course_status = get_or_create_learning_context_link_status(course_key_str, created)
     if course_status.status in [
-        CourseLinksStatusChoices.COMPLETED,
-        CourseLinksStatusChoices.PROCESSING
+        LearningContextLinksStatusChoices.COMPLETED,
+        LearningContextLinksStatusChoices.PROCESSING
     ] and not force:
         return
     store = modulestore()
     course_key = CourseKey.from_string(course_key_str)
-    course_status.status = CourseLinksStatusChoices.PROCESSING
+    course_status.status = LearningContextLinksStatusChoices.PROCESSING
     course_status.save()
     try:
         course_name = CourseOverview.get_from_id(course_key).display_name_with_default
@@ -221,7 +221,7 @@ def create_or_update_upstream_links(course_key_str: str, force: bool = False, cr
     xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
     for xblock in xblocks:
         api.create_or_update_xblock_upstream_link(xblock, course_key_str, course_name, created)
-    course_status.status = CourseLinksStatusChoices.COMPLETED
+    course_status.status = LearningContextLinksStatusChoices.COMPLETED
     course_status.save()
 
 

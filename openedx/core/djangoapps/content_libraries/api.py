@@ -1970,6 +1970,7 @@ def create_or_update_xblock_upstream_link(xblock, course_key: str, course_name: 
     authoring_api.update_or_create_entity_link(
         lib_component,
         upstream_usage_key=xblock.upstream,
+        upstream_context_key=str(upstream_usage_key.context_key),
         downstream_context_key=course_key,
         downstream_context_title=course_name,
         downstream_usage_key=str(xblock.usage_key),
