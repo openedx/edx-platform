@@ -370,7 +370,7 @@ class CourseOptimizerTestCase(TestCase):
             with patch("cms.djangoapps.contentstore.tasks._retry_validation",
                        new_callable=AsyncMock) as mock_retry:
                 mock_retry.return_value = [['block_1', '1']]
-                check_broken_links(None, 'user_id', 'course_key_string', 'language')
+                check_broken_links('user_id', 'course_key_string', 'language')
                 assert mock_retry.call_count == 0, \
                     f'_retry_validation() called {mock_retry.call_count} times; expected 0'
 
