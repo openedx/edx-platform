@@ -12,8 +12,14 @@ def generate_broken_links_descriptor(json_content, request_user):
     """
     Returns a Data Transfer Object for frontend given a list of broken links.
 
-    json_content contains a list of [block_id, link, is_locked]
-        is_locked is true if the link is a studio link and returns 403 on request
+    ** Example json_content structure **
+        Note: is_locked is true if the link is a studio link and returns 403
+    [
+        ['block_id_1', 'link_1', is_locked],
+        ['block_id_1', 'link_2', is_locked],
+        ['block_id_2', 'link_3', is_locked],
+        ...
+    ]
 
     ** Example DTO structure **
     {
@@ -62,7 +68,7 @@ def generate_broken_links_descriptor(json_content, request_user):
 
         usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
-        _update_node_tree_and_dictionary(
+        xblock_node_tree, xblock_dictionary = _update_node_tree_and_dictionary(
             block=block,
             link=link,
             is_locked=is_locked_flag,
@@ -70,7 +76,7 @@ def generate_broken_links_descriptor(json_content, request_user):
             dictionary=xblock_dictionary
         )
 
-    return _create_dto_from_node_tree_recursive(xblock_node_tree, xblock_dictionary)
+    return _create_dto_recursive(xblock_node_tree, xblock_dictionary)
 
 
 def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictionary):
@@ -100,20 +106,29 @@ def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictiona
     ** Example dictionary structure **
     {
         'xblock_id: {
-            'display_name': 'xblock name'
-            'category': 'html'
+            'display_name': 'xblock name',
+            'category': 'chapter'
         },
+        'html_block_id': {
+            'display_name': 'xblock name',
+            'category': 'chapter',
+            'url': 'url_1',
+            'locked_links': [...],
+            'broken_links': [...]
+        }
         ...,
     }
     """
+    updated_tree, updated_dictionary = node_tree, dictionary
+
     path = _get_node_path(block)
-    current_node = node_tree
+    current_node = updated_tree
     xblock_id = ''
 
     # Traverse the path and build the tree structure
     for xblock in path:
         xblock_id = xblock.location.block_id
-        dictionary.setdefault(xblock_id,
+        updated_dictionary.setdefault(xblock_id,
             { 
                 'display_name': xblock.display_name,
                 'category': getattr(xblock, 'category', ''),
@@ -123,18 +138,20 @@ def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictiona
         current_node = current_node.setdefault(xblock_id, {})
     
     # Add block-level details for the last xblock in the path (URL and broken/locked links)
-    dictionary[xblock_id].setdefault('url',
+    updated_dictionary[xblock_id].setdefault('url',
         f'/course/{block.course_id}/editor/{block.category}/{block.location}'
     )
     if is_locked:
-        dictionary[xblock_id].setdefault('locked_links', []).append(link)
+        updated_dictionary[xblock_id].setdefault('locked_links', []).append(link)
     else:
-        dictionary[xblock_id].setdefault('broken_links', []).append(link)
+        updated_dictionary[xblock_id].setdefault('broken_links', []).append(link)
+
+    return updated_tree, updated_dictionary
 
 
 def _get_node_path(block):
     """
-    Retrieves the path frmo the course root node to a specific block, excluding the root.
+    Retrieves the path from the course root node to a specific block, excluding the root.
 
     ** Example Path structure **
     [chapter_node, sequential_node, vertical_node, html_node]
@@ -156,9 +173,10 @@ CATEGORY_TO_LEVEL_MAP = {
 }
 
 
-def _create_dto_from_node_tree_recursive(xblock_node, xblock_dictionary):
+def _create_dto_recursive(xblock_node, xblock_dictionary):
     """
-    Recursively build the Data Transfer Object from the node tree and dictionary.
+    Recursively build the Data Transfer Object by using
+    the structure from the node tree and data from the dictionary.
     """
     # Exit condition when there are no more child nodes (at block level)
     if not xblock_node:
@@ -168,7 +186,7 @@ def _create_dto_from_node_tree_recursive(xblock_node, xblock_dictionary):
     xblock_children = []
 
     for xblock_id, node in xblock_node.items():
-        child_blocks = _create_dto_from_node_tree_recursive(node, xblock_dictionary)
+        child_blocks = _create_dto_recursive(node, xblock_dictionary)
         xblock_data = xblock_dictionary.get(xblock_id, {})
 
         xblock_entry = {
