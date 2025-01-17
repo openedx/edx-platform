@@ -339,7 +339,6 @@ class CourseOptimizerTestCase(TestCase):
                 assert str(i) in urls, f'{i} not supplied as a url for validation in batches function'
 
 
-    @pytest.mark.asyncio
     def test_no_retries_on_403_access_denied_links(self):
         logging.info("******** In test_no_retries_on_403_access_denied_links *******")
         with patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
