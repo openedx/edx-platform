@@ -417,7 +417,7 @@ class CourseOptimizerTestCase(TestCase):
                     f'_retry_validation() called {mock_retry.call_count} times; expected 0'
 
     @pytest.mark.asyncio
-    def test_max_number_of_retries_is_respected(self):
+    async def test_max_number_of_retries_is_respected(self):
         logging.info("******** In test_max_number_of_retries_is_respected *******")
         '''
         Patch initial validation to show no progress (need retries on everything).
