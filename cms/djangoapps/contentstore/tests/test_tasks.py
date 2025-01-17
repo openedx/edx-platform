@@ -288,8 +288,26 @@ class CourseOptimizerTestCase(TestCase):
         assert processed_lines == original_lines-2, \
             f'Processed URL list lines = {processed_lines}; expected {original_lines - 2}'
 
-    def test_urls_out_count_equals_urls_in_count_when_no_hashtags(self):
-        raise NotImplementedError
+    def test_src_and_href_urls_extracted(self):
+        FIRST_URL = 'http://google.com'
+        SECOND_URL = 'https://microsoft.com'
+        THIRD_URL = "/static/resource_name"
+        url_list = f'''
+        href={FIRST_URL}
+        href={SECOND_URL}
+        src={THIRD_URL}
+        '''
+
+        processed_url_list = _get_urls(url_list)
+        pprint.pp(processed_url_list)
+        assert len(processed_url_list) == 3, f"Expected 3 matches; got {len(processed_url_list)}"
+        assert processed_url_list[0] == FIRST_URL, \
+            f"Failed to properly parse {FIRST_URL}; got {processed_url_list[0]}"
+        assert processed_url_list[1] == SECOND_URL, \
+            f"Failed to properly parse {SECOND_URL}; got {processed_url_list[1]}"
+        assert processed_url_list[2] == THIRD_URL, \
+            f"Failed to properly parse {THIRD_URL}; got {processed_url_list[2]}"
+
 
     def test_http_and_https_recognized_as_studio_url_schemes(self):
         raise NotImplementedError
