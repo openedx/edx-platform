@@ -338,7 +338,6 @@ class CourseOptimizerTestCase(TestCase):
             for i in range(1,len(url_list)+1):
                 assert str(i) in urls, f'{i} not supplied as a url for validation in batches function'
 
-
     def test_no_retries_on_403_access_denied_links(self):
         logging.info("******** In test_no_retries_on_403_access_denied_links *******")
         with patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
@@ -356,7 +355,7 @@ class CourseOptimizerTestCase(TestCase):
 
             course_key = 'course-v1:edX+DemoX+Demo_Course'
             retry_count = 3
-            retry_list = await _retry_validation(url_list, course_key, retry_count)
+            retry_list = _retry_validation(url_list, course_key, retry_count)
             print(" ***** retry_list =   ******")
             pprint.pp(retry_list)
             mock_validate_in_batches.assert_called()
