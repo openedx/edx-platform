@@ -1275,6 +1275,7 @@ def check_broken_links(self, user_id, course_key_string, language):
     broken_or_locked_urls, retry_list = _filter_by_status(validated_url_list)
 
     if retry_list:
+        logging.info("**** about to retry link validation ****")
         retry_results = _retry_validation(retry_list, course_key, retry_count=3)
         broken_or_locked_urls.extend(retry_results)
 
