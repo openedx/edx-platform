@@ -30,7 +30,7 @@ from cms.djangoapps.contentstore.tasks import (
     rerun_course,
     _convert_to_standard_url,
     _validate_urls_access_in_batches,
-    _retry_validation,
+    _filter_by_status,
 )
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -340,29 +340,26 @@ class CourseOptimizerTestCase(TestCase):
 
     def test_no_retries_on_403_access_denied_links(self):
         logging.info("******** In test_no_retries_on_403_access_denied_links *******")
-        with patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
-                   new_callable=AsyncMock) as mock_validate_in_batches:
-            url_list = ['1', '2', '3', '4', '5']
-            return_value = []
-            validated_urls = []
-            broken_or_locked_urls = []
-            for i in range(1, len(url_list)+1): # Notch out one of the URLs, having it return a '403' status code
-                return_value.append(
-                {'block_id': 'any',
-                 'url': str(i),
-                 'status': 200},
-                )
-            return_value[2]['status'] = 403 # url = '3' gets notched out as broken
-            return_value[3]['status'] = None # url = '4' gets notched out as unreachable
-            mock_validate_in_batches.return_value = return_value
+        url_list = ['1', '2', '3', '4', '5']
+        filtering_input = []
+        retry_urls = []
+        broken_or_locked_urls = []
+        for i in range(1, len(url_list)+1): # Notch out one of the URLs, having it return a '403' status code
+            filtering_input.append(
+            {'block_id': f'block_{i}',
+             'url': str(i),
+             'status': 200},
+            )
+        filtering_input[2]['status'] = 403 # url = '3' gets notched out as broken
+        filtering_input[3]['status'] = 500
+        filtering_input[4]['status'] = None # url = '4' gets notched out as unreachable
 
-            course_key = 'course-v1:edX+DemoX+Demo_Course'
-            retry_count = 3
-            broken_or_locked_urls = _retry_validation(url_list, course_key, retry_count)
-            print(" ***** broken_or_locked_urls =   ******")
-            pprint.pp(broken_or_locked_urls)
-            mock_validate_in_batches.assert_called()
-            assert len(broken_or_locked_urls) == 2, f'Got{len(broken_or_locked_urls)}; expected 2'
+        broken_or_locked_urls, retry_list = _filter_by_status(filtering_input)
+        print(" ***** broken_or_locked_urls =   ******")
+        pprint.pp(broken_or_locked_urls)
+        assert len(broken_or_locked_urls) == 2  # The inputs with status = 403 and 500
+        assert len(retry_list) == 1             # The input with status = None
+
 
     def test_retries_attempted_on_connection_errors(self):
         raise NotImplementedError
