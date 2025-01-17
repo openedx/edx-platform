@@ -335,9 +335,19 @@ class CourseOptimizerTestCase(TestCase):
     def test_number_of_scanned_blocks_equals_blocks_in_course(self):
         raise NotImplementedError
 
-    def test_every_detected_link_is_validated(self):
-        raise NotImplementedError
-
+    @pytest.mark.asyncio
+    async def test_every_detected_link_is_validated(self):
+        logging.info("******** In test_every_detected_link_is_validated *******")
+        url_list = ['1', '2', '3', '4', '5']
+        course_key = 'course-v1:edX+DemoX+Demo_Course'
+        batch_size = 2
+        with patch("cms.djangoapps.contentstore.tasks._validate_batch", new_callable=AsyncMock) as mock_validate_batch:
+            mock_validate_batch.side_effect = lambda x, y: x
+            validated_urls = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
+            pprint.pp(validated_urls)
+            pprint.pp(url_list)
+            assert validated_urls == url_list, \
+                f"List of validated urls {validated_urls} is not identical to sourced urls {url_list}"
 
     @pytest.mark.asyncio
     async def test_link_validation_is_batched(self):
