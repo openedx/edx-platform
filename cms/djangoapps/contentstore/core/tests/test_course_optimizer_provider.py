@@ -20,39 +20,34 @@ class TestLinkCheckProvider(CourseTestCase):
     """
     def setUp(self):
         """Setup course blocks for tests"""
-        global MOCK_COURSE
-        global MOCK_SECTION
-        global MOCK_SUBSECTION
-        global MOCK_UNIT
-        global MOCK_BLOCK
-
-        MOCK_COURSE = Mock()
-        MOCK_SECTION = Mock(
+        super().setUp()
+        self.mock_course = Mock()
+        self.mock_section = Mock(
             location=Mock(block_id='chapter_1'),
             display_name='Section Name',
             category='chapter'
         )
-        MOCK_SUBSECTION = Mock(
+        self.mock_subsection = Mock(
             location=Mock(block_id='sequential_1'),
             display_name='Subsection Name',
             category='sequential'
         )
-        MOCK_UNIT = Mock(
+        self.mock_unit = Mock(
             location=Mock(block_id='vertical_1'),
             display_name='Unit Name',
             category='vertical'
         )
-        MOCK_BLOCK = Mock(
+        self.mock_block = Mock(
             location=Mock(block_id='block_1'),
             display_name='Block Name',
-            course_id='course-v1:test+course',
+            course_id=self.course.id,
             category='html'
         )
-        MOCK_COURSE.get_parent.return_value = None
-        MOCK_SECTION.get_parent.return_value = MOCK_COURSE
-        MOCK_SUBSECTION.get_parent.return_value = MOCK_SECTION
-        MOCK_UNIT.get_parent.return_value = MOCK_SUBSECTION
-        MOCK_BLOCK.get_parent.return_value = MOCK_UNIT
+        self.mock_course.get_parent.return_value = None
+        self.mock_section.get_parent.return_value = self.mock_course
+        self.mock_subsection.get_parent.return_value = self.mock_section
+        self.mock_unit.get_parent.return_value = self.mock_subsection
+        self.mock_block.get_parent.return_value = self.mock_unit
 
 
     def test_update_node_tree_and_dictionary_returns_node_tree(self):
@@ -70,7 +65,7 @@ class TestLinkCheckProvider(CourseTestCase):
             }
         }
         result_tree, result_dictionary = _update_node_tree_and_dictionary(
-            MOCK_BLOCK, 'example_link', True, {}, {}
+            self.mock_block, 'example_link', True, {}, {}
         )
 
         self.assertEqual(expected_tree, result_tree)
@@ -97,12 +92,12 @@ class TestLinkCheckProvider(CourseTestCase):
             'block_1': {
                 'display_name': 'Block Name',
                 'category': 'html',
-                'url': f'/course/{MOCK_BLOCK.course_id}/editor/html/{MOCK_BLOCK.location}',
+                'url': f'/course/{self.course.id}/editor/html/{self.mock_block.location}',
                 'locked_links': ['example_link']
             }
         }
         result_tree, result_dictionary = _update_node_tree_and_dictionary(
-            MOCK_BLOCK, 'example_link', True, {}, {}
+            self.mock_block, 'example_link', True, {}, {}
         )
 
         self.assertEqual(expected_dictionary, result_dictionary)
