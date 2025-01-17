@@ -427,7 +427,7 @@ class CourseOptimizerTestCase(TestCase):
         with patch("cms.djangoapps.contentstore.tasks._validate_url_access",
                    new_callable=AsyncMock) as mock_validate_url:
             mock_validate_url.side_effect = \
-                lambda session, url_data, course_key: {'block_id': url_data[0], 'url': url_data[1]}
+                lambda session, url_data, course_key: {'block_id': f'block_{url_data}', 'url': url_data}
             with patch("cms.djangoapps.contentstore.tasks._retry_validation_and_filter",
                        new_callable=AsyncMock) as mock_retry_validation:
                 mock_retry_validation.side_effect = \
