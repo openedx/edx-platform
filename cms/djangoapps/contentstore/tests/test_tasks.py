@@ -32,6 +32,7 @@ from cms.djangoapps.contentstore.tasks import (
     _validate_urls_access_in_batches,
     _filter_by_status,
     check_broken_links,
+    _get_urls,
 )
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -272,7 +273,16 @@ class CourseOptimizerTestCase(TestCase):
         raise NotImplementedError
 
     def test_hash_tags_stripped_from_url_lists(self):
-        raise NotImplementedError
+        url_list = '''
+        # This is a comment line
+        http://google.com
+        # This, too, is a comment line
+        https://microsoft.com
+        /static/resource_name
+        '''
+        processed_url_list = _get_urls(url_list)
+        assert len(processed_url_list) == len(url_list)-2, \
+            f'Processed URL list length = {len(processed_url_list)}; expected {len(url_list) - 2}'
 
     def test_urls_out_count_equals_urls_in_count_when_no_hashtags(self):
         raise NotImplementedError
