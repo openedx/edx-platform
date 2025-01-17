@@ -3,6 +3,30 @@ Allows the registration of Django/Python settings that are derived from other se
 via callable methods/lambdas. The derivation time can be controlled to happen after all
 other settings have been set. The derived setting can also be overridden by setting the
 derived setting to an actual value.
+
+Example
+
+In `lms/envs/common.py`:
+
+```
+# Double some other value that might get set later.
+VALUE = lambda settings: settings.SOME_OTHER_VALUE * 2
+# Register this value as one that needs to be derived later.
+derived(VALUE)
+```
+
+Later in a settings file that depends on common.py
+
+```
+from lms.envs.common *
+
+# Set some other value however you want.
+SOME_OTHER_VALUE = 4
+
+# Derive any settings and pass them this settings file for reference.
+# This will update VALUE so that it is the scaler `8` instead of a lambda.
+derive_settings(__name__)
+```
 """
 
 import sys
