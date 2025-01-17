@@ -282,11 +282,10 @@ class CourseOptimizerTestCase(TestCase):
         '''
         processed_url_list = _get_urls(url_list)
         pprint.pp(processed_url_list)
-        assert 1 == 0, "Always fails"
-        # processed_lines = processed_url_list.splitlines()
-        # original_lines = url_list.splitlines()
-        # assert processed_lines == original_lines-2, \
-        #     f'Processed URL list lines = {processed_lines}; expected {original_lines - 2}'
+        processed_lines = len(processed_url_list)
+        original_lines = len(url_list)
+        assert processed_lines == original_lines-2, \
+            f'Processed URL list lines = {processed_lines}; expected {original_lines - 2}'
 
     def test_urls_out_count_equals_urls_in_count_when_no_hashtags(self):
         raise NotImplementedError
