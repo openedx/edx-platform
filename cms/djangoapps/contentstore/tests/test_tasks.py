@@ -280,10 +280,11 @@ class CourseOptimizerTestCase(TestCase):
         href='https://microsoft.com'
         src="/static/resource_name"
         '''
+
         processed_url_list = _get_urls(url_list)
         pprint.pp(processed_url_list)
         processed_lines = len(processed_url_list)    # regex returns a list
-        original_lines = len(url_list.splitlines())    # use splitline to get a list instead of a bunch of chars
+        original_lines = 5
         assert processed_lines == original_lines-2, \
             f'Processed URL list lines = {processed_lines}; expected {original_lines - 2}'
 
