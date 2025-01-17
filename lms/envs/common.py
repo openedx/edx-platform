@@ -3392,8 +3392,34 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
 CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
-CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
+
+# If setting a cross-domain cookie, it's really important to choose
+# a name for the cookie that is DIFFERENT than the cookies used
+# by each subdomain.  For example, suppose the applications
+# at these subdomains are configured to use the following cookie names:
+#
+# 1) foo.example.com --> "csrftoken"
+# 2) baz.example.com --> "csrftoken"
+# 3) bar.example.com --> "csrftoken"
+#
+# For the cross-domain version of the CSRF cookie, you need to choose
+# a name DIFFERENT than "csrftoken"; otherwise, the new token configured
+# for ".example.com" could conflict with the other cookies,
+# non-deterministically causing 403 responses.
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
+
+# When setting the domain for the "cross-domain" version of the CSRF
+# cookie, you should choose something like: ".example.com"
+# (note the leading dot), where both the referer and the host
+# are subdomains of "example.com".
+#
+# Browser security rules require that
+# the cookie domain matches the domain of the server; otherwise
+# the cookie won't get set.  And once the cookie gets set, the client
+# needs to be on a domain that matches the cookie domain, otherwise
+# the client won't be able to read the cookie.
+CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
+
 
 ######################### Django Rest Framework ########################
 
