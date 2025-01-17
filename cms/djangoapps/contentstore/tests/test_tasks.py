@@ -292,10 +292,12 @@ class CourseOptimizerTestCase(TestCase):
         FIRST_URL = 'http://google.com'
         SECOND_URL = 'https://microsoft.com'
         THIRD_URL = "/static/resource_name"
+        FOURTH_URL = 'http://ibm.com'
         url_list = f'''
         href={FIRST_URL}
         href={SECOND_URL}
         src={THIRD_URL}
+        tag={FOURTH_URL}
         '''
 
         processed_url_list = _get_urls(url_list)

@@ -1221,6 +1221,7 @@ def _retry_validation(url_list, course_key, retry_count=3):
     for i in range(0, retry_count):
         if retry_list:
             LOGGER.debug(f'[Link Check] retry attempt #{i + 1}')
+            print("****** About to call _retry_validation_and_filter **********")
             retry_list = _retry_validation_and_filter(course_key, results, retry_list)
     results.extend(retry_list)
 
@@ -1228,6 +1229,7 @@ def _retry_validation(url_list, course_key, retry_count=3):
 
 
 def _retry_validation_and_filter(course_key, results, retry_list):
+    print("********* In _retry_validation_and_filter ***************")
     validated_url_list = asyncio.run(
         _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
     )
@@ -1275,7 +1277,6 @@ def check_broken_links(self, user_id, course_key_string, language):
     broken_or_locked_urls, retry_list = _filter_by_status(validated_url_list)
 
     if retry_list:
-        logging.info("**** about to retry link validation ****")
         retry_results = _retry_validation(retry_list, course_key, retry_count=3)
         broken_or_locked_urls.extend(retry_results)
 
