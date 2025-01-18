@@ -38,7 +38,7 @@ from xmodule.capa.tests.response_xml_factory import (
     TrueFalseResponseXMLFactory
 )
 from xmodule.capa.util import convert_files_to_filenames
-from xmodule.capa.xqueue_interface import dateformat
+from xmodule.capa.xqueue_submission import dateformat
 
 
 class ResponseTest(unittest.TestCase):

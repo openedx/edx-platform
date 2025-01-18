@@ -36,7 +36,9 @@ from shapely.geometry import MultiPoint, Point
 from six.moves import map, range, zip
 
 import xmodule.capa.safe_exec as safe_exec
-import xmodule.capa.xqueue_interface as xqueue_interface
+import xmodule.capa.xqueue_submission as xqueue_submission
+from xmodule.capa.xqueue_submission import XQUEUE_TIMEOUT, XQueueServiceSubmission
+from xmodule.capa.util import construct_callback
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.grade_utils import round_away_from_zero
 
@@ -2675,16 +2677,16 @@ class CodeResponse(LoncapaResponse):
         #------------------------------------------------------------
 
         qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(), xqueue_submission.dateformat)
 
         anonymous_student_id = self.capa_system.anonymous_student_id
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(
+        queuekey = xqueue_submission.make_hashkey(
             str(self.capa_system.seed) + qtime + anonymous_student_id + self.answer_id
         )
-        callback_url = self.capa_system.xqueue.construct_callback()
-        xheader = xqueue_interface.make_xheader(
+        callback_url = self.capa_system.xqueue.send_callback()
+        xheader = xqueue_submission.make_xheader(
             lms_callback_url=callback_url,
             lms_key=queuekey,
             queue_name=self.queue_name
@@ -2714,12 +2716,12 @@ class CodeResponse(LoncapaResponse):
         if is_list_of_files(submission):
             # TODO: Is there any information we want to send here?
             contents.update({'student_response': ''})
-            (error, msg) = qinterface.send_to_queue(header=xheader,
+            (error, msg) = qinterface.send_to_submission(header=xheader,
                                                     body=json.dumps(contents),
                                                     files_to_upload=submission)
         else:
             contents.update({'student_response': submission})
-            (error, msg) = qinterface.send_to_queue(header=xheader,
+            (error, msg) = qinterface.send_to_submission(header=xheader,
                                                     body=json.dumps(contents))
 
         # State associated with the queueing request

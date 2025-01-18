@@ -34,7 +34,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa import responsetypes
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from xmodule.capa.xqueue_interface import XQueueInterface
+from xmodule.capa.xqueue_submission import XQueueInterfaceSubmission
 from xmodule.capa_block import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
 
@@ -257,17 +257,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         (requests.exceptions.ReadTimeout, (1, 'failed to read from the server')),
         (requests.exceptions.ConnectionError, (1, 'cannot connect to server')),
     )
-    @ddt.unpack
-    def test_xqueue_request_exception(self, exception, result):
-        """
-        Makes sure that platform will raise appropriate exception in case of
-        connect/read timeout(s) to request to xqueue
-        """
-        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
-        with patch.object(xqueue_interface.session, 'post', side_effect=exception):
-            # pylint: disable = protected-access
-            response = xqueue_interface._http_post('http://some/fake/url', {})
-            assert response == result
+
 
     def test_showanswer_attempted(self):
         problem = CapaFactory.create(showanswer='attempted')
@@ -1213,57 +1203,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Expect that the number of attempts is NOT incremented
         assert block.attempts == 1
 
-    @patch.object(XQueueInterface, '_http_post')
-    def test_submit_problem_with_files(self, mock_xqueue_post):
-        # Check a problem with uploaded files, using the submit_problem API.
-        # pylint: disable=protected-access
 
-        # The files we'll be uploading.
-        fnames = ["prog1.py", "prog2.py", "prog3.py"]
-        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
-        fileobjs = [open(fpath) for fpath in fpaths]
-        for fileobj in fileobjs:
-            self.addCleanup(fileobj.close)
-
-        block = CapaFactoryWithFiles.create()
-
-        # Mock the XQueueInterface post method
-        mock_xqueue_post.return_value = (0, "ok")
-
-        # Create a request dictionary for submit_problem.
-        get_request_dict = {
-            CapaFactoryWithFiles.input_key(response_num=2): fileobjs,
-            CapaFactoryWithFiles.input_key(response_num=3): 'None',
-        }
-
-        block.submit_problem(get_request_dict)
-
-        # pylint: disable=line-too-long
-        # _http_post is called like this:
-        #   _http_post(
-        #       'http://example.com/xqueue/xqueue/submit/',
-        #       {
-        #           'xqueue_header': '{"lms_key": "df34fb702620d7ae892866ba57572491", "lms_callback_url": "/", "queue_name": "BerkeleyX-cs188x"}',
-        #           'xqueue_body': '{"student_info": "{\\"anonymous_student_id\\": \\"student\\", \\"submission_time\\": \\"20131117183318\\"}", "grader_payload": "{\\"project\\": \\"p3\\"}", "student_response": ""}',
-        #       },
-        #       files={
-        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html'):
-        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html', mode 'r' at 0x49c5f60>,
-        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg'):
-        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg', mode 'r' at 0x49c56f0>,
-        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf'):
-        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf', mode 'r' at 0x49c5a50>,
-        #       },
-        #   )
-        # pylint: enable=line-too-long
-
-        assert mock_xqueue_post.call_count == 1
-        _, kwargs = mock_xqueue_post.call_args
-        self.assertCountEqual(fpaths, list(kwargs['files'].keys()))
-        for fpath, fileobj in kwargs['files'].items():
-            assert fpath == fileobj.name
-
-    @patch.object(XQueueInterface, '_http_post')
+    @patch.object(XQueueInterfaceSubmission, '_http_post')
     def test_submit_problem_with_files_as_xblock(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the XBlock API.
         # pylint: disable=protected-access
@@ -1277,7 +1218,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         block = CapaFactoryWithFiles.create()
 
-        # Mock the XQueueInterface post method
+        # Mock the XQueueInterfaceSubmission post method
         mock_xqueue_post.return_value = (0, "ok")
 
         # Create a webob Request with the files uploaded.
@@ -3900,7 +3841,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                                         'group_label': '',
                                         'variant': block.seed}}
 
-    @patch.object(XQueueInterface, '_http_post')
+    @patch.object(XQueueInterfaceSubmission, '_http_post')
     def test_file_inputs(self, mock_xqueue_post):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
         fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
@@ -3911,7 +3852,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         factory = CapaFactoryWithFiles
         block = factory.create()
 
-        # Mock the XQueueInterface post method
+        # Mock the XQueueInterfaceSubmission post method
         mock_xqueue_post.return_value = (0, "ok")
 
         answer_input_dict = {

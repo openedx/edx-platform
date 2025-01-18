@@ -878,7 +878,7 @@ CSRF_TRUSTED_ORIGINS = []
 CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 
 #################### CAPA External Code Evaluation #############################
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 120  # seconds
 XQUEUE_INTERFACE = {
     'url': 'http://localhost:18040',
     'basic_auth': ['edx', 'edx'],

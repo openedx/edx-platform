@@ -35,7 +35,7 @@ from six.moves import zip
 from xmodule.capa import inputtypes
 from xmodule.capa.checker import DemoSystem
 from xmodule.capa.tests.helpers import test_capa_system
-from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT
+from xmodule.capa.xqueue_submission import XQUEUE_TIMEOUT
 from openedx.core.djangolib.markup import HTML
 
 # just a handy shortcut

@@ -31,7 +31,7 @@ from pytz import UTC
 import xmodule.capa.customrender as customrender
 import xmodule.capa.inputtypes as inputtypes
 import xmodule.capa.responsetypes as responsetypes
-import xmodule.capa.xqueue_interface as xqueue_interface
+import xmodule.capa.xqueue_submission as xqueue_submission
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.safe_exec import safe_exec
 from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_block
@@ -431,7 +431,7 @@ class LoncapaProblem(object):
             if self.correct_map.is_queued(answer_id)
         ]
         queuetimes = [
-            datetime.strptime(qt_str, xqueue_interface.dateformat).replace(tzinfo=UTC)
+            datetime.strptime(qt_str, xqueue_submission.dateformat).replace(tzinfo=UTC)
             for qt_str in queuetime_strs
         ]
 

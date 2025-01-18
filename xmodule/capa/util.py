@@ -11,6 +11,8 @@ from decimal import Decimal
 import nh3
 from calc import evaluator
 from lxml import etree
+from django.conf import settings
+from django.urls import reverse
 
 from openedx.core.djangolib.markup import HTML
 
@@ -249,3 +251,22 @@ def get_course_id_from_capa_block(capa_block):
         #     raise a type error when we try to serialize them into a course
         #     run key. This is tolerable because such course runs are deprecated.
         return None
+
+
+def construct_callback(block, dispatch: str = 'score_update') -> str:
+    """
+    Return a fully qualified callback URL for external queueing system.
+    """
+    relative_xqueue_callback_url = reverse(
+        'xqueue_callback',
+        kwargs=dict(
+            course_id=str(block.scope_ids.usage_id.context_key),
+            userid=str(block.scope_ids.user_id),
+            mod_id=str(block.scope_ids.usage_id),
+            dispatch=dispatch,
+        ),
+    )
+    xqueue_callback_url_prefix = settings.XQUEUE_INTERFACE.get('url', settings.LMS_ROOT_URL)
+    print('xqueue_callback_url_prefix -------', xqueue_callback_url_prefix)
+    print('relative_xqueue_callback_url --------------------', relative_xqueue_callback_url)
+    return xqueue_callback_url_prefix + relative_xqueue_callback_url
