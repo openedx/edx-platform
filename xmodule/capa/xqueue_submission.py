@@ -158,7 +158,9 @@ class XQueueInterfaceSubmission:
             return (0, "Submission sent successfully")
         except Exception as e:
             # Retornar error con mensaje de la excepción
-            return (1, f"Submission failed: {str(e)}")
+            return (1, f"Error: {str(e)}")
+        # Asegurar que siempre se devuelve una tupla
+        return (1, "Unknown error")
 
 
 class XQueueServiceSubmission:

@@ -1014,8 +1014,12 @@ class MatlabInput(CodeInput):
             'requestor_id': anonymous_student_id,
         }
 
-        (error, msg) = qinterface.send_to_submission(header=xheader,
-                                                body=json.dumps(contents))
+        result = qinterface.send_to_submission(header=xheader, body=json.dumps(contents))
+        print("Result from send_to_submission: ", result)
+        if not isinstance(result, tuple) or len(result) != 2:
+            result = (1, "Unknown error")
+
+        error, msg = result
         # save the input state if successful
         if error == 0:
             self.input_state['queuekey'] = queuekey
@@ -1024,8 +1028,8 @@ class MatlabInput(CodeInput):
 
         return {'success': error == 0, 'message': msg}
 
-
 #-----------------------------------------------------------------------------
+
 
 @registry.register
 class Schematic(InputTypeBase):

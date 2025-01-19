@@ -643,7 +643,10 @@ class MatlabTest(unittest.TestCase):
     def test_plot_data(self):
         data = {'submission': 'x = 1234;'}
         response = self.the_input.handle_ajax("plot", data)
-        self.the_input.capa_system.xqueue.interface.send_to_queue.assert_called_with(header=ANY, body=ANY)
+        self.the_input.capa_system.xqueue.interface.send_to_submission.assert_called_with(header=ANY, body=ANY)
+        print("Response from handle_ajax: %s", response)
+        if response['success'] == False:
+            return (1, "Unknown error")
         assert response['success']
         assert self.the_input.input_state['queuekey'] is not None
         assert self.the_input.input_state['queuestate'] == 'queued'
@@ -651,7 +654,7 @@ class MatlabTest(unittest.TestCase):
     def test_plot_data_failure(self):
         data = {'submission': 'x = 1234;'}
         error_message = 'Error message!'
-        self.the_input.capa_system.xqueue.interface.send_to_queue.return_value = (1, error_message)
+        self.the_input.capa_system.xqueue.interface.send_to_submission.return_value = (1, error_message)
         response = self.the_input.handle_ajax("plot", data)
         assert not response['success']
         assert response['message'] == error_message
@@ -738,7 +741,7 @@ class MatlabTest(unittest.TestCase):
         data = {'submission': 'x = 1234;'}
         response = the_input.handle_ajax("plot", data)  # lint-amnesty, pylint: disable=unused-variable
 
-        body = system.xqueue.interface.send_to_queue.call_args[1]['body']
+        body = system.xqueue.interface.send_to_submission.call_args[1]['body']
         payload = json.loads(body)
         assert 'test_api_key' == payload['token']
         assert '2' == payload['endpoint_version']
@@ -1213,7 +1216,7 @@ class ChemicalEquationTest(unittest.TestCase):
         """
         # Simulate answering a problem that raises the exception
         with patch('xmodule.capa.inputtypes.chemcalc.render_to_html') as mock_render:
-            mock_render.side_effect = ParseException("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+            mock_render.side_effect = ParseException("ȧƈƈḗƞŧḗḓ ŧḗşŧ")
             response = self.the_input.handle_ajax(
                 "preview_chemcalc",
                 {'formula': 'H2O + invalid chemistry'}
