@@ -10,6 +10,8 @@ from django.core.management.base import CommandError
 from django.utils import timezone
 from freezegun import freeze_time
 
+from openedx_learning.api.authoring_models import LearningContextLinksStatus, LearningContextLinksStatusChoices
+
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
@@ -137,12 +139,18 @@ class TestUpstreamLinksTasks(ModuleStoreTestCase):
         """
         Test task create_or_update_upstream_links for a course
         """
+        assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key)).exists()
         create_or_update_upstream_links(str(self.course_key), force=False)
         expected_calls = [
             (self.component_1.usage_key, str(self.course_key), self.course.display_name_with_default, self.now),
             (self.component_2.usage_key, str(self.course_key), self.course.display_name_with_default, self.now),
         ]
         assert [(x[0][0].usage_key, x[0][1], x[0][2], x[0][3]) for x in mock_api.call_args_list] == expected_calls
+        assert LearningContextLinksStatus.objects.filter(context_key=str(self.course_key)).exists()
+        assert LearningContextLinksStatus.objects.filter(
+            context_key=str(self.course_key)
+        ).first().status == LearningContextLinksStatusChoices.COMPLETED
+
         mock_api.reset_mock()
         # call again with same course, it should not be processed again
         # as its LearningContextLinksStatusChoices = COMPLETED
@@ -168,3 +176,19 @@ class TestUpstreamLinksTasks(ModuleStoreTestCase):
         # call for xblock with no upstream
         create_or_update_xblock_upstream_link(str(self.component_3.usage_key))
         mock_api.assert_not_called()
+
+    @patch(
+        'openedx.core.djangoapps.content_libraries.api.create_or_update_xblock_upstream_link'
+    )
+    def test_create_or_update_upstream_links_task_for_invalid_course(self, mock_api):
+        """
+        Test task create_or_update_upstream_links for an invalid course key.
+        """
+        course_key = "course-v1:non+existent+course"
+        assert not LearningContextLinksStatus.objects.filter(context_key=course_key).exists()
+        create_or_update_upstream_links(course_key, force=False)
+        mock_api.assert_not_called()
+        assert LearningContextLinksStatus.objects.filter(context_key=course_key).exists()
+        assert LearningContextLinksStatus.objects.filter(
+            context_key=course_key
+        ).first().status == LearningContextLinksStatusChoices.FAILED
