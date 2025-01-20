@@ -499,6 +499,7 @@ class VideoStudioViewHandlers:
         """
         _ = self.runtime.service(self, "i18n").ugettext
 
+        # pylint: disable=too-many-nested-blocks
         if dispatch.startswith('translation'):
 
             if request.method == 'POST':
