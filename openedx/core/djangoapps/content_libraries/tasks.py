@@ -17,18 +17,27 @@ Architecture note:
 from __future__ import annotations
 
 import logging
+from datetime import datetime, timezone
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
 from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
+from opaque_keys.edx.keys import UsageKey
 
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib import ensure_cms
+from openedx_learning.api.authoring import (
+    get_entity_links,
+    get_or_create_learning_context_link_status,
+    update_learning_context_link_status,
+)
+from openedx_learning.api.authoring_models import LearningContextLinksStatusChoices
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
 from xmodule.modulestore import ModuleStoreEnum
@@ -167,6 +176,78 @@ def duplicate_children(
             TASK_LOGGER.exception('Error Copying Overrides from %s to %s', source_block_id, dest_block_id)
             if self.status.state != UserTaskStatus.FAILED:
                 self.status.fail({'raw_error_msg': str(exception)})
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def create_or_update_xblock_upstream_link(usage_key):
+    """
+    Create or update upstream link for a single xblock.
+    """
+    ensure_cms("create_or_update_xblock_upstream_link may only be executed in a CMS context")
+    xblock = modulestore().get_item(UsageKey.from_string(usage_key))
+    if not xblock.upstream or not xblock.upstream_version:
+        return
+    try:
+        course_name = CourseOverview.get_from_id(xblock.course_id).display_name_with_default
+    except CourseOverview.DoesNotExist:
+        TASK_LOGGER.exception(f'Could not find course: {xblock.course_id}')
+        return
+    api.create_or_update_xblock_upstream_link(xblock, str(xblock.course_id), course_name)
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def create_or_update_upstream_links(course_key_str: str, force: bool = False, created: datetime | None = None):
+    """
+    A Celery task to create or update upstream downstream links in database from course xblock content.
+    """
+    ensure_cms("create_or_update_upstream_links may only be executed in a CMS context")
+
+    if not created:
+        created = datetime.now(timezone.utc)
+    course_status = get_or_create_learning_context_link_status(course_key_str, created)
+    if course_status.status in [
+        LearningContextLinksStatusChoices.COMPLETED,
+        LearningContextLinksStatusChoices.PROCESSING
+    ] and not force:
+        return
+    store = modulestore()
+    course_key = CourseKey.from_string(course_key_str)
+    update_learning_context_link_status(
+        context_key=course_key_str,
+        status=LearningContextLinksStatusChoices.PROCESSING,
+        updated=created,
+    )
+    try:
+        course_name = CourseOverview.get_from_id(course_key).display_name_with_default
+    except CourseOverview.DoesNotExist:
+        TASK_LOGGER.exception(f'Could not find course: {course_key_str}')
+        update_learning_context_link_status(
+            context_key=course_key_str,
+            status=LearningContextLinksStatusChoices.FAILED,
+        )
+        return
+    xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
+    for xblock in xblocks:
+        api.create_or_update_xblock_upstream_link(xblock, course_key_str, course_name, created)
+    update_learning_context_link_status(
+        context_key=course_key_str,
+        status=LearningContextLinksStatusChoices.COMPLETED,
+    )
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def update_course_name_in_upstream_links(course_key_str: str, new_course_name: str):
+    """
+    Celery task to update course name in upstream->downstream entity links.
+    """
+    updated_time = datetime.now(timezone.utc)
+    get_entity_links({"downstream_context_key": course_key_str}).update(
+        downstream_context_title=new_course_name,
+        updated=updated_time
+    )
 
 
 def _sync_children(

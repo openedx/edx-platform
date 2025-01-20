@@ -1952,3 +1952,28 @@ def import_blocks_create_task(library_key, course_key, use_course_key_as_block_i
     log.info(f"Import block task created: import_task={import_task} "
              f"celery_task={result.id}")
     return import_task
+
+
+def create_or_update_xblock_upstream_link(xblock, course_key: str, course_name: str, created: datetime | None = None):
+    """
+    Create or update upstream->downstream link in database for given xblock.
+    """
+    if not xblock.upstream:
+        return None
+    upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
+    try:
+        lib_component = get_component_from_usage_key(upstream_usage_key)
+    except ObjectDoesNotExist:
+        log.error(f"Library component not found for {upstream_usage_key}")
+        lib_component = None
+    authoring_api.update_or_create_entity_link(
+        lib_component,
+        upstream_usage_key=xblock.upstream,
+        upstream_context_key=str(upstream_usage_key.context_key),
+        downstream_context_key=course_key,
+        downstream_context_title=course_name,
+        downstream_usage_key=str(xblock.usage_key),
+        version_synced=xblock.upstream_version,
+        version_declined=xblock.upstream_version_declined,
+        created=created,
+    )

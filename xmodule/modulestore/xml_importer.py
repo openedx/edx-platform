@@ -40,6 +40,8 @@ from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from common.djangoapps.util.monitoring import monitor_import_failure
+from openedx.core.djangoapps.content_libraries.tasks import create_or_update_upstream_links
+from openedx.core.djangoapps.content_tagging.api import import_course_tags_from_csv
 from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.errortracker import make_error_tracker
@@ -52,7 +54,6 @@ from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModu
 from xmodule.tabs import CourseTabList
 from xmodule.util.misc import escape_invalid_characters
 from xmodule.x_module import XModuleMixin
-from openedx.core.djangoapps.content_tagging.api import import_course_tags_from_csv
 
 from .inheritance import own_metadata
 from .store_utilities import rewrite_nonportable_content_links
@@ -548,6 +549,11 @@ class ImportManager:
                 # pylint: disable=raise-missing-from
                 raise BlockFailedToImport(leftover.display_name, leftover.location)
 
+    def post_course_import(self, dest_id):
+        """
+        Tasks that need to triggered after a course is imported.
+        """
+
     def run_imports(self):
         """
         Iterate over the given directories and yield courses.
@@ -589,6 +595,7 @@ class ImportManager:
                     logging.info(f'Course import {dest_id}: No tags.csv file present.')
                 except ValueError as e:
                     logging.info(f'Course import {dest_id}: {str(e)}')
+            self.post_course_import(dest_id)
             yield courselike
 
 
@@ -716,6 +723,12 @@ class CourseImportManager(ImportManager):
         """
         csv_path = path(data_path) / 'tags.csv'
         import_course_tags_from_csv(csv_path, dest_id)
+
+    def post_course_import(self, dest_id):
+        """
+        Trigger celery task to create upstream links for newly imported blocks.
+        """
+        create_or_update_upstream_links.delay(str(dest_id))
 
 
 class LibraryImportManager(ImportManager):
