@@ -97,8 +97,9 @@
 <script>
     function postToImportCourse(courseId, importUrl) {
         const csrfToken = document.getElementById('csrf_token').value;
-        const apiUrl = `/api/courses/v0/import/${courseId}/`; // Construct the API URL dynamically
+        const apiUrl = `/course_import_api/import/${courseId}/`; // Construct the API URL dynamically
 
+<!--        /import/course-v1:edX+DemoX+Demo_Course/-->
 
         fetch(apiUrl, {
             method: 'POST',
