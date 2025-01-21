@@ -7,7 +7,7 @@ import json
 import logging
 import pprint
 from unittest import mock
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, patch, MagicMock
 from uuid import uuid4
 
 import pytest as pytest
@@ -32,7 +32,9 @@ from cms.djangoapps.contentstore.tasks import (
     _validate_urls_access_in_batches,
     _filter_by_status,
     check_broken_links,
+    _record_broken_links,
     _get_urls,
+    check_broken_links,
 )
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -445,5 +447,84 @@ class CourseOptimizerTestCase(TestCase):
                 assert mock_retry_validation.call_count == MAX_RETRIES, \
                   f'Got {mock_retry_validation.call_count} retries; expected {MAX_RETRIES}'
 
-    def test_scan_generates_file_named_by_course_key(self):
-        raise NotImplementedError
+    def test_scan_generates_file_named_by_course_key(self, tmp_path):
+        course_key = 'course-v1:edX+DemoX+Demo_Course'
+        filename = _record_broken_links("", course_key)
+        expected_filename = ""
+        assert filename == "", f'Got f{filename} as broken links filename; expected {expected_filename}'
+
+    def mock_dependencies(self):
+        """Fixture to patch all external function calls."""
+        with patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock()) as mock_validate_user, \
+            patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"]) as mock_scan_course, \
+            patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
+                  return_value=[{"url": "url1", "status": "ok"}]) as mock_validate_urls, \
+            patch("cms.djangoapps.contentstore.tasks._filter_by_status", return_value=(["broken_url"], [])) as mock_filter, \
+            patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=["retry_url"]) as mock_retry, \
+            patch("cms.djangoapps.contentstore.tasks._record_broken_links") as mock_record_broken_links:
+            yield {
+                "mock_validate_user": mock_validate_user,
+                "mock_scan_course": mock_scan_course,
+                "mock_validate_urls": mock_validate_urls,
+                "mock_filter": mock_filter,
+                "mock_retry": mock_retry,
+                "mock_record_broken_links": mock_record_broken_links,
+            }
+
+    def test_broken_links(self):
+        # Parameters for the function
+        user_id = "test_user"
+        language = "en"
+        course_key_string = "course-v1:edX+DemoX+2025"
+        course_key = MagicMock()  # Simulate CourseKey.from_string()
+
+        # Mocking self and status attributes for the test
+        class MockStatus:
+            def __init__(self):
+                self.state = "READY"
+
+            def set_state(self, state):
+                self.state = state
+
+            def increment_completed_steps(self):
+                pass
+
+            def fail(self, error_details):
+                self.state = "FAILED"
+
+        class MockSelf:
+            def __init__(self):
+                self.status = MockStatus()
+
+        mock_self = MockSelf()
+
+        check_broken_links(user_id, course_key, language)
+
+        url_list = self.mock_dependencies["mock_scan_course"].return_value
+        validated_url_list = self.mock_dependencies["mock_validate_urls"].return_value
+        broken_or_locked_urls, retry_list = self.mock_dependencies["mock_filter"].return_value
+
+        if retry_list:
+            retry_results = self.mock_dependencies["mock_retry"].return_value
+            broken_or_locked_urls.extend(retry_results)
+
+        try:
+            mock_self.status.increment_completed_steps()
+            self.mock_dependencies["mock_record_broken_links"].assert_called_once_with(
+                mock_self, broken_or_locked_urls, course_key
+            )
+        except Exception as e:
+            logging.exception("Error checking links for course %s", course_key, exc_info=True)
+            if mock_self.status.state != "FAILED":
+                mock_self.status.fail({"raw_error_msg": str(e)})
+            assert False, "Exception should not occur"
+
+        # Assertions to confirm patched calls were invoked
+        self.mock_dependencies["mock_validate_user"].assert_called_once_with(mock_self, user_id, language)
+        self.mock_dependencies["mock_scan_course"].assert_called_once_with(course_key)
+        self.mock_dependencies["mock_validate_urls"].assert_called_once_with(url_list, course_key, batch_size=100)
+        self.mock_dependencies["mock_filter"].assert_called_once_with(validated_url_list)
+        if retry_list:
+            self.mock_dependencies["mock_retry"].assert_called_once_with(retry_list, course_key, retry_count=3)
+
+

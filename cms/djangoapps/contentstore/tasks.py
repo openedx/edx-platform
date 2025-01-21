@@ -1280,19 +1280,10 @@ def check_broken_links(self, user_id, course_key_string, language):
         retry_results = _retry_validation(retry_list, course_key, retry_count=3)
         broken_or_locked_urls.extend(retry_results)
 
+
     try:
         self.status.increment_completed_steps()
-
-        file_name = str(course_key)
-        broken_links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')
-        LOGGER.debug(f'[Link Check] json file being generated at {broken_links_file.name}')
-
-        with open(broken_links_file.name, 'w') as file:
-            json.dump(broken_or_locked_urls, file, indent=4)
-
-        artifact = UserTaskArtifact(status=self.status, name='BrokenLinks')
-        artifact.file.save(name=os.path.basename(broken_links_file.name), content=File(broken_links_file))
-        artifact.save()
+        _record_broken_links(self, broken_or_locked_urls, course_key)
 
     # catch all exceptions so we can record useful error messages
     except Exception as e:  # pylint: disable=broad-except
@@ -1300,3 +1291,15 @@ def check_broken_links(self, user_id, course_key_string, language):
         if self.status.state != UserTaskStatus.FAILED:
             self.status.fail({'raw_error_msg': str(e)})
         return
+
+@shared_task(base=CourseLinkCheckTask, bind=True)
+def _record_broken_links(self, broken_or_locked_urls, course_key):
+    file_name = str(course_key)
+    broken_links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')
+    LOGGER.debug(f'[Link Check] json file being generated at {broken_links_file.name}')
+    with open(broken_links_file.name, 'w') as file:
+        json.dump(broken_or_locked_urls, file, indent=4)
+    artifact = UserTaskArtifact(status=self.status, name='BrokenLinks')
+    artifact.file.save(name=os.path.basename(broken_links_file.name), content=File(broken_links_file))
+    artifact.save()
+    return artifact.file.name
