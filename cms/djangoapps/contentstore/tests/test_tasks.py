@@ -453,25 +453,18 @@ class CourseOptimizerTestCase(TestCase):
         expected_filename = ""
         assert filename == "", f'Got f{filename} as broken links filename; expected {expected_filename}'
 
-    def mock_dependencies(self):
-        """Fixture to patch all external function calls."""
-        with patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock()) as mock_validate_user, \
-            patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"]) as mock_scan_course, \
-            patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
-                  return_value=[{"url": "url1", "status": "ok"}]) as mock_validate_urls, \
-            patch("cms.djangoapps.contentstore.tasks._filter_by_status", return_value=(["broken_url"], [])) as mock_filter, \
-            patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=["retry_url"]) as mock_retry, \
-            patch("cms.djangoapps.contentstore.tasks._record_broken_links") as mock_record_broken_links:
-            yield {
-                "mock_validate_user": mock_validate_user,
-                "mock_scan_course": mock_scan_course,
-                "mock_validate_urls": mock_validate_urls,
-                "mock_filter": mock_filter,
-                "mock_retry": mock_retry,
-                "mock_record_broken_links": mock_record_broken_links,
-            }
-
-    def test_broken_links(self):
+    @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
+    @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])
+    @patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
+                  return_value=[{"url": "url1", "status": "ok"}])
+    @patch("cms.djangoapps.contentstore.tasks._filter_by_status", return_value=(["broken_url"], []))
+    @patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=["retry_url"])
+    def test_broken_links(self,
+                          mock_record_broken_links,
+                          mock_filter,
+                          mock_validate_urls,
+                          mock_scan_course,
+                          mock_validate_user):
         # Parameters for the function
         user_id = "test_user"
         language = "en"
