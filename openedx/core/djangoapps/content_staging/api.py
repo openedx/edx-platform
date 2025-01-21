@@ -66,7 +66,7 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
             olx=block_data.olx_str,
             display_name=block_metadata_utils.display_name_with_default(block),
             suggested_url_name=usage_key.block_id,
-            tags=block_data.tags,
+            tags=block_data.tags or {},
             version_num=(version_num or 0),
         )
         (clipboard, _created) = _UserClipboard.objects.update_or_create(user_id=user_id, defaults={
@@ -209,7 +209,7 @@ def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardDat
             status=content.status,
             block_type=content.block_type,
             display_name=content.display_name,
-            tags=content.tags,
+            tags=content.tags or {},
             version_num=content.version_num,
         ),
         source_usage_key=clipboard.source_usage_key,
