@@ -26,4 +26,3 @@ from .videos import (
     VideoUploadSerializer,
     VideoUsageSerializer,
 )
-from .course_templates import CourseSerializer, CourseMetadataSerializer
