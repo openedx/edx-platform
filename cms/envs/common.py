@@ -2962,10 +2962,9 @@ DISABLED_COUNTRIES = []
 
 
 OPEN_EDX_FILTERS_CONFIG = {
-    "org.openedx.templates.fetch.requested.v1": {
+    "org.edly.templates.fetch.requested.v1": {
         "pipeline": [
-            "openedx_filters.course_authoring.course_templates_pipeline.GithubTemplatesPipeline",
-            "openedx_filters.course_authoring.course_templates_pipeline.S3TemplatesPipeline",
+            "course_import.pipeline.GithubTemplatesPipeline",
         ],
         "fail_silently": False,
     },

@@ -472,20 +472,19 @@ def _latest_task_status(request, course_key_string, view_func=None):
     return task_status.order_by('-created').first()
 
 
-def course_templates(request, course_key_string):
+def custom_course_templates(request, course_key_string):
     courselike_key = CourseKey.from_string(course_key_string)
     organization = courselike_key.org
     # successful_url = f"http://localhost:18010/api/contentstore/v1/course_templates/{course_key_string}"
 
     courses = []
-    from openedx_filters.course_authoring.filters import CourseTemplateRequested
+    from course_import.filters import CourseTemplateRequested
     courses = CourseTemplateRequested.run_filter(
         source_type="github",
         source_config="https://raw.githubusercontent.com/awais786/courses/refs/heads/main/edly_courses.json",
-        templates_data={}
     )
     if courses:
-        courses = courses['source_config']
+        courses = courses['result']
 
     return render(request, 'course_templates.html', {
         # 'upload_zip_endpoint': successful_url,
