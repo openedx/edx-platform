@@ -86,6 +86,8 @@ from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
 
+from .tasks import _validate_user
+
 User = get_user_model()
 
 LOGGER = get_task_logger(__name__)
@@ -1106,13 +1108,13 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
 
 # -------------- Course optimizer functions ------------------
 
-def _validate_user(task, user_id, language):
+def _validate_user(self, user_id, language):
     """Validate if the user exists. Otherwise log error. """
     try:
-        return User.objects.get(pk=user_id)
+        return User.objects.get(pk=user_id), False
     except User.DoesNotExist as exc:
         with translation_language(language):
-            task.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
+            return UserErrors.UNKNOWN_USER_ID.format(user_id), True
         return
 
 def _get_urls(content):
@@ -1268,7 +1270,9 @@ def check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results in a file.
     """
-    user = _validate_user(self, user_id, language)
+    user, is_error = _validate_user(self, user_id, language)
+    if is_error:
+        self.status.fail(user)
 
     self.status.set_state('Scanning')
     course_key = CourseKey.from_string(course_key_string)

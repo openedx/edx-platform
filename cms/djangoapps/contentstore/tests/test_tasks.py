@@ -24,14 +24,13 @@ from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
 logging = logging.getLogger(__name__)
 
-from cms.djangoapps.contentstore.tasks import (
+from ..tasks import (
     export_olx,
     update_special_exams_and_publish,
     rerun_course,
     _convert_to_standard_url,
     _validate_urls_access_in_batches,
     _filter_by_status,
-    check_broken_links,
     _record_broken_links,
     _get_urls,
     check_broken_links,
@@ -453,7 +452,7 @@ class CourseOptimizerTestCase(TestCase):
         expected_filename = ""
         assert filename == "", f'Got f{filename} as broken links filename; expected {expected_filename}'
 
-    @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
+    @patch("tasks._validate_user", return_value=MagicMock())
     @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])
     @patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
                   return_value=[{"url": "url1", "status": "ok"}])
@@ -466,7 +465,7 @@ class CourseOptimizerTestCase(TestCase):
                           mock_scan_course,
                           mock_validate_user):
         # Parameters for the function
-        user_id = "test_user"
+        user_id = 1234
         language = "en"
         course_key_string = "course-v1:edX+DemoX+2025"
         course_key = MagicMock()  # Simulate CourseKey.from_string()
