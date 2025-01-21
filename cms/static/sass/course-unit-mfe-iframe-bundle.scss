@@ -200,7 +200,7 @@ body {
     }
   }
 
-  .modal-window.modal-editor {
+  .modal-window.modal-editor, &.xblock-iframe-content {
     background-color: $white;
     border-radius: 6px;
 
@@ -380,6 +380,22 @@ body {
 
   .modal-lg.modal-window.confirm.openassessment_modal_window {
     height: 635px;
+  }
+
+  // Additions for the xblock editor on the Library Authoring
+  &.xblock-iframe-content .xblock-actions {
+    padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+
+    .action-item {
+      @extend %t-action3;
+
+      display: inline-block;
+      margin-right: ($baseline*0.75);
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
   }
 }
 
