@@ -11,13 +11,13 @@ from .views import (
     CourseDetailsView,
     CourseTeamView,
     CourseTextbooksView,
-    CourseTemplatesListView,
     CourseIndexView,
     CourseGradingView,
     CourseGroupConfigurationsView,
     CourseRerunView,
     CourseSettingsView,
     CourseVideosView,
+    CourseWaffleFlagsView,
     HomePageView,
     HomePageCoursesView,
     HomePageLibrariesView,
@@ -133,10 +133,11 @@ urlpatterns = [
         name="container_vertical"
     ),
     re_path(
-        fr'^course_templates/{settings.COURSE_ID_PATTERN}$',
-        CourseTemplatesListView.as_view(),
-        name="course_templates_api"
+        fr'^course_waffle_flags(?:/{COURSE_ID_PATTERN})?$',
+        CourseWaffleFlagsView.as_view(),
+        name="course_waffle_flags"
     ),
+
     # Authoring API
     # Do not use under v1 yet (Nov. 23). The Authoring API is still experimental and the v0 versions should be used
 ]
