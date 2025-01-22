@@ -1954,4 +1954,4 @@ def import_blocks_create_task(library_key, course_key, use_course_key_as_block_i
     return import_task
 
 # To enable use content library permissions as public API
-permissions = permissions
+lib_permissions = permissions

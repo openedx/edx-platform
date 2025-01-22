@@ -714,7 +714,7 @@ def _get_item(request, data):
             lib_api.require_permission_for_library_key(
                 context_key,
                 request.user,
-                lib_api.permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+                lib_api.lib_permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
             )
             return xblock_api.load_block(usage_key, request.user), True
         raise TranscriptsRequestValidationException(_('Transcripts are not yet supported for this type of block'))
