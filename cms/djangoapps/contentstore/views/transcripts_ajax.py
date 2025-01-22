@@ -19,7 +19,8 @@ from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
 from edxval.api import create_external_video, create_or_update_video_transcript
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, UsageKeyV2
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from cms.djangoapps.contentstore.video_storage_handlers import TranscriptProvider
 from common.djangoapps.student.auth import has_course_author_access
@@ -43,6 +44,8 @@ from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: dis
     get_transcript_link_from_youtube,
     get_transcript_links_from_youtube,
 )
+from openedx.core.djangoapps.content_libraries import api as lib_api, permissions
+from openedx.core.djangoapps.xblock import api as xblock_api
 
 __all__ = [
     'upload_transcripts',
@@ -81,13 +84,17 @@ def link_video_to_component(video_component, user):
     edx_video_id = clean_video_id(video_component.edx_video_id)
     if not edx_video_id:
         edx_video_id = create_external_video(display_name='external video')
+
+        if isinstance(video_component.usage_key, UsageKeyV2):
+            return edx_video_id
+
         video_component.edx_video_id = edx_video_id
         video_component.save_with_metadata(user)
 
     return edx_video_id
 
 
-def save_video_transcript(edx_video_id, input_format, transcript_content, language_code):
+def save_video_transcript(usage_key, edx_video_id, input_format, transcript_content, language_code):
     """
     Saves a video transcript to the VAL and its content to the configured django storage(DS).
 
@@ -118,6 +125,21 @@ def save_video_transcript(edx_video_id, input_format, transcript_content, langua
             },
             file_data=ContentFile(sjson_subs),
         )
+        if isinstance(usage_key.context_key, LibraryLocatorV2):
+            # Save transcript as static asset in Learning Core if is a library component
+            srt_content = Transcript.convert(
+                content=sjson_subs,
+                input_format=Transcript.SJSON,
+                output_format=Transcript.SRT
+            ).encode()
+
+            filename = f"static/{edx_video_id}-{language_code}.srt"
+            lib_api.add_library_block_static_asset_file(
+                usage_key,
+                filename,
+                srt_content,
+            )
+
         result = True
     except (TranscriptsGenerationException, UnicodeDecodeError):
         result = False
@@ -142,9 +164,10 @@ def validate_video_block(request, locator):
     """
     error, item = None, None
     try:
-        item = _get_item(request, {'locator': locator})
+        item, _ = _get_item(request, {'locator': locator})
         if item.category != 'video':
-            error = _('Transcripts are supported only for "video" blocks.')
+            raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" blocks.'))
+
     except (InvalidKeyError, ItemNotFoundError):
         error = _('Cannot find item by locator.')
 
@@ -308,7 +331,7 @@ def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statem
     }
 
     try:
-        __, videos, item = _validate_transcripts_data(request)
+        __, videos, item, isLibraryContent = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(transcripts_presence, str(e))
 
@@ -319,66 +342,81 @@ def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statem
         get_transcript_from_val(edx_video_id=edx_video_id, lang='en')
         command = 'found'
     except NotFoundError:
-        filename = f'subs_{item.sub}.srt.sjson'
-        content_location = StaticContent.compute_location(item.location.course_key, filename)
-        try:
-            local_transcripts = contentstore().find(content_location).data.decode('utf-8')
-            transcripts_presence['current_item_subs'] = item.sub
-        except NotFoundError:
-            pass
-
         # Check for youtube transcripts presence
         youtube_id = videos.get('youtube', None)
         if youtube_id:
-            transcripts_presence['is_youtube_mode'] = True
+            _check_youtube_transcripts(
+                transcripts_presence,
+                youtube_id,
+                item,
+                isLibraryContent,
+            )
 
-            # youtube local
-            filename = f'subs_{youtube_id}.srt.sjson'
+        if not isLibraryContent:
+            filename = f'subs_{item.sub}.srt.sjson'
             content_location = StaticContent.compute_location(item.location.course_key, filename)
             try:
-                local_transcripts = contentstore().find(content_location).data.decode('utf-8')
-                transcripts_presence['youtube_local'] = True
+                contentstore().find(content_location).data.decode('utf-8')
+                transcripts_presence['current_item_subs'] = item.sub
             except NotFoundError:
-                log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
+                pass
 
-            if get_transcript_link_from_youtube(youtube_id):
-                transcripts_presence['youtube_server'] = True
-            #check youtube local and server transcripts for equality
-            if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
+            # Check for html5 local transcripts presence
+            html5_subs = []
+            for html5_id in videos['html5']:
+                filename = f'subs_{html5_id}.srt.sjson'
+                content_location = StaticContent.compute_location(item.location.course_key, filename)
                 try:
-                    transcript_links = get_transcript_links_from_youtube(
-                        youtube_id,
-                        settings,
-                        item.runtime.service(item, "i18n")
+                    html5_subs.append(contentstore().find(content_location).data)
+                    transcripts_presence['html5_local'].append(html5_id)
+                except NotFoundError:
+                    log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
+                if len(html5_subs) == 2:  # check html5 transcripts for equality
+                    transcripts_presence['html5_equal'] = (
+                        json.loads(html5_subs[0].decode('utf-8')) == json.loads(html5_subs[1].decode('utf-8'))
                     )
-                    for (_, link) in transcript_links.items():
-                        youtube_server_subs = get_transcript_from_youtube(
-                            link, youtube_id, item.runtime.service(item, "i18n")
-                        )
-                        if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
-                            transcripts_presence['youtube_diff'] = False
-                except GetTranscriptsFromYouTubeException:
-                    pass
-
-        # Check for html5 local transcripts presence
-        html5_subs = []
-        for html5_id in videos['html5']:
-            filename = f'subs_{html5_id}.srt.sjson'
-            content_location = StaticContent.compute_location(item.location.course_key, filename)
-            try:
-                html5_subs.append(contentstore().find(content_location).data)
-                transcripts_presence['html5_local'].append(html5_id)
-            except NotFoundError:
-                log.debug("Can't find transcripts in storage for non-youtube video_id: %s", html5_id)
-            if len(html5_subs) == 2:  # check html5 transcripts for equality
-                transcripts_presence['html5_equal'] = (
-                    json.loads(html5_subs[0].decode('utf-8')) == json.loads(html5_subs[1].decode('utf-8'))
-                )
 
         command, __ = _transcripts_logic(transcripts_presence, videos)
 
     transcripts_presence.update({'command': command})
     return JsonResponse(transcripts_presence)
+
+
+def _check_youtube_transcripts(transcripts_presence, youtube_id, item, isLibraryContent):
+    """
+    Check for youtube transcripts presence
+    """
+    transcripts_presence['is_youtube_mode'] = True
+
+    if get_transcript_link_from_youtube(youtube_id):
+        transcripts_presence['youtube_server'] = True
+
+    if not isLibraryContent:
+        # youtube local
+        filename = f'subs_{youtube_id}.srt.sjson'
+        content_location = StaticContent.compute_location(item.location.course_key, filename)
+        try:
+            local_transcripts = contentstore().find(content_location).data.decode('utf-8')
+            transcripts_presence['youtube_local'] = True
+        except NotFoundError:
+            log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
+
+    #check youtube local and server transcripts for equality
+    if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
+        try:
+            transcript_links = get_transcript_links_from_youtube(
+                youtube_id,
+                settings,
+                item.runtime.service(item, "i18n")
+            )
+            for (_, link) in transcript_links.items():
+                youtube_server_subs = get_transcript_from_youtube(
+                    link, youtube_id, item.runtime.service(item, "i18n")
+                )
+                if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
+                    transcripts_presence['youtube_diff'] = False
+        except GetTranscriptsFromYouTubeException:
+            pass
 
 
 def _transcripts_logic(transcripts_presence, videos):
@@ -447,7 +485,8 @@ def _validate_transcripts_data(request):
 
         data: dict, loaded json from request,
         videos: parsed `data` to useful format,
-        item:  video item from storage
+        item:  video item from storage or library
+        isLibraryContent: `True` if the item is a library content
 
     Raises `TranscriptsRequestValidationException` if validation is unsuccessful
     or `PermissionDenied` if user has no access.
@@ -456,7 +495,7 @@ def _validate_transcripts_data(request):
     if not data:
         raise TranscriptsRequestValidationException(_('Incoming video data is empty.'))
     try:
-        item = _get_item(request, data)
+        item, isLibraryContent = _get_item(request, data)
     except (InvalidKeyError, ItemNotFoundError):
         raise TranscriptsRequestValidationException(_("Can't find item by locator."))  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -475,7 +514,7 @@ def _validate_transcripts_data(request):
             if videos['html5'].get('video') != video_data['video']:
                 videos['html5'][video_data['video']] = video_data['mode']
 
-    return data, videos, item
+    return data, videos, item, isLibraryContent
 
 
 def validate_transcripts_request(request, include_yt=False, include_html5=False):
@@ -549,7 +588,13 @@ def choose_transcripts(request):
         edx_video_id = link_video_to_component(video, request.user)
 
         # 3. Upload the retrieved transcript to DS for the linked video ID.
-        success = save_video_transcript(edx_video_id, input_format, transcript_content, language_code='en')
+        success = save_video_transcript(
+            video.usage_key,
+            edx_video_id,
+            input_format,
+            transcript_content,
+            language_code='en',
+        )
         if success:
             response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
         else:
@@ -588,7 +633,13 @@ def rename_transcripts(request):
         edx_video_id = link_video_to_component(video, request.user)
 
         # 3. Upload the retrieved transcript to DS for the linked video ID.
-        success = save_video_transcript(edx_video_id, input_format, transcript_content, language_code='en')
+        success = save_video_transcript(
+            video.usage_key,
+            edx_video_id,
+            input_format,
+            transcript_content,
+            language_code='en',
+        )
         if success:
             response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
         else:
@@ -631,7 +682,13 @@ def replace_transcripts(request):
         success = True
         for transcript in transcript_content:
             [language_code, json_content] = transcript
-            success = save_video_transcript(edx_video_id, Transcript.SJSON, json_content, language_code)
+            success = save_video_transcript(
+                video.usage_key,
+                edx_video_id,
+                Transcript.SJSON,
+                json_content,
+                language_code,
+            )
         if success:
             response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
         else:
@@ -643,21 +700,30 @@ def replace_transcripts(request):
 def _get_item(request, data):
     """
     Obtains from 'data' the locator for an item.
-    Next, gets that item from the modulestore (allowing any errors to raise up).
+    Next, gets that item from the modulestore (allowing any errors to raise up)
+    or from library API if is a library content.
     Finally, verifies that the user has access to the item.
 
-    Returns the item.
+    Returns the item and a boolean if is a library content.
     """
     usage_key = UsageKey.from_string(data.get('locator'))
-    if not usage_key.context_key.is_course:
-        # TODO: implement transcript support for learning core / content libraries.
-        raise TranscriptsRequestValidationException(_('Transcripts are not yet supported in content libraries.'))
+
+    context_key = usage_key.context_key
+    if not context_key.is_course:
+        if isinstance(context_key, LibraryLocatorV2):
+            lib_api.require_permission_for_library_key(
+                context_key,
+                request.user,
+                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+            )
+            return xblock_api.load_block(usage_key, request.user), True
+        raise TranscriptsRequestValidationException(_('Transcripts are not yet supported for this type of block'))
     # This is placed before has_course_author_access() to validate the location,
-    # because has_course_author_access() raises  r if location is invalid.
+    # because has_course_author_access() raises error if location is invalid.
     item = modulestore().get_item(usage_key)
 
     # use the item's course_key, because the usage_key might not have the run
     if not has_course_author_access(request.user, item.location.course_key):
         raise PermissionDenied()
 
-    return item
+    return item, False
