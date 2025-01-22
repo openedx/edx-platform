@@ -16,6 +16,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.test.utils import override_settings
 from django.core.files import File
 from edx_toggles.toggles.testutils import override_waffle_flag
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
@@ -27,7 +28,8 @@ from cms.djangoapps.contentstore.tasks import (
     rerun_course,
     _convert_to_standard_url,
     _check_broken_links,
-    _is_studio_url
+    _is_studio_url,
+    _scan_course_for_links
 )
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -35,8 +37,10 @@ from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, RestrictedCourse
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from celery import Task
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -221,6 +225,10 @@ class MockCourseLinkCheckTask(Task):
 class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
+        self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # lint-amnesty, pylint: disable=protected-access
+        self.test_course = CourseFactory.create(
+            org="test", course="course1", display_name="run1"
+        )
         self.mock_urls = [
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@1", "http://example.com/valid"],
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid"]
@@ -311,11 +319,33 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     def test_url_subsitution_on_containers(self):
         raise NotImplementedError
 
-    def test_optimization_occurs_on_published_version(self):
-        raise NotImplementedError
+    @mock.patch('cms.djangoapps.contentstore.tasks.ModuleStoreEnum', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks.modulestore', autospec=True)
+    def test_course_scan_occurs_on_published_version(self, mock_modulestore, mock_module_store_enum):
+        """_scan_course_for_links should only scan published courses"""
+        mock_modulestore_instance = mock.Mock()
+        mock_modulestore.return_value = mock_modulestore_instance
+        mock_modulestore_instance.get_items.return_value = []
 
-    def test_number_of_scanned_blocks_equals_blocks_in_course(self):
-        raise NotImplementedError
+        mock_course_key_string = CourseKey.from_string("course-v1:edX+DemoX+Demo_Course")
+        mock_module_store_enum.RevisionOption.published_only = "mock_published_only"
+
+        _scan_course_for_links(mock_course_key_string)
+
+        mock_modulestore_instance.get_items.assert_called_once_with(
+            mock_course_key_string,
+            qualifiers={'category': 'vertical'},
+            revision=mock_module_store_enum.RevisionOption.published_only
+        )
+
+    @mock.patch('cms.djangoapps.contentstore.tasks._get_urls', autospec=True)
+    def test_number_of_scanned_blocks_equals_blocks_in_course(self, mock_get_urls):
+        """_scan_course_for_links should call _get_urls once per block in course"""
+        mock_get_urls = mock.Mock()
+        result = self.store.get_items(self.test_course.id)
+
+        _scan_course_for_links(self.test_course.id)
+        self.assertEqual(len(result), mock_get_urls.call_count)
 
     def test_every_detected_link_is_validated(self):
         raise NotImplementedError
