@@ -849,7 +849,7 @@ edx-token-utils==0.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-when==2.5.0
+edx-when==2.5.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
