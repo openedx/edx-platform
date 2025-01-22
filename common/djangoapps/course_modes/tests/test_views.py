@@ -607,15 +607,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Check for the HTML element for courses with more than one mode
         self.assertContains(response, '<div class="grid-options">')
 
-    def _assert_legacy_page(self, response, **_):
-        """
-        Assert choose.html was rendered.
-        """
-        # Check for string unique to the legacy choose.html.
-        self.assertContains(response, "Choose Your Track")
-        # This string only occurs in lms/templates/course_modes/choose.html
-        # and related theme and translation files.
-
     @override_settings(MKTG_URLS={'ROOT': 'https://www.example.edx.org'})
     @ddt.data(
         # gated_content_on, course_duration_limits_on, waffle_flag_on, expected_page_assertion_function
@@ -623,10 +614,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         (True, False, True, _assert_unfbe_page),
         (False, True, True, _assert_unfbe_page),
         (False, False, True, _assert_unfbe_page),
-        (True, True, False, _assert_legacy_page),
-        (True, False, False, _assert_legacy_page),
-        (False, True, False, _assert_legacy_page),
-        (False, False, False, _assert_legacy_page),
     )
     @ddt.unpack
     def test_track_selection_types(
@@ -644,7 +631,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         verified course modes), the learner may view 3 different pages:
             1. fbe.html - full FBE
             2. unfbe.html - partial or no FBE
-            3. choose.html - legacy track selection page
 
         This test checks that the right template is rendered.
 
