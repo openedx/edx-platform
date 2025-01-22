@@ -1952,3 +1952,6 @@ def import_blocks_create_task(library_key, course_key, use_course_key_as_block_i
     log.info(f"Import block task created: import_task={import_task} "
              f"celery_task={result.id}")
     return import_task
+
+# To enable use content library permissions as public API
+permissions = permissions

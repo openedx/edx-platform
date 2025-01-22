@@ -44,7 +44,7 @@ from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: dis
     get_transcript_link_from_youtube,
     get_transcript_links_from_youtube,
 )
-from openedx.core.djangoapps.content_libraries import api as lib_api, permissions
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 
 __all__ = [
@@ -714,7 +714,7 @@ def _get_item(request, data):
             lib_api.require_permission_for_library_key(
                 context_key,
                 request.user,
-                permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+                lib_api.permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
             )
             return xblock_api.load_block(usage_key, request.user), True
         raise TranscriptsRequestValidationException(_('Transcripts are not yet supported for this type of block'))
