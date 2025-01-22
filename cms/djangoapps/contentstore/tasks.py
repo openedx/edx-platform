@@ -1112,7 +1112,7 @@ def _validate_user(self, user_id, language):
         return User.objects.get(pk=user_id), False
     except User.DoesNotExist as exc:
         with translation_language(language):
-            return UserErrors.UNKNOWN_USER_ID.format(user_id), True
+            return self.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id), True)
         return
 
 def _get_urls(content):
@@ -1271,9 +1271,7 @@ def _check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results in a file.
     """
-    user, is_error = _validate_user(self, user_id, language)
-    if is_error:
-        self.status.fail(user)
+    user = _validate_user(self, user_id, language)
 
     self.status.set_state('Scanning')
     course_key = CourseKey.from_string(course_key_string)
