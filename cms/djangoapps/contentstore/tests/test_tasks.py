@@ -28,6 +28,7 @@ from cms.djangoapps.contentstore.tasks import (
     rerun_course,
     _convert_to_standard_url,
     _check_broken_links,
+    _is_studio_url,
     _scan_course_for_links
 )
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
@@ -288,11 +289,23 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     def test_urls_out_count_equals_urls_in_count_when_no_hashtags(self):
         raise NotImplementedError
 
-    def test_http_and_https_recognized_as_studio_url_schemes(self):
-        raise NotImplementedError
+    def test_http_url_not_recognized_as_studio_url_scheme(self):
+        self.assertFalse(_is_studio_url(f'http://www.google.com'))
 
-    def test_file_not_recognized_as_studio_url_scheme(self):
-        raise NotImplementedError
+    def test_https_url_not_recognized_as_studio_url_scheme(self):
+        self.assertFalse(_is_studio_url(f'https://www.google.com'))
+
+    def test_http_with_studio_base_url_recognized_as_studio_url_scheme(self):
+        self.assertTrue(_is_studio_url(f'http://{settings.CMS_BASE}/testurl'))
+
+    def test_https_with_studio_base_url_recognized_as_studio_url_scheme(self):
+        self.assertTrue(_is_studio_url(f'https://{settings.CMS_BASE}/testurl'))
+
+    def test_container_url_without_url_base_is_recognized_as_studio_url_scheme(self):
+        self.assertTrue(_is_studio_url(f'container/test'))
+
+    def test_slash_url_without_url_base_is_recognized_as_studio_url_scheme(self):
+        self.assertTrue(_is_studio_url(f'/static/test'))
 
     @pytest.mark.parametrize("url, course_key, post_substitution_url",
                              ["/static/anything_goes_here?raw", "1", "2"])
