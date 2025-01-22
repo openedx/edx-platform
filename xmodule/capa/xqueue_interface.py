@@ -11,6 +11,7 @@ import requests
 from django.conf import settings
 from django.urls import reverse
 from requests.auth import HTTPBasicAuth
+from xmodule.capa.xqueue_submission import XQueueInterfaceSubmission 
 
 if TYPE_CHECKING:
     from xmodule.capa_block import ProblemBlock
@@ -134,7 +135,8 @@ class XQueueInterface:
         if files_to_upload is not None:
             for f in files_to_upload:
                 files.update({f.name: f})
-        print("post -------------------", self._http_post(self.url + '/xqueue/submit/', payload, files=files))
+                
+        submission = XQueueInterfaceSubmission().send_to_submission(header, body, files_to_upload)
         return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
     def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring

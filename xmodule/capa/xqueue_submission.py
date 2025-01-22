@@ -90,15 +90,7 @@ def extract_item_data(header, payload):
 class XQueueInterfaceSubmission:
     """
     Interface to the external grading system
-    """
-
-    def __init__(self, url: str, django_auth: Dict[str, str], requests_auth: Optional[HTTPBasicAuth] = None):
-        self.url = url
-        self.auth = django_auth
-        self.session = requests.Session()
-        self.session.auth = requests_auth
-        
-    
+    """    
 
     def send_to_submission(self, header, body, files_to_upload=None):
         from submissions.api import create_submission
@@ -109,13 +101,10 @@ class XQueueInterfaceSubmission:
             
             # Llamar a create_submission
             submission = create_submission(student_item, answer)
-            print("submission -------------------------------------------------- ", submission)
             
             # Retornar éxito
-            return (0, "Submission sent successfully")
+            return submission
         except Exception as e:
             # Retornar error con mensaje de la excepción
             return (1, f"Error: {str(e)}")
-        # Asegurar que siempre se devuelve una tupla
-        return (1, "Unknown error")
 
