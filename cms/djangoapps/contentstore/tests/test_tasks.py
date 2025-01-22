@@ -459,7 +459,7 @@ class CourseOptimizerTestCase(TestCase):
     @patch("cms.djangoapps.contentstore.tasks._filter_by_status", return_value=(["broken_url"], []))
     @patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=["retry_url"])
     def test_broken_links(self,
-                          mock_record_broken_links,
+                          mock_retry_validation,
                           mock_filter,
                           mock_validate_urls,
                           mock_scan_course,
@@ -491,17 +491,19 @@ class CourseOptimizerTestCase(TestCase):
 
         _check_broken_links(mock_self, user_id, course_key_string, language)
 
-        url_list = self.mock_dependencies["mock_scan_course"].return_value
-        validated_url_list = self.mock_dependencies["mock_validate_urls"].return_value
-        broken_or_locked_urls, retry_list = self.mock_dependencies["mock_filter"].return_value
+        # Prepare expected results based on mock settings
+        url_list = mock_scan_course.return_value
+        validated_url_list = mock_validate_urls.return_value
+        broken_or_locked_urls, retry_list = mock_filter.return_value
 
         if retry_list:
-            retry_results = self.mock_dependencies["mock_retry"].return_value
+            retry_results = mock_retry_validation.return_value
             broken_or_locked_urls.extend(retry_results)
 
+        # Perform verifications
         try:
             mock_self.status.increment_completed_steps()
-            self.mock_dependencies["mock_record_broken_links"].assert_called_once_with(
+            mock_retry_validation.assert_called_once_with(
                 mock_self, broken_or_locked_urls, course_key_string
             )
         except Exception as e:
@@ -511,11 +513,11 @@ class CourseOptimizerTestCase(TestCase):
             assert False, "Exception should not occur"
 
         # Assertions to confirm patched calls were invoked
-        self.mock_dependencies["mock_validate_user"].assert_called_once_with(mock_self, user_id, language)
-        self.mock_dependencies["mock_scan_course"].assert_called_once_with(course_key_string)
-        self.mock_dependencies["mock_validate_urls"].assert_called_once_with(url_list, course_key_string, batch_size=100)
-        self.mock_dependencies["mock_filter"].assert_called_once_with(validated_url_list)
+        mock_validate_user.assert_called_once_with(mock_self, user_id, language)
+        mock_scan_course.assert_called_once_with(course_key_string)
+        mock_validate_urls.assert_called_once_with(url_list, course_key_string, batch_size=100)
+        mock_filter.assert_called_once_with(validated_url_list)
         if retry_list:
-            self.mock_dependencies["mock_retry"].assert_called_once_with(retry_list, course_key_string, retry_count=3)
+            mock_retry_validation.assert_called_once_with(retry_list, course_key_string, retry_count=3)
 
 
