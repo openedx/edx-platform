@@ -23,6 +23,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
+from xmodule.video_block.transcripts_utils import build_components_import_path
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fetch_customizable_fields
@@ -583,8 +584,8 @@ def _import_file_into_course(
     # we're not going to attempt to change.
     if clipboard_file_path.startswith('static/'):
         # If it's in this form, it came from a library and assumes component-local assets
-        file_path = clipboard_file_path.lstrip('static/')
-        import_path = f"components/{usage_key.block_type}/{usage_key.block_id}/{file_path}"
+        file_path = clipboard_file_path.removeprefix('static/')
+        import_path = build_components_import_path(usage_key, file_path)
         filename = pathlib.Path(file_path).name
         new_key = course_key.make_asset_key("asset", import_path.replace("/", "_"))
     else:

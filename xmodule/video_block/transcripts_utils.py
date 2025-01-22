@@ -1021,12 +1021,8 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
         except (KeyError, NotFoundError):
             continue
 
-    if transcript_content is None and language == 'en':
-        # `get_transcript_for_video`` can get the transcript using just the filename,
-        # but in the above loop the filename from 'en' is overwritten.
-        #
-        # If it doesn't yet have the transcription and the language is 'en',
-        # check again but this time using the original filename.
+    if transcript_content is None:
+        # `get_transcript_for_video` can get the transcript using just the filename.
         #
         # The use case for which this has been implemented is when copying a video from
         # a library and pasting it into a course.
@@ -1035,11 +1031,22 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
             input_format, base_name, transcript_content = get_transcript_for_video(
                 video.location,
                 subs_id=None,
-                file_name=other_languages['en'],
+                file_name=other_languages[language],
                 language=language
             )
         except (KeyError, NotFoundError):
-            pass
+            # If the video is copied from a library, the component import path is used,
+            # so we also need to try this use case.
+            try:
+                file_name = build_components_import_path(video.location, other_languages[language])
+                input_format, base_name, transcript_content = get_transcript_for_video(
+                    video.location,
+                    subs_id=None,
+                    file_name=file_name,
+                    language=language
+                )
+            except (KeyError, NotFoundError):
+                pass
 
     if transcript_content is None:
         raise NotFoundError('No transcript for `{lang}` language'.format(
@@ -1060,6 +1067,12 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
         )
 
     return transcript_content, transcript_name, Transcript.mime_types[output_format]
+
+def build_components_import_path(usage_key, file_path):
+    """
+    Build components import path
+    """
+    return f"components/{usage_key.block_type}/{usage_key.block_id}/{file_path}"
 
 
 def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):
