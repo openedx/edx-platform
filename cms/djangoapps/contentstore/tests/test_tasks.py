@@ -500,7 +500,7 @@ class CourseOptimizerTestCase(TestCase):
         url_list = mock_scan_course.return_value
         validated_url_list = mock_validate_urls.return_value
         broken_or_locked_urls, retry_list = mock_filter.return_value
-        course_locator = CourseLocator(course_key_string)
+        course_key = CourseKey.from_string(course_key_string)
         retry_count = 3
 
         if retry_list:
@@ -511,7 +511,7 @@ class CourseOptimizerTestCase(TestCase):
         try:
             mock_self.status.increment_completed_steps()
             mock_retry_validation.assert_called_once_with(
-                mock_self, broken_or_locked_urls, course_locator, retry_count
+                mock_self, broken_or_locked_urls, course_key, retry_count
             )
         except Exception as e:
             logging.exception("Error checking links for course %s", course_key_string, exc_info=True)
@@ -521,11 +521,11 @@ class CourseOptimizerTestCase(TestCase):
 
         # Assertions to confirm patched calls were invoked
         mock_validate_user.assert_called_once_with(mock_self, user_id, language)
-        mock_scan_course.assert_called_once_with(course_key_string)
-        mock_validate_urls.assert_called_once_with(url_list, course_key_string, batch_size=100)
+        mock_scan_course.assert_called_once_with(course_key)
+        mock_validate_urls.assert_called_once_with(url_list, course_key, batch_size=100)
         mock_filter.assert_called_once_with(validated_url_list)
         if retry_list:
-            mock_retry_validation.assert_called_once_with(retry_list, course_key_string, retry_count=3)
+            mock_retry_validation.assert_called_once_with(retry_list, course_key, retry_count=3)
         mock_record_broken_links.assert_called_once()
 
 
