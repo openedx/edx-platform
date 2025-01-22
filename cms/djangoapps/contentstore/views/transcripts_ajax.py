@@ -164,9 +164,9 @@ def validate_video_block(request, locator):
     """
     error, item = None, None
     try:
-        item, _ = _get_item(request, {'locator': locator})
+        item, _isLibraryContent = _get_item(request, {'locator': locator})
         if item.category != 'video':
-            raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" blocks.'))
+            error = _('Transcripts are supported only for "video" blocks.')
 
     except (InvalidKeyError, ItemNotFoundError):
         error = _('Cannot find item by locator.')
