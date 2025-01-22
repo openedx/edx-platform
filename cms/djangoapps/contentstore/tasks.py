@@ -1283,7 +1283,6 @@ def _check_broken_links(self, user_id, course_key_string, language):
         retry_results = _retry_validation(retry_list, course_key, retry_count=3)
         broken_or_locked_urls.extend(retry_results)
 
-
     try:
         self.status.increment_completed_steps()
         _record_broken_links(self, broken_or_locked_urls, course_key)
@@ -1295,7 +1294,6 @@ def _check_broken_links(self, user_id, course_key_string, language):
             self.status.fail({'raw_error_msg': str(e)})
         return
 
-@shared_task(base=CourseLinkCheckTask, bind=True)
 def _record_broken_links(self, broken_or_locked_urls, course_key):
     file_name = str(course_key)
     broken_links_file = NamedTemporaryFile(prefix=file_name + '.', suffix='.json')

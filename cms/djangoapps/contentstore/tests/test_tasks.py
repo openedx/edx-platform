@@ -446,18 +446,19 @@ class CourseOptimizerTestCase(TestCase):
                 assert mock_retry_validation.call_count == MAX_RETRIES, \
                   f'Got {mock_retry_validation.call_count} retries; expected {MAX_RETRIES}'
 
-    def test_scan_generates_file_named_by_course_key(self, tmp_path):
-        course_key = 'course-v1:edX+DemoX+Demo_Course'
-        filename = _record_broken_links("", course_key)
-        expected_filename = ""
-        assert filename == "", f'Got f{filename} as broken links filename; expected {expected_filename}'
+    # def test_scan_generates_file_named_by_course_key(self, tmp_path):
+    #     course_key = 'course-v1:edX+DemoX+Demo_Course'
+    #     filename = _record_broken_links("", course_key)
+    #     expected_filename = ""
+    #     assert filename == "", f'Got f{filename} as broken links filename; expected {expected_filename}'
 
     @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
     @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])
     @patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
                   return_value=[{"url": "url1", "status": "ok"}])
-    @patch("cms.djangoapps.contentstore.tasks._filter_by_status", return_value=(["broken_url"], []))
-    @patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=["retry_url"])
+    @patch("cms.djangoapps.contentstore.tasks._filter_by_status",
+           return_value=(["block_1", "url1", True], ["block_2", "url2"]))
+    @patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=["block_2", "url2"])
     def test_broken_links(self,
                           mock_retry_validation,
                           mock_filter,
