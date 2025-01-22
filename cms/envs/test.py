@@ -136,6 +136,9 @@ LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = f"http://{LMS_BASE}"
 FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 
+CMS_BASE = "localhost:8001"
+CMS_ROOT_URL = f"http://{CMS_BASE}"
+
 COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
 DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
 
