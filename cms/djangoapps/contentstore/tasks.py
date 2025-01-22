@@ -1267,6 +1267,9 @@ def _filter_by_status(results):
 
 @shared_task(base=CourseLinkCheckTask, bind=True)
 def check_broken_links(self, user_id, course_key_string, language):
+    _check_broken_links(self, user_id, course_key_string, language) # To enable pytest testing
+
+def _check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results in a file.
     """

@@ -33,7 +33,7 @@ from ..tasks import (
     _filter_by_status,
     _record_broken_links,
     _get_urls,
-    check_broken_links,
+    _check_broken_links,
 )
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -490,7 +490,7 @@ class CourseOptimizerTestCase(TestCase):
 
         mock_self = MockSelf()
 
-        check_broken_links(user_id, course_key, language)
+        _check_broken_links(mock_self, user_id, course_key, language)
 
         url_list = self.mock_dependencies["mock_scan_course"].return_value
         validated_url_list = self.mock_dependencies["mock_validate_urls"].return_value
