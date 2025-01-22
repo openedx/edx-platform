@@ -56,12 +56,11 @@ from chem import chemcalc
 
 from lxml import etree
 
-from xmodule.capa.xqueue_submission import XQUEUE_TIMEOUT, XQueueServiceSubmission
-from xmodule.capa.util import construct_callback
+from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
 
-from . import xqueue_submission
+from . import xqueue_interface
 from .registry import TagRegistry
 from .util import sanitize_html
 
@@ -988,14 +987,14 @@ class MatlabInput(CodeInput):
 
         # construct xqueue headers
         qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.utcnow().strftime(xqueue_submission.dateformat)
-        callback_url = self.capa_system.xqueue.send_callback('ungraded_response')
+        qtime = datetime.utcnow().strftime(xqueue_interface.dateformat)
+        callback_url = self.capa_system.xqueue.construct_callback('ungraded_response')
         anonymous_student_id = self.capa_system.anonymous_student_id
         # TODO: Why is this using self.capa_system.seed when we have self.seed???
-        queuekey = xqueue_submission.make_hashkey(str(self.capa_system.seed) + qtime +
+        queuekey = xqueue_interface.make_hashkey(str(self.capa_system.seed) + qtime +
                                                  anonymous_student_id +
                                                  self.input_id)
-        xheader = xqueue_submission.make_xheader(
+        xheader = xqueue_interface.make_xheader(
             lms_callback_url=callback_url,
             lms_key=queuekey,
             queue_name=self.queuename)
@@ -1014,12 +1013,8 @@ class MatlabInput(CodeInput):
             'requestor_id': anonymous_student_id,
         }
 
-        result = qinterface.send_to_submission(header=xheader, body=json.dumps(contents))
-        print("Result from send_to_submission: ", result)
-        if not isinstance(result, tuple) or len(result) != 2:
-            result = (1, "Unknown error")
-
-        error, msg = result
+        (error, msg) = qinterface.send_to_queue(header=xheader,
+                                                body=json.dumps(contents))
         # save the input state if successful
         if error == 0:
             self.input_state['queuekey'] = queuekey
@@ -1028,8 +1023,8 @@ class MatlabInput(CodeInput):
 
         return {'success': error == 0, 'message': msg}
 
-#-----------------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
 
 @registry.register
 class Schematic(InputTypeBase):

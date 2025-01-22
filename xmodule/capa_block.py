@@ -51,7 +51,7 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_ID,
 )
 from openedx.core.djangolib.markup import HTML, Text
-from .capa.xqueue_submission import XQueueServiceSubmission
+from .capa.xqueue_interface import XQueueService
 
 from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
@@ -345,7 +345,9 @@ class ProblemBlock(
 
         # Capa was an XModule. When bind_for_student() was called on it with a new runtime, a new CapaModule object
         # was initialized when XModuleDescriptor._xmodule() was called next. self.lcp was constructed in CapaModule
-        # init(). To keep the same behaviour, we delete self.__dict__['lcp']
+        # init(). To keep the same behaviour, we delete self.lcp in bind_for_student().
+        if 'lcp' in self.__dict__:
+            del self.__dict__['lcp']
 
     def student_view(self, _context, show_detailed_errors=False):
         """
@@ -889,7 +891,7 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
-            xqueue=None if is_studio else XQueueServiceSubmission(self),
+            xqueue=None if is_studio else XQueueService(self),
             matlab_api_key=self.matlab_api_key
         )
 
@@ -1639,6 +1641,7 @@ class ProblemBlock(
             )
         }
 
+    # Figure out if we should move these to capa_problem?
     def get_problem(self, _data):
         """
         Return results of get_problem_html, as a simple dict for json-ing.
@@ -1803,7 +1806,8 @@ class ProblemBlock(
         if self.lcp.is_queued():
             prev_submit_time = self.lcp.get_recentmost_queuetime()
 
-            waittime_between_requests = settings.XQUEUE_INTERFACE.get('waittime', 0)
+            xqueue_service = self.lcp.capa_system.xqueue
+            waittime_between_requests = xqueue_service.waittime if xqueue_service else 0
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _("You must wait at least {wait} seconds between submissions.").format(
                     wait=waittime_between_requests)

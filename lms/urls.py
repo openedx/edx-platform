@@ -50,6 +50,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.features.enterprise_support.api import enterprise_enabled
+from submissions import urls as submissions_urls
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -252,6 +253,7 @@ if settings.WIKI_ENABLED:
         path('wiki/create-root/', course_wiki_views.root_create, name='root_create'),
         path('wiki/', include((wiki_url_patterns, wiki_app_name), namespace='wiki')),
         path('notify/', include((notify_url_patterns, notify_app_name), namespace='notify')),
+        path('api/submissions/', include((submissions_urls, 'submissions'), namespace='submissions')),
 
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns

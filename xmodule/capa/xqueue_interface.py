@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from xmodule.capa_block import ProblemBlock
 
 log = logging.getLogger(__name__)
-dateformat = '%Y%m%d%H%M%S'
+dateformat = '%Y-%m-%dT%H:%M:%S'
 
 XQUEUE_METRIC_NAME = 'edxapp.xqueue'
 
@@ -134,7 +134,7 @@ class XQueueInterface:
         if files_to_upload is not None:
             for f in files_to_upload:
                 files.update({f.name: f})
-
+        print("post -------------------", self._http_post(self.url + '/xqueue/submit/', payload, files=files))
         return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
     def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring

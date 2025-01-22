@@ -28,49 +28,6 @@ CONNECT_TIMEOUT = 3.05  # seconds
 READ_TIMEOUT = 10  # seconds
 
 
-def make_hashkey(seed):
-    """
-    Generate a string key by hashing
-    """
-    h = hashlib.md5()
-    h.update(str(seed).encode('latin-1'))
-    return h.hexdigest()
-
-
-def make_xheader(lms_callback_url, lms_key, queue_name):
-    """
-    Generate header for delivery and reply of queue request.
-
-    Xqueue header is a JSON-serialized dict:
-        { 'lms_callback_url': url to which xqueue will return the request (string),
-          'lms_key': secret key used by LMS to protect its state (string),
-          'queue_name': designate a specific queue within xqueue server, e.g. 'MITx-6.00x' (string)
-        }
-    """
-    return json.dumps({
-        'lms_callback_url': lms_callback_url,
-        'lms_key': lms_key,
-        'queue_name': queue_name
-    })
-
-
-def parse_xreply(xreply):
-    """
-    Parse the reply from xqueue. Messages are JSON-serialized dict:
-        { 'return_code': 0 (success), 1 (fail)
-          'content': Message from xqueue (string)
-        }
-    """
-    try:
-        xreply = json.loads(xreply)
-    except ValueError as err:
-        log.error(err)
-        return (1, 'unexpected reply from server')
-
-    return_code = xreply['return_code']
-    content = xreply['content']
-
-    return (return_code, content)
 
 
 def extract_item_data(header, payload):
@@ -162,49 +119,3 @@ class XQueueInterfaceSubmission:
         # Asegurar que siempre se devuelve una tupla
         return (1, "Unknown error")
 
-
-class XQueueServiceSubmission:
-    """
-    XBlock service providing an interface to the XQueue service.
-
-    Args:
-        block: The `ProblemBlock` instance.
-    """
-
-    def __init__(self, block: 'ProblemBlock'):
-        basic_auth = settings.XQUEUE_INTERFACE.get('basic_auth')
-        requests_auth = HTTPBasicAuth(*basic_auth) if basic_auth else None
-        self._interface = XQueueInterfaceSubmission(
-            settings.XQUEUE_INTERFACE['url'], settings.XQUEUE_INTERFACE['django_auth'], requests_auth
-        )
-
-        self._block = block
-
-    @property
-    def interface(self):
-        """
-        Returns the XQueueInterface instance.
-        """
-        return self._interface
-
-    def send_callback(self) -> str:
-        # Llama a construct_callback desde util
-        print('send_callback', construct_callback(self._block))
-        if not hasattr(self, "_block"):
-            raise AttributeError("'CodeResponse' object no tiene el atributo '_block'")
-        return construct_callback(self._block)
-
-    @property
-    def default_queuename(self) -> str:
-        """
-        Returns the default queue name for the current course.
-        """
-        course_id = self._block.scope_ids.usage_id.context_key
-        return f'{course_id.org}-{course_id.course}'.replace(' ', '_')
-
-    @property
-    def waittime(self) -> int:
-        """
-        Returns the number of seconds to wait in between calls to XQueue.
-        """
-        return settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
