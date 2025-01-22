@@ -747,7 +747,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.5.2
+edx-enterprise==5.6.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -854,7 +854,7 @@ edx-when==2.5.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-edxval==2.8.0
+edxval==2.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1189,9 +1189,8 @@ loremipsum==1.0.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.12.1
+lti-consumer-xblock==9.13.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 lxml[html-clean]==5.3.0
@@ -1389,7 +1388,7 @@ openedx-filters==1.12.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.1.5
+openedx-forum==0.1.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1611,6 +1610,7 @@ pyjwt[crypto]==2.10.1
     #   edx-proctoring
     #   edx-rest-api-client
     #   firebase-admin
+    #   lti-consumer-xblock
     #   pylti1p3
     #   snowflake-connector-python
     #   social-auth-core
@@ -2160,6 +2160,10 @@ unicodecsv==0.14.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
+unicodeit==0.7.5
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 unidiff==0.7.5
     # via -r requirements/edx/testing.txt
 uritemplate==4.1.1
