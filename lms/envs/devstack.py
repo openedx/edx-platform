@@ -553,6 +553,20 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:1996',  # frontend-app-learner-dashboard
 ]
 
+RETIREMENT_STATES = [
+    'PENDING',
+    'LOCKING_ACCOUNT',
+    'LOCKING_COMPLETE',
+    'RETIRING_ENROLLMENTS',
+    'ENROLLMENTS_COMPLETE',
+    'RETIRING_LMS_MISC',
+    'LMS_MISC_COMPLETE',
+    'RETIRING_LMS',
+    'LMS_COMPLETE',
+    'ERRORED',
+    'ABORTED',
+    'COMPLETE',
+]
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
