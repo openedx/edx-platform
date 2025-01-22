@@ -458,7 +458,8 @@ class CourseOptimizerTestCase(TestCase):
                   return_value=[{"url": "url1", "status": "ok"}])
     @patch("cms.djangoapps.contentstore.tasks._filter_by_status",
            return_value=(["block_1", "url1", True], ["block_2", "url2"]))
-    @patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=["block_2", "url2"])
+    @patch("cms.djangoapps.contentstore.tasks._retry_validation",
+           return_value=['block_2', 'url2'])
     @patch("cms.djangoapps.contentstore.tasks._record_broken_links")
     def test_broken_links(self,
                           mock_record_broken_links,
@@ -471,6 +472,7 @@ class CourseOptimizerTestCase(TestCase):
         user_id = 1234
         language = "en"
         course_key_string = "course-v1:edX+DemoX+2025"
+
 
         # Mocking self and status attributes for the test
         class MockStatus:
@@ -498,6 +500,8 @@ class CourseOptimizerTestCase(TestCase):
         url_list = mock_scan_course.return_value
         validated_url_list = mock_validate_urls.return_value
         broken_or_locked_urls, retry_list = mock_filter.return_value
+        course_locator = CourseLocator(course_key_string)
+        retry_count = 3
 
         if retry_list:
             retry_results = mock_retry_validation.return_value
@@ -507,7 +511,7 @@ class CourseOptimizerTestCase(TestCase):
         try:
             mock_self.status.increment_completed_steps()
             mock_retry_validation.assert_called_once_with(
-                mock_self, broken_or_locked_urls, course_key_string
+                mock_self, broken_or_locked_urls, course_locator, retry_count
             )
         except Exception as e:
             logging.exception("Error checking links for course %s", course_key_string, exc_info=True)
