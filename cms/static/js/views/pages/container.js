@@ -48,8 +48,6 @@ function($, _, Backbone, gettext, BasePage,
             clipboardData: { content: null },
         },
 
-        targetXBlock: null,
-
         view: 'container_preview',
 
         defaultViewClass: ContainerView,
@@ -137,10 +135,11 @@ function($, _, Backbone, gettext, BasePage,
 
                     if (!data) return;
 
-                    const xblockElement = this.findXBlockElement(this.targetXBlock);
+                    let xblockElement;
                     let xblockWrapper;
 
                     if (data.payload && data.payload.locator) {
+                        xblockElement = $(`[data-locator="${data.payload.locator}"]`);
                         xblockWrapper = $("li.studio-xblock-wrapper[data-locator='" + data.payload.locator + "']");
                     } else {
                         xblockWrapper = $();
@@ -154,14 +153,13 @@ function($, _, Backbone, gettext, BasePage,
                         this.refreshXBlock(xblockElement, false);
                         break;
                     case 'completeXBlockMoving':
-                        xblockWrapper.hide()
+                        xblockWrapper.hide();
                         break;
                     case 'rollbackMovedXBlock':
-                        xblockWrapper.show()
+                        xblockWrapper.show();
                         break;
-                    case 'updateXBlockName':
                     case 'addXBlock':
-                        this.createComponent(this, xblockElement, event.data);
+                        this.createComponent(this, xblockElement, data);
                         break;
                     default:
                         console.warn('Unhandled message type:', data.type);
@@ -446,8 +444,6 @@ function($, _, Backbone, gettext, BasePage,
             const isAccessButton = event.currentTarget.className === 'access-button';
             const primaryHeader = $(event.target).closest('.xblock-header-primary, .nav-actions');
             const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
-
-            this.targetXBlock = event.target;
 
             try {
                 if (this.options.isIframeEmbed && isAccessButton) {
@@ -811,6 +807,8 @@ function($, _, Backbone, gettext, BasePage,
                             payload: { courseXBlockDropdownHeight: 0 }
                         }, document.referrer
                     );
+                    // Saves the height of the XBlock during duplication with the new editor.
+                    // After closing the editor, the page scrolls to the newly created copy of the XBlock.
                     if (['html', 'problem', 'video'].includes(blockType)) {
                         const scrollHeight = event.clientY + this.findXBlockElement(event.target).height();
                         localStorage.setItem('modalEditLastYPosition', scrollHeight.toString());
@@ -964,11 +962,15 @@ function($, _, Backbone, gettext, BasePage,
                 } catch (e) {
                     console.error(e);
                 }
-                return window.addEventListener('message', (event) => {
-                    if (event.data && event.data.type === 'completeXBlockDuplicating') {
-                        return self.onNewXBlock(placeholderElement, null, true, event.data.payload);
-                    }
-                });
+                return window.addEventListener(
+                    'message',
+                    (event) => {
+                        if (event.data && event.data.type === 'completeXBlockDuplicating') {
+                            return self.onNewXBlock(placeholderElement, null, true, event.data.payload);
+                        }
+                    },
+                    { once: true }
+                );
             }
 
             XBlockUtils.duplicateXBlock(xblockElement, parentElement)
@@ -987,13 +989,18 @@ function($, _, Backbone, gettext, BasePage,
                     id: xblockElement.data('locator')
                 });
 
-            if (this.options.isIframeEmbed) {
-                return window.addEventListener('message', (event) => {
-                    if (event.data && event.data.type === 'completeXBlockDeleting') {
-                        return self.onDelete(xblockElement);
-                    }
-                });
-            }
+                if (this.options.isIframeEmbed) {
+                    return window.addEventListener(
+                        'message',
+                        ({ data }) => {
+                            if (data && data.type === 'completeXBlockDeleting') {
+                                const targetXBlockElement = $(`[data-locator="${data.payload.locator}"]`);
+                                return self.onDelete(targetXBlockElement);
+                            }
+                        },
+                        { once: true }
+                    );
+                }
 
             XBlockUtils.deleteXBlock(xblockInfo).done(function() {
                 self.onDelete(xblockElement);
