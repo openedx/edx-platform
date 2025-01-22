@@ -459,7 +459,7 @@ class CourseOptimizerTestCase(TestCase):
     @patch("cms.djangoapps.contentstore.tasks._filter_by_status",
            return_value=(["block_1", "url1", True], ["block_2", "url2"]))
     @patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=["block_2", "url2"])
-    @patch("module_name._record_broken_links")
+    @patch("cms.djangoapps.contentstore.tasks._record_broken_links")
     def test_broken_links(self,
                           mock_record_broken_links,
                           mock_retry_validation,
