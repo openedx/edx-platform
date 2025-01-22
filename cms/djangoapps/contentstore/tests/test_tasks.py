@@ -468,7 +468,6 @@ class CourseOptimizerTestCase(TestCase):
         user_id = 1234
         language = "en"
         course_key_string = "course-v1:edX+DemoX+2025"
-        course_key = MagicMock()  # Simulate CourseKey.from_string()
 
         # Mocking self and status attributes for the test
         class MockStatus:
@@ -490,7 +489,7 @@ class CourseOptimizerTestCase(TestCase):
 
         mock_self = MockSelf()
 
-        _check_broken_links(mock_self, user_id, course_key, language)
+        _check_broken_links(mock_self, user_id, course_key_string, language)
 
         url_list = self.mock_dependencies["mock_scan_course"].return_value
         validated_url_list = self.mock_dependencies["mock_validate_urls"].return_value
@@ -503,20 +502,20 @@ class CourseOptimizerTestCase(TestCase):
         try:
             mock_self.status.increment_completed_steps()
             self.mock_dependencies["mock_record_broken_links"].assert_called_once_with(
-                mock_self, broken_or_locked_urls, course_key
+                mock_self, broken_or_locked_urls, course_key_string
             )
         except Exception as e:
-            logging.exception("Error checking links for course %s", course_key, exc_info=True)
+            logging.exception("Error checking links for course %s", course_key_string, exc_info=True)
             if mock_self.status.state != "FAILED":
                 mock_self.status.fail({"raw_error_msg": str(e)})
             assert False, "Exception should not occur"
 
         # Assertions to confirm patched calls were invoked
         self.mock_dependencies["mock_validate_user"].assert_called_once_with(mock_self, user_id, language)
-        self.mock_dependencies["mock_scan_course"].assert_called_once_with(course_key)
-        self.mock_dependencies["mock_validate_urls"].assert_called_once_with(url_list, course_key, batch_size=100)
+        self.mock_dependencies["mock_scan_course"].assert_called_once_with(course_key_string)
+        self.mock_dependencies["mock_validate_urls"].assert_called_once_with(url_list, course_key_string, batch_size=100)
         self.mock_dependencies["mock_filter"].assert_called_once_with(validated_url_list)
         if retry_list:
-            self.mock_dependencies["mock_retry"].assert_called_once_with(retry_list, course_key, retry_count=3)
+            self.mock_dependencies["mock_retry"].assert_called_once_with(retry_list, course_key_string, retry_count=3)
 
 
