@@ -20,7 +20,7 @@ cryptography==44.0.0
     # via -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.55.3
+fonttools==4.55.4
     # via matplotlib
 joblib==1.4.2
     # via nltk
@@ -75,7 +75,7 @@ random2==1.0.2
     # via -r requirements/edx-sandbox/base.in
 regex==2024.11.6
     # via nltk
-scipy==1.15.0
+scipy==1.15.1
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
