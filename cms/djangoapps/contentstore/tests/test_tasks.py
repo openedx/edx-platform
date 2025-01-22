@@ -511,7 +511,7 @@ class CourseOptimizerTestCase(TestCase):
         try:
             mock_self.status.increment_completed_steps()
             mock_retry_validation.assert_called_once_with(
-                mock_self, broken_or_locked_urls, course_key, retry_count
+                mock_filter.return_value[1], course_key, retry_count
             )
         except Exception as e:
             logging.exception("Error checking links for course %s", course_key_string, exc_info=True)
