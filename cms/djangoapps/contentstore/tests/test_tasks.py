@@ -452,7 +452,7 @@ class CourseOptimizerTestCase(TestCase):
         expected_filename = ""
         assert filename == "", f'Got f{filename} as broken links filename; expected {expected_filename}'
 
-    @patch("tasks._validate_user", return_value=MagicMock())
+    @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
     @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])
     @patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
                   return_value=[{"url": "url1", "status": "ok"}])

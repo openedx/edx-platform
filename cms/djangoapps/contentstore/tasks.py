@@ -86,8 +86,6 @@ from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
 
-from .tasks import _validate_user
-
 User = get_user_model()
 
 LOGGER = get_task_logger(__name__)
