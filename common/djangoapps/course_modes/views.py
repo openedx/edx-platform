@@ -29,7 +29,6 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price, get_verified_track_links
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.date_utils import strftime_localized_html
-from edx_toggles.toggles import WaffleFlag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
