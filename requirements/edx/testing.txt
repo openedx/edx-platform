@@ -651,8 +651,6 @@ edx-toggles==5.2.0
     #   edxval
     #   event-tracking
     #   ora2
-edx-token-utils==0.2.1
-    # via -r requirements/edx/base.txt
 edx-when==2.5.1
     # via
     #   -r requirements/edx/base.txt
