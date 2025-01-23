@@ -3,7 +3,6 @@
 -c ../constraints.txt
 
 -r github.in              # Forks and other dependencies not yet on PyPI
--r paver.txt              # Requirements for running paver commands
 
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 # Please follow these guidelines whenever you change this file:
@@ -126,6 +125,7 @@ openedx-django-wiki
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
+psutil                              # Library for retrieving information on running processes and system utilization
 pycountry
 pycryptodomex
 pyjwkest
@@ -133,6 +133,7 @@ pyjwkest
 # PyJWT 1.6.3 contains PyJWTError, which is required by Apple auth in social-auth-core
 PyJWT>=1.6.3
 pylti1p3                            # Required by content_libraries core library to support LTI 1.3 launches
+pymemcache                          # Python interface to the memcached memory cache daemon
 pymongo                             # MongoDB driver
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil
@@ -159,5 +160,7 @@ unicodecsv                          # Easier support for CSV files with unicode 
 user-util                           # Functionality for retiring users (GDPR compliance)
 webob
 web-fragments                       # Provides the ability to render fragments of web pages
+wrapt                               # Better functools.wrapped. TODO: functools has since improved, maybe we can switch?
 XBlock[django]                      # Courseware component architecture
 xss-utils                           # https://github.com/openedx/edx-platform/pull/20633 Fix XSS via Translations
+unicodeit                           # Converts mathjax equation to plain text by using unicode symbols

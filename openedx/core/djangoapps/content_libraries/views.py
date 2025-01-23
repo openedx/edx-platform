@@ -99,6 +99,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+from cms.djangoapps.contentstore.views.course import (
+    get_allowed_organizations_for_libraries,
+    user_can_create_organizations,
+)
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryBlockImportTaskCreateSerializer,
@@ -122,6 +126,7 @@ import openedx.core.djangoapps.site_configuration.helpers as configuration_helpe
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.types.http import RestRequest
 
 from .models import ContentLibrary, LtiGradedResource, LtiProfile
 
@@ -267,6 +272,14 @@ class LibraryRootView(GenericAPIView):
         except InvalidOrganizationException:
             raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 detail={"org": f"No such organization '{org_name}' found."}
+            )
+        # Ensure the user is allowed to create libraries under this org
+        if not (
+            user_can_create_organizations(request.user) or
+            org_name in get_allowed_organizations_for_libraries(request.user)
+        ):
+            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+                detail={"org": f"User not allowed to create libraries in '{org_name}'."}
             )
         org = Organization.objects.get(short_name=org_name)
 
@@ -667,7 +680,7 @@ class LibraryBlockCollectionsView(APIView):
     View to set collections for a component.
     """
     @convert_exceptions
-    def patch(self, request, usage_key_str) -> Response:
+    def patch(self, request: RestRequest, usage_key_str) -> Response:
         """
         Sets Collections for a Component.
 
@@ -688,7 +701,7 @@ class LibraryBlockCollectionsView(APIView):
             library_key=key.lib_key,
             component=component,
             collection_keys=collection_keys,
-            created_by=self.request.user.id,
+            created_by=request.user.id,
             content_library=content_library,
         )
 
@@ -799,6 +812,7 @@ class LibraryBlockAssetView(APIView):
         """
         Replace a static asset file belonging to this block.
         """
+        file_path = file_path.replace(" ", "_")  # Messes up url/name correspondence due to URL encoding.
         usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(
             usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
