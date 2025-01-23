@@ -7,6 +7,7 @@ from django.conf import settings
 from jwkest import BadSignature, Expired, Invalid, MissingKey, jwk
 from jwkest.jws import JWS
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.jwt import _encode_and_sign, create_jwt, unpack_jwt
 
 
@@ -24,6 +25,7 @@ expected_full_token = {
 }
 
 
+@skip_unless_lms
 class TestSign(unittest.TestCase):
     """
     Tests for JWT creation and signing.
@@ -66,6 +68,7 @@ def _verify_jwt(jwt_token):
     return decoded
 
 
+@skip_unless_lms
 class TestUnpack(unittest.TestCase):
     """
     Tests for JWT unpacking.
