@@ -4321,7 +4321,7 @@ TOKEN_SIGNING = {
 }
 
 # NOTE: In order to create both JWT_PRIVATE_SIGNING_JWK and JWT_PUBLIC_SIGNING_JWK_SET,
-# start devstack on an lms shell and then run the command:
+# in an  lms shell  run the following  command:
 # > python manage.py lms generate_jwt_signing_key
 # This will output asymmetric JWTs to use here. Read more on this on:
 # https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
