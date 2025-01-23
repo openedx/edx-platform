@@ -22,11 +22,15 @@ from xblock.fields import ScopeIds
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
 from xmodule.fields import Timedelta
-from xmodule.lti_2_util import LTIError
 from xmodule.lti_block import LTIBlock
 from xmodule.tests.helpers import StubUserService
 
 from . import get_test_system
+
+if settings.USE_EXTRACTED_LTI_BLOCK:
+    from xblocks_contrib.lti.lti_2_util import LTIError
+else:
+    from xmodule.lti_2_util import LTIError
 
 
 @override_settings(LMS_BASE="edx.org")
