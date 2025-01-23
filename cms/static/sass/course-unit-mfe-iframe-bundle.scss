@@ -383,17 +383,31 @@ body {
   }
 
   // Additions for the xblock editor on the Library Authoring
-  &.xblock-iframe-content .xblock-actions {
-    padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+  &.xblock-iframe-content {
+    // Reset the max-height to allow the settings list to grow
+    .wrapper-comp-settings .list-input.settings-list {
+      max-height: unset;
+    }
 
-    .action-item {
-      @extend %t-action3;
+    // For Google Docs xblock editor
+    #document-settings-tab.google-edit-wrapper .xblock-inputs {
+      position: unset;
+    }
 
-      display: inline-block;
-      margin-right: ($baseline*0.75);
+    .xblock-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+      position: sticky;
+      bottom: 0;
 
-      &:last-child {
-        margin-right: 0;
+      .action-item {
+        @extend %t-action3;
+
+        display: inline-block;
+        margin-right: ($baseline*0.75);
+
+        &:last-child {
+          margin-right: 0;
+        }
       }
     }
   }
