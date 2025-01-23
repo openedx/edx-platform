@@ -31,7 +31,7 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
 
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
@@ -55,14 +55,13 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
 
         expect(screen.queryByText('Some expected block name')).toBeNull();
 
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
         await userEvent.click(toggleButton);
-
     });
 
     test('hide dropdown on second toggle', async () => {
@@ -80,7 +79,7 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
 
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
