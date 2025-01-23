@@ -8,6 +8,7 @@ import json
 import logging
 
 import requests
+from waffle import switch_is_active
 from django.conf import settings
 from django.urls import reverse
 from requests.auth import HTTPBasicAuth
@@ -136,8 +137,16 @@ class XQueueInterface:
             for f in files_to_upload:
                 files.update({f.name: f})
                 
-        submission = XQueueInterfaceSubmission().send_to_submission(header, body, files_to_upload)
-        return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
+        if switch_is_active('xqueue_submission.enabled'):
+            # Use the new edx-submissions workflow
+            submission = XQueueInterfaceSubmission().send_to_submission(header, body, files_to_upload)
+            log.error(submission)
+            if 'error' in submission:
+                return submission['error'], submission.get('message', 'Unknown error')
+            return 0, 'Submission sent successfully'
+        
+        else:
+            return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
     def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:

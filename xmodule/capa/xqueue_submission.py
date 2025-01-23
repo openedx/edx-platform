@@ -31,46 +31,45 @@ READ_TIMEOUT = 10  # seconds
 
 
 def extract_item_data(header, payload):
-    # Convertir header de JSON a diccionario si es necesario
     if isinstance(header, str):
         try:
             header = json.loads(header)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Error al decodificar header: {e}")
+            raise ValueError(f"Error to header: {e}")
 
-    # Convertir payload de JSON a diccionario si es necesario
     if isinstance(payload, str):
         try:
             payload = json.loads(payload)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Error al decodificar payload: {e}")
+            raise ValueError(f"Error to payload: {e}")
 
-    # Extraer callback_url
+    
     callback_url = header.get('lms_callback_url')
+    queue_name = header.get('queue_name')
     if not callback_url:
-        raise ValueError("El header no contiene 'lms_callback_url'.")
+        raise ValueError("El header is not content 'lms_callback_url'.")
 
-    # Extraer datos del callback_url con validaciones
+    
     match_item_id = re.search(r'block@([^/]+)', callback_url)
     match_item_type = re.search(r'type@([^+]+)', callback_url)
     match_course_id = re.search(r'course-v1:([^/]+)', callback_url)
 
     if not (match_item_id and match_item_type and match_course_id):
-        raise ValueError(f"El formato de callback_url no es válido: {callback_url}")
+        raise ValueError(f"The callback_url is not valid: {callback_url}")
 
     item_id = match_item_id.group(1)
     item_type = match_item_type.group(1)
     course_id = match_course_id.group(1)
 
-    # Decodificar student_info
+    
     try:
         student_info = json.loads(payload["student_info"])
     except json.JSONDecodeError as e:
-        raise ValueError(f"Error al decodificar student_info: {e}")
+        raise ValueError(f"Error to student_info: {e}")
 
     student_id = student_info.get("anonymous_student_id")
     if not student_id:
-        raise ValueError("El campo 'anonymous_student_id' no está presente en student_info.")
+        raise ValueError("The field 'anonymous_student_id' is not student_info.")
 
     # Construir el diccionario de resultados
     student_dict = {
@@ -85,7 +84,7 @@ def extract_item_data(header, payload):
     if student_answer is None:
         raise ValueError("El campo 'student_response' no está presente en payload.")
 
-    return student_dict, student_answer
+    return student_dict, student_answer, queue_name
 
 class XQueueInterfaceSubmission:
     """
@@ -95,16 +94,11 @@ class XQueueInterfaceSubmission:
     def send_to_submission(self, header, body, files_to_upload=None):
         from submissions.api import create_submission
         try:
-            # Extraer datos del item
-            student_item, answer = extract_item_data(header, body)
-            print("student_item -------------------------------------------------- ", student_item)
+            student_item, answer, queue_name = extract_item_data(header, body)
             
-            # Llamar a create_submission
-            submission = create_submission(student_item, answer)
+            submission = create_submission(student_item, answer, queue_name=queue_name)
             
-            # Retornar éxito
             return submission
         except Exception as e:
-            # Retornar error con mensaje de la excepción
-            return (1, f"Error: {str(e)}")
+            return (f"Error: {str(e)}")
 
