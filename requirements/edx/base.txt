@@ -80,6 +80,9 @@ boto3==1.36.3
     #   ora2
 botocore==1.36.3
     # via
+    #   -r requirements/edx/kernel.in
+    #   boto3
+    #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 cachecontrol==0.14.2
@@ -534,8 +537,6 @@ edx-toggles==5.2.0
     #   edxval
     #   event-tracking
     #   ora2
-edx-token-utils==0.2.1
-    # via -r requirements/edx/kernel.in
 edx-when==2.5.1
     # via
     #   -r requirements/edx/kernel.in
