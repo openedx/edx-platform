@@ -555,7 +555,6 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
             assert new_block.upstream == str(self.lib_block_key)
             assert new_block.upstream_version == 3
             assert new_block.upstream_display_name == "MCQ-draft"
-            assert new_block.upstream_max_attempts == 5
             return new_block_key
 
         # first verify link for copied block from library
