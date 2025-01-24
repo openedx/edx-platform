@@ -1228,7 +1228,6 @@ pylatexenc==2.10
     #   olxcleaner
 pylint==2.15.10
     # via
-    #   -c requirements/edx/../constraints.txt
     #   edx-lint
     #   pylint-celery
     #   pylint-django
