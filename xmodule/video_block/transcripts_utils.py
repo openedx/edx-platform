@@ -1022,33 +1022,6 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
             continue
 
     if transcript_content is None:
-        # `get_transcript_for_video` can get the transcript using just the filename.
-        #
-        # The use case for which this has been implemented is when copying a video from
-        # a library and pasting it into a course.
-        # The asset is copied, but we only have the filename to obtain the content.
-        try:
-            input_format, base_name, transcript_content = get_transcript_for_video(
-                video.location,
-                subs_id=None,
-                file_name=other_languages[language],
-                language=language
-            )
-        except (KeyError, NotFoundError):
-            # If the video is copied from a library, the component import path is used,
-            # so we also need to try this use case.
-            try:
-                file_name = build_components_import_path(video.location, other_languages[language])
-                input_format, base_name, transcript_content = get_transcript_for_video(
-                    video.location,
-                    subs_id=None,
-                    file_name=file_name,
-                    language=language
-                )
-            except (KeyError, NotFoundError):
-                pass
-
-    if transcript_content is None:
         raise NotFoundError('No transcript for `{lang}` language'.format(
             lang=language
         ))
