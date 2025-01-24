@@ -69,9 +69,19 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.core import XBlock
 
+from openedx_learning.api import authoring
+
+from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
 from cms.lib.xblock.upstream_sync import (
-    UpstreamLink, UpstreamLinkException, NoUpstream, BadUpstream, BadDownstream,
-    fetch_customizable_fields, sync_from_upstream, decline_sync, sever_upstream_link
+    BadDownstream,
+    BadUpstream,
+    NoUpstream,
+    UpstreamLink,
+    UpstreamLinkException,
+    decline_sync,
+    fetch_customizable_fields,
+    sever_upstream_link,
+    sync_from_upstream,
 )
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from common.djangoapps.student.auth import has_studio_write_access, has_studio_read_access
@@ -81,7 +91,6 @@ from openedx.core.lib.api.view_utils import (
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +118,20 @@ class _AuthenticatedRequest(Request):
 #         course_key_string = request.GET['course_id']
 #         syncable = request.GET['ready_to_sync']
 #         ...
+
+
+@view_auth_classes()
+class UpstreamListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves course->library publishable entity links
+    """
+    def get(self, request: _AuthenticatedRequest, course_key_string: str):
+        """
+        Fetches publishable entity links for given course key
+        """
+        links = authoring.get_entity_links_by_downstream(downstream_context_key=course_key_string)
+        serializer = PublishableEntityLinksSerializer(links, many=True)
+        return Response(serializer.data)
 
 
 @view_auth_classes(is_authenticated=True)
