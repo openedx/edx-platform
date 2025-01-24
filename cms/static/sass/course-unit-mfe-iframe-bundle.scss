@@ -389,8 +389,8 @@ body {
       max-height: unset;
     }
 
-    // For Google Docs xblock editor
-    #document-settings-tab.google-edit-wrapper .xblock-inputs {
+    // For Google Docs and Google Calendar xblock editor
+    .google-edit-wrapper .xblock-inputs {
       position: unset;
     }
 
