@@ -1159,10 +1159,8 @@ pyasn1-modules==0.4.2
     # via
     #   -r requirements/edx/base.txt
     #   google-auth
-pycodestyle==2.8.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.in
+pycodestyle==2.12.1
+    # via -r requirements/edx/testing.in
 pycountry==24.6.1
     # via -r requirements/edx/base.txt
 pycparser==2.22
