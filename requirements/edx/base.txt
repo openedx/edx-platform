@@ -72,13 +72,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.36.3
+boto3==1.36.5
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.36.3
+botocore==1.36.5
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -87,7 +87,7 @@ bridgekeeper==0.9
     # via -r requirements/edx/kernel.in
 cachecontrol==0.14.2
     # via firebase-admin
-cachetools==5.5.0
+cachetools==5.5.1
     # via google-auth
 camel-converter[pydantic]==4.0.1
     # via meilisearch
@@ -513,7 +513,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.1.1
+edx-search==4.1.2
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-forum
@@ -595,7 +595,7 @@ google-api-core[grpc]==2.24.0
     #   google-cloud-storage
 google-api-python-client==2.159.0
     # via firebase-admin
-google-auth==2.37.0
+google-auth==2.38.0
     # via
     #   google-api-core
     #   google-api-python-client
@@ -623,11 +623,11 @@ googleapis-common-protos==1.66.0
     # via
     #   google-api-core
     #   grpcio-status
-grpcio==1.69.0
+grpcio==1.70.0
     # via
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.69.0
+grpcio-status==1.70.0
     # via google-api-core
 gunicorn==23.0.0
     # via -r requirements/edx/kernel.in
@@ -702,7 +702,7 @@ lazy==1.6
     #   xblock
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.13.1
+lti-consumer-xblock==9.13.2
     # via -r requirements/edx/kernel.in
 lxml[html-clean,html_clean]==5.3.0
     # via
@@ -919,7 +919,7 @@ pycryptodomex==3.21.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.10.5
+pydantic==2.10.6
     # via camel-converter
 pydantic-core==2.27.2
     # via pydantic
@@ -1089,7 +1089,7 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.11.1
+s3transfer==0.11.2
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
@@ -1135,7 +1135,7 @@ slumber==0.7.1
     #   -r requirements/edx/kernel.in
     #   edx-bulk-grades
     #   edx-enterprise
-snowflake-connector-python==3.12.4
+snowflake-connector-python==3.13.0
     # via edx-enterprise
 social-auth-app-django==5.4.1
     # via

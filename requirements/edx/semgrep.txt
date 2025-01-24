@@ -34,7 +34,7 @@ colorama==0.4.6
     # via semgrep
 defusedxml==0.7.1
     # via semgrep
-deprecated==1.2.15
+deprecated==1.2.16
     # via
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-http
@@ -116,7 +116,7 @@ ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.103.0
+semgrep==1.104.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
