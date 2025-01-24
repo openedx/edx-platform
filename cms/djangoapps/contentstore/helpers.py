@@ -10,6 +10,7 @@ from mimetypes import guess_type
 import re
 
 from attrs import frozen, Factory
+from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
@@ -23,7 +24,8 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
-from xmodule.video_block.transcripts_utils import build_components_import_path
+from xmodule.video_block.transcripts_utils import Transcript, build_components_import_path
+from edxval.api import create_external_video, create_or_update_video_transcript
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fetch_customizable_fields
@@ -300,13 +302,21 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             tags=user_clipboard.content.tags,
         )
 
+        usage_key = new_xblock.scope_ids.usage_id
+        if usage_key.block_type == 'video':
+            # The edx_video_id must always be new so as not
+            # to interfere with the data of the copied block
+            new_xblock.edx_video_id  = create_external_video(display_name='external video')
+            store.update_item(new_xblock, request.user.id)
+
         # Now handle static files that need to go into Files & Uploads.
         static_files = content_staging_api.get_staged_content_static_files(user_clipboard.content.id)
         notices, substitutions = _import_files_into_course(
+            block=new_xblock,
             course_key=parent_key.context_key,
             staged_content_id=user_clipboard.content.id,
             static_files=static_files,
-            usage_key=new_xblock.scope_ids.usage_id,
+            usage_key=usage_key,
         )
 
         # Rewrite the OLX's static asset references to point to the new
@@ -505,6 +515,7 @@ def _import_xml_node_to_parent(
 
 
 def _import_files_into_course(
+    block: XBlock,
     course_key: CourseKey,
     staged_content_id: int,
     static_files: list[content_staging_api.StagedContentFileData],
@@ -541,6 +552,7 @@ def _import_files_into_course(
         # At this point, we know this is a "Files & Uploads" asset that we may need to copy into the course:
         try:
             result, substitution_for_file = _import_file_into_course(
+                block,
                 course_key,
                 staged_content_id,
                 file_data_obj,
@@ -567,6 +579,7 @@ def _import_files_into_course(
 
 
 def _import_file_into_course(
+    block: XBlock,
     course_key: CourseKey,
     staged_content_id: int,
     file_data_obj: content_staging_api.StagedContentFileData,
@@ -617,6 +630,24 @@ def _import_file_into_course(
         if thumbnail_content is not None:
             content.thumbnail_location = thumbnail_location
         contentstore().save(content)
+        if usage_key.block_type == 'video':
+            # Adding transcripts to VAL using the nex edx_video_id
+            language_code = next((k for k, v in block.transcripts.items() if v == filename), None)
+            if language_code:
+                sjson_subs = Transcript.convert(
+                    content=data,
+                    input_format=Transcript.SRT,
+                    output_format=Transcript.SJSON
+                ).encode()
+                create_or_update_video_transcript(
+                    video_id=block.edx_video_id,
+                    language_code=language_code,
+                    metadata={
+                        'file_format': Transcript.SJSON,
+                        'language_code': language_code
+                    },
+                    file_data=ContentFile(sjson_subs),
+                )
         return True, {clipboard_file_path: f"static/{import_path}"}
     elif current_file.content_digest == file_data_obj.md5_hash:
         # The file already exists and matches exactly, so no action is needed

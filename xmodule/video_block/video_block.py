@@ -732,6 +732,8 @@ class _BuiltInVideoBlock(
             if key not in cls.fields:  # lint-amnesty, pylint: disable=unsupported-membership-test
                 continue  # parse_video_xml returns some old non-fields like 'source'
             setattr(video_block, key, cls.fields[key].from_json(val))  # lint-amnesty, pylint: disable=unsubscriptable-object
+        # Don't use VAL in the new runtime:
+        video_block.edx_video_id = None
         return video_block
 
     @classmethod
