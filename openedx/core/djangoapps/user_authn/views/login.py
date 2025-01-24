@@ -195,7 +195,7 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         # Allow login, but warn the user that they will be required to reset their password soon.
         PageLevelMessages.register_warning_message(request, HTML(str(e)))
     except password_policy_compliance.NonCompliantPasswordException as e:
-        # Increment the lockout counter to safguard from further brute force requests
+        # Increment the lockout counter to safeguard from further brute force requests
         # if user's password has been compromised.
         if LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user)
