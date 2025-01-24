@@ -10,13 +10,13 @@ attrs==24.3.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.36.3
+boto3==1.36.5
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.36.3
+botocore==1.36.5
     # via
     #   boto3
     #   s3transfer
-cachetools==5.5.0
+cachetools==5.5.1
     # via google-auth
 certifi==2024.12.14
     # via requests
@@ -54,7 +54,7 @@ google-api-core==2.24.0
     # via google-api-python-client
 google-api-python-client==2.159.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.37.0
+google-auth==2.38.0
     # via
     #   google-api-core
     #   google-api-python-client
@@ -136,7 +136,7 @@ requests-toolbelt==1.0.0
     # via zeep
 rsa==4.9
     # via google-auth
-s3transfer==0.11.1
+s3transfer==0.11.2
     # via boto3
 simple-salesforce==1.12.6
     # via -r scripts/user_retirement/requirements/base.in
