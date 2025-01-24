@@ -126,13 +126,7 @@ class HomePageCoursesViewV2(APIView):
             "in_process_course_actions": [],
         }
         ```
-
-        if the `ENABLE_HOME_PAGE_COURSE_API_V2` feature flag is not enabled, an HTTP 404 "Not Found" response
-        is returned.
         """
-        if not settings.FEATURES.get('ENABLE_HOME_PAGE_COURSE_API_V2', False):
-            return HttpResponseNotFound()
-
         courses, in_process_course_actions = get_course_context_v2(request)
         paginator = HomePageCoursesPaginator()
         courses_page = paginator.paginate_queryset(
