@@ -28,7 +28,7 @@ pbr==6.1.0
     #   stevedore
 pluggy==1.5.0
     # via pytest
-pymongo==4.4.0
+pymongo==4.10.1
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys

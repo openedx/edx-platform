@@ -121,7 +121,7 @@ cachecontrol==0.14.2
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-cachetools==5.5.0
+cachetools==5.5.1
     # via
     #   -r requirements/edx/base.txt
     #   google-auth
@@ -590,7 +590,7 @@ edx-i18n-tools==1.5.0
     #   -r requirements/edx/base.txt
     #   ora2
     #   xblocks-contrib
-edx-lint==5.4.1
+edx-lint==5.5.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
@@ -626,7 +626,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.1.1
+edx-search==4.1.2
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
@@ -684,7 +684,7 @@ execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.1
     # via -r requirements/edx/testing.in
-faker==33.3.1
+faker==34.0.0
     # via factory-boy
 fastapi==0.115.6
     # via pact-python
@@ -903,7 +903,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.13.1
+lti-consumer-xblock==9.13.2
     # via -r requirements/edx/base.txt
 lxml[html-clean]==5.3.0
     # via
@@ -1254,7 +1254,6 @@ pymemcache==4.0.0
     # via -r requirements/edx/base.txt
 pymongo==4.4.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-opaque-keys
     #   event-tracking

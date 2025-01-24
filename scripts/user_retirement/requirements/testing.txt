@@ -24,7 +24,7 @@ botocore==1.36.3
     #   boto3
     #   moto
     #   s3transfer
-cachetools==5.5.0
+cachetools==5.5.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth

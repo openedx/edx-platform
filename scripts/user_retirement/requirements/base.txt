@@ -16,7 +16,7 @@ botocore==1.36.3
     # via
     #   boto3
     #   s3transfer
-cachetools==5.5.0
+cachetools==5.5.1
     # via google-auth
 certifi==2024.12.14
     # via requests

@@ -171,7 +171,7 @@ cachecontrol==0.14.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-cachetools==5.5.0
+cachetools==5.5.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -767,7 +767,7 @@ edx-i18n-tools==1.5.0
     #   -r requirements/edx/testing.txt
     #   ora2
     #   xblocks-contrib
-edx-lint==5.4.1
+edx-lint==5.5.0
     # via -r requirements/edx/testing.txt
 edx-milestones==0.6.0
     # via
@@ -813,7 +813,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.1.1
+edx-search==4.1.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -889,7 +889,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.1
     # via -r requirements/edx/testing.txt
-faker==33.3.1
+faker==34.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -1189,7 +1189,7 @@ loremipsum==1.0.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.13.1
+lti-consumer-xblock==9.13.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1653,7 +1653,6 @@ pymemcache==4.0.0
     #   -r requirements/edx/testing.txt
 pymongo==4.4.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-opaque-keys
