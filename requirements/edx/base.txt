@@ -221,7 +221,6 @@ django==4.2.18
     #   edx-search
     #   edx-submissions
     #   edx-toggles
-    #   edx-token-utils
     #   edx-when
     #   edxval
     #   enmerkar
@@ -538,8 +537,6 @@ edx-toggles==5.2.0
     #   edxval
     #   event-tracking
     #   ora2
-edx-token-utils==0.2.1
-    # via -r requirements/edx/kernel.in
 edx-when==2.5.1
     # via
     #   -r requirements/edx/kernel.in
@@ -931,7 +928,6 @@ pygments==2.19.1
 pyjwkest==1.4.2
     # via
     #   -r requirements/edx/kernel.in
-    #   edx-token-utils
     #   lti-consumer-xblock
 pyjwt[crypto]==2.10.1
     # via
