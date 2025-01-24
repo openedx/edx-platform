@@ -57,10 +57,8 @@ asn1crypto==1.5.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-astroid==2.13.5
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   sphinx-autoapi
+astroid==3.3.8
+    # via sphinx-autoapi
 attrs==24.3.0
     # via
     #   -r requirements/edx/base.txt
@@ -851,8 +849,6 @@ lazy==1.6
     #   lti-consumer-xblock
     #   ora2
     #   xblock
-lazy-object-proxy==1.10.0
-    # via astroid
 loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
@@ -1576,9 +1572,7 @@ wheel==0.45.1
     #   -r requirements/edx/base.txt
     #   django-pipeline
 wrapt==1.17.2
-    # via
-    #   -r requirements/edx/base.txt
-    #   astroid
+    # via -r requirements/edx/base.txt
 xblock[django]==5.1.1
     # via
     #   -r requirements/edx/base.txt
