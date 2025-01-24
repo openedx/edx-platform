@@ -21,7 +21,6 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from common.djangoapps.util.tests.mixins.discovery import CourseCatalogServiceMockMixin
-from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from lms.djangoapps.commerce.tests.mocks import mock_payment_processors
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -32,8 +31,6 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
-
-from ..views import VALUE_PROP_TRACK_SELECTION_FLAG
 
 # Name of the method to mock for Content Type Gating.
 GATING_METHOD_NAME = 'openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment'
@@ -187,27 +184,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # that the right template rendered
 
     @httpretty.activate
-    @ddt.data(
-        (['honor', 'verified', 'credit'], True),
-        (['honor', 'verified'], False),
-    )
-    @ddt.unpack
-    def test_credit_upsell_message(self, available_modes, show_upsell):
-        # Create the course modes
-        for mode in available_modes:
-            CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
-
-        # Check whether credit upsell is shown on the page
-        # This should *only* be shown when a credit mode is available
-        url = reverse('course_modes_choose', args=[str(self.course.id)])
-        response = self.client.get(url)
-
-        if show_upsell:
-            self.assertContains(response, "Credit")
-        else:
-            self.assertNotContains(response, "Credit")
-
-    @httpretty.activate
     @patch('common.djangoapps.course_modes.views.enterprise_customer_for_request')
     @patch('common.djangoapps.course_modes.views.get_course_final_price')
     @ddt.data(
@@ -239,29 +215,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         if is_enterprise_enabled:
             self.assertContains(response, discounted_price)
         self.assertContains(response, verified_mode.min_price)
-
-    @httpretty.activate
-    @ddt.data(True, False)
-    def test_congrats_on_enrollment_message(self, create_enrollment):
-        # Create the course mode
-        CourseModeFactory.create(mode_slug='verified', course_id=self.course.id)
-
-        if create_enrollment:
-            CourseEnrollmentFactory(
-                is_active=True,
-                course_id=self.course.id,
-                user=self.user
-            )
-
-        # Check whether congratulations message is shown on the page
-        # This should *only* be shown when an enrollment exists
-        url = reverse('course_modes_choose', args=[str(self.course.id)])
-        response = self.client.get(url)
-
-        if create_enrollment:
-            self.assertContains(response, "Congratulations!  You are now enrolled in")
-        else:
-            self.assertNotContains(response, "Congratulations!  You are now enrolled in")
 
     @ddt.data('professional', 'no-id-professional')
     def test_professional_enrollment(self, mode):
@@ -529,26 +482,24 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory.create(mode_slug=mode, course_id=self.course.id)
 
-        # Value Prop TODO (REV-2378): remove waffle flag from tests once flag is removed.
-        with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=True):
-            mock_has_perm.return_value = has_perm
-            url = reverse('course_modes_choose', args=[str(self.course.id)])
+        mock_has_perm.return_value = has_perm
+        url = reverse('course_modes_choose', args=[str(self.course.id)])
 
-            # Choose mode (POST request)
-            response = self.client.post(url, post_params)
-            self.assertEqual(response.status_code, status_code)
+        # Choose mode (POST request)
+        response = self.client.post(url, post_params)
+        self.assertEqual(response.status_code, status_code)
 
-            if has_perm:
-                self.assertContains(response, error_msg)
-                self.assertContains(response, 'Sorry, we were unable to enroll you')
+        if has_perm:
+            self.assertContains(response, error_msg)
+            self.assertContains(response, 'Sorry, we were unable to enroll you')
 
-                # Check for CTA button on error page
-                marketing_root = settings.MKTG_URLS.get('ROOT')
-                search_courses_url = urljoin(marketing_root, '/search?tab=course')
-                self.assertContains(response, search_courses_url)
-                self.assertContains(response, '<span>Explore all courses</span>')
-            else:
-                self.assertTrue(CourseEnrollment.is_enrollment_closed(self.user, self.course))
+            # Check for CTA button on error page
+            marketing_root = settings.MKTG_URLS.get('ROOT')
+            search_courses_url = urljoin(marketing_root, '/search?tab=course')
+            self.assertContains(response, search_courses_url)
+            self.assertContains(response, '<span>Explore all courses</span>')
+        else:
+            self.assertTrue(CourseEnrollment.is_enrollment_closed(self.user, self.course))
 
     def _assert_fbe_page(self, response, min_price=None, **_):
         """
@@ -607,33 +558,19 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         # Check for the HTML element for courses with more than one mode
         self.assertContains(response, '<div class="grid-options">')
 
-    def _assert_legacy_page(self, response, **_):
-        """
-        Assert choose.html was rendered.
-        """
-        # Check for string unique to the legacy choose.html.
-        self.assertContains(response, "Choose Your Track")
-        # This string only occurs in lms/templates/course_modes/choose.html
-        # and related theme and translation files.
-
     @override_settings(MKTG_URLS={'ROOT': 'https://www.example.edx.org'})
     @ddt.data(
-        # gated_content_on, course_duration_limits_on, waffle_flag_on, expected_page_assertion_function
-        (True, True, True, _assert_fbe_page),
-        (True, False, True, _assert_unfbe_page),
-        (False, True, True, _assert_unfbe_page),
-        (False, False, True, _assert_unfbe_page),
-        (True, True, False, _assert_legacy_page),
-        (True, False, False, _assert_legacy_page),
-        (False, True, False, _assert_legacy_page),
-        (False, False, False, _assert_legacy_page),
+        # gated_content_on, course_duration_limits_on, expected_page_assertion_function
+        (True, True, _assert_fbe_page),
+        (True, False, _assert_unfbe_page),
+        (False, True, _assert_unfbe_page),
+        (False, False, _assert_unfbe_page),
     )
     @ddt.unpack
     def test_track_selection_types(
             self,
             gated_content_on,
             course_duration_limits_on,
-            waffle_flag_on,
             expected_page_assertion_function
     ):
         """
@@ -644,7 +581,6 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
         verified course modes), the learner may view 3 different pages:
             1. fbe.html - full FBE
             2. unfbe.html - partial or no FBE
-            3. choose.html - legacy track selection page
 
         This test checks that the right template is rendered.
 
@@ -667,15 +603,11 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             user=self.user
         )
 
-        # Value Prop TODO (REV-2378): remove waffle flag from tests once the new Track Selection template is rolled out.
-        # Check whether new track selection template is rendered.
-        # This should *only* be shown when the waffle flag is on.
-        with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=waffle_flag_on):
-            with patch(GATING_METHOD_NAME, return_value=gated_content_on):
-                with patch(CDL_METHOD_NAME, return_value=course_duration_limits_on):
-                    url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
-                    response = self.client.get(url)
-                    expected_page_assertion_function(self, response, min_price=verified_mode.min_price)
+        with patch(GATING_METHOD_NAME, return_value=gated_content_on):
+            with patch(CDL_METHOD_NAME, return_value=course_duration_limits_on):
+                url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
+                response = self.client.get(url)
+                expected_page_assertion_function(self, response, min_price=verified_mode.min_price)
 
     def test_verified_mode_only(self):
         # Create only the verified mode and enroll the user
@@ -690,18 +622,16 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
             user=self.user
         )
 
-        # Value Prop TODO (REV-2378): remove waffle flag from tests once the new Track Selection template is rolled out.
-        with override_waffle_flag(VALUE_PROP_TRACK_SELECTION_FLAG, active=True):
-            with patch(GATING_METHOD_NAME, return_value=True):
-                with patch(CDL_METHOD_NAME, return_value=True):
-                    url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
-                    response = self.client.get(url)
-                    # Check that only the verified option is rendered
-                    self.assertNotContains(response, "Choose a path for your course in")
-                    self.assertContains(response, "Earn a certificate")
-                    self.assertNotContains(response, "Access this course")
-                    self.assertContains(response, '<div class="grid-single">')
-                    self.assertNotContains(response, '<div class="grid-options">')
+        with patch(GATING_METHOD_NAME, return_value=True):
+            with patch(CDL_METHOD_NAME, return_value=True):
+                url = reverse('course_modes_choose', args=[str(self.course_that_started.id)])
+                response = self.client.get(url)
+                # Check that only the verified option is rendered
+                self.assertNotContains(response, "Choose a path for your course in")
+                self.assertContains(response, "Earn a certificate")
+                self.assertNotContains(response, "Access this course")
+                self.assertContains(response, '<div class="grid-single">')
+                self.assertNotContains(response, '<div class="grid-options">')
 
 
 @skip_unless_lms
