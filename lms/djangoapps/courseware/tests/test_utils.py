@@ -3,7 +3,7 @@ Unit test for various Utility functions
 """
 
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from unittest.mock import patch
 
 import ddt
