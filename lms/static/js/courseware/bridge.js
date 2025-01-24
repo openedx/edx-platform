@@ -89,11 +89,11 @@ $.ajax = function (options) {
   if (options.url && options.url.endsWith("handler/xmodule_handler/problem_check")) {
     if (options.data) {
       // Replace spaces with URLEncoded value to ensure correct parsing on the backend
-      let formattedData = options.data.replace(/\+/g, '%20');
-      let jsonMessage = JSON.stringify(formattedData)
+      let optionsCopy = {...options};
+      optionsCopy.data = optionsCopy.data.replace(/\+/g, '%20');
 
-      sendMessageToIOS(jsonMessage)
-      sendMessageToAndroid(jsonMessage)
+      sendMessageToIOS(JSON.stringify(optionsCopy))
+      sendMessageToAndroid(JSON.stringify(optionsCopy))
     }
   }
   return originalAjax.call(this, options);
