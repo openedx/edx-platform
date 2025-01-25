@@ -323,6 +323,49 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
 
     return new_xblock, notices
 
+def import_staged_content_for_library_sync(new_xblock: XBlock, lib_block: XBlock, request) -> StaticFileNotices:
+    """
+    Import a block (along with its children and any required static assets) from
+    the "staged" OLX in the user's clipboard.
+
+    Does not deal with permissions or REST stuff - do that before calling this.
+
+    Returns (1) the newly created block on success or None if the clipboard is
+    empty, and (2) a summary of changes made to static files in the destination
+    course.
+    """
+    if not content_staging_api:
+        raise RuntimeError("The required content_staging app is not installed")
+    library_sync = content_staging_api.save_xblock_to_user_library_sync(lib_block, request.user.id)
+    if not library_sync:
+        # expired/error/loading
+        return StaticFileNotices()
+
+    store = modulestore()
+    with store.bulk_operations(new_xblock.scope_ids.usage_id.context_key):
+        # Now handle static files that need to go into Files & Uploads.
+        static_files = content_staging_api.get_staged_content_static_files(library_sync.content.id)
+        notices, substitutions = _import_files_into_course(
+            course_key=new_xblock.scope_ids.usage_id.context_key,
+            staged_content_id=library_sync.content.id,
+            static_files=static_files,
+            usage_key=new_xblock.scope_ids.usage_id,
+        )
+
+        # Rewrite the OLX's static asset references to point to the new
+        # locations for those assets. See _import_files_into_course for more
+        # info on why this is necessary.
+        if hasattr(new_xblock, 'data') and substitutions:
+            data_with_substitutions = new_xblock.data
+            for old_static_ref, new_static_ref in substitutions.items():
+                data_with_substitutions = data_with_substitutions.replace(
+                    old_static_ref,
+                    new_static_ref,
+                )
+            new_xblock.data = data_with_substitutions
+
+    return notices
+
 
 def _fetch_and_set_upstream_link(
     copied_from_block: str,
