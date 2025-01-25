@@ -574,22 +574,33 @@ class VideoStudioViewHandlers:
                 if edx_video_id:
                     delete_video_transcript(video_id=edx_video_id, language_code=language)
 
-                if language == 'en':
-                    # remove any transcript file from content store for the video ids
-                    possible_sub_ids = [
-                        self.sub,  # pylint: disable=access-member-before-definition
-                        self.youtube_id_1_0
-                    ] + get_html5_ids(self.html5_sources)
-                    for sub_id in possible_sub_ids:
-                        remove_subs_from_store(sub_id, self, language)
-
-                    # update metadata as `en` can also be present in `transcripts` field
-                    remove_subs_from_store(self.transcripts.pop(language, None), self, language)
-
-                    # also empty `sub` field
-                    self.sub = ''  # pylint: disable=attribute-defined-outside-init
+                if isinstance(self.scope_ids.usage_id.context_key, LibraryLocatorV2):
+                    transcript_file_path = f"static/{self.transcripts.pop(language, None)}"
+                    lib_api.delete_library_block_static_asset_file(self.scope_ids.usage_id, transcript_file_path)
+                    field = self.fields['transcripts']
+                    if self.transcripts:
+                        transcripts_copy = self.transcripts.copy()
+                        field.delete_from(self)
+                        field.write_to(self, transcripts_copy)
+                    else:
+                        field.delete_from(self)
                 else:
-                    remove_subs_from_store(self.transcripts.pop(language, None), self, language)
+                    if language == 'en':
+                        # remove any transcript file from content store for the video ids
+                        possible_sub_ids = [
+                            self.sub,  # pylint: disable=access-member-before-definition
+                            self.youtube_id_1_0
+                        ] + get_html5_ids(self.html5_sources)
+                        for sub_id in possible_sub_ids:
+                            remove_subs_from_store(sub_id, self, language)
+
+                        # update metadata as `en` can also be present in `transcripts` field
+                        remove_subs_from_store(self.transcripts.pop(language, None), self, language)
+
+                        # also empty `sub` field
+                        self.sub = ''  # pylint: disable=attribute-defined-outside-init
+                    else:
+                        remove_subs_from_store(self.transcripts.pop(language, None), self, language)
 
                 return Response(status=200)
 
