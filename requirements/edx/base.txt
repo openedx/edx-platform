@@ -37,7 +37,7 @@ asgiref==3.8.1
     #   django-countries
 asn1crypto==1.5.1
     # via snowflake-connector-python
-attrs==24.3.0
+attrs==25.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   aiohttp
@@ -72,13 +72,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.36.5
+boto3==1.36.6
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.36.5
+botocore==1.36.6
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -1040,7 +1040,7 @@ redis==5.2.1
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
-referencing==0.36.1
+referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications

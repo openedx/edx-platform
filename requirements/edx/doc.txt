@@ -58,10 +58,8 @@ asn1crypto==1.5.1
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
 astroid==3.3.8
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   sphinx-autoapi
-attrs==24.3.0
+    # via sphinx-autoapi
+attrs==25.1.0
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -107,13 +105,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.36.5
+boto3==1.36.6
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.36.5
+botocore==1.36.6
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -851,8 +849,6 @@ lazy==1.6
     #   lti-consumer-xblock
     #   ora2
     #   xblock
-lazy-object-proxy==1.10.0
-    # via astroid
 loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
@@ -1271,7 +1267,7 @@ redis==5.2.1
     # via
     #   -r requirements/edx/base.txt
     #   walrus
-referencing==0.36.1
+referencing==0.36.2
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1576,9 +1572,7 @@ wheel==0.45.1
     #   -r requirements/edx/base.txt
     #   django-pipeline
 wrapt==1.17.2
-    # via
-    #   -r requirements/edx/base.txt
-    #   astroid
+    # via -r requirements/edx/base.txt
 xblock[django]==5.1.1
     # via
     #   -r requirements/edx/base.txt
