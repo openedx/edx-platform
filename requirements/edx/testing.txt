@@ -1226,7 +1226,7 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==2.15.10
+pylint==3.3.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   edx-lint
