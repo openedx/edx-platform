@@ -134,7 +134,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-
     @override_settings(NOTIFY_CREDENTIALS_FREQUENCY=3600)
     @freeze_time(datetime(2017, 5, 1, 4))
     def test_auto_execution_different_schedule(self, mock_task):
