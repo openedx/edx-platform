@@ -7,7 +7,7 @@ from unittest import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase, override_settings  # lint-amnesty, pylint: disable=unused-import
+from django.test import TestCase, override_settings
 from freezegun import freeze_time
 
 from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, CourseFactory, CourseRunFactory
@@ -125,11 +125,25 @@ class TestNotifyCredentials(TestCase):
 
     @freeze_time(datetime(2017, 5, 1, 4))
     def test_auto_execution(self, mock_task):
+        """Verify that an automatic execution designed for scheduled windows works correctly"""
         self.expected_options['auto'] = True
         self.expected_options['start_date'] = datetime(2017, 5, 1, 0, 0)
         self.expected_options['end_date'] = datetime(2017, 5, 1, 4, 0)
 
         call_command(Command(), '--auto')
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
+
+    @override_settings(NOTIFY_CREDENTIALS_FREQUENCY=3600)
+    @freeze_time(datetime(2017, 5, 1, 4))
+    def test_auto_execution_different_schedule(self, mock_task):
+        """Verify that an automatic execution designed for scheduled windows
+        works correctly if the window frequency has been changed"""
+        self.expected_options["auto"] = True
+        self.expected_options["start_date"] = datetime(2017, 5, 1, 3, 0)
+        self.expected_options["end_date"] = datetime(2017, 5, 1, 4, 0)
+
+        call_command(Command(), "--auto")
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
