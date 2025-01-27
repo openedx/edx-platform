@@ -3,7 +3,6 @@ Simple utility functions for computing access.
 It allows us to share code between access.py and block transformers.
 """
 
-
 from datetime import datetime, timedelta
 from logging import getLogger
 
@@ -21,7 +20,7 @@ from lms.djangoapps.courseware.access_response import (
     EnrollmentRequiredAccessError,
     IncorrectActiveEnterpriseAccessError,
     StartDateEnterpriseLearnerError,
-    StartDateError
+    StartDateError,
 )
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
@@ -58,9 +57,12 @@ def adjust_start_date(user, days_early_for_beta, start, course_key):
 
     if CourseBetaTesterRole(course_key).has_user(user):
         debug("Adjust start time: user in beta role for %s", course_key)
-        delta = timedelta(days_early_for_beta)
-        effective = start - delta
-        return effective
+        # timedelta.max days from now is in the year 2739931, so that's probably pretty safe
+        delta = timedelta(min(days_early_for_beta, timedelta.max.days))
+        try:
+            return start - delta
+        except OverflowError:
+            return start
 
     return start
 
@@ -93,7 +95,7 @@ def enterprise_learner_enrolled(request, user, course_key):
     # enterprise_customer_data is either None (if learner is not linked to any customer) or a serialized
     # EnterpriseCustomer representing the learner's active linked customer.
     enterprise_customer_data = enterprise_customer_from_session_or_learner_data(request)
-    learner_portal_enabled = enterprise_customer_data and enterprise_customer_data['enable_learner_portal']
+    learner_portal_enabled = enterprise_customer_data and enterprise_customer_data["enable_learner_portal"]
     if not learner_portal_enabled:
         return False
 
@@ -102,18 +104,18 @@ def enterprise_learner_enrolled(request, user, course_key):
     enterprise_enrollments = EnterpriseCourseEnrollment.objects.filter(
         course_id=course_key,
         enterprise_customer_user__user_id=user.id,
-        enterprise_customer_user__enterprise_customer__uuid=enterprise_customer_data['uuid'],
+        enterprise_customer_user__enterprise_customer__uuid=enterprise_customer_data["uuid"],
     )
     enterprise_enrollment_exists = enterprise_enrollments.exists()
     log.info(
         (
-            '[enterprise_learner_enrolled] Checking for an enterprise enrollment for '
-            'lms_user_id=%s in course_key=%s via enterprise_customer_uuid=%s. '
-            'Exists: %s'
+            "[enterprise_learner_enrolled] Checking for an enterprise enrollment for "
+            "lms_user_id=%s in course_key=%s via enterprise_customer_uuid=%s. "
+            "Exists: %s"
         ),
         user.id,
         course_key,
-        enterprise_customer_data['uuid'],
+        enterprise_customer_data["uuid"],
         enterprise_enrollment_exists,
     )
     return enterprise_enrollment_exists
@@ -130,7 +132,7 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
     Returns:
         AccessResponse: Either ACCESS_GRANTED or StartDateError.
     """
-    start_dates_disabled = settings.FEATURES['DISABLE_START_DATES']
+    start_dates_disabled = settings.FEATURES["DISABLE_START_DATES"]
     masquerading_as_student = is_masquerading_as_student(user, course_key)
 
     if start_dates_disabled and not masquerading_as_student:
@@ -161,8 +163,8 @@ def in_preview_mode():
     Returns whether the user is in preview mode or not.
     """
     hostname = get_current_request_hostname()
-    preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE', None)
-    return bool(preview_lms_base and hostname and hostname.split(':')[0] == preview_lms_base.split(':')[0])
+    preview_lms_base = settings.FEATURES.get("PREVIEW_LMS_BASE", None)
+    return bool(preview_lms_base and hostname and hostname.split(":")[0] == preview_lms_base.split(":")[0])
 
 
 def check_course_open_for_learner(user, course):
@@ -233,18 +235,19 @@ def check_public_access(course, visibilities):
 
 def check_data_sharing_consent(course_id):
     """
-        Grants access if the user is do not need DataSharing consent, otherwise returns data sharing link.
+    Grants access if the user is do not need DataSharing consent, otherwise returns data sharing link.
 
-        Returns:
-            AccessResponse: Either ACCESS_GRANTED or DataSharingConsentRequiredAccessError
-        """
+    Returns:
+        AccessResponse: Either ACCESS_GRANTED or DataSharingConsentRequiredAccessError
+    """
     from openedx.features.enterprise_support.api import get_enterprise_consent_url
+
     consent_url = get_enterprise_consent_url(
         request=get_current_request(),
         course_id=str(course_id),
-        return_to='courseware',
+        return_to="courseware",
         enrollment_exists=True,
-        source='CoursewareAccess'
+        source="CoursewareAccess",
     )
     if consent_url:
         return DataSharingConsentRequiredAccessError(consent_url=consent_url)
@@ -274,7 +277,7 @@ def check_correct_active_enterprise_customer(user, course_id):
     except (EnterpriseCustomerUser.DoesNotExist, EnterpriseCustomerUser.MultipleObjectsReturned):
         # Ideally this should not happen. As there should be only 1 active enterprise customer in our system
         log.error("Multiple or No Active Enterprise found for the user %s.", user.id)
-        active_enterprise_name = 'Incorrect'
+        active_enterprise_name = "Incorrect"
 
     enrollment_enterprise_name = enterprise_enrollments.first().enterprise_customer_user.enterprise_customer.name
     return IncorrectActiveEnterpriseAccessError(enrollment_enterprise_name, active_enterprise_name)
