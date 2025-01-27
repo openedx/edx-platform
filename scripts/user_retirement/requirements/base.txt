@@ -6,13 +6,13 @@
 #
 asgiref==3.8.1
     # via django
-attrs==24.3.0
+attrs==25.1.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.36.5
+boto3==1.36.6
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.36.5
+botocore==1.36.6
     # via
     #   boto3
     #   s3transfer
