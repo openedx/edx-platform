@@ -1204,30 +1204,42 @@ async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100)
 
     for i in range(0, url_count, batch_size):
         batch = url_list[i:i + batch_size]
-        async with aiohttp.ClientSession() as session:
-            tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
-            batch_results = await asyncio.gather(*tasks)
-            responses.extend(batch_results)
-            LOGGER.debug(f'[Link Check] request batch {i // batch_size + 1} of {url_count // batch_size + 1}')
+        batch_results = await _validate_batch(batch, course_key)
+        responses.extend(batch_results)
+        LOGGER.debug(f'[Link Check] request batch {i // batch_size + 1} of {url_count // batch_size + 1}')
 
     return responses
 
+
+async def _validate_batch(batch, course_key):
+    async with aiohttp.ClientSession() as session:
+        tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
+        batch_results = await asyncio.gather(*tasks)
+        return batch_results
+
 def _retry_validation(url_list, course_key, retry_count=3):
-    """Retry urls that failed due to connection error."""
+    """Retry urls that failed due to connection error.
+    returns URLs that could not be validated either because locked, or because of persistent connection problems
+    """
     results = []
     retry_list = url_list
     for i in range(0, retry_count):
         if retry_list:
             LOGGER.debug(f'[Link Check] retry attempt #{i + 1}')
-            validated_url_list = asyncio.run(
-                _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
-            )
-            filetered_url_list, retry_list = _filter_by_status(validated_url_list)
-            results.extend(filetered_url_list)
-
+            retry_list = _retry_validation_and_filter(course_key, results, retry_list)
     results.extend(retry_list)
 
     return results
+
+
+def _retry_validation_and_filter(course_key, results, retry_list):
+    validated_url_list = asyncio.run(
+        _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
+    )
+    filtered_url_list, retry_list = _filter_by_status(validated_url_list)
+    results.extend(filtered_url_list)
+    return retry_list
+
 
 def _filter_by_status(results):
     """
@@ -1265,6 +1277,9 @@ def _write_broken_links_to_file(broken_or_locked_urls, broken_links_file):
         json.dump(broken_or_locked_urls, file, indent=4)
 
 def _check_broken_links(task_instance, user_id, course_key_string, language):
+    """
+    Checks for broken links in a course. Store the results in a file.
+    """
     user = _validate_user(task_instance, user_id, language)
 
     task_instance.status.set_state('Scanning')
@@ -1299,7 +1314,6 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
         if task_instance.status.state != UserTaskStatus.FAILED:
             task_instance.status.fail({'raw_error_msg': str(e)})
         return
-
 
 @shared_task(base=CourseLinkCheckTask, bind=True)
 def check_broken_links(self, user_id, course_key_string, language):
