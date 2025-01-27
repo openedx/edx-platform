@@ -1,14 +1,13 @@
 """
 Unit tests for home page view.
 """
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import ddt
 import pytz
 from django.conf import settings
-from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 

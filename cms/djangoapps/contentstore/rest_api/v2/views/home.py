@@ -1,8 +1,7 @@
 """HomePageCoursesViewV2 APIView for getting content available to the logged in user."""
+
 import edx_api_doc_tools as apidocs
 from collections import OrderedDict
-from django.conf import settings
-from django.http import HttpResponseNotFound
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
