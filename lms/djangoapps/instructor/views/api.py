@@ -148,6 +148,7 @@ from .tools import (
     strip_if_string,
 )
 from .. import permissions
+from .tools import DashboardError
 
 log = logging.getLogger(__name__)
 
@@ -3049,19 +3050,26 @@ class ChangeDueDate(APIView):
         """
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
-            return HttpResponseBadRequest(reason=serializer_data.errors)
+            #return HttpResponseBadRequest(reason=serializer_data.errors)
+            return JsonResponse({'error': 'All fields must be filled out'}, status=400)
 
+        due_datetime = serializer_data.validated_data.get('due_datetime')
+        try:
+            due_date = parse_datetime(due_datetime)
+        except DashboardError:
+            return JsonResponse({'error': 'The extension due date and time format is incorrect'}, status=400)
+        
         student = serializer_data.validated_data.get('student')
         if not student:
             response_payload = {
                 'error': f'Could not find student matching identifier: {request.data.get("student")}'
             }
-            return JsonResponse(response_payload)
-
+            return JsonResponse(response_payload, status=404)
+        
+        
         course = get_course_by_id(CourseKey.from_string(course_id))
 
         unit = find_unit(course, serializer_data.validated_data.get('url'))
-        due_date = parse_datetime(serializer_data.validated_data.get('due_datetime'))
         reason = strip_tags(serializer_data.validated_data.get('reason', ''))
         try:
             set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
