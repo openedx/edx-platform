@@ -962,15 +962,17 @@ function($, _, Backbone, gettext, BasePage,
                 } catch (e) {
                     console.error(e);
                 }
-                return window.addEventListener(
-                    'message',
-                    (event) => {
-                        if (event.data && event.data.type === 'completeXBlockDuplicating') {
-                            return self.onNewXBlock(placeholderElement, null, true, event.data.payload);
-                        }
-                    },
-                    { once: true }
-                );
+
+                const messageHandler = ({ data }) => {
+                    if (data && data.type === 'completeXBlockDuplicating') {
+                        self.onNewXBlock(placeholderElement, null, true, data.payload);
+                        window.removeEventListener('message', messageHandler);
+                    }
+                };
+
+                window.addEventListener('message', messageHandler);
+
+                return;
             }
 
             XBlockUtils.duplicateXBlock(xblockElement, parentElement)
@@ -989,18 +991,19 @@ function($, _, Backbone, gettext, BasePage,
                     id: xblockElement.data('locator')
                 });
 
-                if (this.options.isIframeEmbed) {
-                    return window.addEventListener(
-                        'message',
-                        ({ data }) => {
-                            if (data && data.type === 'completeXBlockDeleting') {
-                                const targetXBlockElement = $(`[data-locator="${data.payload.locator}"]`);
-                                return self.onDelete(targetXBlockElement);
-                            }
-                        },
-                        { once: true }
-                    );
-                }
+            if (this.options.isIframeEmbed) {
+                const messageHandler = ({ data }) => {
+                    if (data && data.type === 'completeXBlockDeleting') {
+                        const targetXBlockElement = $(`[data-locator="${data.payload.locator}"]`);
+                        window.removeEventListener('message', messageHandler);
+                        return self.onDelete(targetXBlockElement);
+                    }
+                };
+
+                window.addEventListener('message', messageHandler);
+
+                return;
+            }
 
             XBlockUtils.deleteXBlock(xblockInfo).done(function() {
                 self.onDelete(xblockElement);
