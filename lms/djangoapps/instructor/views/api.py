@@ -3050,7 +3050,6 @@ class ChangeDueDate(APIView):
         """
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
-            #return HttpResponseBadRequest(reason=serializer_data.errors)
             return JsonResponse({'error': 'All fields must be filled out'}, status=400)
 
         due_datetime = serializer_data.validated_data.get('due_datetime')
