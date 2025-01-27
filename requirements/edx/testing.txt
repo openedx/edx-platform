@@ -104,13 +104,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.36.3
+boto3==1.36.5
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.36.3
+botocore==1.36.5
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -121,7 +121,7 @@ cachecontrol==0.14.2
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-cachetools==5.5.0
+cachetools==5.5.1
     # via
     #   -r requirements/edx/base.txt
     #   google-auth
@@ -306,7 +306,6 @@ django==4.2.18
     #   edx-search
     #   edx-submissions
     #   edx-toggles
-    #   edx-token-utils
     #   edx-when
     #   edxval
     #   enmerkar
@@ -576,7 +575,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.6.4
+edx-enterprise==5.6.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -590,7 +589,7 @@ edx-i18n-tools==1.5.0
     #   -r requirements/edx/base.txt
     #   ora2
     #   xblocks-contrib
-edx-lint==5.4.1
+edx-lint==5.5.0
     # via -r requirements/edx/testing.in
 edx-milestones==0.6.0
     # via -r requirements/edx/base.txt
@@ -626,7 +625,7 @@ edx-rest-api-client==6.0.0
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-edx-search==4.1.1
+edx-search==4.1.2
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
@@ -652,8 +651,6 @@ edx-toggles==5.2.0
     #   edxval
     #   event-tracking
     #   ora2
-edx-token-utils==0.2.1
-    # via -r requirements/edx/base.txt
 edx-when==2.5.1
     # via
     #   -r requirements/edx/base.txt
@@ -684,9 +681,9 @@ execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.1
     # via -r requirements/edx/testing.in
-faker==33.3.1
+faker==35.0.0
     # via factory-boy
-fastapi==0.115.6
+fastapi==0.115.7
     # via pact-python
 fastavro==1.10.0
     # via
@@ -739,7 +736,7 @@ google-api-python-client==2.159.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-auth==2.37.0
+google-auth==2.38.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -781,12 +778,12 @@ googleapis-common-protos==1.66.0
     #   grpcio-status
 grimp==3.5
     # via import-linter
-grpcio==1.69.0
+grpcio==1.70.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.69.0
+grpcio-status==1.70.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -903,7 +900,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.13.1
+lti-consumer-xblock==9.13.2
     # via -r requirements/edx/base.txt
 lxml[html-clean]==5.3.0
     # via
@@ -1076,7 +1073,7 @@ packaging==24.2
     #   pytest
     #   snowflake-connector-python
     #   tox
-pact-python==2.3.0
+pact-python==2.3.1
     # via -r requirements/edx/testing.in
 pansi==2024.11.0
     # via
@@ -1193,7 +1190,7 @@ pycryptodomex==3.21.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.10.5
+pydantic==2.10.6
     # via
     #   -r requirements/edx/base.txt
     #   camel-converter
@@ -1211,7 +1208,6 @@ pygments==2.19.1
 pyjwkest==1.4.2
     # via
     #   -r requirements/edx/base.txt
-    #   edx-token-utils
     #   lti-consumer-xblock
 pyjwt[crypto]==2.10.1
     # via
@@ -1445,7 +1441,7 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.11.1
+s3transfer==0.11.2
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1504,7 +1500,7 @@ slumber==0.7.1
     #   edx-enterprise
 sniffio==1.3.1
     # via anyio
-snowflake-connector-python==3.12.4
+snowflake-connector-python==3.13.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1536,7 +1532,7 @@ sqlparse==0.5.3
     #   django
 staff-graded-xblock==3.0.0
     # via -r requirements/edx/base.txt
-starlette==0.41.3
+starlette==0.45.3
     # via fastapi
 stevedore==5.4.0
     # via
