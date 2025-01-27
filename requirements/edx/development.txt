@@ -1692,7 +1692,7 @@ pysrt==1.1.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-pytest==8.3.4
+pytest==8.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint-pytest
@@ -1711,7 +1711,7 @@ pytest-django==4.9.0
     # via -r requirements/edx/testing.txt
 pytest-json-report==1.5.0
     # via -r requirements/edx/testing.txt
-pytest-metadata==1.8.0
+pytest-metadata==3.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-json-report
