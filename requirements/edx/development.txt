@@ -82,7 +82,7 @@ asn1crypto==1.5.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   snowflake-connector-python
-astroid==2.13.5
+astroid==3.3.8
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
