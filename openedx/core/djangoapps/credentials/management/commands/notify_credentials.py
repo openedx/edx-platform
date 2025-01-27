@@ -13,6 +13,7 @@ import shlex
 
 from datetime import datetime, timedelta
 import dateutil.parser
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -157,8 +158,9 @@ class Command(BaseCommand):
             options = self.get_args_from_database()
 
         if options["auto"]:
+            run_frequency = settings.NOTIFY_CREDENTIALS_FREQUENCY
             options["end_date"] = datetime.now().replace(minute=0, second=0, microsecond=0)
-            options["start_date"] = options["end_date"] - timedelta(hours=4)
+            options["start_date"] = options["end_date"] - timedelta(seconds=run_frequency)
 
         log.info(
             f"notify_credentials starting, dry-run={options['dry_run']}, site={options['site']}, "
