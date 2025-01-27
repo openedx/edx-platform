@@ -182,8 +182,8 @@ class TestGoalReminderEmailCommand(TestCase):
         self.make_valid_goal(overview__end=end)
         self.call_command(expect_sent=False)
 
-    @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.ace.send')
-    def test_params_with_ses(self, mock_ace):
+    @mock.patch('lms.djangoapps.course_goals.management.commands.goal_reminder_email.send_email_using_ses')
+    def test_params_with_ses(self, mock_send_email_using_ses):
         """Test that the parameters of the msg passed to ace.send() are set correctly when SES is enabled"""
         with override_waffle_flag(ENABLE_SES_FOR_GOALREMINDER, active=None):
             goal = self.make_valid_goal()
@@ -193,8 +193,8 @@ class TestGoalReminderEmailCommand(TestCase):
             with freeze_time('2021-03-02 10:00:00'):
                 call_command('goal_reminder_email')
 
-            assert mock_ace.call_count == 1
-            msg = mock_ace.call_args[0][0]
+            assert mock_send_email_using_ses.call_count == 1
+            msg = mock_send_email_using_ses.call_args[0][1]
             assert msg.options['override_default_channel'] == 'django_email'
             assert msg.options['from_address'] == settings.LMS_COMM_DEFAULT_FROM_EMAIL
 
