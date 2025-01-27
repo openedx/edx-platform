@@ -323,6 +323,7 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
 
     return new_xblock, notices
 
+
 def import_staged_content_for_library_sync(new_xblock: XBlock, lib_block: XBlock, request) -> StaticFileNotices:
     """
     Import a block (along with its children and any required static assets) from
@@ -355,7 +356,7 @@ def import_staged_content_for_library_sync(new_xblock: XBlock, lib_block: XBlock
         # Rewrite the OLX's static asset references to point to the new
         # locations for those assets. See _import_files_into_course for more
         # info on why this is necessary.
-        if hasattr(new_xblock, 'data') and substitutions:
+        if hasattr(new_xblock, "data") and substitutions:
             data_with_substitutions = new_xblock.data
             for old_static_ref, new_static_ref in substitutions.items():
                 data_with_substitutions = data_with_substitutions.replace(

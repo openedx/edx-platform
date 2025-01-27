@@ -56,7 +56,7 @@ UpstreamLink response schema:
     "ready_to_sync": Boolean
   }
 """
-from dataclasses import asdict
+
 import logging
 
 from attrs import asdict as attrs_asdict

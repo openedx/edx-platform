@@ -151,6 +151,7 @@ class UserLibrarySync(models.Model):
     Each user can trigger a sync from a library component to that component in a course.
     This model is used to facilitate that and to ease tracking.
     """
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     content = models.ForeignKey(StagedContent, on_delete=models.CASCADE)
     source_usage_key = UsageKeyField(
@@ -158,19 +159,18 @@ class UserLibrarySync(models.Model):
         help_text=_("Original usage key/ID of the thing that is being synced."),
     )
 
-
     @property
     def source_context_key(self) -> LearningContextKey:
-        """ Get the context (library) that this was copied from """
+        """Get the context (library) that this was copied from"""
         return self.source_usage_key.context_key
 
     def get_source_context_title(self) -> str:
-        """ Get the title of the source context, if any """
+        """Get the title of the source context, if any"""
         # Just return the ID as the name, since it can only be a library
         return str(self.source_context_key)
 
     def clean(self):
-        """ Check that this model is being used correctly. """
+        """Check that this model is being used correctly."""
         # These could probably be replaced with constraints in Django 4.1+
         if self.user.id != self.content.user.id:
             raise ValidationError("User ID mismatch.")
@@ -180,7 +180,7 @@ class UserLibrarySync(models.Model):
             )
 
     def save(self, *args, **kwargs):
-        """ Save this model instance """
+        """Save this model instance"""
         # Enforce checks on save:
         self.full_clean()
         return super().save(*args, **kwargs)

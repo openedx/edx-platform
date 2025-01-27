@@ -9,17 +9,33 @@ import opaque_keys.edx.django.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
-        ('content_staging', '0005_stagedcontent_version_num'),
+        ("auth", "0012_alter_user_first_name_max_length"),
+        ("content_staging", "0005_stagedcontent_version_num"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserLibrarySync',
+            name="UserLibrarySync",
             fields=[
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
-                ('source_usage_key', opaque_keys.edx.django.models.UsageKeyField(help_text='Original usage key/ID of the thing that is being synced.', max_length=255)),
-                ('content', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='content_staging.stagedcontent')),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "source_usage_key",
+                    opaque_keys.edx.django.models.UsageKeyField(
+                        help_text="Original usage key/ID of the thing that is being synced.", max_length=255
+                    ),
+                ),
+                (
+                    "content",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="content_staging.stagedcontent"),
+                ),
             ],
         ),
     ]

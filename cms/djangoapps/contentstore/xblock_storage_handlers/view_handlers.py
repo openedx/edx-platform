@@ -609,8 +609,8 @@ def _create_block(request):
             return JsonResponse({"error": str(exc)}, status=400)
         static_file_notices = import_staged_content_for_library_sync(created_block, lib_block, request)
         modulestore().update_item(created_block, request.user.id)
-        response['upstreamRef'] = upstream_ref
-        response['static_file_notices'] = asdict(static_file_notices)
+        response["upstreamRef"] = upstream_ref
+        response["static_file_notices"] = asdict(static_file_notices)
 
     return JsonResponse(response)
 

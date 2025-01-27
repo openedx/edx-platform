@@ -83,6 +83,7 @@ class UserLibrarySyncSerializer(serializers.Serializer):
     """
     Serializer for the status of the user's library sync (a UserLibrarySyncData instance)
     """
+
     content = StagedContentSerializer(allow_null=True)
     source_usage_key = serializers.CharField(allow_blank=True)
     # The title of the course that the content came from originally, if relevant

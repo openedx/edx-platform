@@ -14,7 +14,6 @@ from opaque_keys.edx.keys import AssetKey, UsageKey
 from xblock.core import XBlock
 
 from openedx.core.lib.xblock_serializer.api import StaticFile, XBlockSerializer
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from xmodule import block_metadata_utils
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -22,7 +21,11 @@ from xmodule.contentstore.django import contentstore
 from .data import (
     CLIPBOARD_PURPOSE,
     LIBRARY_SYNC_PURPOSE,
-    StagedContentData, StagedContentFileData, StagedContentStatus, UserClipboardData, UserLibrarySyncData,
+    StagedContentData,
+    StagedContentFileData,
+    StagedContentStatus,
+    UserClipboardData,
+    UserLibrarySyncData,
 )
 from .models import (
     UserClipboard as _UserClipboard,
@@ -40,10 +43,7 @@ log = logging.getLogger(__name__)
 
 
 def _save_xblock_to_staged_content(
-    block: XBlock,
-    user_id: int,
-    purpose: str,
-    version_num: int | None = None
+    block: XBlock, user_id: int, purpose: str, version_num: int | None = None
 ) -> _StagedContent:
     """
     Generic function to save an XBlock's OLX to staged content.
@@ -82,7 +82,7 @@ def _save_xblock_to_staged_content(
         )
 
     # Log an event so we can analyze how this feature is used:
-    log.info(f"Saved {usage_key.block_type} component \"{usage_key}\" to staged content for {purpose}.")
+    log.info(f'Saved {usage_key.block_type} component "{usage_key}" to staged content for {purpose}.')
 
     # Try to copy the static files. If this fails, we still consider the overall save attempt to have succeeded,
     # because intra-course operations will still work fine, and users can manually resolve file issues.
@@ -162,15 +162,14 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
         defaults={
             "content": staged_content,
             "source_usage_key": usage_key,
-        }
+        },
     )
 
     return _user_clipboard_model_to_data(clipboard)
 
+
 def save_xblock_to_user_library_sync(
-    block: XBlock,
-    user_id: int,
-    version_num: int | None = None
+    block: XBlock, user_id: int, version_num: int | None = None
 ) -> UserLibrarySyncData:
     """
     Save an XBlock's OLX for library sync.
@@ -184,10 +183,11 @@ def save_xblock_to_user_library_sync(
         defaults={
             "content": staged_content,
             "source_usage_key": usage_key,
-        }
+        },
     )
 
     return _user_library_sync_model_to_data(sync)
+
 
 def get_user_clipboard(user_id: int, only_ready: bool = True) -> UserClipboardData | None:
     """
@@ -251,16 +251,11 @@ def get_user_library_sync_json(user_id: int, request: HttpRequest | None = None)
         sync = _UserLibrarySync.objects.get(user_id=user_id)
     except _UserLibrarySync.DoesNotExist:
         # This user does not have any library sync content.
-        return {
-            "content": None,
-            "source_usage_key": "",
-            "source_context_title": "",
-            "source_edit_url": ""
-        }
+        return {"content": None, "source_usage_key": "", "source_context_title": "", "source_edit_url": ""}
 
     serializer = _UserLibrarySyncSerializer(
         _user_library_sync_model_to_data(sync),
-        context={'request': request},
+        context={"request": request},
     )
     return serializer.data
 
@@ -281,6 +276,7 @@ def _staged_content_to_data(content: _StagedContent) -> StagedContentData:
         version_num=content.version_num,
     )
 
+
 def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardData:
     """
     Convert a UserClipboard model instance to an immutable data object.
@@ -290,6 +286,7 @@ def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardDat
         source_usage_key=clipboard.source_usage_key,
         source_context_title=clipboard.get_source_context_title(),
     )
+
 
 def _user_library_sync_model_to_data(sync: _UserLibrarySync) -> UserLibrarySyncData:
     """
