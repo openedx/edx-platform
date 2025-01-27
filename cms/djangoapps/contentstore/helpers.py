@@ -306,7 +306,7 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
         if usage_key.block_type == 'video':
             # The edx_video_id must always be new so as not
             # to interfere with the data of the copied block
-            new_xblock.edx_video_id  = create_external_video(display_name='external video')
+            new_xblock.edx_video_id = create_external_video(display_name='external video')
             store.update_item(new_xblock, request.user.id)
 
         # Now handle static files that need to go into Files & Uploads.

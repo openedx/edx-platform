@@ -1041,6 +1041,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
 
     return transcript_content, transcript_name, Transcript.mime_types[output_format]
 
+
 def build_components_import_path(usage_key, file_path):
     """
     Build components import path
