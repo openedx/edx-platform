@@ -8,17 +8,17 @@ asgiref==3.8.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
-attrs==24.3.0
+attrs==25.1.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.36.5
+boto3==1.36.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.36.5
+botocore==1.36.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
