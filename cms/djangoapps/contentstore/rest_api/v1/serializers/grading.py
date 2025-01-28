@@ -7,6 +7,9 @@ from rest_framework import serializers
 
 class GradersSerializer(serializers.Serializer):
     """ Serializer for graders """
+    class Meta:
+        ref_name='course_grading.GradersSerializer'
+
     type = serializers.CharField()
     min_count = serializers.IntegerField()
     drop_count = serializers.IntegerField()
@@ -23,6 +26,9 @@ class GracePeriodSerializer(serializers.Serializer):
 
 class CourseGradingModelSerializer(serializers.Serializer):
     """ Serializer for course grading model data """
+    class Meta:
+        ref_name = 'course_grading.CourseGradingModelSerializer'
+    
     graders = GradersSerializer(many=True)
     grade_cutoffs = serializers.DictField(child=serializers.FloatField())
     grace_period = GracePeriodSerializer(required=False, allow_null=True)
