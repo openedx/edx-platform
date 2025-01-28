@@ -11,7 +11,7 @@
 .xmodule_display.xmodule_AnnotatableBlock .annotatable-section {
     position: relative;
     padding: 0.5em 1em;
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
     border-radius: 0.5em;
     margin-bottom: 0.5em;
 }
@@ -29,7 +29,7 @@
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .annotatable-section .annotatable-section-body {
-    border-top: 1px solid var(--gray-l3);
+    border-top: 1px solid var(--gray-l3, #c8c8c8);
     margin-top: 0.5em;
     padding-top: 0.5em;
 }
@@ -151,7 +151,7 @@
     border: 1px solid #333;
     border-radius: 1em;
     background-color: rgba(0, 0, 0, 0.85);
-    color: var(--white);
+    color: var(--white, #fff);
     -webkit-font-smoothing: antialiased;
 }
 
@@ -176,7 +176,7 @@
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip .ui-tooltip-titlebar .ui-state-hover {
     color: inherit;
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip .ui-tooltip-content {

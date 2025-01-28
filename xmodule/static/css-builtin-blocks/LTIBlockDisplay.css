@@ -19,7 +19,7 @@
 
 .xmodule_display.xmodule_LTIBlock div.lti .wrapper-lti-link {
     font-size: 14px;
-    background-color: var(--sidebar-color);
+    background-color: var(--sidebar-color, #f6f6f6);
     padding: var(--baseline, 20px);
 }
 

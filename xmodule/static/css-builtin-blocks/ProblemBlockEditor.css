@@ -111,8 +111,8 @@
 }
 
 .xmodule_edit.xmodule_ProblemBlock .editor .editor-tabs .tab.current {
-    background: var(--white);
-    border-bottom-color: var(--white);
+    background: var(--white, #fff);
+    border-bottom-color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle {
@@ -120,14 +120,14 @@
     margin-top: -4px;
     padding: 3px 9px;
     font-size: 12px;
-    color: var(--link-color);
+    color: var(--link-color, #1b6d99);
 }
 
 .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current {
-    border: 1px solid var(--lightGrey) !important;
+    border: 1px solid var(--lightGrey, #edf1f5) !important;
     border-radius: 3px !important;
-    background: var(--lightGrey) !important;
-    color: var(--darkGrey) !important;
+    background: var(--lightGrey, #edf1f5) !important;
+    color: var(--darkGrey, #8891a1) !important;
     pointer-events: none;
     cursor: none;
 }
@@ -135,7 +135,7 @@
 .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current:hover,
 .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current:focus {
     box-shadow: 0 0 0 0 !important;
-    background-color: var(--white);
+    background-color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_ProblemBlock .simple-editor-cheatsheet {
@@ -143,8 +143,8 @@
     top: 41px;
     left: 70%;
     width: 0;
-    border-left: 1px solid var(--gray-l2);
-    background-color: var(--lightGrey);
+    border-left: 1px solid var(--gray-l2, #adadad);
+    background-color: var(--lightGrey, #edf1f5);
     overflow: hidden;
 }
 
@@ -217,5 +217,5 @@
     width: 26px;
     height: 21px;
     vertical-align: middle;
-    color: var(--body-color);
+    color: var(--body-color, #313131);
 }

@@ -172,8 +172,8 @@
 .xmodule_edit.xmodule_CourseInfoBlock .editor .editor-tabs .tab.current,
 .xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs .tab.current,
 .xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs .tab.current {
-    background: var(--white);
-    border-bottom-color: var(--white);
+    background: var(--white, #fff);
+    border-bottom-color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_AboutBlock .html-editor:after,

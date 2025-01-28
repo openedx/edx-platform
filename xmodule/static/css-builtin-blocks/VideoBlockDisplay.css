@@ -125,7 +125,7 @@
     left: -9999em;
     display: inline-block;
     vertical-align: middle;
-    color: var(--body-color);
+    color: var(--body-color, #313131);
 }
 
 .xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .branding .brand-logo {
@@ -219,7 +219,7 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .btn-play::after {
-    background: var(--white);
+    background: var(--white, #fff);
     position: absolute;
     width: 50%;
     height: 50%;
@@ -246,7 +246,7 @@
     border-radius: calc((var(--baseline, 20px) / 5));
     padding: 8px calc((var(--baseline, 20px) / 2)) 8px calc((var(--baseline, 20px) * 1.5));
     background: rgba(0, 0, 0, 0.75);
-    color: var(--yellow);
+    color: var(--yellow, #e2c01f);
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .closed-captions.is-visible::before {
@@ -257,7 +257,7 @@
     margin-top: -0.6em;
     font-family: 'FontAwesome';
     content: "\f142";
-    color: var(--white);
+    color: var(--white, #fff);
     opacity: 0.5;
 }
 
@@ -844,7 +844,7 @@
     padding: lh();
     box-sizing: border-box;
     transition: none;
-    background: var(--black);
+    background: var(--black, #000);
     visibility: visible;
 }
 
@@ -853,7 +853,7 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video.video-fullscreen .subtitles li.current {
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_VideoBlock .video.is-touch .tc-wrapper .video-wrapper object,
@@ -872,7 +872,7 @@
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: 100%;
-    background-color: var(--black);
+    background-color: var(--black, #000);
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-pre-roll.is-html5 {
@@ -898,7 +898,7 @@
 
 .xmodule_display.xmodule_VideoBlock .video .video-pre-roll .btn-play.btn-pre-roll:hover,
 .xmodule_display.xmodule_VideoBlock .video .video-pre-roll .btn-play.btn-pre-roll:focus {
-    background: var(--blue);
+    background: var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .slider .ui-slider-handle,
@@ -956,7 +956,7 @@
     display: none;
     position: absolute;
     list-style: none;
-    background-color: var(--white);
+    background-color: var(--white, #fff);
     border: 1px solid #eee;
 }
 
@@ -964,7 +964,7 @@
     margin: 0;
     padding: 0;
     border-bottom: 1px solid #eee;
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li a {
@@ -972,14 +972,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--gray-l2);
+    color: var(--gray-l2, #adadad);
     font-size: 14px;
     line-height: 23px;
 }
 
 .xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li a:hover,
 .xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li a:focus {
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
 }
 
 .xmodule_display.xmodule_VideoBlock .a11y-menu-container .a11y-menu-list li.active a {
@@ -999,7 +999,7 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container.open>a {
-    background-color: var(--action-primary-active-bg);
+    background-color: var(--action-primary-active-bg, #0075b4);
     color: var(--very-light-text);
 }
 
@@ -1014,7 +1014,7 @@
     border-radius: 0 3px 3px 0;
     background-color: var(--very-light-text);
     padding: calc((var(--baseline, 20px) * 0.75)) calc((var(--baseline, 20px) * 1.25)) calc((var(--baseline, 20px) * 0.75)) calc((var(--baseline, 20px) * 0.75));
-    color: var(--gray-l2);
+    color: var(--gray-l2, #adadad);
     min-width: 1.5em;
     line-height: 14px;
     text-align: center;
@@ -1027,7 +1027,7 @@
     position: absolute;
     right: calc((var(--baseline, 20px) * 0.5));
     top: 33%;
-    color: var(--lighter-base-font-color);
+    color: var(--lighter-base-font-color, #646464);
 }
 
 .xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container .a11y-menu-list {
@@ -1050,7 +1050,7 @@
 .xmodule_display.xmodule_VideoBlock .contextmenu,
 .xmodule_display.xmodule_VideoBlock .submenu {
     border: 1px solid #333;
-    background: var(--white);
+    background: var(--white, #fff);
     color: #333;
     padding: 0;
     margin: 0;
@@ -1072,7 +1072,7 @@
 .xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item,
 .xmodule_display.xmodule_VideoBlock .submenu .menu-item,
 .xmodule_display.xmodule_VideoBlock .submenu .submenu-item {
-    border-top: 1px solid var(--gray-l3);
+    border-top: 1px solid var(--gray-l3, #c8c8c8);
     padding: calc((var(--baseline, 20px) / 4)) calc((var(--baseline, 20px) / 2));
     outline: none;
 }
@@ -1096,14 +1096,14 @@
 .xmodule_display.xmodule_VideoBlock .submenu .menu-item:focus,
 .xmodule_display.xmodule_VideoBlock .submenu .submenu-item:focus {
     background: #333;
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_VideoBlock .contextmenu .menu-item:focus>span,
 .xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item:focus>span,
 .xmodule_display.xmodule_VideoBlock .submenu .menu-item:focus>span,
 .xmodule_display.xmodule_VideoBlock .submenu .submenu-item:focus>span {
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item,
@@ -1129,12 +1129,12 @@
 .xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item.is-opened,
 .xmodule_display.xmodule_VideoBlock .submenu .submenu-item.is-opened {
     background: #333;
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item.is-opened>span,
 .xmodule_display.xmodule_VideoBlock .submenu .submenu-item.is-opened>span {
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_VideoBlock .contextmenu .submenu-item.is-opened>.submenu,
@@ -1150,7 +1150,7 @@
 .xmodule_display.xmodule_VideoBlock .contextmenu .is-disabled,
 .xmodule_display.xmodule_VideoBlock .submenu .is-disabled {
     pointer-events: none;
-    color: var(--gray-l3);
+    color: var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_VideoBlock .overlay {

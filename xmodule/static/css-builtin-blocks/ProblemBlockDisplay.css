@@ -78,12 +78,12 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect .icon {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct .icon,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct .icon {
-    color: var(--correct);
+    color: var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-text {
@@ -116,12 +116,12 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock .inline-error {
-    color: var(--error-color-dark);
+    color: var(--error-color-dark, #95050d);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem-progress {
     display: inline-block;
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
     font-size: 0.875em;
 }
 
@@ -155,7 +155,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .question-description {
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
     font-size: var(--small-font-size);
 }
 
@@ -197,7 +197,7 @@
     display: inline-block;
     clear: both;
     margin-bottom: calc((var(--baseline, 20px) / 2));
-    border: 2px solid var(--gray-l4);
+    border: 2px solid var(--gray-l4, #e4e4e4);
     border-radius: 3px;
     padding: calc((var(--baseline, 20px) / 2));
     width: 100%;
@@ -232,7 +232,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label {
-    border: 2px solid var(--blue);
+    border: 2px solid var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct,
@@ -253,7 +253,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_correct,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_correct,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_correct {
-    border: 2px solid var(--correct);
+    border: 2px solid var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct .status-icon::after,
@@ -274,7 +274,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_correct .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
@@ -297,7 +297,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_partially-correct,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_partially-correct,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_partially-correct {
-    border: 2px solid var(--partially-correct);
+    border: 2px solid var(--partially-correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_partially-correct .status-icon::after,
@@ -318,7 +318,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_partially-correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_partially-correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_partially-correct .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
@@ -341,7 +341,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_incorrect,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_incorrect,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_incorrect {
-    border: 2px solid var(--incorrect);
+    border: 2px solid var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_incorrect .status-icon::after,
@@ -362,7 +362,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_incorrect .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_incorrect .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_incorrect .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
@@ -385,7 +385,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_submitted,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_submitted,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_submitted {
-    border: 2px solid var(--submitted);
+    border: 2px solid var(--submitted, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup .field {
@@ -432,19 +432,19 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.correct .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.partially-correct .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.incorrect .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
@@ -490,17 +490,17 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div p span.clarification i:hover {
-    color: var(--blue);
+    color: var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.correct input,
 .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
-    border-color: var(--correct);
+    border-color: var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.partially-correct input,
 .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
-    border-color: var(--partially-correct);
+    border-color: var(--partially-correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.processing input {
@@ -508,17 +508,17 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-close input {
-    border-color: var(--incorrect);
+    border-color: var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.incorrect input,
 .xmodule_display.xmodule_ProblemBlock div.problem div.incomplete input {
-    border-color: var(--incorrect);
+    border-color: var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.submitted input,
 .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
-    border-color: var(--submitted);
+    border-color: var(--submitted, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div p.answer {
@@ -618,7 +618,7 @@
     margin: calc(var(--baseline, 20px) / 2) 0;
     padding: calc(var(--baseline, 20px) / 2);
     border-radius: 5px;
-    background: var(--gray-l6);
+    background: var(--gray-l6, #f8f8f8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status:after {
@@ -654,7 +654,7 @@
     padding: var(--baseline, 20px) 0 0 0;
     border: 0;
     border-top: 1px solid #eee;
-    background: var(--white);
+    background: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status.file p.debug {
@@ -803,7 +803,7 @@
     padding: 0px 5px;
     border: 1px solid #eaeaea;
     border-radius: 3px;
-    background-color: var(--gray-l6);
+    background-color: var(--gray-l6, #f8f8f8);
     white-space: nowrap;
     font-size: .9em;
 }
@@ -811,9 +811,9 @@
 .xmodule_display.xmodule_ProblemBlock div.problem pre {
     overflow: auto;
     padding: 6px calc(var(--baseline, 20px) / 2);
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
     border-radius: 3px;
-    background-color: var(--gray-l6);
+    background-color: var(--gray-l6, #f8f8f8);
     font-size: .9em;
     line-height: 1.4;
 }
@@ -829,7 +829,7 @@
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput input {
     box-sizing: border-box;
-    border: 2px solid var(--gray-l4);
+    border: 2px solid var(--gray-l4, #e4e4e4);
     border-radius: 3px;
     min-width: 160px;
     height: 46px;
@@ -844,43 +844,43 @@
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.incorrect input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.incorrect input {
-    border: 2px solid var(--incorrect);
+    border: 2px solid var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.incorrect .status .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.partially-correct input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.partially-correct input {
-    border: 2px solid var(--partially-correct);
+    border: 2px solid var(--partially-correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.partially-correct .status .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.partially-correct .status .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.correct input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.correct input {
-    border: 2px solid var(--correct);
+    border: 2px solid var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.correct .status .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.correct .status .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.submitted input {
-    border: 2px solid var(--submitted);
+    border: 2px solid var(--submitted, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted .status,
@@ -892,7 +892,7 @@
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.unsubmitted input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.unanswered input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.unsubmitted input {
-    border: 2px solid var(--gray-l4);
+    border: 2px solid var(--gray-l4, #e4e4e4);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.unanswered .status .status-icon::after,
@@ -961,7 +961,7 @@
     visibility: hidden;
     width: 0;
     border-right: none;
-    border-left: 1px solid var(--black);
+    border-left: 1px solid var(--black, #000);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror-focused pre.CodeMirror-cursor {
@@ -980,7 +980,7 @@
 
 .xmodule_display.xmodule_ProblemBlock .capa-message {
     display: inline-block;
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
     -webkit-font-smoothing: antialiased;
 }
 
@@ -1003,7 +1003,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-button-wrapper {
-    border-right: 1px solid var(--gray-300);
+    border-right: 1px solid var(--gray-300, #d9d9d9);
     padding: 0 13px;
     display: inline-block;
 }
@@ -1021,7 +1021,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:hover,
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:focus,
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:active {
-    color: var(--primary) !important;
+    color: var(--primary, #0075b4) !important;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn .icon {
@@ -1056,13 +1056,13 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit-cta-description {
-    color: var(--primary);
+    color: var(--primary, #0075b4);
     font-size: small;
     padding-right: calc(var(--baseline, 20px) / 2);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit-cta-link-button {
-    color: var(--primary);
+    color: var(--primary, #0075b4);
     padding-right: calc(var(--baseline, 20px) / 4);
 }
 
@@ -1070,7 +1070,7 @@
     margin-right: calc((var(--baseline, 20px) / 2));
     margin-top: calc(var(--baseline, 20px) / 2);
     display: inline-block;
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
     font-size: var(--medium-font-size);
     -webkit-font-smoothing: antialiased;
     vertical-align: middle;
@@ -1105,7 +1105,7 @@
     display: block;
     margin: lh() 0;
     padding: lh();
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .message {
@@ -1130,9 +1130,9 @@
 .xmodule_display.xmodule_ProblemBlock div.problem div.capa_alert {
     margin-top: var(--baseline, 20px);
     padding: 8px 12px;
-    border: 1px solid var(--warning-color);
+    border: 1px solid var(--warning-color, #ffc01f);
     border-radius: 3px;
-    background: var(--warning-color-accent);
+    background: var(--warning-color-accent, #fffcdd);
     font-size: 0.9em;
 }
 
@@ -1144,57 +1144,57 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.success {
-    border-top: 3px solid var(--success);
+    border-top: 3px solid var(--success, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.success .icon {
     margin-right: 15px;
-    color: var(--success);
+    color: var(--success, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.error {
-    border-top: 3px solid var(--danger);
+    border-top: 3px solid var(--danger, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.error .icon {
     margin-right: 15px;
-    color: var(--danger);
+    color: var(--danger, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.warning {
-    border-top: 3px solid var(--warning);
+    border-top: 3px solid var(--warning, #e2c01f);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.warning .icon {
     margin-right: 15px;
-    color: var(--warning);
+    color: var(--warning, #e2c01f);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.general {
-    border-top: 3px solid var(--general-color-accent);
+    border-top: 3px solid var(--general-color-accent, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.general .icon {
     margin-right: 15px;
-    color: var(--general-color-accent);
+    color: var(--general-color-accent, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint {
-    border: 1px solid var(--uxpl-gray-background);
+    border: 1px solid var(--uxpl-gray-background, #d9d9d9);
     border-radius: 6px;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint .icon {
     margin-right: calc(3 * var(--baseline, 20px) / 4);
-    color: var(--uxpl-gray-dark);
+    color: var(--uxpl-gray-dark, #111111);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint li {
-    color: var(--uxpl-gray-base);
+    color: var(--uxpl-gray-base, #414141);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint li strong {
-    color: var(--uxpl-gray-dark);
+    color: var(--uxpl-gray-dark, #111111);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .icon {
@@ -1249,21 +1249,21 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem button.btn-brand:hover {
-    background-color: var(--btn-brand-focus-background);
+    background-color: var(--btn-brand-focus-background, #065683);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .review-btn {
-    color: var(--blue);
+    color: var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .review-btn.sr {
-    color: var(--blue);
+    color: var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.capa_reset {
     padding: 25px;
-    background-color: var(--error-color-light);
-    border: 1px solid var(--error-color);
+    background-color: var(--error-color-light, #f95861);
+    border: 1px solid var(--error-color, #cb0712);
     border-radius: 3px;
     font-size: 1em;
     margin-top: calc(var(--baseline, 20px) / 2);
@@ -1279,14 +1279,14 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .hints {
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .hints h3 {
     padding: 9px;
     border-bottom: 1px solid #e3e3e3;
     background: #eee;
-    text-shadow: 0 1px 0 var(--white);
+    text-shadow: 0 1px 0 var(--white, #fff);
     font-size: 1em;
 }
 
@@ -1305,8 +1305,8 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .hints div header a {
     display: block;
     padding: 9px;
-    background: var(--gray-l6);
-    box-shadow: inset 0 0 0 1px var(--white);
+    background: var(--gray-l6, #f8f8f8);
+    box-shadow: inset 0 0 0 1px var(--white, #fff);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .hints div>section {
@@ -1333,7 +1333,7 @@
     padding: 9px 9px var(--baseline, 20px);
     border: 1px solid #ddd;
     border-radius: 3px;
-    background: var(--white);
+    background: var(--white, #fff);
     box-shadow: inset 0 0 0 1px #eee;
 }
 
@@ -1354,7 +1354,7 @@
     box-sizing: border-box;
     display: block;
     padding: calc((var(--baseline, 20px) / 5));
-    background: var(--gray-l4);
+    background: var(--gray-l4, #e4e4e4);
     text-align: right;
     font-size: 1em;
 }
@@ -1492,7 +1492,7 @@
     min-height: 50px;
     width: 150px;
     height: 100%;
-    background-color: var(--gray-l3);
+    background-color: var(--gray-l3, #c8c8c8);
     font-size: .9em;
 }
 
@@ -1519,14 +1519,14 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input {
     margin: 0 0 1em 0;
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
     border-radius: 1em;
     /* for debugging the input value field. enable the debug flag on the inputtype */
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .annotation-header {
     padding: .5em 1em;
-    border-bottom: 1px solid var(--gray-l3);
+    border-bottom: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .annotation-body {
@@ -1608,9 +1608,9 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value {
     margin: 1em 0;
     padding: 1em;
-    border: 1px solid var(--black);
+    border: 1px solid var(--black, #000);
     background-color: #999;
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value input[type="text"] {
@@ -1618,8 +1618,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value pre {
-    background-color: var(--gray-l3);
-    color: var(--black);
+    background-color: var(--gray-l3, #c8c8c8);
+    color: var(--black, #000);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value::before {
@@ -1634,12 +1634,12 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_correct input[type="text"],
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_correct input[type="text"] {
-    border-color: var(--correct);
+    border-color: var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_partially-correct input[type="text"],
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_partially-correct input[type="text"] {
-    border-color: var(--partially-correct);
+    border-color: var(--partially-correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_show_correct::after,
@@ -1671,19 +1671,19 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .correct .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .incorrect .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .partially-correct .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
@@ -1711,19 +1711,19 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .correct .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .incorrect .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .partially-correct .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
@@ -1734,5 +1734,5 @@
 
 .xmodule_display.xmodule_ProblemBlock .problems-wrapper .loading-spinner {
     text-align: center;
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
 }
