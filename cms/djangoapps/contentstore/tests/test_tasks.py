@@ -283,14 +283,6 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         ### Check that _save_broken_links_file was called with the correct arguments
         mock_save_broken_links_file.assert_called_once_with(mock_user_task_artifact.return_value, mock.ANY)
 
-    @pytest.mark.skip(reason="This test is not yet implemented")
-    def test_user_does_not_exist_raises_exception(self):
-        assert True
-
-    @pytest.mark.skip(reason="This test is not yet implemented")
-    def test_no_course_access_raises_exception(self):
-        assert True
-
     def test_hash_tags_stripped_from_url_lists(self):
         NUM_HASH_TAG_LINES = 2
         url_list = '''
@@ -307,38 +299,6 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
 
         assert processed_lines == original_lines - NUM_HASH_TAG_LINES, \
             f'Processed URL list lines = {processed_lines}; expected {original_lines - 2}'
-
-    # TODO - Document here what counts as a legitimate URL & modify test accordingly
-    @pytest.mark.skip(reason="Valid URL format to be nailed down")
-    def test_src_and_href_urls_extracted(self):
-        FIRST_URL = 'http://google.com'
-        SECOND_URL = 'https://microsoft.com'
-        THIRD_URL = "/static/resource_name"
-        FOURTH_URL = 'http://ibm.com'
-        url_list = f'''
-        href={FIRST_URL}
-        href={SECOND_URL}
-        src={THIRD_URL}
-        tag={FOURTH_URL}
-        '''
-
-        processed_url_list = _get_urls(url_list)
-        pprint.pp(processed_url_list)
-        assert len(processed_url_list) == 3, f"Expected 3 matches; got {len(processed_url_list)}"
-        assert processed_url_list[0] == FIRST_URL, \
-            f"Failed to properly parse {FIRST_URL}; got {processed_url_list[0]}"
-        assert processed_url_list[1] == SECOND_URL, \
-            f"Failed to properly parse {SECOND_URL}; got {processed_url_list[1]}"
-        assert processed_url_list[2] == THIRD_URL, \
-            f"Failed to properly parse {THIRD_URL}; got {processed_url_list[2]}"
-
-    @pytest.mark.skip(reason="This test is not yet implemented")
-    def test_http_and_https_recognized_as_studio_url_schemes(self):
-        assert True
-
-    @pytest.mark.skip(reason="This test is not yet implemented")
-    def test_file_not_recognized_as_studio_url_scheme(self):
-        assert True
 
     def test_http_url_not_recognized_as_studio_url_scheme(self):
         self.assertFalse(_is_studio_url(f'http://www.google.com'))
@@ -357,9 +317,6 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
 
     def test_slash_url_without_url_base_is_recognized_as_studio_url_scheme(self):
         self.assertTrue(_is_studio_url(f'/static/test'))
-
-    # TODO
-    # Need additional negative tests on _is_studio_url would be appropriate
 
     @mock.patch('cms.djangoapps.contentstore.tasks.ModuleStoreEnum', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks.modulestore', autospec=True)
@@ -384,7 +341,6 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     def test_number_of_scanned_blocks_equals_blocks_in_course(self, mock_get_urls):
         """
         _scan_course_for_links should call _get_urls once per block in course.
-        TODO - verify that the created course actually has blocks. This test not meaningful if it doesn't
         """
         expected_blocks = self.store.get_items(self.test_course.id)
 
@@ -454,36 +410,6 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         assert len(broken_or_locked_urls) == 2  # The inputs with status = 403 and 500
         assert len(retry_list) == 1             # The input with status = None
         assert retry_list[0][1] == '5'      # The only URL fit for a retry operation (status == None)
-
-    # TODO - test retry logic
-
-    @pytest.mark.skip(reason="Failing but needs review -- test not yet correct")
-    @pytest.mark.asyncio
-    async def test_max_number_of_retries_is_respected(self):
-        logging.info("******** In test_max_number_of_retries_is_respected *******")
-        '''
-        Patch initial validation to show no progress (need retries on everything).
-        Patch retries to behave in an equally non-productive way
-        Assert that the number of retries attempted equals the maximum number allowed
-        '''
-        MAX_RETRIES = 3
-        with patch("cms.djangoapps.contentstore.tasks._validate_url_access",
-                   new_callable=AsyncMock) as mock_validate_url:
-            mock_validate_url.side_effect = \
-                lambda session, url_data, course_key: {'block_id': f'block_{url_data}', 'url': url_data}
-            with patch("cms.djangoapps.contentstore.tasks._retry_validation_and_filter",
-                       new_callable=AsyncMock) as mock_retry_validation:
-                mock_retry_validation.side_effect = \
-                    lambda course_key, results, retry_list: retry_list
-
-                url_list = ['1', '2', '3', '4', '5']
-                course_key = 'course-v1:edX+DemoX+Demo_Course'
-                batch_size=2
-                results = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
-                print(" ***** results =   ******")
-                pprint.pp(results)
-                assert mock_retry_validation.call_count == MAX_RETRIES, \
-                  f'Got {mock_retry_validation.call_count} retries; expected {MAX_RETRIES}'
 
     @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
     @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])
