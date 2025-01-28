@@ -156,7 +156,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .question-description {
     color: var(--gray-d1, #5e5e5e);
-    font-size: var(--small-font-size);
+    font-size: var(--small-font-size, 80%);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem form>label,
@@ -396,7 +396,7 @@
     padding: calc((var(--baseline, 20px) / 2));
     padding-left: calc((var(--baseline, 20px) * 2.3));
     position: relative;
-    font-size: var(--base-font-size);
+    font-size: var(--base-font-size, 18px);
     line-height: normal;
     cursor: pointer;
 }
@@ -1042,7 +1042,7 @@
     align-items: center;
 }
 
-@media (max-width: var(--bp-screen-lg)) {
+@media (max-width: var(--bp-screen-lg, 1024px)) {
     .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container {
         max-width: 100%;
         padding-bottom: var(--baseline, 20px);
@@ -1071,7 +1071,7 @@
     margin-top: calc(var(--baseline, 20px) / 2);
     display: inline-block;
     color: var(--gray-d1, #5e5e5e);
-    font-size: var(--medium-font-size);
+    font-size: var(--medium-font-size, 0.9em);
     -webkit-font-smoothing: antialiased;
     vertical-align: middle;
 }
@@ -1140,7 +1140,7 @@
     float: left;
     margin-top: calc(var(--baseline, 20px) / 2);
     padding: calc((var(--baseline, 20px) / 2.5)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 5)) calc((var(--baseline, 20px) / 2));
-    line-height: var(--base-line-height);
+    line-height: var(--base-line-height, 1.5em);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.success {

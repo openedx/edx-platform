@@ -526,7 +526,7 @@
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li.is-active .speed-option,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li.is-active .control-lang {
     border-left: calc(var(--baseline, 20px) / 10) solid #0ea6ec;
-    font-weight: var(--font-bold);
+    font-weight: var(--font-bold, 700);
     color: #0ea6ec;
 }
 
@@ -613,7 +613,7 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .volume .volume-slider-container .volume-slider .ui-slider-handle {
-    transition: height var(--tmg-s2) ease-in-out 0s, width var(--tmg-s2) ease-in-out 0s;
+    transition: height var(--tmg-s2, 2s) ease-in-out 0s, width var(--tmg-s2, 2s) ease-in-out 0s;
     left: -5px;
     box-sizing: border-box;
     height: 13px;
@@ -1008,7 +1008,7 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video-tracks .a11y-menu-container>a {
-    transition: all var(--tmg-f2) ease-in-out 0s;
+    transition: all var(--tmg-f2, 0.25s) ease-in-out 0s;
     font-size: 12px;
     display: block;
     border-radius: 0 3px 3px 0;
