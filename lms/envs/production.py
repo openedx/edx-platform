@@ -17,7 +17,6 @@ Common traits:
 
 
 import codecs
-import copy
 import datetime
 import os
 
@@ -128,40 +127,40 @@ SSL_AUTH_DN_FORMAT_STRING = (
 
 #######################################################################################################################
 
-# A file path to a YAML file from which to load all the configuration for the edx platform
+# A file path to a YAML file from which to load configuration overrides for LMS.
 CONFIG_FILE = get_env_setting('LMS_CFG')
 
 with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
-    __config__ = yaml.safe_load(f)
 
-    # _YAML_TOKENS contains the exact contents of the LMS_CFG YAML file.
-    # We do splat the entirety of the LMS_CFG YAML file (except KEYS_WITH_MERGED_VALUES) into this module.
-    # However, for precise backwards compatibility, we need to reference _YAML_TOKENS directly a few times,
-    # particularly we need to derive Django setting values from YAML values.
-    # This pattern is confusing and we discourage it. Rather than adding more _YAML_TOKENS references, please
-    # consider just referencing this module's variables directly.
-    _YAML_TOKENS = __config__
+    # _YAML_TOKENS starts out with the exact contents of the LMS_CFG YAML file.
+    # Please avoid adding new references to _YAML_TOKENS. Such references make our settings logic more complex.
+    # Instead, just reference the Django settings, which we define in the next step...
+    _YAML_TOKENS = yaml.safe_load(f)
 
-    # Add the key/values from config into the global namespace of this module.
-    # But don't override the FEATURES dict because we do that in an additive way.
-    __config_copy__ = copy.deepcopy(__config__)
+    # Update the global namespace of this module with the key-value pairs from _YAML_TOKENS.
+    # In other words: For (almost) every YAML key-value pair, define/update a Django setting with that name and value.
+    vars().update({
 
-    KEYS_WITH_MERGED_VALUES = [
-        'FEATURES',
-        'TRACKING_BACKENDS',
-        'EVENT_TRACKING_BACKENDS',
-        'JWT_AUTH',
-        'CELERY_QUEUES',
-        'MKTG_URL_LINK_MAP',
-        'REST_FRAMEWORK',
-        'EVENT_BUS_PRODUCER_CONFIG',
-    ]
-    for key in KEYS_WITH_MERGED_VALUES:
-        if key in __config_copy__:
-            del __config_copy__[key]
+        #  Note: If `value` is a mutable object (e.g., a dict), then it will be aliased between the global namespace and
+        #  _YAML_TOKENS. In other words, updates to `value` will manifest in _YAML_TOKENS as well. This is intentional,
+        #  in order to maintain backwards compatibility with old Django plugins which use _YAML_TOKENS.
+        key: value
+        for key, value in _YAML_TOKENS.items()
 
-    vars().update(__config_copy__)
-
+        # Do NOT define/update Django settings for these particular special keys.
+        # We handle each of these with its special logic (below, in this same module).
+        # For example, we need to *update* the default FEATURES dict rather than wholesale *override* it.
+        if key not in [
+            'FEATURES',
+            'TRACKING_BACKENDS',
+            'EVENT_TRACKING_BACKENDS',
+            'JWT_AUTH',
+            'CELERY_QUEUES',
+            'MKTG_URL_LINK_MAP',
+            'REST_FRAMEWORK',
+            'EVENT_BUS_PRODUCER_CONFIG',
+        ]
+    })
 
 try:
     # A file path to a YAML file from which to load all the code revisions currently deployed
@@ -554,11 +553,16 @@ derive_settings(__name__)
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
-# ENV_TOKENS and AUTH_TOKENS are included for reverse compatibility.
-# Removing them may break plugins that rely on them.
-# Please do not add new references to them... just use `django.conf.settings` instead.
-ENV_TOKENS = __config__
-AUTH_TOKENS = __config__
+# These dicts are defined solely for BACKWARDS COMPATIBILITY with existing plugins which may theoretically
+# rely upon them. Please do not add new references to these dicts!
+# - If you need to access the YAML values in this module, use _YAML_TOKENS.
+# - If you need to access to these values elsewhere, use the corresponding rendered `settings.*`
+#   value rathering than diving into these dicts.
+ENV_TOKENS = _YAML_TOKENS
+AUTH_TOKENS = _YAML_TOKENS
+ENV_FEATURES = _YAML_TOKENS.get("FEATURES", {})
+ENV_CELERY_QUEUES = _YAML_CELERY_QUEUES
+ALTERNATE_QUEUE_ENVS = _YAML_ALTERNATE_WORKER_QUEUES
 
 # Load production.py in plugins
 add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
