@@ -26,11 +26,6 @@ algoliasearch<4.0.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35280
 celery>=5.2.2,<6.0.0
 
-# Date: 2021-05-17
-# greater version breaking upgrade builds
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35279
-click==8.1.6
-
 # Date: 2022-07-20
 # edx-enterprise, snowflake-connector-python require charset-normalizer==2.0.0
 # Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
