@@ -80,7 +80,7 @@
     background-image: -webkit-linear-gradient(top, #d4dee8, #c9d5e2);
     background-image: linear-gradient(to bottom, #d4dee8, #c9d5e2);
     position: relative;
-    padding: calc(var(--baseline) / 4);
+    padding: calc(var(--baseline, 20px) / 4);
     border-bottom-color: #a5aaaf;
 }
 
@@ -99,7 +99,7 @@
 .xmodule_edit.xmodule_StaticTabBlock .editor .editor-bar button {
     display: inline-block;
     float: left;
-    padding: 3px calc(var(--baseline) / 2) 5px;
+    padding: 3px calc(var(--baseline, 20px) / 2) 5px;
     margin-left: 7px;
     border: 0;
     border-radius: 2px;
@@ -140,7 +140,7 @@
 .xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs li,
 .xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs li {
     float: left;
-    margin-right: calc(var(--baseline) / 4);
+    margin-right: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_edit.xmodule_AboutBlock .editor .editor-tabs li:last-child,

@@ -59,7 +59,7 @@
 }
 
 .xmodule_display.xmodule_SequenceBlock .sequence-nav {
-    margin: 0 auto var(--baseline);
+    margin: 0 auto var(--baseline, 20px);
     position: relative;
     border-bottom: none;
     z-index: 0;
@@ -213,7 +213,7 @@ body.touch-based-device .xmodule_display.xmodule_SequenceBlock .sequence-nav ol 
     }
 
     .xmodule_display.xmodule_SequenceBlock .sequence-nav-button span:not(:last-child) {
-        padding-right: calc((var(--baseline) / 2));
+        padding-right: calc((var(--baseline, 20px) / 2));
     }
 }
 

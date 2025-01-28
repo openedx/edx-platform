@@ -159,12 +159,12 @@
     font-size: 1em;
     color: inherit;
     background-color: transparent;
-    padding: calc((var(--baseline) / 4)) calc((var(--baseline) / 2));
+    padding: calc((var(--baseline, 20px) / 4)) calc((var(--baseline, 20px) / 2));
     border: none;
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip .ui-tooltip-titlebar .ui-tooltip-title {
-    padding: calc((var(--baseline) / 4)) 0;
+    padding: calc((var(--baseline, 20px) / 4)) 0;
     border-bottom: 2px solid #333;
     font-weight: bold;
 }
@@ -184,7 +184,7 @@
     font-size: 0.875em;
     text-align: left;
     font-weight: 400;
-    padding: 0 calc((var(--baseline) / 2)) calc((var(--baseline) / 2)) calc((var(--baseline) / 2));
+    padding: 0 calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2));
     background-color: transparent;
     border-color: transparent;
 }
@@ -199,12 +199,12 @@
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip-annotatable .ui-tooltip-content {
-    padding: 0 calc((var(--baseline) / 2));
+    padding: 0 calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip-annotatable .ui-tooltip-content .annotatable-comment {
     display: block;
-    margin: 0 0 calc((var(--baseline) / 2)) 0;
+    margin: 0 0 calc((var(--baseline, 20px) / 2)) 0;
     max-height: 225px;
     overflow: auto;
     line-height: normal;
@@ -213,7 +213,7 @@
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip-annotatable .ui-tooltip-content .annotatable-reply {
     display: block;
     border-top: 2px solid #333;
-    padding: calc((var(--baseline) / 4)) 0;
+    padding: calc((var(--baseline, 20px) / 4)) 0;
     margin: 0;
     text-align: center;
 }
@@ -226,7 +226,7 @@
     left: 50%;
     height: 0;
     width: 0;
-    margin-left: calc(-1 * (var(--baseline) / 4));
+    margin-left: calc(-1 * (var(--baseline, 20px) / 4));
     border: 10px solid transparent;
     border-top-color: rgba(0, 0, 0, 0.85);
 }

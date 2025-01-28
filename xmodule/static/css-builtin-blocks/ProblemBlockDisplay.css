@@ -41,7 +41,7 @@
 
 .xmodule_display.xmodule_ProblemBlock h2 {
     margin-top: 0;
-    margin-bottom: calc((var(--baseline) * 0.75));
+    margin-bottom: calc((var(--baseline, 20px) * 0.75));
 }
 
 .xmodule_display.xmodule_ProblemBlock h2.problem-header {
@@ -49,7 +49,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock h2.problem-header section.staff {
-    margin-top: calc((var(--baseline) * 1.5));
+    margin-top: calc((var(--baseline, 20px) * 1.5));
     font-size: 80%;
 }
 
@@ -68,13 +68,13 @@
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct {
-    margin-top: calc((var(--baseline) / 4));
+    margin-top: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect .icon,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct .icon,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct .icon {
-    margin-right: calc((var(--baseline) / 4));
+    margin-right: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect .icon {
@@ -126,7 +126,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem {
-    padding-top: var(--baseline);
+    padding-top: var(--baseline, 20px);
 }
 
 @media print {
@@ -151,7 +151,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .inline+p {
-    margin-top: var(--baseline);
+    margin-top: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .question-description {
@@ -162,19 +162,19 @@
 .xmodule_display.xmodule_ProblemBlock div.problem form>label,
 .xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label {
     display: block;
-    margin-bottom: var(--baseline);
+    margin-bottom: var(--baseline, 20px);
     font: inherit;
     color: inherit;
     -webkit-font-smoothing: initial;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label+.question-description {
-    margin-top: calc(-1 * var(--baseline));
+    margin-top: calc(-1 * var(--baseline, 20px));
 }
 
 .xmodule_display.xmodule_ProblemBlock .wrapper-problem-response+.wrapper-problem-response,
 .xmodule_display.xmodule_ProblemBlock .wrapper-problem-response+p {
-    margin-top: calc((var(--baseline) * 1.5));
+    margin-top: calc((var(--baseline, 20px) * 1.5));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup,
@@ -196,16 +196,16 @@
     box-sizing: border-box;
     display: inline-block;
     clear: both;
-    margin-bottom: calc((var(--baseline) / 2));
+    margin-bottom: calc((var(--baseline, 20px) / 2));
     border: 2px solid var(--gray-l4);
     border-radius: 3px;
-    padding: calc((var(--baseline) / 2));
+    padding: calc((var(--baseline, 20px) / 2));
     width: 100%;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label::after {
-    margin-left: calc((var(--baseline) * 0.75));
+    margin-left: calc((var(--baseline, 20px) * 0.75));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup .indicator-container,
@@ -224,8 +224,8 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input[type="radio"],
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="checkbox"],
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input[type="checkbox"] {
-    margin: calc((var(--baseline) / 4));
-    margin-right: calc((var(--baseline) / 2));
+    margin: calc((var(--baseline, 20px) / 4));
+    margin-right: calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label,
@@ -393,8 +393,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label {
-    padding: calc((var(--baseline) / 2));
-    padding-left: calc((var(--baseline) * 2.3));
+    padding: calc((var(--baseline, 20px) / 2));
+    padding-left: calc((var(--baseline, 20px) * 2.3));
     position: relative;
     font-size: var(--base-font-size);
     line-height: normal;
@@ -406,29 +406,29 @@
     left: 0.5625em;
     position: absolute;
     top: 0.35em;
-    width: calc(var(--baseline) * 1.1);
-    height: calc(var(--baseline) * 1.1);
+    width: calc(var(--baseline, 20px) * 1.1);
+    height: calc(var(--baseline, 20px) * 1.1);
     z-index: 1;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend {
-    margin-bottom: var(--baseline);
+    margin-bottom: var(--baseline, 20px);
     max-width: 100%;
     white-space: normal;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend+.question-description {
-    margin-top: calc(-1 * var(--baseline));
+    margin-top: calc(-1 * var(--baseline, 20px));
     max-width: 100%;
     white-space: normal;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container {
-    margin-left: calc((var(--baseline) * 0.75));
+    margin-left: calc((var(--baseline, 20px) * 0.75));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status {
-    width: var(--baseline);
+    width: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.correct .status-icon::after {
@@ -463,7 +463,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .solution-span>span {
-    margin: var(--baseline) 0;
+    margin: var(--baseline, 20px) 0;
     display: block;
     position: relative;
 }
@@ -523,7 +523,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem div p.answer {
     display: inline-block;
-    margin-top: calc((var(--baseline) / 2));
+    margin-top: calc((var(--baseline, 20px) / 2));
     margin-bottom: 0;
 }
 
@@ -546,7 +546,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div div.equation img.loading {
-    padding-left: calc((var(--baseline) / 2));
+    padding-left: calc((var(--baseline, 20px) / 2));
     display: inline-block;
 }
 
@@ -611,12 +611,12 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .reload {
     float: right;
-    margin: calc((var(--baseline) / 2));
+    margin: calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status {
-    margin: calc(var(--baseline) / 2) 0;
-    padding: calc(var(--baseline) / 2);
+    margin: calc(var(--baseline, 20px) / 2) 0;
+    padding: calc(var(--baseline, 20px) / 2);
     border-radius: 5px;
     background: var(--gray-l6);
 }
@@ -650,8 +650,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status.file {
-    margin-top: var(--baseline);
-    padding: var(--baseline) 0 0 0;
+    margin-top: var(--baseline, 20px);
+    padding: var(--baseline, 20px) 0 0 0;
     border: 0;
     border-top: 1px solid #eee;
     background: var(--white);
@@ -666,11 +666,11 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation p {
-    margin-bottom: calc((var(--baseline) / 5));
+    margin-bottom: calc((var(--baseline, 20px) / 5));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .feedback-on-feedback {
-    margin-right: var(--baseline);
+    margin-right: var(--baseline, 20px);
     height: 100px;
 }
 
@@ -701,7 +701,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .submit-message-container {
-    margin: var(--baseline) 0px;
+    margin: var(--baseline, 20px) 0px;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.inline>span {
@@ -810,7 +810,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem pre {
     overflow: auto;
-    padding: 6px calc(var(--baseline) / 2);
+    padding: 6px calc(var(--baseline, 20px) / 2);
     border: 1px solid var(--gray-l3);
     border-radius: 3px;
     background-color: var(--gray-l6);
@@ -838,7 +838,7 @@
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline .status,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput .status {
     display: inline-block;
-    margin-top: calc((var(--baseline) / 2));
+    margin-top: calc((var(--baseline, 20px) / 2));
     background: none;
 }
 
@@ -909,7 +909,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .trailing_text {
-    margin-right: calc((var(--baseline) / 2));
+    margin-right: calc((var(--baseline, 20px) / 2));
     display: inline-block;
 }
 
@@ -985,7 +985,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action {
-    min-height: var(--baseline);
+    min-height: var(--baseline, 20px);
     width: 100%;
     display: flex;
     display: -ms-flexbox;
@@ -999,7 +999,7 @@
     display: inline-flex;
     justify-content: flex-end;
     width: 100%;
-    padding-bottom: var(--baseline);
+    padding-bottom: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-button-wrapper {
@@ -1025,7 +1025,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn .icon {
-    margin-bottom: calc(var(--baseline) / 10);
+    margin-bottom: calc(var(--baseline, 20px) / 10);
     display: block;
 }
 
@@ -1036,7 +1036,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container {
-    padding-bottom: var(--baseline);
+    padding-bottom: var(--baseline, 20px);
     flex-grow: 1;
     display: flex;
     align-items: center;
@@ -1045,12 +1045,12 @@
 @media (max-width: var(--bp-screen-lg)) {
     .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container {
         max-width: 100%;
-        padding-bottom: var(--baseline);
+        padding-bottom: var(--baseline, 20px);
     }
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit {
-    margin-right: calc((var(--baseline) / 2));
+    margin-right: calc((var(--baseline, 20px) / 2));
     float: left;
     white-space: nowrap;
 }
@@ -1058,17 +1058,17 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit-cta-description {
     color: var(--primary);
     font-size: small;
-    padding-right: calc(var(--baseline) / 2);
+    padding-right: calc(var(--baseline, 20px) / 2);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit-cta-link-button {
     color: var(--primary);
-    padding-right: calc(var(--baseline) / 4);
+    padding-right: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submission-feedback {
-    margin-right: calc((var(--baseline) / 2));
-    margin-top: calc(var(--baseline) / 2);
+    margin-right: calc((var(--baseline, 20px) / 2));
+    margin-top: calc(var(--baseline, 20px) / 2);
     display: inline-block;
     color: var(--gray-d1);
     font-size: var(--medium-font-size);
@@ -1128,7 +1128,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.capa_alert {
-    margin-top: var(--baseline);
+    margin-top: var(--baseline, 20px);
     padding: 8px 12px;
     border: 1px solid var(--warning-color);
     border-radius: 3px;
@@ -1138,8 +1138,8 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification {
     float: left;
-    margin-top: calc(var(--baseline) / 2);
-    padding: calc((var(--baseline) / 2.5)) calc((var(--baseline) / 2)) calc((var(--baseline) / 5)) calc((var(--baseline) / 2));
+    margin-top: calc(var(--baseline, 20px) / 2);
+    padding: calc((var(--baseline, 20px) / 2.5)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 5)) calc((var(--baseline, 20px) / 2));
     line-height: var(--base-line-height);
 }
 
@@ -1185,7 +1185,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint .icon {
-    margin-right: calc(3 * var(--baseline) / 4);
+    margin-right: calc(3 * var(--baseline, 20px) / 4);
     color: var(--uxpl-gray-dark);
 }
 
@@ -1200,7 +1200,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .icon {
     float: left;
     position: relative;
-    top: calc(var(--baseline) / 5);
+    top: calc(var(--baseline, 20px) / 5);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-message {
@@ -1216,7 +1216,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-message ol li:not(:last-child) {
-    margin-bottom: calc(var(--baseline) / 4);
+    margin-bottom: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-btn-wrapper {
@@ -1225,14 +1225,14 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification-btn {
     float: right;
-    padding: calc((var(--baseline) / 10)) calc((var(--baseline) / 4));
-    min-width: calc((var(--baseline) * 3));
+    padding: calc((var(--baseline, 20px) / 10)) calc((var(--baseline, 20px) / 4));
+    min-width: calc((var(--baseline, 20px) * 3));
     display: block;
     clear: both;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification-btn:first-child {
-    margin-bottom: calc(var(--baseline) / 4);
+    margin-bottom: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem button:hover {
@@ -1266,8 +1266,8 @@
     border: 1px solid var(--error-color);
     border-radius: 3px;
     font-size: 1em;
-    margin-top: calc(var(--baseline) / 2);
-    margin-bottom: calc(var(--baseline) / 2);
+    margin-top: calc(var(--baseline, 20px) / 2);
+    margin-bottom: calc(var(--baseline, 20px) / 2);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .capa_reset>h2 {
@@ -1329,8 +1329,8 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .test>section {
     position: relative;
-    margin-bottom: calc((var(--baseline) / 2));
-    padding: 9px 9px var(--baseline);
+    margin-bottom: calc((var(--baseline, 20px) / 2));
+    padding: 9px 9px var(--baseline, 20px);
     border: 1px solid #ddd;
     border-radius: 3px;
     background: var(--white);
@@ -1353,7 +1353,7 @@
     left: 0;
     box-sizing: border-box;
     display: block;
-    padding: calc((var(--baseline) / 5));
+    padding: calc((var(--baseline, 20px) / 5));
     background: var(--gray-l4);
     text-align: right;
     font-size: 1em;
@@ -1376,8 +1376,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section {
-    padding-top: calc((var(--baseline) * 1.5));
-    padding-left: var(--baseline);
+    padding-top: calc((var(--baseline, 20px) * 1.5));
+    padding-left: var(--baseline, 20px);
     background-color: #fafafa;
     color: #2c2c2c;
     font-size: 1em;
@@ -1394,8 +1394,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors {
-    margin: calc((var(--baseline) / 4));
-    padding: calc((var(--baseline) / 2)) calc((var(--baseline) / 2)) calc((var(--baseline) / 2)) calc((var(--baseline) * 2));
+    margin: calc((var(--baseline, 20px) / 4));
+    padding: calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) * 2));
     background: url("var(--static-path)/images/incorrect-icon.png") center left no-repeat;
 }
 
@@ -1404,10 +1404,10 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output {
-    margin: calc(var(--baseline) / 4);
-    padding: var(--baseline) 0 calc((var(--baseline) * 0.75)) 50px;
+    margin: calc(var(--baseline, 20px) / 4);
+    padding: var(--baseline, 20px) 0 calc((var(--baseline, 20px) * 0.75)) 50px;
     border-top: 1px solid #ddd;
-    border-left: var(--baseline) solid #fafafa;
+    border-left: var(--baseline, 20px) solid #fafafa;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output h4 {
@@ -1420,7 +1420,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output dt {
-    margin-top: var(--baseline);
+    margin-top: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output dd {
@@ -1452,8 +1452,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .markup-text {
-    margin: calc((var(--baseline) / 4));
-    padding: var(--baseline) 0 15px 50px;
+    margin: calc((var(--baseline, 20px) / 4));
+    padding: var(--baseline, 20px) 0 15px 50px;
     border-top: 1px solid #ddd;
     border-left: 20px solid #fafafa;
 }
@@ -1467,19 +1467,19 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric tr {
-    margin: calc((var(--baseline) / 2)) 0;
+    margin: calc((var(--baseline, 20px) / 2)) 0;
     height: 100%;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric td {
-    margin: calc((var(--baseline) / 2)) 0;
-    padding: var(--baseline) 0;
+    margin: calc((var(--baseline, 20px) / 2)) 0;
+    padding: var(--baseline, 20px) 0;
     height: 100%;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric th {
-    margin: calc((var(--baseline) / 4));
-    padding: calc((var(--baseline) / 4));
+    margin: calc((var(--baseline, 20px) / 4));
+    padding: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric label,
@@ -1487,7 +1487,7 @@
     position: relative;
     display: inline-block;
     margin: 3px;
-    padding: calc((var(--baseline) * 0.75));
+    padding: calc((var(--baseline, 20px) * 0.75));
     min-width: 50px;
     min-height: 50px;
     width: 150px;
@@ -1500,7 +1500,7 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    margin: calc((var(--baseline) / 2));
+    margin: calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric .selected-grade {
@@ -1575,7 +1575,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag {
     display: inline-block;
-    margin-left: calc((var(--baseline) * 2));
+    margin-left: calc((var(--baseline, 20px) * 2));
     border: 1px solid #666666;
 }
 
@@ -1644,7 +1644,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_show_correct::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_show_correct::after {
-    margin-left: calc((var(--baseline) * 0.75));
+    margin-left: calc((var(--baseline, 20px) * 0.75));
     content: url("var(--static-path)/images/correct-icon.png");
 }
 
