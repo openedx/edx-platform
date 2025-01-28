@@ -577,7 +577,7 @@
     top: 4px;
     width: 14px;
     height: 14px;
-    background: url("var(--static-path)/images/unanswered-icon.png") center center no-repeat;
+    background: var(--icon-unanswered) center center no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div span.processing,
@@ -587,7 +587,7 @@
     top: 6px;
     width: 25px;
     height: 20px;
-    background: url("var(--static-path)/images/spinner.gif") center center no-repeat;
+    background: var(--icon-spinner) center center no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-check {
@@ -596,7 +596,7 @@
     top: 3px;
     width: 25px;
     height: 20px;
-    background: url("var(--static-path)/images/correct-icon.png") center center no-repeat;
+    background: var(--icon-correct) center center no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div span.incomplete,
@@ -606,7 +606,7 @@
     top: 3px;
     width: 20px;
     height: 20px;
-    background: url("var(--static-path)/images/incorrect-icon.png") center center no-repeat;
+    background: var(--icon-incorrect) center center no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .reload {
@@ -638,7 +638,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status .grading {
     margin: 0px 7px 0 0;
     padding-left: 25px;
-    background: url("var(--static-path)/images/info-icon.png") left center no-repeat;
+    background: var(--icon-info) left center no-repeat;
     text-indent: 0px;
 }
 
@@ -1396,7 +1396,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors {
     margin: calc((var(--baseline, 20px) / 4));
     padding: calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) * 2));
-    background: url("var(--static-path)/images/incorrect-icon.png") center left no-repeat;
+    background: var(--icon-incorrect) center left no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors li {
@@ -1428,7 +1428,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct {
-    background: url("var(--static-path)/images/correct-icon.png") left 20px no-repeat;
+    background: var(--icon-correct) left 20px no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct .result-actual-output {
@@ -1436,7 +1436,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct {
-    background: url("var(--static-path)/images/partially-correct-icon.png") left 20px no-repeat;
+    background: var(--icon-partially-correct) left 20px no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct .result-actual-output {
@@ -1444,7 +1444,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect {
-    background: url("var(--static-path)/images/incorrect-icon.png") left 20px no-repeat;
+    background: var(--icon-incorrect) left 20px no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect .result-actual-output {
@@ -1645,7 +1645,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_show_correct::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_show_correct::after {
     margin-left: calc((var(--baseline, 20px) * 0.75));
-    content: url("var(--static-path)/images/correct-icon.png");
+    content: var(--icon-correct);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup span.mock_label {
