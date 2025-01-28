@@ -117,14 +117,14 @@
     background-image: -webkit-linear-gradient(var(--blue, #0075b4), var(--blue, #0075b4));
     background-image: linear-gradient(to, var(--blue, #0075b4));
     color: var(--blue-d1, #005e90);
-    box-shadow: inset 0 1px 2px 1px var(--shadow-l1);
+    box-shadow: inset 0 1px 2px 1px var(--shadow-l1, rgba(0, 0, 0, 0.1));
     background-color: var(--blue-d4, #001724);
     cursor: default;
 }
 
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab:hover,
 .xmodule_edit.xmodule_VideoBlock .editor-with-tabs .edit-header .editor-tabs .inner_tab_wrap a.tab:focus {
-    box-shadow: inset 0 1px 2px 1px var(--shadow);
+    box-shadow: inset 0 1px 2px 1px var(--shadow, rgba(0, 0, 0, 0.2));
     background-image: linear-gradient(#009fe6, #009fe6) !important;
 }
 
