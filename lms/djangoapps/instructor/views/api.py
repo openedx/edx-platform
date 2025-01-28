@@ -3052,11 +3052,6 @@ class ChangeDueDate(APIView):
         if not serializer_data.is_valid():
             return JsonResponse({'error': 'All fields must be filled out'}, status=400)
 
-        due_datetime = serializer_data.validated_data.get('due_datetime')
-        try:
-            due_date = parse_datetime(due_datetime)
-        except DashboardError:
-            return JsonResponse({'error': 'The extension due date and time format is incorrect'}, status=400)
         
         student = serializer_data.validated_data.get('student')
         if not student:
@@ -3064,6 +3059,12 @@ class ChangeDueDate(APIView):
                 'error': f'Could not find student matching identifier: {request.data.get("student")}'
             }
             return JsonResponse(response_payload, status=404)
+        
+        due_datetime = serializer_data.validated_data.get('due_datetime')
+        try:
+            due_date = parse_datetime(due_datetime)
+        except DashboardError:
+            return JsonResponse({'error': 'The extension due date and time format is incorrect'}, status=400)
         
         
         course = get_course_by_id(CourseKey.from_string(course_id))
