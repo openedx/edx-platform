@@ -23,9 +23,8 @@ charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-click==8.1.6
+click==8.1.8
     # via
-    #   -c requirements/edx/../constraints.txt
     #   click-option-group
     #   semgrep
 click-option-group==0.5.6
