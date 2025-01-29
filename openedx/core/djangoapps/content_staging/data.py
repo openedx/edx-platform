@@ -76,17 +76,3 @@ class UserClipboardData:
     def source_context_key(self) -> LearningContextKey:
         """ Get the context (course/library) that this was copied from """
         return self.source_usage_key.context_key
-
-
-@frozen
-class UserLibrarySyncData:
-    """Read-only data model for User Library Sync data"""
-
-    content: StagedContentData = field(validator=validators.instance_of(StagedContentData))
-    source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))  # type: ignore[type-abstract]
-    source_context_title: str
-
-    @property
-    def source_context_key(self) -> LearningContextKey:
-        """Get the context (course/library) that this was copied from"""
-        return self.source_usage_key.context_key
