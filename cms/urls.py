@@ -348,9 +348,9 @@ urlpatterns += [
 ]
 
 # Content tagging
-#urlpatterns += [
-#    path('api/content_tagging/', include(('openedx.core.djangoapps.content_tagging.urls', 'content_tagging'))),
-#]
+urlpatterns += [
+    path('api/content_tagging/', include(('openedx.core.djangoapps.content_tagging.urls', 'content_tagging'))),
+]
 
 # Authoring-api specific API docs (using drf-spectacular and openapi-v3).
 # This is separate from and in addition to the full studio swagger documentation already existing at /api-docs.
