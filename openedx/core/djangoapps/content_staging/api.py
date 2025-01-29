@@ -166,7 +166,7 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
 
 
 def stage_xblock_temporarily(
-    block: XBlock, user_id: int, purpose: str = LIBRARY_SYNC_PURPOSE, version_num: int | None = None,
+    block: XBlock, user_id: int, purpose: str, version_num: int | None = None,
 ) -> _StagedContent:
     """
     "Stage" an XBlock by copying it (and its associated children + static assets)

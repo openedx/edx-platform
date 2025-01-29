@@ -29,6 +29,8 @@ from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fe
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
+from openedx.core.lib.xblock_serializer.api import XBlockSerializer
+from openedx.core.djangoapps.content_staging.data import LIBRARY_SYNC_PURPOSE
 
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
 
@@ -335,7 +337,7 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
     return new_xblock, notices
 
 
-def import_staged_content_for_library_sync(downstream_xblock: XBlock, lib_block: XBlock, request) -> StaticFileNotices:
+def import_static_assets_for_library_sync(downstream_xblock: XBlock, lib_block: XBlock, request) -> StaticFileNotices:
     """
     Import the static assets from the library xblock to the downstream xblock
     through staged content. Also updates the OLX references to point to the new
@@ -346,21 +348,26 @@ def import_staged_content_for_library_sync(downstream_xblock: XBlock, lib_block:
     Returns a summary of changes made to static files in the destination
     course.
     """
+    if not XBlockSerializer(
+        lib_block,
+        fetch_asset_data=True,
+    ).static_files:
+        return StaticFileNotices()
     if not content_staging_api:
         raise RuntimeError("The required content_staging app is not installed")
-    staged_content = content_staging_api.stage_xblock_temporarily(lib_block, request.user.id)
+    staged_content = content_staging_api.stage_xblock_temporarily(lib_block, request.user.id, LIBRARY_SYNC_PURPOSE)
     if not staged_content:
         # expired/error/loading
         return StaticFileNotices()
 
     store = modulestore()
-    with store.bulk_operations(downstream_xblock.context_key):
-        # Now handle static files that need to go into Files & Uploads.
-        # If the required files already exist, nothing will happen besides updating the olx.
-        try:
+    try:
+        with store.bulk_operations(downstream_xblock.context_key):
+            # Now handle static files that need to go into Files & Uploads.
+            # If the required files already exist, nothing will happen besides updating the olx.
             notices = _insert_static_files_into_downstream_xblock(downstream_xblock, staged_content.id, request)
-        finally:
-            staged_content.delete()
+    finally:
+        staged_content.delete()
 
     return notices
 
