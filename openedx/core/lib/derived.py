@@ -28,71 +28,58 @@ SOME_OTHER_VALUE = 4
 derive_settings(__name__)
 ```
 """
+from __future__ import annotations
 
 import sys
+import typing as t
+from collections.abc import Sequence
 
-# Global list holding all settings which will be derived.
-__DERIVED = []
 
-
-def derived(*settings):
+class Derived:
     """
-    Registers settings which are derived from other settings.
-    Can be called multiple times to add more derived settings.
-
-    Args:
-        settings (str): Setting names to register.
+    TODO doc
+    TODO typing
     """
-    __DERIVED.extend(settings)
+    def __init__(self, calculate_value: t.Callable):
+        self.calculate_value = calculate_value
 
 
-def derived_collection_entry(collection_name, *accessors):
-    """
-    Registers a setting which is a dictionary or list and needs a derived value for a particular entry.
-    Can be called multiple times to add more derived settings.
-
-    Args:
-        collection_name (str): Name of setting which contains a dictionary or list.
-        accessors (int|str): Sequence of dictionary keys and list indices in the collection (and
-            collections within it) leading to the value which will be derived.
-            For example: 0, 'DIRS'.
-    """
-    __DERIVED.append((collection_name, accessors))
-
-
-def derive_settings(module_name):
+def derive_settings(module_name: str):
     """
     Derives all registered settings and sets them onto a particular module.
-    Skips deriving settings that are set to a value.
 
     Args:
         module_name (str): Name of module to which the derived settings will be added.
     """
     module = sys.modules[module_name]
-    for derived in __DERIVED:  # lint-amnesty, pylint: disable=redefined-outer-name
-        if isinstance(derived, str):
-            setting = getattr(module, derived)
-            if callable(setting):
-                setting_val = setting(module)
-                setattr(module, derived, setting_val)
-        elif isinstance(derived, tuple):
-            # If a tuple, two elements are expected - else ignore.
-            if len(derived) == 2:
-                # The first element is the name of the attribute which is expected to be a dictionary or list.
-                # The second element is a list of string keys in that dictionary leading to a derived setting.
-                collection = getattr(module, derived[0])
-                accessors = derived[1]
-                for accessor in accessors[:-1]:
-                    collection = collection[accessor]
-                setting = collection[accessors[-1]]
-                if callable(setting):
-                    setting_val = setting(module)
-                    collection[accessors[-1]] = setting_val
+    _derive_dict_items(module, vars(module))
 
 
-def clear_for_tests():
+def _derive_dict_items(settings, the_dict: dict):
     """
-    Clears all settings to be derived. For tests only.
+    TODO doc
     """
-    global __DERIVED
-    __DERIVED = []
+    for key, child in the_dict.items():
+        if isinstance(child, Derived):
+            the_dict[key] = child.calculate_value(settings)
+        elif isinstance(child, Sequence) and not isinstance(child, str):
+            the_dict[key] = _derive_sequence_items(settings, child)
+            _derive_sequence_items(settings, child)
+        elif isinstance(child, dict):
+            _derive_dict_items(settings, child)
+
+
+def _derive_sequence_items(settings, the_seq: Sequence):
+    """
+    TODO doc
+    """
+    result = []
+    for ix, child in enumerate(the_seq):
+        if isinstance(child, Derived):
+            result.append(child.calculate_value(settings))
+        elif isinstance(child, Sequence) and not isinstance(child, str):
+            result.append(_derive_sequence_items(settings, child))
+        elif isinstance(child, dict):
+            _derive_dict_items(settings, child)
+            result.append(child)
+    return type(the_seq)(result)
