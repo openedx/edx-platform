@@ -3,6 +3,10 @@ Command to trigger sending reminder emails for learners to achieve their Course 
 """
 import time
 from datetime import date, datetime, timedelta
+
+import boto3
+from edx_ace.channel.django_email import DjangoEmailChannel
+from edx_ace.channel.mixins import EmailChannelMixin
 from eventtracking import tracker
 import logging
 import uuid
@@ -10,10 +14,10 @@ import uuid
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from edx_ace import ace
+from edx_ace import ace, presentation
 from edx_ace.message import Message
 from edx_ace.recipient import Recipient
-
+from edx_ace.utils.signals import send_ace_message_sent_signal
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.api import get_certificate_for_user_id
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -121,7 +125,11 @@ def send_ace_message(goal, session_id):
     with emulate_http_request(site, user):
         try:
             start_time = time.perf_counter()
-            ace.send(msg)
+            if is_ses_enabled:
+                # experimental implementation to log errors with ses
+                send_email_using_ses(user, msg)
+            else:
+                ace.send(msg)
             end_time = time.perf_counter()
             log.info(f"Goal Reminder for {user.id} for course {goal.course_key} sent in {end_time - start_time} "
                      f"using {'SES' if is_ses_enabled else 'others'}")
@@ -284,7 +292,7 @@ class Command(BaseCommand):
                     'uuid': session_id,
                     'timestamp': datetime.now(),
                     'reason': 'User time zone',
-                    'user_timezone': user_timezone,
+                    'user_timezone': str(user_timezone),
                     'now_in_users_timezone': now_in_users_timezone,
                 }
             )
@@ -297,3 +305,46 @@ class Command(BaseCommand):
                 return True
 
         return False
+
+
+def send_email_using_ses(user, msg):
+    """
+    Send email using AWS SES
+    """
+    msg = presentation.render(DjangoEmailChannel, msg)
+    # send rendered email using SES
+    sender = EmailChannelMixin.get_from_address(msg)
+    recipient = user.email
+    subject = EmailChannelMixin.get_subject(msg)
+    body_text = msg.body
+    body_html = msg.body_html
+
+    try:
+        # Send email
+        response = boto3.client('ses', settings.AWS_SES_REGION_NAME).send_email(
+            Source=sender,
+            Destination={
+                'ToAddresses': [recipient],
+            },
+            Message={
+                'Subject': {
+                    'Data': subject,
+                    'Charset': 'UTF-8'
+                },
+                'Body': {
+                    'Text': {
+                        'Data': body_text,
+                        'Charset': 'UTF-8'
+                    },
+                    'Html': {
+                        'Data': body_html,
+                        'Charset': 'UTF-8'
+                    }
+                }
+            }
+        )
+
+        log.info(f"Goal Reminder Email: email sent using SES with message ID {response['MessageId']}")
+        send_ace_message_sent_signal(DjangoEmailChannel, msg)
+    except Exception as e:
+        log.error(f"Goal Reminder Email: Error sending email using SES: {e}")

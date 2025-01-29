@@ -1059,18 +1059,6 @@ FEATURES = {
     # .. toggle_creation_date: 2024-04-24
     'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': False,
 
-    # .. toggle_name: FEATURES['ENABLE_BLAKE2B_HASHING']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Enables the memcache to use the blake2b hash algorithm instead of depreciated md4 for keys
-    #   exceeding 250 characters
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-04-02
-    # .. toggle_target_removal_date: 2024-12-09
-    # .. toggle_warning: For consistency, keep the value in sync with the setting of the same name in the LMS and CMS.
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34442
-    'ENABLE_BLAKE2B_HASHING': False,
-
     # .. toggle_name: FEATURES['BADGES_ENABLED']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -4323,18 +4311,28 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
+############## Settings for JWT token handling ##############
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'http://127.0.0.1:8740',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_SUPPORTED_VERSION': '1.2.0',
+    'JWT_PRIVATE_SIGNING_JWK': None,
     'JWT_PUBLIC_SIGNING_JWK_SET': None,
 }
+
+# NOTE: In order to create both JWT_PRIVATE_SIGNING_JWK and JWT_PUBLIC_SIGNING_JWK_SET,
+# in an  lms shell  run the following  command:
+# > python manage.py lms generate_jwt_signing_key
+# This will output asymmetric JWTs to use here. Read more on this on:
+# https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
 
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
 COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
+# time between scheduled runs, in seconds
+NOTIFY_CREDENTIALS_FREQUENCY = 14400
 
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
@@ -5387,6 +5385,14 @@ NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
+
+############## NUDGE EMAILS ###############
+# .. setting_name: DISABLED_ORGS_FOR_PROGRAM_NUDGE
+# .. setting_default: []
+# .. setting_description: List of organization codes that should be disabled
+# .. for program nudge emails.
+# .. eg ['BTDx', 'MYTx']
+DISABLED_ORGS_FOR_PROGRAM_NUDGE = []
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
