@@ -392,6 +392,7 @@ body {
     // For Google Docs and Google Calendar xblock editor
     .google-edit-wrapper .xblock-inputs {
       position: unset;
+      overflow-y: unset;
     }
 
     .xblock-actions {
