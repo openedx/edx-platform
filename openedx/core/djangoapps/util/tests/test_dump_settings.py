@@ -26,8 +26,8 @@ def test_for_lms_settings(capsys):
     # Check: tuples are converted to lists
     assert isinstance(dump['XBLOCK_MIXINS'], list)
 
-    # Check: objects (like classes) are repr'd
-    assert "<class 'xmodule.x_module.XModuleMixin'>" in dump['XBLOCK_MIXINS']
+    # Check: classes are converted to dicts of info on the class location
+    assert {"module": "xmodule.x_module", "qualname": "XModuleMixin"} in dump['XBLOCK_MIXINS']
 
     # Check: nested dictionaries come through OK, and int'l strings are just strings
     assert dump['COURSE_ENROLLMENT_MODES']['audit']['display_name'] == "Audit"
@@ -46,8 +46,8 @@ def test_for_cms_settings(capsys):
     # Check: tuples are converted to lists
     assert isinstance(dump['XBLOCK_MIXINS'], list)
 
-    # Check: objects (like classes) are repr'd
-    assert "<class 'xmodule.x_module.XModuleMixin'>" in dump['XBLOCK_MIXINS']
+    # Check: classes are converted to dicts of info on the class location
+    assert {"module": "xmodule.x_module", "qualname": "XModuleMixin"} in dump['XBLOCK_MIXINS']
 
     # Check: nested dictionaries come through OK, and int'l strings are just strings
     assert dump['COURSE_ENROLLMENT_MODES']['audit']['display_name'] == "Audit"

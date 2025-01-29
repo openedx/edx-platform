@@ -33,13 +33,14 @@ class Command(BaseCommand):
     * _("hello") # <-- this will become just "hello"
     * "hello"
 
-    Furthermore, objects which are not easily JSON-ifiable will stringified using their `repr(...)`, e.g.:
-    * "Path('my/path')"                                                # a Path object
-    * "<lms.myapp.MyClass object at 0x704599fa2fd0>"                   # some random class instance
-    * "<_io.TextIOWrapper name='<stderr>' mode='w' encoding='utf-8'>"  # sys.stderr
+    Furthermore, functions and classes are printed as JSON objects like:
+    {
+        "module": "path.to.module",
+        "qualname": "MyClass.MyInnerClass.my_method",  // Or, "<lambda>"
+        "source_hint": "MY_SETTING = lambda: x + y",  // For <lambda>s only
+    }
 
-    and lambdas are printed by *roughly* printing out their source lines (it's impossible in Python to get the *exact*
-    source code, as it's been compiled into bytecode).
+    And everything else will be stringified as its `repr(...)`.
     """
 
     def handle(self, *args, **kwargs):
@@ -82,12 +83,18 @@ def _to_json_friendly_repr(value: object) -> object:
             # Print gettext_lazy as simply the wrapped string
             return proxy_args[0]
     try:
+        module = value.__module__
         qualname = value.__qualname__
     except AttributeError:
         pass
     else:
-        if qualname == "<lambda>":
-            # Handle lambdas by printing the source lines
-            return "lambda defined with line(s): " + inspect.getsource(value).strip()
+        # Handle functions and classes by printing their location (plus approximate source, for lambdas)
+        return {
+            "module": module,
+            "qualname": qualname,
+            **({
+                "source_hint": inspect.getsource(value).strip(),
+            } if qualname == "<lambda>" else {}),
+        }
     # For all other objects, print the repr
     return repr(value)
