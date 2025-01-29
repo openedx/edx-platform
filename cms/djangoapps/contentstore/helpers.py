@@ -262,7 +262,9 @@ class StaticFileNotices:
     error_files: list[str] = Factory(list)
 
 
-def _insert_static_files_into_downstream_xblock(downstream_xblock: XBlock, staged_content_id: int, request) -> StaticFileNotices:
+def _insert_static_files_into_downstream_xblock(
+    downstream_xblock: XBlock, staged_content_id: int, request
+) -> StaticFileNotices:
     """
     Gets static files from staged content, and inserts them into the downstream XBlock.
     """
@@ -273,7 +275,6 @@ def _insert_static_files_into_downstream_xblock(downstream_xblock: XBlock, stage
         static_files=static_files,
         usage_key=downstream_xblock.scope_ids.usage_id,
     )
-
 
     # Rewrite the OLX's static asset references to point to the new
     # locations for those assets. See _import_files_into_course for more

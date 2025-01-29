@@ -14,7 +14,7 @@ from openedx_learning.lib.fields import case_insensitive_char_field, MultiCollat
 
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
-from .data import CLIPBOARD_PURPOSE, LIBRARY_SYNC_PURPOSE, StagedContentStatus
+from .data import CLIPBOARD_PURPOSE, StagedContentStatus
 
 log = logging.getLogger(__name__)
 
