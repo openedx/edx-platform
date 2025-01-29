@@ -4311,18 +4311,28 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
+############## Settings for JWT token handling ##############
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'http://127.0.0.1:8740',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_SUPPORTED_VERSION': '1.2.0',
+    'JWT_PRIVATE_SIGNING_JWK': None,
     'JWT_PUBLIC_SIGNING_JWK_SET': None,
 }
+
+# NOTE: In order to create both JWT_PRIVATE_SIGNING_JWK and JWT_PUBLIC_SIGNING_JWK_SET,
+# in an  lms shell  run the following  command:
+# > python manage.py lms generate_jwt_signing_key
+# This will output asymmetric JWTs to use here. Read more on this on:
+# https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
 
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
 COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
+# time between scheduled runs, in seconds
+NOTIFY_CREDENTIALS_FREQUENCY = 14400
 
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'

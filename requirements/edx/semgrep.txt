@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-attrs==24.3.0
+attrs==25.1.0
     # via
     #   glom
     #   jsonschema
@@ -34,7 +34,7 @@ colorama==0.4.6
     # via semgrep
 defusedxml==0.7.1
     # via semgrep
-deprecated==1.2.15
+deprecated==1.2.18
     # via
     #   opentelemetry-api
     #   opentelemetry-exporter-otlp-proto-http
@@ -92,13 +92,13 @@ packaging==24.2
     # via semgrep
 peewee==3.17.8
     # via semgrep
-protobuf==4.25.5
+protobuf==4.25.6
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
 pygments==2.19.1
     # via rich
-referencing==0.35.1
+referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -116,13 +116,14 @@ ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.101.0
+semgrep==1.104.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
 typing-extensions==4.12.2
     # via
     #   opentelemetry-sdk
+    #   referencing
     #   semgrep
 urllib3==2.2.3
     # via
@@ -131,7 +132,7 @@ urllib3==2.2.3
     #   semgrep
 wcmatch==8.5.2
     # via semgrep
-wrapt==1.17.0
+wrapt==1.17.2
     # via
     #   deprecated
     #   opentelemetry-instrumentation

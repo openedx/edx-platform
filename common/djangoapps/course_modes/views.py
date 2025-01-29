@@ -29,7 +29,6 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.helpers import get_course_final_price, get_verified_track_links
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.date_utils import strftime_localized_html
-from edx_toggles.toggles import WaffleFlag  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
@@ -46,17 +45,6 @@ from common.djangoapps.util.db import outer_atomic
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 LOG = logging.getLogger(__name__)
-
-# .. toggle_name: course_modes.use_new_track_selection
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new track selection template for testing purposes before full rollout
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-8-23
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: REV-2133
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-VALUE_PROP_TRACK_SELECTION_FLAG = WaffleFlag('course_modes.use_new_track_selection', __name__)
 
 
 class ChooseModeView(View):
@@ -158,18 +146,6 @@ class ChooseModeView(View):
             )
             return redirect('{}?{}'.format(reverse('dashboard'), params))
 
-        # When a credit mode is available, students will be given the option
-        # to upgrade from a verified mode to a credit mode at the end of the course.
-        # This allows students who have completed photo verification to be eligible
-        # for university credit.
-        # Since credit isn't one of the selectable options on the track selection page,
-        # we need to check *all* available course modes in order to determine whether
-        # a credit mode is available.  If so, then we show slightly different messaging
-        # for the verified track.
-        has_credit_upsell = any(
-            CourseMode.is_credit_mode(mode) for mode
-            in CourseMode.modes_for_course(course_key, only_selectable=False)
-        )
         course_id = str(course_key)
         gated_content = ContentTypeGatingConfig.enabled_for_enrollment(
             user=request.user,
@@ -184,7 +160,6 @@ class ChooseModeView(View):
             ),
             "modes": modes,
             "is_single_mode": is_single_mode,
-            "has_credit_upsell": has_credit_upsell,
             "course_name": course.display_name_with_default,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
@@ -203,14 +178,6 @@ class ChooseModeView(View):
                 request.user,
             )
         )
-
-        title_content = ''
-        if enrollment_mode:
-            title_content = _("Congratulations!  You are now enrolled in {course_name}").format(
-                course_name=course.display_name_with_default
-            )
-
-        context["title_content"] = title_content
 
         if "verified" in modes:
             verified_mode = modes["verified"]
@@ -266,19 +233,12 @@ class ChooseModeView(View):
             context['audit_access_deadline'] = formatted_audit_access_date
         fbe_is_on = deadline and gated_content
 
-        # Route to correct Track Selection page.
-        # REV-2378 TODO Value Prop: remove waffle flag after all edge cases for track selection are completed.
-        if VALUE_PROP_TRACK_SELECTION_FLAG.is_enabled():
-            if not enterprise_customer_for_request(request):  # TODO: Remove by executing REV-2342
-                if error:
-                    return render_to_response("course_modes/error.html", context)
-                if fbe_is_on:
-                    return render_to_response("course_modes/fbe.html", context)
-                else:
-                    return render_to_response("course_modes/unfbe.html", context)
-
-        # If enterprise_customer, failover to old choose.html page
-        return render_to_response("course_modes/choose.html", context)
+        if error:
+            return render_to_response("course_modes/error.html", context)
+        if fbe_is_on:
+            return render_to_response("course_modes/fbe.html", context)
+        else:
+            return render_to_response("course_modes/unfbe.html", context)
 
     @method_decorator(transaction.non_atomic_requests)
     @method_decorator(login_required)

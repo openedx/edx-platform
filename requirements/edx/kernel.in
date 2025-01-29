@@ -84,7 +84,6 @@ edx-rest-api-client
 edx-search
 edx-submissions
 edx-toggles                         # Feature toggles management
-edx-token-utils			    # Validate exam access tokens
 edx-when
 edxval
 event-tracking

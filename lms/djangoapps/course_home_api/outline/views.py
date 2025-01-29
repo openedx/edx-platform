@@ -501,7 +501,7 @@ class CourseNavigationBlocksView(RetrieveAPIView):
             for section_data in course_sections:
                 section_data['children'] = self.get_accessible_sequences(
                     user_course_outline,
-                    section_data.get('children', ['completion'])
+                    section_data.get('children', [])
                 )
                 accessible_sequence_ids = {str(usage_key) for usage_key in user_course_outline.accessible_sequences}
                 for sequence_data in section_data['children']:
