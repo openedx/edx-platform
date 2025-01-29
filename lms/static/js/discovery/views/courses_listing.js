@@ -68,7 +68,7 @@
                             currentCourses.push(course);
                         } else if ((course_start > currentDate) && ((course_end >= currentDate) || (course_end === undefined))) {
                             upcomingCourses.push(course);
-                        } else if ((course_start < currentDate) && ((course_end >= currentDate) || (course_end === undefined))) {
+                        } else if ((course_start < currentDate) && ((course_end <= currentDate) || (course_end === undefined))) {
                             pastCourses.push(course);
                         }
                     }
