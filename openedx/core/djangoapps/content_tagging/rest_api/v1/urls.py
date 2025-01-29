@@ -3,6 +3,7 @@ Taxonomies API v1 URLs.
 """
 
 from django.urls.conf import include, path
+from drf_yasg.utils import swagger_auto_schema
 from openedx_tagging.core.tagging.rest_api.v1 import views as oel_tagging_views
 from openedx_tagging.core.tagging.rest_api.v1 import views_import as oel_tagging_views_import
 from openedx_tagging.core.tagging.rest_api.v1.views import ObjectTagCountsView
@@ -14,6 +15,7 @@ router = DefaultRouter()
 router.register("taxonomies", views.TaxonomyOrgView, basename="taxonomy")
 router.register("object_tags", views.ObjectTagOrgView, basename="object_tag")
 router.register("object_tag_counts", ObjectTagCountsView, basename="object_tag_counts")
+swagger_auto_schema(auto_schema=None)(ObjectTagCountsView)
 
 urlpatterns = [
     path(
