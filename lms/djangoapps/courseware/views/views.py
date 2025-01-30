@@ -41,7 +41,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_filters.learning.filters import CourseAboutRenderStarted, RenderXBlockStarted
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
@@ -2284,7 +2284,7 @@ def get_financial_aid_courses(user, course_id=None):
                 enrollment.course_overview and \
                 enrollment.course_overview.eligible_for_financial_aid and \
                 CourseMode.objects.filter(
-                    Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(UTC)),
+                    Q(_expiration_datetime__isnull=True) | Q(_expiration_datetime__gt=datetime.now(ZoneInfo("UTC"))),
                     course_id=enrollment.course_id,
                     mode_slug=CourseMode.VERIFIED).exists():
             # This is a workaround to set course_id before disabling the field in case of new financial assistance flow.

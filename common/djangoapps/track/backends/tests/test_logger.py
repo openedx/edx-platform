@@ -32,6 +32,6 @@ def test_logger_backend(caplog):
         'time': '2012-05-01T07:27:01.000200+00:00',
         'date': '2012-05-07'
     }
-
+    print('ola-- ', saved_events[0], unpacked_event)
     assert saved_events[0] == unpacked_event
     assert saved_events[1] == unpacked_event

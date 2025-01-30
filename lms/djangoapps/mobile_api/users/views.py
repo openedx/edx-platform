@@ -8,7 +8,6 @@ import logging
 from functools import cached_property
 from typing import Dict, List, Optional, Set
 
-import pytz
 from completion.exceptions import UnavailableCompletionData
 from completion.models import BlockCompletion
 from completion.utilities import get_key_to_last_completed_block
@@ -25,6 +24,7 @@ from rest_framework import generics, views
 from rest_framework.decorators import api_view
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
+from zoneinfo import ZoneInfo
 from xblock.fields import Scope
 from xblock.runtime import KeyValueStore
 from edx_rest_framework_extensions.paginators import DefaultPagination
@@ -597,7 +597,7 @@ class UserEnrollmentsStatus(views.APIView):
         """
         Gets user's enrollments status.
         """
-        active_status_date = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=30)
+        active_status_date = datetime.datetime.now(ZoneInfo('UTC')) - datetime.timedelta(days=30)
         username = kwargs.get('username')
         course_ids_where_user_has_completions = self._get_course_ids_where_user_has_completions(
             username,

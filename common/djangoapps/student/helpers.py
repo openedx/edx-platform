@@ -20,7 +20,7 @@ from django.core.validators import ValidationError
 from django.db import IntegrityError, ProgrammingError, transaction
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import gettext as _
-from pytz import UTC, timezone
+from zoneinfo import ZoneInfo
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.course_modes.models import CourseMode
@@ -191,7 +191,7 @@ def check_verify_status_by_course(user, course_enrollments):
                 relevant_verification.status not in ["created", "ready"]
             )
             if status is None and not submitted:
-                if deadline is None or deadline > datetime.now(UTC):
+                if deadline is None or deadline > datetime.now(ZoneInfo("UTC")):
                     if IDVerificationService.user_is_verified(user) and verification_expiring_soon:
                         # The user has an active verification, but the verification
                         # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
@@ -221,7 +221,7 @@ def check_verify_status_by_course(user, course_enrollments):
             if status is not None:
                 days_until_deadline = None
 
-                now = datetime.now(UTC)
+                now = datetime.now(ZoneInfo("UTC"))
                 if deadline is not None and deadline > now:
                     days_until_deadline = (deadline - now).days
 
@@ -866,7 +866,7 @@ def get_course_dates_for_email(user, course_id, request):
     would be after today.
     """
     user_timezone_locale = user_timezone_locale_prefs(request)
-    user_timezone = timezone(user_timezone_locale['user_timezone'] or str(UTC))
+    user_timezone = ZoneInfo(user_timezone_locale['user_timezone'] or str(ZoneInfo("UTC")))
 
     course = get_course_with_access(user, 'load', course_id)
     date_blocks = get_course_date_blocks(course, user, request, include_access=True, include_past_dates=True)
@@ -886,7 +886,7 @@ def get_course_dates_for_email(user, course_id, request):
     course_date_list = [{**course_date, }, {**course_date, 'date': today}, {**course_date}]
     for block in blocks:
         block_date = datetime.strptime(block.get('date')[:19], '%Y-%m-%dT%H:%M:%S')
-        block_date = block_date.replace(tzinfo=UTC)
+        block_date = block_date.replace(tzinfo=ZoneInfo('UTC'))
         block_date = block_date.astimezone(user_timezone)
 
         if block_date < today:
