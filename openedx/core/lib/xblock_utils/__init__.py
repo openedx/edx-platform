@@ -102,30 +102,13 @@ def wrap_xblock(
     if context:
         data.update(context.get('wrap_xblock_data', {}))
 
-    css_classes = [
-        'xblock',
-        f'xblock-{markupsafe.escape(view)}',
-        'xblock-{}-{}'.format(
-            markupsafe.escape(view),
-            markupsafe.escape(block.scope_ids.block_type),
-        )
-    ]
-
+    view_safe = markupsafe.escape(view)
+    block_type_safe = markupsafe.escape(block.scope_ids.block_type)
+    css_classes = ['xblock', f'xblock-{view_safe}', f'xblock-{view_safe}-{block_type_safe}']
+    if view in PREVIEW_VIEWS:
+        css_classes += ['xblock-display', f'xblock-display-{block_type_safe}']
     if view == STUDENT_VIEW and getattr(block, 'HIDDEN', False):
         css_classes.append('is-hidden')
-
-    # TODO: This special case will be removed when we update the SCSS under
-    #       xmodule/assets to use the standard XBlock CSS classes.
-    #       See https://github.com/openedx/edx-platform/issues/32617.
-    if getattr(block, 'uses_xmodule_styles_setup', False):
-        if view in PREVIEW_VIEWS:
-            # The block is acting as an XModule
-            css_classes.append('xmodule_display')
-        elif view == STUDIO_VIEW:
-            # The block is acting as an XModuleDescriptor
-            css_classes.append('xmodule_edit')
-
-        css_classes.append('xmodule_' + markupsafe.escape(class_name))
 
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
