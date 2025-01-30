@@ -574,7 +574,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.6.5
+edx-enterprise==5.6.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1048,7 +1048,7 @@ openedx-filters==1.12.0
     #   ora2
 openedx-forum==0.1.6
     # via -r requirements/edx/base.txt
-openedx-learning==0.18.1
+openedx-learning==0.18.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

@@ -81,6 +81,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateResponseMixin, View
+from drf_yasg.utils import swagger_auto_schema
 from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
 from pylti1p3.exception import LtiException, OIDCException
 
@@ -201,8 +202,10 @@ class LibraryRootView(GenericAPIView):
     """
     Views to list, search for, and create content libraries.
     """
+    serializer_class = ContentLibraryMetadataSerializer
 
     @apidocs.schema(
+        responses={200: ContentLibraryMetadataSerializer(many=True)},
         parameters=[
             *LibraryApiPaginationDocs.apidoc_params,
             apidocs.query_parameter(
@@ -530,7 +533,13 @@ class LibraryPasteClipboardView(GenericAPIView):
     """
     Paste content of clipboard into Library.
     """
+    serializer_class = LibraryXBlockMetadataSerializer
+
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=LibraryPasteClipboardSerializer,
+        responses={200: LibraryXBlockMetadataSerializer}
+    )
     def post(self, request, lib_key_str):
         """
         Import the contents of the user's clipboard and paste them into the Library
@@ -558,6 +567,7 @@ class LibraryBlocksView(GenericAPIView):
     """
     Views to work with XBlocks in a specific content library.
     """
+    serializer_class = LibraryXBlockMetadataSerializer
 
     @apidocs.schema(
         parameters=[
@@ -595,6 +605,10 @@ class LibraryBlocksView(GenericAPIView):
         return self.get_paginated_response(serializer.data)
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=LibraryXBlockCreationSerializer,
+        responses={200: LibraryXBlockMetadataSerializer}
+    )
     def post(self, request, lib_key_str):
         """
         Add a new XBlock to this content library
@@ -870,6 +884,9 @@ class LibraryImportTaskViewSet(GenericViewSet):
     Import blocks from Courseware through modulestore.
     """
 
+    queryset = []  # type: ignore[assignment]
+    serializer_class = ContentLibraryBlockImportTaskSerializer
+
     @convert_exceptions
     def list(self, request, lib_key_str):
         """
@@ -889,6 +906,10 @@ class LibraryImportTaskViewSet(GenericViewSet):
         )
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=ContentLibraryBlockImportTaskCreateSerializer,
+        responses={200: ContentLibraryBlockImportTaskSerializer}
+    )
     def create(self, request, lib_key_str):
         """
         Create and queue an import tasks for this library.
