@@ -3,6 +3,7 @@ Tests for the course updates page.
 """
 
 from datetime import datetime
+from unittest import mock
 
 from django.urls import reverse
 from pytz import UTC
@@ -27,6 +28,12 @@ def course_updates_url(course):
     )
 
 
+@mock.patch.dict(
+    'django.conf.settings.FEATURES',
+    {
+        'ENABLE_ENTERPRISE_INTEGRATION': False,
+    }
+)
 class TestCourseUpdatesPage(BaseCourseUpdatesTestCase):
     """
     Test the course updates page.

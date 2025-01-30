@@ -41,6 +41,7 @@ QUERY_COUNT_TABLE_IGNORELIST = WAFFLE_TABLES
     'django.conf.settings.FEATURES',
     {
         'ENABLE_XBLOCK_VIEW_ENDPOINT': True,
+        'ENABLE_ENTERPRISE_INTEGRATION': False,
     }
 )
 @ddt.ddt
