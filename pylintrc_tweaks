@@ -40,12 +40,6 @@ disable+ =
     superfluous-parens,
     logging-not-lazy,
     broad-exception-caught,
-    no-else-raise,
-    pointless-exception-statement,
-    consider-using-join,
-    use-yield-from,
-    used-before-assignment,
-
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
