@@ -167,7 +167,7 @@ def validate_video_block(request, locator):
     """
     error, item = None, None
     try:
-        item, _isLibraryContent = _get_item(request, {'locator': locator})
+        item = _get_item(request, {'locator': locator})
         if item.category != 'video':
             error = _('Transcripts are supported only for "video" blocks.')
 
@@ -334,7 +334,7 @@ def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statem
     }
 
     try:
-        __, videos, item, isLibraryContent = _validate_transcripts_data(request)
+        __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(transcripts_presence, str(e))
 
@@ -352,10 +352,9 @@ def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statem
                 transcripts_presence,
                 youtube_id,
                 item,
-                isLibraryContent,
             )
 
-        if not isLibraryContent:
+        if not isinstance(item.usage_key, UsageKeyV2):
             filename = f'subs_{item.sub}.srt.sjson'
             content_location = StaticContent.compute_location(item.location.course_key, filename)
             try:
@@ -385,7 +384,7 @@ def check_transcripts(request):  # lint-amnesty, pylint: disable=too-many-statem
     return JsonResponse(transcripts_presence)
 
 
-def _check_youtube_transcripts(transcripts_presence, youtube_id, item, isLibraryContent):
+def _check_youtube_transcripts(transcripts_presence, youtube_id, item):
     """
     Check for youtube transcripts presence
     """
@@ -394,7 +393,7 @@ def _check_youtube_transcripts(transcripts_presence, youtube_id, item, isLibrary
     if get_transcript_link_from_youtube(youtube_id):
         transcripts_presence['youtube_server'] = True
 
-    if not isLibraryContent:
+    if not isinstance(item.usage_key, UsageKeyV2):
         # youtube local
         filename = f'subs_{youtube_id}.srt.sjson'
         content_location = StaticContent.compute_location(item.location.course_key, filename)
@@ -489,7 +488,6 @@ def _validate_transcripts_data(request):
         data: dict, loaded json from request,
         videos: parsed `data` to useful format,
         item:  video item from storage or library
-        isLibraryContent: `True` if the item is a library content
 
     Raises `TranscriptsRequestValidationException` if validation is unsuccessful
     or `PermissionDenied` if user has no access.
@@ -498,7 +496,7 @@ def _validate_transcripts_data(request):
     if not data:
         raise TranscriptsRequestValidationException(_('Incoming video data is empty.'))
     try:
-        item, isLibraryContent = _get_item(request, data)
+        item = _get_item(request, data)
     except (InvalidKeyError, ItemNotFoundError):
         raise TranscriptsRequestValidationException(_("Can't find item by locator."))  # lint-amnesty, pylint: disable=raise-missing-from
 
@@ -517,7 +515,7 @@ def _validate_transcripts_data(request):
             if videos['html5'].get('video') != video_data['video']:
                 videos['html5'][video_data['video']] = video_data['mode']
 
-    return data, videos, item, isLibraryContent
+    return data, videos, item
 
 
 def validate_transcripts_request(request, include_yt=False, include_html5=False):
@@ -723,7 +721,7 @@ def _get_item(request, data):
                 request.user,
                 lib_api.lib_permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
             )
-            return xblock_api.load_block(usage_key, request.user), True
+            return xblock_api.load_block(usage_key, request.user)
         raise TranscriptsRequestValidationException(_('Transcripts are not yet supported for this type of block'))
     # This is placed before has_course_author_access() to validate the location,
     # because has_course_author_access() raises error if location is invalid.
@@ -733,4 +731,4 @@ def _get_item(request, data):
     if not has_course_author_access(request.user, item.location.course_key):
         raise PermissionDenied()
 
-    return item, False
+    return item
