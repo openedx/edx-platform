@@ -118,10 +118,12 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     #     for key in itertools.chain([block.scope_ids.usage_id], getattr(block, 'children', []))
     # }
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    cms_root_url = configuration_helpers.get_value('CMS_ROOT_URL', settings.CMS_ROOT_URL)
     context = {
         'fragment': fragment,
         'handler_urls_json': json.dumps(handler_urls),
         'lms_root_url': lms_root_url,
+        'cms_root_url': cms_root_url,
         'view_name': view_name,
         'is_development': settings.DEBUG,
     }
