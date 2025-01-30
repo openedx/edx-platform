@@ -63,7 +63,7 @@ urlpatterns = [
         authoring_videos.VideoEncodingsDownloadView.as_view(), name='cms_api_videos_encodings'
     ),
     re_path(
-        fr'grading/{settings.COURSE_ID_PATTERN}',
+        fr'grading/{settings.COURSE_ID_PATTERN}$',
         AuthoringGradingView.as_view(), name='cms_api_update_grading'
     ),
     path(
