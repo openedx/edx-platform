@@ -401,7 +401,7 @@ def _check_youtube_transcripts(transcripts_presence, youtube_id, item, isLibrary
         except NotFoundError:
             log.debug("Can't find transcripts in storage for youtube id: %s", youtube_id)
 
-    #check youtube local and server transcripts for equality
+    # check youtube local and server transcripts for equality
     if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
         try:
             transcript_links = get_transcript_links_from_youtube(

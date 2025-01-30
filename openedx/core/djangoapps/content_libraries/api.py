@@ -1953,5 +1953,5 @@ def import_blocks_create_task(library_key, course_key, use_course_key_as_block_i
              f"celery_task={result.id}")
     return import_task
 
-# To enable use content library permissions as public API
+# Allow content library permissions to be used in the public API
 lib_permissions = permissions

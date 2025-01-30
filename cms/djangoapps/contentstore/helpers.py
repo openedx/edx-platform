@@ -631,7 +631,7 @@ def _import_file_into_course(
             content.thumbnail_location = thumbnail_location
         contentstore().save(content)
         if usage_key.block_type == 'video':
-            # Adding transcripts to VAL using the nex edx_video_id
+            # Adding transcripts to VAL using the new edx_video_id
             language_code = next((k for k, v in block.transcripts.items() if v == filename), None)
             if language_code:
                 sjson_subs = Transcript.convert(
