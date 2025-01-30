@@ -1009,7 +1009,7 @@ pyyaml==6.0.2
     #   xblock
 random2==1.0.2
     # via -r requirements/edx/kernel.in
-recommender-xblock @ git+https://github.com/openedx/RecommenderXBlock@navin/remove-mustache
+recommender-xblock @ git+https://github.com/openedx/RecommenderXBlock@navin/tmp/investigate
     # via -r requirements/edx/bundled.in
 redis==5.2.1
     # via
