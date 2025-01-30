@@ -20,11 +20,13 @@ from lxml import etree
 from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
+
 
 from .bumper_utils import get_bumper_settings
 
@@ -498,18 +500,17 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     remove_subs_from_store(video_id, item, lang)
 
         reraised_message = ''
-        for lang in new_langs:  # 3b
-            try:
-                generate_sjson_for_all_speeds(
-                    item,
-                    item.transcripts[lang],
-                    {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
-                    lang,
-                )
-            except TranscriptException:
-                pass
-            except AttributeError:
-                pass
+        if not isinstance(item.usage_key.context_key, LibraryLocatorV2):
+            for lang in new_langs:  # 3b
+                try:
+                    generate_sjson_for_all_speeds(
+                        item,
+                        item.transcripts[lang],
+                        {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
+                        lang,
+                    )
+                except TranscriptException:
+                    pass
         if reraised_message:
             item.save_with_metadata(user)
             raise TranscriptException(reraised_message)
