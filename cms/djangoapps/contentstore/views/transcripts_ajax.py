@@ -86,6 +86,9 @@ def link_video_to_component(video_component, user):
         edx_video_id = create_external_video(display_name='external video')
 
         if isinstance(video_component.usage_key, UsageKeyV2):
+            # `edx_video_id` is not used in the new runtime,
+            # also saving it generates errors.
+            # See `parse_xml_new_runtime()` in `video_block.py`
             return edx_video_id
 
         video_component.edx_video_id = edx_video_id
