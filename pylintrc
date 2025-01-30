@@ -321,11 +321,6 @@ disable =
 	superfluous-parens,
 	logging-not-lazy,
 	broad-exception-caught,
-	no-else-raise,
-	pointless-exception-statement,
-	consider-using-join,
-	use-yield-from,
-	used-before-assignment,
 
 [REPORTS]
 output-format = text
@@ -422,4 +417,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = builtins.Exception
 
-# 86de3cc2b03ecf7e6f6f9f2d5f790bb9e7c3eb4c
+# 85c3d025c367597a0a7b23a05fdde9d8c63e1374
