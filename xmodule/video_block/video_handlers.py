@@ -596,15 +596,19 @@ class VideoStudioViewHandlers:
             delete_video_transcript(video_id=edx_video_id, language_code=language)
 
         if isinstance(self.scope_ids.usage_id.context_key, LibraryLocatorV2):
-            transcript_file_path = f"static/{self.transcripts.pop(language, None)}"
-            lib_api.delete_library_block_static_asset_file(self.scope_ids.usage_id, transcript_file_path)
-            field = self.fields['transcripts']
-            if self.transcripts:
-                transcripts_copy = self.transcripts.copy()
-                field.delete_from(self)
-                field.write_to(self, transcripts_copy)
-            else:
-                field.delete_from(self)
+            transcript_name = self.transcripts.pop(language, None)
+            if transcript_name:
+                lib_api.delete_library_block_static_asset_file(
+                    self.scope_ids.usage_id,
+                    f"static/{transcript_name}",
+                )
+                field = self.fields['transcripts']
+                if self.transcripts:
+                    transcripts_copy = self.transcripts.copy()
+                    field.delete_from(self)
+                    field.write_to(self, transcripts_copy)
+                else:
+                    field.delete_from(self)
         else:
             if language == 'en':
                 # remove any transcript file from content store for the video ids
