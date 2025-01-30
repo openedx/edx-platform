@@ -51,16 +51,15 @@ class Command(BaseCommand):
             tarball = tasks.create_export_tarball(library, library_key, {}, None)
         except Exception as e:
             raise CommandError(f'Failed to export "{library_key}" with "{e}"')  # lint-amnesty, pylint: disable=raise-missing-from
-        else:
-            with tarball:
-                # Save generated archive with keyed filename
-                prefix, suffix, n = str(library_key).replace(':', '+'), '.tar.gz', 0
-                while os.path.exists(prefix + suffix):
-                    n += 1
-                    prefix = '{}_{}'.format(prefix.rsplit('_', 1)[0], n) if n > 1 else f'{prefix}_1'
-                filename = prefix + suffix
-                target = os.path.join(dest_path, filename)
-                tarball.file.seek(0)
-                with open(target, 'wb') as f:
-                    shutil.copyfileobj(tarball.file, f)
-                print(f'Library "{library.location.library_key}" exported to "{target}"')
+        with tarball:
+            # Save generated archive with keyed filename
+            prefix, suffix, n = str(library_key).replace(':', '+'), '.tar.gz', 0
+            while os.path.exists(prefix + suffix):
+                n += 1
+                prefix = '{}_{}'.format(prefix.rsplit('_', 1)[0], n) if n > 1 else f'{prefix}_1'
+            filename = prefix + suffix
+            target = os.path.join(dest_path, filename)
+            tarball.file.seek(0)
+            with open(target, 'wb') as f:
+                shutil.copyfileobj(tarball.file, f)
+            print(f'Library "{library.location.library_key}" exported to "{target}"')
