@@ -248,7 +248,7 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
 
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     @patch.object(downstreams_views, "sync_from_upstream")
-    @patch.object(downstreams_views, "import_staged_content_for_library_sync", return_value=StaticFileNotices())
+    @patch.object(downstreams_views, "import_static_assets_for_library_sync", return_value=StaticFileNotices())
     def test_200(self, mock_sync_from_upstream, mock_import_staged_content):
         """
         Does the happy path work?

@@ -80,7 +80,7 @@ from .xblock_helpers import usage_key_with_run
 from ..helpers import (
     get_parent_xblock,
     import_staged_content_from_user_clipboard,
-    import_staged_content_for_library_sync,
+    import_static_assets_for_library_sync,
     is_unit,
     xblock_embed_lms_url,
     xblock_lms_url,
@@ -607,7 +607,7 @@ def _create_block(request):
                 f"using provided library_content_key='{upstream_ref}'"
             )
             return JsonResponse({"error": str(exc)}, status=400)
-        static_file_notices = import_staged_content_for_library_sync(created_block, lib_block, request)
+        static_file_notices = import_static_assets_for_library_sync(created_block, lib_block, request)
         modulestore().update_item(created_block, request.user.id)
         response["upstreamRef"] = upstream_ref
         response["static_file_notices"] = asdict(static_file_notices)

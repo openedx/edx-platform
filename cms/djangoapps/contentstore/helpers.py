@@ -348,10 +348,7 @@ def import_static_assets_for_library_sync(downstream_xblock: XBlock, lib_block: 
     Returns a summary of changes made to static files in the destination
     course.
     """
-    if not XBlockSerializer(
-        lib_block,
-        fetch_asset_data=True,
-    ).static_files:
+    if not lib_block.runtime.get_block_assets(lib_block, fetch_asset_data=False):
         return StaticFileNotices()
     if not content_staging_api:
         raise RuntimeError("The required content_staging app is not installed")
