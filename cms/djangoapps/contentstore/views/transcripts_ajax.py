@@ -689,7 +689,11 @@ def replace_transcripts(request):
                 json_content,
                 language_code,
             )
+            if not success:
+                break
+            video.transcripts[language_code] = f"{edx_video_id}-{language_code}.srt"
         if success:
+            video.save()
             response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
         else:
             response = error_response({}, _('There is a problem with the YouTube transcript file.'))
