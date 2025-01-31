@@ -18,7 +18,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotAuthorized, UserNotFound
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
 from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
 from common.djangoapps.student.models import User
 
@@ -42,21 +41,10 @@ def learner_profile(request, username):
     Example usage:
         GET /account/profile
     """
-    if should_redirect_to_profile_microfrontend():
-        profile_microfrontend_url = f"{settings.PROFILE_MICROFRONTEND_URL}{username}"
-        if request.GET:
-            profile_microfrontend_url += f'?{request.GET.urlencode()}'
-        return redirect(profile_microfrontend_url)
-
-    try:
-        context = learner_profile_context(request, username, request.user.is_staff)
-        return render(
-            request=request,
-            template_name='learner_profile/learner_profile.html',
-            context=context
-        )
-    except (UserNotAuthorized, UserNotFound, ObjectDoesNotExist):
-        raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
+    profile_microfrontend_url = f"{settings.PROFILE_MICROFRONTEND_URL}{username}"
+    if request.GET:
+        profile_microfrontend_url += f'?{request.GET.urlencode()}'
+    return redirect(profile_microfrontend_url)
 
 
 def learner_profile_context(request, profile_username, user_is_staff):

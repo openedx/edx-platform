@@ -1,6 +1,7 @@
 """
 Test that various filters are fired for views in the certificates app.
 """
+from django.conf import settings
 from django.http import HttpResponse
 from django.test import override_settings
 from django.urls import reverse
@@ -110,7 +111,7 @@ class TestAccountSettingsFilters(SharedModuleStoreTestCase):
             password="password",
         )
         self.client.login(username=self.user.username, password="password")
-        self.account_settings_url = '/account/settings'
+        self.account_settings_url = settings.ACCOUNT_MICROFRONTEND_URL
 
     @override_settings(
         OPEN_EDX_FILTERS_CONFIG={
