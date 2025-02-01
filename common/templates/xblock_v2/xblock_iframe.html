@@ -291,66 +291,78 @@
                 blockJS.element = element;
 
                 if (['MetadataOnlyEditingDescriptor', 'SequenceDescriptor'].includes(data['xmodule-type'])) {
-                  // The xmodule type `MetadataOnlyEditingDescriptor` renders a `<div>` with
-                  // the block metadata in the `data-metadata` attribute. But is necessary
-                  // to call `XBlockEditorView.xblockReady()` to run the scripts to build the
-                  // editor using the metadata.
-                  require(['{{ cms_root_url }}/static/studio/js/views/xblock_editor.js'], function(XBlockEditorView) {
-                    var editorView = new XBlockEditorView({
-                        el: element
-                    });
-                    // To render block using metadata
-                    editorView.xblockReady(blockJS);
+                    // The xmodule type `MetadataOnlyEditingDescriptor` renders a `<div>` with
+                    // the block metadata in the `data-metadata` attribute. But is necessary
+                    // to call `XBlockEditorView.xblockReady()` to run the scripts to build the
+                    // editor using the metadata.
+                    require(['{{ cms_root_url }}/static/studio/js/views/xblock_editor.js'], function(XBlockEditorView) {
+                        var editorView = new XBlockEditorView({
+                            el: element,
+                            xblock: blockJS,
+                        });
+                        // To render block using metadata
+                        editorView.xblockReady(blockJS);
 
-                    // Adding cancel and save buttons
-                    var xblockActions = `
-                        <div class="xblock-actions">
-                            <ul>
-                                <li class="action-item">
-                                    <input id="poll-submit-options" type="submit" class="button action-primary save-button" value="Save" onclick="return false;">
-                                </li>
-                                <li class="action-item">
-                                    <a href="#" class="button cancel-button">Cancel</a>
-                                </li>
-                            </ul>
-                        </div>
-                    `;
-                    element.innerHTML += xblockActions;
+                        // Adding cancel and save buttons
+                        var xblockActions = `
+                            <div class="xblock-actions">
+                                <ul>
+                                    <li class="action-item">
+                                        <input id="poll-submit-options" type="submit" class="button action-primary save-button" value="Save" onclick="return false;">
+                                    </li>
+                                    <li class="action-item">
+                                        <a href="#" class="button cancel-button">Cancel</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        `;
+                        element.innerHTML += xblockActions;
 
-                    // Adding cancel functionality
-                    $('.cancel-button', element).bind('click', function() {
-                        runtime.notify('cancel', {});
-                        event.preventDefault();
-                    });
-
-                    // Adding save functionality
-                    $('.save-button', element).bind('click', function() {
-                        event.preventDefault();
-                        var error_message_div = $('.xblock-editor-error-message', element);
-                        const modifiedData = editorView.getChangedMetadata();
-
-                        error_message_div.html();
-                        error_message_div.css('display', 'none');
-
-                        var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
-
-                        runtime.notify('save', {state: 'start', message: gettext("Saving")});
-
-                        $.post(handlerUrl, JSON.stringify(modifiedData)).done(function(response) {
-                            if (response.result === 'success') {
-                                runtime.notify('save', {state: 'end'})
-                                window.location.reload(false);
-                            } else {
-                                runtime.notify('error', {
-                                    'title': 'Error saving changes',
-                                    'message': response.message,
+                        const views = editorView.getMetadataEditor().views;
+                        Object.values(views).forEach(view => {
+                            const uniqueId = view.uniqueId;
+                            const input = element.querySelector(`#${uniqueId}`);
+                            if (input) {
+                                input.addEventListener("input", function(event) {
+                                    view.model.setValue(event.target.value);
                                 });
-                                error_message_div.html('Error: '+response.message);
-                                error_message_div.css('display', 'block');
                             }
-                        });                      
+                        });
+
+                        // Adding cancel functionality
+                        $('.cancel-button', element).bind('click', function() {
+                            runtime.notify('cancel', {});
+                            event.preventDefault();
+                        });
+
+                        // Adding save functionality
+                        $('.save-button', element).bind('click', function() {
+                            //event.preventDefault();
+                            var error_message_div = $('.xblock-editor-error-message', element);
+                            const modifiedData = editorView.getChangedMetadata();
+
+                            error_message_div.html();
+                            error_message_div.css('display', 'none');
+
+                            var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
+
+                            runtime.notify('save', {state: 'start', message: gettext("Saving")});
+
+                            $.post(handlerUrl, JSON.stringify(modifiedData)).done(function(response) {
+                                if (response.result === 'success') {
+                                    runtime.notify('save', {state: 'end'})
+                                    window.location.reload(false);
+                                } else {
+                                    runtime.notify('error', {
+                                        'title': 'Error saving changes',
+                                        'message': response.message,
+                                    });
+                                    error_message_div.html('Error: '+response.message);
+                                    error_message_div.css('display', 'block');
+                                }
+                            });         
+                        });
                     });
-                  });
                 }
 
                 callback(blockJS);
