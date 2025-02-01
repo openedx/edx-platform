@@ -27,7 +27,7 @@ from openedx_events.event_bus import merge_producer_configs
 from path import Path as path
 
 from openedx.core.djangoapps.plugins.constants import ProjectType, SettingsType
-from openedx.core.lib.derived import derive_settings
+from openedx.core.lib.derived import Derived, derive_settings
 from openedx.core.lib.logsettings import get_logger_config
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -125,6 +125,75 @@ SSL_AUTH_DN_FORMAT_STRING = (
     "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
 
+CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
+EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "lms")
+LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
+
+# This is the domain that is used to set shared cookies between various sub-domains.
+# By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN
+SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
+
+# We want Bulk Email running on the high-priority queue, so we define the
+# routing key that points to it. At the moment, the name is the same.
+# We have to reset the value here, since we have changed the value of the queue name.
+BULK_EMAIL_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
+
+# We can run smaller jobs on the low priority queue. See note above for why
+# we have to reset the value here.
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+
+# Queue to use for expiring old entitlements
+ENTITLEMENTS_EXPIRATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+
+# Intentional defaults.
+ID_VERIFICATION_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+PASSWORD_RESET_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+ACTIVATION_EMAIL_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+LOGIN_ISSUE_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+
+# Default queues for various routes
+GRADES_DOWNLOAD_ROUTING_KEY = Derived(lambda settings: settings.HIGH_MEM_QUEUE)
+CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+PROGRAM_CERTIFICATES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
+
+############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
+# The Open edX Enterprise service is currently hosted via the LMS container/process.
+# However, for all intents and purposes this service is treated as a standalone IDA.
+# These configuration settings are specific to the Enterprise service and you should
+# not find references to them within the edx-platform project.
+
+# Publicly-accessible enrollment URL, for use on the client side.
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = Derived(
+    lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+)
+
+# Enrollment URL used on the server-side.
+ENTERPRISE_ENROLLMENT_API_URL = Derived(
+    lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+)
+
+############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
+# The LMS communicates with the Enterprise service via the requests.Session() client
+# The below environmental settings are utilized by the LMS when interacting with
+# the service, and override the default parameters which are defined in common.py
+
+
+def _generate_default_enterprise_api_url(settings):
+    default_enterprise_api_url = None
+    if settings.LMS_INTERNAL_ROOT_URL is not None:
+        default_enterprise_api_url = settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+    return default_enterprise_api_url
+ENTERPRISE_API_URL = Derived(_generate_default_enterprise_api_url)
+
+
+def _generate_default_enterprise_consent_api_url(settings):
+    default_enterprise_consent_api_url = None
+    if settings.LMS_INTERNAL_ROOT_URL is not None:
+        default_enterprise_consent_api_url = settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
+ENTERPRISE_CONSENT_API_URL = Derived(_generate_default_enterprise_consent_api_url)
+
+
 #######################################################################################################################
 
 # A file path to a YAML file from which to load configuration overrides for LMS.
@@ -198,14 +267,10 @@ if STATIC_URL_BASE:
         STATIC_URL += "/"
 
 DATA_DIR = path(DATA_DIR)
-CC_MERCHANT_NAME = _YAML_TOKENS.get('CC_MERCHANT_NAME', PLATFORM_NAME)
-EMAIL_FILE_PATH = _YAML_TOKENS.get('EMAIL_FILE_PATH', DATA_DIR / "emails" / "lms")
 
 # TODO: This was for backwards compatibility back when installed django-cookie-samesite (not since 2022).
 #       The DCS_ version of the setting can be DEPR'd at this point.
 SESSION_COOKIE_SAMESITE = DCS_SESSION_COOKIE_SAMESITE
-
-LMS_INTERNAL_ROOT_URL = _YAML_TOKENS.get('LMS_INTERNAL_ROOT_URL', LMS_ROOT_URL)
 
 for feature, value in _YAML_TOKENS.get('FEATURES', {}).items():
     FEATURES[feature] = value
@@ -215,10 +280,6 @@ ALLOWED_HOSTS = [
     _YAML_TOKENS.get('LMS_BASE'),
     FEATURES['PREVIEW_LMS_BASE'],
 ]
-
-# This is the domain that is used to set shared cookies between various sub-domains.
-# By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN, but we want to make it overrideable.
-SHARED_COOKIE_DOMAIN = _YAML_TOKENS.get('SHARED_COOKIE_DOMAIN', SESSION_COOKIE_DOMAIN)
 
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
@@ -236,17 +297,6 @@ if 'staticfiles' in CACHES:
 # Once we have migrated to service assets off S3, then we can convert this back to
 # managed by the yaml file contents
 
-# We want Bulk Email running on the high-priority queue, so we define the
-# routing key that points to it. At the moment, the name is the same.
-# We have to reset the value here, since we have changed the value of the queue name.
-BULK_EMAIL_ROUTING_KEY = _YAML_TOKENS.get('BULK_EMAIL_ROUTING_KEY', HIGH_PRIORITY_QUEUE)
-
-# We can run smaller jobs on the low priority queue. See note above for why
-# we have to reset the value here.
-BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = _YAML_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMALL_JOBS', DEFAULT_PRIORITY_QUEUE)
-
-# Queue to use for expiring old entitlements
-ENTITLEMENTS_EXPIRATION_ROUTING_KEY = _YAML_TOKENS.get('ENTITLEMENTS_EXPIRATION_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
 
 # Build a CELERY_QUEUES dict the way that celery expects, based on a couple lists of queue names from the YAML.
 _YAML_CELERY_QUEUES = _YAML_TOKENS.get('CELERY_QUEUES', None)
@@ -269,12 +319,6 @@ CELERY_QUEUES.update(
 )
 
 MKTG_URL_LINK_MAP.update(_YAML_TOKENS.get('MKTG_URL_LINK_MAP', {}))
-
-# Intentional defaults.
-ID_VERIFICATION_SUPPORT_LINK = _YAML_TOKENS.get('ID_VERIFICATION_SUPPORT_LINK', SUPPORT_SITE_LINK)
-PASSWORD_RESET_SUPPORT_LINK = _YAML_TOKENS.get('PASSWORD_RESET_SUPPORT_LINK', SUPPORT_SITE_LINK)
-ACTIVATION_EMAIL_SUPPORT_LINK = _YAML_TOKENS.get('ACTIVATION_EMAIL_SUPPORT_LINK', SUPPORT_SITE_LINK)
-LOGIN_ISSUE_SUPPORT_LINK = _YAML_TOKENS.get('LOGIN_ISSUE_SUPPORT_LINK', SUPPORT_SITE_LINK)
 
 # Timezone overrides
 TIME_ZONE = CELERY_TIMEZONE
@@ -371,9 +415,6 @@ EVENT_TRACKING_BACKENDS['tracking_logs']['OPTIONS']['backends'].update(
 EVENT_TRACKING_BACKENDS['segmentio']['OPTIONS']['processors'][0]['OPTIONS']['whitelist'].extend(
     EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST
 )
-
-# Grades download
-GRADES_DOWNLOAD_ROUTING_KEY = _YAML_TOKENS.get('GRADES_DOWNLOAD_ROUTING_KEY', HIGH_MEM_QUEUE)
 
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     AUTHENTICATION_BACKENDS = _YAML_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
@@ -478,49 +519,6 @@ if FEATURES['ENABLE_LTI_PROVIDER']:
 #### JWT configuration ####
 JWT_AUTH.update(_YAML_TOKENS.get('JWT_AUTH', {}))
 
-################################ Settings for Credentials Service ################################
-
-CREDENTIALS_GENERATION_ROUTING_KEY = _YAML_TOKENS.get('CREDENTIALS_GENERATION_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
-
-PROGRAM_CERTIFICATES_ROUTING_KEY = _YAML_TOKENS.get('PROGRAM_CERTIFICATES_ROUTING_KEY', DEFAULT_PRIORITY_QUEUE)
-
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = _YAML_TOKENS.get(
-    'SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY',
-    HIGH_PRIORITY_QUEUE
-)
-
-############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
-# The Open edX Enterprise service is currently hosted via the LMS container/process.
-# However, for all intents and purposes this service is treated as a standalone IDA.
-# These configuration settings are specific to the Enterprise service and you should
-# not find references to them within the edx-platform project.
-
-# Publicly-accessible enrollment URL, for use on the client side.
-ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = _YAML_TOKENS.get(
-    'ENTERPRISE_PUBLIC_ENROLLMENT_API_URL',
-    (LMS_ROOT_URL or '') + LMS_ENROLLMENT_API_PATH
-)
-
-# Enrollment URL used on the server-side.
-ENTERPRISE_ENROLLMENT_API_URL = _YAML_TOKENS.get(
-    'ENTERPRISE_ENROLLMENT_API_URL',
-    (LMS_INTERNAL_ROOT_URL or '') + LMS_ENROLLMENT_API_PATH
-)
-
-############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
-# The LMS communicates with the Enterprise service via the requests.Session() client
-# The below environmental settings are utilized by the LMS when interacting with
-# the service, and override the default parameters which are defined in common.py
-
-DEFAULT_ENTERPRISE_API_URL = None
-if LMS_INTERNAL_ROOT_URL is not None:
-    DEFAULT_ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
-ENTERPRISE_API_URL = _YAML_TOKENS.get('ENTERPRISE_API_URL', DEFAULT_ENTERPRISE_API_URL)
-
-DEFAULT_ENTERPRISE_CONSENT_API_URL = None
-if LMS_INTERNAL_ROOT_URL is not None:
-    DEFAULT_ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
-ENTERPRISE_CONSENT_API_URL = _YAML_TOKENS.get('ENTERPRISE_CONSENT_API_URL', DEFAULT_ENTERPRISE_CONSENT_API_URL)
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
 # The LMS has some features embedded that are related to the Enterprise service, but
