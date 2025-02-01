@@ -291,7 +291,7 @@
                 blockJS.element = element;
 
                 if (['MetadataOnlyEditingDescriptor', 'SequenceDescriptor'].includes(data['xmodule-type'])) {
-                    // The xmodule type `MetadataOnlyEditingDescriptor` renders a `<div>` with
+                    // The xmodule type `MetadataOnlyEditingDescriptor` and `SequenceDescriptor` renders a `<div>` with
                     // the block metadata in the `data-metadata` attribute. But is necessary
                     // to call `XBlockEditorView.xblockReady()` to run the scripts to build the
                     // editor using the metadata.

@@ -131,6 +131,8 @@ class ConditionalBlock(
         default=_('You must complete {link} before you can access this unit.')
     )
 
+    has_children = True
+
     _tag_name = 'conditional'
 
     resources_dir = None
@@ -410,10 +412,3 @@ class ConditionalBlock(
             ConditionalBlock.show_tag_list,
         ])
         return non_editable_fields
-
-    @property
-    def has_children(self):
-        """
-        Determines whether this block has children
-        """
-        return bool(self.sources_list)
