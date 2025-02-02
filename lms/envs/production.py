@@ -179,19 +179,21 @@ ENTERPRISE_ENROLLMENT_API_URL = Derived(
 # the service, and override the default parameters which are defined in common.py
 
 
-def _generate_default_enterprise_api_url(settings):
-    default_enterprise_api_url = None
-    if settings.LMS_INTERNAL_ROOT_URL is not None:
-        default_enterprise_api_url = settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
-    return default_enterprise_api_url
-ENTERPRISE_API_URL = Derived(_generate_default_enterprise_api_url)
+DEFAULT_ENTERPRISE_API_URL = Derived(
+    lambda settings: (
+        None if settings.LMS_INTERNAL_ROOT_URL is None
+        else settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+    )
+)
+ENTERPRISE_API_URL = DEFAULT_ENTERPRISE_API_URL
 
-
-def _generate_default_enterprise_consent_api_url(settings):
-    default_enterprise_consent_api_url = None
-    if settings.LMS_INTERNAL_ROOT_URL is not None:
-        default_enterprise_consent_api_url = settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
-ENTERPRISE_CONSENT_API_URL = Derived(_generate_default_enterprise_consent_api_url)
+DEFAULT_ENTERPRISE_CONSENT_API_URL = Derived(
+    lambda settings: (
+        None if settings.LMS_INTERNAL_ROOT_URL is None
+        else settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
+    )
+)
+ENTERPRISE_CONSENT_API_URL = DEFAULT_ENTERPRISE_CONSENT_API_URL
 
 
 #######################################################################################################################
