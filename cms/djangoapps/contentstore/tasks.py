@@ -1379,7 +1379,7 @@ def _retry_validation(url_list, course_key, retry_count=3):
 
 def _retry_validation_and_filter_results(course_key, results, retry_list):
     """
-    Validates URLs and then filter them by status. 
+    Validates URLs and then filter them by status.
 
     Arguments:
         retry_list: list of urls to retry
