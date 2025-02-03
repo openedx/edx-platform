@@ -3,8 +3,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button } from '@edx/paragon';
-import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import { Provider } from 'react-redux';
 
 import store from '../../data/store';
