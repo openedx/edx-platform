@@ -22,6 +22,7 @@ from openedx.core.lib.api.authentication import (
     BearerAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.api import serializers
 from common.djangoapps.third_party_auth.api.permissions import TPA_PERMISSIONS
@@ -433,3 +434,60 @@ class ThirdPartyAuthUserStatusView(APIView):
                 })
 
         return Response(tpa_states)
+
+
+class ModifyThirdPartyAuthView(APIView):
+    """
+    Modify social auth record for a given user.
+    This API is intended to be a server-to-server endpoint. An on-campus middleware or system should consume this.
+    """
+    authentication_classes = (
+        JwtAuthentication, BearerAuthenticationAllowInactiveUser
+    )
+    permission_classes = (TPA_PERMISSIONS, )
+
+    def delete(self, request):
+        """
+        Delete social auth record for user matched with uid and username/email.
+
+        The request body must contain the following:
+            username_or_email: username or email of the user.
+            uid: UID of the social auth record to delete.
+        """
+        username_or_email = request.data.get("username_or_email")
+        uid = request.data.get("uid")
+
+        if not username_or_email:
+            return Response(
+                data={"error_message": "username_or_email is a required parameter."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if not uid:
+            return Response(
+                data={"error_message": "uid is a required parameter."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = get_user_by_username_or_email(username_or_email)
+            social_auth_records = UserSocialAuth.objects.filter(user=user)
+            social_auth_records.get(uid=uid).delete()
+        except User.DoesNotExist:
+            return Response(
+                data={"error_message": f"User {username_or_email} does not exist."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except UserSocialAuth.DoesNotExist:
+            return Response(
+                data={"error_message": f"User {username_or_email} does not have a social auth record with UID {uid}."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(
+            data={
+                "username": user.username,
+                "email": user.email,
+                "uid": [auth_record.uid for auth_record in social_auth_records]
+            },
+            status=status.HTTP_200_OK
+        )
