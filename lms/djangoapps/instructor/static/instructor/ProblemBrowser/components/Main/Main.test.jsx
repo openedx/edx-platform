@@ -1,11 +1,11 @@
 // eslint-disable-next-line no-redeclare
 /* global jest,test,describe,expect */
-import { Provider } from 'react-redux';
 import React from 'react';
-import store from '../../data/store';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
 
+import store from '../../data/store';
 import Main from './Main';
 
 describe('ProblemBrowser Main component', () => {
@@ -30,11 +30,10 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
         expect(screen.getByRole('button', { name: 'Select a section or problem' })).toBeInTheDocument();
     });
-    
 
     test('render with selected block', () => {
         render(
@@ -51,7 +50,7 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
         expect(screen.getByRole('button', { name: 'Select a section or problem' })).toBeInTheDocument();
     });
@@ -72,7 +71,7 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
         await userEvent.click(toggleButton);
@@ -94,14 +93,18 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
-
-        expect(screen.queryByText('Some expected block name')).toBeNull();
-        const toggleButton = screen.getByRole("button", { name: 'Select a section or problem' });
+        expect(screen.queryByTestId('block-browser-container')).toBeNull();
+        const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
         await userEvent.click(toggleButton);
-        const blockName = screen.queryByText('Some expected block name');
-        expect(blockName).toBeNull();
+        await waitFor(() => {
+            expect(screen.findByTestId('block-browser-container')).resolves.toBeInTheDocument();
+        });
+        await userEvent.click(toggleButton);
+        await waitFor(() => {
+            expect(screen.findByTestId('block-browser-container')).resolves.toBeInTheDocument();
+        });
     });
 
     test('hide dropdown on second toggle', async () => {
@@ -119,17 +122,16 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
-
         await userEvent.click(toggleButton);
         await waitFor(() => {
-            expect(screen.queryByText('Select a section or problem')).not.toBeNull();
+            expect(screen.findByText('block-browser-container')).resolves.toBeInTheDocument();
         });
         await userEvent.click(toggleButton);
         await waitFor(() => {
-            expect(screen.queryByText('Some expected block name')).toBeNull();
+            expect(screen.queryByText('block-browser-container')).toBeNull();
         });
     });
 });
