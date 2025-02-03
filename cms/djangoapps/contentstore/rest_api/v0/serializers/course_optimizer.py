@@ -13,11 +13,13 @@ class LinkCheckBlockSerializer(serializers.Serializer):
     brokenLinks = serializers.ListField(required=False)
     lockedLinks = serializers.ListField(required=False)
 
+
 class LinkCheckUnitSerializer(serializers.Serializer):
     """ Serializer for broken links unit model data """
     id = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     displayName = serializers.CharField(required=True, allow_null=False, allow_blank=True)
     blocks = LinkCheckBlockSerializer(many=True)
+
 
 class LinkCheckSubsectionSerializer(serializers.Serializer):
     """ Serializer for broken links subsection model data """
@@ -25,15 +27,18 @@ class LinkCheckSubsectionSerializer(serializers.Serializer):
     displayName = serializers.CharField(required=True, allow_null=False, allow_blank=True)
     units = LinkCheckUnitSerializer(many=True)
 
+
 class LinkCheckSectionSerializer(serializers.Serializer):
     """ Serializer for broken links section model data """
     id = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     displayName = serializers.CharField(required=True, allow_null=False, allow_blank=True)
     subsections = LinkCheckSubsectionSerializer(many=True)
 
+
 class LinkCheckOutputSerializer(serializers.Serializer):
     """ Serializer for broken links output model data """
     sections = LinkCheckSectionSerializer(many=True)
+
 
 class LinkCheckSerializer(serializers.Serializer):
     """ Serializer for broken links """

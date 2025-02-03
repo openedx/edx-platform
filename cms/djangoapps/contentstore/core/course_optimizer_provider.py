@@ -128,19 +128,22 @@ def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictiona
     # Traverse the path and build the tree structure
     for xblock in path:
         xblock_id = xblock.location.block_id
-        updated_dictionary.setdefault(xblock_id,
-            { 
+        updated_dictionary.setdefault(
+            xblock_id,
+            {
                 'display_name': xblock.display_name,
                 'category': getattr(xblock, 'category', ''),
             }
         )
         # Sets new current node and creates the node if it doesn't exist
         current_node = current_node.setdefault(xblock_id, {})
-    
+
     # Add block-level details for the last xblock in the path (URL and broken/locked links)
-    updated_dictionary[xblock_id].setdefault('url',
+    updated_dictionary[xblock_id].setdefault(
+        'url',
         f'/course/{block.course_id}/editor/{block.category}/{block.location}'
     )
+
     if is_locked:
         updated_dictionary[xblock_id].setdefault('locked_links', []).append(link)
     else:
@@ -162,7 +165,7 @@ def _get_node_path(block):
     while current_node.get_parent():
         path.append(current_node)
         current_node = current_node.get_parent()
-    
+
     return list(reversed(path))
 
 
@@ -193,7 +196,7 @@ def _create_dto_recursive(xblock_node, xblock_dictionary):
             'id': xblock_id,
             'displayName': xblock_data.get('display_name', ''),
         }
-        if child_blocks == None:    # Leaf node
+        if child_blocks is None:    # Leaf node
             level = 'blocks'
             xblock_entry.update({
                 'url': xblock_data.get('url', ''),

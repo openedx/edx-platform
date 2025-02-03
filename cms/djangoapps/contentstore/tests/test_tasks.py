@@ -118,6 +118,7 @@ class ExportCourseTestCase(CourseTestCase):
         self.assertEqual(error.name, 'Error')
         self.assertEqual(error.text, error_message)
 
+
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ExportLibraryTestCase(LibraryTestCase):
     """
@@ -225,7 +226,9 @@ class MockCourseLinkCheckTask(Task):
     def __init__(self):
         self.status = mock.Mock()
 
+
 ############## Course Optimizer tests ##############
+
 
 class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     def setUp(self):
@@ -293,7 +296,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         src="/static/resource_name"
         '''
 
-        original_lines = len(url_list.splitlines()) - 2 # Correct for the two carriage returns surrounding the ''' marks
+        original_lines = len(url_list.splitlines()) - 2     # Correct for the two carriage returns surrounding the ''' marks
         processed_url_list = _get_urls(url_list)
         processed_lines = len(processed_url_list)
 
@@ -365,7 +368,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             mock_validate_batch.side_effect = lambda x, y: x
             validated_urls = await _validate_urls_access_in_batches(url_list, course_key, batch_size)
             mock_validate_batch.assert_called()
-            assert mock_validate_batch.call_count == 3 # two full batches and one partial batch
+            assert mock_validate_batch.call_count == 3  # two full batches and one partial batch
             assert validated_urls == url_list, \
                 f"List of validated urls {validated_urls} is not identical to sourced urls {url_list}"
 
@@ -380,11 +383,11 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
 
             url_list = ['1', '2', '3', '4', '5']
             course_key = 'course-v1:edX+DemoX+Demo_Course'
-            batch_size=2
+            batch_size = 2
             await _validate_urls_access_in_batches(url_list, course_key, batch_size)
             args_list = mock_validate.call_args_list
-            urls = [call_args.args[1] for call_args in args_list] # The middle argument in each of the function calls
-            for i in range(1,len(url_list)+1):
+            urls = [call_args.args[1] for call_args in args_list]   # The middle argument in each of the function calls
+            for i in range(1, len(url_list) + 1):
                 assert str(i) in urls, f'{i} not supplied as a url for validation in batches function'
 
     def test_no_retries_on_403_access_denied_links(self):
@@ -396,12 +399,12 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         '''
         url_list = ['1', '2', '3', '4', '5']
         filtering_input = []
-        for i in range(1, len(url_list)+1): # Notch out one of the URLs, having it return a '403' status code
-            filtering_input.append(
-            {'block_id': f'block_{i}',
-             'url': str(i),
-             'status': 200},
-            )
+        for i in range(1, len(url_list) + 1):     # Notch out one of the URLs, having it return a '403' status code
+            filtering_input.append({
+                'block_id': f'block_{i}',
+                'url': str(i),
+                'status': 200
+            })
         filtering_input[2]['status'] = 403
         filtering_input[3]['status'] = 500
         filtering_input[4]['status'] = None
@@ -414,17 +417,19 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
     @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])
     @patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
-                  return_value=[{"url": "url1", "status": "ok"}])
+        return_value=[{"url": "url1", "status": "ok"}])
     @patch("cms.djangoapps.contentstore.tasks._filter_by_status",
-           return_value=(["block_1", "url1", True], ["block_2", "url2"]))
+        return_value=(["block_1", "url1", True], ["block_2", "url2"]))
     @patch("cms.djangoapps.contentstore.tasks._retry_validation",
-           return_value=['block_2', 'url2'])
-    def test_check_broken_links_calls_expected_support_functions(self,
-                          mock_retry_validation,
-                          mock_filter,
-                          mock_validate_urls,
-                          mock_scan_course,
-                          mock_validate_user):
+        return_value=['block_2', 'url2'])
+    def test_check_broken_links_calls_expected_support_functions(
+        self,
+        mock_retry_validation,
+        mock_filter,
+        mock_validate_urls,
+        mock_scan_course,
+        mock_validate_user
+    ):
         # Parameters for the function
         user_id = 1234
         language = "en"
@@ -481,6 +486,3 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         mock_filter.assert_called_once_with(validated_url_list)
         if retry_list:
             mock_retry_validation.assert_called_once_with(retry_list, course_key, retry_count=3)
-
-
-

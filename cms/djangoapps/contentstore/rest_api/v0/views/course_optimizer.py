@@ -152,7 +152,7 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
         if not has_course_author_access(request.user, course_key):
             print('missing course author access')
             self.permission_denied(request)
-        
+
         task_status = _latest_task_status(request, course_id)
         status = None
         created_at = None

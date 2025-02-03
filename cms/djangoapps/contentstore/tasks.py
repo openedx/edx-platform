@@ -1104,7 +1104,9 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
         key = arguments_dict['course_key_string']
         return f'Broken link check of {key}'
 
+
 # -------------- Course optimizer functions ------------------
+
 
 def _validate_user(task, user_id, language):
     """Validate if the user exists. Otherwise log error. """
@@ -1115,6 +1117,7 @@ def _validate_user(task, user_id, language):
             task.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
         return
 
+
 def _get_urls(content):
     """
     Returns all urls found after href and src in content.
@@ -1124,17 +1127,21 @@ def _get_urls(content):
     url_list = re.findall(regex, content)
     return url_list
 
+
 def _is_studio_url(url):
     """Returns True if url is a studio url."""
     return _is_studio_url_with_base(url) or _is_studio_url_without_base(url)
+
 
 def _is_studio_url_with_base(url):
     """Returns True if url is a studio url with cms base."""
     return url.startswith('http://' + settings.CMS_BASE) or url.startswith('https://' + settings.CMS_BASE)
 
+
 def _is_studio_url_without_base(url):
     """Returns True if url is a studio url without cms base."""
     return not url.startswith('http://') and not url.startswith('https://')
+
 
 def _convert_to_standard_url(url, course_key):
     """
@@ -1154,6 +1161,7 @@ def _convert_to_standard_url(url, course_key):
             return 'https://' + settings.CMS_BASE + '/container/' + url
     else:
         return url
+
 
 def _scan_course_for_links(course_key):
     """
@@ -1178,6 +1186,7 @@ def _scan_course_for_links(course_key):
 
     return urls_to_validate
 
+
 async def _validate_url_access(session, url_data, course_key):
     """
     Returns the status of a url request
@@ -1193,6 +1202,7 @@ async def _validate_url_access(session, url_data, course_key):
         result.update({'status': None})
         LOGGER.debug(f'[Link Check] Request error when validating {url}: {str(e)}')
     return result
+
 
 async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100):
     """
@@ -1216,6 +1226,7 @@ async def _validate_batch(batch, course_key):
         tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
         batch_results = await asyncio.gather(*tasks)
         return batch_results
+
 
 def _retry_validation(url_list, course_key, retry_count=3):
     """Retry urls that failed due to connection error.
@@ -1267,14 +1278,17 @@ def _filter_by_status(results):
 
     return filtered_results, retry_list
 
+
 def _save_broken_links_file(artifact, file_to_save):
     artifact.file.save(name=os.path.basename(file_to_save.name), content=File(file_to_save))
     artifact.save()
     return True
 
+
 def _write_broken_links_to_file(broken_or_locked_urls, broken_links_file):
     with open(broken_links_file.name, 'w') as file:
         json.dump(broken_or_locked_urls, file, indent=4)
+
 
 def _check_broken_links(task_instance, user_id, course_key_string, language):
     """
@@ -1314,6 +1328,7 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
         if task_instance.status.state != UserTaskStatus.FAILED:
             task_instance.status.fail({'raw_error_msg': str(e)})
         return
+
 
 @shared_task(base=CourseLinkCheckTask, bind=True)
 def check_broken_links(self, user_id, course_key_string, language):

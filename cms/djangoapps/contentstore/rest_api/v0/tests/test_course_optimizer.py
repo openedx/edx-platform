@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 
+
 class TestGetLinkCheckStatus(AuthorizeStaffTestCase, ModuleStoreTestCase, TestCase):
     '''
     Authentication and Authorization Tests for CourseOptimizer.
@@ -34,6 +35,7 @@ class TestGetLinkCheckStatus(AuthorizeStaffTestCase, ModuleStoreTestCase, TestCa
         '''
         response = self.make_request(course_id=self.course.id, malicious_kwarg='malicious_kwarg')
         self.assertIn(response.status_code, range(400, 500))
+
 
 class TestPostLinkCheck(AuthorizeStaffTestCase, ModuleStoreTestCase, TestCase):
     '''

@@ -13,6 +13,7 @@ from cms.djangoapps.contentstore.core.course_optimizer_provider import (
     _create_dto_recursive
 )
 
+
 class TestLinkCheckProvider(CourseTestCase):
     """
     Tests for functions that generate a json structure of locked and broken links
@@ -49,7 +50,6 @@ class TestLinkCheckProvider(CourseTestCase):
         self.mock_unit.get_parent.return_value = self.mock_subsection
         self.mock_block.get_parent.return_value = self.mock_unit
 
-
     def test_update_node_tree_and_dictionary_returns_node_tree(self):
         """
         Verify _update_node_tree_and_dictionary creates a node tree structure
@@ -69,7 +69,6 @@ class TestLinkCheckProvider(CourseTestCase):
         )
 
         self.assertEqual(expected_tree, result_tree)
-
 
     def test_update_node_tree_and_dictionary_returns_dictionary(self):
         """
@@ -102,7 +101,6 @@ class TestLinkCheckProvider(CourseTestCase):
 
         self.assertEqual(expected_dictionary, result_dictionary)
 
-
     def test_create_dto_recursive_returns_for_empty_node(self):
         """
         Test _create_dto_recursive behavior at the end of recursion.
@@ -110,7 +108,6 @@ class TestLinkCheckProvider(CourseTestCase):
         """
         expected = _create_dto_recursive({}, {})
         self.assertEqual(None, expected)
-
 
     def test_create_dto_recursive_returns_for_leaf_node(self):
         """
@@ -155,7 +152,6 @@ class TestLinkCheckProvider(CourseTestCase):
         }
         expected = _create_dto_recursive(mock_node_tree, mock_dictionary)
         self.assertEqual(expected_result, expected)
-
 
     def test_create_dto_recursive_returns_for_full_tree(self):
         """
@@ -225,4 +221,3 @@ class TestLinkCheckProvider(CourseTestCase):
         expected = _create_dto_recursive(mock_node_tree, mock_dictionary)
 
         self.assertEqual(expected_result, expected)
-        
