@@ -1331,8 +1331,11 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
 
 
 @shared_task(base=CourseLinkCheckTask, bind=True)
+# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
+#   does stack inspection and can't handle additional decorators.
 def check_broken_links(self, user_id, course_key_string, language):
     """
     Checks for broken links in a course. Store the results in a file.
     """
+    set_code_owner_attribute_from_module(__name__)
     return _check_broken_links(self, user_id, course_key_string, language)

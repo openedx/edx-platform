@@ -416,12 +416,15 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
 
     @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
     @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])
-    @patch("cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
-        return_value=[{"url": "url1", "status": "ok"}])
-    @patch("cms.djangoapps.contentstore.tasks._filter_by_status",
-        return_value=(["block_1", "url1", True], ["block_2", "url2"]))
-    @patch("cms.djangoapps.contentstore.tasks._retry_validation",
-        return_value=['block_2', 'url2'])
+    @patch(
+        "cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches",
+        return_value=[{"url": "url1", "status": "ok"}]
+    )
+    @patch(
+        "cms.djangoapps.contentstore.tasks._filter_by_status",
+        return_value=(["block_1", "url1", True], ["block_2", "url2"])
+    )
+    @patch("cms.djangoapps.contentstore.tasks._retry_validation", return_value=['block_2', 'url2'])
     def test_check_broken_links_calls_expected_support_functions(
         self,
         mock_retry_validation,
