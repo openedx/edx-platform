@@ -51,8 +51,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # l
 
 TOMORROW = now() + timedelta(days=1)
 ONE_WEEK_AGO = now() - timedelta(weeks=1)
-THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
-THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
+THREE_YEARS_FROM_NOW = now() + timedelta(days=365 * 3)
+THREE_YEARS_AGO = now() - timedelta(days=365 * 3)
 
 # Name of the method to mock for Content Type Gating.
 GATING_METHOD_NAME = 'openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment'

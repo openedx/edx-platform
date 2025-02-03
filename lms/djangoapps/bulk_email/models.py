@@ -114,7 +114,7 @@ class Target(models.Model):
         """
         staff_qset = CourseStaffRole(course_id).users_with_role()
         instructor_qset = CourseInstructorRole(course_id).users_with_role()
-        staff_instructor_qset = (staff_qset | instructor_qset)
+        staff_instructor_qset = staff_qset | instructor_qset
         enrollment_query = models.Q(
             is_active=True,
             courseenrollment__course_id=course_id,
