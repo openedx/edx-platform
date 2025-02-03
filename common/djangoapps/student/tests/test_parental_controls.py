@@ -59,7 +59,7 @@ class ProfileParentalControlsTest(TestCase):
         self.set_year_of_birth(current_year - 13)
         assert self.profile.requires_parental_consent()
         assert self.profile.requires_parental_consent(year=current_year)
-        assert not self.profile.requires_parental_consent(year=(current_year + 1))
+        assert not self.profile.requires_parental_consent(year=current_year + 1)
 
         # Verify for a child born 14 years ago
         self.set_year_of_birth(current_year - 14)

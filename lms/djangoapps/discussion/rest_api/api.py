@@ -1010,7 +1010,7 @@ def get_thread_list(
         if view in ["unread", "unanswered", "unresponded"]:
             query_params[view] = "true"
         else:
-            ValidationError({
+            raise ValidationError({
                 "view": [f"Invalid value. '{view}' must be 'unread' or 'unanswered'"]
             })
 

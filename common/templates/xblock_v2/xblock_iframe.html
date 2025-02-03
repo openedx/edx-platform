@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
-<html>
+<!-- Set the height of the iframe to 100% of the viewport height to avoid an extra scrollbar -->
+<html style="height: 100vh;">
 <head>
   <!-- Open links in a new tab, not this iframe -->
   <base target="_blank">
@@ -81,8 +82,11 @@
         href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Capa Problem Editing requires CodeMirror -->
   <link rel="stylesheet" href="{{ lms_root_url }}/static/js/vendor/CodeMirror/codemirror.css">
-  <!-- Built-in XBlocks (and some plugins) depends on LMS CSS -->
-  <link rel="stylesheet" href="{{ lms_root_url }}/static/css/lms-course.css">
+  <!-- Additional CSS for the XBlock Editor on the Library Authoring -->
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/vendor/normalize.css">
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/studio-main-v1.css" />
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/course-unit-mfe-iframe-bundle.css" />
+
   <!-- Configure and load MathJax -->
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -156,11 +160,13 @@
 <!-- The default stylesheet will set the body min-height to 100% (a common strategy to allow for background
   images to fill the viewport), but this has the undesireable side-effect of causing an infinite loop via the onResize
   event listeners below, in certain situations.  Resetting it to the default "auto" skirts the problem.-->
-<body style="min-height: auto; background-color: white;">
-  <!-- fragment body -->
-  {{ fragment.body_html | safe }}
-  <!-- fragment foot -->
-  {{ fragment.foot_html | safe }}
+<body style="min-height: auto; background-color: white;" class="view-container">
+  <div class="wrapper xblock-iframe-content">
+      <!-- fragment body -->
+      {{ fragment.body_html | safe }}
+      <!-- fragment foot -->
+      {{ fragment.foot_html | safe }}
+  </div>
   <script>
     /**
      * Map of all URL handlers for this block and its children, keyed by usage
@@ -216,7 +222,7 @@
                 return url;
             },
             notify: (eventName, data) => {
-                /** 
+                /**
                  * Used in `studio_view` to notify events and errors
                  **/
                 window.parent.postMessage({

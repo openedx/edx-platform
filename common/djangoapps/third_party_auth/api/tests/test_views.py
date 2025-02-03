@@ -60,7 +60,7 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
 
         # Create several users and link each user to Google and TestShib
         for username in LINKED_USERS:
-            make_superuser = (username == ADMIN_USERNAME)
+            make_superuser = username == ADMIN_USERNAME
             make_staff = (username == STAFF_USERNAME) or make_superuser
             user = UserFactory.create(
                 username=username,

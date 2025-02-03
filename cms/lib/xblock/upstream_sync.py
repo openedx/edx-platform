@@ -252,16 +252,16 @@ def _update_customizable_fields(*, upstream: XBlock, downstream: XBlock, only_fe
      * Set `course_problem.upstream_display_name = lib_problem.display_name` ("fetch").
      * If `not only_fetch`, and `course_problem.display_name` wasn't customized, then:
        * Set `course_problem.display_name = lib_problem.display_name` ("sync").
-
-     * Set `course_problem.upstream_max_attempts = lib_problem.max_attempts` ("fetch").
-     * If `not only_fetch`, and `course_problem.max_attempts` wasn't customized, then:
-       * Set `course_problem.max_attempts = lib_problem.max_attempts` ("sync").
     """
     syncable_field_names = _get_synchronizable_fields(upstream, downstream)
 
     for field_name, fetch_field_name in downstream.get_customizable_fields().items():
 
         if field_name not in syncable_field_names:
+            continue
+
+        # Downstream-only fields don't have an upstream fetch field
+        if fetch_field_name is None:
             continue
 
         # FETCH the upstream's value and save it on the downstream (ie, `downstream.upstream_$FIELD`).
@@ -361,6 +361,9 @@ def sever_upstream_link(downstream: XBlock) -> None:
     downstream.upstream = None
     downstream.upstream_version = None
     for _, fetched_upstream_field in downstream.get_customizable_fields().items():
+        # Downstream-only fields don't have an upstream fetch field
+        if fetched_upstream_field is None:
+            continue
         setattr(downstream, fetched_upstream_field, None)  # Null out upstream_display_name, et al.
 
 
@@ -414,21 +417,30 @@ class UpstreamSyncMixin(XBlockMixin):
         help=("The value of display_name on the linked upstream block."),
         default=None, scope=Scope.settings, hidden=True, enforce_type=True,
     )
-    upstream_max_attempts = Integer(
-        help=("The value of max_attempts on the linked upstream block."),
-        default=None, scope=Scope.settings, hidden=True, enforce_type=True,
-    )
 
     @classmethod
-    def get_customizable_fields(cls) -> dict[str, str]:
+    def get_customizable_fields(cls) -> dict[str, str | None]:
         """
         Mapping from each customizable field to the field which can be used to restore its upstream value.
+
+        If the customizable field is mapped to None, then it is considered "downstream only", and cannot be restored
+        from the upstream value.
 
         XBlocks outside of edx-platform can override this in order to set up their own customizable fields.
         """
         return {
             "display_name": "upstream_display_name",
-            "max_attempts": "upstream_max_attempts",
+            "attempts_before_showanswer_button": None,
+            "due": None,
+            "force_save_button": None,
+            "graceperiod": None,
+            "grading_method": None,
+            "max_attempts": None,
+            "show_correctness": None,
+            "show_reset_button": None,
+            "showanswer": None,
+            "submission_wait_seconds": None,
+            "weight": None,
         }
 
     # PRESERVING DOWNSTREAM CUSTOMIZATIONS and RESTORING UPSTREAM VALUES
@@ -483,6 +495,10 @@ class UpstreamSyncMixin(XBlockMixin):
     #            # If the field is already marked as customized, then move on so that we don't
     #            # unneccessarily query the block for its current value.
     #            if field_name in self.downstream_customized:
+    #                continue
+    #
+    #            # If there is no restore_field name, it's a downstream-only field
+    #            if restore_field_name is None:
     #                continue
     #
     #            # If this field's value doesn't match the synced upstream value, then mark the field
