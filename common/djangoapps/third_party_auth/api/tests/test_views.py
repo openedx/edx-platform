@@ -426,11 +426,11 @@ class TestUserSocialAuthAPI(ThirdPartyAuthTestMixin, APITestCase):
     @ddt.data(
         ({'uid': 'test-uid'}, 400, {'error_message': 'username_or_email is a required parameter.'}),
         ({'username_or_email': 'test-user'}, 400, {'error_message': 'uid is a required parameter.'}),
-        ({
-            'username_or_email': ALICE_USERNAME, 'uid': 'abcd'},
+        (
+            {'username_or_email': ALICE_USERNAME, 'uid': 'abcd'},
             404,
-            {'error_message': f'User {ALICE_USERNAME} does not have a social auth record with UID abcd.'
-        }),
+            {'error_message': f'User {ALICE_USERNAME} does not have a social auth record with UID abcd.'}
+        ),
         ({'username_or_email': ALICE_USERNAME, 'uid': f'{ALICE_USERNAME}@gmail.com'}, 200, {
             "username": ALICE_USERNAME,
             "email": f'{ALICE_USERNAME}@example.com',
