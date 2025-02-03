@@ -95,7 +95,6 @@ describe('ProblemBrowser Main component', () => {
                 />
             </Provider>,
         );
-        
         expect(screen.queryByText('Some expected block name')).toBeNull();
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
         await userEvent.click(toggleButton);
