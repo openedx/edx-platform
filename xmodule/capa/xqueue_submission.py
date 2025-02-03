@@ -28,8 +28,6 @@ CONNECT_TIMEOUT = 3.05  # seconds
 READ_TIMEOUT = 10  # seconds
 
 
-
-
 def extract_item_data(header, payload):
     if isinstance(header, str):
         try:
@@ -43,13 +41,11 @@ def extract_item_data(header, payload):
         except json.JSONDecodeError as e:
             raise ValueError(f"Error to payload: {e}")
 
-    
     callback_url = header.get('lms_callback_url')
-    queue_name = header.get('queue_name')
+    queue_name = header.get('queue_name', 'default')
     if not callback_url:
         raise ValueError("El header is not content 'lms_callback_url'.")
 
-    
     match_item_id = re.search(r'block@([^/]+)', callback_url)
     match_item_type = re.search(r'type@([^+]+)', callback_url)
     match_course_id = re.search(r'course-v1:([^/]+)', callback_url)
@@ -61,7 +57,6 @@ def extract_item_data(header, payload):
     item_type = match_item_type.group(1)
     course_id = match_course_id.group(1)
 
-    
     try:
         student_info = json.loads(payload["student_info"])
     except json.JSONDecodeError as e:
@@ -96,9 +91,12 @@ class XQueueInterfaceSubmission:
         try:
             student_item, answer, queue_name = extract_item_data(header, body)
             
+            log.error(f"student_item: {student_item}")
+            log.error(f"header: {header}")
+            log.error(f"body: {body}")
+            
             submission = create_submission(student_item, answer, queue_name=queue_name)
             
             return submission
         except Exception as e:
-            return (f"Error: {str(e)}")
-
+            return {"error": str(e)}

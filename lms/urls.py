@@ -253,7 +253,6 @@ if settings.WIKI_ENABLED:
         path('wiki/create-root/', course_wiki_views.root_create, name='root_create'),
         path('wiki/', include((wiki_url_patterns, wiki_app_name), namespace='wiki')),
         path('notify/', include((notify_url_patterns, notify_app_name), namespace='notify')),
-        path('api/submissions/', include((submissions_urls, 'submissions'), namespace='submissions')),
 
         # These urls are for viewing the wiki in the context of a course. They should
         # never be returned by a reverse() so they come after the other url patterns
@@ -1055,3 +1054,9 @@ urlpatterns += [
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]
+
+
+urlpatterns += [
+    path('xqueue/', include((submissions_urls, 'submissions'), namespace='submissions')),
+]
+

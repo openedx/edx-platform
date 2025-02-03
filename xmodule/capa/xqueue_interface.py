@@ -132,6 +132,7 @@ class XQueueInterface:
             'xqueue_header': header,
             'xqueue_body': body
         }
+        
         files = {}
         if files_to_upload is not None:
             for f in files_to_upload:
@@ -139,7 +140,7 @@ class XQueueInterface:
                 
         if switch_is_active('xqueue_submission.enabled'):
             # Use the new edx-submissions workflow
-            submission = XQueueInterfaceSubmission().send_to_submission(header, body, files_to_upload)
+            submission = XQueueInterfaceSubmission().send_to_submission(header, body, files)
             log.error(submission)
             if 'error' in submission:
                 return submission['error'], submission.get('message', 'Unknown error')

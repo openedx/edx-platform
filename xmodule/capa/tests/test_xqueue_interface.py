@@ -1,15 +1,18 @@
 """Test the XQueue service and interface."""
 
 from unittest import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from django.conf import settings
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.fields import ScopeIds
+from waffle.testutils import override_switch
+import json
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa.xqueue_interface import XQueueInterface, XQueueService
+import pytest
 
 
 @skip_unless_lms
@@ -52,3 +55,61 @@ class XQueueServiceTest(TestCase):
 
         with override_settings(XQUEUE_WAITTIME_BETWEEN_REQUESTS=15):
             assert self.service.waittime == 15
+
+
+@pytest.mark.django_db
+@override_switch('xqueue_submission.enabled', active=True)
+@patch('xmodule.capa.xqueue_submission.XQueueInterfaceSubmission.send_to_submission')
+def test_send_to_queue_with_waffle_enabled(mock_send_to_submission):
+    """Prueba que el flujo de trabajo de edx-submissions se utiliza cuando el switch de waffle está habilitado."""
+    url = "http://example.com/xqueue"
+    django_auth = {"username": "user", "password": "pass"}
+    requests_auth = None
+    xqueue_interface = XQueueInterface(url, django_auth, requests_auth)
+
+    header = json.dumps({
+        'lms_callback_url': 'http://example.com/courses/course-v1:test_org+test_course+test_run/xqueue/block@item_id/type@problem',
+    })
+    body = json.dumps({
+        'student_info': json.dumps({'anonymous_student_id': 'student_id'}),
+        'student_response': 'student_answer'
+    })
+    files_to_upload = None
+
+    mock_send_to_submission.return_value = {'submission': 'mock_submission'}
+    error, msg = xqueue_interface.send_to_queue(header, body, files_to_upload)
+    
+    assert error == 0
+    assert msg == "Submission sent successfully"
+    mock_send_to_submission.assert_called_once_with(header, body, {})
+
+
+@pytest.mark.django_db
+@override_switch('xqueue_submission.enabled', active=False)
+@patch('xmodule.capa.xqueue_interface.XQueueInterface._http_post')
+def test_send_to_queue_with_waffle_disabled(mock_http_post):
+    """Prueba que el flujo de trabajo de XQueue se utiliza cuando el switch de waffle está deshabilitado."""
+    url = "http://example.com/xqueue"
+    django_auth = {"username": "user", "password": "pass"}
+    requests_auth = None
+    xqueue_interface = XQueueInterface(url, django_auth, requests_auth)
+
+    header = json.dumps({
+        'lms_callback_url': 'http://example.com/courses/course-v1:test_org+test_course+test_run/xqueue/block@item_id/type@problem',
+    })
+    body = json.dumps({
+        'student_info': json.dumps({'anonymous_student_id': 'student_id'}),
+        'student_response': 'student_answer'
+    })
+    files_to_upload = None
+
+    mock_http_post.return_value = (0, "Submission sent successfully")
+    error, msg = xqueue_interface.send_to_queue(header, body, files_to_upload)
+    
+    assert error == 0
+    assert msg == "Submission sent successfully"
+    mock_http_post.assert_called_once_with(
+        'http://example.com/xqueue/xqueue/submit/',
+        {'xqueue_header': header, 'xqueue_body': body},
+        files={}
+    )

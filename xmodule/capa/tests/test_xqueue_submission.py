@@ -2,37 +2,17 @@ import json
 import pytest
 from unittest.mock import Mock, patch
 from django.conf import settings
-from xmodule.capa.xqueue_submission import XQueueServiceSubmission, XQueueInterfaceSubmission, extract_item_data
+from xmodule.capa.xqueue_submission import XQueueInterfaceSubmission, extract_item_data
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xblock.fields import ScopeIds
 
 
 @pytest.fixture
 def xqueue_service():
-    """Fixture que devuelve un objeto XQueueServiceSubmission configurado para pruebas."""
+    """Fixture que devuelve un objeto XQueueInterfaceSubmission configurado para pruebas."""
     location = BlockUsageLocator(CourseLocator("test_org", "test_course", "test_run"), "problem", "ExampleProblem")
     block = Mock(scope_ids=ScopeIds('user1', 'mock_problem', location, location))
-    return XQueueServiceSubmission(block)
-
-
-def test_interface_creation(xqueue_service):
-    """Verifica que XQueueServiceSubmission cree un objeto XQueueInterfaceSubmission válido."""
-    assert isinstance(xqueue_service.interface, XQueueInterfaceSubmission)
-
-
-def test_send_callback_generation(xqueue_service):
-    """Verifica que send_callback genere una URL de callback válida."""
-    usage_id = xqueue_service._block.scope_ids.usage_id
-    callback_url = f'courses/{usage_id.context_key}/xqueue/user1/{usage_id}'
-    expected_callback = f'{settings.XQUEUE_INTERFACE["url"]}/{callback_url}/score_update'
-    assert xqueue_service.send_callback() == expected_callback
-
-
-def test_default_queue_name(xqueue_service):
-    """Verifica que default_queuename retorne un nombre de cola formateado correctamente."""
-    course_id = xqueue_service._block.scope_ids.usage_id.context_key
-    expected_queue_name = f'{course_id.org}-{course_id.course}'.replace(' ', '_')
-    assert xqueue_service.default_queuename == expected_queue_name
+    return XQueueInterfaceSubmission()
 
 
 def test_extract_item_data():
@@ -45,7 +25,7 @@ def test_extract_item_data():
         'student_response': 'student_answer'
     })
 
-    student_item, student_answer = extract_item_data(header, payload)
+    student_item, student_answer, queue_name = extract_item_data(header, payload)
     assert student_item == {
         'item_id': 'item_id',
         'item_type': 'problem',
@@ -53,6 +33,7 @@ def test_extract_item_data():
         'student_id': 'student_id'
     }
     assert student_answer == 'student_answer'
+    assert queue_name == 'default'
 
 
 @patch('submissions.api.create_submission')
@@ -68,11 +49,11 @@ def test_send_to_submission(mock_create_submission, xqueue_service):
 
     mock_create_submission.return_value = {'submission': 'mock_submission'}
     # Llamada a send_to_submission
-    error, msg = xqueue_service.interface.send_to_submission(header, body)
+    result = xqueue_service.send_to_submission(header, body)
     
     # Afirmaciones
-    assert error == 0
-    assert msg == "Submission sent successfully"
+    assert 'submission' in result
+    assert result['submission'] == 'mock_submission'
     mock_create_submission.assert_called_once_with(
         {
             'item_id': 'item_id',
@@ -80,5 +61,6 @@ def test_send_to_submission(mock_create_submission, xqueue_service):
             'course_id': 'test_org+test_course+test_run',
             'student_id': 'student_id'
         },
-        'student_answer'
+        'student_answer',
+        queue_name='default'
     )
