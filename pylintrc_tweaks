@@ -36,10 +36,7 @@ disable+ =
     too-many-positional-arguments,
     possibly-used-before-assignment,
     use-dict-literal,
-    useless-return,
-    superfluous-parens,
-    logging-not-lazy,
-    broad-exception-caught,
+    superfluous-parens
 
 [BASIC]
 attr-rgx = [a-z_][a-z0-9_]{2,40}$
