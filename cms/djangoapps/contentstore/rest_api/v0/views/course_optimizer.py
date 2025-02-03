@@ -2,12 +2,10 @@
 
 import json
 import edx_api_doc_tools as apidocs
-from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework import status
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
@@ -16,9 +14,7 @@ from cms.djangoapps.contentstore.rest_api.v0.serializers.course_optimizer import
 from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask, check_broken_links
 from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access
 from common.djangoapps.util.json_request import JsonResponse
-from common.djangoapps.util.views import ensure_valid_course_key
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 # Restricts status in the REST API to only those which the requesting user has permission to view.

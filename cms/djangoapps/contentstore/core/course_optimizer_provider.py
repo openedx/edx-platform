@@ -1,9 +1,6 @@
 """
 Logic for handling actions in Studio related to Course Optimizer.
 """
-
-import json
-
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
 

@@ -1,15 +1,11 @@
 """
 Tests for course optimizer
 """
-
-import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.core.course_optimizer_provider import (
-    generate_broken_links_descriptor,
     _update_node_tree_and_dictionary,
-    _get_node_path,
     _create_dto_recursive
 )
 

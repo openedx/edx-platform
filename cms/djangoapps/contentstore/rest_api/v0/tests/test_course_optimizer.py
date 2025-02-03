@@ -1,3 +1,6 @@
+"""
+Unit tests for course optimizer
+"""
 from django.test import TestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.urls import reverse

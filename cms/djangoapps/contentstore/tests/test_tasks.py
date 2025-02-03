@@ -1,19 +1,17 @@
 """
 Unit tests for course import and export Celery tasks
 """
-import asyncio
 import copy
 import json
 import logging
-import pprint
 from unittest import mock
 from unittest.mock import AsyncMock, patch, MagicMock
 from uuid import uuid4
+from celery import Task
 
-import pytest as pytest
+import pytest
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.test import TestCase
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
@@ -22,20 +20,6 @@ from organizations.models import OrganizationCourse
 from organizations.tests.factories import OrganizationFactory
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-logging = logging.getLogger(__name__)
-
-from ..tasks import (
-    export_olx,
-    update_special_exams_and_publish,
-    rerun_course,
-    _convert_to_standard_url,
-    _validate_urls_access_in_batches,
-    _filter_by_status,
-    _get_urls,
-    _check_broken_links,
-    _is_studio_url,
-    _scan_course_for_links
-)
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from common.djangoapps.course_action_state.models import CourseRerunState
@@ -46,7 +30,19 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from celery import Task
+from ..tasks import (
+    export_olx,
+    update_special_exams_and_publish,
+    rerun_course,
+    _validate_urls_access_in_batches,
+    _filter_by_status,
+    _get_urls,
+    _check_broken_links,
+    _is_studio_url,
+    _scan_course_for_links
+)
+
+logging = logging.getLogger(__name__)
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -231,6 +227,7 @@ class MockCourseLinkCheckTask(Task):
 
 
 class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
+    """Tests for CheckBrokenLinksTask"""
     def setUp(self):
         super().setUp()
         self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # lint-amnesty, pylint: disable=protected-access
@@ -296,7 +293,8 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         src="/static/resource_name"
         '''
 
-        original_lines = len(url_list.splitlines()) - 2     # Correct for the two carriage returns surrounding the ''' marks
+        original_lines = len(url_list.splitlines()) - 2     
+            # Correct for the two carriage returns surrounding the ''' marks
         processed_url_list = _get_urls(url_list)
         processed_lines = len(processed_url_list)
 
@@ -304,10 +302,10 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             f'Processed URL list lines = {processed_lines}; expected {original_lines - 2}'
 
     def test_http_url_not_recognized_as_studio_url_scheme(self):
-        self.assertFalse(_is_studio_url(f'http://www.google.com'))
+        self.assertFalse(_is_studio_url('http://www.google.com'))
 
     def test_https_url_not_recognized_as_studio_url_scheme(self):
-        self.assertFalse(_is_studio_url(f'https://www.google.com'))
+        self.assertFalse(_is_studio_url('https://www.google.com'))
 
     def test_http_with_studio_base_url_recognized_as_studio_url_scheme(self):
         self.assertTrue(_is_studio_url(f'http://{settings.CMS_BASE}/testurl'))
@@ -316,10 +314,10 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         self.assertTrue(_is_studio_url(f'https://{settings.CMS_BASE}/testurl'))
 
     def test_container_url_without_url_base_is_recognized_as_studio_url_scheme(self):
-        self.assertTrue(_is_studio_url(f'container/test'))
+        self.assertTrue(_is_studio_url('container/test'))
 
     def test_slash_url_without_url_base_is_recognized_as_studio_url_scheme(self):
-        self.assertTrue(_is_studio_url(f'/static/test'))
+        self.assertTrue(_is_studio_url('/static/test'))
 
     @mock.patch('cms.djangoapps.contentstore.tasks.ModuleStoreEnum', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks.modulestore', autospec=True)
@@ -440,6 +438,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
 
         # Mocking self and status attributes for the test
         class MockStatus:
+            """Mock for status attributes"""
             def __init__(self):
                 self.state = "READY"
 
@@ -476,7 +475,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             mock_retry_validation.assert_called_once_with(
                 mock_filter.return_value[1], course_key, retry_count=3
             )
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logging.exception("Error checking links for course %s", course_key_string, exc_info=True)
             if mock_self.status.state != "FAILED":
                 mock_self.status.fail({"raw_error_msg": str(e)})

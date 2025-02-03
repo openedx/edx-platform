@@ -8,10 +8,8 @@ import os
 import shutil
 import tarfile
 import re
-import requests
 import aiohttp
 import asyncio
-import time
 from datetime import datetime
 from tempfile import NamedTemporaryFile, mkdtemp
 
@@ -897,7 +895,7 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
 def _create_copy_content_task(v2_library_key, v1_library_key):
     """
     spin up a celery task to import the V1 Library's content into the V2 library.
-    This utalizes the fact that course and v1 library content is stored almost identically.
+    This utilizes the fact that course and v1 library content is stored almost identically.
     """
     return v2contentlib_api.import_blocks_create_task(
         v2_library_key, v1_library_key,
@@ -1108,191 +1106,17 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
 # -------------- Course optimizer functions ------------------
 
 
-def _validate_user(task, user_id, language):
-    """Validate if the user exists. Otherwise log error. """
-    try:
-        return User.objects.get(pk=user_id)
-    except User.DoesNotExist as exc:
-        with translation_language(language):
-            task.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
-        return
-
-
-def _get_urls(content):
-    """
-    Returns all urls found after href and src in content.
-    Excludes urls that are only '#'.
-    """
-    regex = r'\s+(?:href|src)=["\'](?!#)([^"\']*)["\']'
-    url_list = re.findall(regex, content)
-    return url_list
-
-
-def _is_studio_url(url):
-    """Returns True if url is a studio url."""
-    return _is_studio_url_with_base(url) or _is_studio_url_without_base(url)
-
-
-def _is_studio_url_with_base(url):
-    """Returns True if url is a studio url with cms base."""
-    return url.startswith('http://' + settings.CMS_BASE) or url.startswith('https://' + settings.CMS_BASE)
-
-
-def _is_studio_url_without_base(url):
-    """Returns True if url is a studio url without cms base."""
-    return not url.startswith('http://') and not url.startswith('https://')
-
-
-def _convert_to_standard_url(url, course_key):
-    """
-    Returns standard urls when given studio urls. Otherwise return url as is.
-    Example urls:
-      /assets/courseware/v1/506da5d6f866e8f0be44c5df8b6e6b2a/asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
-      /static/getting-started_x250.png
-      /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
-    """
-    if _is_studio_url_without_base(url):
-        if url.startswith('/static/'):
-            processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
-            return 'https://' + settings.CMS_BASE + processed_url
-        elif url.startswith('/'):
-            return 'https://' + settings.CMS_BASE + url
-        else:
-            return 'https://' + settings.CMS_BASE + '/container/' + url
-    else:
-        return url
-
-
-def _scan_course_for_links(course_key):
-    """
-    Returns a list of all urls in a course.
-    Returns: [ [block_id1, url1], [block_id2, url2], ... ]
-    """
-    verticals = modulestore().get_items(course_key, qualifiers={'category': 'vertical'},
-                                        revision=ModuleStoreEnum.RevisionOption.published_only)
-    blocks = []
-    urls_to_validate = []
-
-    for vertical in verticals:
-        blocks.extend(vertical.get_children())
-
-    for block in blocks:
-        block_id = str(block.usage_key)
-        block_info = get_block_info(block)
-        block_data = block_info['data']
-
-        url_list = _get_urls(block_data)
-        urls_to_validate += [[block_id, url] for url in url_list]
-
-    return urls_to_validate
-
-
-async def _validate_url_access(session, url_data, course_key):
-    """
-    Returns the status of a url request
-    Returns: {block_id1, url1, status}
-    """
-    block_id, url = url_data
-    result = {'block_id': block_id, 'url': url}
-    standardized_url = _convert_to_standard_url(url, course_key)
-    try:
-        async with session.get(standardized_url, timeout=5) as response:
-            result.update({'status': response.status})
-    except Exception as e:
-        result.update({'status': None})
-        LOGGER.debug(f'[Link Check] Request error when validating {url}: {str(e)}')
-    return result
-
-
-async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100):
-    """
-    Returns the statuses of a list of url requests.
-    Returns: [ {block_id1, url1, status}, {block_id2, url2, status}, ... ]
-    """
-    responses = []
-    url_count = len(url_list)
-
-    for i in range(0, url_count, batch_size):
-        batch = url_list[i:i + batch_size]
-        batch_results = await _validate_batch(batch, course_key)
-        responses.extend(batch_results)
-        LOGGER.debug(f'[Link Check] request batch {i // batch_size + 1} of {url_count // batch_size + 1}')
-
-    return responses
-
-
-async def _validate_batch(batch, course_key):
-    async with aiohttp.ClientSession() as session:
-        tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
-        batch_results = await asyncio.gather(*tasks)
-        return batch_results
-
-
-def _retry_validation(url_list, course_key, retry_count=3):
-    """Retry urls that failed due to connection error.
-    returns URLs that could not be validated either because locked, or because of persistent connection problems
-    """
-    results = []
-    retry_list = url_list
-    for i in range(0, retry_count):
-        if retry_list:
-            LOGGER.debug(f'[Link Check] retry attempt #{i + 1}')
-            retry_list = _retry_validation_and_filter(course_key, results, retry_list)
-    results.extend(retry_list)
-
-    return results
-
-
-def _retry_validation_and_filter(course_key, results, retry_list):
-    validated_url_list = asyncio.run(
-        _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
-    )
-    filtered_url_list, retry_list = _filter_by_status(validated_url_list)
-    results.extend(filtered_url_list)
-    return retry_list
-
-
-def _filter_by_status(results):
-    """
-    Filter results by status.
-        200: OK. No need to do more
-        403: Forbidden. Record as locked link.
-        None: Error. Retry up to 3 times.
-        Other: Failure. Record as broken link.
-    Returns:
-        filtered_results: [ [block_id1, url1, is_locked], ... ]
-        retry_list: [ [block_id1, url1], ... ]
-    """
-    filtered_results = []
-    retry_list = []
-    for result in results:
-        status, block_id, url = result['status'], result['block_id'], result['url']
-        if status is None:
-            retry_list.append([block_id, url])
-        elif status == 200:
-            continue
-        elif status == 403 and _is_studio_url(url):
-            filtered_results.append([block_id, url, True])
-        else:
-            filtered_results.append([block_id, url, False])
-
-    return filtered_results, retry_list
-
-
-def _save_broken_links_file(artifact, file_to_save):
-    artifact.file.save(name=os.path.basename(file_to_save.name), content=File(file_to_save))
-    artifact.save()
-    return True
-
-
-def _write_broken_links_to_file(broken_or_locked_urls, broken_links_file):
-    with open(broken_links_file.name, 'w') as file:
-        json.dump(broken_or_locked_urls, file, indent=4)
+@shared_task(base=CourseLinkCheckTask, bind=True)
+# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
+#   does stack inspection and can't handle additional decorators.
+def check_broken_links(self, user_id, course_key_string, language):
+    set_code_owner_attribute_from_module(__name__)
+    return _check_broken_links(self, user_id, course_key_string, language)
 
 
 def _check_broken_links(task_instance, user_id, course_key_string, language):
     """
-    Checks for broken links in a course. Store the results in a file.
+    Checks for broken links in a course and store the results in a file.
     """
     user = _validate_user(task_instance, user_id, language)
 
@@ -1327,15 +1151,244 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
         LOGGER.exception('Error checking links for course %s', course_key, exc_info=True)
         if task_instance.status.state != UserTaskStatus.FAILED:
             task_instance.status.fail({'raw_error_msg': str(e)})
+
+
+def _validate_user(task, user_id, language):
+    """Validate if the user exists. Otherwise log an unknown user id error."""
+    try:
+        return User.objects.get(pk=user_id)
+    except User.DoesNotExist as exc:
+        with translation_language(language):
+            task.status.fail(UserErrors.UNKNOWN_USER_ID.format(user_id))
         return
 
 
-@shared_task(base=CourseLinkCheckTask, bind=True)
-# Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
-#   does stack inspection and can't handle additional decorators.
-def check_broken_links(self, user_id, course_key_string, language):
+def _scan_course_for_links(course_key):
     """
-    Checks for broken links in a course. Store the results in a file.
+    Scans a course for links found in the data contents of blocks.
+
+    Returns:
+        list: block id and URL pairs
+    
+    Example return:
+    [ 
+        [block_id1, url1],
+        [block_id2, url2],
+        ...
+    ]
     """
-    set_code_owner_attribute_from_module(__name__)
-    return _check_broken_links(self, user_id, course_key_string, language)
+    verticals = modulestore().get_items(
+        course_key,
+        qualifiers={'category': 'vertical'},
+        revision=ModuleStoreEnum.RevisionOption.published_only
+    )
+    blocks = []
+    urls_to_validate = []
+
+    for vertical in verticals:
+        blocks.extend(vertical.get_children())
+
+    for block in blocks:
+        block_id = str(block.usage_key)
+        block_info = get_block_info(block)
+        block_data = block_info['data']
+
+        url_list = _get_urls(block_data)
+        urls_to_validate += [[block_id, url] for url in url_list]
+
+    return urls_to_validate
+
+
+def _get_urls(content):
+    """
+    Finds and returns a list of URLs in the given content.
+    Includes strings following 'href=' and 'src='.
+    Excludes strings that are only '#'.
+
+    Arguments:
+        content (str): entire content of a block
+
+    Returns:
+        list: urls
+    """
+    regex = r'\s+(?:href|src)=["\'](?!#)([^"\']*)["\']'
+    url_list = re.findall(regex, content)
+    return url_list
+
+
+async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100):
+    """
+    Returns the statuses of a list of URL requests.
+
+    Arguments:
+        url_list (list): block id and URL pairs
+
+    Returns:
+        list: dictionary containing URL, associated block id, and request status
+    """
+    responses = []
+    url_count = len(url_list)
+
+    for i in range(0, url_count, batch_size):
+        batch = url_list[i:i + batch_size]
+        batch_results = await _validate_batch(batch, course_key)
+        responses.extend(batch_results)
+        LOGGER.debug(f'[Link Check] request batch {i // batch_size + 1} of {url_count // batch_size + 1}')
+
+    return responses
+
+
+async def _validate_batch(batch, course_key):
+    """Validate a batch of URLs"""
+    async with aiohttp.ClientSession() as session:
+        tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
+        batch_results = await asyncio.gather(*tasks)
+        return batch_results
+
+
+async def _validate_url_access(session, url_data, course_key):
+    """
+    Validates a URL.
+
+    Arguments:
+        url_data (list): block id and URL pairs
+        course_key (str): locator id for a course
+
+    Returns:
+        dict: URL, associated block id, and request status
+
+    Example return:
+        {
+            'block_id': block_id1,
+            'url': url1,
+            'status': status
+        }
+    """
+    block_id, url = url_data
+    result = {'block_id': block_id, 'url': url}
+    standardized_url = _convert_to_standard_url(url, course_key)
+    try:
+        async with session.get(standardized_url, timeout=5) as response:
+            result.update({'status': response.status})
+    except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+        result.update({'status': None})
+        LOGGER.debug(f'[Link Check] Request error when validating {url}: {str(e)}')
+    return result
+
+
+def _convert_to_standard_url(url, course_key):
+    """
+    Returns standard URLs when given studio URLs. Otherwise returns the URL as is.
+
+    Example URLs:
+        /assets/courseware/v1/506da5d6f866e8f0be44c5df8b6e6b2a/...
+            ...asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
+        /static/getting-started_x250.png
+        /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
+    """
+    if _is_studio_url_without_base(url):
+        if url.startswith('/static/'):
+            processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
+            return 'https://' + settings.CMS_BASE + processed_url
+        elif url.startswith('/'):
+            return 'https://' + settings.CMS_BASE + url
+        else:
+            return 'https://' + settings.CMS_BASE + '/container/' + url
+    else:
+        return url
+
+
+def _is_studio_url(url):
+    """Returns True if url is a studio url."""
+    return _is_studio_url_with_base(url) or _is_studio_url_without_base(url)
+
+
+def _is_studio_url_with_base(url):
+    """Returns True if url is a studio url with cms base."""
+    return url.startswith('http://' + settings.CMS_BASE) or url.startswith('https://' + settings.CMS_BASE)
+
+
+def _is_studio_url_without_base(url):
+    """Returns True if url is a studio url without cms base."""
+    return not url.startswith('http://') and not url.startswith('https://')
+
+
+def _filter_by_status(results):
+    """
+    Filter results by status.
+
+    Statuses:
+        200: OK. No need to do more
+        403: Forbidden. Record as locked link.
+        None: Error. Retry up to 3 times.
+        Other: Failure. Record as broken link.
+
+    Arguments:
+        results (list): URL, associated block id, and request status
+
+    Returns:
+        filtered_results (list): list of block id, URL and if URL is locked
+        retry_list (list): block id and url pairs
+
+    Example return:
+        [ 
+            [block_id1, filtered_results_url1, is_locked],
+            ...
+        ],
+        [ 
+            [block_id1, retry_url1],
+            ...
+        ]
+    """
+    filtered_results = []
+    retry_list = []
+    for result in results:
+        status, block_id, url = result['status'], result['block_id'], result['url']
+        if status is None:
+            retry_list.append([block_id, url])
+        elif status == 200:
+            continue
+        elif status == 403 and _is_studio_url(url):
+            filtered_results.append([block_id, url, True])
+        else:
+            filtered_results.append([block_id, url, False])
+
+    return filtered_results, retry_list
+
+
+def _retry_validation(url_list, course_key, retry_count=3):
+    """
+    Retry URLs that failed due to connection error.
+
+    Returns:
+        list: URLs that could not be validated due to being locked or due to persistent connection problems
+    """
+    results = []
+    retry_list = url_list
+    for i in range(retry_count):
+        if retry_list:
+            LOGGER.debug(f'[Link Check] retry attempt #{i + 1}')
+            retry_list = _retry_validation_and_filter_results(course_key, results, retry_list)
+    results.extend(retry_list)
+
+    return results
+
+
+def _retry_validation_and_filter_results(course_key, results, retry_list):
+    validated_url_list = asyncio.run(
+        _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
+    )
+    filtered_url_list, retry_list = _filter_by_status(validated_url_list)
+    results.extend(filtered_url_list)
+    return retry_list
+
+
+def _save_broken_links_file(artifact, file_to_save):
+    artifact.file.save(name=os.path.basename(file_to_save.name), content=File(file_to_save))
+    artifact.save()
+    return True
+
+
+def _write_broken_links_to_file(broken_or_locked_urls, broken_links_file):
+    with open(broken_links_file.name, 'w') as file:
+        json.dump(broken_or_locked_urls, file, indent=4)
