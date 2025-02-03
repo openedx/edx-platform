@@ -3,6 +3,8 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Button } from '@edx/paragon';
+import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 import { Provider } from 'react-redux';
 
 import store from '../../data/store';
@@ -95,15 +97,15 @@ describe('ProblemBrowser Main component', () => {
                 />
             </Provider>,
         );
-        expect(screen.queryByText('Some expected block name')).toBeNull();
+        expect(screen.queryByTestId('block-browser-container')).toBeNull();
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
         await userEvent.click(toggleButton);
         await waitFor(() => {
-            expect(screen.queryByText('Select a section or problem')).not.toBeNull();
+            expect(screen.findByTestId('block-browser-container')).resolves.toBeInTheDocument();
         });
         await userEvent.click(toggleButton);
         await waitFor(() => {
-            expect(screen.queryByText('Some expected block name')).toBeNull();
+            expect(screen.findByTestId('block-browser-container')).resolves.toBeInTheDocument();
         });
     });
 
@@ -125,14 +127,13 @@ describe('ProblemBrowser Main component', () => {
             </Provider>,
         );
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
-
         await userEvent.click(toggleButton);
         await waitFor(() => {
-            expect(screen.queryByText('Select a section or problem')).not.toBeNull();
+            expect(screen.findByText('block-browser-container')).resolves.toBeInTheDocument();
         });
         await userEvent.click(toggleButton);
         await waitFor(() => {
-            expect(screen.queryByText('Some expected block name')).toBeNull();
+            expect(screen.queryByText('block-browser-container')).toBeNull();
         });
     });
 });
