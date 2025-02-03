@@ -1110,6 +1110,9 @@ class CourseLinkCheckTask(UserTask):  # pylint: disable=abstract-method
 # Note: The decorator @set_code_owner_attribute cannot be used here because the UserTaskMixin
 #   does stack inspection and can't handle additional decorators.
 def check_broken_links(self, user_id, course_key_string, language):
+    """
+    Checks for broken links in a course and store the results in a file.
+    """
     set_code_owner_attribute_from_module(__name__)
     return _check_broken_links(self, user_id, course_key_string, language)
 
@@ -1169,9 +1172,9 @@ def _scan_course_for_links(course_key):
 
     Returns:
         list: block id and URL pairs
-    
+
     Example return:
-    [ 
+    [
         [block_id1, url1],
         [block_id2, url2],
         ...
@@ -1331,11 +1334,11 @@ def _filter_by_status(results):
         retry_list (list): block id and url pairs
 
     Example return:
-        [ 
+        [
             [block_id1, filtered_results_url1, is_locked],
             ...
         ],
-        [ 
+        [
             [block_id1, retry_url1],
             ...
         ]
@@ -1358,7 +1361,7 @@ def _filter_by_status(results):
 
 def _retry_validation(url_list, course_key, retry_count=3):
     """
-    Retry URLs that failed due to connection error.
+    Retry validation for URLs that failed due to connection error.
 
     Returns:
         list: URLs that could not be validated due to being locked or due to persistent connection problems
@@ -1375,6 +1378,15 @@ def _retry_validation(url_list, course_key, retry_count=3):
 
 
 def _retry_validation_and_filter_results(course_key, results, retry_list):
+    """
+    Validates URLs and then filter them by status. 
+
+    Arguments:
+        retry_list: list of urls to retry
+
+    Returns:
+        list: URLs that did not pass validation and should be retried
+    """
     validated_url_list = asyncio.run(
         _validate_urls_access_in_batches(retry_list, course_key, batch_size=100)
     )

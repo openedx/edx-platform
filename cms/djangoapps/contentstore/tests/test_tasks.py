@@ -293,8 +293,9 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         src="/static/resource_name"
         '''
 
-        original_lines = len(url_list.splitlines()) - 2     
-            # Correct for the two carriage returns surrounding the ''' marks
+        # Correct for the two carriage returns surrounding the ''' marks
+        original_lines = len(url_list.splitlines()) - 2
+
         processed_url_list = _get_urls(url_list)
         processed_lines = len(processed_url_list)
 
