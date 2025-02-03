@@ -390,6 +390,7 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
 
 
 @ddt.ddt
+@skip_unless_lms
 class TestUserSocialAuthAPI(ThirdPartyAuthTestMixin, APITestCase):
     """
     Tests ModifyThirdPartyAuthView.
