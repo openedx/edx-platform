@@ -1,11 +1,11 @@
 // eslint-disable-next-line no-redeclare
 /* global jest,test,describe,expect */
-import { Provider } from 'react-redux';
 import React from 'react';
-import store from '../../data/store';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
 
+import store from '../../data/store';
 import Main from './Main';
 
 describe('ProblemBrowser Main component', () => {
@@ -30,11 +30,10 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
         expect(screen.getByRole('button', { name: 'Select a section or problem' })).toBeInTheDocument();
     });
-    
 
     test('render with selected block', () => {
         render(
@@ -51,7 +50,7 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
         expect(screen.getByRole('button', { name: 'Select a section or problem' })).toBeInTheDocument();
     });
@@ -72,7 +71,7 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
         await userEvent.click(toggleButton);
@@ -94,11 +93,11 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
 
         expect(screen.queryByText('Some expected block name')).toBeNull();
-        const toggleButton = screen.getByRole("button", { name: 'Select a section or problem' });
+        const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
         await userEvent.click(toggleButton);
         const blockName = screen.queryByText('Some expected block name');
         expect(blockName).toBeNull();
@@ -119,7 +118,7 @@ describe('ProblemBrowser Main component', () => {
                     reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
-            </Provider>
+            </Provider>,
         );
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
 
