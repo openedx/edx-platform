@@ -29,7 +29,6 @@ from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fe
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
-from openedx.core.lib.xblock_serializer.api import XBlockSerializer
 from openedx.core.djangoapps.content_staging.data import LIBRARY_SYNC_PURPOSE
 
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url

@@ -20,7 +20,6 @@ from xmodule.contentstore.django import contentstore
 
 from .data import (
     CLIPBOARD_PURPOSE,
-    LIBRARY_SYNC_PURPOSE,
     StagedContentData,
     StagedContentFileData,
     StagedContentStatus,
