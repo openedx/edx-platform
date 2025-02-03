@@ -20,6 +20,8 @@ from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 
+from .utils import get_offline_service_user
+
 User = get_user_model()
 log = logging.getLogger(__name__)
 
@@ -32,24 +34,11 @@ class XBlockRenderer:
     :param user: The user for whom the XBlock will be rendered.
     """
 
-    SERVICE_USERNAME = 'offline_mode_worker'
-
     def __init__(self, usage_key_string, user=None, request=None):
         self.usage_key = UsageKey.from_string(usage_key_string)
         self.usage_key = self.usage_key.replace(course_key=modulestore().fill_in_run(self.usage_key.course_key))
-        self.user = user or self.service_user
+        self.user = user or get_offline_service_user()
         self.request = request or self.generate_request()
-
-    @property
-    def service_user(self):
-        """
-        Returns a valid user to be used as the service user.
-        """
-        try:
-            return User.objects.get(username=self.SERVICE_USERNAME)
-        except User.DoesNotExist as e:
-            log.error(f'Service user with username {self.SERVICE_USERNAME} to render XBlock does not exist.')
-            raise e
 
     def generate_request(self):
         """

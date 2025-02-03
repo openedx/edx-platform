@@ -5644,3 +5644,8 @@ USE_EXTRACTED_PROBLEM_BLOCK = False
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
 USE_EXTRACTED_VIDEO_BLOCK = False
+
+# .. setting_name: RETIREMENT_SERVICE_WORKER_USERNAME
+# .. setting_default: offline_mode_worker
+# .. setting_description: Set the username for generating offline content. The user is used for rendering blocks.
+OFFLINE_SERVICE_WORKER_USERNAME = "offline_mode_worker"
