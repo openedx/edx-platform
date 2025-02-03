@@ -95,12 +95,17 @@ describe('ProblemBrowser Main component', () => {
                 />
             </Provider>,
         );
-
+        
         expect(screen.queryByText('Some expected block name')).toBeNull();
         const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
         await userEvent.click(toggleButton);
-        const blockName = screen.queryByText('Some expected block name');
-        expect(blockName).toBeNull();
+        await waitFor(() => {
+            expect(screen.queryByText('Select a section or problem')).not.toBeNull();
+        });
+        await userEvent.click(toggleButton);
+        await waitFor(() => {
+            expect(screen.queryByText('Some expected block name')).toBeNull();
+        });
     });
 
     test('hide dropdown on second toggle', async () => {
