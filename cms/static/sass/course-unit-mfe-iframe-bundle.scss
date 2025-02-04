@@ -411,6 +411,13 @@ body {
         }
       }
     }
+
+    .xmodule_DoneXBlock {
+      &.xblock-v1-studio_view {
+        margin-top: 60px;
+        padding: 0 20px;
+      }
+    }
   }
 }
 
