@@ -2542,7 +2542,6 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         self.assertEqual(response.status_code, 200)
 
 
-
 @httpretty.activate
 @ddt.ddt
 class ThirdPartyRegistrationTestMixin(

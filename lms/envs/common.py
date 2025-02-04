@@ -5574,8 +5574,6 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
 
-
-
 LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 
 
