@@ -523,7 +523,7 @@ class UpdateAllNotificationPreferencesView(APIView):
                                 'error': f'Invalid path: {app}.notification_types.{notification_type}.{channel}'
                             })
 
-                    except Exception as e:
+                    except (KeyError, AttributeError, ValueError) as e:
                         errors.append({
                             'course_id': str(preference.course_id),
                             'error': str(e)
@@ -551,7 +551,7 @@ class UpdateAllNotificationPreferencesView(APIView):
                     status=status.HTTP_200_OK if updated_courses else status.HTTP_400_BAD_REQUEST
                 )
 
-        except Exception as e:
+        except (KeyError, AttributeError, ValueError) as e:
             return Response({
                 'status': 'error',
                 'message': str(e)

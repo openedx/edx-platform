@@ -34,7 +34,6 @@
     "paths": [
       "lms/djangoapps/discussion/",
       "lms/djangoapps/edxnotes/",
-      "lms/djangoapps/email_marketing/",
       "lms/djangoapps/experiments/"
     ]
   },

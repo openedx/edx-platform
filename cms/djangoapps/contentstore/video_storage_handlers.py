@@ -995,9 +995,9 @@ def get_course_youtube_edx_video_ids(course_id):
             f"InvalidKeyError occurred while getting YouTube video IDs for course_id: {course_id}: {error}"
         )
         return JsonResponse({'error': invalid_key_error_msg}, status=500)
-    except Exception as error:
+    except (TypeError, AttributeError) as error:
         LOGGER.exception(
-            f"Unexpected error occurred while getting YouTube video IDs for course_id: {course_id}: {error}"
+            f"Error occurred while getting YouTube video IDs for course_id: {course_id}: {error}"
         )
         return JsonResponse({'error': unexpected_error_msg}, status=500)
 
