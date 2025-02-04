@@ -316,6 +316,7 @@ body {
 
       .openassessment_save_button,
       .save-button,
+      .action-save,
       .continue-button {
         color: $white;
         background-color: $primary;
@@ -347,6 +348,7 @@ body {
       }
 
       .openassessment_cancel_button,
+      .action-cancel,
       .cancel-button {
         color: $text-color;
         background-color: $transparent;
@@ -412,8 +414,8 @@ body {
       }
     }
 
-    .xmodule_DoneXBlock {
-      &.xblock-v1-studio_view {
+    .xblock-v1-studio_view {
+      &.xmodule_DoneXBlock {
         margin-top: 60px;
         padding: 0 20px;
       }
