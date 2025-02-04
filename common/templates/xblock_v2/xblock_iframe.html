@@ -15,6 +15,8 @@
   {% endif %}
   <!-- Most XBlocks require jQuery: -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <!-- ORA2 blocks require timepicker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.min.js"></script>
   <!-- The Video XBlock requires "ajaxWithPrefix" -->
   <script type="text/javascript">
     $.postWithPrefix = $.post;
@@ -378,6 +380,8 @@
                   '.save-button',
                   '.action-cancel',
                   '.action-save',
+                  '.openassessment_cancel_button',
+                  '.openassessment_save_button',
               ];
 
               for (const selector of selectors) {
