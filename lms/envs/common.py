@@ -69,7 +69,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
 )
-from openedx.core.lib.derived import derived, derived_collection_entry
+from openedx.core.lib.derived import Derived
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
@@ -1395,7 +1395,7 @@ TEMPLATES = [
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': _make_mako_template_dirs,
+        'DIRS': Derived(_make_mako_template_dirs),
         # Options specific to this backend.
         'OPTIONS': {
             'context_processors': CONTEXT_PROCESSORS,
@@ -1404,7 +1404,6 @@ TEMPLATES = [
         }
     },
 ]
-derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
 
@@ -1734,7 +1733,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': lambda settings: settings.DATA_DIR,
+                        'fs_root': Derived(lambda settings: settings.DATA_DIR),
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
@@ -1744,7 +1743,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': lambda settings: settings.DATA_DIR,
+                        'fs_root': Derived(lambda settings: settings.DATA_DIR),
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
@@ -2054,8 +2053,7 @@ def _make_locale_paths(settings):  # pylint: disable=missing-function-docstring
         for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
             locale_paths += (path(locale_path), )
     return locale_paths
-LOCALE_PATHS = _make_locale_paths
-derived('LOCALE_PATHS')
+LOCALE_PATHS = Derived(_make_locale_paths)
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -4658,13 +4656,12 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 ############## Settings for LMS Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "lms" / "envs" / "help_tokens.ini"
-HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
-HELP_TOKENS_VERSION = lambda settings: doc_version()
+HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
+HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
 HELP_TOKENS_BOOKS = {
     'learner': 'https://edx.readthedocs.io/projects/open-edx-learner-guide',
     'course_author': 'https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
 }
-derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
 ############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
 # The Open edX Enterprise service is currently hosted via the LMS container/process.
@@ -4952,14 +4949,13 @@ RETIRED_EMAIL_DOMAIN = 'retired.invalid'
 # .. setting_description: Set the format a retired user username field gets transformed into, where {}
 #     is replaced with the hash of the original username. This is a derived setting that depends on
 #     RETIRED_USERNAME_PREFIX value.
-RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+RETIRED_USERNAME_FMT = Derived(lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}')
 # .. setting_name: RETIRED_EMAIL_FMT
 # .. setting_default: retired__user_{}@retired.invalid
 # .. setting_description: Set the format a retired user email field gets transformed into, where {} is
 #     replaced with the hash of the original email. This is a derived setting that depends on
 #     RETIRED_EMAIL_PREFIX and RETIRED_EMAIL_DOMAIN values.
-RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
-derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+RETIRED_EMAIL_FMT = Derived(lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN)
 # .. setting_name: RETIRED_USER_SALTS
 # .. setting_default: ['abc', '123']
 # .. setting_description: Set a list of salts used for hashing usernames and emails on users retirement.
@@ -5447,11 +5443,11 @@ def _should_send_learning_badge_events(settings):
 EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.learning.certificate.created.v1': {
         'learning-certificate-lifecycle':
-            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+            {'event_key_field': 'certificate.course.course_key', 'enabled': Derived(_should_send_certificate_events)},
     },
     'org.openedx.learning.certificate.revoked.v1': {
         'learning-certificate-lifecycle':
-            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+            {'event_key_field': 'certificate.course.course_key', 'enabled': Derived(_should_send_certificate_events)},
     },
     'org.openedx.learning.course.unenrollment.completed.v1': {
         'course-unenrollment-lifecycle':
@@ -5513,33 +5509,16 @@ EVENT_BUS_PRODUCER_CONFIG = {
     "org.openedx.learning.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.course_key",
-            "enabled": _should_send_learning_badge_events,
+            "enabled": Derived(_should_send_learning_badge_events),
         },
     },
     "org.openedx.learning.ccx.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.ccx_course_key",
-            "enabled": _should_send_learning_badge_events,
+            "enabled": Derived(_should_send_learning_badge_events),
         },
     },
 }
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.created.v1',
-                         'learning-certificate-lifecycle', 'enabled')
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
-                         'learning-certificate-lifecycle', 'enabled')
-
-derived_collection_entry(
-    "EVENT_BUS_PRODUCER_CONFIG",
-    "org.openedx.learning.course.passing.status.updated.v1",
-    "learning-badges-lifecycle",
-    "enabled",
-)
-derived_collection_entry(
-    "EVENT_BUS_PRODUCER_CONFIG",
-    "org.openedx.learning.ccx.course.passing.status.updated.v1",
-    "learning-badges-lifecycle",
-    "enabled",
-)
 
 BEAMER_PRODUCT_ID = ""
 
