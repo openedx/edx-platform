@@ -132,7 +132,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
         assert student_data_mode in (StudentDataMode.Ephemeral, StudentDataMode.Persisted)
         self.authored_data_mode = authored_data_mode
         self.authored_data_store = authored_data_store
-        self.children_data_store = None
+        self.children_data_store = authored_data_store
         self.student_data_mode = student_data_mode
         self.handler_url_fn = handler_url
         self.user = user

@@ -150,7 +150,7 @@ class LearningCoreFieldData(FieldData):
         able to read/write it.
         """
         field = self._getfield(block, name)
-        if field.scope not in (Scope.content, Scope.settings):
+        if field.scope not in (Scope.content, Scope.settings, Scope.children):
             raise NotImplementedError(
                 f"Scope {field.scope} (field {name} of {block.scope_ids.usage_id}) "
                 "is unsupported. LearningCoreFieldData only supports the content"
