@@ -682,8 +682,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
             login_user(post_request)
             actions.do_complete(
                 post_request.backend,
-                social_views._do_login,
-                user=user,  # pylint: disable=protected-access, no-member
+                social_views._do_login,  # pylint: disable=protected-access
+                user=user,  # pylint: disable=no-member
                 request=post_request,
             )
 
@@ -914,8 +914,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
 
         self.assert_redirect_after_pipeline_completes(
             actions.do_complete(
-                request.backend, social_views._do_login, user=user, request=request
-            ),  # pylint: disable=protected-access
+                request.backend,
+                social_views._do_login,  # pylint: disable=protected-access
+                user=user,
+                request=request,
+            ),
             requested_redirect_url,
         )
 
@@ -1126,9 +1129,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase, HelperMixin):
             user = request.user
         return actions.do_complete(
             request.backend,
-            social_views._do_login,
+            social_views._do_login,  # pylint: disable=protected-access
             user,
-            None,  # pylint: disable=protected-access
+            None,
             redirect_field_name=auth.REDIRECT_FIELD_NAME,
             request=request,
             partial_token=partial_pipeline_token,
