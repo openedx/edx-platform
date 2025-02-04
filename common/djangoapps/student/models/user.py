@@ -1028,7 +1028,7 @@ class LoginFailures(models.Model):
             entry = cls._get_record_for_user(user)
             entry.delete()
         except ObjectDoesNotExist:
-            return
+            pass
 
     def __str__(self):
         """Str -> Username: count - date."""
