@@ -278,7 +278,9 @@ class TestWordCloud(BaseTestXmodule):
             uuid_str = re.search(r"UUID\('([a-f0-9\-]+)'\)", fragment.content).group(1)
             expected_context['element_id'] = UUID(uuid_str)
             mock_render_django_template.assert_called_once()
-            assert fragment.content == self.runtime.render_template('templates/word_cloud.html', expected_context)
+            # Remove i18n service
+            fragment_content_clean = re.sub(r"\{.*?\}", "{}", fragment.content)
+            assert fragment_content_clean == self.runtime.render_template('templates/word_cloud.html', expected_context)
         else:
             expected_context['ajax_url'] = self.block.ajax_url
             expected_context['element_id'] = self.block.location.html_id()
