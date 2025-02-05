@@ -1,8 +1,77 @@
 """
 Logic for handling actions in Studio related to Course Optimizer.
 """
+import json
+from user_tasks.conf import settings as user_tasks_settings
+from user_tasks.models import UserTaskArtifact, UserTaskStatus
+
+from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
+
+
+# Restricts status in the REST API to only those which the requesting user has permission to view.
+#   These can be overwritten in django settings.
+#   By default, these should be the UserTaskStatus statuses:
+#   'Pending', 'In Progress', 'Succeeded', 'Failed', 'Canceled', 'Retrying'
+STATUS_FILTERS = user_tasks_settings.USER_TASKS_STATUS_FILTERS
+
+
+def get_link_check_data(request, course_id):
+    """
+    Retrives data and formats it for the link check get request.
+    """
+    task_status = _latest_task_status(request, course_id)
+    status = None
+    created_at = None
+    broken_links_dto = None
+    error = None
+    if task_status is None:
+        # The task hasn't been initialized yet; did we store info in the session already?
+        try:
+            session_status = request.session['link_check_status']
+            status = session_status[course_id]
+        except KeyError:
+            status = 'Uninitiated'
+    else:
+        status = task_status.state
+        created_at = task_status.created
+        if task_status.state == UserTaskStatus.SUCCEEDED:
+            artifact = UserTaskArtifact.objects.get(status=task_status, name='BrokenLinks')
+            with artifact.file as file:
+                content = file.read()
+                json_content = json.loads(content)
+                broken_links_dto = generate_broken_links_descriptor(json_content, request.user)
+        elif task_status.state in (UserTaskStatus.FAILED, UserTaskStatus.CANCELED):
+            errors = UserTaskArtifact.objects.filter(status=task_status, name='Error')
+            if errors:
+                error = errors[0].text
+                try:
+                    error = json.loads(error)
+                except ValueError:
+                    # Wasn't JSON, just use the value as a string
+                    pass
+
+    data = {
+        'LinkCheckStatus': status,
+        **({'LinkCheckCreatedAt': created_at} if created_at else {}),
+        **({'LinkCheckOutput': broken_links_dto} if broken_links_dto else {}),
+        **({'LinkCheckError': error} if error else {})
+    }
+    return data
+
+
+def _latest_task_status(request, course_key_string, view_func=None):
+    """
+    Get the most recent link check status update for the specified course
+    key.
+    """
+    args = {'course_key_string': course_key_string}
+    name = CourseLinkCheckTask.generate_name(args)
+    task_status = UserTaskStatus.objects.filter(name=name)
+    for status_filter in STATUS_FILTERS:
+        task_status = status_filter().filter_queryset(request, task_status, view_func)
+    return task_status.order_by('-created').first()
 
 
 def generate_broken_links_descriptor(json_content, request_user):
