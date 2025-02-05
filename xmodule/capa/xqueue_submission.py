@@ -61,12 +61,23 @@ def extract_item_data(header, payload):
         student_info = json.loads(payload["student_info"])
     except json.JSONDecodeError as e:
         raise ValueError(f"Error to student_info: {e}")
+    
+    try:
+        grader_payload = payload["grader_payload"]
+        if isinstance(grader_payload, str):
+            grader_payload = json.loads(grader_payload)
+        grader = grader_payload.get("grader", '')
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Error  grader_payload: {e}")
+    except KeyError as e:
+        raise ValueError(f"Error payload: {e}")
+    
+     
 
     student_id = student_info.get("anonymous_student_id")
     if not student_id:
         raise ValueError("The field 'anonymous_student_id' is not student_info.")
 
-    # Construir el diccionario de resultados
     student_dict = {
         'item_id': item_id,
         'item_type': item_type,
@@ -74,12 +85,11 @@ def extract_item_data(header, payload):
         'student_id': student_id
     }
 
-    # Obtener la respuesta del estudiante
     student_answer = payload.get("student_response")
     if student_answer is None:
         raise ValueError("El campo 'student_response' no está presente en payload.")
 
-    return student_dict, student_answer, queue_name
+    return student_dict, student_answer, queue_name, grader
 
 class XQueueInterfaceSubmission:
     """
@@ -89,13 +99,14 @@ class XQueueInterfaceSubmission:
     def send_to_submission(self, header, body, files_to_upload=None):
         from submissions.api import create_submission
         try:
-            student_item, answer, queue_name = extract_item_data(header, body)
+            student_item, answer, queue_name, grader = extract_item_data(header, body)
             
             log.error(f"student_item: {student_item}")
             log.error(f"header: {header}")
             log.error(f"body: {body}")
+            log.error(f"grader: {grader}")
             
-            submission = create_submission(student_item, answer, queue_name=queue_name)
+            submission = create_submission(student_item, answer, queue_name=queue_name, grader=grader)
             
             return submission
         except Exception as e:
