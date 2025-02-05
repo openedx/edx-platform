@@ -178,7 +178,7 @@ def xblock_handler(
     """
     # To support sandboxed XBlocks, custom frontends, and other use cases, we
     # authenticate requests using a secure token in the URL. see
-    # openedx.core.djangoapps.xblock.utils.get_secure_hash_for_xblock_handler
+    # openedx.core.djangoapps.xblock.utils.get_secure_token_for_xblock_handler
     # for details and rationale.
     if not validate_secure_token_for_xblock_handler(user_id, str(usage_key), secure_token):
         raise PermissionDenied("Invalid/expired auth token.")
