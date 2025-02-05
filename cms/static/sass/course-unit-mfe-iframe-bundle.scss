@@ -386,6 +386,8 @@ body {
 
   // Additions for the xblock editor on the Library Authoring
   &.xblock-iframe-content {
+    height: 100%;
+
     // Reset the max-height to allow the settings list to grow
     .wrapper-comp-settings .list-input.settings-list {
       max-height: unset;
@@ -415,9 +417,27 @@ body {
     }
 
     .xblock-v1-studio_view {
+      height: 100%;
+
+      .editor-with-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+
+        .list-input {
+          height: 90vh;
+        }
+      }
+
       &.xmodule_DoneXBlock {
         margin-top: 60px;
         padding: 0 20px;
+      }
+
+      .xblock-actions {
+        display: flex;
+        justify-content: flex-end;
       }
     }
   }
