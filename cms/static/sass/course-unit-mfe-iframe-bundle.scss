@@ -1,14 +1,22 @@
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
+body {
+  min-width: 800px;
+}
+
 .wrapper {
+  .inner-wrapper {
+    max-width: 100%;
+  }
+
   .wrapper-xblock {
     background-color: $transparent;
     border-radius: 6px;
     border: none;
 
     &:hover {
-      border-color: none;
+      border-color: transparent;
     }
 
     .xblock-header-primary {
@@ -21,6 +29,54 @@
         font-weight: 700;
         color: $black;
       }
+    }
+
+    .xblock-header-secondary {
+      border-radius: 0 0 4px 4px;
+
+      .actions-list .action-item .action-button {
+        border-radius: 4px;
+
+        &:hover {
+          background-color: $primary;
+          color: $white;
+        }
+      }
+    }
+
+    &.level-page .xblock-message {
+      padding: ($baseline * .75) ($baseline * 1.2);
+      border-radius: 0 0 4px 4px;
+
+      &.information {
+        color: $text-color;
+        background-color: $xblock-message-info-bg;
+        border-color: $xblock-message-info-border-color;
+      }
+
+      &.validation.has-warnings {
+        color: $black;
+        background-color: $xblock-message-warning-bg;
+        border-color: $xblock-message-warning-border-color;
+        border-top-width: 1px;
+
+        .icon {
+          color: $xblock-message-warning-border-color;
+        }
+      }
+
+      a {
+        color: $primary;
+      }
+    }
+
+    .xblock-author_view-library_content > .wrapper-xblock-message .xblock-message {
+      font-size: 16px;
+      line-height: 22px;
+      border-radius: 4px;
+      padding: ($baseline * 1.2);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+      margin-bottom: ($baseline * 1.4);
     }
 
     &.level-element {
@@ -40,27 +96,34 @@
       border-bottom-right-radius: 6px;
     }
 
-    .wrapper-xblock .header-actions .actions-list .action-item .action-button {
-      @extend %button-styles;
-
-      color: $primary;
-
-      .fa-ellipsis-v {
-        font-size: $base-font-size;
+    .wrapper-xblock .header-actions .actions-list {
+      .action-actions-menu:last-of-type .nav-sub {
+        right: 120px;
       }
 
-      &:hover {
-        background-color: $primary;
-        color: $white;
-        border-color: $transparent;
-      }
+      .action-item .action-button {
+        @extend %button-styles;
 
-      &:focus {
-        outline: 2px $transparent;
-        background-color: $transparent;
-        box-shadow: inset 0 0 0 2px $primary;
         color: $primary;
-        border-color: $transparent;
+
+        .fa-ellipsis-v {
+          font-size: $base-font-size;
+        }
+
+        &:hover {
+          background-color: $primary;
+          color: $white;
+          border-color: $transparent;
+        color: $white;
+      }
+
+        &:focus {
+          outline: 2px $transparent;
+          background-color: $transparent;
+          box-shadow: inset 0 0 0 2px $primary;
+          color: $primary;
+          border-color: $transparent;
+        }
       }
     }
 
@@ -137,7 +200,7 @@
     }
   }
 
-  .modal-window.modal-editor {
+  .modal-window.modal-editor, &.xblock-iframe-content {
     background-color: $white;
     border-radius: 6px;
 
@@ -318,6 +381,37 @@
   .modal-lg.modal-window.confirm.openassessment_modal_window {
     height: 635px;
   }
+
+  // Additions for the xblock editor on the Library Authoring
+  &.xblock-iframe-content {
+    // Reset the max-height to allow the settings list to grow
+    .wrapper-comp-settings .list-input.settings-list {
+      max-height: unset;
+    }
+
+    // For Google Docs and Google Calendar xblock editor
+    .google-edit-wrapper .xblock-inputs {
+      position: unset;
+      overflow-y: unset;
+    }
+
+    .xblock-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+      position: sticky;
+      bottom: 0;
+
+      .action-item {
+        @extend %t-action3;
+
+        display: inline-block;
+        margin-right: ($baseline*0.75);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
 }
 
 .view-container .content-primary {
@@ -327,6 +421,7 @@
 
 .wrapper-content.wrapper {
   padding: $baseline / 4;
+  background-color: #f8f7f6;
 }
 
 .btn-default.action-edit.title-edit-button {
@@ -629,7 +724,7 @@ select {
   }
 }
 
-.xblock-header-primary {
+.xblock-header:not(.xblock-header-library_content, .xblock-header-split_test) .xblock-header-primary {
   position: relative;
 
   &::before {
@@ -655,4 +750,8 @@ select {
 
 .wrapper-comp-setting.metadata-list-enum .action.setting-clear.active {
   margin-top: 0;
+}
+
+.wrapper-xblock .xblock-header-primary .header-actions .wrapper-nav-sub {
+  z-index: $zindex-dropdown;
 }

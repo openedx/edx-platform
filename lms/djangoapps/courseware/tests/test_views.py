@@ -341,7 +341,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(177, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        with self.assertNumQueries(154, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -2933,9 +2933,9 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
-    @patch('lms.djangoapps.courseware.views.views.unpack_token_for')
+    @patch('lms.djangoapps.courseware.views.views.unpack_jwt')
     def test_render_descendant_of_exam_gated_by_access_token(self, exam_access_token,
-                                                             expected_response, _mock_token_unpack):
+                                                             expected_response, _mock_unpack_jwt):
         """
         Verify blocks inside an exam that requires token access are gated by
         a valid exam access JWT issued for that exam sequence.
@@ -2968,7 +2968,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         CourseOverview.load_from_module_store(self.course.id)
         self.setup_user(admin=False, enroll=True, login=True)
 
-        def _mock_token_unpack_fn(token, user_id):
+        def _mock_unpack_jwt_fn(token, user_id):
             if token == 'valid-jwt-for-exam-sequence':
                 return {'content_id': str(self.sequence.location)}
             elif token == 'valid-jwt-for-incorrect-sequence':
@@ -2976,7 +2976,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
             else:
                 raise Exception('invalid JWT')
 
-        _mock_token_unpack.side_effect = _mock_token_unpack_fn
+        _mock_unpack_jwt.side_effect = _mock_unpack_jwt_fn
 
         # Problem and Vertical response should be gated on access token
         for block in [self.problem_block, self.vertical_block]:

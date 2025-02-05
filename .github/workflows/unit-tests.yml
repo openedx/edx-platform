@@ -71,29 +71,15 @@ jobs:
 
       - name: install system requirements
         run: |
-          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx openssl
+          sudo apt-get update && sudo apt-get install libmysqlclient-dev libxmlsec1-dev lynx
 
-      # This is needed until the ENABLE_BLAKE2B_HASHING can be removed and we
-      # can stop using MD4 by default.
-      - name: enable md4 hashing in libssl
-        run: |
-          cat <<EOF | sudo tee /etc/ssl/openssl.cnf
-          # Use this in order to automatically load providers.
-          openssl_conf = openssl_init
-
-          [openssl_init]
-          providers = provider_sect
-
-          [provider_sect]
-          default = default_sect
-          legacy = legacy_sect
-
-          [default_sect]
-          activate = 1
-
-          [legacy_sect]
-          activate = 1
-          EOF
+      # We pull this image a lot, and Dockerhub will rate limit us if we pull too often.
+      # This is an attempt to cache the image for better performance and to work around that.
+      # It will cache all pulled images, so if we add new images to this we'll need to update the key.
+      - name: Cache Docker images
+        uses: ScribeMD/docker-cache@0.5.0
+        with:
+          key: docker-${{ runner.os }}-mongo-${{ matrix.mongo-version }}
 
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.11.0
@@ -180,7 +166,7 @@ jobs:
         shell: bash
         run: |
           echo "root_cms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=cms.envs.test cms/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
-          echo "root_lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ xmodule/ pavelib/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
+          echo "root_lms_unit_tests_count=$(pytest --disable-warnings --collect-only --ds=lms.envs.test lms/ openedx/ common/djangoapps/ xmodule/ -q | head -n -2 | wc -l)" >> $GITHUB_ENV
 
       - name: get GHA unit test paths
         shell: bash
@@ -218,7 +204,6 @@ jobs:
           workflow don't match the count for unit tests for entire edx-platform suite, please update the unit-test-shards.json under .github/workflows
           to add any missing apps and match the count. for more details please take a look at scripts/gha-shards-readme.md"
           exit 1
-
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
