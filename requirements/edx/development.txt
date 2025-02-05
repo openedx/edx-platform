@@ -2260,7 +2260,7 @@ xblock-drag-and-drop-v2==4.0.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-xblock-google-drive==0.7.0
+xblock-google-drive==0.7.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

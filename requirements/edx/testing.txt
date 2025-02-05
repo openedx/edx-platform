@@ -1681,7 +1681,7 @@ xblock[django]==5.1.1
     #   xblocks-contrib
 xblock-drag-and-drop-v2==4.0.3
     # via -r requirements/edx/base.txt
-xblock-google-drive==0.7.0
+xblock-google-drive==0.7.1
     # via -r requirements/edx/base.txt
 xblock-poll==1.14.0
     # via -r requirements/edx/base.txt
