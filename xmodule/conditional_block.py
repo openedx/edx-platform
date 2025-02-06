@@ -382,28 +382,6 @@ class ConditionalBlock(
             validation.summary = conditional_validation.messages[0]
         return validation
 
-    @XBlock.json_handler
-    def studio_submit(self, submissions, suffix=''):  # pylint: disable=unused-argument
-        """
-        Change the settings for this XBlock given by the Studio user.
-        """
-        if 'display_name' in submissions:
-            self.display_name = submissions['display_name']
-        if 'show_tag_list' in submissions:
-            self.show_tag_list = submissions['show_tag_list']
-        if 'sources_list' in submissions:
-            self.sources_list = submissions['sources_list']
-        if 'conditional_attr' in submissions:
-            self.conditional_attr = submissions['conditional_attr']
-        if 'conditional_value' in submissions:
-            self.conditional_value = submissions['conditional_value']
-        if 'conditional_message' in submissions:
-            self.conditional_message = submissions['conditional_message']
-
-        return {
-            'result': 'success',
-        }
-
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super().non_editable_metadata_fields

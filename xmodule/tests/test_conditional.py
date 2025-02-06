@@ -403,29 +403,3 @@ class ConditionalBlockStudioTest(XModuleXmlImportTest):
         assert validation.summary.type == StudioValidationMessage.NOT_CONFIGURED
         assert validation.summary.action_class == 'edit-button'
         assert validation.summary.action_label == 'Configure list of sources'
-
-    def test_studio_submit_handler(self):
-        """
-        Test studio_submint handler
-        """
-        TEST_SUBMIT_DATA = {
-            'display_name': "New Conditional",
-            'show_tag_list': ["1", "2"],
-            'sources_list': ["1", "2"],
-            'conditional_attr': "test",
-            'conditional_value': 'value',
-            'conditional_message': 'message',
-        }
-        body = json.dumps(TEST_SUBMIT_DATA)
-        request = Request.blank('/')
-        request.method = 'POST'
-        request.body = body.encode('utf-8')
-        res = self.conditional.handle('studio_submit', request)
-        assert json.loads(res.body.decode('utf8')) == {'result': 'success'}
-
-        assert self.conditional.display_name == TEST_SUBMIT_DATA['display_name']
-        assert self.conditional.show_tag_list == TEST_SUBMIT_DATA['show_tag_list']
-        assert self.conditional.sources_list == TEST_SUBMIT_DATA['sources_list']
-        assert self.conditional.conditional_attr == TEST_SUBMIT_DATA['conditional_attr']
-        assert self.conditional.conditional_value == TEST_SUBMIT_DATA['conditional_value']
-        assert self.conditional.conditional_message == TEST_SUBMIT_DATA['conditional_message']
