@@ -56,8 +56,7 @@ For example:
             for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
                 locale_paths += (path(locale_path), )
         return locale_paths
-    LOCALE_PATHS = _make_locale_paths
-    derived('LOCALE_PATHS')
+    LOCALE_PATHS = Derived(_make_locale_paths)
 
 In this case, ``LOCALE_PATHS`` will be defined correctly at the end of the
 settings module parsing no matter what ``REPO_ROOT``,
@@ -92,7 +91,6 @@ when nested within each other:
             'NAME': 'mako',
             'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
             'APP_DIRS': False,
-            'DIRS': _make_mako_template_dirs,
+            'DIRS': Derived(_make_mako_template_dirs),
         },
     ]
-    derived_collection_entry('TEMPLATES', 1, 'DIRS')

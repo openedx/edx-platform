@@ -1,7 +1,7 @@
 """
 Lookup list of installed XBlocks, to aid XBlock developers
 """
-from importlib.metadata import entry_points
+import pkg_resources
 
 
 def get_without_builtins():
@@ -12,10 +12,11 @@ def get_without_builtins():
     """
     xblocks = [
         entry_point.name
-        for entry_point in entry_points(group='xblock.v1')
-        if not entry_point.module.startswith('xmodule')
+        for entry_point in pkg_resources.iter_entry_points('xblock.v1')
+        if not entry_point.module_name.startswith('xmodule')
     ]
-    return sorted(xblocks)
+    xblocks = sorted(xblocks)
+    return xblocks
 
 
 def main():
