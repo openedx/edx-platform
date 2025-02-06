@@ -69,8 +69,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.core import XBlock
 
-from openedx_learning.api import authoring
-
+from cms.djangoapps.contentstore.models import PublishableEntityLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
@@ -129,7 +128,7 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
         """
         Fetches publishable entity links for given course key
         """
-        links = authoring.get_entity_links_by_downstream(downstream_context_key=course_key_string)
+        links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key_string)
         serializer = PublishableEntityLinksSerializer(links, many=True)
         return Response(serializer.data)
 
