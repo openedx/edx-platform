@@ -53,7 +53,7 @@ class StubXQueueService:
         self.default_queuename = 'testqueue'
         self.waittime = 10
 
-    def send_callback(self, dispatch='score_update'):
+    def construct_callback(self, dispatch='score_update'):
         """A callback url method to use in tests."""
         return dispatch
 

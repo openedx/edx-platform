@@ -142,12 +142,9 @@ class XQueueInterface:
             # Use the new edx-submissions workflow
             submission = XQueueInterfaceSubmission().send_to_submission(header, body, files)
             log.error(submission)
-            if 'error' in submission:
-                return submission['error'], submission.get('message', 'Unknown error')
-            return 0, 'Submission sent successfully'
+            
         
-        else:
-            return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
+        return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
     def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
