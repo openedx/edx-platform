@@ -5,7 +5,6 @@ import unittest
 from unittest.mock import Mock, patch
 
 from django.conf import settings
-from webob import Request
 from fs.memoryfs import MemoryFS
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
