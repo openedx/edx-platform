@@ -388,7 +388,8 @@ body.course.view-export-git .nav-course-tools-export-git,
 body.course.view-team .nav-library-settings .title,
 body.course.view-team .nav-library-settings-team,
 body.course.view-checklists .nav-course-tools .title,
-body.course.view-checklists .nav-course-tools-checklists {
+body.course.view-checklists .nav-course-tools-checklists,
+.nav-course-tools-optimizer {
   color: theme-color("primary");
 
   a {

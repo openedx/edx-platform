@@ -7,14 +7,16 @@ from openedx.core.constants import COURSE_ID_PATTERN
 
 from .views import (
     AdvancedCourseSettingsView,
+    APIHeartBeatView,
     AuthoringGradingView,
     CourseTabSettingsView,
     CourseTabListView,
     CourseTabReorderView,
+    LinkCheckView,
+    LinkCheckStatusView,
     TranscriptView,
     YoutubeTranscriptCheckView,
     YoutubeTranscriptUploadView,
-    APIHeartBeatView
 )
 from .views import assets
 from .views import authoring_videos
@@ -101,5 +103,15 @@ urlpatterns = [
     re_path(
         fr'^youtube_transcripts/{settings.COURSE_ID_PATTERN}/upload?$',
         YoutubeTranscriptUploadView.as_view(), name='cms_api_youtube_transcripts_upload'
+    ),
+
+    # Course Optimizer
+    re_path(
+        fr'^link_check/{settings.COURSE_ID_PATTERN}$',
+        LinkCheckView.as_view(), name='link_check'
+    ),
+    re_path(
+        fr'^link_check_status/{settings.COURSE_ID_PATTERN}$',
+        LinkCheckStatusView.as_view(), name='link_check_status'
     ),
 ]
