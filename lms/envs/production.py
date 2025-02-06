@@ -43,6 +43,8 @@ def get_env_setting(setting):
         raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
+MY_RIDICULOUS_SETTING = "my.specific.website.org"
+
 ################################################# PRODUCTION DEFAULTS ################################################
 # We configure some defaults (beyond what has already been configured in common.py) before loading the YAML file below.
 # DO NOT ADD NEW DEFAULTS HERE! Put any new setting defaults in common.py instead, along with a setting annotation.
