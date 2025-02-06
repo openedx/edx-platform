@@ -59,6 +59,7 @@ def notification_preferences_viewed_event(request, course_id):
                 'course_id': str(course_id),
                 'user_forum_roles': get_user_forums_roles(request.user, course_id),
                 'user_course_roles': get_user_course_roles(request.user, course_id),
+                'type': 'course'
             }
         )
 
@@ -140,9 +141,45 @@ def notification_preference_update_event(user, course_id, updated_preference):
                 'notification_app': updated_preference.get('notification_app', ''),
                 'notification_type': updated_preference.get('notification_type', ''),
                 'notification_channel': updated_preference.get('notification_channel', ''),
-                'value': value
+                'value': value,
+                'type': 'course'
             }
         )
+
+
+def notification_preference_update_all_event(user, values):
+    """
+    Emit an event when a notification preference is updated for all courses.
+    """
+    value = values.get('updated_value', '')
+    if values.get('notification_channel', '') == 'email_cadence':
+        value = values.get('email_cadence', '')
+    event_data = {
+        'user_id': str(user.id),
+        'course_ids': [data['course_id'] for data in values.get('successfully_updated_courses', [])],
+        'type': 'account',
+        'notification_app': values.get('app', ''),
+        'notification_type': values.get('notification_type', ''),
+        'notification_channel': values.get('channel', ''),
+        'value': value
+    }
+    tracker.emit(
+        NOTIFICATION_PREFERENCES_UPDATED,
+        event_data
+    )
+
+
+def notification_preferences_viewed_all_event(user):
+    """
+    Emit an event when a user views their notification preferences for all courses.
+    """
+    tracker.emit(
+        NOTIFICATION_PREFERENCES_VIEWED,
+        {
+            'user_id': str(user.id),
+            'type': 'account',
+        }
+    )
 
 
 def notification_tray_opened_event(user, unseen_notifications_count):

@@ -29,7 +29,8 @@ from .events import (
     notification_preferences_viewed_event,
     notification_read_event,
     notification_tray_opened_event,
-    notifications_app_all_read_event
+    notifications_app_all_read_event, notification_preference_update_all_event,
+    notification_preferences_viewed_all_event
 )
 from .models import CourseNotificationPreference, Notification
 from .serializers import (
@@ -528,24 +529,23 @@ class UpdateAllNotificationPreferencesView(APIView):
                             'course_id': str(preference.course_id),
                             'error': str(e)
                         })
-
+                response_context = {
+                    'updated_value': value,
+                    'notification_type': notification_type,
+                    'channel': channel,
+                    'app': app,
+                    'successfully_updated_courses': updated_courses,
+                    'total_updated': len(updated_courses),
+                    'total_courses': notification_preferences.count()
+                }
                 response_data = {
                     'status': 'success' if updated_courses else 'partial_success' if errors else 'error',
                     'message': 'Notification preferences update completed',
-                    'data': {
-                        'updated_value': value,
-                        'notification_type': notification_type,
-                        'channel': channel,
-                        'app': app,
-                        'successfully_updated_courses': updated_courses,
-                        'total_updated': len(updated_courses),
-                        'total_courses': notification_preferences.count()
-                    }
+                    'data': response_context
                 }
-
                 if errors:
                     response_data['errors'] = errors
-
+                notification_preference_update_all_event(request.user, response_context)
                 return Response(
                     response_data,
                     status=status.HTTP_200_OK if updated_courses else status.HTTP_400_BAD_REQUEST
@@ -579,7 +579,7 @@ class AggregatedNotificationPreferences(APIView):
         notification_configs = aggregate_notification_configs(
             notification_configs
         )
-
+        notification_preferences_viewed_all_event(request.user)
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved',
