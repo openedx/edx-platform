@@ -477,6 +477,16 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
             assert object_tag.value in self.lib_block_tags
             assert object_tag.is_copied
 
+        # If we delete the upstream library block...
+        library_api.delete_library_block(self.lib_block_key)
+
+        # ...the copied tags remain, but should no longer be marked as "copied"
+        object_tags = tagging_api.get_object_tags(new_block_key)
+        assert len(object_tags) == len(self.lib_block_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in self.lib_block_tags
+            assert not object_tag.is_copied
+
     def test_paste_from_library_copies_asset(self):
         """
         Assets from a library component copied into a subdir of Files & Uploads.
