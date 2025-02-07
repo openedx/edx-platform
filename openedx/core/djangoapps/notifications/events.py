@@ -52,8 +52,10 @@ def notification_preferences_viewed_event(request, course_id=None):
     """
     event_data = {
         'user_id': str(request.user.id),
+        'course_id': None,
+        'user_forum_roles': [],
+        'user_course_roles': [],
         'type': 'account'
-
     }
     if not course_id:
         tracker.emit(
@@ -144,7 +146,10 @@ def notification_preference_update_event(user, course_id, updated_preference):
         'notification_type': updated_preference.get('notification_type', ''),
         'notification_channel': updated_preference.get('notification_channel', ''),
         'value': value,
-        'type': 'course'
+        'course_id': None,
+        'user_forum_roles': [],
+        'user_course_roles': [],
+        'type': 'course',
     }
     if not isinstance(course_id, list):
         context = contexts.course_context_from_course_id(course_id)
