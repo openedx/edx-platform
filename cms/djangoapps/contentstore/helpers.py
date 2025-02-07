@@ -28,6 +28,7 @@ from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fe
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
+from openedx.core.djangoapps.content_staging.data import LIBRARY_SYNC_PURPOSE
 
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
 
@@ -261,6 +262,37 @@ class StaticFileNotices:
     error_files: list[str] = Factory(list)
 
 
+def _insert_static_files_into_downstream_xblock(
+    downstream_xblock: XBlock, staged_content_id: int, request
+) -> StaticFileNotices:
+    """
+    Gets static files from staged content, and inserts them into the downstream XBlock.
+    """
+    static_files = content_staging_api.get_staged_content_static_files(staged_content_id)
+    notices, substitutions = _import_files_into_course(
+        course_key=downstream_xblock.context_key,
+        staged_content_id=staged_content_id,
+        static_files=static_files,
+        usage_key=downstream_xblock.scope_ids.usage_id,
+    )
+
+    # Rewrite the OLX's static asset references to point to the new
+    # locations for those assets. See _import_files_into_course for more
+    # info on why this is necessary.
+    store = modulestore()
+    if hasattr(downstream_xblock, "data") and substitutions:
+        data_with_substitutions = downstream_xblock.data
+        for old_static_ref, new_static_ref in substitutions.items():
+            data_with_substitutions = data_with_substitutions.replace(
+                old_static_ref,
+                new_static_ref,
+            )
+        downstream_xblock.data = data_with_substitutions
+        if store is not None:
+            store.update_item(downstream_xblock, request.user.id)
+    return notices
+
+
 def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> tuple[XBlock | None, StaticFileNotices]:
     """
     Import a block (along with its children and any required static assets) from
@@ -298,29 +330,41 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             tags=user_clipboard.content.tags,
         )
 
-        # Now handle static files that need to go into Files & Uploads.
-        static_files = content_staging_api.get_staged_content_static_files(user_clipboard.content.id)
-        notices, substitutions = _import_files_into_course(
-            course_key=parent_key.context_key,
-            staged_content_id=user_clipboard.content.id,
-            static_files=static_files,
-            usage_key=new_xblock.scope_ids.usage_id,
-        )
-
-        # Rewrite the OLX's static asset references to point to the new
-        # locations for those assets. See _import_files_into_course for more
-        # info on why this is necessary.
-        if hasattr(new_xblock, 'data') and substitutions:
-            data_with_substitutions = new_xblock.data
-            for old_static_ref, new_static_ref in substitutions.items():
-                data_with_substitutions = data_with_substitutions.replace(
-                    old_static_ref,
-                    new_static_ref,
-                )
-            new_xblock.data = data_with_substitutions
-            store.update_item(new_xblock, request.user.id)
+        notices = _insert_static_files_into_downstream_xblock(new_xblock, user_clipboard.content.id, request)
 
     return new_xblock, notices
+
+
+def import_static_assets_for_library_sync(downstream_xblock: XBlock, lib_block: XBlock, request) -> StaticFileNotices:
+    """
+    Import the static assets from the library xblock to the downstream xblock
+    through staged content. Also updates the OLX references to point to the new
+    locations of those assets in the downstream course.
+
+    Does not deal with permissions or REST stuff - do that before calling this.
+
+    Returns a summary of changes made to static files in the destination
+    course.
+    """
+    if not lib_block.runtime.get_block_assets(lib_block, fetch_asset_data=False):
+        return StaticFileNotices()
+    if not content_staging_api:
+        raise RuntimeError("The required content_staging app is not installed")
+    staged_content = content_staging_api.stage_xblock_temporarily(lib_block, request.user.id, LIBRARY_SYNC_PURPOSE)
+    if not staged_content:
+        # expired/error/loading
+        return StaticFileNotices()
+
+    store = modulestore()
+    try:
+        with store.bulk_operations(downstream_xblock.context_key):
+            # Now handle static files that need to go into Files & Uploads.
+            # If the required files already exist, nothing will happen besides updating the olx.
+            notices = _insert_static_files_into_downstream_xblock(downstream_xblock, staged_content.id, request)
+    finally:
+        staged_content.delete()
+
+    return notices
 
 
 def _fetch_and_set_upstream_link(
@@ -543,6 +587,9 @@ def _import_files_into_course(
             if result is True:
                 new_files.append(file_data_obj.filename)
                 substitutions.update(substitution_for_file)
+            elif substitution_for_file:
+                # substitutions need to be made because OLX references to these files need to be updated
+                substitutions.update(substitution_for_file)
             elif result is None:
                 pass  # This file already exists; no action needed.
             else:
@@ -613,8 +660,8 @@ def _import_file_into_course(
         contentstore().save(content)
         return True, {clipboard_file_path: f"static/{import_path}"}
     elif current_file.content_digest == file_data_obj.md5_hash:
-        # The file already exists and matches exactly, so no action is needed
-        return None, {}
+        # The file already exists and matches exactly, so no action is needed except substitutions
+        return None, {clipboard_file_path: f"static/{import_path}"}
     else:
         # There is a conflict with some other file that has the same name.
         return False, {}
