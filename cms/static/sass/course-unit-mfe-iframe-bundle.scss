@@ -1,3 +1,8 @@
+@import '_builtin-block-variables';
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'neat/neat'; // lib - Neat
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+@import 'build-v1'; // shared app style assets/rendering
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
@@ -411,6 +416,9 @@ body {
         }
       }
     }
+
+    // For openassessment xblock editor
+    @import 'iframe-editors/oa';
   }
 }
 
