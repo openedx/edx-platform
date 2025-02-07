@@ -20,9 +20,11 @@ make all these types of content available offline. Of course it won't be feasibl
 algorithms in mobile, so it's possible to save submission on the mobile app and execute synchronization
 of the user progres as not limited conectivity is back.
 From the product perspective the following Figma designs and product requirements should be considered:
-* Figma
-* Offline mode product pages
+* `Download and Delete (Figma)`_
+* `Downloads (Figma)`_
 
+.. _Download and Delete (Figma): https://www.figma.com/design/iZ56YMjbRMShCCDxqrqRrR/Mobile-App-v2.4-%5BOpen-edX%5D?node-id=18472-187387&t=tMgymS6WIZZJbJHn-0
+.. _Downloads (Figma): https://www.figma.com/design/iZ56YMjbRMShCCDxqrqRrR/Mobile-App-v2.4-%5BOpen-edX%5D
 
 Decision
 --------
