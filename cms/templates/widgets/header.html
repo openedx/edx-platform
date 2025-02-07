@@ -244,7 +244,7 @@
                   </li>
                   % endif
                   % if export_mfe_enabled:
-                  <li class="nav-item nav-course-tools-import">
+                  <li class="nav-item nav-course-tools-export">
                     <a href="${get_export_url(course_key)}">${_("Export")}</a>
                   </li>
                   % endif
@@ -257,7 +257,7 @@
                     <a href="${checklists_url}">${_("Checklists")}</a>
                   </li>
                   % if optimizer_enabled:
-                  <li class="nav-item nav-course-tools-optimizer">
+                  <li class="nav-item">
                     <a href="${get_optimizer_url(course_key)}">${_("Optimize Course")}</a>
                   </li>
                   % endif
