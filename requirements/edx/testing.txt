@@ -1614,6 +1614,7 @@ uritemplate==4.1.1
     #   google-api-python-client
 urllib3==2.2.3
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   botocore
     #   elasticsearch
