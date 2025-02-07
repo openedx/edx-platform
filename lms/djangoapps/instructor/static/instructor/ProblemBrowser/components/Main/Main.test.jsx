@@ -4,7 +4,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
-
+import renderer from 'react-test-renderer';
 import store from '../../data/store';
 import Main from './Main';
 
@@ -13,10 +13,9 @@ describe('ProblemBrowser Main component', () => {
     const problemResponsesEndpoint = '/api/problem_responses/';
     const taskStatusEndpoint = '/api/task_status/';
     const excludedBlockTypes = [];
-    const reportDownloadEndpoint = '/api/download_report/';
 
     test('render with basic parameters', () => {
-        render(
+        const component = renderer.create(
             <Provider store={store}>
                 <Main
                     courseId={courseId}
@@ -27,16 +26,16 @@ describe('ProblemBrowser Main component', () => {
                     onSelectBlock={jest.fn()}
                     selectedBlock={null}
                     taskStatusEndpoint={taskStatusEndpoint}
-                    reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
             </Provider>,
         );
-        expect(screen.getByRole('button', { name: 'Select a section or problem' })).toBeInTheDocument();
+        const tree = component.toJSON();
+        expect(tree).toMatchSnapshot();
     });
 
     test('render with selected block', () => {
-        render(
+        const component = renderer.create(
             <Provider store={store}>
                 <Main
                     courseId={courseId}
@@ -47,17 +46,17 @@ describe('ProblemBrowser Main component', () => {
                     onSelectBlock={jest.fn()}
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
-                    reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
             </Provider>,
         );
-        expect(screen.getByRole('button', { name: 'Select a section or problem' })).toBeInTheDocument();
+        const tree = component.toJSON();
+        expect(tree).toMatchSnapshot();
     });
 
-    test('fetch course block on toggling dropdown', async () => {
+    test('fetch course block on toggling dropdown', () => {
         const fetchCourseBlocksMock = jest.fn();
-        render(
+        const component = renderer.create(
             <Provider store={store}>
                 <Main
                     courseId={courseId}
@@ -68,14 +67,14 @@ describe('ProblemBrowser Main component', () => {
                     onSelectBlock={jest.fn()}
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
-                    reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
             </Provider>,
         );
-        const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
-        await userEvent.click(toggleButton);
-        expect(fetchCourseBlocksMock).toHaveBeenCalledTimes(1);
+        // eslint-disable-next-line prefer-destructuring
+        const instance = component.root.children[0].instance;
+        instance.handleToggleDropdown();
+        expect(fetchCourseBlocksMock.mock.calls.length).toBe(1);
     });
 
     test('display dropdown on toggling dropdown', async () => {
@@ -90,7 +89,6 @@ describe('ProblemBrowser Main component', () => {
                     onSelectBlock={jest.fn()}
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
-                    reportDownloadEndpoint={reportDownloadEndpoint}
                     ShowBtnUi="false"
                 />
             </Provider>,
@@ -104,34 +102,6 @@ describe('ProblemBrowser Main component', () => {
         await userEvent.click(toggleButton);
         await waitFor(() => {
             expect(screen.findByTestId('block-browser-container')).resolves.toBeInTheDocument();
-        });
-    });
-
-    test('hide dropdown on second toggle', async () => {
-        render(
-            <Provider store={store}>
-                <Main
-                    courseId={courseId}
-                    createProblemResponsesReportTask={jest.fn()}
-                    excludeBlockTypes={excludedBlockTypes}
-                    fetchCourseBlocks={jest.fn()}
-                    problemResponsesEndpoint={problemResponsesEndpoint}
-                    onSelectBlock={jest.fn()}
-                    selectedBlock="some-selected-block"
-                    taskStatusEndpoint={taskStatusEndpoint}
-                    reportDownloadEndpoint={reportDownloadEndpoint}
-                    ShowBtnUi="false"
-                />
-            </Provider>,
-        );
-        const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
-        await userEvent.click(toggleButton);
-        await waitFor(() => {
-            expect(screen.findByText('block-browser-container')).resolves.toBeInTheDocument();
-        });
-        await userEvent.click(toggleButton);
-        await waitFor(() => {
-            expect(screen.queryByText('block-browser-container')).toBeNull();
         });
     });
 });

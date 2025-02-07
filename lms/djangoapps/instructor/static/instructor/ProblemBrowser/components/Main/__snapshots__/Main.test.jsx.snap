@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ProblemBrowser Main component render with basic parameters 1`] = `
+<div
+  className="problem-browser-container"
+>
+  <div
+    className="problem-browser"
+  >
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Select a section or problem
+    </button>
+    <input
+      disabled={true}
+      hidden={false}
+      name="problem-location"
+      type="text"
+      value={null}
+    />
+    <button
+      className="btn"
+      name="list-problem-responses-csv"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Create a report of problem responses
+    </button>
+    <div
+      aria-live="polite"
+      className="report-generation-status"
+    />
+  </div>
+</div>
+`;
+
+exports[`ProblemBrowser Main component render with selected block 1`] = `
+<div
+  className="problem-browser-container"
+>
+  <div
+    className="problem-browser"
+  >
+    <button
+      className="btn"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Select a section or problem
+    </button>
+    <input
+      disabled={true}
+      hidden={false}
+      name="problem-location"
+      type="text"
+      value="some-selected-block"
+    />
+    <button
+      className="btn"
+      name="list-problem-responses-csv"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onKeyDown={[Function]}
+      type="button"
+    >
+      Create a report of problem responses
+    </button>
+    <div
+      aria-live="polite"
+      className="report-generation-status"
+    />
+  </div>
+</div>
+`;
