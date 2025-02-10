@@ -1140,6 +1140,8 @@ GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoLite2-Country.mmdb"
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
+OFFLINE_CONTENT_PATH_TEMPLATE = "offline_content/{course_id}/"
+
 ############################ Global Database Configuration #####################
 
 DATABASE_ROUTERS = [
