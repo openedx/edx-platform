@@ -62,7 +62,7 @@ import logging
 from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -128,7 +128,11 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
         """
         Fetches publishable entity links for given course key
         """
-        links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key_string)
+        try:
+            course_key = CourseKey.from_string(course_key_string)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
+        links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
         serializer = PublishableEntityLinksSerializer(links, many=True)
         return Response(serializer.data)
 
