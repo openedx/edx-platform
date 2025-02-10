@@ -69,6 +69,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.core import XBlock
 
+from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from cms.djangoapps.contentstore.models import PublishableEntityLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
 from cms.lib.xblock.upstream_sync import (
@@ -82,8 +83,7 @@ from cms.lib.xblock.upstream_sync import (
     sever_upstream_link,
     sync_from_upstream,
 )
-from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
-from common.djangoapps.student.auth import has_studio_write_access, has_studio_read_access
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
