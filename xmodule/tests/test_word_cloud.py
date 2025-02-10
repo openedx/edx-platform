@@ -112,7 +112,6 @@ class WordCloudBlockTest(TestCase):
         else:
             post_data = MultiDict(('student_words[]', word) for word in ['cat', 'cat', 'dog', 'sun'])
             response = json.loads(block.handle_ajax('submit', post_data))
-
         assert response['status'] == 'success'
         assert response['submitted'] is True
         assert response['total_count'] == 22
