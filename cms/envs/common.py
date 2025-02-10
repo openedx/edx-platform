@@ -883,8 +883,8 @@ XQUEUE_INTERFACE = {
     'url': 'http://localhost:18040',
     'basic_auth': ['edx', 'edx'],
     'django_auth': {
-        'username': 'gabriel_admin',
-        'password': 'carvajal1407'
+        'username': 'lms',
+        'password': 'password'
     }
 }
 
