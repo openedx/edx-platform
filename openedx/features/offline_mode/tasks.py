@@ -1,16 +1,17 @@
 """
 Tasks for offline mode feature.
 """
-from celery import shared_task
+from celery import shared_task, chord
 from edx_django_utils.monitoring import set_code_owner_attribute
 from django.http.response import Http404
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from xmodule.modulestore.django import modulestore
 
-from .assets_management import is_modified
+from .assets_management import is_modified, get_offline_course_total_size
 from .constants import MAX_RETRY_ATTEMPTS, OFFLINE_SUPPORTED_XBLOCKS, RETRY_BACKOFF_INITIAL_TIMEOUT
 from .storage_management import OfflineContentGenerator
+from .models import OfflineCourseSize
 
 
 @shared_task
@@ -23,11 +24,26 @@ def generate_offline_content_for_course(course_id):
     """
     course_key = CourseKey.from_string(course_id)
 
+    tasks = []
+
     for offline_supported_block_type in OFFLINE_SUPPORTED_XBLOCKS:
         for xblock in modulestore().get_items(course_key, qualifiers={'category': offline_supported_block_type}):
             is_not_closed = not hasattr(xblock, 'closed') or not xblock.closed()
             if is_not_closed and is_modified(xblock):
-                generate_offline_content_for_block.apply_async([str(xblock.location)])
+                task = generate_offline_content_for_block.s(str(xblock.location))
+                tasks.append(task)
+
+    chord(tasks)(save_course_size.s(course_id))
+
+
+@shared_task
+@set_code_owner_attribute
+def save_course_size(results, course_id):
+    """
+    Save course size after all offline content generation tasks have finished.
+    """
+    total_offline_course_size = get_offline_course_total_size(course_id)
+    OfflineCourseSize.objects.update_or_create(course_id=course_id, defaults={'size': total_offline_course_size})
 
 
 @shared_task(

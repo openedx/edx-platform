@@ -127,7 +127,7 @@ def block_storage_path(xblock=None, usage_key=None):
         str: The constructed base storage path.
     """
     loc = usage_key or getattr(xblock, 'location', None)
-    return f'offline_content/{str(loc.course_key)}/' if loc else ''
+    return settings.OFFLINE_CONTENT_PATH_TEMPLATE.format(course_id=str(loc.course_key)) if loc else ''
 
 
 def is_modified(xblock):
@@ -176,3 +176,24 @@ def save_external_file(temp_dir, link, filename):
         create_subdirectories_for_asset(file_path)
         with open(file_path, 'wb') as file:
             file.write(response.content)
+
+
+def get_offline_course_total_size(course_id):
+    """
+    Get the total size of the offline content in storage for the course.
+
+    Args:
+        course_id (str): The course ID for which to get the total size.
+    Returns:
+        int: The total size of the offline content.
+    """
+    base_path = settings.OFFLINE_CONTENT_PATH_TEMPLATE.format(course_id=course_id)
+    total_size = 0
+
+    _, filenames = default_storage.listdir(base_path)
+
+    for file_name in filenames:
+        file_full_path = base_path + file_name
+        total_size += default_storage.size(file_full_path)
+
+    return total_size

@@ -58,24 +58,25 @@ class GenerateOfflineContentTasksTestCase(CourseForOfflineTestCase):
             offline_content_generator_mock.assert_not_called()
             offline_content_generator_mock.return_value.generate_offline_content.assert_not_called()
 
-    @patch('openedx.features.offline_mode.tasks.generate_offline_content_for_block')
+    @patch('openedx.features.offline_mode.tasks.chord')
+    @patch('openedx.features.offline_mode.tasks.generate_offline_content_for_block.s')
     @patch('openedx.features.offline_mode.tasks.is_modified')
     def test_generate_offline_content_for_course_supported_block_types(
         self,
         is_modified_mock: MagicMock,
-        generate_offline_content_for_block_mock: MagicMock,
+        mock_generate_offline_content_for_block_task: MagicMock,
+        mock_chord: MagicMock,
     ) -> None:
         is_modified_mock.return_value = True
 
         generate_offline_content_for_course(str(self.course.id))
+        expected_calls = [
+            call(str(self.html_block.location)),
+            call(str(self.problem_block.location)),
+        ]
+        mock_generate_offline_content_for_block_task.assert_has_calls(expected_calls, any_order=True)
 
-        generate_offline_content_for_block_mock.assert_has_calls(
-            [
-                call.apply_async([str(self.html_block.location)]),
-                call.apply_async([str(self.problem_block.location)]),
-            ],
-        )
-
+    @patch('openedx.features.offline_mode.tasks.chord')
     @patch('openedx.features.offline_mode.tasks.generate_offline_content_for_block')
     @patch('openedx.features.offline_mode.tasks.is_modified')
     @patch('openedx.features.offline_mode.tasks.modulestore')
@@ -92,6 +93,7 @@ class GenerateOfflineContentTasksTestCase(CourseForOfflineTestCase):
         modulestore_mock: MagicMock,
         is_modified_mock: MagicMock,
         generate_offline_content_for_block_mock: MagicMock,
+        mock_chord: MagicMock,
     ) -> None:
         xblock_location_mock = 'xblock_location_mock'
         modulestore_mock.return_value.get_items.return_value = [
