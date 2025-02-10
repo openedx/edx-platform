@@ -215,6 +215,16 @@
                 }
                 return url;
             },
+            notify: (eventName, data) => {
+                /** 
+                 * Used in `studio_view` to notify events and errors
+                 **/
+                window.parent.postMessage({
+                    type: 'xblock-event',
+                    eventName,
+                    data,
+                }, '*');
+            }
         };
 
         /**
@@ -257,6 +267,25 @@
             } else {
                 const blockJS = { element };
                 callback(blockJS);
+            }
+
+            if ('{{ view_name | safe }}' === 'studio_view') {
+              // Used when rendering the `studio_view`, in order to avoid open a new tab on click cancel or save
+              const selectors = [
+                  '.cancel-button',
+                  '.save-button',
+                  '.action-cancel',
+                  '.action-save',
+              ];
+
+              for (const selector of selectors) {
+                  const queryObject = document.querySelector(selector);
+                  if (queryObject) {
+                      queryObject.addEventListener('click', function() {
+                          event.preventDefault();
+                      });
+                  }
+              }
             }
         }
 

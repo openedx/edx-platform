@@ -25,7 +25,14 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString, List
 from xblock.scorable import ScorableXBlockMixin, Score
+from xblocks_contrib.problem import ProblemBlock as _ExtractedProblemBlock
 
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ID,
+)
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.capa import responsetypes
 from xmodule.capa.capa_problem import LoncapaProblem, LoncapaSystem
 from xmodule.capa.inputtypes import Status
@@ -36,8 +43,8 @@ from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
-from xmodule.util.sandboxing import SandboxService
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
+from xmodule.util.sandboxing import SandboxService
 from xmodule.x_module import (
     ResourceTemplates,
     XModuleMixin,
@@ -45,19 +52,11 @@ from xmodule.x_module import (
     shim_xmodule_js
 )
 from xmodule.xml_block import XmlMixin
-from common.djangoapps.xblock_django.constants import (
-    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
-    ATTR_KEY_USER_IS_STAFF,
-    ATTR_KEY_USER_ID,
-)
-from openedx.core.djangolib.markup import HTML, Text
 from .capa.xqueue_interface import XQueueService
-
 from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
-
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.gettext_noop` because Django cannot be imported in this file
@@ -134,7 +133,7 @@ class Randomization(String):
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
 @XBlock.wants('call_to_action')
-class ProblemBlock(
+class _BuiltInProblemBlock(
     ScorableXBlockMixin,
     RawMixin,
     XmlMixin,
@@ -160,6 +159,8 @@ class ProblemBlock(
     system is inspired.
     """
     INDEX_CONTENT_TYPE = 'CAPA'
+
+    is_extracted = False
 
     resources_dir = None
 
@@ -2509,3 +2510,10 @@ def randomization_bin(seed, problem_id):
     r_hash.update(str(problem_id).encode())
     # get the first few digits of the hash, convert to an int, then mod.
     return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
+
+
+ProblemBlock = (
+    _ExtractedProblemBlock if settings.USE_EXTRACTED_PROBLEM_BLOCK
+    else _BuiltInProblemBlock
+)
+ProblemBlock.__name__ = "ProblemBlock"

@@ -265,9 +265,10 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            '"/container/{}" class="action-button">\\s*<span class="action-button-text">View</span>'.format(
-                re.escape(str(wrapper_usage_key))
-            ),
+            (
+                '"/container/{}" class="action-button xblock-view-action-button">'
+                '\\s*<span class="action-button-text">View</span>'
+            ).format(re.escape(str(wrapper_usage_key))),
         )
 
     @patch("cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers.get_object_tag_counts")
@@ -312,12 +313,12 @@ class GetItemTest(ItemTest):
         resp = self.create_xblock(
             parent_usage_key=split_test_usage_key,
             category="html",
-            boilerplate="zooming_image.yaml",
+            boilerplate="latex_html.yaml",
         )
         self.assertEqual(resp.status_code, 200)
         html, __ = self._get_container_preview(split_test_usage_key)
         self.assertIn("Announcement", html)
-        self.assertIn("Zooming", html)
+        self.assertIn("LaTeX", html)
 
     def test_split_test_edited(self):
         """

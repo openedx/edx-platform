@@ -33,7 +33,12 @@ from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreXBlockRuntime,
 )
 from .data import CheckPerm, LatestVersion
-from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
+from .rest_api.url_converters import VersionConverter
+from .utils import (
+    get_secure_token_for_xblock_handler,
+    get_xblock_id_for_anonymous_user,
+    get_auto_latest_version,
+)
 
 from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
 
@@ -208,13 +213,26 @@ def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
     )
 
 
-def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
+def get_block_olx(
+    usage_key: UsageKeyV2,
+    *,
+    version: int | LatestVersion = LatestVersion.AUTO
+) -> str:
     """
-    Get the OLX source of the draft version of the given Learning-Core-backed XBlock.
+    Get the OLX source of the of the given Learning-Core-backed XBlock and a version.
     """
-    # Inefficient but simple approach. Optimize later if needed.
     component = get_component_from_usage_key(usage_key)
-    component_version = component.versioning.draft
+    version = get_auto_latest_version(version)
+
+    if version == LatestVersion.DRAFT:
+        component_version = component.versioning.draft
+    elif version == LatestVersion.PUBLISHED:
+        component_version = component.versioning.published
+    else:
+        assert isinstance(version, int)
+        component_version = component.versioning.version_num(version)
+    if component_version is None:
+        raise NoSuchUsage(usage_key)
 
     # TODO: we should probably make a method on ComponentVersion that returns
     # a content based on the name. Accessing by componentversioncontent__key is
@@ -222,6 +240,11 @@ def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
     content = component_version.contents.get(componentversioncontent__key="block.xml")
 
     return content.text
+
+
+def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
+    """ DEPRECATED. Use get_block_olx(). Can be removed post-Teak. """
+    return get_block_olx(usage_key, version=LatestVersion.DRAFT)
 
 
 def render_block_view(block, view_name, user):  # pylint: disable=unused-argument

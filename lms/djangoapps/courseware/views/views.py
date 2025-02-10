@@ -33,6 +33,8 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic import View
 from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key
 from ipware.ip import get_client_ip
+from xblock.core import XBlock
+
 from lms.djangoapps.static_template_view.views import render_500
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
@@ -1562,6 +1564,10 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_sta
     set_custom_attributes_for_course_key(course_key)
     set_custom_attribute('usage_key', usage_key_string)
     set_custom_attribute('block_type', usage_key.block_type)
+    block_class = XBlock.load_class(usage_key.block_type)
+    if hasattr(block_class, 'is_extracted'):
+        is_extracted = block_class.is_extracted
+        set_custom_attribute('block_extracted', is_extracted)
 
     requested_view = request.GET.get('view', 'student_view')
     if requested_view != 'student_view' and requested_view != 'public_view':  # lint-amnesty, pylint: disable=consider-using-in
@@ -2316,28 +2322,35 @@ def courseware_mfe_search_enabled(request, course_id=None):
     Simple GET endpoint to expose whether the user may use Courseware Search
     for a given course.
     """
-    enabled = False
     course_key = CourseKey.from_string(course_id) if course_id else None
     user = request.user
 
+    has_required_enrollment = False
     if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED'):
         enrollment_mode, _ = CourseEnrollment.enrollment_mode_for_user(user, course_key)
         if (
             auth.user_has_role(user, CourseStaffRole(CourseKey.from_string(course_id)))
             or (enrollment_mode in CourseMode.VERIFIED_MODES)
         ):
-            enabled = True
+            has_required_enrollment = True
     else:
-        enabled = True
+        has_required_enrollment = True
 
     inclusion_date = settings.FEATURES.get('COURSEWARE_SEARCH_INCLUSION_DATE')
     start_date = CourseOverview.get_from_id(course_key).start
+    has_valid_inclusion_date = False
 
-    # only include courses that have a start date later than the setting-defined inclusion date
+    # only include courses that have a start date later than the setting-defined inclusion date, if setting exists
     if inclusion_date:
-        enabled = enabled and (start_date and start_date.strftime('%Y-%m-%d') > inclusion_date)
+        has_valid_inclusion_date = start_date and start_date.strftime('%Y-%m-%d') > inclusion_date
 
-    payload = {"enabled": courseware_mfe_search_is_enabled(course_key) if enabled else False}
+    # if the user has the appropriate enrollment, the feature is enabled if the course has a valid start date
+    # or if the feature is explicitly enabled via waffle flag.
+    enabled = (has_valid_inclusion_date or courseware_mfe_search_is_enabled(course_key)) \
+        if has_required_enrollment \
+        else False
+
+    payload = {"enabled": enabled}
     return JsonResponse(payload)
 
 

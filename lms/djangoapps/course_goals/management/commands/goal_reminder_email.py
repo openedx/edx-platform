@@ -1,6 +1,7 @@
 """
 Command to trigger sending reminder emails for learners to achieve their Course Goals
 """
+import time
 from datetime import date, datetime, timedelta
 from eventtracking import tracker
 import logging
@@ -119,7 +120,11 @@ def send_ace_message(goal, session_id):
 
     with emulate_http_request(site, user):
         try:
+            start_time = time.perf_counter()
             ace.send(msg)
+            end_time = time.perf_counter()
+            log.info(f"Goal Reminder for {user.id} for course {goal.course_key} sent in {end_time - start_time} "
+                     f"using {'SES' if is_ses_enabled else 'others'}")
         except Exception as exc:  # pylint: disable=broad-except
             log.error(f"Goal Reminder for {user.id} for course {goal.course_key} could not send: {exc}")
             tracker.emit(
@@ -279,7 +284,7 @@ class Command(BaseCommand):
                     'uuid': session_id,
                     'timestamp': datetime.now(),
                     'reason': 'User time zone',
-                    'user_timezone': user_timezone,
+                    'user_timezone': str(user_timezone),
                     'now_in_users_timezone': now_in_users_timezone,
                 }
             )

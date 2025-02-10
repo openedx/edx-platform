@@ -33,9 +33,11 @@ from ..api import (
     get_handler_url as _get_handler_url,
     load_block,
     render_block_view as _render_block_view,
+    get_block_olx,
 )
 from ..utils import validate_secure_token_for_xblock_handler
 from .url_converters import VersionConverter
+from .serializers import XBlockOlxSerializer
 
 User = get_user_model()
 
@@ -120,6 +122,7 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
         'fragment': fragment,
         'handler_urls_json': json.dumps(handler_urls),
         'lms_root_url': lms_root_url,
+        'view_name': view_name,
         'is_development': settings.DEBUG,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
@@ -213,6 +216,23 @@ def xblock_handler(
     return response
 
 
+@api_view(['GET'])
+@view_auth_classes(is_authenticated=False)
+def get_block_olx_view(
+    request,
+    usage_key: UsageKeyV2,
+    version: LatestVersion | int = LatestVersion.AUTO,
+):
+    """
+    Get the OLX (XML serialization) of the specified XBlock
+    """
+    context_impl = get_learning_context_impl(usage_key)
+    if not context_impl.can_view_block_for_editing(request.user, usage_key):
+        raise PermissionDenied(f"You don't have permission to access the OLX of component '{usage_key}'.")
+    olx = get_block_olx(usage_key, version=version)
+    return Response(XBlockOlxSerializer({"olx": olx}).data)
+
+
 def cors_allow_xblock_handler(sender, request, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
     """
     Sandboxed XBlocks need to be able to call XBlock handlers via POST,
@@ -302,10 +322,6 @@ class BlockFieldsView(APIView):
 
         # Save after the callback so any changes made in the callback will get persisted.
         block.save()
-
-        # Signal that we've modified this block
-        context_impl = get_learning_context_impl(usage_key)
-        context_impl.send_block_updated_event(usage_key)
 
         block_dict = {
             "id": str(block.usage_key),

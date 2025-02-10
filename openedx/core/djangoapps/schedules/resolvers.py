@@ -14,6 +14,7 @@ from django.urls import reverse
 from edx_ace.recipient import Recipient
 from edx_ace.recipient_resolver import RecipientResolver
 from edx_django_utils.monitoring import function_trace, set_custom_attribute
+from openedx_filters.learning.filters import ScheduleQuerySetRequested
 
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link, can_show_verified_upgrade
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
@@ -153,6 +154,10 @@ class BinnedSchedulesBaseResolver(PrefixedDebugLoggerMixin, RecipientResolver):
         ).order_by(order_by)
 
         schedules = self.filter_by_org(schedules)
+
+        # .. filter_implemented_name: ScheduleQuerySetRequested
+        # .. filter_type: org.openedx.learning.schedule.queryset.requested.v1
+        schedules = ScheduleQuerySetRequested.run_filter(schedules)
 
         if "read_replica" in settings.DATABASES:
             schedules = schedules.using("read_replica")
@@ -377,6 +382,13 @@ class CourseUpdateResolver(BinnedSchedulesBaseResolver):
                 language,
                 context,
             )
+            LOG.info(
+                'Sending email to user: {} for Instructor-paced course with course-key: {} and language: {}'.format(
+                    user.username,
+                    self.course_id,
+                    language
+                )
+            )
             with function_trace('enqueue_send_task'):
                 self.async_send_task.apply_async((self.site.id, str(msg)), retry=False)  # pylint: disable=no-member
 
@@ -462,6 +474,13 @@ class CourseNextSectionUpdate(PrefixedDebugLoggerMixin, RecipientResolver):
                 'Sending email to user: {} for course-key: {}'.format(
                     user.username,
                     self.course_id
+                )
+            )
+            LOG.info(
+                'Sending email to user: {} for Self-paced course with course-key: {} and language: {}'.format(
+                    user.username,
+                    self.course_id,
+                    language
                 )
             )
             with function_trace('enqueue_send_task'):
