@@ -57,7 +57,8 @@ If error retrieving block happened, the generation task will be scheduled for re
 Mobile API extension
 ~~~~~~~~~~~~~~~~~~~~
 
-Extend mobile API endpoint for Course Home, to return information about offline content available for download for supported blocks
+Extend the Course Home mobile API endpoint, and add a new version of the API (url /api/mobile/v4/course_info/blocks/)
+to return information about offline content available for download for supported blocks
 {
 ...
 "offline_download": {
@@ -79,13 +80,13 @@ This script should expose markCompleted JS function so mobile can change state o
     * **Replace static and media**: Save static and media assets files used in block to temporary directory and replace their static paths with local paths.
     * **Archive and store content**: Archive the generated content and store it on the server or external storage.
 * **Mechanism for updating the generated data**: When updating course blocks (namely when publishing) the content that has been changed should be re-generated.
-    * **Track course publishing events on CMS side**: Signal in the CMS that makes request to LMS to update course content.
-    * **Track course publishing events on LMS side**: API endpoint to receive the signal from CMS and update course content.
+    * **Track course publishing events on LMS side**: Add a new signal `course_cache_updated` to be called after the course structure cache update in `update_course_in_cache_v2`. Add a signal that listens to `course_cache_updated` and starts block generation.
     * **Update archive**: Check generated archive creation date and update it if less than course publishing date.
 * **Implement a Mobile Local Storage Mechanism**: Use the device's local storage to save course content for offline access.
     * **Extend blocks API**: Add links to download blocks content and  where it is possible.
 * **Sync Mechanism**: Periodically synchronize local data with the server when the device is online.
     * **Sync on app side**: On course outline screen, check if the course content is up to date and update it if necessary.
+    * **Sync user responses**: When the device is offline, save user responses locally and send them to the server when the device is online.
 * **Selective Download**: Allow users to choose specific content to download for offline use.
 * **Full Course Download**: Provide an option to download entire courses for offline access.
 
