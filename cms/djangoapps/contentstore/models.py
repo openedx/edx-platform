@@ -118,6 +118,9 @@ class PublishableEntityLink(models.Model):
 
     @property
     def upstream_version(self) -> int | None:
+        """
+        Returns upstream block version number if available.
+        """
         version_num = None
         if hasattr(self.upstream_block, 'published'):
             if hasattr(self.upstream_block.published, 'version'):
@@ -127,6 +130,9 @@ class PublishableEntityLink(models.Model):
 
     @property
     def upstream_context_title(self) -> str:
+        """
+        Returns upstream context title.
+        """
         return self.upstream_block.learning_package.title
 
     class Meta:
@@ -186,12 +192,16 @@ class PublishableEntityLink(models.Model):
 
     @classmethod
     def get_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet["PublishableEntityLink"]:
+        """
+        Get all links for given downstream context, preselects related published version and learning package.
+        """
         return cls.objects.filter(
             downstream_context_key=downstream_context_key
         ).select_related(
             "upstream_block__published__version",
             "upstream_block__learning_package"
         )
+
 
 class LearningContextLinksStatusChoices(models.TextChoices):
     """
