@@ -328,17 +328,6 @@ class XBlockShim:
         )
         return self.runtime
 
-    @property
-    def graded(self):
-        """
-        Not sure what this is or how it's supposed to be set. Capa seems to
-        expect a 'graded' attribute to be present on itself. Possibly through
-        contentstore's update_section_grader_type() ?
-        """
-        if self.scope_ids.block_type != 'problem':
-            raise AttributeError(".graded shim is only for capa")
-        return False
-
     # Attributes defined by XModuleMixin and sometimes used by the LMS
     # Set sensible defaults.
     # If any of these are meant to be used in new stuff (are not deprecated)
