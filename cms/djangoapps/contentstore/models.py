@@ -202,6 +202,15 @@ class PublishableEntityLink(models.Model):
             "upstream_block__learning_package"
         )
 
+    @classmethod
+    def get_by_upstream_usage_key(cls, upstream_usage_key: UsageKey) -> QuerySet["PublishableEntityLink"]:
+        """
+        Get all downstream context keys for given upstream usage key
+        """
+        return cls.objects.filter(
+            upstream_usage_key=upstream_usage_key,
+        )
+
 
 class LearningContextLinksStatusChoices(models.TextChoices):
     """

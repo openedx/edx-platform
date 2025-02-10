@@ -40,6 +40,12 @@ https://github.com/openedx/edx-platform/issues/35653):
       400: Downstream block is not linked to upstream content.
       404: Downstream block not found or user lacks permission to edit it.
 
+  /api/contentstore/v2/upstream/{usage_key_string}/downstream-contexts
+
+    GET: List all downstream contexts (Courses) linked to a library block.
+        200: A list of Course IDs and their display names, along with the number of times the block
+            is linked to each.
+
   # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
@@ -60,6 +66,7 @@ UpstreamLink response schema:
 import logging
 
 from attrs import asdict as attrs_asdict
+from collections import Counter
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -71,6 +78,7 @@ from xblock.core import XBlock
 
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from cms.djangoapps.contentstore.models import PublishableEntityLink
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
@@ -90,6 +98,7 @@ from openedx.core.lib.api.view_utils import (
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 logger = logging.getLogger(__name__)
 
@@ -135,6 +144,40 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
         links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
         serializer = PublishableEntityLinksSerializer(links, many=True)
         return Response(serializer.data)
+
+
+@view_auth_classes()
+class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves library block->courses links
+    """
+    def get(self, _: _AuthenticatedRequest, usage_key_string: str) -> Response:
+        """
+        Fetches downstream context links for given publishable entity
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+            print(usage_key)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
+        links = PublishableEntityLink.get_by_upstream_usage_key(upstream_usage_key=usage_key)
+        downstream_key_list = [link.downstream_context_key for link in links]
+
+        # Count the number of times each course is linked to the library block
+        counter = Counter(downstream_key_list)
+
+        result = []
+        for context_key, count in counter.most_common():
+            # The following code only can handle the correct display_name for Courses as context
+            course = modulestore().get_course(context_key)
+            result.append({
+                "id": str(context_key),
+                "display_name": course.display_name,
+                "url": reverse_course_url('course_handler', context_key),
+                "count": count,
+            })
+
+        return Response(result)
 
 
 @view_auth_classes(is_authenticated=True)
