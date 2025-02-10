@@ -36,6 +36,7 @@ from pytz import UTC
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import (
+    enable_course_optimizer,
     exam_setting_view_enabled,
     libraries_v1_enabled,
     libraries_v2_enabled,
@@ -388,6 +389,19 @@ def get_export_url(course_locator) -> str:
         if mfe_base_url:
             export_url = course_mfe_url
     return export_url
+
+
+def get_optimizer_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for optimizer page view.
+    """
+    optimizer_url = None
+    if enable_course_optimizer(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/optimizer'
+        if mfe_base_url:
+            optimizer_url = course_mfe_url
+    return optimizer_url
 
 
 def get_files_uploads_url(course_locator) -> str:

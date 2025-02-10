@@ -4,6 +4,7 @@ Unit tests for /api/contentstore/v2/downstreams/* JSON APIs.
 from unittest.mock import patch
 from django.conf import settings
 
+from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.lib.xblock.upstream_sync import UpstreamLink, BadUpstream
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -247,7 +248,8 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
 
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     @patch.object(downstreams_views, "sync_from_upstream")
-    def test_200(self, mock_sync_from_upstream):
+    @patch.object(downstreams_views, "import_static_assets_for_library_sync", return_value=StaticFileNotices())
+    def test_200(self, mock_sync_from_upstream, mock_import_staged_content):
         """
         Does the happy path work?
         """
@@ -255,6 +257,7 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
         response = self.call_api(self.downstream_video_key)
         assert response.status_code == 200
         assert mock_sync_from_upstream.call_count == 1
+        assert mock_import_staged_content.call_count == 1
 
 
 class DeleteDownstreamSyncViewtest(_DownstreamSyncViewTestMixin, SharedModuleStoreTestCase):

@@ -153,6 +153,7 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             "last_published": None,
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
+            "publish_status": "never",
         }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
@@ -177,6 +178,7 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             library_api.publish_changes(library.key)
         doc_problem["last_published"] = published_date.timestamp()
         doc_problem["published"] = {"display_name": "Blank Problem"}
+        doc_problem["publish_status"] = "published"
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
 
         # Delete the Library Block

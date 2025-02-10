@@ -58,3 +58,7 @@ lms/templates/dashboard.html                                         @openedx/ax
 # Ensure minimal.yml stays minimal, this could be a team in the future
 # but it's just me for now, others can sign up if they care as well.
 lms/envs/minimal.yml                                                 @feanil
+
+# Ensure that un-necessary changes don't happen to the settings files as we're cleaning them up.
+lms/envs/production.py                                               @feanil @kdmccormick
+cms/envs/production.py                                               @feanil @kdmccormick

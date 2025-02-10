@@ -186,7 +186,7 @@ class UpstreamLink:
         )
 
 
-def sync_from_upstream(downstream: XBlock, user: User) -> None:
+def sync_from_upstream(downstream: XBlock, user: User) -> XBlock:
     """
     Update `downstream` with content+settings from the latest available version of its linked upstream content.
 
@@ -200,6 +200,7 @@ def sync_from_upstream(downstream: XBlock, user: User) -> None:
     _update_non_customizable_fields(upstream=upstream, downstream=downstream)
     _update_tags(upstream=upstream, downstream=downstream)
     downstream.upstream_version = link.version_available
+    return upstream
 
 
 def fetch_customizable_fields(*, downstream: XBlock, user: User, upstream: XBlock | None = None) -> None:

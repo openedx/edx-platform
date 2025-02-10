@@ -9,7 +9,7 @@ from importlib import import_module
 import gettext
 import logging
 
-from importlib.resources import path as resources_path
+from pkg_resources import resource_filename
 import re  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.conf import settings
@@ -422,8 +422,7 @@ class XBlockI18nService:
             return 'django', xblock_locale_path
 
         # Pre-OEP-58 translations within the XBlock pip packages are deprecated but supported.
-        deprecated_xblock_locale_path = str(resources_path(xblock_module_name, 'translations'))
-
+        deprecated_xblock_locale_path = resource_filename(xblock_module_name, 'translations')
         # The `text` domain was used for XBlocks pre-OEP-58.
         return 'text', deprecated_xblock_locale_path
 
