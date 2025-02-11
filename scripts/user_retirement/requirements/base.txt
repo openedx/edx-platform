@@ -10,15 +10,15 @@ attrs==25.1.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.36.6
+boto3==1.36.17
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.36.6
+botocore==1.36.17
     # via
     #   boto3
     #   s3transfer
 cachetools==5.5.1
     # via google-auth
-certifi==2024.12.14
+certifi==2025.1.31
     # via requests
 cffi==1.17.1
     # via
@@ -35,7 +35,7 @@ click==8.1.6
     #   edx-django-utils
 cryptography==44.0.0
     # via pyjwt
-django==4.2.18
+django==4.2.19
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
@@ -50,9 +50,9 @@ edx-django-utils==7.1.0
     # via edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.24.0
+google-api-core==2.24.1
     # via google-api-python-client
-google-api-python-client==2.159.0
+google-api-python-client==2.160.0
     # via -r scripts/user_retirement/requirements/base.in
 google-auth==2.38.0
     # via
@@ -77,17 +77,17 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-lxml==5.3.0
+lxml==5.3.1
     # via zeep
 more-itertools==10.6.0
     # via simple-salesforce
-newrelic==10.4.0
+newrelic==10.6.0
     # via edx-django-utils
-pbr==6.1.0
+pbr==6.1.1
     # via stevedore
 platformdirs==4.3.6
     # via zeep
-proto-plus==1.25.0
+proto-plus==1.26.0
     # via google-api-core
 protobuf==5.29.3
     # via
@@ -114,7 +114,7 @@ pyparsing==3.2.1
     # via httplib2
 python-dateutil==2.9.0.post0
     # via botocore
-pytz==2024.2
+pytz==2025.1
     # via
     #   jenkinsapi
     #   zeep
@@ -164,3 +164,6 @@ urllib3==1.26.20
     #   requests
 zeep==4.3.1
     # via simple-salesforce
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

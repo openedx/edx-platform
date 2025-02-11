@@ -14,11 +14,11 @@ attrs==25.1.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.36.6
+boto3==1.36.17
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.36.6
+botocore==1.36.17
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -28,7 +28,7 @@ cachetools==5.5.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-certifi==2024.12.14
+certifi==2025.1.31
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests
@@ -52,7 +52,7 @@ cryptography==44.0.0
     #   pyjwt
 ddt==1.7.2
     # via -r scripts/user_retirement/requirements/testing.in
-django==4.2.18
+django==4.2.19
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django-crum
@@ -72,11 +72,11 @@ edx-django-utils==7.1.0
     #   edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-api-core==2.24.0
+google-api-core==2.24.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.159.0
+google-api-python-client==2.160.0
     # via -r scripts/user_retirement/requirements/base.txt
 google-auth==2.38.0
     # via
@@ -116,7 +116,7 @@ jmespath==1.0.1
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   botocore
-lxml==5.3.0
+lxml==5.3.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
@@ -132,13 +132,13 @@ more-itertools==10.6.0
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==10.4.0
+newrelic==10.6.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
 packaging==24.2
     # via pytest
-pbr==6.1.0
+pbr==6.1.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   stevedore
@@ -148,7 +148,7 @@ platformdirs==4.3.6
     #   zeep
 pluggy==1.5.0
     # via pytest
-proto-plus==1.25.0
+proto-plus==1.26.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -195,7 +195,7 @@ python-dateutil==2.9.0.post0
     #   -r scripts/user_retirement/requirements/base.txt
     #   botocore
     #   moto
-pytz==2024.2
+pytz==2025.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   jenkinsapi
@@ -280,3 +280,6 @@ zeep==4.3.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
