@@ -5,7 +5,6 @@ import logging
 from datetime import datetime, timezone
 from functools import wraps
 from typing import Optional
-from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.cache import cache
@@ -35,14 +34,12 @@ from cms.djangoapps.contentstore.courseware_index import (
     CoursewareSearchIndexer,
     LibrarySearchIndexer,
 )
-from cms.djangoapps.contentstore.utils import get_cms_api_client
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
 from common.djangoapps.util.block_utils import yield_dynamic_block_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.lib.gating import api as gating_api
-from openedx.features.offline_mode.toggles import is_offline_mode_enabled
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -58,7 +55,6 @@ from .signals import GRADING_POLICY_CHANGED
 log = logging.getLogger(__name__)
 
 GRADING_POLICY_COUNTDOWN_SECONDS = 3600
-LMS_OFFLINE_HANDLER_URL = '/offline_mode/handle_course_published'
 
 
 def locked(expiry_seconds, key):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -179,14 +175,6 @@ def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=
 
     # Send to a signal for catalog info changes as well, but only once we know the transaction is committed.
     transaction.on_commit(lambda: emit_catalog_info_changed_signal(course_key))
-
-    if is_offline_mode_enabled(course_key):
-        client = get_cms_api_client()
-        client.post(
-            url=urljoin(settings.LMS_ROOT_URL, LMS_OFFLINE_HANDLER_URL),
-            data={'course_id': str(course_key)},
-        )
-        log.info('Sent course_published event to offline mode handler')
 
 
 @receiver(SignalHandler.course_deleted)

@@ -3312,7 +3312,7 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
     'openedx.features.name_affirmation_api.apps.NameAffirmationApiConfig',
-    'openedx.features.offline_mode',
+    'openedx.features.offline_mode.apps.OfflineModeConfig',
 
     'lms.djangoapps.experiments',
 

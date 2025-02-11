@@ -1,5 +1,5 @@
 """
-
+Utility functions for offline mode.
 """
 import logging
 

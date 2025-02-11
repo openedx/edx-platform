@@ -116,4 +116,3 @@ class OfflineContentGenerator:
                     self.add_files_to_zip_recursively(zip_file, full_path, full_path_in_zip)
         except OSError:
             log.error(f'Error while reading the directory: {current_base_path}')
-            return
