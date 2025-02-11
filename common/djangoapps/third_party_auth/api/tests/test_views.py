@@ -233,8 +233,16 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
     @ddt.data(
         ({}, 400, ["Must provide one of ['email', 'username']"]),
         ({'username': ALICE_USERNAME}, 400, ["Must provide uid"]),
-        ({'username': 'invalid-user', 'uid': f'{ALICE_USERNAME}@gmail.com'}, 404, {"User invalid-user does not exist."}),
-        ({'username': ALICE_USERNAME, 'uid': 'invalid-uid'}, 404, {f"User {ALICE_USERNAME} does not have a social auth record with UID invalid-uid."}),
+        (
+            {'username': 'invalid-user', 'uid': f'{ALICE_USERNAME}@gmail.com'},
+            404,
+            {"User invalid-user does not exist."}
+        ),
+        (
+            {'username': ALICE_USERNAME, 'uid': 'invalid-uid'},
+            404,
+            {f"User {ALICE_USERNAME} does not have a social auth record with UID invalid-uid."}
+        ),
         ({'username': ALICE_USERNAME, 'uid': f'{ALICE_USERNAME}@gmail.com'}, 200, {
             "active": [
                 {
