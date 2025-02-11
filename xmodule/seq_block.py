@@ -557,10 +557,8 @@ class SequenceBlock(
                 'This section is a prerequisite. You must complete this section in order to unlock additional content.'
             )
 
-        blocks = self._render_student_view_for_blocks(context, children, fragment, view) if prereq_met else []
-
         params = {
-            'items': blocks,
+            'items': self._render_student_view_for_blocks(context, children, fragment, view),
             'element_id': self.location.html_id(),
             'item_id': str(self.location),
             'is_time_limited': self.is_time_limited,
