@@ -564,7 +564,7 @@ PDF_RECEIPT_BILLING_ADDRESS = 'add your own billing address here with appropriat
 PDF_RECEIPT_TERMS_AND_CONDITIONS = 'add your own terms and conditions'
 PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 
-PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
+PROFILE_MICROFRONTEND_URL = "http://profile-mfe"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
 ACCOUNT_MICROFRONTEND_URL = "http://account-mfe"
 AUTHN_MICROFRONTEND_URL = "http://authn-mfe"

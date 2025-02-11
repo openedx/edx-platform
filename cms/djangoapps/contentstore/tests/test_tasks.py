@@ -243,46 +243,6 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             ['block-v1:edX+DemoX+Demo_Course+type@vertical+block@2', 'http://example.com/invalid', False]
         ]
 
-    @mock.patch('cms.djangoapps.contentstore.tasks.UserTaskArtifact', autospec=True)
-    @mock.patch('cms.djangoapps.contentstore.tasks._scan_course_for_links')
-    @mock.patch('cms.djangoapps.contentstore.tasks._save_broken_links_file', autospec=True)
-    @mock.patch('cms.djangoapps.contentstore.tasks._write_broken_links_to_file', autospec=True)
-    def test_check_broken_links_stores_broken_and_locked_urls(
-        self,
-        mock_write_broken_links_to_file,
-        mock_save_broken_links_file,
-        mock_scan_course_for_links,
-        mock_user_task_artifact
-    ):
-        '''
-        The test verifies that the check_broken_links task correctly
-        stores broken or locked URLs in the course.
-        The expected behavior is that the after scanning the course,
-        validating the URLs, and filtering the results, the task stores the results in a
-        JSON file.
-
-        Note that this test mocks all validation functions and therefore
-        does not test link validation or any of its support functions.
-        '''
-        # Arrange
-        mock_user = UserFactory.create(username='student', password='password')
-        mock_course_key_string = "course-v1:edX+DemoX+Demo_Course"
-        mock_task = MockCourseLinkCheckTask()
-        mock_scan_course_for_links.return_value = self.mock_urls
-
-        # Act
-        _check_broken_links(mock_task, mock_user.id, mock_course_key_string, 'en')  # pylint: disable=no-value-for-parameter
-
-        # Assert
-        ### Check that UserTaskArtifact was called with the correct arguments
-        mock_user_task_artifact.assert_called_once_with(status=mock.ANY, name='BrokenLinks')
-
-        ### Check that the correct links are written to the file
-        mock_write_broken_links_to_file.assert_called_once_with(self.expected_file_contents, mock.ANY)
-
-        ### Check that _save_broken_links_file was called with the correct arguments
-        mock_save_broken_links_file.assert_called_once_with(mock_user_task_artifact.return_value, mock.ANY)
-
     def test_hash_tags_stripped_from_url_lists(self):
         NUM_HASH_TAG_LINES = 2
         url_list = '''

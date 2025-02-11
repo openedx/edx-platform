@@ -496,7 +496,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
         # Check that the URLs are absolute
         for url in user_info["header_urls"].values():
-            assert 'http://testserver/' in url
+            assert 'http://' in url
 
     def test_logout_deletes_mktg_cookies(self):
         response, _ = self._login_response(self.user_email, self.password)

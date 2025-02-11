@@ -4,6 +4,7 @@
 from datetime import date
 import json
 from unittest.mock import MagicMock, patch
+from urllib.parse import urljoin
 from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
@@ -57,8 +58,8 @@ class CookieTests(TestCase):
     def _get_expected_header_urls(self):
         expected_header_urls = {
             'logout': reverse('logout'),
-            'account_settings': reverse('account_settings'),
-            'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
+            'account_settings': settings.ACCOUNT_MICROFRONTEND_URL,
+            'learner_profile': urljoin(settings.PROFILE_MICROFRONTEND_URL, f'/u/{self.user.username}'),
         }
         block_url = retrieve_last_sitewide_block_completed(self.user)
         if block_url:
