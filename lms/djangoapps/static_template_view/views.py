@@ -92,8 +92,7 @@ def render_press_release(request, slug):
         resp = render_to_response('static_templates/press_releases/' + template, {})
     except TemplateDoesNotExist:
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
-    else:
-        return resp
+    return resp
 
 
 @fix_crum_request

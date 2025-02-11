@@ -8,23 +8,23 @@ asgiref==3.8.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   django
-attrs==24.3.0
+attrs==25.1.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.36.3
+boto3==1.36.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.36.3
+botocore==1.36.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
     #   moto
     #   s3transfer
-cachetools==5.5.0
+cachetools==5.5.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
@@ -78,7 +78,7 @@ google-api-core==2.24.0
     #   google-api-python-client
 google-api-python-client==2.159.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.37.0
+google-auth==2.38.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -235,7 +235,7 @@ rsa==4.9
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-s3transfer==0.11.1
+s3transfer==0.11.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
