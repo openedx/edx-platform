@@ -14,6 +14,7 @@ from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
 from rest_framework.test import APITestCase
 from social_django.models import UserSocialAuth
 
+from common.djangoapps.student.models import User
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.api.permissions import (
     JwtHasScope,
@@ -217,58 +218,37 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
     def setUp(self):  # pylint: disable=arguments-differ
         """ Create users for use in the tests """
         super().setUp()
-
-        google = self.configure_google_provider(enabled=True)
-        staff_user = UserFactory.create(
-            username=STAFF_USERNAME,
-            is_staff=True,
-            is_superuser=True,
-        )
-
-        test_user = UserFactory.create(
-            username=ALICE_USERNAME,
-            email=f'{ALICE_USERNAME}@example.com',
-        )
-        UserSocialAuth.objects.create(
-            user=test_user,
-            provider=google.backend_name,
-            uid=f'{ALICE_USERNAME}@gmail.com',
-        )
-        UserSocialAuth.objects.create(
-            user=test_user,
-            provider=google.backend_name,
-            uid=f'{ALICE_USERNAME}1@gmail.com',
-        )
-
-        self.auth_token = f"JWT {generate_jwt(staff_user, is_restricted=False, scopes=None, filters=None)}"
+        admin_user = User.objects.get(username=ADMIN_USERNAME)
+        self.auth_token = f"JWT {generate_jwt(admin_user, is_restricted=False, scopes=None, filters=None)}"
 
 
-    def make_url(self, identifier):
+    def make_url(self, params):
         """
         Return the view URL, with the identifier provided
         """
         return '?'.join([
             reverse('third_party_auth_users_api_v2'),
-            urllib.parse.urlencode(identifier)
+            urllib.parse.urlencode(params)
         ])
 
 
     @ddt.data(
-        (None, 'uid=test-uid', 400, {'error_message': 'username_or_email is a required parameter.'}),
-        # ({'username_or_email': 'test-user'}, 400, {'error_message': 'uid is a required parameter.'}),
-        # (
-        #     {'username_or_email': ALICE_USERNAME, 'uid': 'abcd'},
-        #     404,
-        #     {'error_message': f'User {ALICE_USERNAME} does not have a social auth record with UID abcd.'}
-        # ),
-        # ({'username_or_email': ALICE_USERNAME, 'uid': f'{ALICE_USERNAME}@gmail.com'}, 200, {
-        #     "username": ALICE_USERNAME,
-        #     "email": f'{ALICE_USERNAME}@example.com',
-        #     "uid": [f'{ALICE_USERNAME}1@gmail.com']
-        # }),
+        ({}, 400, ["Must provide one of ['email', 'username']"]),
+        ({'username': ALICE_USERNAME}, 400, ["Must provide uid"]),
+        ({'username': 'invalid-user', 'uid': f'{ALICE_USERNAME}@gmail.com'}, 404, {"User invalid-user does not exist."}),
+        ({'username': ALICE_USERNAME, 'uid': 'invalid-uid'}, 404, {f"User {ALICE_USERNAME} does not have a social auth record with UID invalid-uid."}),
+        ({'username': ALICE_USERNAME, 'uid': f'{ALICE_USERNAME}@gmail.com'}, 200, {
+            "active": [
+                {
+                    "provider_id": PROVIDER_ID_TESTSHIB,
+                    "name": "TestShib",
+                    "remote_id": f"remote_{ALICE_USERNAME}"
+                }
+            ]
+        }),
     )
     @ddt.unpack
-    def test_delete_social_auth_record(self, identifier, uid, expect_code, expect_data):
+    def test_delete_social_auth_record(self, identifier, expect_code, expect_data):
         url = self.make_url(identifier)
         response = self.client.delete(url, HTTP_AUTHORIZATION=self.auth_token)
         assert response.status_code == expect_code
@@ -438,60 +418,3 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
                    'connect_url': f'/auth/login/google-oauth2/?auth_entry=account_settings&next={next_url}',
                    'connected': False, 'id': 'oa2-google-oauth2'
                }])
-
-
-@ddt.ddt
-@skip_unless_lms
-class TestUserSocialAuthAPI(ThirdPartyAuthTestMixin, APITestCase):
-    """
-    Tests ModifyThirdPartyAuthView.
-    """
-
-    def setUp(self):  # pylint: disable=arguments-differ
-        """ Create users for use in the tests """
-        super().setUp()
-
-        google = self.configure_google_provider(enabled=True)
-        staff_user = UserFactory.create(
-            username=STAFF_USERNAME,
-            is_staff=True,
-            is_superuser=True,
-        )
-
-        test_user = UserFactory.create(
-            username=ALICE_USERNAME,
-            email=f'{ALICE_USERNAME}@example.com',
-        )
-        UserSocialAuth.objects.create(
-            user=test_user,
-            provider=google.backend_name,
-            uid=f'{ALICE_USERNAME}@gmail.com',
-        )
-        UserSocialAuth.objects.create(
-            user=test_user,
-            provider=google.backend_name,
-            uid=f'{ALICE_USERNAME}1@gmail.com',
-        )
-
-        self.auth_token = f"JWT {generate_jwt(staff_user, is_restricted=False, scopes=None, filters=None)}"
-
-    @ddt.data(
-        ({'uid': 'test-uid'}, 400, {'error_message': 'username_or_email is a required parameter.'}),
-        ({'username_or_email': 'test-user'}, 400, {'error_message': 'uid is a required parameter.'}),
-        (
-            {'username_or_email': ALICE_USERNAME, 'uid': 'abcd'},
-            404,
-            {'error_message': f'User {ALICE_USERNAME} does not have a social auth record with UID abcd.'}
-        ),
-        ({'username_or_email': ALICE_USERNAME, 'uid': f'{ALICE_USERNAME}@gmail.com'}, 200, {
-            "username": ALICE_USERNAME,
-            "email": f'{ALICE_USERNAME}@example.com',
-            "uid": [f'{ALICE_USERNAME}1@gmail.com']
-        }),
-    )
-    @ddt.unpack
-    def test_delete_social_auth_record(self, data, expect_code, expect_data):
-        url = reverse('modify_third_party_auth_api')
-        response = self.client.delete(url, data, HTTP_AUTHORIZATION=self.auth_token)
-        assert response.status_code == expect_code
-        assert (response.data == expect_data)
