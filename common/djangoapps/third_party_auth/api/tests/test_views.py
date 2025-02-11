@@ -214,6 +214,35 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
     Test the Third Party Auth User REST API
     """
 
+    def setUp(self):  # pylint: disable=arguments-differ
+        """ Create users for use in the tests """
+        super().setUp()
+
+        google = self.configure_google_provider(enabled=True)
+        staff_user = UserFactory.create(
+            username=STAFF_USERNAME,
+            is_staff=True,
+            is_superuser=True,
+        )
+
+        test_user = UserFactory.create(
+            username=ALICE_USERNAME,
+            email=f'{ALICE_USERNAME}@example.com',
+        )
+        UserSocialAuth.objects.create(
+            user=test_user,
+            provider=google.backend_name,
+            uid=f'{ALICE_USERNAME}@gmail.com',
+        )
+        UserSocialAuth.objects.create(
+            user=test_user,
+            provider=google.backend_name,
+            uid=f'{ALICE_USERNAME}1@gmail.com',
+        )
+
+        self.auth_token = f"JWT {generate_jwt(staff_user, is_restricted=False, scopes=None, filters=None)}"
+
+
     def make_url(self, identifier):
         """
         Return the view URL, with the identifier provided
@@ -222,6 +251,28 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
             reverse('third_party_auth_users_api_v2'),
             urllib.parse.urlencode(identifier)
         ])
+
+
+    @ddt.data(
+        (None, 'uid=test-uid', 400, {'error_message': 'username_or_email is a required parameter.'}),
+        # ({'username_or_email': 'test-user'}, 400, {'error_message': 'uid is a required parameter.'}),
+        # (
+        #     {'username_or_email': ALICE_USERNAME, 'uid': 'abcd'},
+        #     404,
+        #     {'error_message': f'User {ALICE_USERNAME} does not have a social auth record with UID abcd.'}
+        # ),
+        # ({'username_or_email': ALICE_USERNAME, 'uid': f'{ALICE_USERNAME}@gmail.com'}, 200, {
+        #     "username": ALICE_USERNAME,
+        #     "email": f'{ALICE_USERNAME}@example.com',
+        #     "uid": [f'{ALICE_USERNAME}1@gmail.com']
+        # }),
+    )
+    @ddt.unpack
+    def test_delete_social_auth_record(self, identifier, uid, expect_code, expect_data):
+        url = self.make_url(identifier)
+        response = self.client.delete(url, HTTP_AUTHORIZATION=self.auth_token)
+        assert response.status_code == expect_code
+        assert (response.data == expect_data)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)

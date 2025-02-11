@@ -22,7 +22,6 @@ from openedx.core.lib.api.authentication import (
     BearerAuthenticationAllowInactiveUser
 )
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-from common.djangoapps.student.models import get_user_by_username_or_email
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.api import serializers
 from common.djangoapps.third_party_auth.api.permissions import TPA_PERMISSIONS
@@ -66,12 +65,29 @@ class BaseUserView(APIView):
     identifier_kinds = ['email', 'username']
 
     authentication_classes = (
+        JwtAuthentication,
         # Users may want to view/edit the providers used for authentication before they've
         # activated their account, so we allow inactive users.
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
+
+    def get_active_providers(self, user, is_unprivileged):
+        """
+        Fetch account details of active providers for the user.
+        """
+        providers = pipeline.get_provider_user_states(user)
+
+        active_providers = [
+            self.get_provider_data(assoc, is_unprivileged)
+            for assoc in providers if assoc.has_account
+        ]
+
+        return Response({
+            "active": active_providers
+        })
+
 
     def do_get(self, request, identifier):
         """
@@ -87,18 +103,8 @@ class BaseUserView(APIView):
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        providers = pipeline.get_provider_user_states(user)
-
-        active_providers = [
-            self.get_provider_data(assoc, is_unprivileged)
-            for assoc in providers if assoc.has_account
-        ]
-
-        # In the future this can be trivially modified to return the inactive/disconnected providers as well.
-
-        return Response({
-            "active": active_providers
-        })
+        return self.get_active_providers(user, is_unprivileged)
+        
 
     def get_provider_data(self, assoc, is_unprivileged):
         """
@@ -249,6 +255,49 @@ class UserViewV2(BaseUserView):
         """
         identifier = self.get_identifier_for_requested_user(request)
         return self.do_get(request, identifier)
+
+    def delete(self, request):
+        """
+        Delete given social auth record for a user.
+
+        Args:
+            request (Request): The HTTP DELETE request
+
+        Request Parameters:
+            email/username: Must provide one of 'email' or 'username'.  If both are provided,
+            the username will be ignored.
+            uid: UID of the social auth record to delete
+
+        Return:
+            JSON serialized list of the providers linked to this user after the delete operation.
+
+        """
+        identifier = self.get_identifier_for_requested_user(request)
+        uid = request.query_params.get("uid")
+        if not uid:
+            raise exceptions.ValidationError("Must provide uid")
+        
+        is_unprivileged = self.is_unprivileged_query(request, identifier)
+
+        if is_unprivileged:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            user = User.objects.get(**{identifier.kind: identifier.value})
+            social_auth_records = UserSocialAuth.objects.filter(user=user)
+            social_auth_records.get(uid=uid).delete()
+        except User.DoesNotExist:
+            return Response(
+                data={f"User {identifier.value} does not exist."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except UserSocialAuth.DoesNotExist:
+            return Response(
+                data={f"User {identifier.value} does not have a social auth record with UID {uid}."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return self.get_active_providers(user, is_unprivileged)
 
     def get_identifier_for_requested_user(self, request):
         """
@@ -434,60 +483,3 @@ class ThirdPartyAuthUserStatusView(APIView):
                 })
 
         return Response(tpa_states)
-
-
-class ModifyThirdPartyAuthView(APIView):
-    """
-    Modify social auth record for a given user.
-    This API is intended to be a server-to-server endpoint. An on-campus middleware or system should consume this.
-    """
-    authentication_classes = (
-        JwtAuthentication, BearerAuthenticationAllowInactiveUser
-    )
-    permission_classes = (TPA_PERMISSIONS, )
-
-    def delete(self, request):
-        """
-        Delete social auth record for user matched with uid and username/email.
-
-        The request body must contain the following:
-            username_or_email: username or email of the user.
-            uid: UID of the social auth record to delete.
-        """
-        username_or_email = request.data.get("username_or_email")
-        uid = request.data.get("uid")
-
-        if not username_or_email:
-            return Response(
-                data={"error_message": "username_or_email is a required parameter."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if not uid:
-            return Response(
-                data={"error_message": "uid is a required parameter."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            user = get_user_by_username_or_email(username_or_email)
-            social_auth_records = UserSocialAuth.objects.filter(user=user)
-            social_auth_records.get(uid=uid).delete()
-        except User.DoesNotExist:
-            return Response(
-                data={"error_message": f"User {username_or_email} does not exist."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except UserSocialAuth.DoesNotExist:
-            return Response(
-                data={"error_message": f"User {username_or_email} does not have a social auth record with UID {uid}."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        return Response(
-            data={
-                "username": user.username,
-                "email": user.email,
-                "uid": [auth_record.uid for auth_record in social_auth_records]
-            },
-            status=status.HTTP_200_OK
-        )
