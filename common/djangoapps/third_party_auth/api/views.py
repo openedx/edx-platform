@@ -88,7 +88,6 @@ class BaseUserView(APIView):
             "active": active_providers
         })
 
-
     def do_get(self, request, identifier):
         """
         Fulfill the request, now that the identifier has been specified.
@@ -104,7 +103,6 @@ class BaseUserView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return self.get_active_providers(user, is_unprivileged)
-        
 
     def get_provider_data(self, assoc, is_unprivileged):
         """
@@ -276,7 +274,7 @@ class UserViewV2(BaseUserView):
         uid = request.query_params.get("uid")
         if not uid:
             raise exceptions.ValidationError("Must provide uid")
-        
+
         is_unprivileged = self.is_unprivileged_query(request, identifier)
 
         if is_unprivileged:

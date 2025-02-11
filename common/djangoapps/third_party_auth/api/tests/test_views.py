@@ -221,7 +221,6 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
         admin_user = User.objects.get(username=ADMIN_USERNAME)
         self.auth_token = f"JWT {generate_jwt(admin_user, is_restricted=False, scopes=None, filters=None)}"
 
-
     def make_url(self, params):
         """
         Return the view URL, with the identifier provided
@@ -230,7 +229,6 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
             reverse('third_party_auth_users_api_v2'),
             urllib.parse.urlencode(params)
         ])
-
 
     @ddt.data(
         ({}, 400, ["Must provide one of ['email', 'username']"]),
