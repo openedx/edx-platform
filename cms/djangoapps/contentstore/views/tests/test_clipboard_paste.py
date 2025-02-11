@@ -6,6 +6,13 @@ APIs.
 import ddt
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
+from openedx_events.content_authoring.signals import (
+    LIBRARY_BLOCK_DELETED,
+    XBLOCK_CREATED,
+    XBLOCK_DELETED,
+    XBLOCK_UPDATED,
+)
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 from xmodule.modulestore.django import contentstore, modulestore
@@ -393,10 +400,16 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.
 
 
-class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
+class ClipboardPasteFromV2LibraryTestCase(OpenEdxEventsTestMixin, ModuleStoreTestCase):
     """
     Test Clipboard Paste functionality with a "new" (as of Sumac) library
     """
+    ENABLED_OPENEDX_EVENTS = [
+        LIBRARY_BLOCK_DELETED.event_type,
+        XBLOCK_CREATED.event_type,
+        XBLOCK_DELETED.event_type,
+        XBLOCK_UPDATED.event_type,
+    ]
 
     def setUp(self):
         """
