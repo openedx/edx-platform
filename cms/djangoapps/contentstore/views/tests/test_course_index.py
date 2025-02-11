@@ -450,12 +450,10 @@ class TestCourseIndexArchived(CourseTestCase):
         features = settings.FEATURES.copy()
         features['ENABLE_SEPARATE_ARCHIVED_COURSES'] = separate_archived_courses
         with override_settings(FEATURES=features):
-            self.check_index_page_with_query_count(
-                separate_archived_courses=separate_archived_courses,
-                org=org,
-                mongo_queries=mongo_queries,
-                sql_queries=sql_queries,
-            )
+            self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
+                                                   org=org,
+                                                   mongo_queries=mongo_queries,
+                                                   sql_queries=sql_queries)
 
     @ddt.data(
         # Staff user has course staff access
