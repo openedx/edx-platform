@@ -104,5 +104,4 @@ describe('ProblemBrowser Main component', () => {
             expect(screen.findByTestId('block-browser-container')).resolves.toBeInTheDocument();
         });
     });
-
 });
