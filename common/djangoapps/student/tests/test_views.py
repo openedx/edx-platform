@@ -233,7 +233,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         UserProfile.objects.get(user=self.user).delete()
         response = self.client.get(self.path)
-        self.assertRedirects(response, reverse('account_settings'))
+        self.assertRedirects(response, settings.ACCOUNT_MICROFRONTEND_URL, target_status_code=302)
 
     @patch('common.djangoapps.student.views.dashboard.learner_home_mfe_enabled')
     def test_redirect_to_learner_home(self, mock_learner_home_mfe_enabled):

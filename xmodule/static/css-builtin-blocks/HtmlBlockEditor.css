@@ -80,7 +80,7 @@
     background-image: -webkit-linear-gradient(top, #d4dee8, #c9d5e2);
     background-image: linear-gradient(to bottom, #d4dee8, #c9d5e2);
     position: relative;
-    padding: calc(var(--baseline) / 4);
+    padding: calc(var(--baseline, 20px) / 4);
     border-bottom-color: #a5aaaf;
 }
 
@@ -99,7 +99,7 @@
 .xmodule_edit.xmodule_StaticTabBlock .editor .editor-bar button {
     display: inline-block;
     float: left;
-    padding: 3px calc(var(--baseline) / 2) 5px;
+    padding: 3px calc(var(--baseline, 20px) / 2) 5px;
     margin-left: 7px;
     border: 0;
     border-radius: 2px;
@@ -140,7 +140,7 @@
 .xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs li,
 .xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs li {
     float: left;
-    margin-right: calc(var(--baseline) / 4);
+    margin-right: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_edit.xmodule_AboutBlock .editor .editor-tabs li:last-child,
@@ -159,9 +159,9 @@
     padding: 7px 20px 3px;
     border: 1px solid #a5aaaf;
     border-radius: 3px 3px 0 0;
-    background-color: var(--transparent);
-    background-image: -webkit-linear-gradient(top, var(--transparent) 87%, rgba(0, 0, 0, 0.06));
-    background-image: linear-gradient(to bottom, var(--transparent) 87%, rgba(0, 0, 0, 0.06));
+    background-color: var(--transparent, transparent);
+    background-image: -webkit-linear-gradient(top, var(--transparent, transparent) 87%, rgba(0, 0, 0, 0.06));
+    background-image: linear-gradient(to bottom, var(--transparent, transparent) 87%, rgba(0, 0, 0, 0.06));
     background-color: #e5ecf3;
     font-size: 13px;
     color: #3c3c3c;
@@ -172,8 +172,8 @@
 .xmodule_edit.xmodule_CourseInfoBlock .editor .editor-tabs .tab.current,
 .xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs .tab.current,
 .xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs .tab.current {
-    background: var(--white);
-    border-bottom-color: var(--white);
+    background: var(--white, #fff);
+    border-bottom-color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_AboutBlock .html-editor:after,
