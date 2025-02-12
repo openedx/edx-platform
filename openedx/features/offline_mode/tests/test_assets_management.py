@@ -273,7 +273,7 @@ class AssetsManagementTestCase(TestCase):
 
         result = block_storage_path(xblock_mock)
 
-        self.assertEqual(result, 'course_key_mock/')
+        self.assertEqual(result, 'offline_content/course_key_mock/')
 
     def test_block_storage_path_does_not_exists(self) -> None:
         result = block_storage_path()
