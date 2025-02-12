@@ -5,7 +5,7 @@ Content library signal handlers.
 import logging
 
 from django.conf import settings
-from django.db.models.signals import post_save, post_delete, m2m_changed
+from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
 
 from opaque_keys import InvalidKeyError
@@ -27,7 +27,6 @@ from lms.djangoapps.grades.api import signals as grades_signals
 
 from .api import library_component_usage_key
 from .models import ContentLibrary, LtiGradedResource
-
 
 log = logging.getLogger(__name__)
 

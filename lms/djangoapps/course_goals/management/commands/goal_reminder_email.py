@@ -321,20 +321,21 @@ def send_email_using_ses(user, msg):
     """
     Send email using AWS SES
     """
-    msg = presentation.render(DjangoEmailChannel, msg)
+    render_msg = presentation.render(DjangoEmailChannel, msg)
     # send rendered email using SES
+
     sender = EmailChannelMixin.get_from_address(msg)
-    recipient = user.email
-    subject = EmailChannelMixin.get_subject(msg)
-    body_text = msg.body
-    body_html = msg.body_html
+
+    subject = EmailChannelMixin.get_subject(render_msg)
+    body_text = render_msg.body
+    body_html = render_msg.body_html
 
     try:
         # Send email
         response = boto3.client('ses', settings.AWS_SES_REGION_NAME).send_email(
             Source=sender,
             Destination={
-                'ToAddresses': [recipient],
+                'ToAddresses': [user.email],
             },
             Message={
                 'Subject': {
@@ -358,3 +359,4 @@ def send_email_using_ses(user, msg):
         send_ace_message_sent_signal(DjangoEmailChannel, msg)
     except Exception as e:  # pylint: disable=broad-exception-caught
         log.error(f"Goal Reminder Email: Error sending email using SES: {e}")
+        raise e

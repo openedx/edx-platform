@@ -22,11 +22,11 @@ from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
 from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
+from opaque_keys.edx.keys import CourseKey
 
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
 
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib import ensure_cms
 from xmodule.capa_block import ProblemBlock
