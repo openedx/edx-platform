@@ -181,6 +181,10 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertEqual(len(list(courses_list_by_staff)), TOTAL_COURSES_COUNT)
         self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_list_by_staff))
 
+        # Now count the db queries for staff
+        with self.assertNumQueries(2):
+            list(_accessible_courses_summary_iter(self.request))
+
     def test_get_course_list_with_invalid_course_location(self):
         """
         Test getting courses with invalid course location (course deleted from modulestore).
@@ -316,10 +320,6 @@ class TestCourseListing(ModuleStoreTestCase):
         # course count is returned
         self.assertEqual(len(list(courses_list)), 2)
         self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_list))
-
-        # Now count the db queries for staff
-        with self.assertNumQueries(2):
-            list(_accessible_courses_summary_iter(self.request))
 
     @ddt.data(OrgStaffRole(), OrgInstructorRole())
     def test_course_listing_org_permissions_exception(self, role):
