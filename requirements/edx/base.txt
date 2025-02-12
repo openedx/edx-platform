@@ -170,7 +170,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==4.2.17
+django==4.2.19
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -1236,6 +1236,7 @@ uritemplate==4.1.1
     #   google-api-python-client
 urllib3==2.2.3
     # via
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/paver.txt
     #   botocore
     #   elasticsearch
