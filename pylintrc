@@ -317,15 +317,7 @@ disable =
 	too-many-positional-arguments,
 	possibly-used-before-assignment,
 	use-dict-literal,
-	useless-return,
-	superfluous-parens,
-	logging-not-lazy,
-	broad-exception-caught,
-	no-else-raise,
-	pointless-exception-statement,
-	consider-using-join,
-	use-yield-from,
-	used-before-assignment,
+	superfluous-parens
 
 [REPORTS]
 output-format = text
@@ -422,4 +414,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = builtins.Exception
 
-# 86de3cc2b03ecf7e6f6f9f2d5f790bb9e7c3eb4c
+# 5aea7d7fb264005eb373099c856a54cdfa4f311c

@@ -224,8 +224,11 @@ class Command(BaseCommand):
                 'goal_count': total_goals,
             }
         )
-        log.info(f'Processing course goals, total goal count {total_goals},'
-                 + f'timestamp: {datetime.now()}, uuid: {session_id}')
+        log.info('Processing course goals, total goal count {}, timestamp: {}, uuid: {}'.format(
+            total_goals,
+            datetime.now(),
+            session_id
+        ))
         for goal in course_goals:
             # emulate a request for waffle's benefit
             with emulate_http_request(site=Site.objects.get_current(), user=goal.user):
@@ -234,8 +237,13 @@ class Command(BaseCommand):
                 else:
                     filtered_count += 1
             if (sent_count + filtered_count) % 10000 == 0:
-                log.info(f'Processing course goals: sent {sent_count} filtered {filtered_count} out of {total_goals},'
-                         + f'timestamp: {datetime.now()}, uuid: {session_id}')
+                log.info('Processing course goals: sent {} filtered {} out of {}, timestamp: {}, uuid: {}'.format(
+                    sent_count,
+                    filtered_count,
+                    total_goals,
+                    datetime.now(),
+                    session_id
+                ))
 
         tracker.emit(
             'edx.course.goal.email.session_completed',
@@ -247,8 +255,10 @@ class Command(BaseCommand):
                 'emails_filtered': filtered_count,
             }
         )
-        log.info(f'Processing course goals complete: sent {sent_count} emails, filtered out {filtered_count} emails'
-                 + f'timestamp: {datetime.now()}, uuid: {session_id}')
+        log.info('Processing course goals complete: sent {} emails, '
+                 'filtered out {} emails, timestamp: {}, '
+                 'uuid: {}'.format(sent_count, filtered_count, datetime.now(), session_id)
+                 )
 
     @staticmethod
     def handle_goal(goal, today, sunday_date, monday_date, session_id):
@@ -311,20 +321,21 @@ def send_email_using_ses(user, msg):
     """
     Send email using AWS SES
     """
-    msg = presentation.render(DjangoEmailChannel, msg)
+    render_msg = presentation.render(DjangoEmailChannel, msg)
     # send rendered email using SES
+
     sender = EmailChannelMixin.get_from_address(msg)
-    recipient = user.email
-    subject = EmailChannelMixin.get_subject(msg)
-    body_text = msg.body
-    body_html = msg.body_html
+
+    subject = EmailChannelMixin.get_subject(render_msg)
+    body_text = render_msg.body
+    body_html = render_msg.body_html
 
     try:
         # Send email
         response = boto3.client('ses', settings.AWS_SES_REGION_NAME).send_email(
             Source=sender,
             Destination={
-                'ToAddresses': [recipient],
+                'ToAddresses': [user.email],
             },
             Message={
                 'Subject': {
@@ -346,5 +357,6 @@ def send_email_using_ses(user, msg):
 
         log.info(f"Goal Reminder Email: email sent using SES with message ID {response['MessageId']}")
         send_ace_message_sent_signal(DjangoEmailChannel, msg)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         log.error(f"Goal Reminder Email: Error sending email using SES: {e}")
+        raise e
