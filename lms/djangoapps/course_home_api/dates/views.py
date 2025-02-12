@@ -75,13 +75,13 @@ class DatesTabView(RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         course_key_string = kwargs.get('course_key_string')
         course_key = CourseKey.from_string(course_key_string)
+        is_mobile = request.GET.get('mobile', False)
 
         # Enable NR tracing for this view based on course
         monitoring_utils.set_custom_attribute('course_id', course_key_string)
         monitoring_utils.set_custom_attribute('user_id', request.user.id)
         monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
-
-        course = get_course_or_403(request.user, 'load', course_key, check_if_enrolled=False)
+        course = get_course_or_403(request.user, 'load', course_key, check_if_enrolled=False, is_mobile=is_mobile)
         is_staff = bool(has_access(request.user, 'staff', course_key))
 
         _, request.user = setup_masquerade(

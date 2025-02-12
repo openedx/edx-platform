@@ -94,7 +94,7 @@ def get_course(course_id, depth=0):
     return course
 
 
-def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
+def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False, is_mobile=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Given a course_key, look up the corresponding course block,
     check that the user has the access to perform the specified action
@@ -113,7 +113,7 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
       be plugged in as additional callback checks for different actions.
     """
     course = get_course_by_id(course_key, depth)
-    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
+    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated, is_mobile=is_mobile)  # lint-amnesty, pylint: disable=line-too-long
     return course
 
 
@@ -202,7 +202,7 @@ def check_course_access(
     return non_staff_access_response
 
 
-def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
+def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False, is_mobile=False):  # lint-amnesty, pylint: disable=line-too-long
     """
     Check that the user has the access to perform the specified action
     on the course (CourseBlock|CourseOverview).
@@ -216,6 +216,9 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
     access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
 
     if not access_response:
+        # StartDateError should be ignored for mobile devices for correct integration with calendar
+        if isinstance(access_response, StartDateError) and is_mobile:
+            return
         # Redirect if StartDateError
         if isinstance(access_response, StartDateError):
             start_date = strftime_localized(course.start, 'SHORT_DATE')
