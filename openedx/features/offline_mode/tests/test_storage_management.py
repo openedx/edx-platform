@@ -243,11 +243,13 @@ class OfflineContentGeneratorFunctionalTestCase(CourseForOfflineTestCase):
     def test_generate_offline_content(self, save_mathjax_to_xblock_assets_mock):
         OfflineContentGenerator(self.html_block, self.html_data).generate_offline_content()
 
-        expected_offline_content_path = 'test_root/uploads/course-v1:RaccoonGang+1+2024/HTML_xblock_for_Offline.zip'
+        expected_offline_content_path = (
+            'test_root/uploads/offline_content/course-v1:RaccoonGang+1+2024/HTML_xblock_for_Offline.zip'
+        )
 
         save_mathjax_to_xblock_assets_mock.assert_called_once()
         self.assertTrue(os.path.exists(expected_offline_content_path))
-        shutil.rmtree('test_root/uploads/course-v1:RaccoonGang+1+2024', ignore_errors=True)
+        shutil.rmtree('test_root/uploads/offline_content/course-v1:RaccoonGang+1+2024', ignore_errors=True)
 
     def test_save_xblock_html_to_temp_dir(self):
         shutil.rmtree('test_root/assets', ignore_errors=True)

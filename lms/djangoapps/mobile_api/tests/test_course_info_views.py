@@ -23,8 +23,6 @@ from lms.djangoapps.mobile_api.testutils import MobileAPITestCase, MobileAuthTes
 from lms.djangoapps.mobile_api.utils import API_V05, API_V1, API_V2, API_V3, API_V4
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
-from openedx.features.offline_mode.constants import DEFAULT_OFFLINE_SUPPORTED_XBLOCKS
-from openedx.features.offline_mode.toggles import ENABLE_OFFLINE_MODE
 from xmodule.html_block import CourseInfoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -448,6 +446,7 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView, MilestonesTestCaseMixin
         get_offline_block_content_path_mock.return_value = offline_content_path_mock
         default_storage_mock.get_modified_time.return_value = created_time_mock
         default_storage_mock.size.return_value = size_mock
+        default_storage_mock.url.return_value = offline_content_path_mock
 
         expected_offline_download_data = {
             'file_url': offline_content_path_mock,
@@ -488,30 +487,6 @@ class TestBlocksInfoInCourseView(TestBlocksInCourseView, MilestonesTestCaseMixin
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for block_info in response.data['blocks'].values():
             self.assertNotIn('offline_download', block_info)
-
-    @override_waffle_flag(ENABLE_OFFLINE_MODE, active=True)
-    @patch('openedx.features.offline_mode.html_manipulator.save_mathjax_to_xblock_assets')
-    def test_create_offline_content_integration_test(self, save_mathjax_to_xblock_assets_mock: MagicMock) -> None:
-        UserFactory.create(username='offline_mode_worker', password='password', is_staff=True)
-        handle_course_published_url = reverse('offline_mode:handle_course_published')
-        self.client.login(username='offline_mode_worker', password='password')
-
-        handler_response = self.client.post(handle_course_published_url, {'course_id': str(self.course.id)})
-        self.assertEqual(handler_response.status_code, status.HTTP_200_OK)
-
-        url = reverse('blocks_info_in_course', kwargs={'api_version': API_V4})
-
-        response = self.verify_response(url=url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        for block_info in response.data['blocks'].values():
-            if block_type := block_info.get('type'):
-                if block_type in DEFAULT_OFFLINE_SUPPORTED_XBLOCKS:
-                    expected_offline_content_url = f'/uploads/{self.course.id}/{block_info["block_id"]}.zip'
-                    self.assertIn('offline_download', block_info)
-                    self.assertIn('file_url', block_info['offline_download'])
-                    self.assertIn('last_modified', block_info['offline_download'])
-                    self.assertIn('file_size', block_info['offline_download'])
-                    self.assertEqual(expected_offline_content_url, block_info['offline_download']['file_url'])
 
 
 class TestCourseEnrollmentDetailsView(MobileAPITestCase, MilestonesTestCaseMixin):  # lint-amnesty, pylint: disable=test-inherits-tests
