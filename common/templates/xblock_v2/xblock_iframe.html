@@ -15,6 +15,8 @@
   {% endif %}
   <!-- Most XBlocks require jQuery: -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <!-- ORA2 blocks require timepicker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.min.js"></script>
   <!-- The Video XBlock requires "ajaxWithPrefix" -->
   <script type="text/javascript">
     $.postWithPrefix = $.post;
@@ -84,6 +86,7 @@
   <link rel="stylesheet" href="{{ lms_root_url }}/static/js/vendor/CodeMirror/codemirror.css">
   <!-- Additional CSS for the XBlock Editor on the Library Authoring -->
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/vendor/normalize.css">
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/vendor/hint.css">
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/studio-main-v1.css" />
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/course-unit-mfe-iframe-bundle.css" />
 
@@ -282,6 +285,8 @@
                   '.save-button',
                   '.action-cancel',
                   '.action-save',
+                  '.openassessment_cancel_button',
+                  '.openassessment_save_button',
               ];
 
               for (const selector of selectors) {

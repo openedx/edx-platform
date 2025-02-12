@@ -1,0 +1,1214 @@
+// openassessment: views - base
+// ====================
+
+// NOTES:
+// * The basic view and all of its states of the openassessment xblock
+
+// openassessment: utilities - variables
+// ====================
+
+// NOTES:
+// * these are openassessment-specific variable files
+
+// --------------------
+// layout (neat-based) - forced breakpoints/sizing
+// --------------------
+$grid-size-s: 530px;                                                                    // small
+$grid-size-m: 760px;                                                                    // medium
+$grid-size-l: 925px;                                                                    // large
+$grid-size-x: 1300px;                                                                   // extra large
+$grid-size-f: 1600px;                                                                   // full size
+
+// --------------------
+// layout (neat-based) - mediaqueries
+// --------------------
+$bp-m: new-breakpoint(max-width ($grid-size-s - 1) 4);                                  // mobile devices - make grid 4 columns
+$bp-ds: new-breakpoint(min-width $grid-size-s max-width ($grid-size-m - 1) 6);          // small displays - make grid 6 columns
+$bp-dm: new-breakpoint(min-width $grid-size-m max-width ($grid-size-l - 1) 12);         // medium displays - make grid 12 columns
+$bp-dl: new-breakpoint(min-width $grid-size-l max-width ($grid-size-x - 1) 12);         // large displays - make grid 12 columns
+$bp-dx: new-breakpoint(min-width $grid-size-x 12);                                      // large displays - make grid 12 columns
+
+
+
+.wrapper--openassessment {
+  position: relative;
+}
+
+// default to hide and show when it is needed
+.openassessment-initial-wrapper {
+  display: none;
+
+  &.is--showing {
+    display: block;
+  }
+
+  .ora-loading {
+    background: $uxpl-gray-background;
+    padding: $baseline-horizontal;
+    text-align: center;
+
+    .wrapper--anim {
+      @include animation(pulse $tmg-s3 ease-in-out infinite);
+    }
+
+    .icon {
+      display: inline-block;
+      color: $uxpl-gray-base;
+    }
+
+    .copy {
+      color: $uxpl-gray-base;
+    }
+  }
+}
+
+.openassessment {
+  @include direction();
+
+  // --------------------
+  // general: chrome
+  // --------------------
+  .openassessment__title {
+    @include row();
+    @extend %t-regular;
+  }
+
+
+  // --------------------
+  // overall message
+  // --------------------
+  .openassessment__message {
+    @include row();
+    background: none;
+    padding: 0;
+  }
+
+  // --------------------
+  // overall actions
+  // --------------------
+  .list--actions {
+    margin-bottom: ($baseline-vertical/2);
+    @include text-align(center);
+
+    @include media($bp-ds) {
+      @include text-align(right);
+    }
+
+    @include media($bp-dm) {
+      @include text-align(right);
+    }
+
+    @include media($bp-dl) {
+      @include text-align(right);
+    }
+
+    @include media($bp-dx) {
+      @include text-align(right);
+    }
+
+    // STATE: actions has an error
+    &.has--error {
+
+      .message {
+        margin-bottom: $baseline-vertical;
+        @include text-align(left);
+      }
+    }
+
+    .action--submit {
+      @extend %btn--primary;
+      @extend %action-2;
+      @include margin-left($baseline-vertical/2);
+      margin-top: ($baseline-vertical/2);
+
+      .copy, .icon {
+        display: inline;
+      }
+
+      .icon {
+        @extend %icon-2;
+      }
+
+      .fa-caret-right:before {
+        @include transform(rotate(bidi-rotate-angle(0deg)));
+      }
+    }
+  }
+
+  // --------------------
+  // steps
+  // --------------------
+  .openassessment__steps {
+    @extend %no-list;
+    counter-reset: item; // setting counter here
+  }
+
+  .openassessment__steps__step {
+    @extend %ui-section;
+
+    // step title
+    .step__title {
+      display: inline;
+      margin-bottom: ($baseline-vertical/2);
+      width: 100%;
+      margin-bottom: 0;
+
+      .step__counter, .wrapper--copy {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .wrapper--copy {
+        @include margin-left(($baseline-horizontal/2));
+        @include border-left(1px solid $uxpl-gray-background);
+        @include padding-left(($baseline-horizontal/2));
+
+        @include media($bp-m) {
+          @include margin-left(0);
+          @include border-left(none);
+          @include padding-left(0);
+        }
+
+        @include media($bp-ds) {
+          @include margin-left(0);
+          @include border-left(none);
+          @include padding-left(0);
+        }
+      }
+
+      .step__counter {
+        display: none;
+
+        // increment: show numbers using parent list counter
+        &:before {
+          @extend %hd-2;
+          @extend %t-strong;
+          display: none;
+          content: counter(item, decimal);
+          counter-increment: item;
+          color: $uxpl-gray-base;
+        }
+
+        @include media($bp-dm) {
+          display: inline-block;
+
+
+          &:before {
+            display: inline;
+          }
+        }
+
+        @include media($bp-dl) {
+          display: inline-block;
+
+
+          &:before {
+            display: inline;
+          }
+        }
+
+        @include media($bp-dx) {
+          display: inline-block;
+
+
+          &:before {
+            display: inline;
+          }
+        }
+      }
+
+      .step__label, .step__deadline {
+        display: block;
+      }
+
+      .step__label {
+        @extend %t-superheading;
+      }
+
+      .step__deadline {
+        @extend %hd-4;
+        color: $uxpl-gray-base;
+        margin-left: 5px;
+      }
+    }
+
+    // step status
+    .step__status {
+      display: inline;
+      margin-top: ($baseline-vertical/4);
+
+      @include media($bp-dm) {
+        margin-top: 0;
+        @include float(right);
+        position: relative;
+        top: -($baseline-vertical) - 12;
+      }
+
+      @include media($bp-dl) {
+        margin-top: 0;
+        @include float(right);
+        position: relative;
+        top: -($baseline-vertical) - 12;
+      }
+
+      @include media($bp-dx) {
+        margin-top: 0;
+        @include float(right);
+        position: relative;
+        top: -($baseline-vertical) - 12;
+      }
+
+      .step__status__value {
+        border-radius: ($baseline-vertical/10);
+        padding: ($baseline-vertical/4)-1 ($baseline-horizontal/4);
+        background: $uxpl-gray-background;
+        position: relative;
+
+        @include media($bp-ds) {
+          display: block;
+        }
+
+        @include media($bp-dm) {
+          display: block;
+        }
+
+        @include media($bp-dl) {
+          display: block;
+        }
+
+        @include media($bp-dx) {
+          display: block;
+        }
+      }
+
+      .icon {
+        @extend %icon-3;
+        display: inline-block;
+        vertical-align: baseline;
+        @include margin-right(($baseline-horizontal/4));
+      }
+
+      .copy {
+        @extend %t-score;
+        color: $uxpl-gray-base;
+      }
+    }
+
+    // step content wrapper
+    .wrapper--step__content {
+      margin-top: ($baseline-vertical/2);
+      padding-top: ($baseline-vertical/2);
+      border-top: 1px solid $uxpl-gray-background;
+    }
+
+    // step message
+    .step__message {
+      @include row();
+      margin-bottom: $baseline-vertical;
+    }
+
+    // step instructions
+    .step__instruction {
+      @extend %copy-2;
+      margin-bottom: $baseline-vertical;
+      color: $uxpl-gray-base;
+    }
+
+    // step content
+    .step__content {
+      margin-bottom: $baseline-vertical;
+    }
+
+    .step__content__section {
+      margin-bottom: ($baseline-vertical*2);
+
+      &:last-child {
+        @extend %wipe-last-child;
+      }
+    }
+
+    // STATE: step is loading
+    &.is--loading {
+
+      .step__header {
+        padding-bottom: 0;
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .step__counter:before, .step__label, .step__deadline {
+        color: $uxpl-gray-base;
+      }
+
+      .step__status__value {
+        background: $uxpl-gray-background;
+
+        .wrapper--anim {
+          @include animation(pulse $tmg-s3 ease-in-out infinite);
+        }
+
+        .icon {
+          display: inline-block;
+          color: $uxpl-gray-base;
+        }
+
+        .copy {
+          color: $uxpl-gray-base;
+        }
+      }
+    }
+
+    // STATE: step is incomplete
+    &.is--incomplete {
+
+      .step__counter:before {
+        border-color: rgb(255, 249, 235);
+        color: $uxpl-gray-base;
+      }
+
+      .step__status__value {
+        background: rgb(255, 249, 235);
+
+        .copy, .icon {
+          color: $uxpl-gray-base;
+        }
+      }
+    }
+
+    // STATE: step is unavailable
+    &.is--unavailable {
+
+      .step__counter:before, .step__label, .step__deadline {
+        color: $uxpl-gray-base;
+      }
+
+      .step__status__value {
+        background: $uxpl-gray-background;
+
+        .icon {
+          display: inline-block;
+          color: $uxpl-gray-base;
+        }
+
+        .copy {
+          color: $uxpl-gray-base;
+        }
+      }
+    }
+
+    // STATE: step is unavailable
+    &.is--waiting {
+
+      .step__counter:before, .step__label, .step__deadline {
+        color: $uxpl-gray-base;
+      }
+
+      .step__status__value {
+        background: $uxpl-gray-background;
+
+        .icon {
+          display: inline-block;
+          color: $uxpl-gray-base;
+        }
+
+        .copy {
+          color: $uxpl-gray-base;
+        }
+      }
+
+      .step__title .grade__value__title {
+        color: $uxpl-gray-background;
+      }
+
+      .step__instruction, .grade__value__description {
+        color: $uxpl-gray-base;
+      }
+    }
+
+    // STATE: step is complete/submitted/graded
+    &.is--complete {
+
+      .step__counter:before {
+        color: rgb(0, 129, 0);
+      }
+
+      .step__status__value {
+        background: rgb(0, 129, 0);
+
+        .icon {
+          display: inline-block;
+        }
+
+        .copy, .icon {
+          color: $white;
+        }
+      }
+
+      button {
+        opacity: 1;
+      }
+    }
+
+    // STATE: in-progress
+    &.is--in-progress {
+
+      .step__counter:before {
+        color: rgb(0, 117, 180);
+      }
+
+      .step__status__value {
+        background: rgb(0, 117, 180);
+
+        .icon {
+          display: inline-block;
+        }
+
+        .copy, .icon {
+          color: $white;
+        }
+      }
+
+      button {
+        opacity: 1;
+      }
+    }
+
+    // STATE: has error
+    &.has--error {
+
+      .step__counter:before {
+        border-color: rgba($color-error, 0.5);
+        color: $color-error;
+      }
+
+      .step__status__value {
+        background: $color-error;
+
+        .copy, .icon {
+          color: $white;
+        }
+      }
+
+      .step__label {
+        color: $color-error;
+      }
+    }
+  }
+
+
+  // --------------------
+  // ui-slidable
+  // --------------------
+  .ui-slidable__container {
+    .ui-slidable__content {
+      width: 100%;
+    }
+
+    // If there is an icon, it should rotate when clicked
+    @include transition(color $tmg-f2 ease-in);
+    .icon {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+      @include transform(rotate(bidi-rotate-angle(0deg)));
+    }
+
+    &.is--initially--collapsed  {
+      .ui-slidable__content {
+        display: none;
+      }
+    }
+
+    &.is--showing {
+      .ui-slidable .icon {
+        @include transform(rotate(bidi-rotate-angle(90deg)));
+        @include transform-origin(50% 50%);
+      }
+
+      .ui-slidable__container {
+        &:not(.is--showing) {
+          .icon {
+            @include transition(all $tmg-f2 ease-in-out 0s);
+            @include transform(rotate(bidi-rotate-angle(0deg)));
+          }
+        }
+      }
+    }
+
+    .ui-slidable {
+      // Override default button styling.
+      @extend %btn-reset;
+      background: none;
+      border-radius: ($baseline-vertical/4);
+      padding: 5px;
+
+      &:active, &:focus:not(:disabled), &:hover:not(:disabled) {
+        background: none;
+        border: none;
+        box-shadow: none;
+      }
+
+      &:not([disabled]) {
+        color: rgb(0, 117, 180);
+
+        &:hover, &:focus {
+          color: rgb(0, 117, 180)-focus;
+        }
+      }
+
+      .wrapper--copy {
+        text-align: left;
+      }
+    }
+  }
+
+  // --------------------
+  // submission
+  // --------------------
+
+  .submission__answer__part__prompt {
+    @extend %ui-well;
+    position: relative;
+    margin: ($baseline-vertical/2) 0;
+    border: 1px solid $uxpl-gray-background;
+    @include border-left(($baseline-horizontal/4));
+    @include padding-left(($baseline-horizontal*0.75));
+  }
+
+  .submission__answer__part__prompt__title {
+    @extend %text-sr;
+  }
+
+  .submission__answer__part__prompt__copy {
+    @extend %copy-2;
+    color: $uxpl-gray-base;
+
+    > * {
+      margin-bottom: $baseline-vertical;
+
+      &:last-child {
+        @extend %wipe-last-child;
+      }
+    }
+
+    a {
+      @extend %link-copy;
+    }
+  }
+
+  .submission__answer__part__text__title {
+    @extend %t-heading;
+  }
+
+  .submission__answer__part__text__value {
+    margin: ($baseline-vertical/2) 0;
+    border-color: $gray-d4;
+
+    &:not(textarea) {
+      border: 1px;
+      background-color: $white;
+      padding: $baseline-vertical;
+    }
+  }
+
+  .submission__upload__files__title,
+  .submission__answer__part__tip__title {
+    @extend %t-heading;
+  }
+
+  .submission__file__description__label {
+    margin-bottom: 5px;
+  }
+
+  .submission__answer__file__block {
+    margin-bottom: 8px;
+  }
+
+  .submission__img__preview {
+    float: left;
+    margin-right: 10px;
+  }
+
+  // --------------------
+  // response
+  // --------------------
+  .step--response {
+
+    // response form
+    .response__submission {
+      padding: ($baseline-vertical/2) ($baseline-horizontal/4);
+      border-radius: ($baseline-vertical/10);
+    }
+
+    .response__submission__content {
+      @extend %action-items;
+
+      label {
+        @extend %text-sr;
+      }
+
+      .files__descriptions {
+        display: none;
+
+        .submission__file__description {
+          padding-bottom: 10px;
+        }
+      }
+
+      .submission__answer__part__text {
+        textarea {
+          @extend %ui-content-longanswer;
+          min-height: ($baseline-vertical*10);
+        }
+      }
+
+      .submission__file__description {
+        textarea {
+          @extend %ui-content-longanswer;
+          min-height: ($baseline-vertical*4);
+          width: 70%;
+        }
+      }
+
+      .submission__team__answer__display__file {
+        margin-bottom: ($baseline-vertical/2);
+      }
+
+      .tip {
+        @extend %t-score;
+        padding: ($baseline-vertical/4) ($baseline-horizontal/4);
+        color: $white;
+      }
+    }
+
+    .response__submission__actions {
+      @extend %action-items
+    }
+  }
+
+
+  // --------------------
+  // peer assessment
+  // --------------------
+  .step--peer-assessment {
+
+    .list--peer-assessments {
+      @extend %no-list;
+    }
+
+    // peer submission
+    .peer-assessment__display {
+      @extend %ui-subsection;
+    }
+
+    .peer-assessment__display__header {
+      @include clearfix();
+
+      span {
+        @extend %t-strong; // FIX: needed due to DOM structure
+      }
+
+      .peer-assessment__display__title {
+        @extend %t-heading;
+        margin-bottom: ($baseline-vertical/2);
+        color: $uxpl-gray-base;
+      }
+    }
+
+    .peer-assessment__display__response {
+      @extend %ui-subsection-content;
+      @extend %copy-3;
+      @extend %ui-content-longanswer;
+      @extend %ui-well;
+      color: $uxpl-gray-base;
+    }
+
+    // assessment form
+    .peer-assessment__assessment {
+      @extend %action-items;
+
+      // fields
+      .assessment__fields {
+        margin-bottom: $baseline-vertical;
+      }
+
+      // rubric question
+      .assessment__rubric__question {
+        @extend %ui-rubric-question;
+      }
+
+      // rubric options
+      .question__answers {
+        @extend %ui-rubric-answers;
+      }
+
+      // genereal feedback question
+      .assessment__rubric__question--feedback {
+
+        .wrapper--input {
+          margin-top: $baseline-vertical;
+        }
+
+        .question__title__copy {
+          @include margin-left(0);
+          white-space: pre-wrap;
+        }
+
+        textarea {
+          @extend %ui-content-longanswer;
+          min-height: ($baseline-vertical*5);
+        }
+      }
+    }
+  }
+
+
+  // --------------------
+  // self assessment
+  // --------------------
+  .step--self-assessment {
+
+    // submission
+    .self-assessment__display {
+      @extend %ui-subsection;
+    }
+
+    .self-assessment__display__header {
+      @include clearfix();
+    }
+
+    .self-assessment__display__title {
+      @extend %t-heading;
+      margin-bottom: ($baseline-vertical/2);
+      color: $uxpl-gray-base;
+    }
+
+    .self-assessment__display__response {
+      @extend %ui-subsection-content;
+      @extend %copy-3;
+      @extend %ui-content-longanswer;
+      @extend %ui-well;
+      color: $uxpl-gray-base;
+    }
+
+    // assessment form
+    .self-assessment__assessment {
+      @extend %action-items;
+
+      // fields
+      .assessment__fields {
+        margin-bottom: $baseline-vertical;
+      }
+
+      // rubric question
+      .assessment__rubric__question {
+        @extend %ui-rubric-question;
+      }
+
+      // rubric options
+      .question__answers {
+        @extend %ui-rubric-answers;
+        overflow: visible; // needed for ui-hints
+      }
+
+      // genereal feedback question
+      .assessment__rubric__question--feedback {
+
+        .wrapper--input {
+          margin-top: $baseline-vertical;
+        }
+
+        .question__title__copy {
+          @include margin-left(0);
+          white-space: pre-wrap;
+        }
+
+        textarea {
+          @extend %ui-content-longanswer;
+          min-height: ($baseline-vertical*5);
+        }
+      }
+    }
+  }
+
+
+  // --------------------
+  // grade status
+  // --------------------
+  // TODO: clean this up - need to make sure counter doens't show when loading or in other states
+  .step--grade {
+
+    .step__title {
+      // @include media($bp-m) {
+      //   @include bidi-span-columns(4 of 4);
+      // }
+      //
+      // @include media($bp-ds) {
+      //   @include bidi-span-columns(6 of 6);
+      // }
+      //
+      // @include media($bp-dm) {
+      //   @include bidi-span-columns(12 of 12);
+      // }
+      //
+      // @include media($bp-dl) {
+      //   @include bidi-span-columns(12 of 12);
+      // }
+      //
+      // @include media($bp-dx) {
+      //   @include bidi-span-columns(12 of 12);
+      // }
+
+      .step__counter, .step__counter:before {
+        display: none;
+      }
+
+      .wrapper--copy {
+        @include margin-left(0);
+        @include border-left(none);
+        @include padding-left(0);
+      }
+
+      .step__label, .grade__value {
+        display: inline;
+        vertical-align: middle;
+      }
+
+      .step__label {
+        @include margin-right(($baseline-horizontal/4));
+      }
+
+      .grade__value__title {
+        @extend %t-superheading;
+
+        .grade__value__earned {
+          @extend %t-strong;
+        }
+
+        .grade__value__potential {
+          @extend %t-strong;
+        }
+      }
+    }
+
+    .grade__value__description {
+      @extend %copy-2;
+      margin-bottom: $baseline-vertical;
+      color: $uxpl-gray-base;
+    }
+
+    .grade__summary {
+      @extend %copy-2;
+    }
+  }
+
+
+  // --------------------
+  // UI: submitted response
+  // --------------------
+  .submission__answer__display__title {
+    @extend %t-heading;
+    margin-bottom: ($baseline-vertical/2);
+    color: $uxpl-gray-base;
+  }
+
+  .submission__answer__display__content {
+    @extend %copy-3;
+    @extend %ui-subsection-content;
+
+    padding: ($baseline-vertical/2) ($baseline-horizontal/4) $baseline-vertical ($baseline-horizontal/4);
+    border-radius: ($baseline-vertical/10);
+    list-style: none;
+
+    .submission__answer__part {
+      margin: ($baseline-vertical*1.5) 0px 0px;
+
+      &:first-child {
+        margin-top: 0px;
+      }
+    }
+  }
+
+
+  // --------------------
+  // UI: displayed peer assessments
+  // --------------------
+
+  // peer review summary
+  .submission__peer-evaluations {
+    @extend %ui-subsection;
+  }
+
+  .submission__peer-evaluations__title {
+    @extend %t-heading;
+    margin-bottom: ($baseline-vertical/2);
+    color: $uxpl-gray-base;
+  }
+
+  // rubric questions
+  .submission__peer-evaluations__questions {
+    @extend %no-list;
+    @extend %ui-subsection-content;
+    margin-bottom: ($baseline-vertical/2);
+
+    &:last-child {
+      margin-bottom: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    // individual question
+    .question {
+      margin-bottom: ($baseline-vertical*1.5);
+      @extend %wipe-last-child;
+    }
+
+    .question__title {
+      @include clearfix();
+      margin-bottom: $baseline-vertical;
+      border-bottom: ($baseline-vertical/10) solid $uxpl-gray-base;
+      padding-bottom: ($baseline-vertical/4);
+
+      .icon {
+        @extend %icon-1;
+        display: inline-block;
+        vertical-align: middle;
+      }
+    }
+
+    .question__title__copy {
+      @extend %t-heading;
+      @include margin-left(($baseline-horizontal/4));
+      white-space: pre-wrap;
+    }
+
+    .question__score {
+      @extend %t-score;
+      @include float(right);
+      @include margin-left($baseline-vertical);
+    }
+
+    .question__score__value {
+      @extend %t-strong;
+      color: $uxpl-gray-base;
+
+      &:after {
+        content: "/";
+        @include margin-left(($baseline-vertical/4));
+        color: $uxpl-gray-base;
+      }
+    }
+
+    .question__score__potential {
+      @extend %t-strong;
+      color: $uxpl-gray-base;
+
+      .unit {
+        @extend %t-strong;
+        @include margin-left(($baseline-vertical/4));
+      }
+    }
+
+    .question__answers {
+      @extend %no-list;
+      @extend %wipe-last-child;
+      @include row();
+      overflow: visible; // needed for ui-hints
+    }
+
+    // individual answers
+    .answer {
+      margin-bottom: $baseline-vertical;
+      @extend %no-list;
+
+      // CASE: self assessment
+      &.self-assessment {
+        @include border-left(($baseline-horizontal/8));
+        @include padding-left(($baseline-horizontal/2));
+
+        .answer__source {
+          color: $uxpl-gray-background;
+        }
+      }
+    }
+
+    .answer__source {
+      @extend %hd-5;
+      @extend %t-strong;
+      @extend %t-titlecase;
+      display: block;
+      color: $uxpl-gray-base;
+
+      .answer__source__value-with-points {
+        @extend %t-score;
+        color: $uxpl-gray-base;
+      }
+    }
+
+    .answer__value {
+      display: block;
+      margin-bottom: ($baseline-vertical/2);
+      color: $uxpl-gray-base;
+
+      .answer__value__raw {
+        white-space: pre-wrap;
+      }
+    }
+
+    .answer__value__value {
+      @extend %hd-2;
+      @extend %t-strong;
+      color: $uxpl-gray-base;
+
+      .ui-hint {
+        @extend %trans-color;
+        color: $uxpl-gray-background;
+
+        // STATE: hover - needed to reset color to what's expected from _navigation.scss (TODO: clean up specificity)
+        &:hover, &:focus {
+          color: rgba(0, 117, 180, 0.2);
+        }
+      }
+    }
+
+    .answer__score, .answer__score__value {
+      @extend %t-score;
+      display: block;
+      color: $uxpl-gray-base;
+    }
+  }
+
+  // criterion-based feedback
+  .answer--feedback {
+
+    // @include media($bp-ds) {
+    //   @include bidi-span-columns(6 of 6);
+    // }
+    //
+    // @include media($bp-dm) {
+    //   @include bidi-span-columns(12 of 12);
+    // }
+    //
+    // @include media($bp-dl) {
+    //   @include bidi-span-columns(12 of 12);
+    // }
+    //
+    // @include media($bp-dx) {
+    //   @include bidi-span-columns(12 of 12);
+    // }
+
+    .answer--feedback__title {
+      @extend %action-2;
+    }
+
+    .answer--feedback__title__copy {
+      @include margin-left(($baseline-horizontal/4));
+    }
+
+    .answer--feedback__content {
+      margin-top: ($baseline-vertical/4);
+    }
+
+    .action--save {
+      @extend %action-button !optional
+    }
+
+    .feedback {
+      @extend %no-list;
+      @extend %wipe-last-child;
+      margin-bottom: $baseline-vertical;
+    }
+
+    .feedback__source {
+      @extend %hd-5;
+      @extend %t-strong;
+      @extend %t-titlecase;
+      display: block;
+      color: $uxpl-gray-base;
+    }
+
+    .feedback__value {
+      @extend %copy-3;
+      display: block;
+
+      .feedback__value__raw {
+        white-space: pre-wrap;
+      }
+
+    }
+  }
+
+
+  // overall feedback form
+  .submission__feedback {
+    @extend %ui-subsection;
+  }
+
+  .submission__feedback__title {
+    @extend %ui-subsection-title;
+    @extend %t-heading;
+    border-bottom-color: solid $uxpl-gray-base;
+    color: $uxpl-gray-base;
+
+    .icon {
+      @extend %icon-1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  .submission__feedback__title__copy {
+    @extend %t-heading;
+    @include margin-left(($baseline-horizontal/4));
+  }
+
+  .submission__feedback__content {
+    @extend %ui-subsection-content;
+    margin-bottom: $baseline-vertical;
+  }
+
+  .submission__feedback__instructions {
+    @extend %copy-2;
+    margin-bottom: $baseline-vertical;
+    color: $uxpl-gray-base;
+  }
+
+  .submission__feedback__elements {
+    padding: $baseline-vertical ($baseline-horizontal/2) $baseline-vertical ($baseline-horizontal/2);
+    border-radius: ($baseline-vertical/10);
+  }
+
+  .submission__feedback__fields {
+    margin-bottom: $baseline-vertical;
+
+    .field {
+      margin-bottom: ($baseline-vertical*1.5);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    select {
+      display: block;
+    }
+
+    textarea {
+      @extend %ui-content-longanswer;
+      min-height: ($baseline-vertical*10);
+    }
+  }
+
+  .submission__feedback__actions {
+    @extend %ui-subsection-content;
+    padding-top: 0;
+
+    .list--actions {
+      padding: 0;
+    }
+  }
+
+  .action--submit {
+    @extend %btn--secondary;
+    @extend %action-2;
+    @include margin-right(($baseline-vertical/2));
+  }
+}
