@@ -47,7 +47,7 @@ handle settings that depend on other settings.
 
 Tutor does provide YAML files, but *it also has custom production and
 development settings files*! The result is that we have multiple layers of
-indirection setting between edx-platform's common base settings, and the Django
+indirection between edx-platform's common base settings, and the Django
 settings rendered into the actual community-supported Open edX distribution
 (Tutor). Specifically, production edx-platform configuration currently works
 like this:
@@ -73,7 +73,7 @@ like this:
 
       * which sets production-inappropriate defaults;
 
-    * it sets more defaults, some of the edX.org-specific;
+    * it sets more defaults, some of them edX.org-specific;
 
     * it loads ``/openedx/config/lms.yml``...
 
@@ -161,15 +161,20 @@ This is our target edx-platform settings module structure:
 * ``openedx/envs/common.py``: Defaults shared between LMS and CMS (new!).
 
   * ``lms/envs/common.py``: LMS default settings. Wherever possible,
-    prod-ready values should be used; where not possible, obviously-incorrrect
-    values should be used.
+    prod-ready values should be used. Where not possible, defaults should be
+    omitted (if the settings come from third-party libraries like Django) or be
+    set to obviously-wrong values (if edx-platform is defining them). For all
+    edx-platform-defined settings, code annotations should exist, either in
+    this file or in ``openedx/envs/common.py``.
 
     * ``lms/envs/test.py``: Override LMS settings for unit tests. Should work
       in a local venv as well as in CI.
 
-    * ``$THIRD_PARTY/lms/production.py``: Third-party providers (like edx.org) and
-      tools (like Tutor) will need to provide a custom setting settings file
-      derived from common.py in order to deploy LMS.
+    * ``<third_party_repo>/lms_production.py`` (example path): In order to
+      deploy the LMS, third-party providers (like edx.org) and tools (like
+      Tutor) will need to separately maintain their own custom settings module
+      derived from ``lms/envs/common.py``, and point their
+      ``DJANGO_SETTINGS_MODULE`` environment variable at this module.
 
     * ``lms/envs/yaml.py``: (Possibly) An alternative to third-party
       production.py. Loads overrides from a YAML file at ``LMS_CFG``,
@@ -181,21 +186,23 @@ This is our target edx-platform settings module structure:
       settings. Will use ``local.openedx.io`` (which resolves to 127.0.0.1) as
       a base domain, which should be suitable for third-party tools as well.
 
-      * ``$THIRD_PARTY/lms/dev.py``: Third-party tools (like Tutor, and 2U's
-        Devstack) will need to provide a custom settings file derived from
-        development.py in orer to serve a local LMS.
+      * ``<third_party_repo>/lms_development.py`` (example path): In order to
+        run the LMS, third-party tools (like Tutor, and 2U's devstack) will
+        need to separately maintain their own custom settings module derived
+        from ``lms/envs/development.py``, and point their
+        ``DJANGO_SETTINGS_MODULE`` environment variable at this module.
 
   * ``cms/envs/common.py``
 
     * ``cms/envs/test.py``
 
-    * ``$THIRD_PARTY/cms/production.py``
+    * ``<third_party_repo>/cms_production.py`` (example path)
 
     * ``cms/envs/yaml.py`` (Possibly)
 
     * ``cms/envs/development.py``
 
-      * ``$THIRD_PARTY/cms/dev.py``
+      * ``<third_party_repo>/cms_development.py`` (example path)
 
 
 Consequences
