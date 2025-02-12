@@ -274,12 +274,17 @@ def _insert_static_files_into_downstream_xblock(
     """
     static_files = content_staging_api.get_staged_content_static_files(staged_content_id)
     notices, substitutions = _import_files_into_course(
-        block=downstream_xblock,
         course_key=downstream_xblock.context_key,
         staged_content_id=staged_content_id,
         static_files=static_files,
-        usage_key=downstream_xblock.scope_ids.usage_id,
+        usage_key=downstream_xblock.usage_key,
     )
+    if downstream_xblock.usage_key.block_type == 'video':
+        _import_transcripts(
+            downstream_xblock,
+            staged_content_id=staged_content_id,
+            static_files=static_files,
+        )
 
     # Rewrite the OLX's static asset references to point to the new
     # locations for those assets. See _import_files_into_course for more
@@ -559,7 +564,6 @@ def _import_xml_node_to_parent(
 
 
 def _import_files_into_course(
-    block: XBlock,
     course_key: CourseKey,
     staged_content_id: int,
     static_files: list[content_staging_api.StagedContentFileData],
@@ -596,7 +600,6 @@ def _import_files_into_course(
         # At this point, we know this is a "Files & Uploads" asset that we may need to copy into the course:
         try:
             result, substitution_for_file = _import_file_into_course(
-                block,
                 course_key,
                 staged_content_id,
                 file_data_obj,
@@ -626,7 +629,6 @@ def _import_files_into_course(
 
 
 def _import_file_into_course(
-    block: XBlock,
     course_key: CourseKey,
     staged_content_id: int,
     file_data_obj: content_staging_api.StagedContentFileData,
@@ -677,24 +679,6 @@ def _import_file_into_course(
         if thumbnail_content is not None:
             content.thumbnail_location = thumbnail_location
         contentstore().save(content)
-        if usage_key.block_type == 'video':
-            # Adding transcripts to VAL using the new edx_video_id
-            language_code = next((k for k, v in block.transcripts.items() if v == filename), None)
-            if language_code:
-                sjson_subs = Transcript.convert(
-                    content=data,
-                    input_format=Transcript.SRT,
-                    output_format=Transcript.SJSON
-                ).encode()
-                create_or_update_video_transcript(
-                    video_id=block.edx_video_id,
-                    language_code=language_code,
-                    metadata={
-                        'file_format': Transcript.SJSON,
-                        'language_code': language_code
-                    },
-                    file_data=ContentFile(sjson_subs),
-                )
         return True, {clipboard_file_path: f"static/{import_path}"}
     elif current_file.content_digest == file_data_obj.md5_hash:
         # The file already exists and matches exactly, so no action is needed except substitutions
@@ -702,6 +686,50 @@ def _import_file_into_course(
     else:
         # There is a conflict with some other file that has the same name.
         return False, {}
+
+
+def _import_transcripts(
+    block: XBlock,
+    staged_content_id: int,
+    static_files: list[content_staging_api.StagedContentFileData],
+):
+    """
+    Adds transcripts to VAL using the new edx_video_id.
+    """
+    for file_data_obj in static_files:
+        clipboard_file_path = file_data_obj.filename
+        data = content_staging_api.get_staged_content_static_file_data(
+            staged_content_id,
+            clipboard_file_path
+        )
+        if data is None:
+            raise NotFoundError(file_data_obj.source_key)
+
+        if clipboard_file_path.startswith('static/'):
+            # If it's in this form, it came from a library and assumes component-local assets
+            file_path = clipboard_file_path.removeprefix('static/')
+        else:
+            # Otherwise it came from a course...
+            file_path = clipboard_file_path
+
+        filename = pathlib.Path(file_path).name
+
+        language_code = next((k for k, v in block.transcripts.items() if v == filename), None)
+        if language_code:
+            sjson_subs = Transcript.convert(
+                content=data,
+                input_format=Transcript.SRT,
+                output_format=Transcript.SJSON
+            ).encode()
+            create_or_update_video_transcript(
+                video_id=block.edx_video_id,
+                language_code=language_code,
+                metadata={
+                    'file_format': Transcript.SJSON,
+                    'language_code': language_code
+                },
+                file_data=ContentFile(sjson_subs),
+            )
 
 
 def is_item_in_course_tree(item):
