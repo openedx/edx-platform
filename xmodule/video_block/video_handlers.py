@@ -561,11 +561,11 @@ class VideoStudioViewHandlers:
                 self.transcripts[new_language_code] = f'{edx_video_id}-{new_language_code}.srt'
                 response = Response(json.dumps(payload), status=201)
 
-                if isinstance(self.scope_ids.usage_id.context_key, LibraryLocatorV2):
+                if isinstance(self.usage_key.context_key, LibraryLocatorV2):
                     # Save transcript as static asset in Learning Core if is a library component
                     filename = f"static/{self.transcripts[new_language_code]}"
                     lib_api.add_library_block_static_asset_file(
-                        self.scope_ids.usage_id,
+                        self.usage_key,
                         filename,
                         content,
                     )
@@ -595,11 +595,11 @@ class VideoStudioViewHandlers:
         if edx_video_id:
             delete_video_transcript(video_id=edx_video_id, language_code=language)
 
-        if isinstance(self.scope_ids.usage_id.context_key, LibraryLocatorV2):
+        if isinstance(self.usage_key.context_key, LibraryLocatorV2):
             transcript_name = self.transcripts.pop(language, None)
             if transcript_name:
                 lib_api.delete_library_block_static_asset_file(
-                    self.scope_ids.usage_id,
+                    self.usage_key,
                     f"static/{transcript_name}",
                 )
                 field = self.fields['transcripts']
