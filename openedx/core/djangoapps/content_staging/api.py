@@ -14,29 +14,36 @@ from opaque_keys.edx.keys import AssetKey, UsageKey
 from xblock.core import XBlock
 
 from openedx.core.lib.xblock_serializer.api import StaticFile, XBlockSerializer
-from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 from xmodule import block_metadata_utils
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 
 from .data import (
     CLIPBOARD_PURPOSE,
-    StagedContentData, StagedContentFileData, StagedContentStatus, UserClipboardData
+    StagedContentData,
+    StagedContentFileData,
+    StagedContentStatus,
+    UserClipboardData,
 )
 from .models import (
     UserClipboard as _UserClipboard,
     StagedContent as _StagedContent,
     StagedContentFile as _StagedContentFile,
 )
-from .serializers import UserClipboardSerializer as _UserClipboardSerializer
+from .serializers import (
+    UserClipboardSerializer as _UserClipboardSerializer,
+)
 from .tasks import delete_expired_clipboards
 
 log = logging.getLogger(__name__)
 
 
-def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int | None = None) -> UserClipboardData:
+def _save_xblock_to_staged_content(
+    block: XBlock, user_id: int, purpose: str, version_num: int | None = None
+) -> _StagedContent:
     """
-    Copy an XBlock's OLX to the user's clipboard.
+    Generic function to save an XBlock's OLX to staged content.
+    Used by both clipboard and library sync functionality.
     """
     block_data = XBlockSerializer(
         block,
@@ -49,7 +56,7 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
         # Mark all of the user's existing StagedContent rows as EXPIRED
         to_expire = _StagedContent.objects.filter(
             user_id=user_id,
-            purpose=CLIPBOARD_PURPOSE,
+            purpose=purpose,
         ).exclude(
             status=StagedContentStatus.EXPIRED,
         )
@@ -60,7 +67,7 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
         # Insert a new StagedContent row for this
         staged_content = _StagedContent.objects.create(
             user_id=user_id,
-            purpose=CLIPBOARD_PURPOSE,
+            purpose=purpose,
             status=StagedContentStatus.READY,
             block_type=usage_key.block_type,
             olx=block_data.olx_str,
@@ -69,23 +76,16 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
             tags=block_data.tags,
             version_num=(version_num or 0),
         )
-        (clipboard, _created) = _UserClipboard.objects.update_or_create(user_id=user_id, defaults={
-            "content": staged_content,
-            "source_usage_key": usage_key,
-        })
 
     # Log an event so we can analyze how this feature is used:
-    log.info(f"Copied {usage_key.block_type} component \"{usage_key}\" to their clipboard.")
+    log.info(f'Saved {usage_key.block_type} component "{usage_key}" to staged content for {purpose}.')
 
-    # Try to copy the static files. If this fails, we still consider the overall copy attempt to have succeeded,
-    # because intra-course pasting will still work fine, and in any case users can manually resolve the file issue.
+    # Try to copy the static files. If this fails, we still consider the overall save attempt to have succeeded,
+    # because intra-course operations will still work fine, and users can manually resolve file issues.
     try:
-        _save_static_assets_to_user_clipboard(block_data.static_files, usage_key, staged_content)
+        _save_static_assets_to_staged_content(block_data.static_files, usage_key, staged_content)
     except Exception:  # pylint: disable=broad-except
-        # Regardless of what happened, with get_asset_key_from_path or contentstore or run_filter, we don't want the
-        # whole "copy to clipboard" operation to fail, which would be a bad user experience. For copying and pasting
-        # within a single course, static assets don't even matter. So any such errors become warnings here.
-        log.exception(f"Unable to copy static files to clipboard for component {usage_key}")
+        log.exception(f"Unable to copy static files to staged content for component {usage_key}")
 
     # Enqueue a (potentially slow) task to delete the old staged content
     try:
@@ -93,14 +93,15 @@ def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int 
     except Exception:  # pylint: disable=broad-except
         log.exception(f"Unable to enqueue cleanup task for StagedContents: {','.join(str(x) for x in expired_ids)}")
 
-    return _user_clipboard_model_to_data(clipboard)
+    return staged_content
 
 
-def _save_static_assets_to_user_clipboard(
+def _save_static_assets_to_staged_content(
     static_files: list[StaticFile], usage_key: UsageKey, staged_content: _StagedContent
 ):
     """
-    Helper method for save_xblock_to_user_clipboard endpoint. This deals with copying static files into the clipboard.
+    Helper method for saving static files into staged content.
+    Used by both clipboard and library sync functionality.
     """
     for f in static_files:
         source_key = (
@@ -142,6 +143,37 @@ def _save_static_assets_to_user_clipboard(
             )
         except Exception:  # pylint: disable=broad-except
             log.exception(f"Unable to copy static file {f.name} to clipboard for component {usage_key}")
+
+
+def save_xblock_to_user_clipboard(block: XBlock, user_id: int, version_num: int | None = None) -> UserClipboardData:
+    """
+    Copy an XBlock's OLX to the user's clipboard.
+    """
+    staged_content = _save_xblock_to_staged_content(block, user_id, CLIPBOARD_PURPOSE, version_num)
+    usage_key = block.usage_key
+
+    # Create/update the clipboard entry
+    (clipboard, _created) = _UserClipboard.objects.update_or_create(
+        user_id=user_id,
+        defaults={
+            "content": staged_content,
+            "source_usage_key": usage_key,
+        },
+    )
+
+    return _user_clipboard_model_to_data(clipboard)
+
+
+def stage_xblock_temporarily(
+    block: XBlock, user_id: int, purpose: str, version_num: int | None = None,
+) -> _StagedContent:
+    """
+    "Stage" an XBlock by copying it (and its associated children + static assets)
+    into the content staging area. This XBlock can then be accessed and manipulated
+    using any of the staged content APIs, before being deleted.
+    """
+    staged_content = _save_xblock_to_staged_content(block, user_id, purpose, version_num)
+    return staged_content
 
 
 def get_user_clipboard(user_id: int, only_ready: bool = True) -> UserClipboardData | None:
@@ -190,28 +222,29 @@ def get_user_clipboard_json(user_id: int, request: HttpRequest | None = None):
     return serializer.data
 
 
+def _staged_content_to_data(content: _StagedContent) -> StagedContentData:
+    """
+    Convert a StagedContent model instance to an immutable data object.
+    """
+    return StagedContentData(
+        id=content.id,
+        user_id=content.user_id,
+        created=content.created,
+        purpose=content.purpose,
+        status=content.status,
+        block_type=content.block_type,
+        display_name=content.display_name,
+        tags=content.tags or {},
+        version_num=content.version_num,
+    )
+
+
 def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardData:
     """
     Convert a UserClipboard model instance to an immutable data object.
     """
-    content = clipboard.content
-    source_context_key = clipboard.source_usage_key.context_key
-    if source_context_key.is_course and (course_overview := get_course_overview_or_none(source_context_key)):
-        source_context_title = course_overview.display_name_with_default
-    else:
-        source_context_title = str(source_context_key)  # Fall back to stringified context key as a title
     return UserClipboardData(
-        content=StagedContentData(
-            id=content.id,
-            user_id=content.user_id,
-            created=content.created,
-            purpose=content.purpose,
-            status=content.status,
-            block_type=content.block_type,
-            display_name=content.display_name,
-            tags=content.tags,
-            version_num=content.version_num,
-        ),
+        content=_staged_content_to_data(clipboard.content),
         source_usage_key=clipboard.source_usage_key,
         source_context_title=clipboard.get_source_context_title(),
     )
