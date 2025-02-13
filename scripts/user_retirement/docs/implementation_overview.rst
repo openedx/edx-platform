@@ -1,6 +1,5 @@
 .. _Implmentation:
 
-#######################
 Implementation Overview
 #######################
 
@@ -11,11 +10,10 @@ these services. As a consequence, to remove a user's PII, you must be able
 to request each service containing PII to remove, delete, or unlink the
 data for that user in that service.
 
-In the user retirement feature, a centralized process (the *driver* scripts) 
-orchestrates all of these requests. For information about how to configure the 
+In the user retirement feature, a centralized process (the *driver* scripts)
+orchestrates all of these requests. For information about how to configure the
 driver scripts, see :ref:`driver-setup`.
 
-****************************
 The User Retirement Workflow
 ****************************
 
@@ -50,7 +48,8 @@ This example state diagram outlines the pathways users follow throughout the
 workflow:
 
 .. digraph:: retirement_states_example
-   :align: center
+
+    :align: center
 
       ranksep = "0.3";
 
@@ -78,7 +77,6 @@ point, either their entry should be cleaned up from the
 administrator needs to examine the error and resolve it. For more information,
 see :ref:`recovering-from-errored`.
 
-*******************
 The User Experience
 *******************
 
@@ -103,7 +101,6 @@ enabled, allowing account deletions to queue up.  The
 ``ENABLE_ACCOUNT_DELETION`` feature in django settings toggles the visibility
 of this section.  See :ref:`django-settings`.
 
-================
 Third Party Auth
 ================
 
