@@ -3050,7 +3050,7 @@ class ChangeDueDate(APIView):
         """
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
-            return JsonResponseBadRequest({'error': 'All fields must be filled out'}, status=400)
+            return JsonResponseBadRequest({'error': 'All fields must be filled out'})
 
 
         student = serializer_data.validated_data.get('student')
@@ -3064,7 +3064,7 @@ class ChangeDueDate(APIView):
         try:
             due_date = parse_datetime(due_datetime)
         except DashboardError:
-            return JsonResponseBadRequest({'error': 'The extension due date and time format is incorrect'}, status=400)
+            return JsonResponseBadRequest({'error': 'The extension due date and time format is incorrect'})
 
         course = get_course_by_id(CourseKey.from_string(course_id))
         unit = find_unit(course, serializer_data.validated_data.get('url'))
