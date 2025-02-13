@@ -82,9 +82,12 @@ from openedx.core.release import RELEASE_LINE
             <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/editImageModal.min.css')}" />
         % endif
         <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-        {% comment %} TODO: Confirm if we can retrieve static files from the backend {% endcomment %}
-        <link rel="stylesheet" type="text/css" href="${static.url('dist/openassessment-ltr.57031c2cf8d1638b07a0.css')}" />
-        </%block>
+        % for _, resource in resources:
+            % if resource['kind'] == 'url' and resource['mimetype'] == 'text/css':
+                <link rel="stylesheet" href="${resource['data']}" type="text/css" />
+            % endif
+        % endfor
+    </%block>
 
     <!-- Hotjar Tracking Code -->
     <script>
@@ -101,8 +104,8 @@ from openedx.core.release import RELEASE_LINE
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE} view-container">
-    <%static:js group='base_vendor'/>
-    <%static:webpack entry="commons"/>
+    <%static:js group='base_vendor' />
+    <%static:webpack entry='commons' />
 
     <script type="text/javascript">
         window.baseUrl = '${settings.STATIC_URL | n, js_escaped_string}';

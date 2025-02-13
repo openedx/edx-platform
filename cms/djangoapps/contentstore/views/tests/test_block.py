@@ -23,6 +23,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
 from pytz import UTC
+from bs4 import BeautifulSoup
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlockAside
@@ -4582,5 +4583,27 @@ class TestXblockEditView(CourseTestCase):
 
         html_content = resp.content.decode(resp.charset)
         self.assertIn("var decodedActionName = 'edit';", html_content)
-        self.assertIn('"lms_url": "http://localhost:8000/courses/course-v1:org.0+course_0+Run_0/jump_to/block-v1:org.0+course_0+Run_0+type@video+block@My_Video"', html_content)
-        self.assertIn('"embed_lms_url": "http://localhost:8000/xblock/block-v1:org.0+course_0+Run_0+type@video+block@My_Video"', html_content)
+        self.assertIn(
+            '"lms_url": "http://localhost:8000/courses/course-v1:org.0+course_0+Run_0/'
+            'jump_to/block-v1:org.0+course_0+Run_0+type@video+block@My_Video"',
+            html_content
+        )
+        self.assertIn(
+            '"embed_lms_url": "http://localhost:8000/xblock/block-v1:org.0+course_0+Run_0/'
+            'type@video+block@My_Video"',
+            html_content
+        )
+
+    def test_xblock_edit_view_contains_resources(self):
+        url = reverse_usage_url("xblock_edit_handler", self.video.location)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+        html_content = resp.content.decode(resp.charset)
+        soup = BeautifulSoup(html_content, "html.parser")
+
+        resource_links = [link["href"] for link in soup.find_all("link", {"rel": "stylesheet"})]
+        script_sources = [script["src"] for script in soup.find_all("script") if script.get("src")]
+
+        self.assertGreater(len(resource_links), 0, f"No CSS resources found in HTML. Found: {resource_links}")
+        self.assertGreater(len(script_sources), 0, f"No JS resources found in HTML. Found: {script_sources}")
