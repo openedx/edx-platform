@@ -513,6 +513,20 @@ class VideoStudioViewHandlers:
 
         return response
 
+    def _save_transcript_field(self):
+        """
+        Save `transcripts` block field.
+        """
+        field = self.fields['transcripts']
+        if self.transcripts:
+            transcripts_copy = self.transcripts.copy()
+            # Need to delete to overwrite, it's weird behavior,
+            # but it only works like this.
+            field.delete_from(self)
+            field.write_to(self, transcripts_copy)
+        else:
+            field.delete_from(self)
+
     def _studio_transcript_upload(self, request):
         """
         Upload transcript. Usedn in "POST" method in `studio_transcript`
@@ -527,29 +541,21 @@ class VideoStudioViewHandlers:
             new_language_code = request.POST['new_language_code']
             transcript_file = request.POST['file'].file
 
-            if not edx_video_id:
-                # Back-populate the video ID for an external video.
-                # pylint: disable=attribute-defined-outside-init
-                self.edx_video_id = edx_video_id = create_external_video(display_name='external video')
+            isLibrary = isinstance(self.usage_key.context_key, LibraryLocatorV2)
+
+            if isLibrary:
+                filename = f'transcript-{new_language_code}.srt'
+            else:
+                if not edx_video_id:
+                    # Back-populate the video ID for an external video.
+                    # pylint: disable=attribute-defined-outside-init
+                    self.edx_video_id = edx_video_id = create_external_video(display_name='external video')
+                filename = f'{edx_video_id}-{new_language_code}.srt'
 
             try:
                 # Convert SRT transcript into an SJSON format
                 # and upload it to S3.
                 content = transcript_file.read()
-                sjson_subs = Transcript.convert(
-                    content=content.decode('utf-8'),
-                    input_format=Transcript.SRT,
-                    output_format=Transcript.SJSON
-                ).encode()
-                create_or_update_video_transcript(
-                    video_id=edx_video_id,
-                    language_code=language_code,
-                    metadata={
-                        'file_format': Transcript.SJSON,
-                        'language_code': new_language_code
-                    },
-                    file_data=ContentFile(sjson_subs),
-                )
                 payload = {
                     'edx_video_id': edx_video_id,
                     'language_code': new_language_code
@@ -558,10 +564,8 @@ class VideoStudioViewHandlers:
                 # language_code fields will have the same value.
                 if language_code != new_language_code:
                     self.transcripts.pop(language_code, None)
-                self.transcripts[new_language_code] = f'{edx_video_id}-{new_language_code}.srt'
-                response = Response(json.dumps(payload), status=201)
-
-                if isinstance(self.usage_key.context_key, LibraryLocatorV2):
+                self.transcripts[new_language_code] = filename
+                if isLibrary:
                     # Save transcript as static asset in Learning Core if is a library component
                     filename = f"static/{self.transcripts[new_language_code]}"
                     lib_api.add_library_block_static_asset_file(
@@ -569,6 +573,23 @@ class VideoStudioViewHandlers:
                         filename,
                         content,
                     )
+                    self._save_transcript_field()
+                else:
+                    sjson_subs = Transcript.convert(
+                        content=content.decode('utf-8'),
+                        input_format=Transcript.SRT,
+                        output_format=Transcript.SJSON
+                    ).encode()
+                    create_or_update_video_transcript(
+                        video_id=edx_video_id,
+                        language_code=language_code,
+                        metadata={
+                            'file_format': Transcript.SJSON,
+                            'language_code': new_language_code
+                        },
+                        file_data=ContentFile(sjson_subs),
+                    )
+                response = Response(json.dumps(payload), status=201)
             except (TranscriptsGenerationException, UnicodeDecodeError):
                 response = Response(
                     json={
@@ -602,13 +623,7 @@ class VideoStudioViewHandlers:
                     self.usage_key,
                     f"static/{transcript_name}",
                 )
-                field = self.fields['transcripts']
-                if self.transcripts:
-                    transcripts_copy = self.transcripts.copy()
-                    field.delete_from(self)
-                    field.write_to(self, transcripts_copy)
-                else:
-                    field.delete_from(self)
+                self._save_transcript_field()
         else:
             if language == 'en':
                 # remove any transcript file from content store for the video ids
