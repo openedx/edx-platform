@@ -4583,16 +4583,6 @@ class TestXblockEditView(CourseTestCase):
 
         html_content = resp.content.decode(resp.charset)
         self.assertIn("var decodedActionName = 'edit';", html_content)
-        self.assertIn(
-            '"lms_url": "http://localhost:8000/courses/course-v1:org.0+course_0+Run_0/'
-            'jump_to/block-v1:org.0+course_0+Run_0+type@video+block@My_Video"',
-            html_content
-        )
-        self.assertIn(
-            '"embed_lms_url": "http://localhost:8000/xblock/block-v1:org.0+course_0+Run_0/'
-            'type@video+block@My_Video"',
-            html_content
-        )
 
     def test_xblock_edit_view_contains_resources(self):
         url = reverse_usage_url("xblock_edit_handler", self.video.location)

@@ -1,9 +1,11 @@
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
-body {
-  min-width: 800px;
-  background: transparent;
+html {
+  body {
+    min-width: 800px;
+    background: transparent;
+  }
 }
 
 [class*="view-"] .wrapper {

@@ -321,7 +321,7 @@ def xblock_edit_view(request, usage_key_string):
     store = modulestore()
 
     with store.bulk_operations(usage_key.course_key):
-        course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+        course, xblock, _, __ = _get_item_in_course(request, usage_key)
         container_handler_context = get_container_handler_context(request, usage_key, course, xblock)
 
         fragment = get_preview_fragment(request, xblock, {})
