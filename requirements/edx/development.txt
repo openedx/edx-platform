@@ -2264,7 +2264,7 @@ xblock-google-drive==0.7.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-xblock-poll==1.14.0
+xblock-poll==1.14.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
