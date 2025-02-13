@@ -16,7 +16,8 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import override as override_language
-from edx_ace import ace
+from edx_ace import ace, presentation
+from edx_ace.channel.django_email import DjangoEmailChannel
 from edx_ace.recipient import Recipient
 from eventtracking import tracker
 from submissions import api as sub_api  # installed from the edx-submissions repository
@@ -591,6 +592,19 @@ def send_mail_to_student(student, param_dict, language=None):
         user_context=param_dict,
     )
 
+    render_msg = presentation.render(DjangoEmailChannel, message)
+    if not render_msg.body_html.count(student):
+        log.error(
+            {
+                'message': 'Email template does not contain required email address',
+                'email_address': student,
+                'message_type': message_type,
+                'render_msg': render_msg.body,
+                'count': render_msg.body_html.count(student),
+                'lms_user_id': lms_user_id,
+                **param_dict
+            }
+        )
     ace.send(message)
 
 
