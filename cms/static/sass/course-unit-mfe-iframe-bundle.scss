@@ -316,6 +316,7 @@ body {
 
       .openassessment_save_button,
       .save-button,
+      .action-save,
       .continue-button {
         color: $white;
         background-color: $primary;
@@ -347,6 +348,7 @@ body {
       }
 
       .openassessment_cancel_button,
+      .action-cancel,
       .cancel-button {
         color: $text-color;
         background-color: $transparent;
@@ -384,6 +386,8 @@ body {
 
   // Additions for the xblock editor on the Library Authoring
   &.xblock-iframe-content {
+    height: 100%;
+
     // Reset the max-height to allow the settings list to grow
     .wrapper-comp-settings .list-input.settings-list {
       max-height: unset;
@@ -409,6 +413,31 @@ body {
         &:last-child {
           margin-right: 0;
         }
+      }
+    }
+
+    .xblock-v1-studio_view {
+      height: 100%;
+
+      .editor-with-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+
+        .list-input {
+          height: 90vh;
+        }
+      }
+
+      &.xmodule_DoneXBlock {
+        margin-top: 60px;
+        padding: 0 20px;
+      }
+
+      .xblock-actions {
+        display: flex;
+        justify-content: flex-end;
       }
     }
   }
