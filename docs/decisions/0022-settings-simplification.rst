@@ -175,7 +175,9 @@ This is our target edx-platform settings module structure:
     settings with obviously-wrong defaults; (c) un-annotated LMS-specific
     overrides of settings defined in ``openedx/envs/common.py``; and (d)
     un-annotated overrides of third-party settings. Again, ``Derived`` settings
-    can be used as appropriate.
+    can be used as appropriate. This will be the default settings file for
+    running LMS management commands, although tools can override this (as
+    usual) by specifying a ``DJANGO_SETTINGS_MODULE``.
 
     * ``lms/envs/test.py``: Override LMS settings for unit tests. Should work
       in a local venv as well as in CI. Needs to invoke ``derive_settings`` in
