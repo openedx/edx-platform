@@ -11,12 +11,14 @@ import requests
 from django.conf import settings
 from django.urls import reverse
 from requests.auth import HTTPBasicAuth
+from waffle import switch_is_active
+from xmodule.capa.xqueue_submission import XQueueInterfaceSubmission
 
 if TYPE_CHECKING:
     from xmodule.capa_block import ProblemBlock
 
 log = logging.getLogger(__name__)
-dateformat = '%Y%m%d%H%M%S'
+dateformat = '%Y-%m-%dT%H:%M:%S'
 
 XQUEUE_METRIC_NAME = 'edxapp.xqueue'
 
@@ -134,6 +136,11 @@ class XQueueInterface:
         if files_to_upload is not None:
             for f in files_to_upload:
                 files.update({f.name: f})
+                
+        if switch_is_active('xqueue_submission.enabled'):
+            # Use the new edx-submissions workflow
+            submission = XQueueInterfaceSubmission().send_to_submission(header, body, files)
+            log.error(submission)
 
         return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
