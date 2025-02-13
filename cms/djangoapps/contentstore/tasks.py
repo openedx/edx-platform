@@ -10,11 +10,11 @@ import re
 import shutil
 import tarfile
 from datetime import datetime, timezone
+from importlib.metadata import entry_points
 from tempfile import NamedTemporaryFile, mkdtemp
 
 import aiohttp
 import olxcleaner
-import pkg_resources
 from ccx_keys.locator import CCXLocator
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -96,7 +96,7 @@ LOGGER = get_task_logger(__name__)
 FILE_READ_CHUNK = 1024  # bytes
 FULL_COURSE_REINDEX_THRESHOLD = 1
 ALL_ALLOWED_XBLOCKS = frozenset(
-    [entry_point.name for entry_point in pkg_resources.iter_entry_points("xblock.v1")]
+    [entry_point.name for entry_point in entry_points(group="xblock.v1")]
 )
 
 

@@ -552,7 +552,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.6.10
+edx-enterprise==5.6.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1573,7 +1573,7 @@ wheel==0.45.1
     #   django-pipeline
 wrapt==1.17.2
     # via -r requirements/edx/base.txt
-xblock[django]==5.1.1
+xblock[django]==5.1.2
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
