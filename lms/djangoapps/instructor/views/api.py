@@ -3052,7 +3052,6 @@ class ChangeDueDate(APIView):
         if not serializer_data.is_valid():
             return JsonResponseBadRequest({'error': 'All fields must be filled out'})
 
-
         student = serializer_data.validated_data.get('student')
         if not student:
             response_payload = {
