@@ -67,6 +67,7 @@ from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRol
 from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.content_libraries import api as v2contentlib_api
+from openedx.core.djangoapps.content_tagging.api import make_copied_tags_editable
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
@@ -1466,3 +1467,23 @@ def create_or_update_upstream_links(
     for xblock in xblocks:
         create_or_update_xblock_upstream_link(xblock, course_key_str, created)
     course_status.update_status(LearningContextLinksStatusChoices.COMPLETED)
+
+
+@shared_task
+@set_code_owner_attribute
+def handle_unlink_upstream_block(upstream_usage_key_string: str) -> None:
+    """
+    Handle updates needed to downstream blocks when the upstream link is severed.
+    """
+    ensure_cms("handle_unlink_upstream_block may only be executed in a CMS context")
+
+    try:
+        upstream_usage_key = UsageKey.from_string(upstream_usage_key_string)
+    except (InvalidKeyError):
+        LOGGER.exception(f'Invalid upstream usage_key: {upstream_usage_key_string}')
+        return
+
+    for link in PublishableEntityLink.objects.filter(
+        upstream_usage_key=upstream_usage_key,
+    ):
+        make_copied_tags_editable(str(link.downstream_usage_key))
