@@ -158,52 +158,72 @@ Decision
 
 This is our target edx-platform settings module structure:
 
-* ``openedx/envs/common.py``: Defaults shared between LMS and CMS (new!).
+* ``openedx/envs/common.py``: Define as much shared configuration between LMS
+  and CMS as possible, including: (a) where possible, annotated definitions of
+  edx-platform-specific settings with *reasonable, production-ready* defaults;
+  (b) otherwise, annotated definitions of edx-platform-specific settings (like
+  secrets) with *obviously-wrong* defaults, ensuring they aren't used in
+  production; and (c) un-annotated reasonable production-ready overrides of
+  third-party settings. When a particular setting's default should depend on
+  the *final* value of another setting, the former should be assigned to a
+  ``Derived(...)`` value, where ``...`` is a computation based on the latter.
 
-  * ``lms/envs/common.py``: LMS default settings. Wherever possible,
-    prod-ready values should be used. Where not possible, defaults should be
-    omitted (if the settings come from third-party libraries like Django) or be
-    set to obviously-wrong values (if edx-platform is defining them). For all
-    edx-platform-defined settings, code annotations should exist, either in
-    this file or in ``openedx/envs/common.py``.
+  * ``lms/envs/common.py``: Extend ``openedx/envs/common.py`` to create, as
+    much as possible, a production-ready settings file for the LMS. These
+    extension may include: (a) annotated definitions of LMS-specific settings
+    with production-ready defaults; (b) annotated definitions of LMS-specific
+    settings with obviously-wrong defaults; (c) un-annotated LMS-specific
+    overrides of settings defined in ``openedx/envs/common.py``; and (d)
+    un-annotated overrides of third-party settings. Again, ``Derived`` settings
+    can be used as appropriate.
 
     * ``lms/envs/test.py``: Override LMS settings for unit tests. Should work
-      in a local venv as well as in CI.
+      in a local venv as well as in CI. Needs to invoke ``derive_settings`` in
+      order to render all previously-defined ``Derived`` settings.
 
-    * ``<third_party_repo>/lms_production.py`` (example path): In order to
+    * ``<third_party_repo>/lms_prod.py`` (example path): In order to
       deploy the LMS, third-party providers (like edx.org) and tools (like
       Tutor) will need to separately maintain their own custom settings module
       derived from ``lms/envs/common.py``, and point their
-      ``DJANGO_SETTINGS_MODULE`` environment variable at this module.
+      ``DJANGO_SETTINGS_MODULE`` environment variable at this module. It is
+      important that this module both (i) replaces the obviously-wrong settings
+      with appropriate production settings, and (ii) invokes
+      ``derive_settings`` to render all previously-defined ``Derived`` settings.
 
     * ``lms/envs/yaml.py``: (Possibly) An alternative to third-party
       production.py. Loads overrides from a YAML file at ``LMS_CFG``,
       plus some well-defined special handling for mergable values like
       ``FEATURES``. This is adapted from and replaces lms/envs/production.py.
+      It will invoke ``derive_settings``.
 
-    * ``lms/envs/development.py``: Override LMS settings so that it can run
+    * ``lms/envs/dev.py``: Override LMS settings so that it can run
       "bare metal" directly on a developer's local machine using debug-friendly
       settings. Will use ``local.openedx.io`` (which resolves to 127.0.0.1) as
-      a base domain, which should be suitable for third-party tools as well.
+      a base domain, which should be suitable for third-party tools as well. It
+      will invoke ``derive_settings``.
 
-      * ``<third_party_repo>/lms_development.py`` (example path): In order to
+      * ``<third_party_repo>/lms_dev.py`` (example path): In order to
         run the LMS, third-party tools (like Tutor, and 2U's devstack) will
         need to separately maintain their own custom settings module derived
-        from ``lms/envs/development.py``, and point their
+        from ``lms/envs/dev.py``, and point their
         ``DJANGO_SETTINGS_MODULE`` environment variable at this module.
 
   * ``cms/envs/common.py``
 
     * ``cms/envs/test.py``
 
-    * ``<third_party_repo>/cms_production.py`` (example path)
+    * ``<third_party_repo>/cms_prod.py`` (example path)
 
     * ``cms/envs/yaml.py`` (Possibly)
 
-    * ``cms/envs/development.py``
+    * ``cms/envs/dev.py``
 
-      * ``<third_party_repo>/cms_development.py`` (example path)
+      * ``<third_party_repo>/cms_dev.py`` (example path)
 
+Notes on defaults:
+
+* When the default value of setting X depends on the *final* value of setting
+  Y, ``openedx.core
 
 Consequences
 ************
@@ -232,14 +252,14 @@ non-breaking unless noted.
   "bubble" them up to (openedx,cms,lms)/common.py. Keep
   (lms,cms)/envs/production.py unchanged through this process.
 
-* Develop (cms,lms)/envs/development based off of (cms,lms)/envs/common.py.
+* Develop (cms,lms)/envs/dev based off of (cms,lms)/envs/common.py.
   Iterate until we can run "bare metal" development server for LMS and CMS
   using these settings.
 
 * BREAKING (major): Deprecate and remove (cms,lms)/envs/devstack.py.
   Tools (like Tutor and 2U's devstack) will either need to maintain local
   copies of these modules, or "rebase" themselves onto
-  (lms,cms)/envs/development.py.
+  (lms,cms)/envs/dev.py.
 
 * Propose and, if accepted, implement an update to OEP-45 (Configuring and
   Operating Open edX). `Progress on this update is tracked here`_.
