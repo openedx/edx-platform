@@ -10,6 +10,7 @@ All user changes are saved immediately.
 import json
 import logging
 import os
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -84,20 +85,55 @@ def link_video_to_component(video_component, user):
     edx_video_id = clean_video_id(video_component.edx_video_id)
     if not edx_video_id:
         edx_video_id = create_external_video(display_name='external video')
-
-        if isinstance(video_component.usage_key, UsageKeyV2):
-            # `edx_video_id` is not used in the new runtime,
-            # also saving it generates errors.
-            # See `parse_xml_new_runtime()` in `video_block.py`
-            return edx_video_id
-
         video_component.edx_video_id = edx_video_id
         video_component.save_with_metadata(user)
 
     return edx_video_id
 
 
-def save_video_transcript(usage_key, edx_video_id, input_format, transcript_content, language_code):
+def save_video_transcript_in_learning_core(
+    usage_key,
+    input_format,
+    transcript_content,
+    language_code
+):
+    """
+    Saves a video transcript to the learning core
+
+    Arguments:
+        usage_key: UsageKey of the block
+        input_format: Input transcript format for content being passed.
+        transcript_content: Content of the transcript file
+        language_code: transcript language code
+    
+    Returns:
+        result: A boolean indicating whether the transcript was saved or not.
+        video_key: Key used in video filename
+    """
+    video_key = None
+    try:
+        srt_content = Transcript.convert(
+            content=transcript_content,
+            input_format=input_format,
+            output_format=Transcript.SRT
+        ).encode()
+
+        video_key = uuid4()
+
+        filename = f"static/{video_key}-{language_code}.srt"
+        lib_api.add_library_block_static_asset_file(
+            usage_key,
+            filename,
+            srt_content,
+        )
+        result = True
+    except (TranscriptsGenerationException, UnicodeDecodeError):
+        result = False
+
+    return result, video_key
+
+
+def save_video_transcript(edx_video_id, input_format, transcript_content, language_code):
     """
     Saves a video transcript to the VAL and its content to the configured django storage(DS).
 
@@ -128,20 +164,6 @@ def save_video_transcript(usage_key, edx_video_id, input_format, transcript_cont
             },
             file_data=ContentFile(sjson_subs),
         )
-        if isinstance(usage_key.context_key, LibraryLocatorV2):
-            # Save transcript as static asset in Learning Core if is a library component
-            srt_content = Transcript.convert(
-                content=sjson_subs,
-                input_format=Transcript.SJSON,
-                output_format=Transcript.SRT
-            ).encode()
-
-            filename = f"static/{edx_video_id}-{language_code}.srt"
-            lib_api.add_library_block_static_asset_file(
-                usage_key,
-                filename,
-                srt_content,
-            )
 
         result = True
     except (TranscriptsGenerationException, UnicodeDecodeError):
@@ -586,18 +608,27 @@ def choose_transcripts(request):
             return error_response({}, _('No such transcript.'))
 
         # 2. Link a video to video component if its not already linked to one.
-        edx_video_id = link_video_to_component(video, request.user)
+        if not isinstance(video.usage_key.context_key, LibraryLocatorV2):
+            edx_video_id = link_video_to_component(video, request.user)
+            video_key = edx_video_id
 
         # 3. Upload the retrieved transcript to DS for the linked video ID.
-        success = save_video_transcript(
-            video.usage_key,
-            edx_video_id,
-            input_format,
-            transcript_content,
-            language_code='en',
-        )
+        if isinstance(video.usage_key.context_key, LibraryLocatorV2):
+            success, video_key = save_video_transcript_in_learning_core(
+                video.usage_key,
+                input_format,
+                transcript_content,
+                language_code='en',
+            )
+        else:
+            success = save_video_transcript(
+                edx_video_id,
+                input_format,
+                transcript_content,
+                language_code='en',
+            )
         if success:
-            response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+            response = JsonResponse({'edx_video_id': video_key, 'status': 'Success'}, status=200)
         else:
             response = error_response({}, _('There is a problem with the chosen transcript file.'))
 
@@ -631,18 +662,27 @@ def rename_transcripts(request):
             return error_response({}, _('No such transcript.'))
 
         # 2. Link a video to video component if its not already linked to one.
-        edx_video_id = link_video_to_component(video, request.user)
+        if not isinstance(video.usage_key.context_key, LibraryLocatorV2):
+            edx_video_id = link_video_to_component(video, request.user)
+            video_key = edx_video_id
 
         # 3. Upload the retrieved transcript to DS for the linked video ID.
-        success = save_video_transcript(
-            video.usage_key,
-            edx_video_id,
-            input_format,
-            transcript_content,
-            language_code='en',
-        )
+        if isinstance(video.usage_key.context_key, LibraryLocatorV2):
+            success, video_key = save_video_transcript_in_learning_core(
+                video.usage_key,
+                input_format,
+                transcript_content,
+                language_code='en',
+            )
+        else:
+            success = save_video_transcript(
+                edx_video_id,
+                input_format,
+                transcript_content,
+                language_code='en',
+            )
         if success:
-            response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+            response = JsonResponse({'edx_video_id': video_key, 'status': 'Success'}, status=200)
         else:
             response = error_response(
                 {}, _('There is a problem with the existing transcript file. Please upload a different file.')
@@ -675,7 +715,9 @@ def replace_transcripts(request):
             return error_response({}, str(e))
 
         # 2. Link a video to video component if its not already linked to one.
-        edx_video_id = link_video_to_component(video, request.user)
+        if not isinstance(video.usage_key.context_key, LibraryLocatorV2):
+            edx_video_id = link_video_to_component(video, request.user)
+            video_key = edx_video_id
 
         # for transcript in transcript_links:
 
@@ -683,19 +725,26 @@ def replace_transcripts(request):
         success = True
         for transcript in transcript_content:
             [language_code, json_content] = transcript
-            success = save_video_transcript(
-                video.usage_key,
-                edx_video_id,
-                Transcript.SJSON,
-                json_content,
-                language_code,
-            )
+            if isinstance(video.usage_key.context_key, LibraryLocatorV2):
+                success, video_key = save_video_transcript_in_learning_core(
+                    video.usage_key,
+                    Transcript.SJSON,
+                    json_content,
+                    language_code,
+                )
+            else:
+                success = save_video_transcript(
+                    edx_video_id,
+                    Transcript.SJSON,
+                    json_content,
+                    language_code,
+                )
             if not success:
                 break
-            video.transcripts[language_code] = f"{edx_video_id}-{language_code}.srt"
+            video.transcripts[language_code] = f"{video_key}-{language_code}.srt"
         if success:
             video.save()
-            response = JsonResponse({'edx_video_id': edx_video_id, 'status': 'Success'}, status=200)
+            response = JsonResponse({'edx_video_id': video_key, 'status': 'Success'}, status=200)
         else:
             response = error_response({}, _('There is a problem with the YouTube transcript file.'))
 
