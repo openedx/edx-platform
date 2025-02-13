@@ -467,7 +467,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.6.10
+edx-enterprise==5.6.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -811,7 +811,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.15.2
+openedx-events==9.18.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -1252,7 +1252,7 @@ wheel==0.45.1
     # via django-pipeline
 wrapt==1.17.2
     # via -r requirements/edx/kernel.in
-xblock[django]==5.1.1
+xblock[django]==5.1.2
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock

@@ -18,7 +18,7 @@ from opaque_keys.edx.keys import UsageKeyV2, LearningContextKey
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
-from xblock.field_data import FieldData, SplitFieldData
+from xblock.field_data import DictFieldData, FieldData, SplitFieldData
 from xblock.fields import Scope, ScopeIds
 from xblock.runtime import IdReader, KvsFieldData, MemoryIdManager, Runtime
 
@@ -351,8 +351,10 @@ class XBlockRuntime(RuntimeShim, Runtime):
         Initialize the FieldData implementation for the specified XBlock
         """
         if self.user is None:
-            # No user is specified, so we want to throw an error if anything attempts to read/write user-specific fields
-            student_data_store = None
+            # No user is specified, so we want to ignore any user-specific data. We cannot throw an
+            # error here because the XBlock loading process will write to the user_state if we have
+            # mutable fields.
+            student_data_store = DictFieldData({})
         elif self.user.is_anonymous:
             # This is an anonymous (non-registered) user:
             assert isinstance(self.user_id, str) and self.user_id.startswith("anon")
