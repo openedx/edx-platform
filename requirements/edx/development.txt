@@ -1371,7 +1371,7 @@ openedx-events==9.18.0
     #   edx-name-affirmation
     #   event-tracking
     #   ora2
-openedx-filters==1.12.0
+git+https://github.com/openedx/openedx-filters.git@MJG/fix-authoring-subdomain
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
