@@ -226,9 +226,8 @@ chem==1.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-click==8.1.6
+click==8.1.8
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/../pip-tools.txt
     #   -r requirements/edx/assets.txt
     #   -r requirements/edx/development.in
