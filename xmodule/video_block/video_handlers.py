@@ -529,7 +529,7 @@ class VideoStudioViewHandlers:
 
     def _studio_transcript_upload(self, request):
         """
-        Upload transcript. Usedn in "POST" method in `studio_transcript`
+        Upload transcript. Used in "POST" method in `studio_transcript`
         """
         _ = self.runtime.service(self, "i18n").ugettext
         error = self.validate_transcript_upload_data(data=request.POST)
@@ -603,7 +603,7 @@ class VideoStudioViewHandlers:
 
     def _studio_transcript_delete(self, request):
         """
-        Delete transcript. Usedn in "DELETE" method in `studio_transcript`
+        Delete transcript. Used in "DELETE" method in `studio_transcript`
         """
         request_data = request.json
 
@@ -646,7 +646,7 @@ class VideoStudioViewHandlers:
 
     def _studio_transcript_get(self, request):
         """
-        Get transcript. Usedn in "GET" method in `studio_transcript`
+        Get transcript. Used in "GET" method in `studio_transcript`
         """
         _ = self.runtime.service(self, "i18n").ugettext
         language = request.GET.get('language_code')
