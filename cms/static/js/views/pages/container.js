@@ -149,6 +149,9 @@ function($, _, Backbone, gettext, BasePage,
                     case 'refreshXBlock':
                         this.render();
                         break;
+                    case 'completeXBlockEditing':
+                        this.refreshXBlock(xblockElement, false);
+                        break;
                     case 'completeManageXBlockAccess':
                         this.refreshXBlock(xblockElement, false);
                         break;
@@ -506,6 +509,18 @@ function($, _, Backbone, gettext, BasePage,
                     }
                     window.location.href = destinationUrl;
                     return;
+                }
+
+                if (this.options.isIframeEmbed) {
+                    return window.parent.postMessage(
+                        {
+                            type: 'editXBlock',
+                            message: 'Sends a message when the legacy modal window is shown',
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator')
+                            }
+                        }, document.referrer
+                    );
                 }
             }
 
@@ -1050,23 +1065,20 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         viewXBlockContent: function(event) {
-          try {
-            if (this.options.isIframeEmbed) {
-              event.preventDefault();
-              var usageId = event.currentTarget.href.split('/').pop() || '';
-              window.parent.postMessage(
-                {
-                  type: 'handleViewXBlockContent',
-                  payload: {
-                    usageId: usageId,
-                  },
-                }, document.referrer
-              );
-              return true;
+            try {
+                if (this.options.isIframeEmbed) {
+                    event.preventDefault();
+                    var usageId = event.currentTarget.href.split('/').pop() || '';
+                    window.parent.postMessage({
+                        type: 'handleViewXBlockContent',
+                        message: 'View the content of the XBlock',
+                        payload: { usageId },
+                    }, document.referrer);
+                    return true;
+                }
+            } catch (e) {
+                console.error(e);
             }
-          } catch (e) {
-            console.error(e);
-          }
         },
 
         toggleSaveButton: function() {
