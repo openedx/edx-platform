@@ -1,13 +1,11 @@
 // eslint-disable-next-line no-redeclare
 /* global jest,test,describe,expect */
-import { Button } from '@edx/paragon';
-import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
-import { Provider } from 'react-redux';
-import { shallow } from 'enzyme';
 import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
 import renderer from 'react-test-renderer';
 import store from '../../data/store';
-
 import Main from './Main';
 
 describe('ProblemBrowser Main component', () => {
@@ -28,6 +26,7 @@ describe('ProblemBrowser Main component', () => {
                     onSelectBlock={jest.fn()}
                     selectedBlock={null}
                     taskStatusEndpoint={taskStatusEndpoint}
+                    ShowBtnUi="false"
                 />
             </Provider>,
         );
@@ -47,6 +46,7 @@ describe('ProblemBrowser Main component', () => {
                     onSelectBlock={jest.fn()}
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
+                    ShowBtnUi="false"
                 />
             </Provider>,
         );
@@ -67,6 +67,7 @@ describe('ProblemBrowser Main component', () => {
                     onSelectBlock={jest.fn()}
                     selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
+                    ShowBtnUi="false"
                 />
             </Provider>,
         );
@@ -76,21 +77,31 @@ describe('ProblemBrowser Main component', () => {
         expect(fetchCourseBlocksMock.mock.calls.length).toBe(1);
     });
 
-    test('display dropdown on toggling dropdown', () => {
-        const component = shallow(
-            <Main
-                courseId={courseId}
-                createProblemResponsesReportTask={jest.fn()}
-                excludeBlockTypes={excludedBlockTypes}
-                fetchCourseBlocks={jest.fn()}
-                problemResponsesEndpoint={problemResponsesEndpoint}
-                onSelectBlock={jest.fn()}
-                selectedBlock="some-selected-block"
-                taskStatusEndpoint={taskStatusEndpoint}
-            />,
+    test('display dropdown on toggling dropdown', async () => {
+        render(
+            <Provider store={store}>
+                <Main
+                    courseId={courseId}
+                    createProblemResponsesReportTask={jest.fn()}
+                    excludeBlockTypes={excludedBlockTypes}
+                    fetchCourseBlocks={jest.fn()}
+                    problemResponsesEndpoint={problemResponsesEndpoint}
+                    onSelectBlock={jest.fn()}
+                    selectedBlock="some-selected-block"
+                    taskStatusEndpoint={taskStatusEndpoint}
+                    ShowBtnUi="false"
+                />
+            </Provider>,
         );
-        expect(component.find(BlockBrowserContainer).length).toBeFalsy();
-        component.find(Button).find({ label: 'Select a section or problem' }).simulate('click');
-        expect(component.find(BlockBrowserContainer).length).toBeTruthy();
+        expect(screen.queryByTestId('block-browser-container')).toBeNull();
+        const toggleButton = screen.getByRole('button', { name: 'Select a section or problem' });
+        await userEvent.click(toggleButton);
+        await waitFor(() => {
+            expect(screen.findByTestId('block-browser-container')).resolves.toBeInTheDocument();
+        });
+        await userEvent.click(toggleButton);
+        await waitFor(() => {
+            expect(screen.findByTestId('block-browser-container')).resolves.toBeInTheDocument();
+        });
     });
 });
