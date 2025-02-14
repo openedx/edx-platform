@@ -1683,22 +1683,27 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@common_exceptions_400
-def get_course_survey_results(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetCourseSurveyResults(DeveloperErrorViewMixin, APIView):
     """
     get the survey results report for the particular course.
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('survey')
-    task_api.submit_course_survey_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.ENROLLMENT_REPORT
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        method to return survey results report for the particular course.
+        """
+        course_key = CourseKey.from_string(course_id)
+        report_type = _('survey')
+        task_api.submit_course_survey_report(request, course_key)
+        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+        return JsonResponse({"status": success_status})
 
 
 @transaction.non_atomic_requests
