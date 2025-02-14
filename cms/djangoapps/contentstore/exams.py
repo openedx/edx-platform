@@ -75,12 +75,12 @@ def register_exams(course_key):
         # from contentstore/proctoring.py. These exams are powered by the edx-proctoring plugin and not the edx-exams
         # microservice.
         if course.proctoring_provider == 'lti_external':
-            timed_exam.due if not course.self_paced else None
-        else:
             due_date = (
-                timed_exam.due.isoformat() if timed_exam.due 
+                timed_exam.due.isoformat() if timed_exam.due
                 else (course.end.isoformat() if course.end else None)
             )
+        else:
+            due_date = timed_exam.due if not course.self_paced else None
 
         exams_list.append({
             'course_id': str(course_key),
