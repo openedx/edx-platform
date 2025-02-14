@@ -65,12 +65,28 @@ class BaseUserView(APIView):
     identifier_kinds = ['email', 'username']
 
     authentication_classes = (
+        JwtAuthentication,
         # Users may want to view/edit the providers used for authentication before they've
         # activated their account, so we allow inactive users.
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
     throttle_classes = [ProviderSustainedThrottle, ProviderBurstThrottle]
+
+    def get_active_providers(self, user, is_unprivileged):
+        """
+        Fetch account details of active providers for the user.
+        """
+        providers = pipeline.get_provider_user_states(user)
+
+        active_providers = [
+            self.get_provider_data(assoc, is_unprivileged)
+            for assoc in providers if assoc.has_account
+        ]
+
+        return Response({
+            "active": active_providers
+        })
 
     def do_get(self, request, identifier):
         """
@@ -86,18 +102,7 @@ class BaseUserView(APIView):
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        providers = pipeline.get_provider_user_states(user)
-
-        active_providers = [
-            self.get_provider_data(assoc, is_unprivileged)
-            for assoc in providers if assoc.has_account
-        ]
-
-        # In the future this can be trivially modified to return the inactive/disconnected providers as well.
-
-        return Response({
-            "active": active_providers
-        })
+        return self.get_active_providers(user, is_unprivileged)
 
     def get_provider_data(self, assoc, is_unprivileged):
         """
@@ -248,6 +253,49 @@ class UserViewV2(BaseUserView):
         """
         identifier = self.get_identifier_for_requested_user(request)
         return self.do_get(request, identifier)
+
+    def delete(self, request):
+        """
+        Delete given social auth record for a user.
+
+        Args:
+            request (Request): The HTTP DELETE request
+
+        Request Parameters:
+            email/username: Must provide one of 'email' or 'username'.  If both are provided,
+            the username will be ignored.
+            uid: UID of the social auth record to delete
+
+        Return:
+            JSON serialized list of the providers linked to this user after the delete operation.
+
+        """
+        identifier = self.get_identifier_for_requested_user(request)
+        uid = request.query_params.get("uid")
+        if not uid:
+            raise exceptions.ValidationError("Must provide uid")
+
+        is_unprivileged = self.is_unprivileged_query(request, identifier)
+
+        if is_unprivileged:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            user = User.objects.get(**{identifier.kind: identifier.value})
+            social_auth_records = UserSocialAuth.objects.filter(user=user)
+            social_auth_records.get(uid=uid).delete()
+        except User.DoesNotExist:
+            return Response(
+                data={f"User {identifier.value} does not exist."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except UserSocialAuth.DoesNotExist:
+            return Response(
+                data={f"User {identifier.value} does not have a social auth record with UID {uid}."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return self.get_active_providers(user, is_unprivileged)
 
     def get_identifier_for_requested_user(self, request):
         """

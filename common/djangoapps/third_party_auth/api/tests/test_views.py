@@ -14,6 +14,7 @@ from edx_rest_framework_extensions.auth.jwt.tests.utils import generate_jwt
 from rest_framework.test import APITestCase
 from social_django.models import UserSocialAuth
 
+from common.djangoapps.student.models import User
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth.api.permissions import (
     JwtHasScope,
@@ -214,14 +215,50 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
     Test the Third Party Auth User REST API
     """
 
-    def make_url(self, identifier):
+    def setUp(self):  # pylint: disable=arguments-differ
+        """ Create users for use in the tests """
+        super().setUp()
+        admin_user = User.objects.get(username=ADMIN_USERNAME)
+        self.auth_token = f"JWT {generate_jwt(admin_user, is_restricted=False, scopes=None, filters=None)}"
+
+    def make_url(self, params):
         """
         Return the view URL, with the identifier provided
         """
         return '?'.join([
             reverse('third_party_auth_users_api_v2'),
-            urllib.parse.urlencode(identifier)
+            urllib.parse.urlencode(params)
         ])
+
+    @ddt.data(
+        ({}, 400, ["Must provide one of ['email', 'username']"]),
+        ({'username': ALICE_USERNAME}, 400, ["Must provide uid"]),
+        (
+            {'username': 'invalid-user', 'uid': f'{ALICE_USERNAME}@gmail.com'},
+            404,
+            {"User invalid-user does not exist."}
+        ),
+        (
+            {'username': ALICE_USERNAME, 'uid': 'invalid-uid'},
+            404,
+            {f"User {ALICE_USERNAME} does not have a social auth record with UID invalid-uid."}
+        ),
+        ({'username': ALICE_USERNAME, 'uid': f'{ALICE_USERNAME}@gmail.com'}, 200, {
+            "active": [
+                {
+                    "provider_id": PROVIDER_ID_TESTSHIB,
+                    "name": "TestShib",
+                    "remote_id": f"remote_{ALICE_USERNAME}"
+                }
+            ]
+        }),
+    )
+    @ddt.unpack
+    def test_delete_social_auth_record(self, identifier, expect_code, expect_data):
+        url = self.make_url(identifier)
+        response = self.client.delete(url, HTTP_AUTHORIZATION=self.auth_token)
+        assert response.status_code == expect_code
+        assert (response.data == expect_data)
 
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
