@@ -40,6 +40,11 @@ https://github.com/openedx/edx-platform/issues/35653):
       400: Downstream block is not linked to upstream content.
       404: Downstream block not found or user lacks permission to edit it.
 
+  /api/contentstore/v2/upstream/{usage_key_string}/downstream-contexts
+
+    GET: List all downstream contexts (Courses) linked to a library block.
+        200: A list of Course IDs and their display names and URLs.
+
   # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
@@ -62,19 +67,30 @@ import logging
 from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.core import XBlock
 
-from cms.lib.xblock.upstream_sync import (
-    UpstreamLink, UpstreamLinkException, NoUpstream, BadUpstream, BadDownstream,
-    fetch_customizable_fields, sync_from_upstream, decline_sync, sever_upstream_link
-)
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
-from common.djangoapps.student.auth import has_studio_write_access, has_studio_read_access
+from cms.djangoapps.contentstore.models import PublishableEntityLink
+from cms.djangoapps.contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
+from cms.lib.xblock.upstream_sync import (
+    BadDownstream,
+    BadUpstream,
+    NoUpstream,
+    UpstreamLink,
+    UpstreamLinkException,
+    decline_sync,
+    fetch_customizable_fields,
+    sever_upstream_link,
+    sync_from_upstream,
+)
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
@@ -109,6 +125,57 @@ class _AuthenticatedRequest(Request):
 #         course_key_string = request.GET['course_id']
 #         syncable = request.GET['ready_to_sync']
 #         ...
+
+
+@view_auth_classes()
+class UpstreamListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves course->library publishable entity links
+    """
+    def get(self, request: _AuthenticatedRequest, course_key_string: str):
+        """
+        Fetches publishable entity links for given course key
+        """
+        try:
+            course_key = CourseKey.from_string(course_key_string)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
+        links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
+        serializer = PublishableEntityLinksSerializer(links, many=True)
+        return Response(serializer.data)
+
+
+@view_auth_classes()
+class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves library block->courses links
+    """
+    def get(self, _: _AuthenticatedRequest, usage_key_string: str) -> Response:
+        """
+        Fetches downstream context links for given publishable entity
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+            print(usage_key)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
+
+        # Get unique downstream context keys for the given usage key
+        context_key_list = set(PublishableEntityLink.get_by_upstream_usage_key(
+            upstream_usage_key=usage_key
+        ).values_list('downstream_context_key', flat=True))
+
+        course_overviews = CourseOverview.objects.filter(id__in=context_key_list).values_list('id', 'display_name')
+
+        result = []
+        for context_key, display_name in course_overviews:
+            result.append({
+                "id": str(context_key),
+                "display_name": display_name,
+                "url": reverse_course_url('course_handler', context_key),
+            })
+
+        return Response(result)
 
 
 @view_auth_classes(is_authenticated=True)
