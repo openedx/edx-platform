@@ -3,6 +3,10 @@ Command to trigger sending reminder emails for learners to achieve their Course 
 """
 import time
 from datetime import date, datetime, timedelta
+
+import boto3
+from edx_ace.channel.django_email import DjangoEmailChannel
+from edx_ace.channel.mixins import EmailChannelMixin
 from eventtracking import tracker
 import logging
 import uuid
@@ -10,10 +14,10 @@ import uuid
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from edx_ace import ace
+from edx_ace import ace, presentation
 from edx_ace.message import Message
 from edx_ace.recipient import Recipient
-
+from edx_ace.utils.signals import send_ace_message_sent_signal
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.api import get_certificate_for_user_id
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -121,7 +125,11 @@ def send_ace_message(goal, session_id):
     with emulate_http_request(site, user):
         try:
             start_time = time.perf_counter()
-            ace.send(msg)
+            if is_ses_enabled:
+                # experimental implementation to log errors with ses
+                send_email_using_ses(user, msg)
+            else:
+                ace.send(msg)
             end_time = time.perf_counter()
             log.info(f"Goal Reminder for {user.id} for course {goal.course_key} sent in {end_time - start_time} "
                      f"using {'SES' if is_ses_enabled else 'others'}")
@@ -216,8 +224,11 @@ class Command(BaseCommand):
                 'goal_count': total_goals,
             }
         )
-        log.info(f'Processing course goals, total goal count {total_goals},'
-                 + f'timestamp: {datetime.now()}, uuid: {session_id}')
+        log.info('Processing course goals, total goal count {}, timestamp: {}, uuid: {}'.format(
+            total_goals,
+            datetime.now(),
+            session_id
+        ))
         for goal in course_goals:
             # emulate a request for waffle's benefit
             with emulate_http_request(site=Site.objects.get_current(), user=goal.user):
@@ -226,8 +237,13 @@ class Command(BaseCommand):
                 else:
                     filtered_count += 1
             if (sent_count + filtered_count) % 10000 == 0:
-                log.info(f'Processing course goals: sent {sent_count} filtered {filtered_count} out of {total_goals},'
-                         + f'timestamp: {datetime.now()}, uuid: {session_id}')
+                log.info('Processing course goals: sent {} filtered {} out of {}, timestamp: {}, uuid: {}'.format(
+                    sent_count,
+                    filtered_count,
+                    total_goals,
+                    datetime.now(),
+                    session_id
+                ))
 
         tracker.emit(
             'edx.course.goal.email.session_completed',
@@ -239,8 +255,10 @@ class Command(BaseCommand):
                 'emails_filtered': filtered_count,
             }
         )
-        log.info(f'Processing course goals complete: sent {sent_count} emails, filtered out {filtered_count} emails'
-                 + f'timestamp: {datetime.now()}, uuid: {session_id}')
+        log.info('Processing course goals complete: sent {} emails, '
+                 'filtered out {} emails, timestamp: {}, '
+                 'uuid: {}'.format(sent_count, filtered_count, datetime.now(), session_id)
+                 )
 
     @staticmethod
     def handle_goal(goal, today, sunday_date, monday_date, session_id):
@@ -284,7 +302,7 @@ class Command(BaseCommand):
                     'uuid': session_id,
                     'timestamp': datetime.now(),
                     'reason': 'User time zone',
-                    'user_timezone': user_timezone,
+                    'user_timezone': str(user_timezone),
                     'now_in_users_timezone': now_in_users_timezone,
                 }
             )
@@ -297,3 +315,48 @@ class Command(BaseCommand):
                 return True
 
         return False
+
+
+def send_email_using_ses(user, msg):
+    """
+    Send email using AWS SES
+    """
+    render_msg = presentation.render(DjangoEmailChannel, msg)
+    # send rendered email using SES
+
+    sender = EmailChannelMixin.get_from_address(msg)
+
+    subject = EmailChannelMixin.get_subject(render_msg)
+    body_text = render_msg.body
+    body_html = render_msg.body_html
+
+    try:
+        # Send email
+        response = boto3.client('ses', settings.AWS_SES_REGION_NAME).send_email(
+            Source=sender,
+            Destination={
+                'ToAddresses': [user.email],
+            },
+            Message={
+                'Subject': {
+                    'Data': subject,
+                    'Charset': 'UTF-8'
+                },
+                'Body': {
+                    'Text': {
+                        'Data': body_text,
+                        'Charset': 'UTF-8'
+                    },
+                    'Html': {
+                        'Data': body_html,
+                        'Charset': 'UTF-8'
+                    }
+                }
+            }
+        )
+
+        log.info(f"Goal Reminder Email: email sent using SES with message ID {response['MessageId']}")
+        send_ace_message_sent_signal(DjangoEmailChannel, msg)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        log.error(f"Goal Reminder Email: Error sending email using SES: {e}")
+        raise e

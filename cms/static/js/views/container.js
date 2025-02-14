@@ -70,6 +70,17 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                     newParent = undefined;
                 },
                 update: function(event, ui) {
+                    try {
+                        window.parent.postMessage(
+                            {
+                                type: 'refreshPositions',
+                                message: 'Refresh positions of all xblocks',
+                                payload: {}
+                            }, document.referrer
+                        );
+                    } catch (e) {
+                        console.error(e);
+                    }
                     // When dragging from one ol to another, this method
                     // will be called twice (once for each list). ui.sender will
                     // be null if the change is related to the list the element

@@ -81,6 +81,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateResponseMixin, View
+from drf_yasg.utils import swagger_auto_schema
 from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
 from pylti1p3.exception import LtiException, OIDCException
 
@@ -99,6 +100,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+from cms.djangoapps.contentstore.views.course import (
+    get_allowed_organizations_for_libraries,
+    user_can_create_organizations,
+)
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryBlockImportTaskCreateSerializer,
@@ -122,6 +127,7 @@ import openedx.core.djangoapps.site_configuration.helpers as configuration_helpe
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.types.http import RestRequest
 
 from .models import ContentLibrary, LtiGradedResource, LtiProfile
 
@@ -196,8 +202,10 @@ class LibraryRootView(GenericAPIView):
     """
     Views to list, search for, and create content libraries.
     """
+    serializer_class = ContentLibraryMetadataSerializer
 
     @apidocs.schema(
+        responses={200: ContentLibraryMetadataSerializer(many=True)},
         parameters=[
             *LibraryApiPaginationDocs.apidoc_params,
             apidocs.query_parameter(
@@ -267,6 +275,14 @@ class LibraryRootView(GenericAPIView):
         except InvalidOrganizationException:
             raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 detail={"org": f"No such organization '{org_name}' found."}
+            )
+        # Ensure the user is allowed to create libraries under this org
+        if not (
+            user_can_create_organizations(request.user) or
+            org_name in get_allowed_organizations_for_libraries(request.user)
+        ):
+            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+                detail={"org": f"User not allowed to create libraries in '{org_name}'."}
             )
         org = Organization.objects.get(short_name=org_name)
 
@@ -517,7 +533,13 @@ class LibraryPasteClipboardView(GenericAPIView):
     """
     Paste content of clipboard into Library.
     """
+    serializer_class = LibraryXBlockMetadataSerializer
+
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=LibraryPasteClipboardSerializer,
+        responses={200: LibraryXBlockMetadataSerializer}
+    )
     def post(self, request, lib_key_str):
         """
         Import the contents of the user's clipboard and paste them into the Library
@@ -545,6 +567,7 @@ class LibraryBlocksView(GenericAPIView):
     """
     Views to work with XBlocks in a specific content library.
     """
+    serializer_class = LibraryXBlockMetadataSerializer
 
     @apidocs.schema(
         parameters=[
@@ -582,6 +605,10 @@ class LibraryBlocksView(GenericAPIView):
         return self.get_paginated_response(serializer.data)
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=LibraryXBlockCreationSerializer,
+        responses={200: LibraryXBlockMetadataSerializer}
+    )
     def post(self, request, lib_key_str):
         """
         Add a new XBlock to this content library
@@ -667,7 +694,7 @@ class LibraryBlockCollectionsView(APIView):
     View to set collections for a component.
     """
     @convert_exceptions
-    def patch(self, request, usage_key_str) -> Response:
+    def patch(self, request: RestRequest, usage_key_str) -> Response:
         """
         Sets Collections for a Component.
 
@@ -688,7 +715,7 @@ class LibraryBlockCollectionsView(APIView):
             library_key=key.lib_key,
             component=component,
             collection_keys=collection_keys,
-            created_by=self.request.user.id,
+            created_by=request.user.id,
             content_library=content_library,
         )
 
@@ -799,6 +826,7 @@ class LibraryBlockAssetView(APIView):
         """
         Replace a static asset file belonging to this block.
         """
+        file_path = file_path.replace(" ", "_")  # Messes up url/name correspondence due to URL encoding.
         usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(
             usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
@@ -856,6 +884,9 @@ class LibraryImportTaskViewSet(GenericViewSet):
     Import blocks from Courseware through modulestore.
     """
 
+    queryset = []  # type: ignore[assignment]
+    serializer_class = ContentLibraryBlockImportTaskSerializer
+
     @convert_exceptions
     def list(self, request, lib_key_str):
         """
@@ -875,6 +906,10 @@ class LibraryImportTaskViewSet(GenericViewSet):
         )
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=ContentLibraryBlockImportTaskCreateSerializer,
+        responses={200: ContentLibraryBlockImportTaskSerializer}
+    )
     def create(self, request, lib_key_str):
         """
         Create and queue an import tasks for this library.
