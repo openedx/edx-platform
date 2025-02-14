@@ -43,8 +43,7 @@ https://github.com/openedx/edx-platform/issues/35653):
   /api/contentstore/v2/upstream/{usage_key_string}/downstream-contexts
 
     GET: List all downstream contexts (Courses) linked to a library block.
-        200: A list of Course IDs and their display names, along with the number of times the block
-            is linked to each.
+        200: A list of Course IDs and their display names and URLs.
 
   # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
@@ -66,7 +65,6 @@ UpstreamLink response schema:
 import logging
 
 from attrs import asdict as attrs_asdict
-from collections import Counter
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -92,6 +90,7 @@ from cms.lib.xblock.upstream_sync import (
     sync_from_upstream,
 )
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
@@ -160,21 +159,20 @@ class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
             print(usage_key)
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
-        links = PublishableEntityLink.get_by_upstream_usage_key(upstream_usage_key=usage_key)
-        downstream_key_list = [link.downstream_context_key for link in links]
 
-        # Count the number of times each course is linked to the library block
-        counter = Counter(downstream_key_list)
+        # Get unique downstream context keys for the given usage key
+        context_key_list = set(PublishableEntityLink.get_by_upstream_usage_key(
+            upstream_usage_key=usage_key
+        ).values_list('downstream_context_key', flat=True))
+
+        course_overviews = CourseOverview.objects.filter(id__in=context_key_list).values_list('id', 'display_name')
 
         result = []
-        for context_key, count in counter.most_common():
-            # The following code only can handle the correct display_name for Courses as context
-            course = modulestore().get_course(context_key)
+        for context_key, display_name in course_overviews:
             result.append({
                 "id": str(context_key),
-                "display_name": course.display_name,
+                "display_name": display_name,
                 "url": reverse_course_url('course_handler', context_key),
-                "count": count,
             })
 
         return Response(result)

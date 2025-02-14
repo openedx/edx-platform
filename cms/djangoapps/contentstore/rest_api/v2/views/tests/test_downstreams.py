@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
@@ -56,6 +57,7 @@ class _BaseDownstreamViewTestMixin:
         freezer.start()
         self.maxDiff = 2000
         self.course = CourseFactory.create()
+        CourseOverviewFactory.create(id=self.course.id, display_name=self.course.display_name)
         chapter = BlockFactory.create(category='chapter', parent=self.course)
         sequential = BlockFactory.create(category='sequential', parent=chapter)
         unit = BlockFactory.create(category='vertical', parent=sequential)
@@ -68,6 +70,7 @@ class _BaseDownstreamViewTestMixin:
         ).usage_key
 
         self.another_course = CourseFactory.create(display_name="Another Course")
+        CourseOverviewFactory.create(id=self.another_course.id, display_name=self.another_course.display_name)
         another_chapter = BlockFactory.create(category='chapter', parent=self.another_course)
         another_sequential = BlockFactory.create(category='sequential', parent=another_chapter)
         another_unit = BlockFactory.create(category='vertical', parent=another_sequential)
@@ -370,16 +373,14 @@ class GetDownstreamContextsTest(_BaseDownstreamViewTestMixin, SharedModuleStoreT
         data = response.json()
         expected = [
             {
-                'id': str(self.another_course.id),
-                'display_name': str(self.another_course.display_name),
-                'url': f'/course/{str(self.another_course.id)}',
-                'count': 3,
-            },
-            {
                 'id': str(self.course.id),
                 'display_name': str(self.course.display_name),
                 'url': f'/course/{str(self.course.id)}',
-                'count': 1,
+            },
+            {
+                'id': str(self.another_course.id),
+                'display_name': str(self.another_course.display_name),
+                'url': f'/course/{str(self.another_course.id)}',
             },
         ]
         self.assertListEqual(data, expected)
