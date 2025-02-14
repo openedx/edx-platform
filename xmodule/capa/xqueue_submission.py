@@ -24,11 +24,12 @@ XQUEUE_TIMEOUT = 35  # seconds
 CONNECT_TIMEOUT = 3.05  # seconds
 READ_TIMEOUT = 10  # seconds
 
+
 class XQueueInterfaceSubmission:
     """
     Interface to the external grading system
     """
-    
+
     def extract_item_data(self, header, payload):
         from lms.djangoapps.courseware.models import StudentModule
         from opaque_keys.edx.locator import BlockUsageLocator
@@ -65,10 +66,10 @@ class XQueueInterfaceSubmission:
             student_info = json.loads(payload["student_info"])
         except json.JSONDecodeError as e:
             raise ValueError(f"Error to student_info: {e}")
-        
+
         usage_key = BlockUsageLocator.from_string(item_id)
         course_key = CourseKey.from_string(course_id)
-        
+
         try:
             grader_payload = payload["grader_payload"]
             if isinstance(grader_payload, str):
@@ -78,8 +79,6 @@ class XQueueInterfaceSubmission:
             raise ValueError(f"Error  grader_payload: {e}")
         except KeyError as e:
             raise ValueError(f"Error payload: {e}")
-        
-        
 
         student_id = student_info.get("anonymous_student_id")
         if not student_id:
@@ -95,14 +94,14 @@ class XQueueInterfaceSubmission:
         student_answer = payload.get("student_response")
         if student_answer is None:
             raise ValueError("The field 'student_response' do not exist.")
-        
+
         student_module = StudentModule.objects.filter(
-        module_state_key=usage_key,
-        course_id=course_key
+            module_state_key=usage_key,
+            course_id=course_key
         ).first()
 
         log.error(f"student_module: {student_module}")
-        
+
         if student_module and student_module.grade is not None:
             score = student_module.grade
         else:
@@ -116,14 +115,14 @@ class XQueueInterfaceSubmission:
         from submissions.api import create_submission
         try:
             student_item, answer, queue_name, grader, score = self.extract_item_data(header, body)
-            
+
             log.error(f"student_item: {student_item}")
             log.error(f"header: {header}")
             log.error(f"body: {body}")
             log.error(f"grader: {grader}")
-            
+
             submission = create_submission(student_item, answer, queue_name=queue_name, grader=grader, score=score)
-            
+
             return submission
         except Exception as e:
             return {"error": str(e)}

@@ -18,6 +18,7 @@ import pytest
 @skip_unless_lms
 class XQueueServiceTest(TestCase):
     """Test the XQueue service methods."""
+
     def setUp(self):
         super().setUp()
         location = BlockUsageLocator(CourseLocator("test_org", "test_course", "test_run"), "problem", "ExampleProblem")
@@ -77,7 +78,7 @@ def test_send_to_queue_with_waffle_enabled(mock_send_to_submission):
 
     mock_send_to_submission.return_value = {'submission': 'mock_submission'}
     error, msg = xqueue_interface.send_to_queue(header, body, files_to_upload)
-    
+
     mock_send_to_submission.assert_called_once_with(header, body, {})
 
 
@@ -85,7 +86,7 @@ def test_send_to_queue_with_waffle_enabled(mock_send_to_submission):
 @override_switch('xqueue_submission.enabled', active=False)
 @patch('xmodule.capa.xqueue_interface.XQueueInterface._http_post')
 def test_send_to_queue_with_waffle_disabled(mock_http_post):
-    
+
     url = "http://example.com/xqueue"
     django_auth = {"username": "user", "password": "pass"}
     requests_auth = None
@@ -102,7 +103,7 @@ def test_send_to_queue_with_waffle_disabled(mock_http_post):
 
     mock_http_post.return_value = (0, "Submission sent successfully")
     error, msg = xqueue_interface.send_to_queue(header, body, files_to_upload)
-    
+
     mock_http_post.assert_called_once_with(
         'http://example.com/xqueue/xqueue/submit/',
         {'xqueue_header': header, 'xqueue_body': body},

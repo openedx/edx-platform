@@ -25,9 +25,9 @@ def test_extract_item_data():
     })
     with patch('lms.djangoapps.courseware.models.StudentModule.objects.filter') as mock_filter:
         mock_filter.return_value.first.return_value = Mock(grade=0.85)
-        
-        student_item, student_answer, queue_name,grader, score = XQueueInterfaceSubmission().extract_item_data(header, payload)
-        
+
+        student_item, student_answer, queue_name, grader, score = XQueueInterfaceSubmission().extract_item_data(header, payload)
+
         assert student_item == {
             'item_id': 'block-v1:org+course+run+type@problem+block@item_id',
             'item_type': 'problem',
@@ -50,15 +50,15 @@ def test_send_to_submission(mock_create_submission, xqueue_service):
         'student_response': 'student_answer',
         'grader_payload': json.dumps({'grader': 'test.py'})
     })
-    
+
     with patch('lms.djangoapps.courseware.models.StudentModule.objects.filter') as mock_filter:
         mock_filter.return_value.first.return_value = Mock(grade=0.85)
-        
+
         mock_create_submission.return_value = {'submission': 'mock_submission'}
-        
+
         # Llamada a send_to_submission
         result = xqueue_service.send_to_submission(header, body)
-        
+
         # Afirmaciones
         assert 'submission' in result
         assert result['submission'] == 'mock_submission'
