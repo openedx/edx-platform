@@ -743,7 +743,7 @@ class VideoExportTestCase(VideoBlockTestBase):
 
     def test_export_to_xml_without_video_id(self):
         """
-        Test that we write the correct XML without video_id on export.
+        Test that we write the correct XML on export of a video without edx_video_id.
         """
         self.block.youtube_id_0_75 = 'izygArpw-Qo'
         self.block.youtube_id_1_0 = 'p2Q6BrNhdh8'
