@@ -105,7 +105,7 @@ def save_video_transcript_in_learning_core(
         input_format: Input transcript format for content being passed.
         transcript_content: Content of the transcript file
         language_code: transcript language code
-    
+
     Returns:
         result: A boolean indicating whether the transcript was saved or not.
         video_key: Key used in video filename

@@ -560,20 +560,14 @@ class VideoStudioViewHandlers:
                     'edx_video_id': edx_video_id,
                     'language_code': new_language_code
                 }
-                # If a new transcript is added, then both new_language_code and
-                # language_code fields will have the same value.
-                if language_code != new_language_code:
-                    self.transcripts.pop(language_code, None)
-                self.transcripts[new_language_code] = filename
                 if isLibrary:
                     # Save transcript as static asset in Learning Core if is a library component
-                    filename = f"static/{self.transcripts[new_language_code]}"
+                    filename = f"static/{filename}"
                     lib_api.add_library_block_static_asset_file(
                         self.usage_key,
                         filename,
                         content,
                     )
-                    self._save_transcript_field()
                 else:
                     sjson_subs = Transcript.convert(
                         content=content.decode('utf-8'),
@@ -589,6 +583,15 @@ class VideoStudioViewHandlers:
                         },
                         file_data=ContentFile(sjson_subs),
                     )
+
+                # If a new transcript is added, then both new_language_code and
+                # language_code fields will have the same value.
+                if language_code != new_language_code:
+                    self.transcripts.pop(language_code, None)
+                self.transcripts[new_language_code] = filename
+
+                if isLibrary:
+                    self._save_transcript_field()
                 response = Response(json.dumps(payload), status=201)
             except (TranscriptsGenerationException, UnicodeDecodeError):
                 response = Response(
