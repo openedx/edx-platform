@@ -23,7 +23,7 @@ from edx_proctoring.models import ProctoredExam
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.statuses import ProctoredExamStudentAttemptStatus
 from edx_proctoring.tests.test_services import MockLearningSequencesService, MockScheduleItemData
-from edx_proctoring.tests.utils import ProctoredExamTestCase
+from edx_proctoring.tests.test_utils.utils import ProctoredExamTestCase
 from oauth2_provider.models import AccessToken, RefreshToken
 from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.tests.factories import OrganizationFactory
