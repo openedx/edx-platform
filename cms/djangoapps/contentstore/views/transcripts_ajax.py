@@ -46,6 +46,7 @@ from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: dis
 )
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.djangoapps.xblock.data import CheckPerm
 
 __all__ = [
     'upload_transcripts',
@@ -761,12 +762,11 @@ def _get_item(request, data):
     context_key = usage_key.context_key
     if not context_key.is_course:
         if isinstance(context_key, LibraryLocatorV2):
-            lib_api.require_permission_for_library_key(
-                context_key,
+            return xblock_api.load_block(
+                usage_key,
                 request.user,
-                lib_api.lib_permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+                check_permission=CheckPerm.CAN_EDIT,
             )
-            return xblock_api.load_block(usage_key, request.user)
         raise TranscriptsRequestValidationException(_('Transcripts are not yet supported for this type of block'))
     # This is placed before has_course_author_access() to validate the location,
     # because has_course_author_access() raises error if location is invalid.
