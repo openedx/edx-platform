@@ -187,10 +187,13 @@ def notification_preference_unsubscribe_event(user):
     """
     Emits an event when user clicks on one-click-unsubscribe url
     """
-    event_data = {
+    context_data = {
         'user_id': user.id,
-        'username': user.username,
-        'event_type': 'email_digest_unsubscribe'
+        'username': user.username
     }
-    tracker.emit(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
+    event_data = context_data.copy()
+    event_data['event_type'] = 'email_digest_unsubscribe'
+
+    with tracker.get_tracker().context(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, context_data):
+        tracker.emit(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
     segment.track(user.id, NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)
