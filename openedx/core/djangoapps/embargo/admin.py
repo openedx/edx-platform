@@ -8,7 +8,7 @@ from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
 from .forms import IPFilterForm, RestrictedCourseForm
-from .models import CountryAccessRule, IPFilter, RestrictedCourse
+from .models import CountryAccessRule, GlobalRestrictedCountry, IPFilter, RestrictedCourse
 
 
 class IPFilterAdmin(ConfigurationModelAdmin):
@@ -41,5 +41,20 @@ class RestrictedCourseAdmin(admin.ModelAdmin):
     search_fields = ('course_key',)
 
 
+class GlobalRestrictedCountryAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for the Global Country Restriction model.
+    """
+    list_display = ("country",)
+
+    def delete_queryset(self, request, queryset):
+        """
+        Override the delete_queryset method to clear the cache when objects are deleted in bulk.
+        """
+        super().delete_queryset(request, queryset)
+        GlobalRestrictedCountry.update_cache()
+
+
 admin.site.register(IPFilter, IPFilterAdmin)
 admin.site.register(RestrictedCourse, RestrictedCourseAdmin)
+admin.site.register(GlobalRestrictedCountry, GlobalRestrictedCountryAdmin)
