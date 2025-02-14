@@ -593,7 +593,7 @@ def send_mail_to_student(student, param_dict, language=None):
     )
 
     render_msg = presentation.render(DjangoEmailChannel, message)
-    if not render_msg.body_html.count(student):
+    if not render_msg.body_html.count(student) and message_type == 'allowed_enroll':
         log.error(
             {
                 'message': 'Email template does not contain required email address',
