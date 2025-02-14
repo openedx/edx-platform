@@ -25,7 +25,11 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
 from xmodule.video_block.transcripts_utils import Transcript, build_components_import_path
-from edxval.api import create_external_video, create_or_update_video_transcript
+from edxval.api import (
+    create_external_video,
+    create_or_update_video_transcript,
+    delete_video_transcript,
+)
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fetch_customizable_fields
@@ -730,6 +734,18 @@ def _import_transcripts(
                 },
                 file_data=ContentFile(sjson_subs),
             )
+
+
+def clear_transcripts(block: XBlock):
+    """
+    Deletes all transcripts of a video block
+    """
+    for language_code in block.transcripts.keys():
+        delete_video_transcript(
+            video_id=block.edx_video_id,
+            language_code=language_code,
+        )
+    block.transcripts = {}
 
 
 def is_item_in_course_tree(item):

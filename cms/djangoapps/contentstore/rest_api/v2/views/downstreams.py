@@ -73,7 +73,9 @@ from cms.lib.xblock.upstream_sync import (
     UpstreamLink, UpstreamLinkException, NoUpstream, BadUpstream, BadDownstream,
     fetch_customizable_fields, sync_from_upstream, decline_sync, sever_upstream_link
 )
-from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
+from cms.djangoapps.contentstore.helpers import (
+    import_static_assets_for_library_sync, clear_transcripts
+)
 from common.djangoapps.student.auth import has_studio_write_access, has_studio_read_access
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
@@ -198,6 +200,9 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
         try:
+            if downstream.usage_key.block_type == "video":
+                # Delete all transcripts so we can copy new ones from upstream
+                clear_transcripts(downstream)
             upstream = sync_from_upstream(downstream, request.user)
             static_file_notices = import_static_assets_for_library_sync(downstream, upstream, request)
         except UpstreamLinkException as exc:
