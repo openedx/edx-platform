@@ -122,105 +122,6 @@ paths:
       in: path
       required: true
       type: string
-  /bookmarks/v1/bookmarks/:
-    get:
-      operationId: bookmarks_v1_bookmarks_list
-      summary: Get a paginated list of bookmarks for a user.
-      description: |-
-        The list can be filtered by passing parameter "course_id=<course_id>"
-        to only include bookmarks from a particular course.
-
-        The bookmarks are always sorted in descending order by creation date.
-
-        Each page in the list contains 10 bookmarks by default. The page
-        size can be altered by passing parameter "page_size=<page_size>".
-
-        To include the optional fields pass the values in "fields" parameter
-        as a comma separated list. Possible values are:
-
-        * "display_name"
-        * "path"
-
-        **Example Requests**
-
-        GET /api/bookmarks/v1/bookmarks/?course_id={course_id1}&fields=display_name,path
-      parameters:
-      - name: page
-        in: query
-        description: A page number within the paginated result set.
-        required: false
-        type: integer
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      - name: course_id
-        in: query
-        description: The id of the course to limit the list
-        type: string
-      - name: fields
-        in: query
-        description: 'The fields to return: display_name, path.'
-        type: string
-      responses:
-        '200':
-          description: ''
-      tags:
-      - bookmarks
-    post:
-      operationId: bookmarks_v1_bookmarks_create
-      summary: Create a new bookmark for a user.
-      description: |-
-        The POST request only needs to contain one parameter "usage_id".
-
-        Http400 is returned if the format of the request is not correct,
-        the usage_id is invalid or a block corresponding to the usage_id
-        could not be found.
-
-        **Example Requests**
-
-        POST /api/bookmarks/v1/bookmarks/
-        Request data: {"usage_id": <usage-id>}
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - bookmarks
-    parameters: []
-  /bookmarks/v1/bookmarks/{username},{usage_id}/:
-    get:
-      operationId: bookmarks_v1_bookmarks_read
-      summary: Get a specific bookmark for a user.
-      description: |-
-        **Example Requests**
-
-        GET /api/bookmarks/v1/bookmarks/{username},{usage_id}?fields=display_name,path
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - bookmarks
-    delete:
-      operationId: bookmarks_v1_bookmarks_delete
-      description: DELETE /api/bookmarks/v1/bookmarks/{username},{usage_id}
-      parameters: []
-      responses:
-        '204':
-          description: ''
-      tags:
-      - bookmarks
-    parameters:
-    - name: username
-      in: path
-      required: true
-      type: string
-    - name: usage_id
-      in: path
-      required: true
-      type: string
   /bulk_enroll/v1/bulk_enroll:
     post:
       operationId: bulk_enroll_v1_bulk_enroll_create
@@ -1848,114 +1749,6 @@ paths:
       in: path
       required: true
       type: string
-  /course_live/course/{course_id}/:
-    get:
-      operationId: course_live_course_read
-      summary: Handle HTTP/GET requests
-      description: Handle HTTP/GET requests
-      parameters:
-      - name: course_id
-        in: path
-        description: The course for which to get provider list
-        type: string
-        required: true
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/CourseLiveConfiguration'
-        '401':
-          description: The requester is not authenticated.
-        '403':
-          description: The requester cannot access the specified course.
-        '404':
-          description: The requested course does not exist.
-      tags:
-      - course_live
-    post:
-      operationId: course_live_course_create
-      summary: Handle HTTP/POST requests
-      description: Handle HTTP/POST requests
-      parameters:
-      - name: course_id
-        in: path
-        description: The course for which to get provider list
-        type: string
-        required: true
-      - name: lti_1p1_client_key
-        in: path
-        description: The LTI provider's client key
-        type: string
-        required: true
-      - name: lti_1p1_client_secret
-        in: path
-        description: The LTI provider's client secretL
-        type: string
-        required: true
-      - name: lti_1p1_launch_url
-        in: path
-        description: The LTI provider's launch URL
-        type: string
-        required: true
-      - name: provider_type
-        in: path
-        description: The LTI provider's launch URL
-        type: string
-        required: true
-      - name: lti_config
-        in: query
-        description: 'The lti_config object with required additional parameters '
-        type: object
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/CourseLiveConfiguration'
-        '400':
-          description: Required parameters are missing.
-        '401':
-          description: The requester is not authenticated.
-        '403':
-          description: The requester cannot access the specified course.
-        '404':
-          description: The requested course does not exist.
-      tags:
-      - course_live
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /course_live/iframe/{course_id}/:
-    get:
-      operationId: course_live_iframe_read
-      description: Handle HTTP/GET requests
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - course_live
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /course_live/providers/{course_id}/:
-    get:
-      operationId: course_live_providers_read
-      description: A view for retrieving Program live IFrame .
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - course_live
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
   /course_modes/v1/courses/{course_id}/:
     get:
       operationId: course_modes_v1_courses_read
@@ -3138,168 +2931,6 @@ paths:
           description: ''
       tags:
       - courses
-    parameters:
-    - name: usage_key_string
-      in: path
-      required: true
-      type: string
-  /courseware/celebration/{course_key_string}:
-    post:
-      operationId: courseware_celebration_create
-      description: Handle a POST request.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - courseware
-    parameters:
-    - name: course_key_string
-      in: path
-      required: true
-      type: string
-  /courseware/course/{course_key_string}:
-    get:
-      operationId: courseware_course_read
-      summary: '**Use Cases**'
-      description: |-
-        Request details for a course
-
-        **Example Requests**
-
-            GET /api/courseware/course/{course_key}
-
-        **Response Values**
-
-            Body consists of the following fields:
-
-            * access_expiration: An object detailing when access to this course will expire
-                * expiration_date: (str) When the access expires, in ISO 8601 notation
-                * masquerading_expired_course: (bool) Whether this course is expired for the masqueraded user
-                * upgrade_deadline: (str) Last chance to upgrade, in ISO 8601 notation (or None if can't upgrade anymore)
-                * upgrade_url: (str) Upgrade linke (or None if can't upgrade anymore)
-            * celebrations: An object detailing which celebrations to render
-                * first_section: (bool) If the first section celebration should render
-                    Note: Also uses information from frontend so this value is not final
-                * streak_length_to_celebrate: (int) The streak length to celebrate for the learner
-                * streak_discount_enabled: (bool) If the frontend should render an upgrade discount for hitting the streak
-                * weekly_goal: (bool) If the weekly goal celebration should render
-            * course_goals:
-                * selected_goal:
-                    * days_per_week: (int) The number of days the learner wants to learn per week
-                    * subscribed_to_reminders: (bool) Whether the learner wants email reminders about their goal
-                * weekly_learning_goal_enabled: Flag indicating if this feature is enabled for this call
-            * effort: A textual description of the weekly hours of effort expected
-                in the course.
-            * end: Date the course ends, in ISO 8601 notation
-            * enrollment: Enrollment status of authenticated user
-                * mode: `audit`, `verified`, etc
-                * is_active: boolean
-            * enrollment_end: Date enrollment ends, in ISO 8601 notation
-            * enrollment_start: Date enrollment begins, in ISO 8601 notation
-            * entrance_exam_data: An object containing information about the course's entrance exam
-                * entrance_exam_current_score: (float) The users current score on the entrance exam
-                * entrance_exam_enabled: (bool) If the course has an entrance exam
-                * entrance_exam_id: (str) The block id for the entrance exam if enabled. Will be a section (chapter)
-                * entrance_exam_minimum_score_pct: (float) The minimum score a user must receive on the entrance exam
-                    to unlock the remainder of the course. Returned as a float (i.e. 0.7 for 70%)
-                * entrance_exam_passed: (bool) Indicates if the entrance exam has been passed
-            * id: A unique identifier of the course; a serialized representation
-                of the opaque key identifying the course.
-            * language: The language code for the course
-            * media: An object that contains named media items.  Included here:
-                * course_image: An image to show for the course.  Represented
-                  as an object with the following fields:
-                    * uri: The location of the image
-            * name: Name of the course
-            * offer: An object detailing upgrade discount information
-                * code: (str) Checkout code
-                * expiration_date: (str) Expiration of offer, in ISO 8601 notation
-                * original_price: (str) Full upgrade price without checkout code; includes currency symbol
-                * discounted_price: (str) Upgrade price with checkout code; includes currency symbol
-                * percentage: (int) Amount of discount
-                * upgrade_url: (str) Checkout URL
-            * org: Name of the organization that owns the course
-            * related_programs: A list of objects that contains program data related to the given course including:
-                * progress: An object containing program progress:
-                    * complete: (int) Number of complete courses in the program (a course is completed if the user has
-                        earned a certificate for any of the nested course runs)
-                    * in_progress: (int) Number of courses in the program that are in progress (a course is in progress if
-                        the user has enrolled in any of the nested course runs)
-                    * not_started: (int) Number of courses in the program that have not been started
-                * slug: (str) The program type
-                * title: (str) The title of the program
-                * url: (str) The link to the program's landing page
-                * uuid: (str) A unique identifier of the program
-            * short_description: A textual description of the course
-            * start: Date the course begins, in ISO 8601 notation
-            * start_display: Readably formatted start of the course
-            * start_type: Hint describing how `start_display` is set. One of:
-                * `"string"`: manually set by the course author
-                * `"timestamp"`: generated from the `start` timestamp
-                * `"empty"`: no start date is specified
-            * pacing: Course pacing. Possible values: instructor, self
-            * user_timezone: User's chosen timezone setting (or null for browser default)
-            * user_has_passing_grade: Whether or not the effective user's grade is equal to or above the courses minimum
-                passing grade
-            * course_exit_page_is_active: Flag for the learning mfe on whether or not the course exit page should display
-            * certificate_data: data regarding the effective user's certificate for the given course
-            * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
-                verified mode. Will update to reverify URL if necessary.
-            * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
-            * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
-            * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
-
-        **Parameters:**
-
-            requested_fields (optional) comma separated list:
-                If set, then only those fields will be returned.
-            username (optional) username to masquerade as (if requesting user is staff)
-
-        **Returns**
-
-            * 200 on success with above fields.
-            * 400 if an invalid parameter was sent or the username was not provided
-              for an authenticated request.
-            * 403 if a user who does not have permission to masquerade as
-              another user specifies a username other than their own.
-            * 404 if the course is not available or cannot be seen.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - courseware
-    parameters:
-    - name: course_key_string
-      in: path
-      required: true
-      type: string
-  /courseware/resume/{course_key_string}:
-    get:
-      operationId: courseware_resume_read
-      description: Return response to a GET request.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - courseware
-    parameters:
-    - name: course_key_string
-      in: path
-      required: true
-      type: string
-  /courseware/sequence/{usage_key_string}:
-    get:
-      operationId: courseware_sequence_read
-      description: Return response to a GET request.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - courseware
     parameters:
     - name: usage_key_string
       in: path
@@ -5614,509 +5245,6 @@ paths:
       description: A unique integer value identifying this Experiment Key-Value Pair.
       required: true
       type: integer
-  /grades/v1/courses/:
-    get:
-      operationId: grades_v1_courses_list
-      description: Gets a course progress status.
-      parameters:
-      - name: cursor
-        in: query
-        description: The pagination cursor value.
-        required: false
-        type: string
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      responses:
-        '200':
-          description: ''
-      tags:
-      - grades
-    parameters: []
-  /grades/v1/courses/{course_id}/:
-    get:
-      operationId: grades_v1_courses_read
-      description: Gets a course progress status.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - grades
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /grades/v1/gradebook/{course_id}/:
-    get:
-      operationId: grades_v1_gradebook_read
-      description: |-
-        Checks for course author access for the given course by the requesting user.
-        Calls the view function if has access, otherwise raises a 403.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - grades
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /grades/v1/gradebook/{course_id}/bulk-update:
-    post:
-      operationId: grades_v1_gradebook_bulk-update_create
-      description: |-
-        Checks for course author access for the given course by the requesting user.
-        Calls the view function if has access, otherwise raises a 403.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - grades
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /grades/v1/gradebook/{course_id}/grading-info:
-    get:
-      operationId: grades_v1_gradebook_grading-info_list
-      description: |-
-        Checks for course author access for the given course by the requesting user.
-        Calls the view function if has access, otherwise raises a 403.
-      parameters:
-      - name: page
-        in: query
-        description: A page number within the paginated result set.
-        required: false
-        type: integer
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      responses:
-        '200':
-          description: ''
-      tags:
-      - grades
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /grades/v1/policy/courses/{course_id}/:
-    get:
-      operationId: grades_v1_policy_courses_read
-      summary: '**Use Case**'
-      description: |-
-        Get the course grading policy.
-
-        **Example requests**:
-
-            GET /api/grades/v1/policy/courses/{course_id}/
-
-        **Response Values**
-
-            * assignment_type: The type of the assignment, as configured by course
-              staff. For example, course staff might make the assignment types Homework,
-              Quiz, and Exam.
-
-            * count: The number of assignments of the type.
-
-            * dropped: Number of assignments of the type that are dropped.
-
-            * weight: The weight, or effect, of the assignment type on the learner's
-              final grade.
-      parameters:
-      - name: page
-        in: query
-        description: A page number within the paginated result set.
-        required: false
-        type: integer
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      responses:
-        '200':
-          description: ''
-      tags:
-      - grades
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /grades/v1/section_grades_breakdown/:
-    get:
-      operationId: grades_v1_section_grades_breakdown_list
-      summary: '**Use Cases**'
-      description: |-
-        Get a list of all grades for all sections, optionally filtered by a course ID or list of usernames.
-
-        **Example Requests**
-
-            GET /api/grades/v1/section_grades_breakdown
-
-            GET /api/grades/v1/section_grades_breakdown?course_id={course_id}
-
-            GET /api/grades/v1/section_grades_breakdown?username={username},{username},{username}
-
-            GET /api/grades/v1/section_grades_breakdown?course_id={course_id}&username={username}
-
-        **Query Parameters for GET**
-
-            * course_id: Filters the result to course grade status for the course corresponding to the
-                given course ID. The value must be URL encoded. Optional.
-
-            * username: List of comma-separated usernames. Filters the result to the course grade status
-                of the given users. Optional.
-
-            * page_size: Number of results to return per page. Optional.
-
-        **Response Values**
-
-            If the request for information about the course grade status is successful, an HTTP 200 "OK" response
-            is returned.
-
-            The HTTP 200 response has the following values.
-
-            * results: A list of the course grading status matching the request.
-
-                * course_id: Course ID of the course in the course grading status.
-
-                * user: Username of the user in the course enrollment.
-
-                * passed: Boolean flag for user passing the course.
-
-                * current_grade: An integer representing the current grade of the course.
-
-                * section_breakdown: A summary of each course section's grade.
-
-                A dictionary in the section_breakdown list has the following keys:
-                    * percent: A float percentage for the section.
-                    * label: A short string identifying the section. Preferably fixed-length. E.g. "HW  3".
-                    * detail: A string explanation of the score. E.g. "Homework 1 - Ohms Law - 83% (5/6)"
-                    * category: A string identifying the category.
-                    * prominent: A boolean value indicating that this section should be displayed as more prominent
-                        than other items.
-
-            * next: The URL to the next page of results, or null if this is the
-                last page.
-
-            * previous: The URL to the next page of results, or null if this
-                is the first page.
-
-            If the user is not logged in, a 401 error is returned.
-
-            If the user is not global staff, a 403 error is returned.
-
-            If the specified course_id is not valid or any of the specified usernames
-            are not valid, a 400 error is returned.
-
-            If the specified course_id does not correspond to a valid course or if all the specified
-            usernames do not correspond to valid users, an HTTP 200 "OK" response is returned with an
-            empty 'results' field.
-      parameters:
-      - name: cursor
-        in: query
-        description: The pagination cursor value.
-        required: false
-        type: string
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      responses:
-        '200':
-          description: ''
-      tags:
-      - grades
-    parameters: []
-  /grades/v1/submission_history/{course_id}/:
-    get:
-      operationId: grades_v1_submission_history_read
-      description: |-
-        Get submission history details. This submission history is related to only
-        ProblemBlock and it doesn't support LegacyLibraryContentBlock or ContentLibraries
-        as of now.
-
-        **Usecases**:
-
-            Users with GlobalStaff status can retrieve everyone's submission history.
-
-        **Example Requests**:
-
-            GET /api/grades/v1/submission_history/{course_id}
-            GET /api/grades/v1/submission_history/{course_id}/?username={username}
-
-        **Query Parameters for GET**
-
-            * course_id: Course id to retrieve submission history.
-            * username: Single username for which this view will retrieve the submission history details.
-
-        **Response Values**:
-
-            If there's an error while getting the submission history an empty response will
-            be returned.
-            The submission history response has the following attributes:
-
-                * Results: A list of submission history:
-                    * course_id: Course id
-                    * course_name: Course name
-                    * user: Username
-                    * problems: List of problems
-                        * location: problem location
-                        * name: problem's display name
-                        * submission_history: List of submission history
-                            * state: State of submission.
-                            * grade: Grade.
-                            * max_grade: Maximum possible grade.
-                        * data: problem's data.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - grades
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /grades/v1/subsection/{subsection_id}/:
-    get:
-      operationId: grades_v1_subsection_read
-      description: |-
-        Returns subection grade data, override grade data and a history of changes made to
-        a specific users specific subsection grade.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - grades
-    parameters:
-    - name: subsection_id
-      in: path
-      required: true
-      type: string
-  /instructor/v1/reports/{course_id}:
-    get:
-      operationId: instructor_v1_reports_read
-      summary: List report CSV files that are available for download for this course.
-      description: |-
-        **Use Cases**
-
-        Lists reports available for download
-
-        **Example Requests**:
-
-            GET /api/instructor/v1/reports/{course_id}
-
-        **Response Values**
-        ```json
-        {
-            "downloads": [
-                {
-                    "url": "https://1.mock.url",
-                    "link": "<a href="https://1.mock.url">mock_file_name_1</a>",
-                    "name": "mock_file_name_1"
-                }
-            ]
-        }
-        ```
-
-        The report name will depend on the type of report generated. For example a
-        problem responses report for an entire course might be called:
-
-            edX_DemoX_Demo_Course_student_state_from_block-v1_edX+DemoX+Demo_Course+type@course+block@course_2021-04-30-0918.csv
-      parameters:
-      - name: course_id
-        in: path
-        description: ID for the course whose reports need to be listed.
-        type: string
-        required: true
-      - name: report_name
-        in: query
-        description: Filter results to only return details of for the report with
-          the specified name.
-        type: string
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/ReportDownloadsList'
-        '401':
-          description: The requesting user is not authenticated.
-        '403':
-          description: The requesting user lacks access to the course.
-        '404':
-          description: The requested course does not exist.
-      tags:
-      - instructor
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /instructor/v1/reports/{course_id}/generate/problem_responses:
-    post:
-      operationId: instructor_v1_reports_generate_problem_responses_create
-      summary: Initiate generation of a CSV file containing all student answers
-      description: |-
-        to a given problem.
-
-        **Example requests**
-
-            POST /api/instructor/v1/reports/{course_id}/generate/problem_responses {
-                "problem_locations": [
-                    "{usage_key1}",
-                    "{usage_key2}",
-                    "{usage_key3}"
-                ]
-            }
-            POST /api/instructor/v1/reports/{course_id}/generate/problem_responses {
-                "problem_locations": ["{usage_key}"],
-                "problem_types_filter": ["problem"]
-            }
-
-        **POST Parameters**
-
-        A POST request can include the following parameters:
-
-        * problem_location: A list of usage keys for the blocks to include in
-          the report. If the location is a block that contains other blocks,
-          (such as the course, section, subsection, or unit blocks) then all
-          blocks under that block will be included in the report.
-        * problem_types_filter: Optional. A comma-separated list of block types
-          to include in the report. If set, only blocks of the specified types
-          will be included in the report.
-
-        To get data on all the poll and survey blocks in a course, you could
-        POST the usage key of the course for `problem_location`, and
-        "poll, survey" as the value for `problem_types_filter`.
-
-
-        **Example Response:**
-        If initiation is successful (or generation task is already running):
-        ```json
-        {
-            "status": "The problem responses report is being created. ...",
-            "task_id": "4e49522f-31d9-431a-9cff-dd2a2bf4c85a"
-        }
-        ```
-
-        Responds with BadRequest if any of the provided problem locations are faulty.
-      parameters:
-      - name: data
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/ProblemResponseReportPostParams'
-      - name: course_id
-        in: path
-        description: ID of the course for which report is to be generate.
-        type: string
-        required: true
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/ProblemResponsesReportStatus'
-        '400':
-          description: The provided parameters were invalid. Make sure you've provided
-            at least one valid usage key for `problem_locations`.
-        '401':
-          description: The requesting user is not authenticated.
-        '403':
-          description: The requesting user lacks access to the course.
-      tags:
-      - instructor
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /instructor/v1/tasks/{course_id}:
-    get:
-      operationId: instructor_v1_tasks_read
-      summary: List instructor tasks filtered by `course_id`.
-      description: |-
-        **Use Cases**
-
-        Lists currently running instructor tasks
-
-        **Parameters**
-           - With no arguments, lists running tasks.
-           - `problem_location_str` lists task history for problem
-           - `problem_location_str` and `unique_student_identifier` lists task
-               history for problem AND student (intersection)
-
-        **Example Requests**:
-
-            GET /courses/{course_id}/instructor/api/v0/tasks
-
-        **Response Values**
-        ```json
-            {
-              "tasks": [
-                {
-                  "status": "Incomplete",
-                  "task_type": "grade_problems",
-                  "task_id": "2519ff31-22d9-4a62-91e2-55495895b355",
-                  "created": "2019-01-15T18:00:15.902470+00:00",
-                  "task_input": "{}",
-                  "duration_sec": "unknown",
-                  "task_message": "No status information available",
-                  "requester": "staff",
-                  "task_state": "PROGRESS"
-                }
-              ]
-            }
-        ```
-      parameters:
-      - name: course_id
-        in: path
-        description: ID for the course whose tasks need to be listed.
-        type: string
-        required: true
-      - name: problem_location_str
-        in: query
-        description: Filter instructor tasks to this problem location.
-        type: string
-      - name: unique_student_identifier
-        in: query
-        description: Filter tasks to a singe problem and a single student. Must be
-          used in combination with `problem_location_str`.
-        type: string
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/InstructorTasksList'
-        '401':
-          description: The requesting user is not authenticated.
-        '403':
-          description: The requesting user lacks access to the course.
-        '404':
-          description: The requested course does not exist.
-      tags:
-      - instructor
-    parameters:
-    - name: course_id
-      in: path
-      required: true
-      type: string
   /instructor_task/v1/schedules/{course_id}/bulk_email/:
     get:
       operationId: instructor_task_v1_schedules_bulk_email_list
@@ -6548,23 +5676,6 @@ paths:
           description: ''
       tags:
       - mfe_config
-    parameters: []
-  /mfe_context:
-    get:
-      operationId: mfe_context_list
-      description: |-
-        Returns
-        - dynamic registration fields
-        - dynamic optional fields
-        - the context for third party auth providers
-        - user country code
-        - the currently running pipeline.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - mfe_context
     parameters: []
   /mobile/{api_version}/course_info/blocks/:
     get:
@@ -7134,6 +6245,18 @@ paths:
       tags:
       - notifications
     parameters: []
+  /notifications/configurations/:
+    get:
+      operationId: notifications_configurations_list
+      description: API view for getting the aggregate notification preferences for
+        the current user.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - notifications
+    parameters: []
   /notifications/configurations/{course_key_string}:
     get:
       operationId: notifications_configurations_read
@@ -7309,6 +6432,17 @@ paths:
       in: path
       required: true
       type: string
+  /notifications/preferences/update-all/:
+    post:
+      operationId: notifications_preferences_update-all_create
+      description: Update all notification preferences for the current user.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - notifications
+    parameters: []
   /notifications/preferences/update/{username}/{patch}/:
     get:
       operationId: notifications_preferences_update_read
@@ -7880,319 +7014,6 @@ paths:
       in: path
       required: true
       type: string
-  /program_enrollments/v1/integration-reset:
-    post:
-      operationId: program_enrollments_v1_integration-reset_create
-      description: Reset enrollment and user data for organization
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - program_enrollments
-    parameters: []
-  /program_enrollments/v1/programs/enrollments/:
-    get:
-      operationId: program_enrollments_v1_programs_enrollments_list
-      description: How to respond to a GET request to this endpoint
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    parameters: []
-  /program_enrollments/v1/programs/readonly_access/:
-    get:
-      operationId: program_enrollments_v1_programs_readonly_access_list
-      description: How to respond to a GET request to this endpoint
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    parameters: []
-  /program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/enrollments/:
-    get:
-      operationId: program_enrollments_v1_programs_courses_enrollments_list
-      description: Get a list of students enrolled in a course within a program.
-      parameters:
-      - name: cursor
-        in: query
-        description: The pagination cursor value.
-        required: false
-        type: string
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    post:
-      operationId: program_enrollments_v1_programs_courses_enrollments_create
-      description: Enroll a list of students in a course in a program
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - program_enrollments
-    put:
-      operationId: program_enrollments_v1_programs_courses_enrollments_update
-      description: Create or Update the program course enrollments of a list of learners
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    patch:
-      operationId: program_enrollments_v1_programs_courses_enrollments_partial_update
-      description: Modify the program course enrollments of a list of learners
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    parameters:
-    - name: program_uuid
-      in: path
-      required: true
-      type: string
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /program_enrollments/v1/programs/{program_uuid}/courses/{course_id}/grades/:
-    get:
-      operationId: program_enrollments_v1_programs_courses_grades_list
-      description: Defines the GET list endpoint for ProgramCourseGrade objects.
-      parameters:
-      - name: cursor
-        in: query
-        description: The pagination cursor value.
-        required: false
-        type: string
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    parameters:
-    - name: program_uuid
-      in: path
-      required: true
-      type: string
-    - name: course_id
-      in: path
-      required: true
-      type: string
-  /program_enrollments/v1/programs/{program_uuid}/enrollments/:
-    get:
-      operationId: program_enrollments_v1_programs_enrollments_list
-      description: Defines the GET list endpoint for ProgramEnrollment objects.
-      parameters:
-      - name: cursor
-        in: query
-        description: The pagination cursor value.
-        required: false
-        type: string
-      - name: page_size
-        in: query
-        description: Number of results to return per page.
-        required: false
-        type: integer
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    post:
-      operationId: program_enrollments_v1_programs_enrollments_create
-      description: Create program enrollments for a list of learners
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - program_enrollments
-    put:
-      operationId: program_enrollments_v1_programs_enrollments_update
-      description: Create/update program enrollments for a list of learners
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    patch:
-      operationId: program_enrollments_v1_programs_enrollments_partial_update
-      description: Update program enrollments for a list of learners
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - program_enrollments
-    parameters:
-    - name: program_uuid
-      in: path
-      required: true
-      type: string
-  /program_enrollments/v1/programs/{program_uuid}/overview/:
-    get:
-      operationId: program_enrollments_v1_programs_overview_read
-      description: |-
-        A view for getting data associated with a user's course enrollments
-        as part of a program enrollment.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/CourseRunOverviewList'
-      tags:
-      - program_enrollments
-    parameters:
-    - name: program_uuid
-      in: path
-      required: true
-      type: string
-  /program_enrollments/v1/users/{username}/programs/{program_uuid}/courses:
-    get:
-      operationId: program_enrollments_v1_users_programs_courses_list
-      summary: Get an overview of each of a user's course enrollments associated with
-        a program.
-      description: |-
-        This endpoint exists to get an overview of each course-run enrollment
-        that a user has for course-runs within a given program.
-        Fields included are the title, upcoming due dates, etc.
-        This API endpoint is intended for use with the
-        [Program Learner Portal MFE](https://github.com/openedx/frontend-app-learner-portal-programs).
-
-        It is important to note that the set of enrollments that this endpoint returns
-        is different than a user's set of *program-course-run enrollments*.
-        Specifically, this endpoint may include course runs that are *within*
-        the specified program but were not *enrolled in* via the specified program.
-
-        **Example Response:**
-        ```json
-        {
-            "next": null,
-            "previous": null,
-            "results": [
-                {
-                    "course_run_id": "edX+AnimalsX+Aardvarks",
-                    "display_name": "Astonishing Aardvarks",
-                    "course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/course/",
-                    "start_date": "2017-02-05T05:00:00Z",
-                    "end_date": "2018-02-05T05:00:00Z",
-                    "course_run_status": "completed"
-                    "emails_enabled": true,
-                    "due_dates": [
-                        {
-                            "name": "Introduction: What even is an aardvark?",
-                            "url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/jump_to/
-                                  block-v1:edX+AnimalsX+Aardvarks+type@chapter+block@1414ffd5143b4b508f739b563ab468b7",
-                            "date": "2017-05-01T05:00:00Z"
-                        },
-                        {
-                            "name": "Quiz: Aardvark or Anteater?",
-                            "url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Aardvarks/jump_to/
-                                    block-v1:edX+AnimalsX+Aardvarks+type@sequential+block@edx_introduction",
-                            "date": "2017-03-05T00:00:00Z"
-                        }
-                    ],
-                    "micromasters_title": "Animals",
-                    "certificate_download_url": "https://courses.edx.org/certificates/123"
-                },
-                {
-                    "course_run_id": "edX+AnimalsX+Baboons",
-                    "display_name": "Breathtaking Baboons",
-                    "course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Baboons/course/",
-                    "start_date": "2018-02-05T05:00:00Z",
-                    "end_date": null,
-                    "course_run_status": "in_progress"
-                    "emails_enabled": false,
-                    "due_dates": [],
-                    "micromasters_title": "Animals",
-                    "certificate_download_url": "https://courses.edx.org/certificates/123",
-                    "resume_course_run_url": "https://courses.edx.org/courses/course-v1:edX+AnimalsX+Baboons/jump_to/
-                                               block-v1:edX+AnimalsX+Baboons+type@sequential+block@edx_introduction"
-                }
-            ]
-        }
-        ```
-      parameters:
-      - name: cursor
-        in: query
-        description: The pagination cursor value.
-        required: false
-        type: string
-      - name: page_size
-        in: query
-        description: Number of results to return per page. Defaults to 10. Maximum
-          is 25.
-        type: integer
-      - name: username
-        in: path
-        description: The username of the user for which enrollment overviews will
-          be fetched. For now, this must be the requesting user; otherwise, 403 will
-          be returned. In the future, global staff users may be able to supply other
-          usernames.
-        type: string
-        required: true
-      - name: program_uuid
-        in: path
-        description: UUID of a program. Enrollments will be returned for course runs
-          in this program.
-        type: string
-        required: true
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/PageOfCourseRunOverview'
-        '401':
-          description: The requester is not authenticated.
-        '403':
-          description: The requester cannot access the specified program and/or the
-            requester may not retrieve this data for the specified user.
-        '404':
-          description: The requested program does not exist.
-      tags:
-      - program_enrollments
-    parameters:
-    - name: username
-      in: path
-      required: true
-      type: string
-    - name: program_uuid
-      in: path
-      required: true
-      type: string
-  /send_account_activation_email:
-    post:
-      operationId: send_account_activation_email_create
-      description: Returns status code.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - send_account_activation_email
-    parameters: []
   /team/v0/bulk_team_membership/{course_id}:
     get:
       operationId: team_v0_bulk_team_membership_read
@@ -8574,23 +7395,6 @@ paths:
       in: path
       required: true
       type: string
-  /third_party_auth_context:
-    get:
-      operationId: third_party_auth_context_list
-      description: |-
-        Returns
-        - dynamic registration fields
-        - dynamic optional fields
-        - the context for third party auth providers
-        - user country code
-        - the currently running pipeline.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - third_party_auth_context
-    parameters: []
   /toggles/v0/state/:
     get:
       operationId: toggles_v0_state_list
@@ -8601,54 +7405,6 @@ paths:
           description: ''
       tags:
       - toggles
-    parameters: []
-  /user/v1/account/password_reset/:
-    get:
-      operationId: user_v1_account_password_reset_list
-      description: HTTP end-point for GETting a description of the password reset
-        form.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - user
-    parameters: []
-  /user/v1/account/password_reset/token/validate/:
-    post:
-      operationId: user_v1_account_password_reset_token_validate_create
-      description: HTTP end-point to validate password reset token.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - user
-    parameters: []
-  /user/v1/account/registration/:
-    get:
-      operationId: user_v1_account_registration_list
-      description: HTTP end-points for creating a new user.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - user
-    post:
-      operationId: user_v1_account_registration_create
-      summary: Create the user's account.
-      description: |-
-        You must send all required form fields with the request.
-
-        You can optionally send a "course_id" param to indicate in analytics
-        events that the user registered while enrolling in a particular course.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - user
     parameters: []
   /user/v1/accounts:
     get:
@@ -9438,126 +8194,6 @@ paths:
       description: A unique integer value identifying this user.
       required: true
       type: integer
-  /user/v1/validation/registration:
-    post:
-      operationId: user_v1_validation_registration_create
-      summary: POST /api/user/v1/validation/registration/
-      description: |-
-        Expects request of the form
-        ```
-        {
-            "name": "Dan the Validator",
-            "username": "mslm",
-            "email": "mslm@gmail.com",
-            "confirm_email": "mslm@gmail.com",
-            "password": "password123",
-            "country": "PK"
-        }
-        ```
-        where each key is the appropriate form field name and the value is
-        user input. One may enter individual inputs if needed. Some inputs
-        can get extra verification checks if entered along with others,
-        like when the password may not equal the username.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - user
-    parameters: []
-  /user/v2/account/registration/:
-    get:
-      operationId: user_v2_account_registration_list
-      description: HTTP end-points for creating a new user.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - user
-    post:
-      operationId: user_v2_account_registration_create
-      summary: Create the user's account.
-      description: |-
-        You must send all required form fields with the request.
-
-        You can optionally send a "course_id" param to indicate in analytics
-        events that the user registered while enrolling in a particular course.
-      parameters: []
-      responses:
-        '201':
-          description: ''
-      tags:
-      - user
-    parameters: []
-  /user/{api_version}/account/login_session/:
-    get:
-      operationId: user_account_login_session_list
-      description: HTTP end-points for logging in users.
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-      - user
-    post:
-      operationId: user_account_login_session_create
-      summary: POST /user/{api_version}/account/login_session/
-      description: Returns 200 on success, and a detailed error message otherwise.
-      parameters:
-      - name: data
-        in: body
-        required: true
-        schema:
-          type: object
-          properties:
-            email:
-              type: string
-            password:
-              type: string
-      responses:
-        '200':
-          description: ''
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-              value:
-                type: string
-              error_code:
-                type: string
-        '400':
-          description: ''
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-              value:
-                type: string
-              error_code:
-                type: string
-        '403':
-          description: ''
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-              value:
-                type: string
-              error_code:
-                type: string
-      tags:
-      - user
-      security:
-      - csrf: []
-    parameters:
-    - name: api_version
-      in: path
-      required: true
-      type: string
   /user_tours/discussion_tours/{tour_id}/:
     get:
       operationId: user_tours_discussion_tours_read
@@ -9817,6 +8453,26 @@ paths:
       tags:
       - val
     parameters: []
+  /val/v0/videos/video-transcripts/:
+    post:
+      operationId: val_v0_videos_video-transcripts_create
+      description: Creates a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - val
+    delete:
+      operationId: val_v0_videos_video-transcripts_delete
+      description: Delete a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - val
+    parameters: []
   /val/v0/videos/video-transcripts/create/:
     post:
       operationId: val_v0_videos_video-transcripts_create_create
@@ -9824,6 +8480,15 @@ paths:
       parameters: []
       responses:
         '201':
+          description: ''
+      tags:
+      - val
+    delete:
+      operationId: val_v0_videos_video-transcripts_create_delete
+      description: Delete a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '204':
           description: ''
       tags:
       - val
@@ -9955,6 +8620,21 @@ paths:
       in: path
       required: true
       type: string
+  /xblock/v2/xblocks/{usage_key}/olx/:
+    get:
+      operationId: xblock_v2_xblocks_olx_list
+      description: Get the OLX (XML serialization) of the specified XBlock
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
   /xblock/v2/xblocks/{usage_key}/view/{view_name}/:
     get:
       operationId: xblock_v2_xblocks_view_read
@@ -10051,6 +8731,25 @@ paths:
       required: true
       type: string
     - name: handler_name
+      in: path
+      required: true
+      type: string
+  /xblock/v2/xblocks/{usage_key}@{version}/olx/:
+    get:
+      operationId: xblock_v2_xblocks_olx_list
+      description: Get the OLX (XML serialization) of the specified XBlock
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
+    - name: version
       in: path
       required: true
       type: string
@@ -10840,65 +9539,6 @@ definitions:
         $ref: '#/definitions/VerificationData'
       disable_progress_graph:
         title: Disable progress graph
-        type: boolean
-  Lti:
-    required:
-    - lti_config
-    type: object
-    properties:
-      lti_1p1_client_key:
-        title: Lti 1p1 client key
-        description: Client key provided by the LTI tool provider.
-        type: string
-        maxLength: 255
-      lti_1p1_client_secret:
-        title: Lti 1p1 client secret
-        description: Client secret provided by the LTI tool provider.
-        type: string
-        maxLength: 255
-      lti_1p1_launch_url:
-        title: Lti 1p1 launch url
-        description: The URL of the external tool that initiates the launch.
-        type: string
-        maxLength: 255
-      version:
-        title: Version
-        type: string
-        enum:
-        - lti_1p1
-        - lti_1p3
-      lti_config:
-        title: Lti config
-        type: object
-  CourseLiveConfiguration:
-    required:
-    - provider_type
-    type: object
-    properties:
-      course_key:
-        title: Course key
-        type: string
-        readOnly: true
-        minLength: 1
-      provider_type:
-        title: LTI provider
-        description: The LTI provider's id
-        type: string
-        maxLength: 50
-        minLength: 1
-      enabled:
-        title: Enabled
-        description: If disabled, the LTI in the associated course will be disabled.
-        type: boolean
-      lti_configuration:
-        $ref: '#/definitions/Lti'
-      pii_sharing_allowed:
-        title: Pii sharing allowed
-        type: string
-        readOnly: true
-      free_tier:
-        title: Free tier
-        description: True, if LTI credential are provided by Org globally
         type: boolean
   course_modes.CourseMode:
     required:
@@ -11759,151 +10399,6 @@ definitions:
         type: string
         format: date-time
         readOnly: true
-  ReportDownload:
-    description: Report Download
-    required:
-    - url
-    - name
-    - link
-    type: object
-    properties:
-      url:
-        title: Url
-        description: URL from which report can be downloaded.
-        type: string
-        format: uri
-        minLength: 1
-      name:
-        title: Name
-        description: Name of report.
-        type: string
-        minLength: 1
-      link:
-        title: Link
-        description: HTML anchor tag that contains the name and link.
-        type: string
-        minLength: 1
-  ReportDownloadsList:
-    required:
-    - downloads
-    type: object
-    properties:
-      downloads:
-        description: List of report downloads
-        type: array
-        items:
-          $ref: '#/definitions/ReportDownload'
-  ProblemResponseReportPostParams:
-    required:
-    - problem_locations
-    type: object
-    properties:
-      problem_locations:
-        description: 'A list of usage keys for the blocks to include in the report. '
-        type: array
-        items:
-          description: A usage key location for a section or a problem. If the location
-            is a block that contains other blocks, (such as the course, section, subsection,
-            or unit blocks) then all blocks under that block will be included in the
-            report.
-          type: string
-          minLength: 1
-      problem_types_filter:
-        description: 'A list of problem/block types to generate the report for. This
-          field can be omitted if the report should include details of allblock types. '
-        type: array
-        items:
-          type: string
-          minLength: 1
-  ProblemResponsesReportStatus:
-    required:
-    - status
-    - task_id
-    type: object
-    properties:
-      status:
-        title: Status
-        description: User-friendly text describing current status of report generation.
-        type: string
-        minLength: 1
-      task_id:
-        title: Task id
-        description: A unique id for the report generation task. It can be used to
-          query the latest report generation status.
-        type: string
-        format: uuid
-  InstructorTask:
-    required:
-    - status
-    - task_type
-    - task_id
-    - created
-    - task_input
-    - requester
-    - task_state
-    - duration_sec
-    - task_message
-    type: object
-    properties:
-      status:
-        title: Status
-        description: Current status of task.
-        type: string
-        minLength: 1
-      task_type:
-        title: Task type
-        description: Identifies the kind of task being performed, e.g. rescoring.
-        type: string
-        minLength: 1
-      task_id:
-        title: Task id
-        description: The celery ID for the task.
-        type: string
-        minLength: 1
-      created:
-        title: Created
-        description: The date and time when the task was created.
-        type: string
-        format: date-time
-      task_input:
-        title: Task input
-        description: The input parameters for the task. The format and content of
-          this data will depend on the kind of task being performed. For instanceit
-          may contain the problem locations for a problem resources task.
-        type: object
-        additionalProperties:
-          type: string
-          x-nullable: true
-      requester:
-        title: Requester
-        description: The username of the user who initiated this task.
-        type: string
-        minLength: 1
-      task_state:
-        title: Task state
-        description: The last knows state of the celery task.
-        type: string
-        minLength: 1
-      duration_sec:
-        title: Duration sec
-        description: Task duration information, if known
-        type: string
-        minLength: 1
-      task_message:
-        title: Task message
-        description: User-friendly task status information, if available.
-        type: string
-        minLength: 1
-  InstructorTasksList:
-    required:
-    - tasks
-    type: object
-    properties:
-      tasks:
-        description: List of instructor tasks.
-        type: array
-        items:
-          $ref: '#/definitions/InstructorTask'
   ScheduledBulkEmail:
     required:
     - task
@@ -12072,6 +10567,11 @@ definitions:
         format: uri
         maxLength: 200
         x-nullable: true
+      course_id:
+        title: Course id
+        type: string
+        maxLength: 255
+        x-nullable: true
       last_read:
         title: Last read
         type: string
@@ -12161,132 +10661,6 @@ definitions:
         title: Logo url
         type: string
         minLength: 1
-  DueDate:
-    required:
-    - name
-    - url
-    - date
-    type: object
-    properties:
-      name:
-        title: Name
-        type: string
-        minLength: 1
-      url:
-        title: Url
-        type: string
-        minLength: 1
-      date:
-        title: Date
-        type: string
-        format: date-time
-  CourseRunOverview:
-    required:
-    - course_run_id
-    - display_name
-    - course_run_url
-    - start_date
-    - end_date
-    - course_run_status
-    - due_dates
-    type: object
-    properties:
-      course_run_id:
-        title: Course run id
-        description: ID for the course run.
-        type: string
-        minLength: 1
-      display_name:
-        title: Display name
-        description: Display name of the course run.
-        type: string
-        minLength: 1
-      resume_course_run_url:
-        title: Resume course run url
-        description: The absolute url that takes the user back to their position in
-          the course run; if absent, user has not made progress in the course.
-        type: string
-        minLength: 1
-      course_run_url:
-        title: Course run url
-        description: The absolute url for the course run.
-        type: string
-        minLength: 1
-      start_date:
-        title: Start date
-        description: Start date for the course run; null if no start date.
-        type: string
-        format: date-time
-      end_date:
-        title: End date
-        description: End date for the course run; null if no end date.
-        type: string
-        format: date-time
-      course_run_status:
-        title: Course run status
-        description: The user's status of the course run.
-        type: string
-        enum:
-        - in_progress
-        - upcoming
-        - completed
-      emails_enabled:
-        title: Emails enabled
-        description: Boolean representing whether emails are enabled for the course;if
-          absent, the bulk email feature is either not enable at the platformlevel
-          or is not enabled for the course; if True or False, bulk emailfeature is
-          enabled, and value represents whether or not user wantsto receive emails.
-        type: boolean
-      due_dates:
-        description: List of subsection due dates for the course run. Due dates are
-          only returned if the course run is in progress.
-        type: array
-        items:
-          $ref: '#/definitions/DueDate'
-      micromasters_title:
-        title: Micromasters title
-        description: Title of the MicroMasters program that the course run is a part
-          of; if absent, the course run is not a part of a MicroMasters program.
-        type: string
-        minLength: 1
-      certificate_download_url:
-        title: Certificate download url
-        description: URL to download a certificate, if available; if absent, certificate
-          is not downloadable.
-        type: string
-        minLength: 1
-  CourseRunOverviewList:
-    required:
-    - course_runs
-    type: object
-    properties:
-      course_runs:
-        type: array
-        items:
-          $ref: '#/definitions/CourseRunOverview'
-  PageOfCourseRunOverview:
-    required:
-    - results
-    type: object
-    properties:
-      previous:
-        title: Previous
-        description: Link to the previous page or results, or null if this is the
-          first.
-        type: string
-        format: uri
-        minLength: 1
-      next:
-        title: Next
-        description: Link to the next page of results, or null if this is the last.
-        type: string
-        format: uri
-        minLength: 1
-      results:
-        description: The list of result objects on this page.
-        type: array
-        items:
-          $ref: '#/definitions/CourseRunOverview'
   UserMapping:
     type: object
     properties:
