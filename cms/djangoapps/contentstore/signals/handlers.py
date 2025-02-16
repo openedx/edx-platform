@@ -8,6 +8,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django.dispatch import receiver
 from edx_toggles.toggles import SettingToggle
@@ -220,6 +221,7 @@ def handle_item_deleted(**kwargs):
     if usage_key:
         # Strip branch info
         usage_key = usage_key.for_branch(None)
+        delete_offline_content_for_block(usage_key)
         course_key = usage_key.course_key
         try:
             deleted_block = modulestore().get_item(usage_key)
@@ -234,6 +236,20 @@ def handle_item_deleted(**kwargs):
             id_list.add(block.location)
 
         ComponentLink.objects.filter(downstream_usage_key__in=id_list).delete()
+
+
+def delete_offline_content_for_block(usage_key):
+    """
+    Deletes the offline content zip file for the given block.
+
+    File will be deleted from the storage on block deletion (without publishing).
+    If changes will be discarded, offline content for this block will be regenerated automatically.
+    """
+    deleted_block_offline_archive_path = f'offline_content/{str(usage_key.course_key)}/{usage_key.block_id}.zip'
+
+    if default_storage.exists(deleted_block_offline_archive_path):
+        default_storage.delete(deleted_block_offline_archive_path)
+        log.info(f"Successfully deleted the file: {deleted_block_offline_archive_path}")
 
 
 @receiver(GRADING_POLICY_CHANGED)
