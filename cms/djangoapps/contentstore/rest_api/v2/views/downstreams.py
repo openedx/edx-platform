@@ -73,14 +73,13 @@ from cms.lib.xblock.upstream_sync import (
     UpstreamLink, UpstreamLinkException, NoUpstream, BadUpstream, BadDownstream,
     fetch_customizable_fields, sync_from_upstream, decline_sync, sever_upstream_link
 )
-from cms.djangoapps.contentstore.helpers import (
-    import_static_assets_for_library_sync, clear_transcripts
-)
+from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from common.djangoapps.student.auth import has_studio_write_access, has_studio_read_access
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
 )
+from xmodule.video_block.transcripts_utils import clear_transcripts
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 

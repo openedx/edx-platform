@@ -686,6 +686,18 @@ def convert_video_transcript(file_name, content, output_format):
     return dict(filename=filename, content=converted_transcript)
 
 
+def clear_transcripts(block):
+    """
+    Deletes all transcripts of a video block from VAL
+    """
+    for language_code in block.transcripts.keys():
+        edxval_api.delete_video_transcript(
+            video_id=block.edx_video_id,
+            language_code=language_code,
+        )
+    block.transcripts = {}
+
+
 class Transcript:
     """
     Container for transcript methods.
