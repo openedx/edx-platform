@@ -567,4 +567,3 @@ class UpstreamTestCase(ModuleStoreTestCase):
 
         # `edx_video_id` doesn't change
         assert downstream.edx_video_id == "test_video_id"
-        
