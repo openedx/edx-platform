@@ -6,19 +6,19 @@
 #
 asgiref==3.8.1
     # via django
-attrs==24.2.0
+attrs==25.1.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.35.27
+boto3==1.36.6
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.35.27
+botocore==1.36.6
     # via
     #   boto3
     #   s3transfer
-cachetools==5.5.0
+cachetools==5.5.1
     # via google-auth
-certifi==2024.8.30
+certifi==2024.12.14
     # via requests
 cffi==1.17.1
     # via
@@ -33,9 +33,9 @@ click==8.1.6
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==43.0.1
+cryptography==44.0.0
     # via pyjwt
-django==4.2.16
+django==4.2.18
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
@@ -44,24 +44,24 @@ django==4.2.16
     #   edx-django-utils
 django-crum==0.7.9
     # via edx-django-utils
-django-waffle==4.1.0
+django-waffle==4.2.0
     # via edx-django-utils
-edx-django-utils==5.16.0
+edx-django-utils==7.1.0
     # via edx-rest-api-client
 edx-rest-api-client==6.0.0
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.20.0
+google-api-core==2.24.0
     # via google-api-python-client
-google-api-python-client==2.147.0
+google-api-python-client==2.159.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.35.0
+google-auth==2.38.0
     # via
     #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
 google-auth-httplib2==0.2.0
     # via google-api-python-client
-googleapis-common-protos==1.65.0
+googleapis-common-protos==1.66.0
     # via google-api-core
 httplib2==0.22.0
     # via
@@ -69,7 +69,7 @@ httplib2==0.22.0
     #   google-auth-httplib2
 idna==3.10
     # via requests
-isodate==0.6.1
+isodate==0.7.2
     # via zeep
 jenkinsapi==0.3.13
     # via -r scripts/user_retirement/requirements/base.in
@@ -77,26 +77,24 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-lxml==4.9.4
-    # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
-    #   zeep
-more-itertools==10.5.0
+lxml==5.3.0
+    # via zeep
+more-itertools==10.6.0
     # via simple-salesforce
-newrelic==9.13.0
+newrelic==10.4.0
     # via edx-django-utils
 pbr==6.1.0
     # via stevedore
 platformdirs==4.3.6
     # via zeep
-proto-plus==1.24.0
+proto-plus==1.25.0
     # via google-api-core
-protobuf==5.28.2
+protobuf==5.29.3
     # via
     #   google-api-core
     #   googleapis-common-protos
     #   proto-plus
-psutil==6.0.0
+psutil==6.1.1
     # via edx-django-utils
 pyasn1==0.6.1
     # via
@@ -106,13 +104,13 @@ pyasn1-modules==0.4.1
     # via google-auth
 pycparser==2.22
     # via cffi
-pyjwt[crypto]==2.9.0
+pyjwt[crypto]==2.10.1
     # via
     #   edx-rest-api-client
     #   simple-salesforce
 pynacl==1.5.0
     # via edx-django-utils
-pyparsing==3.1.4
+pyparsing==3.2.1
     # via httplib2
 python-dateutil==2.9.0.post0
     # via botocore
@@ -138,20 +136,19 @@ requests-toolbelt==1.0.0
     # via zeep
 rsa==4.9
     # via google-auth
-s3transfer==0.10.2
+s3transfer==0.11.2
     # via boto3
 simple-salesforce==1.12.6
     # via -r scripts/user_retirement/requirements/base.in
 simplejson==3.19.3
     # via -r scripts/user_retirement/requirements/base.in
-six==1.16.0
+six==1.17.0
     # via
-    #   isodate
     #   jenkinsapi
     #   python-dateutil
-sqlparse==0.5.1
+sqlparse==0.5.3
     # via django
-stevedore==5.3.0
+stevedore==5.4.0
     # via edx-django-utils
 typing-extensions==4.12.2
     # via simple-salesforce
@@ -161,8 +158,9 @@ uritemplate==4.1.1
     # via google-api-python-client
 urllib3==1.26.20
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
+    #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
+    #   -r scripts/user_retirement/requirements/base.in
     #   botocore
     #   requests
-zeep==4.2.1
+zeep==4.3.1
     # via simple-salesforce

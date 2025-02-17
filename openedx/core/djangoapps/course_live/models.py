@@ -12,6 +12,8 @@ from simple_history.models import HistoricalRecords
 class CourseLiveConfiguration(TimeStampedModel):
     """
     Associates a Course with a LTI provider and configuration
+
+    .. no_pii:
     """
     course_key = CourseKeyField(max_length=255, db_index=True, null=False)
     enabled = models.BooleanField(

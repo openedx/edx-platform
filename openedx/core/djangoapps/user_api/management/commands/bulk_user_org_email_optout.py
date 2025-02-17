@@ -135,11 +135,10 @@ class Command(BaseCommand):
                               optout_rows[end_idx][0], optout_rows[end_idx][1],
                               str(err))
                     raise
-                else:
-                    cursor.execute('COMMIT;')
-                    log.info("Committed opt-out for rows (%s, %s) through (%s, %s).",
-                             optout_rows[start_idx][0], optout_rows[start_idx][1],
-                             optout_rows[end_idx][0], optout_rows[end_idx][1])
+                cursor.execute('COMMIT;')
+                log.info("Committed opt-out for rows (%s, %s) through (%s, %s).",
+                         optout_rows[start_idx][0], optout_rows[start_idx][1],
+                         optout_rows[end_idx][0], optout_rows[end_idx][1])
                 log.info("Sleeping %s seconds...", sleep_between)
                 time.sleep(sleep_between)
             curr_row_idx += chunk_size
