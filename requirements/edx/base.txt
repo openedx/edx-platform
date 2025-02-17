@@ -1272,7 +1272,7 @@ xblock-drag-and-drop-v2==4.0.3
     # via -r requirements/edx/bundled.in
 xblock-google-drive==0.7.1
     # via -r requirements/edx/bundled.in
-xblock-poll==1.14.0
+xblock-poll==1.14.1
     # via -r requirements/edx/bundled.in
 xblock-utils==4.0.0
     # via
