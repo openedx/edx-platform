@@ -1728,7 +1728,7 @@ class GetProctoredExamResults(DeveloperErrorViewMixin, APIView):
             task_api.submit_proctored_exam_results_report(request, course_key)
             success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
             return JsonResponse({"status": success_status})
-        except AlreadyRunningError as error:
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as error:
             # Return a 400 status code with the error message
             return JsonResponse({"error": str(error)}, status=400)
 
