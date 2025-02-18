@@ -933,7 +933,7 @@ future==1.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pyjwkest
-geoip2==4.8.1
+geoip2==5.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
