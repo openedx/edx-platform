@@ -69,7 +69,7 @@ from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
 )
-from openedx.core.lib.derived import derived, derived_collection_entry
+from openedx.core.lib.derived import Derived
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
@@ -1059,18 +1059,6 @@ FEATURES = {
     # .. toggle_creation_date: 2024-04-24
     'ENABLE_COURSEWARE_SEARCH_VERIFIED_ENROLLMENT_REQUIRED': False,
 
-    # .. toggle_name: FEATURES['ENABLE_BLAKE2B_HASHING']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Enables the memcache to use the blake2b hash algorithm instead of depreciated md4 for keys
-    #   exceeding 250 characters
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-04-02
-    # .. toggle_target_removal_date: 2024-12-09
-    # .. toggle_warning: For consistency, keep the value in sync with the setting of the same name in the LMS and CMS.
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34442
-    'ENABLE_BLAKE2B_HASHING': False,
-
     # .. toggle_name: FEATURES['BADGES_ENABLED']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1407,7 +1395,7 @@ TEMPLATES = [
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': _make_mako_template_dirs,
+        'DIRS': Derived(_make_mako_template_dirs),
         # Options specific to this backend.
         'OPTIONS': {
             'context_processors': CONTEXT_PROCESSORS,
@@ -1416,7 +1404,6 @@ TEMPLATES = [
         }
     },
 ]
-derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 DEFAULT_TEMPLATE_ENGINE_DIRS = DEFAULT_TEMPLATE_ENGINE['DIRS'][:]
 
@@ -1746,7 +1733,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': lambda settings: settings.DATA_DIR,
+                        'fs_root': Derived(lambda settings: settings.DATA_DIR),
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
@@ -1756,7 +1743,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': lambda settings: settings.DATA_DIR,
+                        'fs_root': Derived(lambda settings: settings.DATA_DIR),
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
@@ -2066,8 +2053,7 @@ def _make_locale_paths(settings):  # pylint: disable=missing-function-docstring
         for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
             locale_paths += (path(locale_path), )
     return locale_paths
-LOCALE_PATHS = _make_locale_paths
-derived('LOCALE_PATHS')
+LOCALE_PATHS = Derived(_make_locale_paths)
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -3287,9 +3273,6 @@ INSTALLED_APPS = [
     # Enables default site and redirects
     'django_sites_extensions',
 
-    # Email marketing integration
-    'lms.djangoapps.email_marketing.apps.EmailMarketingConfig',
-
     # additional release utilities to ease automation
     'release_util',
 
@@ -3324,7 +3307,6 @@ INSTALLED_APPS = [
     'openedx.features.course_bookmarks',
     'openedx.features.course_experience',
     'openedx.features.enterprise_support.apps.EnterpriseSupportConfig',
-    'openedx.features.learner_profile',
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
@@ -3404,8 +3386,34 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
 CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
-CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
+
+# If setting a cross-domain cookie, it's really important to choose
+# a name for the cookie that is DIFFERENT than the cookies used
+# by each subdomain.  For example, suppose the applications
+# at these subdomains are configured to use the following cookie names:
+#
+# 1) foo.example.com --> "csrftoken"
+# 2) baz.example.com --> "csrftoken"
+# 3) bar.example.com --> "csrftoken"
+#
+# For the cross-domain version of the CSRF cookie, you need to choose
+# a name DIFFERENT than "csrftoken"; otherwise, the new token configured
+# for ".example.com" could conflict with the other cookies,
+# non-deterministically causing 403 responses.
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
+
+# When setting the domain for the "cross-domain" version of the CSRF
+# cookie, you should choose something like: ".example.com"
+# (note the leading dot), where both the referer and the host
+# are subdomains of "example.com".
+#
+# Browser security rules require that
+# the cookie domain matches the domain of the server; otherwise
+# the cookie won't get set.  And once the cookie gets set, the client
+# needs to be on a domain that matches the cookie domain, otherwise
+# the client won't be able to read the cookie.
+CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
+
 
 ######################### Django Rest Framework ########################
 
@@ -4323,18 +4331,28 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 # Exam Service
 EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
+############## Settings for JWT token handling ##############
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'http://127.0.0.1:8740',
     'JWT_SIGNING_ALGORITHM': 'RS512',
     'JWT_SUPPORTED_VERSION': '1.2.0',
+    'JWT_PRIVATE_SIGNING_JWK': None,
     'JWT_PUBLIC_SIGNING_JWK_SET': None,
 }
+
+# NOTE: In order to create both JWT_PRIVATE_SIGNING_JWK and JWT_PUBLIC_SIGNING_JWK_SET,
+# in an  lms shell  run the following  command:
+# > python manage.py lms generate_jwt_signing_key
+# This will output asymmetric JWTs to use here. Read more on this on:
+# https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/docs/decisions/0008-use-asymmetric-jwts.rst
 
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
 COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
+# time between scheduled runs, in seconds
+NOTIFY_CREDENTIALS_FREQUENCY = 14400
 
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
@@ -4637,13 +4655,12 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 ############## Settings for LMS Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "lms" / "envs" / "help_tokens.ini"
-HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
-HELP_TOKENS_VERSION = lambda settings: doc_version()
+HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
+HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
 HELP_TOKENS_BOOKS = {
     'learner': 'https://edx.readthedocs.io/projects/open-edx-learner-guide',
     'course_author': 'https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
 }
-derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
 ############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
 # The Open edX Enterprise service is currently hosted via the LMS container/process.
@@ -4931,14 +4948,13 @@ RETIRED_EMAIL_DOMAIN = 'retired.invalid'
 # .. setting_description: Set the format a retired user username field gets transformed into, where {}
 #     is replaced with the hash of the original username. This is a derived setting that depends on
 #     RETIRED_USERNAME_PREFIX value.
-RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+RETIRED_USERNAME_FMT = Derived(lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}')
 # .. setting_name: RETIRED_EMAIL_FMT
 # .. setting_default: retired__user_{}@retired.invalid
 # .. setting_description: Set the format a retired user email field gets transformed into, where {} is
 #     replaced with the hash of the original email. This is a derived setting that depends on
 #     RETIRED_EMAIL_PREFIX and RETIRED_EMAIL_DOMAIN values.
-RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
-derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+RETIRED_EMAIL_FMT = Derived(lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN)
 # .. setting_name: RETIRED_USER_SALTS
 # .. setting_default: ['abc', '123']
 # .. setting_description: Set a list of salts used for hashing usernames and emails on users retirement.
@@ -5372,12 +5388,6 @@ COOL_OFF_DAYS = 14
 ############ Settings for externally hosted executive education courses ############
 EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
-############## PLOTLY ##############
-
-ENTERPRISE_PLOTLY_SECRET = "I am a secret"
-
-############## PLOTLY ##############
-
 ############ Internal Enterprise Settings ############
 ENTERPRISE_VSF_UUID = "e815503343644ac7845bc82325c34460"
 ############ Internal Enterprise Settings ############
@@ -5393,6 +5403,14 @@ NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
+
+############## NUDGE EMAILS ###############
+# .. setting_name: DISABLED_ORGS_FOR_PROGRAM_NUDGE
+# .. setting_default: []
+# .. setting_description: List of organization codes that should be disabled
+# .. for program nudge emails.
+# .. eg ['BTDx', 'MYTx']
+DISABLED_ORGS_FOR_PROGRAM_NUDGE = []
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
@@ -5424,11 +5442,11 @@ def _should_send_learning_badge_events(settings):
 EVENT_BUS_PRODUCER_CONFIG = {
     'org.openedx.learning.certificate.created.v1': {
         'learning-certificate-lifecycle':
-            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+            {'event_key_field': 'certificate.course.course_key', 'enabled': Derived(_should_send_certificate_events)},
     },
     'org.openedx.learning.certificate.revoked.v1': {
         'learning-certificate-lifecycle':
-            {'event_key_field': 'certificate.course.course_key', 'enabled': _should_send_certificate_events},
+            {'event_key_field': 'certificate.course.course_key', 'enabled': Derived(_should_send_certificate_events)},
     },
     'org.openedx.learning.course.unenrollment.completed.v1': {
         'course-unenrollment-lifecycle':
@@ -5490,33 +5508,16 @@ EVENT_BUS_PRODUCER_CONFIG = {
     "org.openedx.learning.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.course_key",
-            "enabled": _should_send_learning_badge_events,
+            "enabled": Derived(_should_send_learning_badge_events),
         },
     },
     "org.openedx.learning.ccx.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.ccx_course_key",
-            "enabled": _should_send_learning_badge_events,
+            "enabled": Derived(_should_send_learning_badge_events),
         },
     },
 }
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.created.v1',
-                         'learning-certificate-lifecycle', 'enabled')
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.learning.certificate.revoked.v1',
-                         'learning-certificate-lifecycle', 'enabled')
-
-derived_collection_entry(
-    "EVENT_BUS_PRODUCER_CONFIG",
-    "org.openedx.learning.course.passing.status.updated.v1",
-    "learning-badges-lifecycle",
-    "enabled",
-)
-derived_collection_entry(
-    "EVENT_BUS_PRODUCER_CONFIG",
-    "org.openedx.learning.ccx.course.passing.status.updated.v1",
-    "learning-badges-lifecycle",
-    "enabled",
-)
 
 BEAMER_PRODUCT_ID = ""
 

@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
 
 .xmodule_display.xmodule_WordCloudBlock .input-cloud {
-    margin: calc((var(--baseline) / 4));
+    margin: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_WordCloudBlock .result_cloud_section {

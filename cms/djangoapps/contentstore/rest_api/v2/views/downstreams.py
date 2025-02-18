@@ -56,8 +56,10 @@ UpstreamLink response schema:
     "ready_to_sync": Boolean
   }
 """
+
 import logging
 
+from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
@@ -71,6 +73,7 @@ from cms.lib.xblock.upstream_sync import (
     UpstreamLink, UpstreamLinkException, NoUpstream, BadUpstream, BadDownstream,
     fetch_customizable_fields, sync_from_upstream, decline_sync, sever_upstream_link
 )
+from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from common.djangoapps.student.auth import has_studio_write_access, has_studio_read_access
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
@@ -195,7 +198,8 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
         try:
-            sync_from_upstream(downstream, request.user)
+            upstream = sync_from_upstream(downstream, request.user)
+            static_file_notices = import_static_assets_for_library_sync(downstream, upstream, request)
         except UpstreamLinkException as exc:
             logger.exception(
                 "Could not sync from upstream '%s' to downstream '%s'",
@@ -206,7 +210,9 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
         modulestore().update_item(downstream, request.user.id)
         # Note: We call `get_for_block` (rather than `try_get_for_block`) because if anything is wrong with the
         #       upstream at this point, then that is completely unexpected, so it's appropriate to let the 500 happen.
-        return Response(UpstreamLink.get_for_block(downstream).to_json())
+        response = UpstreamLink.get_for_block(downstream).to_json()
+        response["static_file_notices"] = attrs_asdict(static_file_notices)
+        return Response(response)
 
     def delete(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
         """

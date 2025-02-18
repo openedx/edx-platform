@@ -1,8 +1,7 @@
 # Do things in edx-platform
 .PHONY: base-requirements check-types clean \
   compile-requirements detect_changed_source_translations dev-requirements \
-  docker_auth docker_build docker_tag_build_push_lms docker_tag_build_push_lms_dev \
-  docker_tag_build_push_cms docker_tag_build_push_cms_dev docs extract_translations \
+  docs extract_translations \
   guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
   pre-requirements pull pull_xblock_translations pull_translations push_translations \
   requirements shell swagger \
@@ -67,9 +66,6 @@ pull_translations: clean_translations  ## pull translations via atlas
 detect_changed_source_translations: ## check if translation files are up-to-date
 	i18n_tool changed
 
-pull: ## update the Docker image used by "make shell"
-	docker pull edxops/edxapp:latest
-
 pre-requirements: ## install Python requirements for running pip-tools
 	pip install -r requirements/pip.txt
 	pip install -r requirements/pip-tools.txt
@@ -94,17 +90,9 @@ test-requirements: pre-requirements
 
 requirements: dev-requirements ## install development environment requirements
 
-shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
-	docker run -it -e "NO_PYTHON_UNINSTALL=1" -e "PIP_INDEX_URL=https://pypi.python.org/simple" -e TERM \
-	-v `pwd`:/edx/app/edxapp/edx-platform:cached \
-	-v edxapp_lms_assets:/edx/var/edxapp/staticfiles/ \
-	-v edxapp_node_modules:/edx/app/edxapp/edx-platform/node_modules \
-	edxops/edxapp:latest /edx/app/edxapp/devstack.sh open
-
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
 	requirements/edx/coverage \
-	requirements/edx/paver \
 	requirements/edx-sandbox/base \
 	requirements/edx/base \
 	requirements/edx/doc \
@@ -164,27 +152,6 @@ upgrade-package: ## update just one package to the latest usable release
 check-types: ## run static type-checking tests
 	mypy
 
-docker_auth:
-	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
-
-docker_build: docker_auth
-	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
-	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
-	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
-	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production -t openedx/cms
-
-docker_tag_build_push_lms: docker_auth
-	docker buildx build -t openedx/lms:latest -t openedx/lms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production --push .
-
-docker_tag_build_push_lms_dev: docker_auth
-	docker buildx build -t openedx/lms-dev:latest -t openedx/lms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
-
-docker_tag_build_push_cms: docker_auth
-	docker buildx build -t openedx/cms:latest -t openedx/cms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production --push .
-
-docker_tag_build_push_cms_dev: docker_auth
-	docker buildx build -t openedx/cms-dev:latest -t openedx/cms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development --push .
-
 lint-imports:
 	lint-imports
 
@@ -204,3 +171,37 @@ migrate: migrate-lms migrate-cms
 # Part of https://github.com/openedx/wg-developer-experience/issues/136
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
+
+xsslint: ## check xss for quality issuest
+	python scripts/xsslint/xss_linter.py \
+	--rule-totals \
+	--config=scripts.xsslint_config \
+	--thresholds=scripts/xsslint_thresholds.json
+
+pycodestyle: ## check python files for quality issues
+	pycodestyle .
+
+## Re-enable --lint flag when this issue https://github.com/openedx/edx-platform/issues/35775 is resolved
+pii_check: ## check django models for pii annotations
+	DJANGO_SETTINGS_MODULE=cms.envs.test \
+	code_annotations django_find_annotations \
+		--config_file .pii_annotations.yml \
+		--app_name cms \
+		--coverage \
+		--lint
+
+	DJANGO_SETTINGS_MODULE=lms.envs.test \
+	code_annotations django_find_annotations \
+		--config_file .pii_annotations.yml \
+		--app_name lms \
+		--coverage \
+		--lint
+
+check_keywords: ## check django models for reserve keywords
+	DJANGO_SETTINGS_MODULE=cms.envs.test \
+	python manage.py cms check_reserved_keywords \
+	--override_file db_keyword_overrides.yml
+
+	DJANGO_SETTINGS_MODULE=lms.envs.test \
+	python manage.py lms check_reserved_keywords \
+	--override_file db_keyword_overrides.yml
