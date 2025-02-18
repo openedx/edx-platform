@@ -15,6 +15,7 @@ from xmodule.capa.xqueue_interface import XQueueInterface, XQueueService
 import pytest
 
 
+@pytest.mark.django_db
 @skip_unless_lms
 class XQueueServiceTest(TestCase):
     """Test the XQueue service methods."""

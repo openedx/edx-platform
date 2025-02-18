@@ -141,8 +141,10 @@ class XQueueInterface:
             # Use the new edx-submissions workflow
             submission = XQueueInterfaceSubmission().send_to_submission(header, body, files)
             log.error(submission)
+            return None, ''
 
-        return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
+        else:
+            return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
     def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
@@ -191,8 +193,13 @@ class XQueueService:
         """
         Return a fully qualified callback URL for external queueing system.
         """
+        if switch_is_active('callback_submission.enabled'):
+            dispatch_callback = "callback_submission"
+        else:
+            dispatch_callback = 'xqueue_callback'
+        
         relative_xqueue_callback_url = reverse(
-            'xqueue_callback',
+            dispatch_callback,
             kwargs=dict(
                 course_id=str(self._block.scope_ids.usage_id.context_key),
                 userid=str(self._block.scope_ids.user_id),

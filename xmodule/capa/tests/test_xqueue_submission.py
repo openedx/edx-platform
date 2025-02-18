@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 from django.conf import settings
 from xmodule.capa.xqueue_submission import XQueueInterfaceSubmission
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from xblock.fields import ScopeIds
 
 
@@ -40,6 +41,7 @@ def test_extract_item_data():
         assert score == 0.85
 
 
+@pytest.mark.django_db
 @patch('submissions.api.create_submission')
 def test_send_to_submission(mock_create_submission, xqueue_service):
     header = json.dumps({
