@@ -683,7 +683,7 @@ future==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   pyjwkest
-geoip2==4.8.1
+geoip2==5.0.1
     # via -r requirements/edx/base.txt
 gitdb==4.0.12
     # via gitpython
