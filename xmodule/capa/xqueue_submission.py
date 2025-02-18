@@ -51,16 +51,9 @@ class XQueueInterfaceSubmission:
         if not callback_url:
             raise ValueError("El header is not content 'lms_callback_url'.")
 
-        match_item_id = re.search(r'(block-v1:[^/]+)', callback_url)
-        match_course_id = re.search(r'(course-v1:[^\/]+)', callback_url)
-        match_item_type = re.search(r'type@([^+]+)', callback_url)
-
-        if not (match_item_id and match_item_type and match_course_id):
-            raise ValueError(f"The callback_url is not valid: {callback_url}")
-
-        item_id = match_item_id.group(1)
-        item_type = match_item_type.group(1)
-        course_id = match_course_id.group(1)
+        item_id = re.search(r'block@([^\/]+)', callback_url).group(1)
+        item_type = re.search(r'type@([^+]+)', callback_url).group(1)
+        course_id = re.search(r'(course-v1:[^\/]+)', callback_url).group(1)
 
         try:
             student_info = json.loads(payload["student_info"])
@@ -70,6 +63,7 @@ class XQueueInterfaceSubmission:
         usage_key = BlockUsageLocator.from_string(item_id)
         course_key = CourseKey.from_string(course_id)
 
+        full_block_id = f"block-v1:{course_id.replace('course-v1:', '')}+type@{item_type}+block@{item_id}"
         try:
             grader_payload = payload["grader_payload"]
             if isinstance(grader_payload, str):
@@ -85,7 +79,7 @@ class XQueueInterfaceSubmission:
             raise ValueError("The field 'anonymous_student_id' is not student_info.")
 
         student_dict = {
-            'item_id': item_id,
+            'item_id': full_block_id,
             'item_type': item_type,
             'course_id': course_id,
             'student_id': student_id
