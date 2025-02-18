@@ -587,7 +587,7 @@ edx-opaque-keys[django]==2.11.0
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/base.txt
-edx-proctoring==5.0.1
+edx-proctoring==5.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -683,7 +683,7 @@ future==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   pyjwkest
-geoip2==4.8.1
+geoip2==5.0.1
     # via -r requirements/edx/base.txt
 gitdb==4.0.12
     # via gitpython
@@ -1591,9 +1591,9 @@ xblock[django]==5.1.2
     #   xblocks-contrib
 xblock-drag-and-drop-v2==4.0.3
     # via -r requirements/edx/base.txt
-xblock-google-drive==0.7.0
+xblock-google-drive==0.7.1
     # via -r requirements/edx/base.txt
-xblock-poll==1.14.0
+xblock-poll==1.14.1
     # via -r requirements/edx/base.txt
 xblock-utils==4.0.0
     # via

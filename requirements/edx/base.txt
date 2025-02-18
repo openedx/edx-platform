@@ -502,7 +502,7 @@ edx-opaque-keys[django]==2.11.0
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/kernel.in
-edx-proctoring==5.0.1
+edx-proctoring==5.1.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring-proctortrack
@@ -582,7 +582,7 @@ fs-s3fs==0.1.8
     #   openedx-django-pyfs
 future==1.0.0
     # via pyjwkest
-geoip2==4.8.1
+geoip2==5.0.1
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
@@ -1270,9 +1270,9 @@ xblock[django]==5.1.2
     #   xblocks-contrib
 xblock-drag-and-drop-v2==4.0.3
     # via -r requirements/edx/bundled.in
-xblock-google-drive==0.7.0
+xblock-google-drive==0.7.1
     # via -r requirements/edx/bundled.in
-xblock-poll==1.14.0
+xblock-poll==1.14.1
     # via -r requirements/edx/bundled.in
 xblock-utils==4.0.0
     # via

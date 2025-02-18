@@ -51,11 +51,13 @@
                 <tr>
                 <p style="color: rgba(0,0,0,.75); font-size: 16px; font-size: 1rem; margin: 0; padding-top: 20px; padding-bottom: 14px">
                     {% filter force_escape %}
-                        {% blocktrans count count=days_per_week asvar goal_text %}
-                            You set a goal of learning {start_bold}{{days_per_week}} time a week in {{course_name}}{end_bold}. You’re not quite there, but there's still time to reach that goal!
-                            {% plural %}
-                            You set a goal of learning {start_bold}{{days_per_week}} times a week in {{course_name}}{end_bold}. You're not quite there, but there's still time to reach that goal!
-                        {% endblocktrans %}
+                        {% autoescape off %}
+                            {% blocktrans count count=days_per_week asvar goal_text %}
+                                You set a goal of learning {start_bold}{{days_per_week}} time a week in {{course_name}}{end_bold}. You’re not quite there, but there's still time to reach that goal!
+                                {% plural %}
+                                You set a goal of learning {start_bold}{{days_per_week}} times a week in {{course_name}}{end_bold}. You're not quite there, but there's still time to reach that goal!
+                            {% endblocktrans %}
+                        {% endautoescape %}
                     {% endfilter %}
                     {% interpolate_html goal_text start_bold='<b>'|safe end_bold='</b>'|safe %}
                  </p>
@@ -107,7 +109,7 @@
                         {% filter force_escape %}{% blocktrans %}
                             Adjust my goal
                         {% endblocktrans %}{% endfilter %}
-                    </div>                
+                    </div>
                 </a>
 
                 <center>
