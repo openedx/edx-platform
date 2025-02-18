@@ -148,6 +148,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "last_published": None,
             "created": created_date.timestamp(),
             "modified": modified_date.timestamp(),
+            "publish_status": "never",
         }
         self.doc_problem2 = {
             "id": "lborg1libproblemp2-b2f65e29",
@@ -164,6 +165,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "last_published": None,
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
+            "publish_status": "never",
         }
 
         # Create a couple of taxonomies with tags

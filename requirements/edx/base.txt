@@ -401,7 +401,7 @@ drf-yasg==1.21.8
     # via
     #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.11.3
+edx-ace==1.11.4
     # via -r requirements/edx/kernel.in
 edx-api-doc-tools==2.0.0
     # via
@@ -467,7 +467,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.6.6
+edx-enterprise==5.6.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -502,7 +502,7 @@ edx-opaque-keys[django]==2.11.0
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/kernel.in
-edx-proctoring==5.0.1
+edx-proctoring==5.1.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring-proctortrack
@@ -582,7 +582,7 @@ fs-s3fs==0.1.8
     #   openedx-django-pyfs
 future==1.0.0
     # via pyjwkest
-geoip2==4.8.1
+geoip2==5.0.1
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
@@ -811,7 +811,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.15.2
+openedx-events==9.18.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -827,7 +827,7 @@ openedx-filters==1.12.0
     #   ora2
 openedx-forum==0.1.6
     # via -r requirements/edx/kernel.in
-openedx-learning==0.18.2
+openedx-learning==0.18.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -1252,7 +1252,7 @@ wheel==0.45.1
     # via django-pipeline
 wrapt==1.17.2
     # via -r requirements/edx/kernel.in
-xblock[django]==5.1.1
+xblock[django]==5.1.2
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock
@@ -1270,9 +1270,9 @@ xblock[django]==5.1.1
     #   xblocks-contrib
 xblock-drag-and-drop-v2==4.0.3
     # via -r requirements/edx/bundled.in
-xblock-google-drive==0.7.0
+xblock-google-drive==0.7.1
     # via -r requirements/edx/bundled.in
-xblock-poll==1.14.0
+xblock-poll==1.14.1
     # via -r requirements/edx/bundled.in
 xblock-utils==4.0.0
     # via

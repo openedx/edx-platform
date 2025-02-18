@@ -508,7 +508,7 @@ drf-yasg==1.21.8
     #   -r requirements/edx/base.txt
     #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.11.3
+edx-ace==1.11.4
     # via -r requirements/edx/base.txt
 edx-api-doc-tools==2.0.0
     # via
@@ -574,7 +574,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.6.6
+edx-enterprise==5.6.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -611,7 +611,7 @@ edx-opaque-keys[django]==2.11.0
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/base.txt
-edx-proctoring==5.0.1
+edx-proctoring==5.1.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -680,7 +680,7 @@ execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.1
     # via -r requirements/edx/testing.in
-faker==35.0.0
+faker==36.1.1
     # via factory-boy
 fastapi==0.115.7
     # via pact-python
@@ -719,7 +719,7 @@ future==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   pyjwkest
-geoip2==4.8.1
+geoip2==5.0.1
     # via -r requirements/edx/base.txt
 glob2==0.7
     # via -r requirements/edx/base.txt
@@ -1032,7 +1032,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==9.15.2
+openedx-events==9.18.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1048,7 +1048,7 @@ openedx-filters==1.12.0
     #   ora2
 openedx-forum==0.1.6
     # via -r requirements/edx/base.txt
-openedx-learning==0.18.2
+openedx-learning==0.18.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1319,7 +1319,6 @@ python-dateutil==2.9.0.post0
     #   edx-ace
     #   edx-enterprise
     #   edx-proctoring
-    #   faker
     #   freezegun
     #   icalendar
     #   olxcleaner
@@ -1577,7 +1576,6 @@ typing-extensions==4.12.2
     #   anyio
     #   django-countries
     #   edx-opaque-keys
-    #   faker
     #   fastapi
     #   grimp
     #   import-linter
@@ -1591,6 +1589,7 @@ tzdata==2025.1
     # via
     #   -r requirements/edx/base.txt
     #   celery
+    #   faker
     #   icalendar
     #   kombu
 unicodecsv==0.14.1
@@ -1663,7 +1662,7 @@ wheel==0.45.1
     #   django-pipeline
 wrapt==1.17.2
     # via -r requirements/edx/base.txt
-xblock[django]==5.1.1
+xblock[django]==5.1.2
     # via
     #   -r requirements/edx/base.txt
     #   acid-xblock
@@ -1681,9 +1680,9 @@ xblock[django]==5.1.1
     #   xblocks-contrib
 xblock-drag-and-drop-v2==4.0.3
     # via -r requirements/edx/base.txt
-xblock-google-drive==0.7.0
+xblock-google-drive==0.7.1
     # via -r requirements/edx/base.txt
-xblock-poll==1.14.0
+xblock-poll==1.14.1
     # via -r requirements/edx/base.txt
 xblock-utils==4.0.0
     # via
