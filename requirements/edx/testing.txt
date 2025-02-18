@@ -680,7 +680,7 @@ execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.1
     # via -r requirements/edx/testing.in
-faker==35.0.0
+faker==36.1.1
     # via factory-boy
 fastapi==0.115.7
     # via pact-python
@@ -1319,7 +1319,6 @@ python-dateutil==2.9.0.post0
     #   edx-ace
     #   edx-enterprise
     #   edx-proctoring
-    #   faker
     #   freezegun
     #   icalendar
     #   olxcleaner
@@ -1577,7 +1576,6 @@ typing-extensions==4.12.2
     #   anyio
     #   django-countries
     #   edx-opaque-keys
-    #   faker
     #   fastapi
     #   grimp
     #   import-linter
@@ -1591,6 +1589,7 @@ tzdata==2025.1
     # via
     #   -r requirements/edx/base.txt
     #   celery
+    #   faker
     #   icalendar
     #   kombu
 unicodecsv==0.14.1
