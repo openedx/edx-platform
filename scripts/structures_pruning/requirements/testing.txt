@@ -22,7 +22,7 @@ iniconfig==2.0.0
     # via pytest
 packaging==24.2
     # via pytest
-pbr==6.1.0
+pbr==6.1.1
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   stevedore
@@ -42,3 +42,6 @@ typing-extensions==4.12.2
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
