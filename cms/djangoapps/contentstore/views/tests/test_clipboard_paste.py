@@ -6,6 +6,13 @@ APIs.
 import ddt
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
+from openedx_events.content_authoring.signals import (
+    LIBRARY_BLOCK_DELETED,
+    XBLOCK_CREATED,
+    XBLOCK_DELETED,
+    XBLOCK_UPDATED,
+)
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 from xmodule.modulestore.django import contentstore, modulestore
@@ -393,10 +400,16 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.
 
 
-class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
+class ClipboardPasteFromV2LibraryTestCase(OpenEdxEventsTestMixin, ModuleStoreTestCase):
     """
     Test Clipboard Paste functionality with a "new" (as of Sumac) library
     """
+    ENABLED_OPENEDX_EVENTS = [
+        LIBRARY_BLOCK_DELETED.event_type,
+        XBLOCK_CREATED.event_type,
+        XBLOCK_DELETED.event_type,
+        XBLOCK_UPDATED.event_type,
+    ]
 
     def setUp(self):
         """
@@ -476,6 +489,16 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         for object_tag in object_tags:
             assert object_tag.value in self.lib_block_tags
             assert object_tag.is_copied
+
+        # If we delete the upstream library block...
+        library_api.delete_library_block(self.lib_block_key)
+
+        # ...the copied tags remain, but should no longer be marked as "copied"
+        object_tags = tagging_api.get_object_tags(new_block_key)
+        assert len(object_tags) == len(self.lib_block_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in self.lib_block_tags
+            assert not object_tag.is_copied
 
     def test_paste_from_library_copies_asset(self):
         """

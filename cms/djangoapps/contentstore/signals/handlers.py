@@ -12,10 +12,17 @@ from django.db import transaction
 from django.dispatch import receiver
 from edx_toggles.toggles import SettingToggle
 from opaque_keys.edx.keys import CourseKey
-from openedx_events.content_authoring.data import CourseCatalogData, CourseData, CourseScheduleData, XBlockData
+from openedx_events.content_authoring.data import (
+    CourseCatalogData,
+    CourseData,
+    CourseScheduleData,
+    LibraryBlockData,
+    XBlockData,
+)
 from openedx_events.content_authoring.signals import (
     COURSE_CATALOG_INFO_CHANGED,
     COURSE_IMPORT_COMPLETED,
+    LIBRARY_BLOCK_DELETED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
@@ -38,7 +45,11 @@ from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from ..models import PublishableEntityLink
-from ..tasks import create_or_update_upstream_links, handle_create_or_update_xblock_upstream_link
+from ..tasks import (
+    create_or_update_upstream_links,
+    handle_create_or_update_xblock_upstream_link,
+    handle_unlink_upstream_block,
+)
 from .signals import GRADING_POLICY_CHANGED
 
 log = logging.getLogger(__name__)
@@ -287,3 +298,16 @@ def handle_new_course_import(**kwargs):
         force=True,
         replace=True
     )
+
+
+@receiver(LIBRARY_BLOCK_DELETED)
+def unlink_upstream_block_handler(**kwargs):
+    """
+    Handle unlinking the upstream (library) block from any downstream (course) blocks.
+    """
+    library_block = kwargs.get("library_block", None)
+    if not library_block or not isinstance(library_block, LibraryBlockData):
+        log.error("Received null or incorrect data for event")
+        return
+
+    handle_unlink_upstream_block.delay(str(library_block.usage_key))

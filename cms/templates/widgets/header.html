@@ -8,7 +8,7 @@
   from urllib.parse import quote_plus
   from common.djangoapps.student.auth import has_studio_advanced_settings_access
   from cms.djangoapps.contentstore import toggles
-  from cms.djangoapps.contentstore.utils import get_pages_and_resources_url, get_course_outline_url, get_updates_url, get_files_uploads_url, get_video_uploads_url, get_schedule_details_url, get_grading_url, get_advanced_settings_url, get_import_url, get_export_url, get_studio_home_url, get_course_team_url, get_optimizer_url
+  from cms.djangoapps.contentstore.utils import get_pages_and_resources_url, get_course_outline_url, get_course_libraries_url, get_updates_url, get_files_uploads_url, get_video_uploads_url, get_schedule_details_url, get_grading_url, get_advanced_settings_url, get_import_url, get_export_url, get_studio_home_url, get_course_team_url, get_optimizer_url
   from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
   from openedx.core.djangoapps.lang_pref.api import header_language_selector_is_enabled, released_languages
 %>
@@ -67,6 +67,7 @@
             import_mfe_enabled = toggles.use_new_import_page(context_course.id)
             export_mfe_enabled = toggles.use_new_export_page(context_course.id)
             optimizer_enabled = toggles.enable_course_optimizer(context_course.id)
+            libraries_v2_enabled = toggles.libraries_v2_enabled()
 
       %>
       <h2 class="info-course">
@@ -102,6 +103,11 @@
                   % if course_outline_mfe_enabled:
                   <li class="nav-item nav-course-courseware-outline">
                     <a href="${get_course_outline_url(course_key)}">${_("Outline")}</a>
+                  </li>
+                  % endif
+                  % if libraries_v2_enabled:
+                  <li class="nav-item nav-course-courseware-outline">
+                    <a href="${get_course_libraries_url(course_key)}">${_("Libraries")}</a>
                   </li>
                   % endif
                   % if not updates_mfe_enabled:

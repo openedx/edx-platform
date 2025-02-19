@@ -523,6 +523,18 @@ def get_custom_pages_url(course_locator) -> str:
     return custom_pages_url
 
 
+def get_course_libraries_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for custom pages view.
+    """
+    url = None
+    if libraries_v2_enabled():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        if mfe_base_url:
+            url = f'{mfe_base_url}/course/{course_locator}/libraries'
+    return url
+
+
 def get_taxonomy_list_url() -> str | None:
     """
     Gets course authoring microfrontend URL for taxonomy list page view.
