@@ -12,4 +12,5 @@ urlpatterns = [
     path('my_user_info', my_user_info, name='user-info'),
     path('notifications/', include('lms.djangoapps.mobile_api.notifications.urls')),
     path('course_info/', include('lms.djangoapps.mobile_api.course_info.urls')),
+    path('download_courses/', include('lms.djangoapps.mobile_api.download_courses.urls')),
 ]
