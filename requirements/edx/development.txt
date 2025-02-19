@@ -883,7 +883,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.1
     # via -r requirements/edx/testing.txt
-faker==35.0.0
+faker==36.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -933,7 +933,7 @@ future==1.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pyjwkest
-geoip2==4.8.1
+geoip2==5.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1729,7 +1729,6 @@ python-dateutil==2.9.0.post0
     #   edx-ace
     #   edx-enterprise
     #   edx-proctoring
-    #   faker
     #   freezegun
     #   icalendar
     #   olxcleaner
@@ -2122,7 +2121,6 @@ typing-extensions==4.12.2
     #   django-stubs-ext
     #   djangorestframework-stubs
     #   edx-opaque-keys
-    #   faker
     #   fastapi
     #   grimp
     #   import-linter
@@ -2139,6 +2137,7 @@ tzdata==2025.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   celery
+    #   faker
     #   icalendar
     #   kombu
 unicodecsv==0.14.1
@@ -2274,7 +2273,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/testing.txt
     #   edx-sga
     #   xblock-poll
-xblocks-contrib==0.1.0
+xblocks-contrib==0.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
