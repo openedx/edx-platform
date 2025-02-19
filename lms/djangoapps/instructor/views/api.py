@@ -1706,22 +1706,31 @@ class GetCourseSurveyResults(DeveloperErrorViewMixin, APIView):
         return JsonResponse({"status": success_status})
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EXAM_RESULTS)
-@common_exceptions_400
-def get_proctored_exam_results(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetProctoredExamResults(DeveloperErrorViewMixin, APIView):
     """
-    get the proctored exam resultsreport for the particular course.
+    get the proctored exam results report for the particular course.
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('proctored exam results')
-    task_api.submit_proctored_exam_results_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
-    return JsonResponse({"status": success_status})
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EXAM_RESULTS
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        get the proctored exam results report for the particular course.
+        """
+        try:
+            course_key = CourseKey.from_string(course_id)
+            report_type = _('proctored exam results')
+            task_api.submit_proctored_exam_results_report(request, course_key)
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            return JsonResponse({"status": success_status})
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as error:
+            # Return a 400 status code with the error message
+            return JsonResponse({"error": str(error)}, status=400)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
