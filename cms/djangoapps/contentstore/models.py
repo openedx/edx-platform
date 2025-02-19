@@ -106,6 +106,8 @@ class PublishableEntityLink(models.Model):
     # A downstream entity can only link to single upstream entity
     # whereas an entity can be upstream for multiple downstream entities.
     downstream_usage_key = UsageKeyField(max_length=255, unique=True)
+    # Search by parent key (i.e., unit key)
+    downstream_parent_usage_key = UsageKeyField(max_length=255, db_index=True)
     # Search by course/downstream key
     downstream_context_key = CourseKeyField(max_length=255, db_index=True)
     version_synced = models.IntegerField()
@@ -147,6 +149,7 @@ class PublishableEntityLink(models.Model):
         upstream_usage_key: UsageKey,
         upstream_context_key: str,
         downstream_usage_key: UsageKey,
+        downstream_parent_usage_key: UsageKey,
         downstream_context_key: CourseKey,
         version_synced: int,
         version_declined: int | None = None,
@@ -161,6 +164,7 @@ class PublishableEntityLink(models.Model):
             'upstream_usage_key': upstream_usage_key,
             'upstream_context_key': upstream_context_key,
             'downstream_usage_key': downstream_usage_key,
+            'downstream_parent_usage_key': downstream_parent_usage_key,
             'downstream_context_key': downstream_context_key,
             'version_synced': version_synced,
             'version_declined': version_declined,
@@ -200,6 +204,15 @@ class PublishableEntityLink(models.Model):
         ).select_related(
             "upstream_block__published__version",
             "upstream_block__learning_package"
+        )
+
+    @classmethod
+    def get_by_upstream_usage_key(cls, upstream_usage_key: UsageKey) -> QuerySet["PublishableEntityLink"]:
+        """
+        Get all downstream context keys for given upstream usage key
+        """
+        return cls.objects.filter(
+            upstream_usage_key=upstream_usage_key,
         )
 
 

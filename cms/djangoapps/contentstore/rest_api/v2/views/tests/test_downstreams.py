@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
@@ -56,6 +57,7 @@ class _BaseDownstreamViewTestMixin:
         freezer.start()
         self.maxDiff = 2000
         self.course = CourseFactory.create()
+        CourseOverviewFactory.create(id=self.course.id, display_name=self.course.display_name)
         chapter = BlockFactory.create(category='chapter', parent=self.course)
         sequential = BlockFactory.create(category='sequential', parent=chapter)
         unit = BlockFactory.create(category='vertical', parent=sequential)
@@ -66,6 +68,18 @@ class _BaseDownstreamViewTestMixin:
         self.downstream_html_key = BlockFactory.create(
             category='html', parent=unit, upstream=MOCK_HTML_UPSTREAM_REF, upstream_version=1,
         ).usage_key
+
+        self.another_course = CourseFactory.create(display_name="Another Course")
+        CourseOverviewFactory.create(id=self.another_course.id, display_name=self.another_course.display_name)
+        another_chapter = BlockFactory.create(category='chapter', parent=self.another_course)
+        another_sequential = BlockFactory.create(category='sequential', parent=another_chapter)
+        another_unit = BlockFactory.create(category='vertical', parent=another_sequential)
+        for _ in range(3):
+            # Adds 3 videos linked to the same upstream
+            BlockFactory.create(
+                category='video', parent=another_unit, upstream=MOCK_UPSTREAM_REF, upstream_version=123,
+            )
+
         self.fake_video_key = self.course.id.make_usage_key("video", "NoSuchVideo")
         self.superuser = UserFactory(username="superuser", password="password", is_staff=True, is_superuser=True)
         self.learner = UserFactory(username="learner", password="password")
@@ -336,6 +350,37 @@ class GetUpstreamViewTest(_BaseDownstreamViewTestMixin, SharedModuleStoreTestCas
                 'upstream_version': None,
                 'version_declined': None,
                 'version_synced': 1,
+            },
+        ]
+        self.assertListEqual(data, expected)
+
+
+class GetDownstreamContextsTest(_BaseDownstreamViewTestMixin, SharedModuleStoreTestCase):
+    """
+    Test that `GET /api/v2/contentstore/upstream/:usage_key/downstream-contexts returns list of
+    link contexts (i.e. courses) in given upstream entity (i.e. library block).
+    """
+    def call_api(self, usage_key_string):
+        return self.client.get(f"/api/contentstore/v2/upstream/{usage_key_string}/downstream-contexts")
+
+    def test_200_downstream_context_list(self):
+        """
+        Returns all downstream courses for given library block
+        """
+        self.client.login(username="superuser", password="password")
+        response = self.call_api(MOCK_UPSTREAM_REF)
+        assert response.status_code == 200
+        data = response.json()
+        expected = [
+            {
+                'id': str(self.course.id),
+                'display_name': str(self.course.display_name),
+                'url': f'/course/{str(self.course.id)}',
+            },
+            {
+                'id': str(self.another_course.id),
+                'display_name': str(self.another_course.display_name),
+                'url': f'/course/{str(self.another_course.id)}',
             },
         ]
         self.assertListEqual(data, expected)

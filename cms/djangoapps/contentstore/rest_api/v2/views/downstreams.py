@@ -40,6 +40,11 @@ https://github.com/openedx/edx-platform/issues/35653):
       400: Downstream block is not linked to upstream content.
       404: Downstream block not found or user lacks permission to edit it.
 
+  /api/contentstore/v2/upstream/{usage_key_string}/downstream-contexts
+
+    GET: List all downstream contexts (Courses) linked to a library block.
+        200: A list of Course IDs and their display names and URLs.
+
   # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
@@ -61,6 +66,8 @@ import logging
 
 from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
+from django.utils.translation import gettext_lazy as _
+from itertools import groupby
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import NotFound, ValidationError
@@ -71,6 +78,7 @@ from xblock.core import XBlock
 
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from cms.djangoapps.contentstore.models import PublishableEntityLink
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
@@ -135,6 +143,55 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
         links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
         serializer = PublishableEntityLinksSerializer(links, many=True)
         return Response(serializer.data)
+
+
+@view_auth_classes()
+class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves library block->course->unit links
+    """
+    def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
+        """
+        Fetches downstream links for given publishable entity
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
+
+        links = (
+            PublishableEntityLink
+                .get_by_upstream_usage_key(upstream_usage_key=usage_key)
+                .order_by("downstream_context_key", "downstream_parent_usage_key")
+                .values( "downstream_usage_key", "downstream_context_key", "downstream_parent_usage_key")
+        )
+
+        result = []
+        for context_key, links_by_context in groupby(links, lambda link: link["downstream_context_key"]):
+            # Pre-fetch the course with all of its children:
+            course = modulestore().get_course(context_key, depth=None)
+            if course is None:
+                raise BadDownstream(_("Course {context_key} not found").format(context_key=context_key))
+            course_link = {
+                "id": str(context_key),
+                "display_name": course.display_name,
+                "url": reverse_course_url("course_handler", context_key),
+                "units": []
+            }
+            for unit_key, links_by_unit  in groupby(links_by_context, lambda link: link["downstream_parent_usage_key"]):
+                unit_link = {
+                    "id": str(unit_key),
+                    "url": reverse_usage_url("container_handler", unit_key),
+                    "links": []
+                }
+                for downstream_link in links_by_unit:
+                    unit_link["links"].append({
+                        "id": str(downstream_link["downstream_usage_key"]),
+                    })
+                course_link["units"].append(unit_link)
+            result.append(course_link)
+
+        return Response(result)
 
 
 @view_auth_classes(is_authenticated=True)

@@ -2383,6 +2383,8 @@ def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, c
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
+
+    print(f"!!!!!!!!!!!!!!!!! xblock.parent -> {xblock.parent}")
     PublishableEntityLink.update_or_create(
         lib_component,
         upstream_usage_key=xblock.upstream,
