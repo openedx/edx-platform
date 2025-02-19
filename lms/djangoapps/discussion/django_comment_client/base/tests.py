@@ -812,7 +812,7 @@ class ViewsTestCase(
             headers=ANY,
             params=ANY,
             timeout=ANY,
-            data={"body": updated_body}
+            data={"body": updated_body, "course_id": str(self.course_id)}
         )
 
     def test_flag_thread_open(self, mock_is_forum_v2_enabled, mock_request):
