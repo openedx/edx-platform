@@ -98,7 +98,11 @@ def save_video_transcript_in_learning_core(
     language_code
 ):
     """
-    Saves a video transcript to the learning core
+    Saves a video transcript to the learning core.
+    
+    Learning Core uses the standard `.srt` format for subtitles.
+    Note: SJSON is an edx-specific format that we're trying to move away from,
+    so for all new stuff related to Learning Core should only use `.srt`.
 
     Arguments:
         usage_key: UsageKey of the block

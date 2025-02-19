@@ -541,9 +541,9 @@ class VideoStudioViewHandlers:
             new_language_code = request.POST['new_language_code']
             transcript_file = request.POST['file'].file
 
-            isLibrary = isinstance(self.usage_key.context_key, LibraryLocatorV2)
+            is_library = isinstance(self.usage_key.context_key, LibraryLocatorV2)
 
-            if isLibrary:
+            if is_library:
                 filename = f'transcript-{new_language_code}.srt'
             else:
                 if not edx_video_id:
@@ -560,7 +560,7 @@ class VideoStudioViewHandlers:
                     'edx_video_id': edx_video_id,
                     'language_code': new_language_code
                 }
-                if isLibrary:
+                if is_library:
                     # Save transcript as static asset in Learning Core if is a library component
                     filename = f"static/{filename}"
                     lib_api.add_library_block_static_asset_file(
@@ -590,7 +590,7 @@ class VideoStudioViewHandlers:
                     self.transcripts.pop(language_code, None)
                 self.transcripts[new_language_code] = filename
 
-                if isLibrary:
+                if is_library:
                     self._save_transcript_field()
                 response = Response(json.dumps(payload), status=201)
             except (TranscriptsGenerationException, UnicodeDecodeError):
@@ -622,6 +622,9 @@ class VideoStudioViewHandlers:
         if isinstance(self.usage_key.context_key, LibraryLocatorV2):
             transcript_name = self.transcripts.pop(language, None)
             if transcript_name:
+                # TODO: In the future, we need a proper XBlock API
+                # like `self.static_assets.delete(...)` instead of coding
+                # these runtime-specific/library-specific APIs.
                 lib_api.delete_library_block_static_asset_file(
                     self.usage_key,
                     f"static/{transcript_name}",
