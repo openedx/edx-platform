@@ -13,15 +13,7 @@ class PublishableEntityLinksSerializer(serializers.ModelSerializer):
     """
     upstream_context_title = serializers.CharField(read_only=True)
     upstream_version = serializers.IntegerField(read_only=True)
-    ready_to_sync = serializers.SerializerMethodField()
-
-    def get_ready_to_sync(self, obj):
-        """Calculate ready_to_sync field"""
-        return bool(
-            obj.upstream_version and
-            obj.upstream_version > (obj.version_synced or 0) and
-            obj.upstream_version > (obj.version_declined or 0)
-        )
+    ready_to_sync = serializers.BooleanField()
 
     class Meta:
         model = PublishableEntityLink

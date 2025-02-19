@@ -9,6 +9,8 @@ from config_models.models import ConfigurationModel
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.fields import IntegerField, TextField
+from django.db.models.functions import Coalesce
+from django.db.models.lookups import GreaterThan
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -191,16 +193,33 @@ class PublishableEntityLink(models.Model):
         return link
 
     @classmethod
-    def get_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet["PublishableEntityLink"]:
+    def get_by_downstream_context(
+        cls,
+        downstream_context_key: CourseKey,
+        ready_to_sync: bool | None = None,
+    ) -> QuerySet["PublishableEntityLink"]:
         """
         Get all links for given downstream context, preselects related published version and learning package.
         """
-        return cls.objects.filter(
+        result = cls.objects.filter(
             downstream_context_key=downstream_context_key
         ).select_related(
             "upstream_block__published__version",
             "upstream_block__learning_package"
+        ).annotate(
+            ready_to_sync=(
+                GreaterThan(
+                    Coalesce("upstream_block__published__version__version_num", 0),
+                    Coalesce("version_synced", 0)
+                ) & GreaterThan(
+                    Coalesce("upstream_block__published__version__version_num", 0),
+                    Coalesce("version_declined", 0)
+                )
+            )
         )
+        if ready_to_sync is not None:
+            result = result.filter(ready_to_sync=ready_to_sync)
+        return result
 
     @classmethod
     def get_by_upstream_usage_key(cls, upstream_usage_key: UsageKey) -> QuerySet["PublishableEntityLink"]:

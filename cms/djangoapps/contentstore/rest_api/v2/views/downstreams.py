@@ -69,6 +69,7 @@ from django.contrib.auth.models import User  # pylint: disable=imported-auth-use
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.fields import BooleanField
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -141,7 +142,13 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
+        ready_to_sync = request.GET.get('ready_to_sync')
+        if ready_to_sync is not None:
+            ready_to_sync = BooleanField().to_internal_value(ready_to_sync)
+        links = PublishableEntityLink.get_by_downstream_context(
+            downstream_context_key=course_key,
+            ready_to_sync=ready_to_sync,
+        )
         serializer = PublishableEntityLinksSerializer(links, many=True)
         return Response(serializer.data)
 
