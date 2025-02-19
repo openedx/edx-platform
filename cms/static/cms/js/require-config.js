@@ -355,9 +355,9 @@
             }
         },
         config: {
-          text: {
-            useXhr: () => true
-          }
+            text: {
+                useXhr: () => true
+            }
         }
     });
 }).call(this, require, define);
