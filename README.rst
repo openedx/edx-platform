@@ -253,6 +253,7 @@ quality, which will make your contribution more likely to be accepted.
 New features are accepted. Discussing your new ideas with the maintainers
 before you write code will also increase the chances that your work is accepted.
 
+
 Code of Conduct
 ***************
 
