@@ -242,7 +242,8 @@ def delete_offline_content_for_block(usage_key):
     File will be deleted from the storage on block deletion (without publishing).
     If changes will be discarded, offline content for this block will be regenerated automatically.
     """
-    deleted_block_offline_archive_path = f'offline_content/{str(usage_key.course_key)}/{usage_key.block_id}.zip'
+    base_offline_course_path = settings.OFFLINE_CONTENT_PATH_TEMPLATE.format(course_id=str(usage_key.course_key))
+    deleted_block_offline_archive_path = f'{base_offline_course_path}{usage_key.block_id}.zip'
 
     if default_storage.exists(deleted_block_offline_archive_path):
         default_storage.delete(deleted_block_offline_archive_path)

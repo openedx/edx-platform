@@ -693,6 +693,9 @@ DJFS = {
     'directory_root': '/edx/var/edxapp/django-pyfs/static/django-pyfs',
     'url_root': '/static/django-pyfs',
 }
+
+OFFLINE_CONTENT_PATH_TEMPLATE = "offline_content/{course_id}/"
+
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
 
