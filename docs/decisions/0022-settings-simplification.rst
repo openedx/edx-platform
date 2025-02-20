@@ -222,11 +222,6 @@ This is our target edx-platform settings module structure:
 
       * ``<third_party_repo>/cms_dev.py`` (example path)
 
-Notes on defaults:
-
-* When the default value of setting X depends on the *final* value of setting
-  Y, ``openedx.core
-
 Consequences
 ************
 
