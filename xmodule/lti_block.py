@@ -68,6 +68,7 @@ import oauthlib.oauth1
 from django.conf import settings
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -609,8 +610,12 @@ class _BuiltInLTIBlock(
     def get_course(self):
         """
         Return course by course id.
+
+        Returns None if the current block is not part of a course (i.e part of a library).
         """
-        return self.runtime.modulestore.get_course(self.course_id)
+        if isinstance(self.course_id, CourseKey):
+            return self.runtime.modulestore.get_course(self.course_id)
+        return None
 
     @property
     def context_id(self):
@@ -960,7 +965,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         Obtains client_key and client_secret credentials from current course.
         """
         course = self.get_course()
-        for lti_passport in course.lti_passports:
+        lti_passports = course.lti_passports if course else []
+        for lti_passport in lti_passports:
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
             except ValueError:
