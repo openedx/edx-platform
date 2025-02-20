@@ -38,13 +38,7 @@ INSTALLED_APPS.extend(
         "cms.djangoapps.xblock_config.apps.XBlockConfig",
         "lms.djangoapps.lti_provider",
         "openedx.core.djangoapps.content.search",
-        "openedx.core.djangoapps.content_libraries",
         "openedx.core.djangoapps.content_staging",
-        "openedx.core.djangoapps.bookmarks",
-        "openedx.core.djangoapps.discussions",
-        "openedx.core.djangoapps.theming",
-        "lms.djangoapps.program_enrollments",
-        "push_notifications",
     ]
 )
 
