@@ -65,7 +65,7 @@ like this:
 
     * and uses templates vars from Tutor configuration (``config.yml``),
 
-    * and invokes hooks from any enable Tutor plugins;
+    * and invokes hooks from any enabled Tutor plugins;
 
   * it imports ``lms/envs/production.py``,
 
@@ -187,21 +187,23 @@ Target settings structure for edx-platform
   edx-platform-specific settings with *reasonable, production-ready* defaults;
   (b) otherwise, annotated definitions of edx-platform-specific settings (like
   secrets) with *obviously-wrong* defaults, ensuring they aren't used in
-  production; and (c) un-annotated reasonable production-ready overrides of
-  third-party settings. When a particular setting's default should depend on
-  the *final* value of another setting, the former should be assigned to a
+  production; and (c) reasonable production-ready overrides of third-party
+  settings, ideally with explanatory comments (but not annotations). When a
+  particular setting's default should depend on the *final* value of another
+  setting, the former should be assigned to a
   ``Derived(...)`` value, where ``...`` is a computation based on the latter.
 
   * ``lms/envs/common.py``: Extend ``openedx/envs/common.py`` to create, as
     much as possible, a production-ready settings file for the LMS. These
     extension may include: (a) annotated definitions of LMS-specific settings
     with production-ready defaults; (b) annotated definitions of LMS-specific
-    settings with obviously-wrong defaults; (c) un-annotated LMS-specific
-    overrides of settings defined in ``openedx/envs/common.py``; and (d)
-    un-annotated overrides of third-party settings. Again, ``Derived`` settings
-    can be used as appropriate. This will be the default settings file for
-    running LMS management commands, although tools can override this (as
-    usual) by specifying a ``DJANGO_SETTINGS_MODULE``.
+    settings with obviously-wrong defaults; and (c) LMS-specific
+    overrides of settings defined in ``openedx/envs/common.py`` and of
+    third-party settings, ideally with explanatory comments (but not
+    annotations). Again, ``Derived`` settings can be used as appropriate. This
+    will be the default settings file for running LMS management commands,
+    although tools can override this (as usual) by specifying a
+    ``DJANGO_SETTINGS_MODULE``.
 
     * ``lms/envs/test.py``: Override LMS settings for unit tests. Should work
       in a local venv as well as in CI. Needs to invoke ``derive_settings`` in
