@@ -56,17 +56,15 @@ from chem import chemcalc
 
 from lxml import etree
 
-from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT
+from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT, get_flag_by_name
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.stringify import stringify_children
 
-from . import xqueue_interface
+from . import xqueue_interface, xqueue_submission
 from .registry import TagRegistry
 from .util import sanitize_html
 
 log = logging.getLogger(__name__)
-
-#########################################################################
 
 registry = TagRegistry()  # pylint: disable=invalid-name
 
@@ -408,7 +406,7 @@ class OptionInput(InputTypeBase):
 
     Example:
 
-    <optioninput options="('Up','Down')" correct="Up"/><text>The location of the sky</text>
+    <optioninput options="('Up', 'Down')" correct="Up"/><text>The location of the sky</text>
 
     # TODO: allow ordering to be randomized
     """
@@ -423,8 +421,8 @@ class OptionInput(InputTypeBase):
         id==description for now.  TODO: make it possible to specify different id and descriptions.
         """
         # convert single quotes inside option values to html encoded string
-        options = re.sub(r"([a-zA-Z])('|\\')([a-zA-Z])", r"\1&#39;\3", options)
-        options = re.sub(r"\\'", r"&#39;", options)  # replace already escaped single quotes
+        options = re.sub(r"([a-zA-Z])('|\\')([a-zA-Z])", r"\1&  #39;\3", options)
+        options = re.sub(r"\\'", r"&  #39;", options)  # replace already escaped single quotes
         # parse the set of possible options
         lexer = shlex.shlex(options[1:-1])
 
@@ -434,7 +432,7 @@ class OptionInput(InputTypeBase):
 
         # remove quotes
         # convert escaped single quotes (html encoded string) back to single quotes
-        tokens = [x[1:-1].replace("&#39;", "'") for x in lexer]
+        tokens = [x[1:-1].replace("&  #39;", "'") for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
@@ -505,7 +503,7 @@ class ChoiceGroup(InputTypeBase):
             raise Exception(msg)
 
         self.choices = self.extract_choices(self.xml, i18n)
-        self._choices_map = dict(self.choices,)
+        self._choices_map = dict(self.choices, )
 
     @classmethod
     def get_attributes(cls):
@@ -602,16 +600,16 @@ class JSInput(InputTypeBase):
         Register the attributes.
         """
         return [
-            Attribute('params', None),       # extra iframe params
+            Attribute('params', None),  # extra iframe params
             Attribute('html_file', None),
             Attribute('gradefn', "gradefn"),
             Attribute('get_statefn', None),  # Function to call in iframe
-                                             #   to get current state.
+            #   to get current state.
             Attribute('initial_state', None),  # JSON string to be used as initial state
             Attribute('set_statefn', None),  # Function to call iframe to
-                                             #   set state
-            Attribute('width', "400"),       # iframe width
-            Attribute('height', "300"),      # iframe height
+            #   set state
+            Attribute('width', "400"),  # iframe width
+            Attribute('height', "300"),  # iframe height
             # Title for the iframe, which should be supplied by the author of the problem. Not translated
             # because we are in a class method and therefore do not have access to capa_system.i18n.
             # Note that the default "display name" for the problem is also not translated.
@@ -987,7 +985,10 @@ class MatlabInput(CodeInput):
 
         # construct xqueue headers
         qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.utcnow().strftime(xqueue_interface.dateformat)
+        if get_flag_by_name('send_to_submission_course.enable'):
+            qtime = datetime.utcnow().strftime(xqueue_submission.dateformat)
+        else:
+            qtime = datetime.utcnow().strftime(xqueue_interface.dateformat)
         callback_url = self.capa_system.xqueue.construct_callback('ungraded_response')
         anonymous_student_id = self.capa_system.anonymous_student_id
         # TODO: Why is this using self.capa_system.seed when we have self.seed???
@@ -1086,9 +1087,9 @@ class ImageInput(InputTypeBase):
 
     def setup(self):
         """
-        if value is of the form [x,y] then parse it and send along coordinates of previous answer
+        if value is of the form [x, y] then parse it and send along coordinates of previous answer
         """
-        m = re.match(r'\[([0-9]+),([0-9]+)]',
+        m = re.match(r'\[([0-9]+), ([0-9]+)]',
                      self.value.strip().replace(' ', ''))
         if m:
             # Note: we subtract 15 to compensate for the size of the dot on the screen.
@@ -1626,7 +1627,7 @@ class ChoiceTextGroup(InputTypeBase):
     CheckboxProblem:
     <problem>
       <startouttext/>
-        A person randomly selects 100 times, with replacement, from the list of numbers \(\sqrt{2}\) , 2, 3, 4 ,5 ,6
+        A person randomly selects 100 times, with replacement, from the list of numbers \(\sqrt{2}\) , 2, 3, 4 , 5 , 6
         and records the results. The first number they pick is \(\sqrt{2}\) Given this information
         select the correct choices and fill in numbers to make them accurate.
       <endouttext/>

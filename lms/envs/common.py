@@ -3060,6 +3060,8 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
 
     'django_celery_results',
+    
+    
 
     # Common Initialization
     'openedx.core.djangoapps.common_initialization.apps.CommonInitializationConfig',

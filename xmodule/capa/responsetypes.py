@@ -37,6 +37,8 @@ from six.moves import map, range, zip
 
 import xmodule.capa.safe_exec as safe_exec
 import xmodule.capa.xqueue_interface as xqueue_interface
+import xmodule.capa.xqueue_submission as xqueue_submission
+from xmodule.capa.xqueue_interface import get_flag_by_name
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.grade_utils import round_away_from_zero
 
@@ -2675,8 +2677,10 @@ class CodeResponse(LoncapaResponse):
         #------------------------------------------------------------
 
         qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
-
+        if get_flag_by_name('send_to_submission_course.enable'):
+            qtime = datetime.strftime(datetime.now(UTC), xqueue_submission.dateformat)
+        else:
+            qtime = datetime.strftime(datetime.now(UTC), xqueue_submission.dateformat)
         anonymous_student_id = self.capa_system.anonymous_student_id
 
         # Generate header
