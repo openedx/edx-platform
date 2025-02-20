@@ -149,7 +149,7 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
 @view_auth_classes()
 class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
     """
-    Serves library block->course->container links
+    Serves library block->downstream usage keys
     """
     def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
         """
@@ -160,63 +160,16 @@ class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
 
-        links = (
+        downstream_usage_key_list = (
             PublishableEntityLink
             .get_by_upstream_usage_key(upstream_usage_key=usage_key)
             .order_by("downstream_context_key", "downstream_parent_usage_key")
-            .values("downstream_usage_key", "downstream_context_key", "downstream_parent_usage_key")
+            .values_list("downstream_usage_key", flat=True)
         )
 
-        context_key_list = set(link["downstream_context_key"] for link in links)
+        downstream_usage_key_str_list = [str(usage_key) for usage_key in downstream_usage_key_list]
 
-        courses_display_name = dict(
-            CourseOverview.objects.filter(id__in=context_key_list).values_list('id', 'display_name')
-        )
-
-        result = []
-        for context_key, links_by_context in groupby(links, lambda x: x["downstream_context_key"]):
-            if context_key not in courses_display_name:
-                raise BadDownstream(_("Course {context_key} not found").format(context_key=context_key))
-
-            course_link = {
-                "id": str(context_key),
-                "display_name": courses_display_name[context_key],
-                "url": reverse_course_url("course_handler", context_key),
-                "containers": []
-            }
-
-            for parent_key, links_by_unit in groupby(links_by_context, lambda x: x["downstream_parent_usage_key"]):
-                try:
-                    parent = modulestore().get_item(parent_key)
-
-                    parent_link = {
-                        "id": str(parent_key),
-                        "display_name": parent.display_name,
-                        "url": reverse_usage_url("container_handler", parent_key),
-                        "links": []
-                    }
-
-                    for downstream_link in links_by_unit:
-                        parent_link["links"].append({
-                            "id": str(downstream_link["downstream_usage_key"]),
-                        })
-
-                    # Don't include empty containers
-                    if parent_link["links"]:
-                        course_link["containers"].append(parent_link)
-
-                except ItemNotFoundError:
-                    logger.exception(
-                        "Unit %s not found in course %s",
-                        parent_key,
-                        context_key
-                    )
-
-            # Don't include empty courses
-            if course_link["containers"]:
-                result.append(course_link)
-
-        return Response(result)
+        return Response(downstream_usage_key_str_list)
 
 
 @view_auth_classes(is_authenticated=True)
