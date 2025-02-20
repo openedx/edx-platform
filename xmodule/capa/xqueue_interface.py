@@ -11,12 +11,14 @@ import requests
 from django.conf import settings
 from django.urls import reverse
 from requests.auth import HTTPBasicAuth
+from waffle import switch_is_active
+from xmodule.capa.xqueue_submission import XQueueInterfaceSubmission
 
 if TYPE_CHECKING:
     from xmodule.capa_block import ProblemBlock
 
 log = logging.getLogger(__name__)
-dateformat = '%Y%m%d%H%M%S'
+dateformat = '%Y-%m-%dT%H:%M:%S'
 
 XQUEUE_METRIC_NAME = 'edxapp.xqueue'
 
@@ -135,7 +137,14 @@ class XQueueInterface:
             for f in files_to_upload:
                 files.update({f.name: f})
 
-        return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
+        if switch_is_active('xqueue_submission.enabled'):
+            # Use the new edx-submissions workflow
+            submission = XQueueInterfaceSubmission().send_to_submission(header, body, files)
+            log.error(submission)
+            return None, ''
+
+        else:
+            return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
     def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
@@ -184,8 +193,13 @@ class XQueueService:
         """
         Return a fully qualified callback URL for external queueing system.
         """
+        if switch_is_active('callback_submission.enabled'):
+            dispatch_callback = "callback_submission"
+        else:
+            dispatch_callback = 'xqueue_callback'
+        
         relative_xqueue_callback_url = reverse(
-            'xqueue_callback',
+            dispatch_callback,
             kwargs=dict(
                 course_id=str(self._block.scope_ids.usage_id.context_key),
                 userid=str(self._block.scope_ids.user_id),

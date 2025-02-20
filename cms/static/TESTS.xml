@@ -1,0 +1,781 @@
+<?xml version="1.0"?>
+<testsuite name="Chrome 132.0.0 (Windows 10.0.0)" package="javascript" timestamp="2025-02-13T21:42:02" id="0" hostname="LAPTOP-L94NBIGJ" tests="766" errors="0" failures="0" time="7.497">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"/>
+  </properties>
+  <testcase name="Course: should take a name argument" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Metadata: knows when the value has not been modified" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Metadata: knows when the value has been modified" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Metadata: tracks when values have been explicitly set" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Metadata: has both 'display value' and a 'value' methods" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Metadata: has a clear method for reverting to the default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Metadata: has a getter for field name" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Metadata: has a getter for options" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Metadata: has a getter for type" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="CMS: should initialize URL" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="main helper: turn on Backbone emulateHTTP" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="main helper: setup AJAX CSRF token" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="AJAX Errors: successful AJAX request does not pop an error notification" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="AJAX Errors: AJAX request with error should pop an error notification" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="AJAX Errors: can override AJAX request with error so it does not pop an error notification" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Section: should take an id argument" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Section: should take a name argument" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Section: should have a URL set" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Section: should serialize to JSON correctly" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Section: show/hide a notification when it saves to the server" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Section: don't hide notification when saving fails" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="CourseGraderModel: converts a float to an integer" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="CourseGraderModel: converts float value of weight to an integer with rounding" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="CourseGraderModel: converts a string to an integer" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="CourseGraderModel: does a no-op for integers" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="CourseGraderModel: gives validation error if min_count is less than 1 or drop_count is NaN" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="CourseGraderModel: gives validation error if drop_count is not less than min_count" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="CourseGradingPolicy: sets a null grace period to 00:00" time="0" classname="Javascript.Chrome"/>
+  <testcase name="CourseGradingPolicy: parses a time in HH:MM format" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="CourseGradingPolicy: returns null on an incorrectly formatted string" time="0" classname="Javascript.Chrome"/>
+  <testcase name="CourseGradingPolicy: enforces that the passing grade is &lt;= the minimum grade to receive credit if credit is enabled" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="CourseGradingPolicy: does not enforce the passing grade limit in non-credit courses" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should have an empty name by default" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should not show chapters by default" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should have a ChapterSet with one chapter by default" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should be empty by default" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should have a URL root" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should be able to reset itself" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should not be dirty by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should be dirty after it's been changed" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should not be dirty after calling setOriginalAttributes" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: should match server model to client model" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: requires a name" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: requires at least one chapter" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: requires a valid chapter" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: requires all chapters to be valid" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Textbook model: can pass validation" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Textbook collection: should have a url set" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter model: should have a name by default" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Chapter model: should have an asset_path by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter model: should have an order by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter model: should be empty by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter model: requires a name" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter model: requires an asset_path" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Chapter model: can pass validation" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter collection: is empty by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter collection: is empty if all chapters are empty" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter collection: is not empty if a chapter is not empty" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Chapter collection: should have a nextOrder function" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: is unfinished by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: is not uploading by default" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: is valid by default" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: is valid for text files by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: is valid for PNG files by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: can accept a file type when explicitly set" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: can accept a file format when explicitly set" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: can accept multiple file types" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: can accept multiple file formats" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: returns a list of the uploader's file types" time="0" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: returns a map of formatted file types and extensions" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="FileUpload: does not format with only one mime type" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does send expected data on save" time="0.059" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does rewrite links for preview" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: shows static links in edit mode" time="0.041" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: removes newly created course info on cancel" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: do not close new course info on click outside modal" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does not remove existing course info on cancel" time="0.028" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does not remove existing course info on click outside modal" time="0.026" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does not allow updates to be saved with an invalid date" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does not allow updates to be saved with a blank date" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: saves &lt;ol>&lt;/ol> when content left empty" time="0.022" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does not rewrite links on save" time="0.02" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does rewrite links in initial content" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: does rewrite links after edit" time="0.027" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: shows static links in edit mode" time="0.025" classname="Javascript.Chrome"/>
+  <testcase name="Course Updates and Handouts: can open course handouts with bad html on edit" time="0.034" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: creates child views on initialize, and sorts them alphabetically" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns its display name" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns an empty string if there is no display name property with a valid value" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has no modified values by default" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns modified values only" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: uses a text input type" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns the intial value upon initialization" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: can update its value in the view" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has a clear method to revert to the model default" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has an update model method" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: triggers correct event on input change" time="0.352" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: triggers correct event on clear" time="0.062" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: constructs correct data" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: uses a select input type" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns the intial value upon initialization" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: can update its value in the view" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has a clear method to revert to the model default" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has an update model method" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: does not update to a value that is not an option" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: uses a number input type" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns the intial value upon initialization" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: can update its value in the view" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has a clear method to revert to the model default" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has an update model method" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: knows the difference between integer and float" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: sets attribtues related to min, max, and step" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: corrects values that are out of range" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: sets default values for integer and float fields that are empty" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: disallows invalid characters" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns the initial value upon initialization" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: updates its value correctly" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has a clear method to revert to the model default" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has an update model method" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: can add an entry" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: can remove an entry" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: only allows one blank entry at a time" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: re-enables the add setting button after entering a new value" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: uses a text input type" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns the intial value upon initialization" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: value is converted correctly" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: can update its value in the view" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has a clear method to revert to the model default" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has an update model method" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: returns the initial value upon initialization" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: updates its value correctly" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has a clear method to revert to the model default" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: has an update model method" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: can add an entry" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: can remove an entry" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: only allows one blank entry at a time" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: only allows unique keys" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Test Metadata Editor: re-enables the add setting button after entering a new value" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="ShowTextbook: should render properly" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="ShowTextbook: should set the 'editing' property on the model when the edit button is clicked" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ShowTextbook: should pop a delete confirmation when the delete button is clicked" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="ShowTextbook: should show chapters appropriately" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="ShowTextbook: should hide chapters appropriately" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="ShowTextbook: should destroy itself on confirmation" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: should render properly" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: should allow you to create new empty chapters" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: should save properly" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: should not save on invalid" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: does not save on cancel" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: does not re-render on cancel" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: should be possible to correct validation errors" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: removes all empty chapters on cancel if the model has a non-empty chapter" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="EditTextbook: removes all empty chapters on cancel except one if the model has no non-empty chapters" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ListTextbooks: should scroll to newly added textbook" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="ListTextbooks: should focus first input element of newly added textbook" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="ListTextbooks: should re-render when new textbook added" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="ListTextbooks: should remove textbook html section on model.destroy" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="EditChapter: can render" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="EditChapter: can delete itself" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="EditChapter: saves content when opening upload dialog" time="0" classname="Javascript.Chrome">
+    <skipped/>
+  </testcase>
+  <testcase name="UploadDialog: should render without a file selected" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="UploadDialog: should render with a PDF selected" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="UploadDialog: should render an error with an invalid file type selected" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="UploadDialog: should render an error with an invalid file type after a correct file type selected" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="UploadDialog: can upload correctly" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="UploadDialog: can handle upload errors" time="0.036" classname="Javascript.Chrome"/>
+  <testcase name="UploadDialog: removes itself after two seconds on successful upload" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: Initialize" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: Template doesn't exist" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: All works okay if correct data is passed" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: Error message is not passed" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: Show message and buttons" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: Show message and hide buttons" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: hideError" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: importHandler" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: replaceHandler" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: chooseHandler" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: Invoke without extraParamas" time="0.022" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: Invoke with extraParamas" time="0.026" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.MessageManager: Fail" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: All works okay if all arguments are passed" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: collection argument(s) is/are absent" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: field name argument(s) is/are absent" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: both argument(s) is/are absent" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://www.youtube.com/watch?v=OEoXaMPEzfM&amp;feature=feedrec_grec_index" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://www.youtube.com/user/IngridMichaelsonVEVO#p/a/u/1/OEoXaMPEzfM" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://www.youtube.com/v/OEoXaMPEzfM?fs=1&amp;amp;hl=en_US&amp;amp;rel=0" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://www.youtube.com/watch?v=OEoXaMPEzfM#t=0m10s" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://www.youtube.com/embed/OEoXaMPEzfM?rel=0" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://www.youtube.com/watch?v=OEoXaMPEzfM" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://youtu.be/OEoXaMPEzfM" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: no arguments" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: wrong data type" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://youtu.be/" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: /static/example" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://google.com/somevideo.mp4" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.mp4?param=1&amp;param=2#hash" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.mp4#hash" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.mp4?param=1&amp;param=2" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.mp4" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: ftp://somelink.com/file_name.mp4" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://somelink.com/file_name.mp4" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://somelink.com/sub/sub/file_name.mp4" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://cdn.somecdn.net/v/file_name.mp4" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: somelink.com/file_name.mp4" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: file_name.mp4" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.webm?param=1&amp;param=2#hash" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.webm#hash" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.webm?param=1&amp;param=2" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.webm" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: ftp://somelink.com/file_name.webm" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://somelink.com/file_name.webm" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://somelink.com/sub/sub/file_name.webm" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://cdn.somecdn.net/v/file_name.webm" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: somelink.com/file_name.webm" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: file_name.webm" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.m4v?param=1&amp;param=2#hash" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.m4v#hash" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.m4v?param=1&amp;param=2" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.m4v" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: ftp://somelink.com/file_name.m4v" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://somelink.com/file_name.m4v" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://somelink.com/sub/sub/file_name.m4v" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://cdn.somecdn.net/v/file_name.m4v" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: somelink.com/file_name.m4v" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: file_name.m4v" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.ogv?param=1&amp;param=2#hash" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.ogv#hash" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.ogv?param=1&amp;param=2" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://somelink.com/file_name.ogv" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: ftp://somelink.com/file_name.ogv" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://somelink.com/file_name.ogv" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://somelink.com/sub/sub/file_name.ogv" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://cdn.somecdn.net/v/file_name.ogv" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: somelink.com/file_name.ogv" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: file_name.ogv" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://goo.gl/other_link_id?param=1&amp;param=2#hash" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://goo.gl/other_link_id?param=1&amp;param=2" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://goo.gl/other_link_id#hash" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://goo.gl/other_link_id" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://goo.gl/other_link_id" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: ftp://goo.gl/other_link_id" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: https://goo.gl/other_link_id" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: other_link_id" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: no arguments" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: wrong data type" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://youtu.be/" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://example.com/.mp4" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://example.com/video_name." time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://example.com/" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: http://example.com" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: Method: getYoutubeLink" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: html5" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: youtube" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: incorrect" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: youtube videoId is wrong" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: no arguments" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Utils: wrong data type" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: handles transcripts:basicTabFieldChanged" time="0.069" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: handles xblock:editorModalHidden" time="0.064" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: toModels with argument as object" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: toModels with argument as string" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: MetadataView.Editor is initialized" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: Correct data" time="0.06" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: If metadataCollection is not defined" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: Youtube Id has length not eqaul 11" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: Correct data" time="0.062" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: metadataCollection is not defined" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.Editor: Youtube Id is not adjusted" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Initialize" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Template doesn't exist" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Container where template will be inserted doesn't exist" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: All works okay if all data is okay" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: File is not chosen" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: File is chosen" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: clickHandler" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Valid File Type - error should be hided" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Invalid File Type - error should be shown" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Correct file type" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Incorrect file type" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: xhrResetProgressBar" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: xhrProgressHandler" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Ajax Success" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Transcripts.FileUploader: Ajax transport Error" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="ComponentTemplates: orders templates correctly" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Model : allows url to be passed in constructor" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Model : returns empty string if url not set" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XblockInfo isEditableOnCourseOutline: works correct" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XblockInfo actions state and header visibility : works correct to hide icons e.g. trash icon, drag when actions are not required" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XblockInfo actions state and header visibility : works correct to show icons e.g. trash icon, drag when actions are required" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XblockInfo actions state and header visibility : displays icons e.g. trash icon, drag when actions are undefined" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XblockInfo actions state and header visibility : works correct to hide header content" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XblockInfo actions state and header visibility : works correct to show header content when is_header_visible is not defined" time="0" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationModel: handles empty variable" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationModel: creates a summary if not defined" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationModel: respects summary properties that are defined" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationModel: clears messages if showSummaryOnly is true" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="License model constructor: accepts no arguments" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="License model constructor: accepts normal arguments" time="0" classname="Javascript.Chrome"/>
+  <testcase name="License model constructor: accepts a license string argument" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="License model constructor: accepts a custom license argument" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="License model: can parse license strings" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="License model: can stringify a null license" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="License model: can stringify a simple license" time="0" classname="Javascript.Chrome"/>
+  <testcase name="License model: can stringify a license with options" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="License model: can stringify a custom license" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: correctly finds the drop target of a drag" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: can drag and drop across section boundaries, with special handling for single sibling" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: can drop before the first element, even if element being dragged is&#xA;slightly before the first element" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: can drag and drop across section boundaries, with special handling for last element" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: can drop past the last element, even if element being dragged is&#xA;slightly before/taller then the last element" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: can drag into an empty list" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: reports a null destination on a failed drag" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: can drag into a collapsed list" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: sets the dragState to its default values" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: collapses expanded elements" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: adds the correct CSS class to the drop destination" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: does not add CSS class to the drop destination if out of bounds" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: scrolls up if necessary" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: scrolls down if necessary" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: calls handleReorder on a successful drag" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: clears out the drag state" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: sets the element to the correct position" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: expands an element if it was collapsed on drag start" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: expands a collapsed element when something is dropped in it" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: should send an update on reorder from one parent to another" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Overview drag and drop functionality: should send an update on reorder within the same parent" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="IframeBinding: modifies src url of DOM iframe and embed elements when iframeBinding function is executed" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="IframeBinding: does not modify src url of DOM iframe if it is empty" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="IframeBinding: does nothing on tinymce iframe" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="urlRoot : defines xblock urlRoot" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="getUpdateUrl : can take no arguments" time="0" classname="Javascript.Chrome"/>
+  <testcase name="getUpdateUrl : appends a locator" time="0" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: renders correct text in file drag/drop area" time="0.052" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should trigger file selection when the drop zone is clicked" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: shows course video settings pane when course video settings button is clicked" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should not initiate course video settings view when video transcript is disabled" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should not show a notification message if there are no active video uploads" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show error notification for status update request in case of server error" time="0.033" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should correctly parse and show S3 error response xml" time="0.024" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should send correct status update request" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should not fail upload for supported file formats" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should fail upload for unspported file formats" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: larger thanmax file size" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: equal tomax file size" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: smaller thanmax file size" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should trigger the correct request" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should start uploads" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should display upload status and progress" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show a notification message when there are active video uploads" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should not show notification once video uploads are complete" time="0.016" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should not show notification once video uploads are complete" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should not show notification once video uploads are complete" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should not show notification once video uploads are complete" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should trigger the correct request" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should start uploads" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should display upload status and progress" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show a notification message when there are active video uploads" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show notification when videos are still uploading" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show notification when videos are still uploading" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show notification when videos are still uploading" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show notification when videos are still uploading" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should trigger the correct request" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should start uploads" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should display upload status and progress" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show a notification message when there are active video uploads" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should start a new upload" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show notification when videos are still uploading" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should start a new upload" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show notification when videos are still uploading" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should start a new upload" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show notification when videos are still uploading" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should update status and progress" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should start a new upload" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="ActiveVideoUploadListView: should show notification when videos are still uploading" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadView: should render video name correctly" time="0.025" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadView: should render created timestamp correctly" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadView: should render video id correctly" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadView: should render status correctly" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadView: should render remove button correctly" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadView: shows a confirmation popup when the remove button is clicked" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadView: shows a notification when the remove button is clicked" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: Verifies that the ThumbnailView is not initialized on disabling the feature" time="0.021" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: renders as expected" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: does not show duration if not available" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: shows the duration if available" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: calculates duration correctly" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: can upload image" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: shows error state correctly" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: calls readMessage with correct message" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: should show error message in case of server error" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: should show error message when file is smaller than minimum size" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: should show error message when file is larger than maximum size" time="0.044" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: should not show error message when file size is equals to minimum file size" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: should not show error message when file size is equals to maximum file size" time="0.041" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: should show error message when file has unsupported content type" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="VideoThumbnailView: should not show error message when file has supported content type" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: renders as expected" time="0.016" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: closes course video settings pane when close button is clicked" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: closes course video settings pane when clicked outside course video settings pane" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: does not close course video settings pane when clicked inside course video settings pane" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: does not populate transcription plans if transcription plans are not provided" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: populates transcription plans correctly" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: populates active preferances correctly" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: resets to active preferences when clicked on cancel" time="0.022" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows video source language directly in case of 3Play provider" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows source language when fidelity is selected" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows target language when source language is selected" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows target language same as selected source language in case of mechanical fidelity" time="0.016" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: saves transcript settings on update settings button click if preferances are selected" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: removes transcript settings on update settings button click when no provider is selected" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows error message if server sends error" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: implies preferences are required if not selected when saving preferances" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: removes error state on preferances if selected" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows provider selected view if active provider is present" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: does not show transcript preferences or organization credentials if None provider is saved" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: does not show transcript preferences or organization credentials if None provider is checked" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows organization credentials when organization credentials for selected provider are not present" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows transcript preferences when organization credentials for selected provider are present" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows organization credentials view if clicked on change provider button" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows cielo specific organization credentials fields only" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows 3play specific organization credentials fields only" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows warning message when changing organization credentials if present already" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: does not show warning message when changing organization credentials if not present already" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows validation errors if no organization credentials are provided when saving credentials" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: saves cielo organization credentials on clicking save credentials button" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: saves 3Play organization credentials on clicking save credentials button" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows error message on saving organization credentials if server sends bad request error" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="CourseVideoSettingsView: shows error message on saving organization credentials if server sends error" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: renders as expected" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: does not show list of transcripts initially" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: shows list of transcripts when clicked on show transcript button" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: hides list of transcripts when clicked on hide transcripts button" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: renders appropriate text when no transcript is available" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: renders correct transcript attributes" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: can upload transcript" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: can delete transcript" time="0.022" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: should show error message when deleting a transcript in case of server error" time="0.034" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: shows error state correctly" time="0.02" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: should show error message in case of server error" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="VideoTranscriptsView: should show error message in case of unsupported transcript file format" time="0.016" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadListView: should render an empty collection" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadListView: should render a non-empty collection" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadListView: removes video upon click on Remove button" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="PreviousVideoUploadListView: does nothing upon click on Cancel button" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Assets: shows the upload modal when clicked on &quot;Upload your first asset&quot; button" time="0.031" classname="Javascript.Chrome"/>
+  <testcase name="Assets: has properly initialized constants for handling upload file errors" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Assets: uploads file properly" time="0.045" classname="Javascript.Chrome"/>
+  <testcase name="Assets: blocks file uploads larger than the max file size" time="0.028" classname="Javascript.Chrome"/>
+  <testcase name="Assets: allows file uploads equal in size to the max file size" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="Assets: allows file uploads smaller than the max file size" time="0.025" classname="Javascript.Chrome"/>
+  <testcase name="Assets: returns the registered info for a filter column" time="0.027" classname="Javascript.Chrome"/>
+  <testcase name="Assets: throws an exception for an unregistered filter column" time="0.031" classname="Javascript.Chrome"/>
+  <testcase name="Assets: make sure selectFilter sets collection filter if undefined" time="0.036" classname="Javascript.Chrome"/>
+  <testcase name="Assets: make sure _toggleFilterColumn filters asset list" time="0.074" classname="Javascript.Chrome"/>
+  <testcase name="Assets: opens and closes select type menu" time="0.024" classname="Javascript.Chrome"/>
+  <testcase name="Assets: check filtering works with sorting by column on" time="0.068" classname="Javascript.Chrome"/>
+  <testcase name="Assets: shows type select menu, selects type, and filters results" time="0.044" classname="Javascript.Chrome"/>
+  <testcase name="Assets: hides the error modal if a large file, then small file is uploaded" time="0.028" classname="Javascript.Chrome"/>
+  <testcase name="Assets: can move forward a page using the next page button" time="0.036" classname="Javascript.Chrome"/>
+  <testcase name="Assets: can move back a page using the previous page button" time="0.027" classname="Javascript.Chrome"/>
+  <testcase name="Assets: can set the current page using the page number input" time="0.028" classname="Javascript.Chrome"/>
+  <testcase name="BaseView: calls before and after render functions when render of baseview is called" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="BaseView: calls iframeBinding function when afterRender of baseview is called" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="BaseView: hides a collapsible node when clicking on the toggle link" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="BaseView: expands a collapsible node when clicking twice on the toggle link" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should set show_previews" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can set the current page" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should not change page after a server error" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: does not move forward after a server error" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can move to the next page" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can not move forward from the final page" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can move back a page" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can not move back from the first page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: does not move back after a server error" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: does not move forward if a server error occurs" time="0.025" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can move to the next page" time="0.019" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be enabled when there is at least one more page" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be disabled on the final page" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be disabled on an empty page" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: does not move back if a server error occurs" time="0.024" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can go back a page" time="0.019" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be disabled on the first page" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be enabled on the second page" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be disabled for an empty page" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: shows the correct metadata for the current page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show correct count on first page" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show correct count on second page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show correct count for an empty collection" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show correct total on the first page" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show correct total on the second page" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show zero total for an empty collection" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: does not move forward if a server error occurs" time="0.022" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can move to the next page" time="0.016" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be enabled when there is at least one more page" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be disabled on the final page" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be disabled on an empty page" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: does not move back if a server error occurs" time="0.022" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: can go back a page" time="0.018" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be disabled on the first page" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be enabled on the second page" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should be disabled for an empty page" time="0.021" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show 1 on the first page" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show 2 on the second page" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show 1 for an empty collection" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show the correct value with more than one page" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should show page 1 when there are no assets" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should initially have a blank page input" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should handle invalid page requests" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should switch pages via the input field" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should handle AJAX failures when switching pages via the input field" time="0.02" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should send false when showChildrenPreviews was true" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should send true when showChildrenPreviews was false" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should trigger render on success" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should not trigger render on failure" time="0.021" classname="Javascript.Chrome"/>
+  <testcase name="Paging Container: should send force_render when new block causes page change" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should render properly" time="0.019" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should show groups appropriately" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should hide groups appropriately" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should show empty usage appropriately" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should hide empty usage appropriately" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should show non-empty usage appropriately" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should hide non-empty usage appropriately" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should show validation warning icon and message appropriately" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should show validation error icon and message appropriately" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations details view: should hide validation icons and messages appropriately" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: should render properly" time="0.018" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: should allow you to create new groups" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: should save properly" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: does not hide saving message if failure" time="0.02" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: does not save on cancel" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: should be removed on cancel if it is a new item" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: should be possible to correct validation errors" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: if the model has a non-empty groups" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: if the model has no non-empty groups" time="0.021" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: groups have correct default names" time="0.031" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: cannot be deleted if it is in use" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations editor view: does not contain warning message if it is not in use" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations list view: should be rendered if no group configurations" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations list view: should disappear if group configuration is added" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations list view: should appear if configurations were removed" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations list view: can create a new group configuration" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations controller view: should render properly" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations controller view: should destroy itself on confirmation of deleting" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations controller view: does not hide deleting message if failure" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations group editor view: can render properly" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Experiment group configurations group editor view: can delete itself" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: shows a message when no groups are present" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: can render groups" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: can create an initial group and save" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: can add another group and save" time="0.018" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: can cancel adding a group" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: can cancel editing a group" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: can show and correct a validation error" time="0.016" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: can not invalidate an existing content group" time="0.018" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: trims whitespace" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Content groups list view: only edits one form at a time" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Content groups details view: should render properly" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Content groups details view: should show empty usage appropriately" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Content groups details view: should hide empty usage appropriately" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Content groups details view: should show non-empty usage appropriately" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Content groups details view: should hide non-empty usage appropriately" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Content groups details view: should hide validation icons and messages appropriately" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="Content groups editor view: should save properly" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Content groups editor view: does not hide saving message if failure" time="0.024" classname="Javascript.Chrome"/>
+  <testcase name="Content groups editor view: does not save on cancel" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Content groups editor view: cannot be deleted if it is in use" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Content groups editor view: does not contain warning message if it is not in use" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Content group controller view: should render properly" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Content group controller view: should destroy itself on confirmation of deleting" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Content group controller view: does not hide deleting message if failure" time="0.016" classname="Javascript.Chrome"/>
+  <testcase name="UnitOutlineView: can render itself" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="UnitOutlineView: highlights the current unit" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="UnitOutlineView: can add a unit" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="UnitOutlineView: refreshes when the XBlockInfo model syncs" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="XBlockView: can render a nested xblock" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="XBlockView: can render an xblock with no CSS or JavaScript" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="XBlockView: can render an xblock with required CSS" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="XBlockView: can render an xblock with required JavaScript" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="XBlockView: can render an xblock with required HTML" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="XBlockView: aborts rendering when a dependent script fails to load" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XBlockView: Triggers an event to the runtime when a notification-action-button is clicked" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationView helper methods: has a getIcon method" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationView helper methods: has a getDisplayName method" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationView helper methods: can add additional classes" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationView rendering: renders summary and detailed messages types" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationView rendering: renders summary and detailed messages text" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationView rendering: renders action info" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="XBlockValidationView rendering: renders a summary only" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="License view: renders with no license" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="License view: renders with the right license selected" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="License view: switches license type on click" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="License view: sets default license options when switching license types" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="License view: renders license options" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="License view: toggles boolean options on click" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="License view: doesn't toggle disabled options" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="License view: doesn't allow simultaneous conflicting options" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="License view: has no preview by default" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="License view: displays a preview if showPreview is true" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="Paging: can set the current page" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should not change page after a server error" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Paging: does not move forward after a server error" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Paging: can move to the next page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: can not move forward from the final page" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Paging: can move back a page" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Paging: can not move back from the first page" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Paging: does not move back after a server error" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="Paging: can toggle direction of the current sort" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Paging: sets the correct default sort direction for a column" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Paging: returns the registered info for a column" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Paging: throws an exception for an unregistered column" time="0" classname="Javascript.Chrome"/>
+  <testcase name="Paging: does not move forward if a server error occurs" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Paging: can move to the next page" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should be enabled when there is at least one more page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should be disabled on the final page" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should be disabled on an empty page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: does not move back if a server error occurs" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Paging: can go back a page" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should be disabled on the first page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should be enabled on the second page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should be disabled for an empty page" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Paging: shows the correct metadata for the current page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: shows the correct metadata when sorted ascending" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should show correct count on first page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should show correct count on second page" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should show correct count for an empty collection" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should show correct total on the first page" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should show correct total on the second page" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should show zero total for an empty collection" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should show correct initial sort order" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Paging: should show updated sort order" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="GroupConfigurationsPage: can render itself" time="0" classname="Javascript.Chrome">
+    <skipped/>
+  </testcase>
+  <testcase name="GroupConfigurationsPage: should focus and expand if its id is part of url hash" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="GroupConfigurationsPage: should not focus on any experiment configuration if url hash is empty" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="GroupConfigurationsPage: should not focus on any experiment configuration if url hash contains wrong id" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="GroupConfigurationsPage: should not show a notification message if an experiment configuration is not changed" time="0.003" classname="Javascript.Chrome"/>
+  <testcase name="GroupConfigurationsPage: should show a notification message if an experiment configuration is changed" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="GroupConfigurationsPage: should not show a notification message if a content group is not changed" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="GroupConfigurationsPage: should show a notification message if a content group is changed" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: returns a message for an empty string" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: does not return a message for a non empty string" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: shows an error message" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: hides an error message" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: disables the save button" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: enables the save button when all errors are removed" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: does not enable the save button when errors remain" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: shows an error message when non URL characters are entered" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: does not show an error message when tabbing into a field" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: shows an error message when a required field is empty" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: shows an error message when spaces are entered and unicode is allowed" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: shows an error message when total length exceeds 65 characters" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: does not show an error message when non URL characters are entered" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: saves course reruns" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: displays an error when saving fails" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: does not save if there are validation errors" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Create course rerun page: can be canceled" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: can dismiss notifications" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: saves new courses" time="0.026" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: set the correct direction of text in case of rtl" time="0.019" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: displays an error when saving fails" time="0.027" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: saves new libraries" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: displays an error when a required field is blank" time="0.018" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: can cancel library creation" time="0.022" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: displays an error when saving a library fails" time="0.034" classname="Javascript.Chrome"/>
+  <testcase name="Course listing page: can switch tabs" time="0.014" classname="Javascript.Chrome"/>
+  <testcase name="Library Instructor Access Page: can give a user permission to use the library" time="0.079" classname="Javascript.Chrome"/>
+  <testcase name="Library Instructor Access Page: can promote user" time="0.072" classname="Javascript.Chrome"/>
+  <testcase name="Library Instructor Access Page: can cancel adding a user to the library" time="0.058" classname="Javascript.Chrome"/>
+  <testcase name="Library Instructor Access Page: displays an error when the required field is blank" time="0.069" classname="Javascript.Chrome"/>
+  <testcase name="Library Instructor Access Page: displays an error when the user has already been added" time="0.077" classname="Javascript.Chrome"/>
+  <testcase name="Library Instructor Access Page: can remove a user's permission to access the library" time="0.071" classname="Javascript.Chrome"/>
+  <testcase name="Library Instructor Access Page: can't give a user permission to use the library" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Library Instructor Access Page: can't promote or demote user" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="BaseModal: is visible after show is called" time="0.016" classname="Javascript.Chrome"/>
+  <testcase name="BaseModal: sends focus to the modal window after show is called" time="0.068" classname="Javascript.Chrome"/>
+  <testcase name="BaseModal: is removed after hide is called" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="BaseModal: is removed after cancel is clicked" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="BaseModal: is visible after show is called" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="BaseModal: is removed after hide is called" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="BaseModal: is removed after cancel is clicked" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="MoveXBlockModal: rendered as expected" time="0.018" classname="Javascript.Chrome"/>
+  <testcase name="MoveXBlockModal: sends request to fetch course outline" time="0.023" classname="Javascript.Chrome"/>
+  <testcase name="MoveXBlockModal: shows error notification when fetch course outline request fails" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="ValidationErrorModal: is visible after show is called" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="ValidationErrorModal: displays none if no error given" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="ValidationErrorModal: correctly displays json error message objects" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="ValidationErrorModal: run callback when undo changes button is clicked" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: Changing the time field do not affect other time fields" time="0.033" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: Selecting a course in pre-requisite drop down should save it as part of course details" time="0.045" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should disallow save with an invalid minimum score percentage" time="0.027" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should provide a default value for the minimum score percentage" time="0.023" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: shows and hide the grade requirement section appropriately" time="0.042" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should save entrance exam course details information correctly" time="0.039" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should save language as part of course details" time="0.024" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should not error if about_page_editable is False" time="0.027" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should save title" time="0.045" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should save subtitle" time="0.047" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should save duration" time="0.042" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should save description" time="0.044" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: can add learning information" time="0.04" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: can delete learning information" time="0.034" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: can save learning information" time="0.04" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: can add instructor information" time="0.032" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: can delete instructor information" time="0.032" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: can save instructor information" time="0.044" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should disallow save with a certificate available date before end date" time="0.027" classname="Javascript.Chrome"/>
+  <testcase name="Settings/Main: should allow save with a certificate available date before end date for self-paced course" time="0.023" classname="Javascript.Chrome"/>
+  <testcase name="CertificateModel: certificate should have name by default" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="CertificateModel: certificate should have description by default" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="CertificateModel: certificate should be able to reset itself" time="0.008" classname="Javascript.Chrome"/>
+  <testcase name="CertificateModel: certificate should have signatories in its relations" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="CertificateModel: requires a name" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="CertificateModel: can pass validation" time="0.001" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should parse a JSON string collection into a Backbone model collection" time="0.029" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should parse a JSON object collection into a Backbone model collection" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should have empty certificate collection if there is an error parsing certifcate JSON" time="0.015" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should display the certificate course title override" time="0.018" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should present an Edit action" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should change to &quot;edit&quot; mode when clicking the Edit button and confirming the prompt" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should not show confirmation prompt when clicked on &quot;edit&quot; in case of inactive certificate" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should not present a Edit action if user is not global staff and certificate is active" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should present a Delete action" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should not present a Delete action if user is not global staff and certificate is active" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should prompt the user when when clicking the Delete button" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should scroll to top after rendering if necessary" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: displays certificate signatories details" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should present Edit action on signaotry" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: should not present Edit action on signaotry if user is not global staff and certificate is active" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: supports in-line editing of signatory information" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Details Spec:: correctly persists changes made during in-line signatory editing" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: can render properly" time="0.013" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: should not have delete button if user is not global staff and certificate is active" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: should save properly" time="0.009" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: does not hide saving message if failure" time="0.019" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: does not save on cancel" time="0.01" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: user can only add signatories up to limit" time="0.055" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: user can add signatories if not reached the upper limit" time="0.012" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: user can add signatories when signatory reached the upper limit But after deleting a signatory" time="0.056" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: signatories should save when fields have too many characters per line" time="0.023" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: signatories should save when title span on more than 2 lines" time="0.031" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: user can delete those signatories already saved" time="0.017" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: can cancel deletion of signatories" time="0.028" classname="Javascript.Chrome"/>
+  <testcase name="Certificate editor view: signatories should save properly" time="0.024" classname="Javascript.Chrome"/>
+  <testcase name="Certificates list view: should be rendered if no certificates" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Certificates list view: should disappear if certificate is added" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Certificates list view: should appear if certificate(s) were removed" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Certificates list view: should open in edit mode if model has editing attribute" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Web Preview Spec:: course mode event should call when user choose a new mode" time="0.011" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Web Preview Spec:: course mode selection updating the link successfully" time="0.005" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Web Preview Spec:: toggle certificate activation event works fine" time="0.007" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Web Preview Spec:: certificate deactivation works fine" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Web Preview Spec:: certificate activation works fine" time="0.004" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Web Preview Spec:: certificate should be deactivate when method &quot;remove&quot; called" time="0.002" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Web Preview Spec:: certificate web preview should be removed when method &quot;remove&quot; called" time="0.006" classname="Javascript.Chrome"/>
+  <testcase name="Certificate Web Preview Spec:: method &quot;show&quot; should call the render function" time="0.002" classname="Javascript.Chrome"/>
+  <system-out>
+    <![CDATA[
+]]>
+  </system-out>
+  <system-err/>
+</testsuite>
