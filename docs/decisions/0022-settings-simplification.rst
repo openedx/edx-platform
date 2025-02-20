@@ -318,7 +318,8 @@ Alternatives Considered
 ***********************
 
 One alternative settings structure
-----------------------------------
+==================================
+
 
 Here is an alternate structure would de-dupe any shared LMS/CMS dev & test
 logic by creating more shared modules within openedx/envs folder. Although
