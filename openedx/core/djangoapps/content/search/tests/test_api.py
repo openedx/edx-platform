@@ -85,6 +85,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     "display_name": "Test Course",
+                    "url": "/course/course-v1:org1+test_course+test_run"
                 },
             ],
             "content": {},
@@ -103,6 +104,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     "display_name": "Test Course",
+                    "url": "/course/course-v1:org1+test_course+test_run"
                 },
                 {
                     "display_name": "sequential",

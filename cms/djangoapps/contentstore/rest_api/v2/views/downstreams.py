@@ -40,6 +40,11 @@ https://github.com/openedx/edx-platform/issues/35653):
       400: Downstream block is not linked to upstream content.
       404: Downstream block not found or user lacks permission to edit it.
 
+  /api/contentstore/v2/upstream/{usage_key_string}/downstream-links
+
+    GET: List all downstream blocks linked to a library block.
+        200: A list of downstream usage_keys linked to the library block.
+
   # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
@@ -135,6 +140,31 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
         links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
         serializer = PublishableEntityLinksSerializer(links, many=True)
         return Response(serializer.data)
+
+
+@view_auth_classes()
+class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves library block->downstream usage keys
+    """
+    def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
+        """
+        Fetches downstream links for given publishable entity
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
+
+        downstream_usage_key_list = (
+            PublishableEntityLink
+            .get_by_upstream_usage_key(upstream_usage_key=usage_key)
+            .values_list("downstream_usage_key", flat=True)
+        )
+
+        downstream_usage_key_str_list = [str(usage_key) for usage_key in downstream_usage_key_list]
+
+        return Response(downstream_usage_key_str_list)
 
 
 @view_auth_classes(is_authenticated=True)
