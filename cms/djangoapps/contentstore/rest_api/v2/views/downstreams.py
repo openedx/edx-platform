@@ -63,11 +63,11 @@ UpstreamLink response schema:
 """
 
 import logging
+from itertools import groupby
 
 from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from django.utils.translation import gettext_lazy as _
-from itertools import groupby
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import NotFound, ValidationError
@@ -78,8 +78,8 @@ from xblock.core import XBlock
 
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from cms.djangoapps.contentstore.models import PublishableEntityLink
-from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
     BadUpstream,
@@ -92,6 +92,7 @@ from cms.lib.xblock.upstream_sync import (
     sync_from_upstream,
 )
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
@@ -148,7 +149,7 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
 @view_auth_classes()
 class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
     """
-    Serves library block->course->unit links
+    Serves library block->course->container links
     """
     def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
         """
@@ -161,35 +162,59 @@ class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
 
         links = (
             PublishableEntityLink
-                .get_by_upstream_usage_key(upstream_usage_key=usage_key)
-                .order_by("downstream_context_key", "downstream_parent_usage_key")
-                .values( "downstream_usage_key", "downstream_context_key", "downstream_parent_usage_key")
+            .get_by_upstream_usage_key(upstream_usage_key=usage_key)
+            .order_by("downstream_context_key", "downstream_parent_usage_key")
+            .values("downstream_usage_key", "downstream_context_key", "downstream_parent_usage_key")
+        )
+
+        context_key_list = set(link["downstream_context_key"] for link in links)
+
+        courses_display_name = dict(
+            CourseOverview.objects.filter(id__in=context_key_list).values_list('id', 'display_name')
         )
 
         result = []
-        for context_key, links_by_context in groupby(links, lambda link: link["downstream_context_key"]):
-            # Pre-fetch the course with all of its children:
-            course = modulestore().get_course(context_key, depth=None)
-            if course is None:
+        for context_key, links_by_context in groupby(links, lambda x: x["downstream_context_key"]):
+            if context_key not in courses_display_name:
                 raise BadDownstream(_("Course {context_key} not found").format(context_key=context_key))
+
             course_link = {
                 "id": str(context_key),
-                "display_name": course.display_name,
+                "display_name": courses_display_name[context_key],
                 "url": reverse_course_url("course_handler", context_key),
-                "units": []
+                "containers": []
             }
-            for unit_key, links_by_unit  in groupby(links_by_context, lambda link: link["downstream_parent_usage_key"]):
-                unit_link = {
-                    "id": str(unit_key),
-                    "url": reverse_usage_url("container_handler", unit_key),
-                    "links": []
-                }
-                for downstream_link in links_by_unit:
-                    unit_link["links"].append({
-                        "id": str(downstream_link["downstream_usage_key"]),
-                    })
-                course_link["units"].append(unit_link)
-            result.append(course_link)
+
+            for parent_key, links_by_unit in groupby(links_by_context, lambda x: x["downstream_parent_usage_key"]):
+                try:
+                    parent = modulestore().get_item(parent_key)
+
+                    parent_link = {
+                        "id": str(parent_key),
+                        "display_name": parent.display_name,
+                        "url": reverse_usage_url("container_handler", parent_key),
+                        "links": []
+                    }
+
+                    for downstream_link in links_by_unit:
+                        parent_link["links"].append({
+                            "id": str(downstream_link["downstream_usage_key"]),
+                        })
+
+                    # Don't include empty containers
+                    if parent_link["links"]:
+                        course_link["containers"].append(parent_link)
+
+                except ItemNotFoundError:
+                    logger.exception(
+                        "Unit %s not found in course %s",
+                        parent_key,
+                        context_key
+                    )
+
+            # Don't include empty courses
+            if course_link["containers"]:
+                result.append(course_link)
 
         return Response(result)
 

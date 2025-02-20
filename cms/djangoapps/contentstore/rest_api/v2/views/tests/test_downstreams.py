@@ -60,24 +60,27 @@ class _BaseDownstreamViewTestMixin:
         CourseOverviewFactory.create(id=self.course.id, display_name=self.course.display_name)
         chapter = BlockFactory.create(category='chapter', parent=self.course)
         sequential = BlockFactory.create(category='sequential', parent=chapter)
-        unit = BlockFactory.create(category='vertical', parent=sequential)
-        self.regular_video_key = BlockFactory.create(category='video', parent=unit).usage_key
+        self.unit = BlockFactory.create(category='vertical', parent=sequential)
+        self.regular_video_key = BlockFactory.create(category='video', parent=self.unit).usage_key
         self.downstream_video_key = BlockFactory.create(
-            category='video', parent=unit, upstream=MOCK_UPSTREAM_REF, upstream_version=123,
+            category='video', parent=self.unit, upstream=MOCK_UPSTREAM_REF, upstream_version=123,
         ).usage_key
         self.downstream_html_key = BlockFactory.create(
-            category='html', parent=unit, upstream=MOCK_HTML_UPSTREAM_REF, upstream_version=1,
+            category='html', parent=self.unit, upstream=MOCK_HTML_UPSTREAM_REF, upstream_version=1,
         ).usage_key
 
         self.another_course = CourseFactory.create(display_name="Another Course")
         CourseOverviewFactory.create(id=self.another_course.id, display_name=self.another_course.display_name)
-        another_chapter = BlockFactory.create(category='chapter', parent=self.another_course)
-        another_sequential = BlockFactory.create(category='sequential', parent=another_chapter)
-        another_unit = BlockFactory.create(category='vertical', parent=another_sequential)
+        another_chapter = BlockFactory.create(category="chapter", parent=self.another_course)
+        another_sequential = BlockFactory.create(category="sequential", parent=another_chapter)
+        self.another_unit = BlockFactory.create(category="vertical", parent=another_sequential)
+        self.another_video_keys = []
         for _ in range(3):
             # Adds 3 videos linked to the same upstream
-            BlockFactory.create(
-                category='video', parent=another_unit, upstream=MOCK_UPSTREAM_REF, upstream_version=123,
+            self.another_video_keys.append(
+                BlockFactory.create(
+                    category="video", parent=self.another_unit, upstream=MOCK_UPSTREAM_REF, upstream_version=123,
+                ).usage_key
             )
 
         self.fake_video_key = self.course.id.make_usage_key("video", "NoSuchVideo")
@@ -329,6 +332,7 @@ class GetUpstreamViewTest(_BaseDownstreamViewTestMixin, SharedModuleStoreTestCas
                 'created': date_format,
                 'downstream_context_key': str(self.course.id),
                 'downstream_usage_key': str(self.downstream_video_key),
+                'downstream_parent_usage_key': str(self.unit.usage_key),
                 'id': 1,
                 'ready_to_sync': False,
                 'updated': date_format,
@@ -342,6 +346,7 @@ class GetUpstreamViewTest(_BaseDownstreamViewTestMixin, SharedModuleStoreTestCas
                 'created': date_format,
                 'downstream_context_key': str(self.course.id),
                 'downstream_usage_key': str(self.downstream_html_key),
+                'downstream_parent_usage_key': str(self.unit.usage_key),
                 'id': 2,
                 'ready_to_sync': False,
                 'updated': date_format,
@@ -373,14 +378,32 @@ class GetDownstreamContextsTest(_BaseDownstreamViewTestMixin, SharedModuleStoreT
         data = response.json()
         expected = [
             {
-                'id': str(self.course.id),
-                'display_name': str(self.course.display_name),
-                'url': f'/course/{str(self.course.id)}',
+                "id": str(self.course.id),
+                "display_name": str(self.course.display_name),
+                "url": f"/course/{str(self.course.id)}",
+                "containers": [
+                    {
+                        "id": str(self.unit.usage_key),
+                        "display_name": str(self.unit.display_name),
+                        "url": f"/container/{str(self.unit.usage_key)}",
+                        "links": [
+                            {"id": str(self.downstream_video_key)},
+                        ],
+                    },
+                ],
             },
             {
-                'id': str(self.another_course.id),
-                'display_name': str(self.another_course.display_name),
-                'url': f'/course/{str(self.another_course.id)}',
+                "id": str(self.another_course.id),
+                "display_name": str(self.another_course.display_name),
+                "url": f"/course/{str(self.another_course.id)}",
+                "containers": [
+                    {
+                        "id": str(self.another_unit.usage_key),
+                        "display_name": str(self.another_unit.display_name),
+                        "url": f"/container/{str(self.another_unit.usage_key)}",
+                        "links": [{"id": str(key)} for key in self.another_video_keys],
+                    },
+                ],
             },
         ]
         self.assertListEqual(data, expected)

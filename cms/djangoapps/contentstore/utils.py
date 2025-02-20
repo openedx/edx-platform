@@ -2371,7 +2371,7 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, created: datetime | None = None):
+def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, created: datetime | None = None) -> None:
     """
     Create or update upstream->downstream link in database for given xblock.
     """
@@ -2383,14 +2383,13 @@ def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, c
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
-
-    print(f"!!!!!!!!!!!!!!!!! xblock.parent -> {xblock.parent}")
     PublishableEntityLink.update_or_create(
         lib_component,
         upstream_usage_key=xblock.upstream,
         upstream_context_key=str(upstream_usage_key.context_key),
-        downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,
+        downstream_parent_usage_key=xblock.parent,
+        downstream_context_key=course_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
         created=created,
