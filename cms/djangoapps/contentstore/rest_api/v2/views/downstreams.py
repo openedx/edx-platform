@@ -40,6 +40,11 @@ https://github.com/openedx/edx-platform/issues/35653):
       400: Downstream block is not linked to upstream content.
       404: Downstream block not found or user lacks permission to edit it.
 
+  /api/contentstore/v2/upstream/{usage_key_string}/downstream-contexts
+
+    GET: List all downstream contexts (Courses) linked to a library block.
+        200: A list of Course IDs and their display names and URLs.
+
   # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
@@ -58,9 +63,11 @@ UpstreamLink response schema:
 """
 
 import logging
+from itertools import groupby
 
 from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
+from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import NotFound, ValidationError
@@ -72,6 +79,7 @@ from xblock.core import XBlock
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from cms.djangoapps.contentstore.models import PublishableEntityLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
     BadUpstream,
@@ -84,6 +92,7 @@ from cms.lib.xblock.upstream_sync import (
     sync_from_upstream,
 )
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
@@ -135,6 +144,32 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
         links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
         serializer = PublishableEntityLinksSerializer(links, many=True)
         return Response(serializer.data)
+
+
+@view_auth_classes()
+class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves library block->downstream usage keys
+    """
+    def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
+        """
+        Fetches downstream links for given publishable entity
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
+
+        downstream_usage_key_list = (
+            PublishableEntityLink
+            .get_by_upstream_usage_key(upstream_usage_key=usage_key)
+            .order_by("downstream_context_key", "downstream_parent_usage_key")
+            .values_list("downstream_usage_key", flat=True)
+        )
+
+        downstream_usage_key_str_list = [str(usage_key) for usage_key in downstream_usage_key_list]
+
+        return Response(downstream_usage_key_str_list)
 
 
 @view_auth_classes(is_authenticated=True)
