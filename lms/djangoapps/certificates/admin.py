@@ -22,6 +22,7 @@ from lms.djangoapps.certificates.models import (
     CertificateTemplateAsset,
     GeneratedCertificate,
     ModifiedCertificateTemplateCommandConfiguration,
+    PurgeReferencestoPDFCertificatesCommandConfiguration,
 )
 
 
@@ -100,6 +101,11 @@ class ModifiedCertificateTemplateCommandConfigurationAdmin(ConfigurationModelAdm
 
 @admin.register(CertificateGenerationCommandConfiguration)
 class CertificateGenerationCommandConfigurationAdmin(ConfigurationModelAdmin):
+    pass
+
+
+@admin.register(PurgeReferencestoPDFCertificatesCommandConfiguration)
+class PurgeReferencestoPDFCertificatesCommandConfigurationAdmin(ConfigurationModelAdmin):
     pass
 
 
