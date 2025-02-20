@@ -264,7 +264,8 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     @patch.object(downstreams_views, "sync_from_upstream")
     @patch.object(downstreams_views, "import_static_assets_for_library_sync", return_value=StaticFileNotices())
-    def test_200(self, mock_sync_from_upstream, mock_import_staged_content):
+    @patch.object(downstreams_views, "clear_transcripts")
+    def test_200(self, mock_sync_from_upstream, mock_import_staged_content, mock_clear_transcripts):
         """
         Does the happy path work?
         """
@@ -273,6 +274,7 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
         assert response.status_code == 200
         assert mock_sync_from_upstream.call_count == 1
         assert mock_import_staged_content.call_count == 1
+        assert mock_clear_transcripts.call_count == 1
 
 
 class DeleteDownstreamSyncViewtest(_DownstreamSyncViewTestMixin, SharedModuleStoreTestCase):
