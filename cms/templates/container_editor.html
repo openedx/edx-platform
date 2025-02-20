@@ -1,0 +1,133 @@
+## coding=utf-8
+## mako
+
+## Pages currently use v1 styling by default. Once the Pattern Library
+## rollout has been completed, this default can be switched to v2.
+<%! main_css = "style-main-v1" %>
+
+<%! course_unit_mfe_iframe_css = "course-unit-mfe-iframe-bundle" %>
+
+## Standard imports
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import gettext as _
+from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
+from lms.djangoapps.branding import api as branding_api
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from cms.djangoapps.contentstore.helpers import xblock_type_display_name
+from openedx.core.release import RELEASE_LINE
+%>
+<%def name="online_help_token()">
+<%
+    return "container"
+%>
+</%def>
+
+<%page expression_filter="h"/>
+<!doctype html>
+<html lang="${LANGUAGE_CODE}">
+<head dir="${static.dir_rtl()}">
+    <%
+        jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+    %>
+
+    % if getattr(settings, 'CAPTURE_CONSOLE_LOG', False):
+        <script type="text/javascript">
+            var oldOnError = window.onerror;
+            window.localStorage.setItem('console_log_capture', JSON.stringify([]));
+
+            window.onerror = function (message, url, lineno, colno, error) {
+                if (oldOnError) {
+                    oldOnError.apply(this, arguments);
+                }
+
+                var messages = JSON.parse(window.localStorage.getItem('console_log_capture'));
+                messages.push([message, url, lineno, colno, (error || {}).stack]);
+                window.localStorage.setItem('console_log_capture', JSON.stringify(messages));
+            }
+        </script>
+    % endif
+
+    <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+
+    % if settings.DEBUG:
+        <script type="text/javascript" src="${static.url('js/src/gettext_fallback.js')}"></script>
+    % endif
+
+    <%static:css group='style-vendor'/>
+    <%static:css group='style-vendor-tinymce-content'/>
+    <%static:css group='style-vendor-tinymce-skin'/>
+    <%static:css group='${self.attr.course_unit_mfe_iframe_css}'/>
+
+    % if uses_bootstrap:
+        <link rel="stylesheet" href="${static.url(self.attr.main_css)}" type="text/css" media="all" />
+    % else:
+        <%static:css group='${self.attr.main_css}'/>
+    % endif
+
+    <%include file="widgets/segment-io.html" />
+
+    <%block name="header_extras">
+        % for template_name in templates:
+            <script type="text/template" id="${template_name}-tpl">
+                <%static:include path="js/${template_name}.underscore" />
+            </script>
+        % endfor
+        <script type="text/template" id="image-modal-tpl">
+            <%static:include path="common/templates/image-modal.underscore" />
+        </script>
+
+        % if not settings.STUDIO_FRONTEND_CONTAINER_URL:
+            <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/common.min.css')}" />
+            <link rel="stylesheet" type="text/css" href="${static.url('common/css/vendor/editImageModal.min.css')}" />
+        % endif
+        <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+        % for _, resource in resources:
+            % if resource['kind'] == 'url' and resource['mimetype'] == 'text/css':
+                <link rel="stylesheet" href="${resource['data']}" type="text/css" />
+            % endif
+        % endfor
+    </%block>
+
+    <!-- Hotjar Tracking Code -->
+    <script>
+        (function(h, o, t, j, a, r){
+            h.hj = h.hj || function() { (h.hj.q = h.hj.q || []).push(arguments) };
+            h._hjSettings={ hjid: Number('${settings.HOTJAR_ID |n, js_escaped_string}'), hjsv: 6 };
+            a = o.getElementsByTagName('head')[0];
+            r = o.createElement('script');
+            r.async = 1;
+            r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
+</head>
+
+<body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE} view-container">
+    <%static:js group='base_vendor' />
+    <%static:webpack entry='commons' />
+
+    <script type="text/javascript">
+        window.baseUrl = '${settings.STATIC_URL | n, js_escaped_string}';
+        require.config({ baseUrl: window.baseUrl });
+    </script>
+    <script type="text/javascript" src="${static.url("cms/js/require-config.js")}"></script>
+
+    <%block name='page_bundle'>
+        <%static:webpack entry="js/factories/container">
+            require(['js/models/xblock_info', 'js/views/modals/edit_xblock'],
+            function (XBlockInfo, EditXBlockModal) {
+                var decodedActionName = '${action_name|n, decode.utf8}';
+                var encodedXBlockDetails = ${xblock_info | n, dump_js_escaped_json};
+
+                if (decodedActionName === 'edit') {
+                    var editXBlockModal = new EditXBlockModal();
+                    var xblockInfoInstance = new XBlockInfo(encodedXBlockDetails);
+
+                    editXBlockModal.edit([], xblockInfoInstance, {});
+                }
+            });
+        </%static:webpack>
+    </%block>
+</body>
+</html>
