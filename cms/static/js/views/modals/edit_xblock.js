@@ -83,6 +83,11 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         getXBlockUpstreamLink: function() {
+            if (!this.xblockElement || !this.xblockElement.length) {
+                console.error('xblockElement is empty or not defined');
+                return;
+            }
+
             const usageKey = this.xblockElement.data('locator');
             $.ajax({
                 url: '/api/contentstore/v2/downstreams/' + usageKey,
@@ -219,6 +224,16 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         onSave: function() {
+            try {
+                window.parent.postMessage({
+                    type: 'saveEditedXBlockData',
+                    message: 'Sends a message when the xblock data is saved',
+                    payload: {}
+                }, document.referrer);
+            } catch (e) {
+                console.error(e);
+            }
+
             var refresh = this.editOptions.refresh;
             this.hide();
             if (refresh) {
@@ -229,6 +244,16 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         hide: function() {
             // Notify child views to stop listening events
             Backbone.trigger('xblock:editorModalHidden');
+
+            try {
+                window.parent.postMessage({
+                    type: 'closeXBlockEditorModal',
+                    message: 'Sends a message when the modal window is closed',
+                    payload: {}
+                }, document.referrer);
+            } catch (e) {
+                console.error(e);
+            }
 
             BaseModal.prototype.hide.call(this);
 
