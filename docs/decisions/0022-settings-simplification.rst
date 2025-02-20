@@ -13,10 +13,10 @@ Context
 
 OEP-45 declares that sites will configure each IDA's (indepently-deployable
 application's) Django settings with an ``<APPNAME>_CFG`` yaml file, parsed and
-loaded by a single upstream-provided ``DJANGO_SETTINGS_MODULE``. this contrasts
+loaded by a single upstream-provided ``DJANGO_SETTINGS_MODULE``. This contrasts
 with the django convention, which is that sites override Django settings using
-a their own ``DJANGO_SETTINGS_MODULE``. The rationale is that all Open edX
-customization can be reasonably specified in YAML; therefore, it is
+their own ``DJANGO_SETTINGS_MODULE``. The rationale was that all Open edX
+setting customization can be reasonably specified in YAML; therefore, it is
 operationally safer to avoid using a custom ``DJANGO_SETTINGS_MODULE``, and it
 is operationally desirable for all operation modes to execute the same Python
 module for configuration. This was `briefly discussed in the oep-45 review
@@ -38,7 +38,7 @@ For example, in theory, the upstream production LMS config might be named
 The upstream production CMS config would exist in parallel.
 
 However, as of Sumac, we do not know of any site other than edx.org that
-successfully uses only YAML files for configuration. Furthermore,
+successfully uses only YAML files for configuration. Furthermore, the
 upstream-provided ``DJANGO_SETTINGS_MODULE`` which loads these yaml files
 (``lms/envs/production.py``) is not simple: it declares defaults, imports from
 other Django settings modules, sets more defaults, handles dozens of special
@@ -65,7 +65,7 @@ like this:
 
     * and uses templates vars from Tutor configuration (``config.yml``),
 
-    * and invokes hooks from any enable Tutor plugins;
+    * and invokes hooks from any enabled Tutor plugins;
 
   * it imports ``lms/envs/production.py``,
 
@@ -85,7 +85,7 @@ like this:
 
     * it reverts some of ``lms.yml`` with new "defaults";
 
-    * and it uses certain values ``/openedx/config/lms.yml`` to conditionally
+    * and it uses certain values from ``/openedx/config/lms.yml`` to conditionally
       override more settings and update certain dictionary settings, in a way
       which is not documented.
 
@@ -124,7 +124,7 @@ like this:
 
     * it reverts some of ``/openedx/config/cms.yml`` with new "defaults";
 
-    * and it uses certain values ``/openedx/config/cms.yml`` to conditionally
+    * and it uses certain values from ``/openedx/config/cms.yml`` to conditionally
       override more settings and update certain dictionary settings, in a way
       which is not documented.
 
@@ -133,11 +133,11 @@ cited as a chief area of pain for Open edX developers and operators.
 Discussions in the Named Release Planning and Build-Test-Release Working Groups
 frequently are encumbered with confusion and uncertainty of what the default
 settings are in edx-platform, how they differ from Tutor's default settings,
-what settings can be overriden, and how to do so. Only a minority of developers
+what settings can be overridden, and how to do so. Only a minority of developers
 and operators fully understand the configuration logic described above
 end-to-end; even for those that do, following this override chain for any given
 Django setting is time-consuming and error-prone. CAT-1 bugs and high-severity
-security vulnerabilities have arisen due to misunderstanding of how
+security vulnerabilities have arisen due to misunderstandings of how
 edx-platform Django settings are rendered.
 
 Developers are frequently instructed that if they need to override a Django
@@ -293,10 +293,10 @@ Alternatives Considered
 One alternative settings structure
 ----------------------------------
 
-Here is an alternate structure would de-dupe any shared LMS/CMS dev & test
+Here is an alternate structure that would de-dupe any shared LMS/CMS dev & test
 logic by creating more shared modules within openedx/envs folder. Although
 DRYer, this structure would increase the total number of edx-platform files and
-potentially encourage more LMS-CMS coupling. So, will not pursue this
+potentially encourage more LMS-CMS coupling. So, we will not pursue this
 structure, but will keep it in mind as an alternative if we enounter
 difficulties with the plan laid out in this ADR.
 
