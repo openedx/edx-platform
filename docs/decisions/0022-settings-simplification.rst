@@ -153,10 +153,34 @@ pathways are outside of the scope of this ADR, but are mentioned to demonstrate
 the distressing level of complexity that developers and operators face when
 working with the platform.
 
-Decision
-********
+Decision & Consequences
+***********************
 
-This is our target edx-platform settings module structure:
+Overview
+========
+
+We orient edx-platform towards using standard Django settings configuration
+patterns. Specifically, we will make it easy for operators to override settings
+by supplying a custom ``DJANGO_SETTINGS_MODULE``.
+
+Moving towards this goals will need to be an iterative and careful process,
+and it's likely that some aspects of the target structure or plan (described
+below) will need to updated along the way. Nonetheless, once it becomes clear
+that we are landing on a solid settings structure for edx-platform, we'll
+propose an OEP-45 update to generalize the structure to all deployable Open edX
+Django applications.
+
+Finally, based on what we learn throughout this process, our OEP-45 propsal
+will either recommend to:
+
+1. Drop support for the ``<APP>_CFG`` YAML files, or
+
+2. Simplify the ``<APP>_CFG`` YAML schema, document it, and clarify that it
+   is an optional alternative to ``DJANGO_SETTINGS_MODULE`` rather than the
+   required/preferred configuration method.
+
+Target settings structure for edx-platform
+==========================================
 
 * ``openedx/envs/common.py``: Define as much shared configuration between LMS
   and CMS as possible, including: (a) where possible, annotated definitions of
@@ -192,11 +216,12 @@ This is our target edx-platform settings module structure:
       with appropriate production settings, and (ii) invokes
       ``derive_settings`` to render all previously-defined ``Derived`` settings.
 
-    * ``lms/envs/yaml.py``: (Possibly) An alternative to third-party
-      production.py. Loads overrides from a YAML file at ``LMS_CFG``,
-      plus some well-defined special handling for mergable values like
-      ``FEATURES``. This is adapted from and replaces lms/envs/production.py.
-      It will invoke ``derive_settings``.
+    * ``lms/envs/yaml.py`` (only if we decide to retain YAML support):
+      An upstream-maintained alternative to
+      ``<third_party_repo>/lms_repo.py>``. Loads overrides from a YAML file at
+      ``LMS_CFG``, plus some well-defined special handling for mergable values
+      like ``FEATURES``. This is adapted from and replaces
+      lms/envs/production.py. It will invoke ``derive_settings``.
 
     * ``lms/envs/dev.py``: Override LMS settings so that it can run
       "bare metal" directly on a developer's local machine using debug-friendly
@@ -216,25 +241,25 @@ This is our target edx-platform settings module structure:
 
     * ``<third_party_repo>/cms_prod.py`` (example path)
 
-    * ``cms/envs/yaml.py`` (Possibly)
+    * ``cms/envs/yaml.py`` (only if we decide to retain YAML support)
 
     * ``cms/envs/dev.py``
 
       * ``<third_party_repo>/cms_dev.py`` (example path)
 
-Consequences
-************
+Plan of action
+==============
 
-Moving to the target structure will take several steps. The steps are
-non-breaking unless noted.
+These steps are non-breaking unless noted.
 
 * Introduce a dump_settings management command so that we can more easily
   validate changes (or lack thereof) to the terminal edx-platform settings
   modules.
 
-* BREAKING (minor, all settings modules): Improve edx-platform's API for
+* Improve edx-platform's API for
   deriving settings, as we are about to depend on it significantly more than we
-  currently do.
+  currently do. This is a potentially BREAKING CHANGE to any third-party
+  settings files which imported from ``openedx.core.lib.derived``.
 
 * Remove redundant overrides in (cms,lms)/envs/production.py. Use Derived
   settings defaults to further simplify the module without changing its output.
@@ -244,37 +269,42 @@ non-breaking unless noted.
   (cms,lms)/envs/common.py into openedx/envs/common.py. This may be iteratively
   done across multiple PRs.
 
-* BREAKING (major, just common.py): Find the best production-ready defaults
-  between both (lms,cms)/envs/production.py and Tutor's production.pys, and
-  "bubble" them up to (openedx,cms,lms)/common.py. Keep
-  (lms,cms)/envs/production.py unchanged through this process.
+* Find the best production-ready defaults between both
+  (lms,cms)/envs/production.py and Tutor's production.pys, and "bubble" them up
+  to (openedx,cms,lms)/common.py. Keep (lms,cms)/envs/production.py unchanged
+  through this process. This is a BREAKING CHANGE for any operator that derives
+  from (lms,cms)/envs/common.py directly. Most operators derive from
+  (lms,cms)/envs/production.py, so we do not expect this to affect many sites,
+  if any.
 
 * Develop (cms,lms)/envs/dev based off of (cms,lms)/envs/common.py.
   Iterate until we can run "bare metal" development server for LMS and CMS
   using these settings.
 
-* BREAKING (major): Deprecate and remove (cms,lms)/envs/devstack.py.
-  Tools (like Tutor and 2U's devstack) will either need to maintain local
-  copies of these modules, or "rebase" themselves onto
-  (lms,cms)/envs/dev.py.
+* Deprecate and remove (cms,lms)/envs/devstack.py. This is a BREAKING CHANGE to
+  third-party development tools (like Tutor and 2U's devstack), as they will
+  now either need to maintain local copies of these modules, or "rebase"
+  themselves onto (lms,cms)/envs/dev.py.
 
 * Propose and, if accepted, implement an update to OEP-45 (Configuring and
-  Operating Open edX). `Progress on this update is tracked here`_.
-  Based on community feedback, the update will be either to:
+  Operating Open edX). `Progress on this update is tracked here`_. As mentioned
+  in the Decision section, this update will either:
 
-  1. BREAKING (major): Revoke the OEP-45 sections regarding YAML. Deprecate and
-     remove (cms,lms)/envs/production.py. Tools and providers that use
-     these settings modules will either need to maintain local copies of these
-     modules, or "rebase" their internal settings modules onto
-     (cms,lms)/envs/common.py. Update operator documenation as needed.
+  1. Revoke the OEP-45 sections regarding YAML. Deprecate and remove
+     (cms,lms)/envs/production.py. This is a BREAKING CHANGE for tools and
+     providers that use these settings modules, as they will either need to
+     maintain local copies of these modules, or "rebase" their internal
+     settings modules onto (cms,lms)/envs/common.py. Update operator
+     documenation as needed.
 
-  2. BREAKING (major): Update OEP-45 to clarify that YAML configuration is
+  2. Update OEP-45 to clarify that YAML configuration is
      optional. Operators can opt out of YAML by deriving directly from
-     (cms,lms)/envs/common.py, or opt into YAML by using
-     (cms,lms)/envs/yaml.py. Document a simplified YAML schema in OEP-45. Issue
-     DEPR(s) explaining that (cms,lms)/envs/production.py is renamed to
-     (cms,lms)/envs/yaml.py, and that several breaking behavior changes are
-     happening in order to achieve the documented schema.
+     (cms,lms)/envs/common.py, or they can opt into YAML by using
+     (cms,lms)/envs/yaml.py. Document a simplified YAML schema in OEP-45.
+     There will be several well-communicated BREAKING CHANGES in YAML behavior
+     in order to achieve the simplified schema. Furthermore, the rename of
+     (cms,lms)/envs/production.py to (cms,lms)/envs/yaml.py will be a BREAKING
+     CHANGE.
 
 * Create tickets to achieve a similar OEP-45-compliant settings structure in
   any IDAs (independently-deployable applications) which exist in the openedx
