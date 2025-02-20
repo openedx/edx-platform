@@ -1268,7 +1268,7 @@ xblock[django]==5.1.2
     #   xblock-google-drive
     #   xblock-utils
     #   xblocks-contrib
-xblock-drag-and-drop-v2==4.0.3
+xblock-drag-and-drop-v2==5.0.1
     # via -r requirements/edx/bundled.in
 xblock-google-drive==0.7.1
     # via -r requirements/edx/bundled.in
