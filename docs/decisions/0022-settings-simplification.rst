@@ -12,11 +12,11 @@ Context
 *******
 
 OEP-45 declares that sites will configure each IDA's (indepently-deployable
-application's) Django settings with an ``<APPNAME>_CFG`` yaml file, parsed and
-loaded by a single upstream-provided ``DJANGO_SETTINGS_MODULE``. this contrasts
-with the django convention, which is that sites override Django settings using
-a their own ``DJANGO_SETTINGS_MODULE``. The rationale is that all Open edX
-customization can be reasonably specified in YAML; therefore, it is
+application's) Django settings with an ``<APPNAME>_CFG`` YAML file, parsed and
+loaded by a single upstream-provided ``DJANGO_SETTINGS_MODULE``. This contrasts
+with the Django convention, which is that sites override Django settings using
+their own ``DJANGO_SETTINGS_MODULE``. The rationale was that all Open edX
+setting customization can be reasonably specified in YAML; therefore, it is
 operationally safer to avoid using a custom ``DJANGO_SETTINGS_MODULE``, and it
 is operationally desirable for all operation modes to execute the same Python
 module for configuration. This was `briefly discussed in the oep-45 review
@@ -38,7 +38,7 @@ For example, in theory, the upstream production LMS config might be named
 The upstream production CMS config would exist in parallel.
 
 However, as of Sumac, we do not know of any site other than edx.org that
-successfully uses only YAML files for configuration. Furthermore,
+successfully uses only YAML files for configuration. Furthermore, the
 upstream-provided ``DJANGO_SETTINGS_MODULE`` which loads these yaml files
 (``lms/envs/production.py``) is not simple: it declares defaults, imports from
 other Django settings modules, sets more defaults, handles dozens of special
@@ -85,9 +85,9 @@ like this:
 
     * it reverts some of ``lms.yml`` with new "defaults";
 
-    * and it uses certain values ``/openedx/config/lms.yml`` to conditionally
-      override more settings and update certain dictionary settings, in a way
-      which is not documented.
+    * and it uses certain values from ``/openedx/config/lms.yml`` to
+      conditionally override more settings and update certain dictionary
+      settings, in a way which is not documented.
 
 * ``cms/envs/tutor/production.py``...
 
@@ -102,7 +102,7 @@ like this:
 
     * and uses templates vars from Tutor configuration (``config.yml``),
 
-    * and invokes hooks from any enable Tutor plugins;
+    * and invokes hooks from any enabled Tutor plugins;
 
   * it imports ``cms/envs/production.py``,
 
@@ -124,9 +124,9 @@ like this:
 
     * it reverts some of ``/openedx/config/cms.yml`` with new "defaults";
 
-    * and it uses certain values ``/openedx/config/cms.yml`` to conditionally
-      override more settings and update certain dictionary settings, in a way
-      which is not documented.
+    * and it uses certain values from ``/openedx/config/cms.yml`` to
+      conditionally override more settings and update certain dictionary
+      settings, in a way which is not documented.
 
 This is very difficult to reason about. Configuration complexity is frequently
 cited as a chief area of pain for Open edX developers and operators.
@@ -173,9 +173,9 @@ Django applications.
 Finally, based on what we learn throughout this process, our OEP-45 propsal
 will either recommend to:
 
-1. Drop support for the ``<APP>_CFG`` YAML files, or
+1. Drop support for the ``<APPNAME>_CFG`` YAML files, or
 
-2. Simplify the ``<APP>_CFG`` YAML schema, document it, and clarify that it
+2. Simplify the ``<APPNAME>_CFG`` YAML schema, document it, and clarify that it
    is an optional alternative to ``DJANGO_SETTINGS_MODULE`` rather than the
    required/preferred configuration method.
 
@@ -266,10 +266,10 @@ These steps are non-breaking unless noted.
 * Remove redundant overrides in (cms,lms)/envs/production.py. Use Derived
   settings defaults to further simplify the module without changing its output.
 
-* Create openedx/envs/common.py, ensuring that toggle and setting annotations
-  are loaded from it. Move settings which are shared between
-  (cms,lms)/envs/common.py into openedx/envs/common.py. This may be iteratively
-  done across multiple PRs.
+* Create openedx/envs/common.py, ensuring that any annotations defined in it
+  are included in the edx-platform reference docs build. Move settings which
+  are shared between (cms,lms)/envs/common.py into openedx/envs/common.py. This
+  may be iteratively done across multiple PRs.
 
 * Find the best production-ready defaults between both
   (lms,cms)/envs/production.py and Tutor's production.pys, and "bubble" them up
@@ -321,10 +321,10 @@ One alternative settings structure
 ==================================
 
 
-Here is an alternate structure would de-dupe any shared LMS/CMS dev & test
+Here is an alternate structure that would de-dupe any shared LMS/CMS dev & test
 logic by creating more shared modules within openedx/envs folder. Although
 DRYer, this structure would increase the total number of edx-platform files and
-potentially encourage more LMS-CMS coupling. So, will not pursue this
+potentially encourage more LMS-CMS coupling. So, we will not pursue this
 structure, but will keep it in mind as an alternative if we enounter
 difficulties with the plan laid out in this ADR.
 
