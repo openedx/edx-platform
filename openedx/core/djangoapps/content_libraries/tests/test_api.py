@@ -591,6 +591,35 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             event_receiver.call_args_list[0].kwargs,
         )
 
+    def test_restore_library_block(self):
+        api.update_library_collection_components(
+            self.lib1.library_key,
+            self.col1.key,
+            usage_keys=[
+                UsageKey.from_string(self.lib1_problem_block["id"]),
+                UsageKey.from_string(self.lib1_html_block["id"]),
+            ],
+        )
+
+        event_receiver = mock.Mock()
+        LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
+
+        api.restore_library_block(UsageKey.from_string(self.lib1_problem_block["id"]))
+
+        assert event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_COLLECTION_UPDATED,
+                "sender": None,
+                "library_collection": LibraryCollectionData(
+                    self.lib1.library_key,
+                    collection_key=self.col1.key,
+                    background=True,
+                ),
+            },
+            event_receiver.call_args_list[0].kwargs,
+        )
+
     def test_add_component_and_revert(self):
         # Add component and publish
         api.update_library_collection_components(

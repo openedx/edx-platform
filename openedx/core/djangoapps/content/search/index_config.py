@@ -25,6 +25,7 @@ INDEX_FILTERABLE_ATTRIBUTES = [
     Fields.access_id,
     Fields.last_published,
     Fields.content + "." + Fields.problem_types,
+    Fields.publish_status,
 ]
 
 # Mark which attributes are used for keyword search, in order of importance:

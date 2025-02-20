@@ -56,29 +56,40 @@ UpstreamLink response schema:
     "ready_to_sync": Boolean
   }
 """
+
 import logging
 
+from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.core import XBlock
 
+from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
+from cms.djangoapps.contentstore.models import PublishableEntityLink
+from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
 from cms.lib.xblock.upstream_sync import (
-    UpstreamLink, UpstreamLinkException, NoUpstream, BadUpstream, BadDownstream,
-    fetch_customizable_fields, sync_from_upstream, decline_sync, sever_upstream_link
+    BadDownstream,
+    BadUpstream,
+    NoUpstream,
+    UpstreamLink,
+    UpstreamLinkException,
+    decline_sync,
+    fetch_customizable_fields,
+    sever_upstream_link,
+    sync_from_upstream,
 )
-from common.djangoapps.student.auth import has_studio_write_access, has_studio_read_access
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
 )
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-
 
 logger = logging.getLogger(__name__)
 
@@ -106,6 +117,24 @@ class _AuthenticatedRequest(Request):
 #         course_key_string = request.GET['course_id']
 #         syncable = request.GET['ready_to_sync']
 #         ...
+
+
+@view_auth_classes()
+class UpstreamListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves course->library publishable entity links
+    """
+    def get(self, request: _AuthenticatedRequest, course_key_string: str):
+        """
+        Fetches publishable entity links for given course key
+        """
+        try:
+            course_key = CourseKey.from_string(course_key_string)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
+        links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
+        serializer = PublishableEntityLinksSerializer(links, many=True)
+        return Response(serializer.data)
 
 
 @view_auth_classes(is_authenticated=True)
@@ -195,7 +224,8 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
         try:
-            sync_from_upstream(downstream, request.user)
+            upstream = sync_from_upstream(downstream, request.user)
+            static_file_notices = import_static_assets_for_library_sync(downstream, upstream, request)
         except UpstreamLinkException as exc:
             logger.exception(
                 "Could not sync from upstream '%s' to downstream '%s'",
@@ -206,7 +236,9 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
         modulestore().update_item(downstream, request.user.id)
         # Note: We call `get_for_block` (rather than `try_get_for_block`) because if anything is wrong with the
         #       upstream at this point, then that is completely unexpected, so it's appropriate to let the 500 happen.
-        return Response(UpstreamLink.get_for_block(downstream).to_json())
+        response = UpstreamLink.get_for_block(downstream).to_json()
+        response["static_file_notices"] = attrs_asdict(static_file_notices)
+        return Response(response)
 
     def delete(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
         """

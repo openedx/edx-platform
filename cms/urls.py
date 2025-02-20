@@ -168,7 +168,7 @@ urlpatterns = oauth2_urlpatterns + [
             contentstore_views.textbooks_detail_handler, name='textbooks_detail_handler'),
     re_path(fr'^videos/{settings.COURSE_KEY_PATTERN}(?:/(?P<edx_video_id>[-\w]+))?$',
             contentstore_views.videos_handler, name='videos_handler'),
-    re_path(fr'^generate_video_upload_link/{settings.COURSE_KEY_PATTERN}',
+    re_path(fr'^generate_video_upload_link/{settings.COURSE_KEY_PATTERN}$',
             contentstore_views.generate_video_upload_link_handler, name='generate_video_upload_link'),
     re_path(fr'^video_images/{settings.COURSE_KEY_PATTERN}(?:/(?P<edx_video_id>[-\w]+))?$',
             contentstore_views.video_images_handler, name='video_images_handler'),
@@ -276,6 +276,8 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
                 certificates_list_handler, name='certificates_list_handler')
     ]
 
+# Maintenance Dashboard
+urlpatterns.append(path('maintenance/', include('cms.djangoapps.maintenance.urls', namespace='maintenance')))
 
 if settings.DEBUG:
     try:

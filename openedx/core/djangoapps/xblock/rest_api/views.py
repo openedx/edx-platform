@@ -118,10 +118,13 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     #     for key in itertools.chain([block.scope_ids.usage_id], getattr(block, 'children', []))
     # }
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+    cms_root_url = configuration_helpers.get_value('CMS_ROOT_URL', settings.CMS_ROOT_URL)
     context = {
         'fragment': fragment,
         'handler_urls_json': json.dumps(handler_urls),
         'lms_root_url': lms_root_url,
+        'cms_root_url': cms_root_url,
+        'view_name': view_name,
         'is_development': settings.DEBUG,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
@@ -321,10 +324,6 @@ class BlockFieldsView(APIView):
 
         # Save after the callback so any changes made in the callback will get persisted.
         block.save()
-
-        # Signal that we've modified this block
-        context_impl = get_learning_context_impl(usage_key)
-        context_impl.send_block_updated_event(usage_key)
 
         block_dict = {
             "id": str(block.usage_key),

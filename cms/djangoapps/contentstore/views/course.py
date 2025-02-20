@@ -23,7 +23,6 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import function_trace
-from edx_toggles.toggles import WaffleSwitch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
@@ -137,11 +136,6 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler',
            'get_course_and_check_access']
-
-WAFFLE_NAMESPACE = 'studio_home'
-ENABLE_GLOBAL_STAFF_OPTIMIZATION = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_NAMESPACE}.enable_global_staff_optimization', __name__
-)
 
 
 class AccessListFallback(Exception):
@@ -394,15 +388,12 @@ def get_in_process_course_actions(request):
     ]
 
 
-def _accessible_courses_summary_iter(request, org=None):
+def _accessible_courses_summary_iter(request):
     """
     List all courses available to the logged in user by iterating through all the courses
 
     Arguments:
         request: the request object
-        org (string): if not None, this value will limit the courses returned. An empty
-            string will result in no courses, and otherwise only courses with the
-            specified org will be returned. The default value is None.
     """
     def course_filter(course_summary):
         """
@@ -416,9 +407,7 @@ def _accessible_courses_summary_iter(request, org=None):
 
     enable_home_page_api_v2 = settings.FEATURES["ENABLE_HOME_PAGE_COURSE_API_V2"]
 
-    if org is not None:
-        courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
-    elif enable_home_page_api_v2:
+    if enable_home_page_api_v2:
         # If the new home page API is enabled, we should use the Django ORM to filter and order the courses
         courses_summary = CourseOverview.get_all_courses()
     else:
@@ -765,21 +754,17 @@ def course_index(request, course_key):
 
 
 @function_trace('get_courses_accessible_to_user')
-def get_courses_accessible_to_user(request, org=None):
+def get_courses_accessible_to_user(request):
     """
     Try to get all courses by first reversing django groups and fallback to old method if it fails
     Note: overhead of pymongo reads will increase if getting courses from django groups fails
 
     Arguments:
         request: the request object
-        org (string): for global staff users ONLY, this value will be used to limit
-            the courses returned. A value of None will have no effect (all courses
-            returned), an empty string will result in no courses, and otherwise only courses with the
-            specified org will be returned. The default value is None.
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_summary_iter(request, org)
+        courses, in_process_course_actions = _accessible_courses_summary_iter(request)
     else:
         try:
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
