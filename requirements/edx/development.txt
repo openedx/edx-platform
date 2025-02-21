@@ -745,7 +745,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.6.10
+edx-enterprise==5.6.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -790,12 +790,13 @@ edx-opaque-keys[django]==2.11.0
     #   edx-when
     #   lti-consumer-xblock
     #   openedx-events
+    #   openedx-filters
     #   ora2
 edx-organizations==6.13.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-proctoring==5.0.1
+edx-proctoring==5.1.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -883,7 +884,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.1
     # via -r requirements/edx/testing.txt
-faker==35.0.0
+faker==36.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -933,7 +934,7 @@ future==1.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   pyjwkest
-geoip2==4.8.1
+geoip2==5.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1371,7 +1372,7 @@ openedx-events==9.18.0
     #   edx-name-affirmation
     #   event-tracking
     #   ora2
-openedx-filters==1.12.0
+openedx-filters==2.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1381,7 +1382,7 @@ openedx-forum==0.1.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-learning==0.18.2
+openedx-learning==0.18.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1729,7 +1730,6 @@ python-dateutil==2.9.0.post0
     #   edx-ace
     #   edx-enterprise
     #   edx-proctoring
-    #   faker
     #   freezegun
     #   icalendar
     #   olxcleaner
@@ -2122,7 +2122,6 @@ typing-extensions==4.12.2
     #   django-stubs-ext
     #   djangorestframework-stubs
     #   edx-opaque-keys
-    #   faker
     #   fastapi
     #   grimp
     #   import-linter
@@ -2139,6 +2138,7 @@ tzdata==2025.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   celery
+    #   faker
     #   icalendar
     #   kombu
 unicodecsv==0.14.1
@@ -2256,15 +2256,15 @@ xblock[django]==5.1.2
     #   xblock-google-drive
     #   xblock-utils
     #   xblocks-contrib
-xblock-drag-and-drop-v2==4.0.3
+xblock-drag-and-drop-v2==5.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-xblock-google-drive==0.7.0
+xblock-google-drive==0.7.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-xblock-poll==1.14.0
+xblock-poll==1.14.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2274,7 +2274,7 @@ xblock-utils==4.0.0
     #   -r requirements/edx/testing.txt
     #   edx-sga
     #   xblock-poll
-xblocks-contrib==0.1.0
+xblocks-contrib==0.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

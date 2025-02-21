@@ -18,6 +18,7 @@ import openedx.core.djangoapps.debug.views
 import openedx.core.djangoapps.lang_pref.views
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import views as contentstore_views
+from cms.djangoapps.contentstore.views.block import xblock_edit_view
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
 from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
@@ -150,6 +151,8 @@ urlpatterns = oauth2_urlpatterns + [
             name='xblock_outline_handler'),
     re_path(fr'^xblock/container/{settings.USAGE_KEY_PATTERN}$', contentstore_views.xblock_container_handler,
             name='xblock_container_handler'),
+    re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}/action/edit$', xblock_edit_view,
+            name='xblock_edit_handler'),
     re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}/(?P<view_name>[^/]+)$', contentstore_views.xblock_view_handler,
             name='xblock_view_handler'),
     re_path(fr'^xblock/{settings.USAGE_KEY_PATTERN}?$', contentstore_views.xblock_handler,
@@ -276,6 +279,8 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
                 certificates_list_handler, name='certificates_list_handler')
     ]
 
+# Maintenance Dashboard
+urlpatterns.append(path('maintenance/', include('cms.djangoapps.maintenance.urls', namespace='maintenance')))
 
 if settings.DEBUG:
     try:

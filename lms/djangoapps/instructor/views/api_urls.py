@@ -57,7 +57,7 @@ urlpatterns = [
     path('show_student_extensions', api.ShowStudentExtensions.as_view(), name='show_student_extensions'),
 
     # proctored exam downloads...
-    path('get_proctored_exam_results', api.get_proctored_exam_results, name='get_proctored_exam_results'),
+    path('get_proctored_exam_results', api.GetProctoredExamResults.as_view(), name='get_proctored_exam_results'),
 
     # Grade downloads...
     path('list_report_downloads', api.ListReportDownloads.as_view(), name='list_report_downloads'),
@@ -65,7 +65,7 @@ urlpatterns = [
     path('problem_grade_report', api.problem_grade_report, name='problem_grade_report'),
 
     # Reports..
-    path('get_course_survey_results', api.get_course_survey_results, name='get_course_survey_results'),
+    path('get_course_survey_results', api.GetCourseSurveyResults.as_view(), name='get_course_survey_results'),
     path('export_ora2_data', api.export_ora2_data, name='export_ora2_data'),
     path('export_ora2_summary', api.export_ora2_summary, name='export_ora2_summary'),
 
