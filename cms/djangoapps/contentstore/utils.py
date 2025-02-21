@@ -98,7 +98,7 @@ from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.html_to_text import html_to_text
-from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TEAM_SCHEME
+from openedx.core.lib.teams_config import TEAM_SCHEME
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
@@ -2196,9 +2196,7 @@ def get_group_configurations_context(course, store):
             if should_show_enrollment_track:
                 displayable_partitions.insert(0, partition)
         elif partition['scheme'] == TEAM_SCHEME:
-            should_show_team_partitions = len(partition['groups']) > 0 and CONTENT_GROUPS_FOR_TEAMS.is_enabled(
-                course_key
-            )
+            should_show_team_partitions = len(partition['groups']) > 0
             if should_show_team_partitions:
                 displayable_partitions.append(partition)
         elif partition['scheme'] != RANDOM_SCHEME:

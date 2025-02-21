@@ -17,7 +17,7 @@ from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
-from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TeamsConfig, TeamsetType
+from openedx.core.lib.teams_config import TeamsConfig, TeamsetType
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG
 from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -316,9 +316,6 @@ class CourseMetadata:
         This is used by the Dynamic Team Partition Generator to create the dynamic user partitions
         based on the team-sets defined in the course.
         """
-        if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(block.id):
-            return teams_config
-
         for team_set in teams_config.teamsets:
             if not team_set.user_partition_id:
                 team_set.user_partition_id = cls.get_user_partition_id(

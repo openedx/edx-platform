@@ -15,10 +15,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import Group
 
 
-@patch(
-    "lms.djangoapps.teams.team_partition_scheme.CONTENT_GROUPS_FOR_TEAMS.is_enabled",
-    lambda _: True
-)
 class TestTeamPartitionScheme(ModuleStoreTestCase):
     """
     Test the TeamPartitionScheme partition scheme and its related functions.

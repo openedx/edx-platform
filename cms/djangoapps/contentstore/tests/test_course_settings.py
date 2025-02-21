@@ -1753,49 +1753,9 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.request.user = self.user
         set_current_request(self.request)
 
-    def test_team_content_groups_off(self):
+    def test_team_content_groups(self):
         """
-        Tests that user_partition_id is not added to the model when content groups for teams are off.
-        """
-        course = CourseFactory.create(
-            teams_configuration=TeamsConfig({
-                'max_team_size': 2,
-                'team_sets': [{
-                    'id': 'arbitrary-topic-id',
-                    'name': 'arbitrary-topic-name',
-                    'description': 'arbitrary-topic-desc'
-                }]
-            })
-        )
-        settings_dict = {
-            "teams_configuration": {
-                "value": {
-                    "max_team_size": 2,
-                    "team_sets": [
-                        {
-                            "id": "topic_3_id",
-                            "name": "Topic 3 Name",
-                            "description": "Topic 3 desc"
-                        },
-                    ]
-                }
-            }
-        }
-
-        _, errors, updated_data = CourseMetadata.validate_and_update_from_json(
-            course,
-            settings_dict,
-            user=self.user
-        )
-
-        self.assertEqual(len(errors), 0)
-        for team_set in updated_data["teams_configuration"]["value"]["team_sets"]:
-            self.assertNotIn("user_partition_id", team_set)
-
-    @patch("cms.djangoapps.models.settings.course_metadata.CONTENT_GROUPS_FOR_TEAMS.is_enabled", lambda _: True)
-    def test_team_content_groups_on(self):
-        """
-        Tests that user_partition_id is added to the model when content groups for teams are on.
+        Tests that user_partition_id is added to the model.
         """
         course = CourseFactory.create(
             teams_configuration=TeamsConfig({
