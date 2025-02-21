@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Invokes the custom save() function defined as part of the `GeneratedCertificate`
+    Doesn't invoke the custom save() function defined as part of the `GeneratedCertificate`
     model; perforce will emit no Django signals. This is desired behavior. We are
     using this management command to purge information that was never sent to any
     other systems, so we don't need to propagate updates.
