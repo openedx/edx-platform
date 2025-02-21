@@ -99,6 +99,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+from cms.djangoapps.contentstore.views.course import (
+    get_allowed_organizations_for_libraries,
+    user_can_create_organizations,
+)
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryBlockImportTaskCreateSerializer,
@@ -270,6 +274,14 @@ class LibraryRootView(GenericAPIView):
         except InvalidOrganizationException:
             raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 detail={"org": f"No such organization '{org_name}' found."}
+            )
+        # Ensure the user is allowed to create libraries under this org
+        if not (
+            user_can_create_organizations(request.user) or
+            org_name in get_allowed_organizations_for_libraries(request.user)
+        ):
+            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+                detail={"org": f"User not allowed to create libraries in '{org_name}'."}
             )
         org = Organization.objects.get(short_name=org_name)
 

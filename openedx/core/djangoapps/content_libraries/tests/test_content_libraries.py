@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import ddt
 from django.contrib.auth.models import Group
+from django.test import override_settings
 from django.test.client import Client
 from freezegun import freeze_time
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
@@ -139,6 +140,63 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert response == {
             'slug': ['Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.'],
         }
+
+    def test_library_org_validation(self):
+        """
+        Staff users can create libraries in any existing or auto-created organization.
+        """
+        assert Organization.objects.filter(short_name='auto-created-org').count() == 0
+        self._create_library(slug="auto-created-org-1", title="Library in an auto-created org", org='auto-created-org')
+        assert Organization.objects.filter(short_name='auto-created-org').count() == 1
+        self._create_library(slug="existing-org-1", title="Library in an existing org", org="CL-TEST")
+
+    @patch(
+        "openedx.core.djangoapps.content_libraries.views.user_can_create_organizations",
+    )
+    @patch(
+        "openedx.core.djangoapps.content_libraries.views.get_allowed_organizations_for_libraries",
+    )
+    @override_settings(ORGANIZATIONS_AUTOCREATE=False)
+    def test_library_org_no_autocreate(self, mock_get_allowed_organizations, mock_can_create_organizations):
+        """
+        When org auto-creation is disabled, user must use one of their allowed orgs.
+        """
+        mock_can_create_organizations.return_value = False
+        mock_get_allowed_organizations.return_value = ["CL-TEST"]
+        assert Organization.objects.filter(short_name='auto-created-org').count() == 0
+        response = self._create_library(
+            slug="auto-created-org-2",
+            org="auto-created-org",
+            title="Library in an auto-created org",
+            expect_response=400,
+        )
+        assert response == {
+            'org': "No such organization 'auto-created-org' found.",
+        }
+
+        Organization.objects.get_or_create(
+            short_name="not-allowed-org",
+            defaults={"name": "Content Libraries Test Org Membership"},
+        )
+        response = self._create_library(
+            slug="not-allowed-org",
+            org="not-allowed-org",
+            title="Library in an not-allowed org",
+            expect_response=400,
+        )
+        assert response == {
+            'org': "User not allowed to create libraries in 'not-allowed-org'.",
+        }
+        assert mock_can_create_organizations.call_count == 1
+        assert mock_get_allowed_organizations.call_count == 1
+
+        self._create_library(
+            slug="allowed-org-2",
+            org="CL-TEST",
+            title="Library in an allowed org",
+        )
+        assert mock_can_create_organizations.call_count == 2
+        assert mock_get_allowed_organizations.call_count == 2
 
     @skip("This endpoint shouldn't support num_blocks and has_unpublished_*.")
     @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootView.pagination_class.page_size", new=2)
