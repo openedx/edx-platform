@@ -47,6 +47,17 @@ define([
                 title: gettext("Studio's having trouble saving your work"),
                 message: message
             });
+            if (window.self !== window.top) {
+                try {
+                    window.parent.postMessage({
+                        type: 'studioAjaxError',
+                        message: 'Sends a message when an AJAX error occurs',
+                        payload: {}
+                    }, document.referrer);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
             console.log('Studio AJAX Error', { // eslint-disable-line no-console
                 url: event.currentTarget.URL,
                 response: jqXHR.responseText,

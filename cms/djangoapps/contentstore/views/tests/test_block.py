@@ -23,6 +23,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
 from pytz import UTC
+from bs4 import BeautifulSoup
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlockAside
@@ -4538,3 +4539,61 @@ class TestUpdateFromSource(ModuleStoreTestCase):
             user_id=user.id,
         )
         self.check_updated(source_block, destination_block.location)
+
+
+class TestXblockEditView(CourseTestCase):
+    """
+    Test xblock_edit_view.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.chapter = self._create_block(self.course, "chapter", "Week 1")
+        self.sequential = self._create_block(self.chapter, "sequential", "Lesson 1")
+        self.vertical = self._create_block(self.sequential, "vertical", "Unit")
+        self.html = self._create_block(self.vertical, "html", "HTML")
+        self.child_container = self._create_block(
+            self.vertical, "split_test", "Split Test"
+        )
+        self.child_vertical = self._create_block(
+            self.child_container, "vertical", "Child Vertical"
+        )
+        self.video = self._create_block(self.child_vertical, "video", "My Video")
+        self.store = modulestore()
+
+        self.store.publish(self.vertical.location, self.user.id)
+
+    def _create_block(self, parent, category, display_name, **kwargs):
+        """
+        creates a block in the module store, without publishing it.
+        """
+        return BlockFactory.create(
+            parent=parent,
+            category=category,
+            display_name=display_name,
+            publish_item=False,
+            user_id=self.user.id,
+            **kwargs,
+        )
+
+    def test_xblock_edit_view(self):
+        url = reverse_usage_url("xblock_edit_handler", self.video.location)
+        resp = self.client.get_html(url)
+        self.assertEqual(resp.status_code, 200)
+
+        html_content = resp.content.decode(resp.charset)
+        self.assertIn("var decodedActionName = 'edit';", html_content)
+
+    def test_xblock_edit_view_contains_resources(self):
+        url = reverse_usage_url("xblock_edit_handler", self.video.location)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+        html_content = resp.content.decode(resp.charset)
+        soup = BeautifulSoup(html_content, "html.parser")
+
+        resource_links = [link["href"] for link in soup.find_all("link", {"rel": "stylesheet"})]
+        script_sources = [script["src"] for script in soup.find_all("script") if script.get("src")]
+
+        self.assertGreater(len(resource_links), 0, f"No CSS resources found in HTML. Found: {resource_links}")
+        self.assertGreater(len(script_sources), 0, f"No JS resources found in HTML. Found: {script_sources}")
