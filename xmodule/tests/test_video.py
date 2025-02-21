@@ -741,6 +741,48 @@ class VideoExportTestCase(VideoBlockTestBase):
             course_id=self.block.scope_ids.usage_id.context_key,
         )
 
+    def test_export_to_xml_without_video_id(self):
+        """
+        Test that we write the correct XML on export of a video without edx_video_id.
+        """
+        self.block.youtube_id_0_75 = 'izygArpw-Qo'
+        self.block.youtube_id_1_0 = 'p2Q6BrNhdh8'
+        self.block.youtube_id_1_25 = '1EeWXzPdhSA'
+        self.block.youtube_id_1_5 = 'rABDYkeK0x8'
+        self.block.show_captions = False
+        self.block.start_time = datetime.timedelta(seconds=1.0)
+        self.block.end_time = datetime.timedelta(seconds=60)
+        self.block.track = 'http://www.example.com/track'
+        self.block.handout = 'http://www.example.com/handout'
+        self.block.download_track = True
+        self.block.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source1.ogg']
+        self.block.download_video = True
+        self.block.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
+
+        xml = self.block.definition_to_xml(self.file_system)
+        parser = etree.XMLParser(remove_blank_text=True)
+        xml_string = '''\
+         <video
+            url_name="SampleProblem"
+            start_time="0:00:01"
+            show_captions="false"
+            end_time="0:01:00"
+            download_video="true"
+            download_track="true"
+            youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"
+            transcripts='{"ge": "german_translation.srt", "ua": "ukrainian_translation.srt"}'
+         >
+           <source src="http://www.example.com/source.mp4"/>
+           <source src="http://www.example.com/source1.ogg"/>
+           <track src="http://www.example.com/track"/>
+           <handout src="http://www.example.com/handout"/>
+           <transcript language="ge" src="german_translation.srt" />
+           <transcript language="ua" src="ukrainian_translation.srt" />
+         </video>
+        '''
+        expected = etree.XML(xml_string, parser=parser)
+        self.assertXmlEqual(expected, xml)
+
     @patch('xmodule.video_block.video_block.edxval_api')
     def test_export_to_xml_val_error(self, mock_val_api):
         # Export should succeed without VAL data if video does not exist
