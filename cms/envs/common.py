@@ -1689,6 +1689,8 @@ INSTALLED_APPS = [
     # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
 
+    # Maintenance tools
+    'cms.djangoapps.maintenance',
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking

@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 from config_models.models import ConfigurationModel
 from django.db import models
+from django.db.models import QuerySet
 from django.db.models.fields import IntegerField, TextField
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
@@ -115,6 +116,25 @@ class PublishableEntityLink(models.Model):
     def __str__(self):
         return f"{self.upstream_usage_key}->{self.downstream_usage_key}"
 
+    @property
+    def upstream_version(self) -> int | None:
+        """
+        Returns upstream block version number if available.
+        """
+        version_num = None
+        if hasattr(self.upstream_block, 'published'):
+            if hasattr(self.upstream_block.published, 'version'):
+                if hasattr(self.upstream_block.published.version, 'version_num'):
+                    version_num = self.upstream_block.published.version.version_num
+        return version_num
+
+    @property
+    def upstream_context_title(self) -> str:
+        """
+        Returns upstream context title.
+        """
+        return self.upstream_block.learning_package.title
+
     class Meta:
         verbose_name = _("Publishable Entity Link")
         verbose_name_plural = _("Publishable Entity Links")
@@ -169,6 +189,18 @@ class PublishableEntityLink(models.Model):
             link.updated = created
             link.save()
         return link
+
+    @classmethod
+    def get_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet["PublishableEntityLink"]:
+        """
+        Get all links for given downstream context, preselects related published version and learning package.
+        """
+        return cls.objects.filter(
+            downstream_context_key=downstream_context_key
+        ).select_related(
+            "upstream_block__published__version",
+            "upstream_block__learning_package"
+        )
 
 
 class LearningContextLinksStatusChoices(models.TextChoices):
