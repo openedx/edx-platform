@@ -76,7 +76,10 @@ from xblock.core import XBlock
 
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from cms.djangoapps.contentstore.models import PublishableEntityLink
-from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
+from cms.djangoapps.contentstore.rest_api.v2.serializers import (
+    PublishableEntityLinksSerializer,
+    PublishableEntityLinksUsageKeySerializer,
+)
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
     BadUpstream,
@@ -156,15 +159,11 @@ class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
 
-        downstream_usage_key_list = (
-            PublishableEntityLink
-            .get_by_upstream_usage_key(upstream_usage_key=usage_key)
-            .values_list("downstream_usage_key", flat=True)
-        )
+        links = PublishableEntityLink.get_by_upstream_usage_key(upstream_usage_key=usage_key)
 
-        downstream_usage_key_str_list = [str(usage_key) for usage_key in downstream_usage_key_list]
+        serializer = PublishableEntityLinksUsageKeySerializer(links, many=True)
 
-        return Response(downstream_usage_key_str_list)
+        return Response(serializer.data)
 
 
 @view_auth_classes(is_authenticated=True)
