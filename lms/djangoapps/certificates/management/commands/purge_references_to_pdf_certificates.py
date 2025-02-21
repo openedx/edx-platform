@@ -20,7 +20,6 @@ from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     PurgeReferencestoPDFCertificatesCommandConfiguration,
 )
-from openedx.core.djangoapps.user_api.api import get_retired_user_ids
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -100,9 +99,8 @@ class Command(BaseCommand):
             f"resetting status, from the following certificate records: {certificate_ids}"
         )
         if not options["dry_run"]:
-            x = GeneratedCertificate.objects.filter(id__in=certificate_ids).update(
+            GeneratedCertificate.objects.filter(id__in=certificate_ids).update(
                 download_url="",
                 download_uuid="",
                 status=CertificateStatuses.unavailable,
             )
-            print(f"XX {x}")
