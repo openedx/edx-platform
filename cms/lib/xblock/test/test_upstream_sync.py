@@ -71,6 +71,21 @@ class UpstreamTestCase(ModuleStoreTestCase):
             '/>\n'
         ))
 
+        self.upstream_video_key = libs.create_library_block(self.library.key, "video", "video-upstream").usage_key
+        libs.set_library_block_olx(self.upstream_video_key, (
+            '<video'
+            ' display_name="Video Test"'
+            ' edx_video_id=""'
+            ' end_time="00:00:00"'
+            ' html5_sources="[&quot;https://www.sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4&quot;]"'
+            ' start_time="00:00:00"'
+            ' track=""'
+            ' youtube_id_1_0=""'
+            '>'
+            ' <source src="https://www.sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"/>'
+            '</video>'
+        ))
+
         libs.publish_changes(self.library.key, self.user.id)
 
         self.taxonomy_all_org = tagging_api.create_taxonomy(
@@ -539,3 +554,16 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert len(object_tags) == len(new_upstream_tags)
         for object_tag in object_tags:
             assert object_tag.value in new_upstream_tags
+
+    def test_sync_video_block(self):
+        downstream = BlockFactory.create(category='video', parent=self.unit, upstream=str(self.upstream_video_key))
+        downstream.edx_video_id = "test_video_id"
+
+        # Sync
+        sync_from_upstream(downstream, self.user)
+        assert downstream.upstream_version == 2
+        assert downstream.upstream_display_name == "Video Test"
+        assert downstream.display_name == "Video Test"
+
+        # `edx_video_id` doesn't change
+        assert downstream.edx_video_id == "test_video_id"
