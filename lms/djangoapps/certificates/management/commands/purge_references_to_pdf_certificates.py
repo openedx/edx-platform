@@ -15,7 +15,6 @@ import shlex
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 
-from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import (
     GeneratedCertificate,
     PurgeReferencestoPDFCertificatesCommandConfiguration,
@@ -95,12 +94,11 @@ class Command(BaseCommand):
             raise CommandError("You must specify one or more certificate IDs")
 
         log.info(
-            f"{dry_run_string}Purging download_url and download_uri, and "
-            f"resetting status, from the following certificate records: {certificate_ids}"
+            f"{dry_run_string}Purging download_url and download_uri "
+            f"from the following certificate records: {certificate_ids}"
         )
         if not options["dry_run"]:
             GeneratedCertificate.objects.filter(id__in=certificate_ids).update(
                 download_url="",
                 download_uuid="",
-                status=CertificateStatuses.unavailable,
             )

@@ -8,7 +8,6 @@ from django.core.management import CommandError, call_command
 from testfixtures import LogCapture
 
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -29,7 +28,6 @@ class PurgeReferencesToPDFCertificatesTests(ModuleStoreTestCase):
         self.cert_1 = GeneratedCertificateFactory(
             user=self.user,
             course_id=self.course_run_1.id,
-            status=CertificateStatuses.downloadable,
             download_url="http://example.com/1",
             download_uuid=uuid.uuid4(),
             grade=1.00,
@@ -37,7 +35,6 @@ class PurgeReferencesToPDFCertificatesTests(ModuleStoreTestCase):
         self.cert_2 = GeneratedCertificateFactory(
             user=self.user,
             course_id=self.course_run_2.id,
-            status=CertificateStatuses.downloadable,
             download_url="http://example.com/2",
             download_uuid=uuid.uuid4(),
             grade=2.00,
@@ -45,7 +42,6 @@ class PurgeReferencesToPDFCertificatesTests(ModuleStoreTestCase):
         self.cert_3 = GeneratedCertificateFactory(
             user=self.user,
             course_id=self.course_run_3.id,
-            status=CertificateStatuses.downloadable,
             download_url="http://example.com/3",
             download_uuid=uuid.uuid4(),
             grade=3.00,
@@ -74,22 +70,19 @@ class PurgeReferencesToPDFCertificatesTests(ModuleStoreTestCase):
         cert3_post = GeneratedCertificate.objects.get(id=self.cert_3.id)
         self.assertEqual(cert1_post.download_url, "http://example.com/1")
         self.assertNotEqual(cert1_post.download_uuid, "")
-        self.assertEqual(cert1_post.status, CertificateStatuses.downloadable)
 
         self.assertEqual(cert2_post.download_url, "")
         self.assertEqual(cert2_post.download_uuid, "")
-        self.assertEqual(cert2_post.status, CertificateStatuses.unavailable)
 
         self.assertEqual(cert3_post.download_url, "")
         self.assertEqual(cert3_post.download_uuid, "")
-        self.assertEqual(cert3_post.status, CertificateStatuses.unavailable)
 
     def test_management_command_dry_run(self):
         """
         Verify that the management command does not purge any data when invoked with the `--dry-run` flag
         """
         expected_log_msg = (
-            "[DRY RUN] Purging download_url and download_uri, and resetting status, "
+            "[DRY RUN] Purging download_url and download_uri "
             f"from the following certificate records: {list(str(self.cert_3.id))}"
         )
 
@@ -104,6 +97,5 @@ class PurgeReferencesToPDFCertificatesTests(ModuleStoreTestCase):
         cert3_post = GeneratedCertificate.objects.get(id=self.cert_3.id)
         self.assertEqual(cert3_post.download_url, "http://example.com/3")
         self.assertNotEqual(cert3_post.download_uuid, "")
-        self.assertEqual(cert3_post.status, CertificateStatuses.downloadable)
 
         assert logger.records[0].msg == expected_log_msg
