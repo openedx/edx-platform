@@ -499,6 +499,7 @@ edx-opaque-keys[django]==2.11.0
     #   edx-when
     #   lti-consumer-xblock
     #   openedx-events
+    #   openedx-filters
     #   ora2
 edx-organizations==6.13.0
     # via -r requirements/edx/kernel.in
@@ -820,7 +821,7 @@ openedx-events==9.18.0
     #   edx-name-affirmation
     #   event-tracking
     #   ora2
-openedx-filters==1.12.0
+openedx-filters==2.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
