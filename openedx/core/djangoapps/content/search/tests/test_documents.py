@@ -158,7 +158,6 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
-                    'url': '/course/course-v1:edX+toy+2012_Fall',
                 },
                 {
                     'display_name': 'chapter',
@@ -171,10 +170,6 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 {
                     'display_name': 'vertical',
                     'usage_key': 'block-v1:edX+toy+2012_Fall+type@vertical+block@vertical_test',
-                    'url': (
-                        '/course/course-v1:edX+toy+2012_Fall'
-                        '/container/block-v1:edX+toy+2012_Fall+type@vertical+block@vertical_test'
-                    ),
                 },
             ],
             "content": {
@@ -213,7 +208,6 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
-                    'url': '/course/course-v1:edX+toy+2012_Fall',
                 },
                 {
                     'display_name': 'Overview',
@@ -257,7 +251,6 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
-                    'url': '/course/course-v1:edX+toy+2012_Fall',
                 },
                 {
                     'display_name': 'Overview',

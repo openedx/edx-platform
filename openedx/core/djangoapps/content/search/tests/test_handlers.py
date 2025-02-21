@@ -72,7 +72,6 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             "breadcrumbs": [
                 {
                     "display_name": "Test Course",
-                    "url": "/course/course-v1:orgA+test_course+test_run",
                 },
             ],
             "content": {},
@@ -93,7 +92,6 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             "breadcrumbs": [
                 {
                     "display_name": "Test Course",
-                    "url": "/course/course-v1:orgA+test_course+test_run",
                 },
                 {
                     "display_name": "sequential",

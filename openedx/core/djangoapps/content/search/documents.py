@@ -47,9 +47,9 @@ class Fields:
     context_key = "context_key"
     org = "org"
     access_id = "access_id"  # .models.SearchAccess.id
-    # breadcrumbs: an array of {"display_name": "...", "usage_key": "...", "url": "..."} entries.
-    # First one is the name of the course/library itself.
+    # breadcrumbs: an array of {"display_name": "..."} entries. First one is the name of the course/library itself.
     # After that is the name of any parent Section/Subsection/Unit/etc.
+    # It's a list of dictionaries because for now we just include the name of each but in future we may add their IDs.
     breadcrumbs = "breadcrumbs"
     # tags (dictionary)
     # See https://blog.meilisearch.com/nested-hierarchical-facets-guide/
@@ -199,7 +199,6 @@ def _fields_from_block(block) -> dict:
     class implementation returns only:
         {"content": {"display_name": "..."}, "content_type": "..."}
     """
-
     block_type = block.scope_ids.block_type
     block_data = {
         Fields.usage_key: str(block.usage_key),
@@ -214,9 +213,6 @@ def _fields_from_block(block) -> dict:
     }
     # Get the breadcrumbs (course, section, subsection, etc.):
     if block.usage_key.context_key.is_course:  # Getting parent is not yet implemented in Learning Core (for libraries).
-        # Import here to avoid circular imports
-        from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
-
         cur_block = block
         while cur_block.parent:
             if not cur_block.has_cached_parent:
@@ -229,15 +225,6 @@ def _fields_from_block(block) -> dict:
             }
             if cur_block.scope_ids.block_type != "course":
                 parent_data["usage_key"] = str(cur_block.usage_key)
-                # Section and subsections don't have URLs in the CMS
-                if cur_block.scope_ids.block_type not in ["chapter", "sequential"]:
-                    parent_data["url"] = (
-                        reverse_course_url("course_handler", cur_block.context_key) +
-                        reverse_usage_url("container_handler", cur_block.usage_key)
-                    )
-            else:
-                parent_data["url"] = reverse_course_url("course_handler", cur_block.context_key)
-
             block_data[Fields.breadcrumbs].insert(
                 0,
                 parent_data,
