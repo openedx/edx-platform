@@ -70,7 +70,6 @@ export default class Main extends React.Component {
                     {this.state.showDropdown
             && (
                 <BlockBrowserContainer
-                    data-testid="block-browser-container"
                     onSelectBlock={(blockId) => {
                         this.hideDropdown();
                         onSelectBlock(blockId);
