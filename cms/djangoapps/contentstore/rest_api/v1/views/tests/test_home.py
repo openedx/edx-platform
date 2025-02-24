@@ -15,12 +15,6 @@ from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
 
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = True
-FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = False
-
-
 @ddt.ddt
 class HomePageViewTest(CourseTestCase):
     """
@@ -99,7 +93,6 @@ class HomePageViewTest(CourseTestCase):
         )
 
 
-@override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API)
 @ddt.ddt
 class HomePageCoursesViewTest(CourseTestCase):
     """
@@ -141,7 +134,6 @@ class HomePageCoursesViewTest(CourseTestCase):
         print(response.data)
         self.assertDictEqual(expected_response, response.data)
 
-    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
     def test_home_page_response_with_api_v2(self):
         """Check successful response content with api v2 modifications.
 
@@ -171,7 +163,6 @@ class HomePageCoursesViewTest(CourseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
 
-    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
     @ddt.data(
         ("active_only", "true", 2, 0),
         ("archived_only", "true", 0, 1),
@@ -214,7 +205,6 @@ class HomePageCoursesViewTest(CourseTestCase):
         self.assertEqual(len(response.data["archived_courses"]), expected_archived_length)
         self.assertEqual(len(response.data["courses"]), expected_active_length)
 
-    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
     @ddt.data(
         ("active_only", "true"),
         ("archived_only", "true"),
@@ -231,7 +221,6 @@ class HomePageCoursesViewTest(CourseTestCase):
         self.assertEqual(len(response.data["courses"]), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
     @ddt.data(
         ("active_only", "true"),
         ("archived_only", "true"),
@@ -243,7 +232,7 @@ class HomePageCoursesViewTest(CourseTestCase):
         """Test home page with org filter and ordering when there are no courses for a non-staff user."""
         self.course_overview.delete()
 
-        response = self.non_staff_client.get(self.url)
+        response = self.non_staff_client.get(self.url, {filter_key: filter_value})
 
         self.assertEqual(len(response.data["courses"]), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
