@@ -56,6 +56,6 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
         if not getattr(settings, "SEARCH_SKIP_INVITATION_ONLY_FILTERING", True):
             exclude_dictionary['invitation_only'] = True
         if not getattr(settings, "SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING", True):
-            exclude_dictionary['catalog_visibility'] = 'none'
+            exclude_dictionary['catalog_visibility'] = ['none','about']
 
         return exclude_dictionary
