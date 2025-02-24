@@ -5,12 +5,14 @@ from typing import Dict, Optional, TYPE_CHECKING
 
 import hashlib
 import json
+import re
 import logging
 
 import requests
 from django.conf import settings
 from django.urls import reverse
 from requests.auth import HTTPBasicAuth
+from xmodule.capa.xqueue_submission import XQueueInterfaceSubmission
 
 if TYPE_CHECKING:
     from xmodule.capa_block import ProblemBlock
@@ -24,6 +26,34 @@ XQUEUE_METRIC_NAME = 'edxapp.xqueue'
 XQUEUE_TIMEOUT = 35  # seconds
 CONNECT_TIMEOUT = 3.05  # seconds
 READ_TIMEOUT = 10  # seconds
+
+
+def is_flag_active(flag_name, course_id):
+    """
+    Look for the waffle flag by name and course_id.
+    """
+    from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel as waffle
+    flag = waffle.objects.filter(waffle_flag=flag_name, course_id=course_id, enabled=True).first()
+    return flag and flag.enabled
+
+
+def get_flag_by_name(flag_name):
+    """
+    Look for the waffle flag by name.
+    """
+    from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+    flag = WaffleFlagCourseOverrideModel.objects.filter(waffle_flag=flag_name, enabled=True).first()
+    return flag and flag.enabled
+
+
+def get_course_id(callback_url):
+    """
+    Extract course_id from the callback URL
+    """
+    course_id_match = re.search(r'(course-v1:[^\/]+)', callback_url)
+    if not course_id_match:
+        raise ValueError("The callback_url does not contain the required information.")
+    return course_id_match.group(1)
 
 
 def make_hashkey(seed):
@@ -135,7 +165,16 @@ class XQueueInterface:
             for f in files_to_upload:
                 files.update({f.name: f})
 
-        return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
+        header_info = json.loads(header)
+        course_id = get_course_id(header_info['lms_callback_url'])
+        if is_flag_active('send_to_submission_course.enable', course_id):
+            # Use the new edx-submissions workflow
+            submission = XQueueInterfaceSubmission().send_to_submission(header, body, files)
+            log.error(submission)
+            return None, ''
+
+        else:
+            return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
     def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
@@ -184,8 +223,12 @@ class XQueueService:
         """
         Return a fully qualified callback URL for external queueing system.
         """
+        if get_flag_by_name('send_to_submission_course.enable'):
+            dispatch_callback = "callback_submission"
+        else:
+            dispatch_callback = 'xqueue_callback'
         relative_xqueue_callback_url = reverse(
-            'xqueue_callback',
+            dispatch_callback,
             kwargs=dict(
                 course_id=str(self._block.scope_ids.usage_id.context_key),
                 userid=str(self._block.scope_ids.user_id),

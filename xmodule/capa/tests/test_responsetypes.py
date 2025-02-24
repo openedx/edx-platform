@@ -39,6 +39,8 @@ from xmodule.capa.tests.response_xml_factory import (
 )
 from xmodule.capa.util import convert_files_to_filenames
 from xmodule.capa.xqueue_interface import dateformat
+import xmodule.capa.xqueue_submission as xqueue_submission
+from xmodule.capa.xqueue_interface import get_flag_by_name
 
 
 class ResponseTest(unittest.TestCase):
@@ -929,6 +931,7 @@ class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, " ", "incorrect")
 
 
+@pytest.mark.django_db
 class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = CodeResponseXMLFactory
 
@@ -944,8 +947,12 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     @staticmethod
     def make_queuestate(key, time):
         """Create queuestate dict"""
-        timestr = datetime.strftime(time, dateformat)
-        return {'key': key, 'time': timestr}
+        if get_flag_by_name('send_to_submission_course.enable'):
+            timestr = datetime.strftime(time, xqueue_submission.dateformat)
+            return {'key': key, 'time': timestr}
+        else:
+            timestr = datetime.strftime(time, dateformat)
+            return {'key': key, 'time': timestr}
 
     def test_is_queued(self):
         """

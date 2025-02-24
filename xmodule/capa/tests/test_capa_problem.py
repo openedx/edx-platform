@@ -54,7 +54,7 @@ class CAPAProblemTest(unittest.TestCase):
         """.format(question=question)
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': question, 'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}}}
+            {'1_2_1': {'label': question, 'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}}}
         assert len(problem.tree.xpath('//label')) == 0
 
     @ddt.unpack
@@ -123,7 +123,7 @@ class CAPAProblemTest(unittest.TestCase):
         """.format(question1, question2)
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
+            {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
         for question in (question1, question2):
             assert len(problem.tree.xpath('//label[text()="{}"]'.format(question))) == 0
 
@@ -146,8 +146,8 @@ class CAPAProblemTest(unittest.TestCase):
         """.format(desc1, desc2)
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': '___ requires sacrifices.',
-                          'descriptions': {'description_1_1_1': desc1, 'description_1_1_2': desc2}}}
+            {'1_2_1': {'label': '___ requires sacrifices.',
+                       'descriptions': {'description_1_1_1': desc1, 'description_1_1_2': desc2}}}
 
     def test_additional_answer_is_skipped_from_resulting_html(self):
         """Tests that additional_answer element is not present in transformed HTML"""
@@ -236,10 +236,10 @@ class CAPAProblemTest(unittest.TestCase):
         """
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': 'Select the correct synonym of paranoid?',
-                          'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}},
-                '1_3_1': {'label': 'What Apple device competed with the portable CD player?',
-                          'descriptions': {'description_1_2_1': 'Device looks like an egg plant.'}}}
+            {'1_2_1': {'label': 'Select the correct synonym of paranoid?',
+                       'descriptions': {'description_1_1_1': 'Only the paranoid survive.'}},
+             '1_3_1': {'label': 'What Apple device competed with the portable CD player?',
+                       'descriptions': {'description_1_2_1': 'Device looks like an egg plant.'}}}
         assert len(problem.tree.xpath('//label')) == 0
 
     def test_question_title_not_removed_got_children(self):
@@ -291,8 +291,8 @@ class CAPAProblemTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'group_label': group_label, 'label': input1_label, 'descriptions': {}},
-                '1_2_2': {'group_label': group_label, 'label': input2_label, 'descriptions': {}}}
+            {'1_2_1': {'group_label': group_label, 'label': input1_label, 'descriptions': {}},
+             '1_2_2': {'group_label': group_label, 'label': input2_label, 'descriptions': {}}}
 
     def test_single_inputtypes(self):
         """
@@ -355,7 +355,7 @@ class CAPAProblemTest(unittest.TestCase):
         )
         problem = new_loncapa_problem(xml)
         assert problem.problem_data ==\
-               {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
+            {'1_2_1': {'label': question1, 'descriptions': {}}, '1_3_1': {'label': question2, 'descriptions': {}}}
         assert len(problem.tree.xpath('//{}'.format(tag))) == 0
 
     @ddt.unpack
