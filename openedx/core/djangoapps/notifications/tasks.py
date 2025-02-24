@@ -14,6 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
+from lms.djangoapps.utils import get_braze_client
 from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
 from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
@@ -28,6 +29,7 @@ from openedx.core.djangoapps.notifications.grouping_notifications import (
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
+    NotificationBrazeCampaigns,
     get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
@@ -203,6 +205,35 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             generated_notification_audience, app_name, notification_type, course_key, content_url,
             notification_content, sender_id=sender_id
         )
+        send_braze_notification_to_mobile_users(generated_notification_audience, app_name, notification_type, course_key, content_url,notification_content, sender_id=sender_id)
+
+def send_braze_notification_to_mobile_users(generated_notification_audience, app_name, notification_type, course_key, content_url,
+            notification_content, sender_id):
+    if app_name != 'discussion':
+        return
+
+    campaign_id = NotificationBrazeCampaigns.get_notification_campaign_id(notification_type)
+    if not campaign_id:
+        return
+
+    post_data = {
+        'trigger_properties': {
+            'notification_type': notification_type,
+            'course_id': course_key,
+            'topic_id': notification_content['extra_context']['topic_id'],
+            'thread_id': notification_content['extra_context']['thread_id'],
+            'content_url': content_url,
+            **notification_content,
+        },
+
+    }
+    emails = generated_notification_audience
+    try:
+        braze_client = get_braze_client()
+        if braze_client:
+            braze_client.send_campaign_message(campaign_id=campaign_id, trigger_properties=post_data, emails=emails)
+    except Exception as exc:  # pylint: disable=broad-except
+        logger.error(f'Unable to send notification request with Braze ')
 
 
 def is_notification_valid(notification_type, context):
