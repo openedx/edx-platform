@@ -45,11 +45,14 @@ https://github.com/openedx/edx-platform/issues/35653):
     GET: List all downstream blocks linked to a library block.
         200: A list of downstream usage_keys linked to the library block.
 
-  # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
       GET: List downstream blocks that can be synced, filterable by course or sync-readiness.
         200: A paginated list of applicable & accessible downstream blocks. Entries are UpstreamLinks.
+
+  /api/contentstore/v2/downstreams/<course_key>/summary
+      GET: List summary of links by course key
+        200: A paginated list of summary of links by course key
 
 UpstreamLink response schema:
   {
@@ -115,41 +118,28 @@ class _AuthenticatedRequest(Request):
     user: User
 
 
-# TODO: Potential future view.
-# @view_auth_classes(is_authenticated=True)
-# class DownstreamListView(DeveloperErrorViewMixin, APIView):
-#     """
-#     List all blocks which are linked to upstream content, with optional filtering.
-#     """
-#     def get(self, request: _AuthenticatedRequest) -> Response:
-#         """
-#         Handle the request.
-#         """
-#         course_key_string = request.GET['course_id']
-#         syncable = request.GET['ready_to_sync']
-#         ...
-
-
 @view_auth_classes()
-class UpstreamListView(DeveloperErrorViewMixin, APIView):
+class DownstreamListView(DeveloperErrorViewMixin, APIView):
     """
-    Serves course->library publishable entity links
+    List all blocks which are linked to an upstream context, with optional filtering.
     """
-    def get(self, request: _AuthenticatedRequest, course_key_string: str):
+    def get(self, request: _AuthenticatedRequest):
         """
         Fetches publishable entity links for given course key
         """
-        try:
-            course_key = CourseKey.from_string(course_key_string)
-        except InvalidKeyError as exc:
-            raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
+        course_key_string = request.GET.get('course_id')
         ready_to_sync = request.GET.get('ready_to_sync')
+        filter = {}
+        if course_key_string:
+            try:
+                course_key = CourseKey.from_string(course_key_string)
+                filter["downstream_context_key"] = course_key
+            except InvalidKeyError as exc:
+                raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
         if ready_to_sync is not None:
             ready_to_sync = BooleanField().to_internal_value(ready_to_sync)
-        links = PublishableEntityLink.get_by_downstream_context(
-            downstream_context_key=course_key,
-            ready_to_sync=ready_to_sync,
-        )
+            filter["ready_to_sync"] = ready_to_sync
+        links = PublishableEntityLink.filter_links(**filter)
         serializer = PublishableEntityLinksSerializer(links, many=True)
         return Response(serializer.data)
 
@@ -176,7 +166,7 @@ class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
 
 
 @view_auth_classes()
-class UpstreamSummaryView(DeveloperErrorViewMixin, APIView):
+class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
     """
     Serves course->library publishable entity links summary
     """
