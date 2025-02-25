@@ -89,11 +89,10 @@ describe('ProblemBrowser Main component', () => {
                 await userEvent.click(screen.getByText('Select a section or problem'));
             });
 
-            await waitFor(() => 
-                expect(screen.getByTestId('mocked-block-browser-container'))
-                  .toHaveClass('block-browser'),
-            );
-              
+            await waitFor(() => {
+                expect(screen.getByTestId('mocked-block-browser-container')).toHaveClass('block-browser');
+            });
+
             expect(container).toMatchSnapshot();
 
             await act(async () => {
