@@ -855,11 +855,15 @@ class _BuiltInVideoBlock(
                 if new_transcripts.get('en'):
                     xml.set('sub', '')
 
-                # Update `transcripts` attribute in the xml
-                xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
-
             except edxval_api.ValVideoNotFoundError:
                 pass
+        else:
+            if transcripts.get('en'):
+                xml.set('sub', '')
+
+        if transcripts:
+            # Update `transcripts` attribute in the xml
+            xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
 
             # Sorting transcripts for easy testing of resulting xml
             for transcript_language in sorted(transcripts.keys()):

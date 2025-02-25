@@ -527,7 +527,9 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 tagValueElement.className = 'tagging-label-value';
 
                 tagContentElement.appendChild(tagValueElement);
-                parentElement.appendChild(tagContentElement);
+                if (parentElement) {
+                    parentElement.appendChild(tagContentElement);
+                }
 
                 if (tag.children.length > 0) {
                     var tagIconElement = document.createElement('span'),
