@@ -1,14 +1,13 @@
 """
 Unit tests for home page view.
 """
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import ddt
 import pytz
 from django.conf import settings
-from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 
@@ -16,11 +15,7 @@ from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = True
 
-
-@override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
 @ddt.ddt
 class HomePageCoursesViewV2Test(CourseTestCase):
     """
@@ -208,21 +203,6 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @patch("cms.djangoapps.contentstore.views.course.CourseOverview")
-    @patch("cms.djangoapps.contentstore.views.course.modulestore")
-    def test_api_v2_is_disabled(self, mock_modulestore, mock_course_overview):
-        """Get list of courses when home page course v2 API is disabled.
-
-        Expected result:
-        - Courses are read from the modulestore.
-        """
-        with override_settings(FEATURES={'ENABLE_HOME_PAGE_COURSE_API_V2': False}):
-            response = self.client.get(self.api_v1_url)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        mock_modulestore().get_course_summaries.assert_called_once()
-        mock_course_overview.get_all_courses.assert_not_called()
-
     @ddt.data(
         ("active_only", "true"),
         ("archived_only", "true"),
@@ -245,7 +225,6 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(len(response.data['results']['courses']), 0)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
     @ddt.data(
         ("active_only", "true", 2, 0),
         ("archived_only", "true", 0, 1),
