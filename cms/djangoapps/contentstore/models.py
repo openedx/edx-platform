@@ -193,17 +193,15 @@ class PublishableEntityLink(models.Model):
         return link
 
     @classmethod
-    def get_by_downstream_context(
+    def filter_links(
         cls,
-        downstream_context_key: CourseKey,
-        ready_to_sync: bool | None = None,
+        **filter,
     ) -> QuerySet["PublishableEntityLink"]:
         """
-        Get all links for given downstream context, preselects related published version and learning package.
+        Get all links along with sync flag, upstream context title and version, with optional filtering.
         """
-        result = cls.objects.filter(
-            downstream_context_key=downstream_context_key
-        ).select_related(
+        ready_to_sync = filter.pop('ready_to_sync', None)
+        result = cls.objects.filter(**filter).select_related(
             "upstream_block__published__version",
             "upstream_block__learning_package"
         ).annotate(
@@ -235,7 +233,7 @@ class PublishableEntityLink(models.Model):
         """
         Returns a summary of links by upstream context for given downstream_context_key.
         """
-        result = cls.get_by_downstream_context(downstream_context_key).values(
+        result = cls.filter_links(downstream_context_key=downstream_context_key).values(
             "upstream_context_key",
             upstream_context_title=F("upstream_block__learning_package__title"),
         ).annotate(
