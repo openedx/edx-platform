@@ -79,6 +79,7 @@ from cms.djangoapps.contentstore.helpers import import_static_assets_for_library
 from cms.djangoapps.contentstore.models import PublishableEntityLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
     PublishableEntityLinksSerializer,
+    PublishableEntityLinksSummarySerializer,
     PublishableEntityLinksUsageKeySerializer,
 )
 from cms.lib.xblock.upstream_sync import (
@@ -97,9 +98,9 @@ from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
 )
-from xmodule.video_block.transcripts_utils import clear_transcripts
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.video_block.transcripts_utils import clear_transcripts
 
 logger = logging.getLogger(__name__)
 
@@ -174,6 +175,24 @@ class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
         return Response(serializer.data)
 
 
+@view_auth_classes()
+class UpstreamSummaryView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves course->library publishable entity links summary
+    """
+    def get(self, request: _AuthenticatedRequest, course_key_string: str):
+        """
+        Fetches publishable entity links summary for given course key
+        """
+        try:
+            course_key = CourseKey.from_string(course_key_string)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
+        links = PublishableEntityLink.summarize_by_downstream_context(downstream_context_key=course_key)
+        serializer = PublishableEntityLinksSummarySerializer(links, many=True)
+        return Response(serializer.data)
+
+
 @view_auth_classes(is_authenticated=True)
 class DownstreamView(DeveloperErrorViewMixin, APIView):
     """
@@ -238,7 +257,7 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
         try:
             sever_upstream_link(downstream)
-        except NoUpstream as exc:
+        except NoUpstream:
             logger.exception(
                 "Tried to DELETE upstream link of '%s', but it wasn't linked to anything in the first place. "
                 "Will do nothing. ",

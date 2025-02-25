@@ -30,3 +30,13 @@ class PublishableEntityLinksUsageKeySerializer(serializers.ModelSerializer):
     class Meta:
         model = PublishableEntityLink
         fields = ('downstream_usage_key')
+
+
+class PublishableEntityLinksSummarySerializer(serializers.Serializer):
+    """
+    Serializer for summary for publishable entity links
+    """
+    upstream_context_title = serializers.CharField(read_only=True)
+    upstream_context_key = serializers.CharField(read_only=True)
+    ready_to_sync_count = serializers.IntegerField(read_only=True)
+    total_count = serializers.IntegerField(read_only=True)

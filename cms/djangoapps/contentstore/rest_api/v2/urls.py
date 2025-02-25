@@ -35,6 +35,11 @@ urlpatterns = [
         name='downstream-link-list'
     ),
     re_path(
+        f'^upstreams/{settings.COURSE_KEY_PATTERN}/summary$',
+        downstreams.UpstreamSummaryView.as_view(),
+        name='upstream-summary-list'
+    ),
+    re_path(
         fr'^downstreams/{settings.USAGE_KEY_PATTERN}/sync$',
         downstreams.SyncFromUpstreamView.as_view(),
         name="sync_from_upstream"
