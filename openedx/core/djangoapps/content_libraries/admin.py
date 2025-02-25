@@ -3,7 +3,11 @@ Admin site for content libraries
 """
 from django.contrib import admin
 from .models import (
-    ContentLibrary, ContentLibraryPermission, ContentLibraryMigration, ContentLibraryBlockMigration
+    ContentLibrary,
+    ContentLibraryPermission,
+    LegacyLibraryMigrationSource,
+    LegacyLibraryMigration,
+    LegacyLibraryBlockMigration,
 )
 
 
@@ -43,18 +47,37 @@ class ContentLibraryAdmin(admin.ModelAdmin):
             return ["library_key", ]
 
 
-class ContentLibraryBlockMigrationInline(admin.TabularInline):
+class LegacyLibraryBlockMigrationInline(admin.TabularInline):
     """
     Django admin UI for content library block migrations
     """
-    model = ContentLibraryBlockMigration
-    list_display = ("library_migration", "block_type", "source_block_id", "target_block_id")
+    model = LegacyLibraryBlockMigration
+    list_display = ("library_migration", "source_key", "target")  # @@TODO
 
 
-@admin.register(ContentLibraryMigration)
-class ContentLibraryMigrationAdmin(admin.ModelAdmin):
+@admin.register(LegacyLibraryMigration)
+class LegacyLibraryMigrationAdmin(admin.ModelAdmin):
     """
     Django admin UI for content library migrations
     """
-    list_display = ("source_key", "target", "target_collection")
-    inlines = (ContentLibraryBlockMigrationInline,)
+    model = LegacyLibraryMigration
+    list_display = ("source", "target_library", "target_collection")
+    inlines = (LegacyLibraryBlockMigrationInline,)
+
+
+class LegacyLibraryMigrationInline(admin.ModelAdmin):
+    """
+    Django admin UI for content library migrations
+    """
+    model = LegacyLibraryMigration
+    list_display = ("target_library", "target_collection")  # @@TODO show names?
+
+
+@admin.register(LegacyLibraryMigrationSource)
+class LegacyLibraryMigrationSourceAdmin(admin.ModelAdmin):
+    """
+    @@TODO
+    """
+    model = LegacyLibraryMigrationSource
+    list_display = ("library_key", "authoritative_migration")  # @@TODO fk display
+    inlines = (LegacyLibraryMigrationInline,)  # @@TODO does this just work?

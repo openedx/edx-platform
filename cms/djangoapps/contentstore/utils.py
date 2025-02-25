@@ -31,6 +31,7 @@ from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
 from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
 from pytz import UTC
+from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import (
@@ -2372,7 +2373,7 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, created: datetime | None = None) -> None:
+def create_or_update_xblock_upstream_link(xblock: XBlock, created: datetime | None = None) -> None:
     """
     Create or update upstream->downstream link in database for given xblock.
     """
@@ -2388,9 +2389,32 @@ def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, c
         lib_component,
         upstream_usage_key=upstream_usage_key,
         upstream_context_key=str(upstream_usage_key.context_key),
-        downstream_context_key=course_key,
+        downstream_context_key=str(xblock.context_key),
         downstream_usage_key=xblock.usage_key,
         version_synced=xblock.upstream_version,
         version_declined=xblock.upstream_version_declined,
         created=created,
     )
+
+
+def create_or_update_children_upstream_links(lc_block: LegacyLibraryContentBlock, created: datetime | None = None):
+    """
+    Given an LLC XBlock, save its upstream info for each of its children which don't already have links in the database.
+    """
+    for child in xblock.children:
+        upstream_usage_key = get_migrated_library_block_usage_key(lc_block.usage_key, child.usage_key)  # @@TODO
+        try:
+            lib_component = get_component_from_usage_key(upstream_usage_key)
+        except ObjectDoesNotExist:
+            log.error(f"Library component not found for {upstream_usage_key}")
+            lib_component = None
+        PublishableEntityLink.update_or_create(
+            lib_component,
+            upstream_usage_key=str(upstream_usage_key),
+            upstream_context_key=str(upstream_usage_key.context_key),
+            downstream_context_key=str(child.context_key),
+            downstream_usage_key=str(child.usage_key),
+            version_synced=2,  # @@TODO
+            version_declined=1,  # @@TODO
+            created=created,
+        )
