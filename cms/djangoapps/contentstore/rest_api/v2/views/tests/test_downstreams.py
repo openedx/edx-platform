@@ -66,6 +66,20 @@ class _BaseDownstreamViewTestMixin:
         self.downstream_html_key = BlockFactory.create(
             category='html', parent=unit, upstream=MOCK_HTML_UPSTREAM_REF, upstream_version=1,
         ).usage_key
+
+        self.another_course = CourseFactory.create(display_name="Another Course")
+        another_chapter = BlockFactory.create(category="chapter", parent=self.another_course)
+        another_sequential = BlockFactory.create(category="sequential", parent=another_chapter)
+        another_unit = BlockFactory.create(category="vertical", parent=another_sequential)
+        self.another_video_keys = []
+        for _ in range(3):
+            # Adds 3 videos linked to the same upstream
+            self.another_video_keys.append(
+                BlockFactory.create(
+                    category="video", parent=another_unit, upstream=MOCK_UPSTREAM_REF, upstream_version=123,
+                ).usage_key
+            )
+
         self.fake_video_key = self.course.id.make_usage_key("video", "NoSuchVideo")
         self.superuser = UserFactory(username="superuser", password="password", is_staff=True, is_superuser=True)
         self.learner = UserFactory(username="learner", password="password")
@@ -340,4 +354,24 @@ class GetUpstreamViewTest(_BaseDownstreamViewTestMixin, SharedModuleStoreTestCas
                 'version_synced': 1,
             },
         ]
+        self.assertListEqual(data, expected)
+
+
+class GetDownstreamContextsTest(_BaseDownstreamViewTestMixin, SharedModuleStoreTestCase):
+    """
+    Test that `GET /api/v2/contentstore/upstream/:usage_key/downstream-links returns list of
+    linked blocks usage_keys in given upstream entity (i.e. library block).
+    """
+    def call_api(self, usage_key_string):
+        return self.client.get(f"/api/contentstore/v2/upstream/{usage_key_string}/downstream-links")
+
+    def test_200_downstream_context_list(self):
+        """
+        Returns all downstream courses for given library block
+        """
+        self.client.login(username="superuser", password="password")
+        response = self.call_api(MOCK_UPSTREAM_REF)
+        assert response.status_code == 200
+        data = response.json()
+        expected = [str(self.downstream_video_key)] + [str(key) for key in self.another_video_keys]
         self.assertListEqual(data, expected)

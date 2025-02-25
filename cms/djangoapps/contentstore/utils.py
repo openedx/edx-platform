@@ -2371,7 +2371,7 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, created: datetime | None = None):
+def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, created: datetime | None = None) -> None:
     """
     Create or update upstream->downstream link in database for given xblock.
     """
