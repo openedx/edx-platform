@@ -48,11 +48,11 @@ https://github.com/openedx/edx-platform/issues/35653):
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
       GET: List downstream blocks that can be synced, filterable by course or sync-readiness.
-        200: A paginated list of applicable & accessible downstream blocks. Entries are UpstreamLinks.
+        200: A paginated list of applicable & accessible downstream blocks. Entries are PublishableEntityLinks.
 
   /api/contentstore/v2/downstreams/<course_key>/summary
       GET: List summary of links by course key
-        200: A paginated list of summary of links by course key
+        200: A list of summary of links by course key
 
 UpstreamLink response schema:
   {
@@ -69,6 +69,7 @@ import logging
 
 from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
+from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.exceptions import NotFound, ValidationError
@@ -118,11 +119,28 @@ class _AuthenticatedRequest(Request):
     user: User
 
 
+class DownstreamListPaginator(DefaultPagination):
+    """Custom paginator for downstream entity links"""
+    page_size = 100
+    max_page_size = 1000
+
+    def get_paginated_response(self, data, *args, **kwargs):
+        return Response({
+            'next': self.page.next_page_number() if self.page.has_next() else None,
+            'previous': self.page.previous_page_number() if self.page.has_previous() else None,
+            'count': self.page.paginator.count,
+            'num_pages': self.page.paginator.num_pages,
+            'current_page': self.page.number,
+            'results': data
+        })
+
+
 @view_auth_classes()
 class DownstreamListView(DeveloperErrorViewMixin, APIView):
     """
     List all blocks which are linked to an upstream context, with optional filtering.
     """
+
     def get(self, request: _AuthenticatedRequest):
         """
         Fetches publishable entity links for given course key
@@ -130,6 +148,7 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
         course_key_string = request.GET.get('course_id')
         ready_to_sync = request.GET.get('ready_to_sync')
         filter = {}
+        paginator = DownstreamListPaginator()
         if course_key_string:
             try:
                 course_key = CourseKey.from_string(course_key_string)
@@ -140,8 +159,9 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
             ready_to_sync = BooleanField().to_internal_value(ready_to_sync)
             filter["ready_to_sync"] = ready_to_sync
         links = PublishableEntityLink.filter_links(**filter)
-        serializer = PublishableEntityLinksSerializer(links, many=True)
-        return Response(serializer.data)
+        paginated_links = paginator.paginate_queryset(links, self.request, view=self)
+        serializer = PublishableEntityLinksSerializer(paginated_links, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 @view_auth_classes()
