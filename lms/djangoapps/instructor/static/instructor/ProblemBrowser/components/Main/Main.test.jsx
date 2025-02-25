@@ -81,28 +81,21 @@ describe('ProblemBrowser Main component', () => {
             });
         });
 
-        test('should display dropdown when toggled', async () => {
+        test("should display dropdown when toggled", async () => {
             const { container } = renderMainComponent();
-        
-            expect(screen.queryByTestId('mocked-block-browser-container')).toBeNull();
-        
+            expect(screen.queryByTestId("mocked-block-browser-container")).toBeNull();
             await act(async () => {
-                await userEvent.click(screen.getByText('Select a section or problem'));
+                await userEvent.click(screen.getByText("Select a section or problem"));
             });
-        
-            await waitFor(() => expect(
-                screen.getByTestId('mocked-block-browser-container'),
-            ).toHaveClass('block-browser'));
-        
+            await waitFor(() =>
+                expect(screen.getByTestId("mocked-block-browser-container")).toHaveClass("block-browser")
+            );
             expect(container).toMatchSnapshot();
-        
             await act(async () => {
-                await userEvent.click(screen.getByText('Select a section or problem'));
+                await userEvent.click(screen.getByText("Select a section or problem"));
             });
-        
-            await waitFor(() => expect(screen.queryByTestId('mocked-block-browser-container')).toBeNull());
-        
+            await waitFor(() => expect(screen.queryByTestId("mocked-block-browser-container")).toBeNull());
             expect(container).toMatchSnapshot();
         });
-    });    
+    });   
 });
