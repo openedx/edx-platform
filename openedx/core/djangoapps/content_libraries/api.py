@@ -1319,7 +1319,11 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     from cms.djangoapps.contentstore import helpers as studio_helpers
     block_types = sorted(name for name, class_ in XBlock.load_classes())
 
-    # Get enabled block in libraries types from `settings.LIBRARY_ENABLED_BLOCKS`
+    # Get enabled block types
+    #
+    # TODO: For now we are using `settings.LIBRARY_ENABLED_BLOCKS` without filtering
+    # to return the enabled block types for all libraries. In the future, filtering will be
+    # done based on a custom configuration per library.
     enabled_block_types = [item for item in block_types if item in settings.LIBRARY_ENABLED_BLOCKS]
 
     info = []
