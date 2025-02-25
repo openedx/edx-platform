@@ -40,11 +40,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, Lib
 from ..course import _deprecated_blocks_info, course_outline_initial_state, reindex_course_and_check_access
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import VisibilityState, create_xblock_info
 
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = True
-FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = False
-
 
 class TestCourseIndex(CourseTestCase):
     """
@@ -430,19 +425,18 @@ class TestCourseIndexArchived(CourseTestCase):
         archived_course_tab = parsed_html.find_class('archived-courses')
         self.assertEqual(len(archived_course_tab), 1 if separate_archived_courses else 0)
 
-    @override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API)
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 0, 23),
-        (False, 'staff', None, 0, 23),
+        (True, 'staff', None, 23),
+        (False, 'staff', None, 23),
         # Base user has global staff access
-        (True, 'user', ORG, 2, 23),
-        (False, 'user', ORG, 2, 23),
-        (True, 'user', None, 2, 23),
-        (False, 'user', None, 2, 23),
+        (True, 'user', ORG, 23),
+        (False, 'user', ORG, 23),
+        (True, 'user', None, 23),
+        (False, 'user', None, 23),
     )
     @ddt.unpack
-    def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
+    def test_separate_archived_courses(self, separate_archived_courses, username, org, sql_queries):
         """
         Ensure that archived courses are shown as expected for all user types, when the feature is enabled/disabled.
         Also ensure that enabling the feature does not adversely affect the database query count.
@@ -458,19 +452,18 @@ class TestCourseIndexArchived(CourseTestCase):
         with override_settings(FEATURES=features):
             self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
                                                    org=org,
-                                                   mongo_queries=mongo_queries,
+                                                   mongo_queries=0,
                                                    sql_queries=sql_queries)
 
-    @override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 0, 23),
-        (False, 'staff', None, 0, 23),
+        (True, 'staff', None, 23),
+        (False, 'staff', None, 23),
         # Base user has global staff access
-        (True, 'user', ORG, 0, 23),
-        (False, 'user', ORG, 0, 23),
-        (True, 'user', None, 0, 23),
-        (False, 'user', None, 0, 23),
+        (True, 'user', ORG, 23),
+        (False, 'user', ORG, 23),
+        (True, 'user', None, 23),
+        (False, 'user', None, 23),
     )
     @ddt.unpack
     def test_separate_archived_courses_with_home_page_course_v2_api(
@@ -478,7 +471,6 @@ class TestCourseIndexArchived(CourseTestCase):
         separate_archived_courses,
         username,
         org,
-        mongo_queries,
         sql_queries
     ):
         """
@@ -496,7 +488,7 @@ class TestCourseIndexArchived(CourseTestCase):
         with override_settings(FEATURES=features):
             self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
                                                    org=org,
-                                                   mongo_queries=mongo_queries,
+                                                   mongo_queries=0,
                                                    sql_queries=sql_queries)
 
 
