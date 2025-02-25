@@ -129,6 +129,8 @@ CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
 EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "lms")
 LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
 
+CSRF_TRUSTED_ORIGINS = Derived(lambda settings: settings.CSRF_TRUSTED_ORIGINS_WITH_SCHEME)
+
 # This is the domain that is used to set shared cookies between various sub-domains.
 # By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN
 SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
@@ -341,7 +343,6 @@ LOGGING = get_logger_config(
     service_variant=SERVICE_VARIANT,
 )
 
-# Determines which origins are trusted for unsafe requests eg. POST requests.
 CSRF_TRUSTED_ORIGINS = _YAML_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
@@ -393,7 +394,7 @@ for name, database in DATABASES.items():
 
 # Get the MODULESTORE from auth.json, but if it doesn't exist,
 # use the one from common.py
-MODULESTORE = convert_module_store_setting_if_needed(_YAML_TOKENS.get('MODULESTORE', MODULESTORE))
+MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 BROKER_URL = "{}://{}:{}@{}/{}".format(CELERY_BROKER_TRANSPORT,
                                        CELERY_BROKER_USER,
@@ -532,6 +533,8 @@ ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = set(ENTERPRISE_EXCLUDED_REGISTRATION_F
 ########################## Extra middleware classes  #######################
 
 # Allow extra middleware classes to be added to the app through configuration.
+# TODO: Declare `EXTRA_MIDDLEWARE_CLASSES = []` in lms/envs/common.py so that we can simplify this
+#       next line. See CMS settings for the example of what we want.
 MIDDLEWARE.extend(_YAML_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
 ########################## Derive Any Derived Settings  #######################
