@@ -1162,7 +1162,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             assert [dict(item) for item in block_types] == expected
 
 
-
 @ddt.ddt
 class ContentLibraryXBlockValidationTest(APITestCase):
     """Tests only focused on service validation, no Learning Core interactions here."""
