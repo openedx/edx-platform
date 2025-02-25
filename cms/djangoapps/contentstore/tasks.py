@@ -1129,7 +1129,7 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
     """
     user = _validate_user(task_instance, user_id, language)
 
-    task_instance.status.set_state('Scanning')
+    task_instance.status.set_state(UserTaskStatus.IN_PROGRESS)
     course_key = CourseKey.from_string(course_key_string)
 
     url_list = _scan_course_for_links(course_key)

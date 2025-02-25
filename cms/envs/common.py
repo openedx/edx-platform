@@ -547,16 +547,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
     'ENABLE_HIDE_FROM_TOC_UI': False,
 
-    # .. toggle_name: FEATURES['ENABLE_HOME_PAGE_COURSE_API_V2']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: Enables the new home page course v2 API, which is a new version of the home page course
-    #   API with pagination, filter and ordering capabilities.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-03-14
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34173
-    'ENABLE_HOME_PAGE_COURSE_API_V2': True,
-
     # .. toggle_name: FEATURES['ENABLE_GRADING_METHOD_IN_PROBLEMS']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -2586,6 +2576,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
+TRANSCRIPT_LANG_CACHE_TIMEOUT = 60 * 60 * 24
 
 
 ##### shoppingcart Payment #####
