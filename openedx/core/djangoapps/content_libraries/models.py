@@ -46,9 +46,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from opaque_keys.edx.django.models import CourseKeyField
-from opaque_keys.edx.locator import (
-    BlockUsageLocator, LibraryUsageLocatorV2, LibraryLocatorV2, LibraryCollectionLocator
-)
+from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryLocatorV2
 from pylti1p3.contrib.django import DjangoDbToolConf
 from pylti1p3.contrib.django import DjangoMessageLaunch
 from pylti1p3.contrib.django.lti1p3_tool_config.models import LtiTool
@@ -58,7 +56,7 @@ from openedx.core.djangoapps.content_libraries.constants import (
     LICENSE_OPTIONS, ALL_RIGHTS_RESERVED,
 )
 from opaque_keys.edx.django.models import LearningContextKeyField, UsageKeyField
-from openedx_learning.api.authoring_models import LearningPackage, Collection
+from openedx_learning.api.authoring_models import LearningPackage, Collection, Component
 from organizations.models import Organization  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .apps import ContentLibrariesConfig
@@ -229,58 +227,134 @@ class ContentLibraryPermission(models.Model):
         return f"ContentLibraryPermission ({self.access_level} for {who})"
 
 
-class ContentLibraryMigration(models.Model):
+class LegacyLibraryMigrationSource(models.Model):
     """
-    Record of a legacy (v1) content library that has been migrated into a new (v2) content library.
+    For each legacy (v1) content library, a record of its migration(s).
+
+    If a v1 library doesn't have a row here, then it hasn't been migrated yet.
     """
-    source_key = LearningContextKeyField(unique=True, max_length=255)
-    target = models.ForeignKey(ContentLibrary, on_delete=models.CASCADE)
-    target_collection = models.ForeignKey(Collection, on_delete=models.SET_NULL, null=True)
 
-    @property
-    def target_key(self) -> LibraryLocatorV2:
-        return self.target.library_key
-
-    @property
-    def target_library_collection_key(self) -> LibraryCollectionLocator | None:
-        return (
-            LibraryCollectionLocator(self.target_key, self.target_collection.key)
-            if self.target_collection
-            else None
-        )
-
-    def __str__(self) -> str:
-        return f"{self.source_key} -> {self.target_library_collection_key or self.target_key}"
-
-
-class ContentLibraryBlockMigration(models.Model):
-    """
-    Record of a legacy (v1) content library block that has been migrated into a new (v) content library block.
-    """
-    library_migration = models.ForeignKey(
-        ContentLibraryMigration, on_delete=models.CASCADE, related_name="block_migrations"
+    # V1 library that we're migrating from.
+    library_key = LearningContextKeyField(
+        max_length=255,
+        unique=True,  # At most one status per v1 library
     )
-    block_type = models.SlugField()
-    source_block_id = models.SlugField()
-    target_block_id = models.SlugField()
 
-    @property
-    def source_usage_key(self) -> BlockUsageLocator:
-        return self.library_migration.source_key.make_usage_key(self.block_type, self.source_block_id)
-
-    @property
-    def target_usage_key(self) -> LibraryUsageLocatorV2:
-        return LibraryUsageLocatorV2(  # type: ignore[abstract]  # (we are missing an annotation in opaque-keys)
-            lib_key=self.library_migration.target_key,
-            usage_id=self.target_block_id,
-            block_type=self.block_type,
-        )
-
-    def __str__(self):
-        return f"{self.source_usage_key} -> {self.target_usage_key}"
+    # V1 libraries can be migrated multiple times, but only one of them can be the "authoritative" migration--that is,
+    # the one through which legacy course references are forwarded.
+    authoritative_migration = models.ForeignKey(
+        "LegacyLibraryMigration",
+        null=True,  # NULL means no authoritative migration (no forwarding of references)
+        on_delete=models.SET_NULL,  # authoritative migration can be deleted without affecting non-authoritative ones.
+    )
 
     class Meta:
-        unique_together = [('library_migration', 'block_type', 'source_block_id')]
+        # The authoritative_target Migration should have a foreign key back to this same MigrationSource.
+        # In other words, we expect: `self.authoritative_target in self.all_targets`
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(authoritative_target__migration_info__pk=models.F("pk")),
+                name="authoritative_migration_points_back_to_its_source",
+            ),
+        ]
+
+
+class LegacyLibraryMigration(models.Model):
+    """
+    A particular migration from a legacy (V1) content to a new (V2) content library collection.
+    """
+
+    # Associate this migration target back to a source legacy library.
+    source = models.ForeignKey(
+        LegacyLibraryMigrationSource,
+        on_delete=models.CASCADE,  # Delete this record if the source is deleted.
+        related_name="all_migrations",
+    )
+
+    # V2 library that we're migrating to.
+    target_library = models.ForeignKey(
+        ContentLibrary,
+        on_delete=models.CASCADE,  # Delete this record if the source is deleted.
+        # Not unique. Multiple V1 libraries can be migrated to the same V2 library.
+    )
+
+    # Collection within a V2 library that we've migrated to.
+    target_collection = models.ForeignKey(
+        Collection,
+        unique=True,  # Any given collection should be the target of at most one V1 library migration.
+        on_delete=models.SET_NULL,  # Collections can be deleted, but the migrated blocks (and the migration) survive.
+        null=True,
+    )
+
+    # User who initiated this library migration.
+    migrated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    # When the migration was initiated.
+    migrated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            # The target collection should be part of the target library (or NULL).  @@TODO
+            models.CheckConstraint(
+                check=models.Q(target_collection__isnull=True) | models.Q(
+                    target_collection__learning_package=models.F("target_library__learning_package")
+                ),
+                name="target_collection_belongs_to_target_library",
+            ),
+        ]
+
+
+class LegacyLibraryBlockMigration(models.Model):
+    """
+    Record of a legacy (V1) content library block that has been migrated into a new (V2) content library block.
+    """
+    # The library-migration event of which this block-migration was a part.
+    library_migration = models.ForeignKey(
+        LegacyLibraryMigration,
+        on_delete=models.CASCADE,  # If the library-migration event is deleted, then this block-migration event goes too
+        related_name="block_migrations",
+    )
+
+    # The usage key of the source legacy library block.
+    # Any given legacy library block will be migrated at most once (hence unique=True).
+    # EXPECTATION: source_key points at a block within the source V1 library.
+    #              i.e., `source_key.context_key` == `library_migration.source.library_key`.
+    source_key = UsageKeyField(max_length=255)
+
+    # The V2 library component holding the migrated content.
+    target = models.ForeignKey(
+        Component,  # No need to support Units, etc., because V1 libraries only supported problem, html, and video
+        unique=True,  # Any given lib component can be the target of at most one block migration
+        on_delete=models.SET_NULL,  # Block might get deleted by author and then pruned; that doesn't undo the migration
+        null=True,
+    )
+
+    class Meta:
+        constraints = [
+            # For each LegacyLibraryMigration, each source block (source_key) must have exactly one
+            # LegacyLibraryBlockMigration.
+            models.UniqueConstraint(
+                fields=["library_migration", "source_key"],
+                name="source_block_unique_within_library_migration",
+            ),
+            # The target component should be part of the target library (or NULL).  @@TODO
+            models.CheckConstraint(
+                check=(
+                    models.Q(target__isnull=True) |
+                    models.Q(
+                        target__learning_package=models.F("library_migration__target_library__learning_package")
+                    )
+                ),
+                name="target_component_belongs_to_target_library",
+            ),
+        ]
+
+    @property
+    def target_key(self) -> LibraryUsageLocatorV2:
+        return "@@TODO"
+
+    def __str__(self):
+        return f"{self.source_key} -> {self.target_key}"
 
 
 class ContentLibraryBlockImportTask(models.Model):

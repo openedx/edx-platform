@@ -19,7 +19,7 @@ from openedx.core.djangoapps.content_libraries.api import create_library_block
 from xmodule.util.keys import BlockKey
 from xmodule.modulestore.django import modulestore
 
-from .models import ContentLibrary, ContentLibraryMigration, ContentLibraryBlockMigration
+from .models import ContentLibrary, LegacyLibraryMigrationSource, LegacyLibraryMigration, LegacyLibraryBlockMigration
 
 
 log = logging.getLogger(__name__)
@@ -75,11 +75,20 @@ def migrate_legacy_library(
     target_block_entity_keys: set[str] = set()
 
     with transaction.atomic():
-        migration = ContentLibraryMigration.objects.create(
-            source_key=source_key,
-            target=target,
+        migration_source = LegacyLibraryMigrationSource.objects.get_or_create(source_key=source_key)
+        migration = LegacyLibraryMigration(
+            source=migration_source,
+            target_library=target,
             target_collection=collection,
+            migrated_by=user,
         )
+        authoritative = "@@TODO"
+        if authoritative:
+            if migration_source.authoritative_migration:
+                raise Exception("@@TODO")
+            migration_source.authoritative_migration = migration
+        migration.save()
+        migration_source.save()
 
         for source_block in source.get_children():
             block_type: str = source_block.usage_key.block_type
@@ -118,7 +127,7 @@ def migrate_legacy_library(
                 tag_object(str(target_block_meta.usage_key), taxonomy, taxonomy_tags)
 
             # Make a record of the migration
-            ContentLibraryBlockMigration.objects.create(
+            LegacyLibraryBlockMigration.objects.create(
                 library_migration=migration,
                 block_type=block_type,
                 source_block_id=source_block.usage_key.block_id,
