@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import Count, F, Q, QuerySet
 from django.db.models.fields import IntegerField, TextField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import GreaterThan
@@ -229,6 +229,20 @@ class PublishableEntityLink(models.Model):
         return cls.objects.filter(
             upstream_usage_key=upstream_usage_key,
         )
+
+    @classmethod
+    def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
+        """
+        Returns a summary of links by upstream context for given downstream_context_key.
+        """
+        result = cls.get_by_downstream_context(downstream_context_key).values(
+            "upstream_context_key",
+            upstream_context_title=F("upstream_block__learning_package__title"),
+        ).annotate(
+            ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
+            total_count=Count('id')
+        )
+        return result
 
 
 class LearningContextLinksStatusChoices(models.TextChoices):
