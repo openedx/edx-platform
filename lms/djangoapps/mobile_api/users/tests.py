@@ -9,6 +9,7 @@ from urllib.parse import parse_qs
 
 import ddt
 import pytz
+from completion.models import BlockCompletion
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
 from django.db import transaction
@@ -283,6 +284,35 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         # Verify only edX courses are returned
         for entry in courses:
             assert entry['course']['org'] == 'edX'
+
+    @ddt.data(API_V05, API_V1, API_V2)
+    @patch('lms.djangoapps.mobile_api.users.views.get_current_site_orgs', return_value=['edX'])
+    def test_filter_by_current_site_orgs(self, api_version, get_current_site_orgs_mock):
+        self.login()
+
+        # Create list of courses with various organizations
+        courses = [
+            CourseFactory.create(org='edX', mobile_available=True),
+            CourseFactory.create(org='edX', mobile_available=True),
+            CourseFactory.create(org='edX', mobile_available=True, visible_to_staff_only=True),
+            CourseFactory.create(org='Proversity.org', mobile_available=True),
+            CourseFactory.create(org='MITx', mobile_available=True),
+            CourseFactory.create(org='HarvardX', mobile_available=True),
+        ]
+
+        # Enroll in all the courses
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=api_version)
+        courses = response.data['enrollments'] if api_version == API_V2 else response.data
+
+        # Test for 3 expected courses
+        self.assertEqual(len(courses), 3)
+
+        # Verify only edX courses are returned
+        for entry in courses:
+            self.assertEqual(entry['course']['org'], 'edX')
 
     def create_enrollment(self, expired):
         """
@@ -1381,3 +1411,145 @@ class TestDiscussionCourseEnrollmentSerializer(UrlResetMixin, MobileAPITestCase,
             assert isinstance(discussion_url, str)
         else:
             assert discussion_url is None
+
+
+@ddt.ddt
+class TestUserEnrollmentsStatus(MobileAPITestCase, MobileAuthUserTestMixin):
+    """
+    Tests for /api/mobile/{api_version}/users/<user_name>/enrollments_status/
+    """
+
+    REVERSE_INFO = {'name': 'user-enrollments-status', 'params': ['username', 'api_version']}
+
+    def test_no_mobile_available_courses(self) -> None:
+        self.login()
+        courses = [CourseFactory.create(org="edx", mobile_available=False) for _ in range(3)]
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V1)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, [])
+
+    def test_no_enrollments(self) -> None:
+        self.login()
+        for _ in range(3):
+            CourseFactory.create(org="edx", mobile_available=True)
+
+        response = self.api_response(api_version=API_V1)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, [])
+
+    def test_user_have_only_active_enrollments_and_no_completions(self) -> None:
+        self.login()
+        courses = [CourseFactory.create(org="edx", mobile_available=True) for _ in range(3)]
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(api_version=API_V1)
+
+        expected_response = [
+            {'course_id': str(courses[0].course_id), 'course_name': courses[0].display_name, 'recently_active': True},
+            {'course_id': str(courses[1].course_id), 'course_name': courses[1].display_name, 'recently_active': True},
+            {'course_id': str(courses[2].course_id), 'course_name': courses[2].display_name, 'recently_active': True},
+        ]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, expected_response)
+
+    def test_user_have_active_and_inactive_enrollments_and_no_completions(self) -> None:
+        self.login()
+        courses = [CourseFactory.create(org="edx", mobile_available=True) for _ in range(3)]
+        for course in courses:
+            self.enroll(course.id)
+        old_course = CourseFactory.create(org="edx", mobile_available=True)
+        self.enroll(old_course.id)
+        old_enrollment = CourseEnrollment.objects.filter(user=self.user, course=old_course.course_id).first()
+        old_enrollment.created = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=31)
+        old_enrollment.save()
+
+        response = self.api_response(api_version=API_V1)
+
+        expected_response = [
+            {'course_id': str(courses[0].course_id), 'course_name': courses[0].display_name, 'recently_active': True},
+            {'course_id': str(courses[1].course_id), 'course_name': courses[1].display_name, 'recently_active': True},
+            {'course_id': str(courses[2].course_id), 'course_name': courses[2].display_name, 'recently_active': True},
+            {'course_id': str(old_course.course_id), 'course_name': old_course.display_name, 'recently_active': False}
+        ]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, expected_response)
+
+    @ddt.data(
+        (27, True),
+        (28, True),
+        (29, True),
+        (31, False),
+        (32, False),
+    )
+    @ddt.unpack
+    def test_different_enrollment_dates(self, enrolled_days_ago: int, recently_active_status: bool) -> None:
+        self.login()
+        course = CourseFactory.create(org="edx", mobile_available=True, run='1001')
+        self.enroll(course.id)
+        enrollment = CourseEnrollment.objects.filter(user=self.user, course=course.course_id).first()
+        enrollment.created = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=enrolled_days_ago)
+        enrollment.save()
+
+        response = self.api_response(api_version=API_V1)
+
+        expected_response = [
+            {
+                'course_id': str(course.course_id),
+                'course_name': course.display_name,
+                'recently_active': recently_active_status
+            }
+        ]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, expected_response)
+
+    @ddt.data(
+        (27, True),
+        (28, True),
+        (29, True),
+        (31, False),
+        (32, False),
+    )
+    @ddt.unpack
+    def test_different_completion_dates(self, completed_days_ago: int, recently_active_status: bool) -> None:
+        self.login()
+        course = CourseFactory.create(org="edx", mobile_available=True, run='1010')
+        section = BlockFactory.create(
+            parent=course,
+            category='chapter',
+        )
+        self.enroll(course.id)
+        enrollment = CourseEnrollment.objects.filter(user=self.user, course=course.course_id).first()
+        # make enrollment older 30 days ago
+        enrollment.created = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=50)
+        enrollment.save()
+        completion = BlockCompletion.objects.create(
+            user=self.user,
+            context_key=course.context_key,
+            block_type='course',
+            block_key=section.location,
+            completion=0.5,
+        )
+        completion.created = datetime.datetime.now(pytz.UTC) - datetime.timedelta(days=completed_days_ago)
+        completion.save()
+
+        response = self.api_response(api_version=API_V1)
+
+        expected_response = [
+            {
+                'course_id': str(course.course_id),
+                'course_name': course.display_name,
+                'recently_active': recently_active_status
+            }
+        ]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.data, expected_response)

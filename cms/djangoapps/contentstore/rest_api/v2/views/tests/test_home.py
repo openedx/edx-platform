@@ -1,28 +1,21 @@
 """
 Unit tests for home page view.
 """
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import ddt
 import pytz
 from django.conf import settings
-from django.test import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_switch
 from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
-from cms.djangoapps.contentstore.views.course import ENABLE_GLOBAL_STAFF_OPTIMIZATION
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = True
 
-
-@override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API)
 @ddt.ddt
 class HomePageCoursesViewV2Test(CourseTestCase):
     """
@@ -45,6 +38,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             org=archived_course_key.org,
             end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
         )
+        self.non_staff_client, _ = self.create_non_staff_authed_user_client()
 
     def test_home_page_response(self):
         """Get list of courses available to the logged in user.
@@ -62,7 +56,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
                 OrderedDict([
                     ("course_key", course_id),
                     ("display_name", self.course.display_name),
-                    ("lms_link", f'//{settings.LMS_BASE}/courses/{course_id}/jump_to/{self.course.location}'),
+                    ("lms_link", f'{settings.LMS_ROOT_URL}/courses/{course_id}/jump_to/{self.course.location}'),
                     ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.course.id)}'),
                     ("number", self.course.number),
                     ("org", self.course.org),
@@ -76,7 +70,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
                     ("display_name", self.archived_course.display_name),
                     (
                         "lms_link",
-                        f'//{settings.LMS_BASE}/courses/{archived_course_id}/jump_to/{self.archived_course.location}'
+                        f'{settings.LMS_ROOT_URL}/courses/{archived_course_id}/jump_to/{self.archived_course.location}'
                     ),
                     (
                         "cms_link",
@@ -103,30 +97,6 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
 
-    @override_waffle_switch(ENABLE_GLOBAL_STAFF_OPTIMIZATION, True)
-    def test_org_query_if_passed(self):
-        """Get list of courses when org filter passed as a query param.
-
-        Expected result:
-        - A list of courses available to the logged in user for the specified org.
-        """
-        response = self.client.get(self.api_v2_url, {"org": "demo-org"})
-
-        self.assertEqual(len(response.data['results']['courses']), 1)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    @override_waffle_switch(ENABLE_GLOBAL_STAFF_OPTIMIZATION, True)
-    def test_org_query_if_empty(self):
-        """Get home page with an empty org query param.
-
-        Expected result:
-        - An empty list of courses available to the logged in user.
-        """
-        response = self.client.get(self.api_v2_url)
-
-        self.assertEqual(len(response.data['results']['courses']), 0)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     def test_active_only_query_if_passed(self):
         """Get list of active courses only.
 
@@ -139,7 +109,7 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(response.data["results"]["courses"], [OrderedDict([
             ("course_key", str(self.course.id)),
             ("display_name", self.course.display_name),
-            ("lms_link", f'//{settings.LMS_BASE}/courses/{str(self.course.id)}/jump_to/{self.course.location}'),
+            ("lms_link", f'{settings.LMS_ROOT_URL}/courses/{str(self.course.id)}/jump_to/{self.course.location}'),
             ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.course.id)}'),
             ("number", self.course.number),
             ("org", self.course.org),
@@ -164,7 +134,11 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             ("display_name", self.archived_course.display_name),
             (
                 "lms_link",
-                f'//{settings.LMS_BASE}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}',
+                '{url_root}/courses/{course_id}/jump_to/{location}'.format(
+                    url_root=settings.LMS_ROOT_URL,
+                    course_id=str(self.archived_course.id),
+                    location=self.archived_course.location
+                ),
             ),
             ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.archived_course.id)}'),
             ("number", self.archived_course.number),
@@ -190,7 +164,11 @@ class HomePageCoursesViewV2Test(CourseTestCase):
             ("display_name", self.archived_course.display_name),
             (
                 "lms_link",
-                f'//{settings.LMS_BASE}/courses/{str(self.archived_course.id)}/jump_to/{self.archived_course.location}',
+                '{url_root}/courses/{course_id}/jump_to/{location}'.format(
+                    url_root=settings.LMS_ROOT_URL,
+                    course_id=str(self.archived_course.id),
+                    location=self.archived_course.location
+                ),
             ),
             ("cms_link", f'//{settings.CMS_BASE}{reverse_course_url("course_handler", self.archived_course.id)}'),
             ("number", self.archived_course.number),
@@ -225,17 +203,98 @@ class HomePageCoursesViewV2Test(CourseTestCase):
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @patch("cms.djangoapps.contentstore.views.course.CourseOverview")
-    @patch("cms.djangoapps.contentstore.views.course.modulestore")
-    def test_api_v2_is_disabled(self, mock_modulestore, mock_course_overview):
-        """Get list of courses when home page course v2 API is disabled.
+    @ddt.data(
+        ("active_only", "true"),
+        ("archived_only", "true"),
+        ("search", "sample"),
+        ("order", "org"),
+        ("page", 1),
+    )
+    @ddt.unpack
+    def test_if_empty_list_of_courses(self, query_param, value):
+        """Get list of courses when no courses are available.
 
         Expected result:
-        - Courses are read from the modulestore.
+        - An empty list of courses available to the logged in user.
         """
-        with override_settings(FEATURES={'ENABLE_HOME_PAGE_COURSE_API_V2': False}):
-            response = self.client.get(self.api_v1_url)
+        self.active_course.delete()
+        self.archived_course.delete()
+
+        response = self.client.get(self.api_v2_url, {query_param: value})
+
+        self.assertEqual(len(response.data['results']['courses']), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @ddt.data(
+        ("active_only", "true", 2, 0),
+        ("archived_only", "true", 0, 1),
+        ("search", "foo", 1, 0),
+        ("search", "demo", 0, 1),
+        ("order", "org", 2, 1),
+        ("order", "display_name", 2, 1),
+        ("order", "number", 2, 1),
+        ("order", "run", 2, 1)
+    )
+    @ddt.unpack
+    def test_filter_and_ordering_courses(
+        self,
+        filter_key,
+        filter_value,
+        expected_active_length,
+        expected_archived_length
+    ):
+        """Get list of courses when filter and ordering are applied.
+
+        This test creates two courses besides the default courses created in the setUp method.
+        Then filters and orders them based on the filter_key and filter_value passed as query parameters.
+
+        Expected result:
+        - A list of courses available to the logged in user for the specified filter and order.
+        """
+        archived_course_key = self.store.make_course_key("demo-org", "demo-number", "demo-run")
+        CourseOverviewFactory.create(
+            display_name="Course (Demo)",
+            id=archived_course_key,
+            org=archived_course_key.org,
+            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=pytz.UTC),
+        )
+        active_course_key = self.store.make_course_key("foo-org", "foo-number", "foo-run")
+        CourseOverviewFactory.create(
+            display_name="Course (Foo)",
+            id=active_course_key,
+            org=active_course_key.org,
+        )
+
+        response = self.client.get(self.api_v2_url, {filter_key: filter_value})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        mock_modulestore().get_course_summaries.assert_called_once()
-        mock_course_overview.get_all_courses.assert_not_called()
+        self.assertEqual(
+            len([course for course in response.data["results"]["courses"] if course["is_active"]]),
+            expected_active_length
+        )
+        self.assertEqual(
+            len([course for course in response.data["results"]["courses"] if not course["is_active"]]),
+            expected_archived_length
+        )
+
+    @ddt.data(
+        ("active_only", "true"),
+        ("archived_only", "true"),
+        ("search", "sample"),
+        ("order", "org"),
+        ("page", 1),
+    )
+    @ddt.unpack
+    def test_if_empty_list_of_courses_non_staff(self, query_param, value):
+        """Get list of courses when no courses are available for non-staff users.
+
+        Expected result:
+        - An empty list of courses available to the logged in user.
+        """
+        self.active_course.delete()
+        self.archived_course.delete()
+
+        response = self.non_staff_client.get(self.api_v2_url, {query_param: value})
+
+        self.assertEqual(len(response.data["results"]["courses"]), 0)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

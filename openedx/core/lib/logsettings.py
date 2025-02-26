@@ -145,16 +145,6 @@ def log_python_warnings():
         module="sass",
     )
     warnings.filterwarnings(
-        'ignore',
-        'Deprecated call to `pkg_resources.declare_namespace.*',
-        category=DeprecationWarning,
-    )
-    warnings.filterwarnings(
-        'ignore',
-        '.*pkg_resources is deprecated as an API.*',
-        category=DeprecationWarning,
-    )
-    warnings.filterwarnings(
         'ignore', "'etree' is deprecated. Use 'xml.etree.ElementTree' instead.",
         category=DeprecationWarning, module='wiki'
     )

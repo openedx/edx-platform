@@ -1,16 +1,23 @@
 """
 Command to trigger sending reminder emails for learners to achieve their Course Goals
 """
+import time
 from datetime import date, datetime, timedelta
+
+import boto3
+from edx_ace.channel.django_email import DjangoEmailChannel
+from edx_ace.channel.mixins import EmailChannelMixin
+from eventtracking import tracker
 import logging
+import uuid
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
-from edx_ace import ace
+from edx_ace import ace, presentation
 from edx_ace.message import Message
 from edx_ace.recipient import Recipient
-
+from edx_ace.utils.signals import send_ace_message_sent_signal
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.certificates.api import get_certificate_for_user_id
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -23,7 +30,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
-from openedx.features.course_experience import ENABLE_COURSE_GOALS
+from openedx.features.course_experience import ENABLE_COURSE_GOALS, ENABLE_SES_FOR_GOALREMINDER
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 
 log = logging.getLogger(__name__)
@@ -32,7 +39,7 @@ MONDAY_WEEKDAY = 0
 SUNDAY_WEEKDAY = 6
 
 
-def send_ace_message(goal):
+def send_ace_message(goal, session_id):
     """
     Send an email reminding users to stay on track for their learning goal in this course
 
@@ -46,6 +53,15 @@ def send_ace_message(goal):
         course = CourseOverview.get_from_id(goal.course_key)
     except CourseOverview.DoesNotExist:
         log.error(f"Goal Reminder course {goal.course_key} not found.")
+        tracker.emit(
+            'edx.course.goal.email.failed',
+            {
+                'uuid': session_id,
+                'timestamp': datetime.now(),
+                'reason': 'course not found',
+                'course_key': goal.course_key,
+            }
+        )
         return False
 
     course_name = course.display_name
@@ -86,20 +102,48 @@ def send_ace_message(goal):
         'programs_url': getattr(settings, 'ACE_EMAIL_PROGRAMS_URL', None),
     })
 
+    options = {'transactional': True}
+
+    is_ses_enabled = ENABLE_SES_FOR_GOALREMINDER.is_enabled(goal.course_key)
+
+    if is_ses_enabled:
+        options = {
+            'transactional': True,
+            'from_address': settings.LMS_COMM_DEFAULT_FROM_EMAIL,
+            'override_default_channel': 'django_email',
+        }
+
     msg = Message(
         name="goalreminder",
         app_label="course_goals",
         recipient=Recipient(user.id, user.email),
         language=language,
         context=message_context,
-        options={'transactional': True},
+        options=options,
     )
 
     with emulate_http_request(site, user):
         try:
-            ace.send(msg)
+            start_time = time.perf_counter()
+            if is_ses_enabled:
+                # experimental implementation to log errors with ses
+                send_email_using_ses(user, msg)
+            else:
+                ace.send(msg)
+            end_time = time.perf_counter()
+            log.info(f"Goal Reminder for {user.id} for course {goal.course_key} sent in {end_time - start_time} "
+                     f"using {'SES' if is_ses_enabled else 'others'}")
         except Exception as exc:  # pylint: disable=broad-except
             log.error(f"Goal Reminder for {user.id} for course {goal.course_key} could not send: {exc}")
+            tracker.emit(
+                'edx.course.goal.email.failed',
+                {
+                    'uuid': session_id,
+                    'timestamp': datetime.now(),
+                    'reason': 'ace error',
+                    'error': str(exc),
+                }
+            )
             return False
     return True
 
@@ -121,8 +165,16 @@ class Command(BaseCommand):
 
         try:
             self._handle_all_goals()
-        except BaseException:  # pylint: disable=broad-except
+        except BaseException as exc:  # pylint: disable=broad-except
             log.exception("Error while sending course goals emails: ")
+            tracker.emit(
+                'edx.course.goal.email.failed',
+                {
+                    'timestamp': datetime.now(),
+                    'reason': 'base exception',
+                    'error': str(exc),
+                }
+            )
             for h in log.handlers:
                 h.flush()
             raise
@@ -137,6 +189,7 @@ class Command(BaseCommand):
         today = date.today()
         sunday_date = today + timedelta(days=SUNDAY_WEEKDAY - today.weekday())
         monday_date = today - timedelta(days=today.weekday())
+        session_id = str(uuid.uuid4())
 
         # Monday is the start of when we consider user's activity towards counting towards their weekly
         # goal. As such, we use Mondays to clear out the email reminders sent from the previous week.
@@ -163,21 +216,52 @@ class Command(BaseCommand):
         filtered_count = 0
         course_goals = course_goals.exclude(course_key__in=courses_to_exclude).select_related('user').order_by('user')
         total_goals = len(course_goals)
-        log.info(f'Processing course goals, total goal count {total_goals}')
+        tracker.emit(
+            'edx.course.goal.email.session_started',
+            {
+                'uuid': session_id,
+                'timestamp': datetime.now(),
+                'goal_count': total_goals,
+            }
+        )
+        log.info('Processing course goals, total goal count {}, timestamp: {}, uuid: {}'.format(
+            total_goals,
+            datetime.now(),
+            session_id
+        ))
         for goal in course_goals:
             # emulate a request for waffle's benefit
             with emulate_http_request(site=Site.objects.get_current(), user=goal.user):
-                if self.handle_goal(goal, today, sunday_date, monday_date):
+                if self.handle_goal(goal, today, sunday_date, monday_date, session_id):
                     sent_count += 1
                 else:
                     filtered_count += 1
             if (sent_count + filtered_count) % 10000 == 0:
-                log.info(f'Processing course goals: sent {sent_count} filtered {filtered_count} out of {total_goals}')
+                log.info('Processing course goals: sent {} filtered {} out of {}, timestamp: {}, uuid: {}'.format(
+                    sent_count,
+                    filtered_count,
+                    total_goals,
+                    datetime.now(),
+                    session_id
+                ))
 
-        log.info(f'Processing course goals complete: sent {sent_count} emails, filtered out {filtered_count} emails')
+        tracker.emit(
+            'edx.course.goal.email.session_completed',
+            {
+                'uuid': session_id,
+                'timestamp': datetime.now(),
+                'goal_count': total_goals,
+                'emails_sent': sent_count,
+                'emails_filtered': filtered_count,
+            }
+        )
+        log.info('Processing course goals complete: sent {} emails, '
+                 'filtered out {} emails, timestamp: {}, '
+                 'uuid: {}'.format(sent_count, filtered_count, datetime.now(), session_id)
+                 )
 
     @staticmethod
-    def handle_goal(goal, today, sunday_date, monday_date):
+    def handle_goal(goal, today, sunday_date, monday_date, session_id):
         """Sends an email reminder for a single CourseGoal, if it passes all our checks"""
         if not ENABLE_COURSE_GOALS.is_enabled(goal.course_key):
             return False
@@ -212,12 +296,67 @@ class Command(BaseCommand):
         user_timezone = get_user_timezone_or_last_seen_timezone_or_utc(goal.user)
         now_in_users_timezone = datetime.now(user_timezone)
         if not 8 <= now_in_users_timezone.hour < 18:
+            tracker.emit(
+                'edx.course.goal.email.filtered',
+                {
+                    'uuid': session_id,
+                    'timestamp': datetime.now(),
+                    'reason': 'User time zone',
+                    'user_timezone': str(user_timezone),
+                    'now_in_users_timezone': now_in_users_timezone,
+                }
+            )
             return False
 
         if required_days_left == days_left_in_week:
-            sent = send_ace_message(goal)
+            sent = send_ace_message(goal, session_id)
             if sent:
                 CourseGoalReminderStatus.objects.update_or_create(goal=goal, defaults={'email_reminder_sent': True})
                 return True
 
         return False
+
+
+def send_email_using_ses(user, msg):
+    """
+    Send email using AWS SES
+    """
+    render_msg = presentation.render(DjangoEmailChannel, msg)
+    # send rendered email using SES
+
+    sender = EmailChannelMixin.get_from_address(msg)
+
+    subject = EmailChannelMixin.get_subject(render_msg)
+    body_text = render_msg.body
+    body_html = render_msg.body_html
+
+    try:
+        # Send email
+        response = boto3.client('ses', settings.AWS_SES_REGION_NAME).send_email(
+            Source=sender,
+            Destination={
+                'ToAddresses': [user.email],
+            },
+            Message={
+                'Subject': {
+                    'Data': subject,
+                    'Charset': 'UTF-8'
+                },
+                'Body': {
+                    'Text': {
+                        'Data': body_text,
+                        'Charset': 'UTF-8'
+                    },
+                    'Html': {
+                        'Data': body_html,
+                        'Charset': 'UTF-8'
+                    }
+                }
+            }
+        )
+
+        log.info(f"Goal Reminder Email: email sent using SES with message ID {response['MessageId']}")
+        send_ace_message_sent_signal(DjangoEmailChannel, msg)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        log.error(f"Goal Reminder Email: Error sending email using SES: {e}")
+        raise e

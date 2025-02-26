@@ -6,11 +6,18 @@ APIs.
 import ddt
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
+from openedx_events.content_authoring.signals import (
+    LIBRARY_BLOCK_DELETED,
+    XBLOCK_CREATED,
+    XBLOCK_DELETED,
+    XBLOCK_UPDATED,
+)
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 from xmodule.modulestore.django import contentstore, modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
-from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory, LibraryFactory
 
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from openedx.core.djangoapps.content_libraries import api as library_api
@@ -165,12 +172,12 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
                 publish_item=True,
             ).location
 
-        library = ClipboardLibraryContentPasteTestCase.setup_library()
+        library = ClipboardPasteFromV1LibraryTestCase.setup_library()
         with self.store.bulk_operations(course_key):
             library_content_block_key = BlockFactory.create(
                 parent=self.store.get_item(unit_key),
                 category="library_content",
-                source_library_id=str(library.key),
+                source_library_id=str(library.context_key),
                 display_name="LC Block",
                 publish_item=True,
             ).location
@@ -184,7 +191,7 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
 
         tagging_api.set_taxonomy_orgs(taxonomy_all_org, all_orgs=True)
         for tag_value in ('tag_1', 'tag_2', 'tag_3', 'tag_4', 'tag_5', 'tag_6', 'tag_7'):
-            Tag.objects.create(taxonomy=taxonomy_all_org, value=tag_value)
+            tagging_api.add_tag_to_taxonomy(taxonomy_all_org, tag_value)
         tagging_api.tag_object(
             object_id=str(unit_key),
             taxonomy=taxonomy_all_org,
@@ -393,10 +400,16 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.
 
 
-class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
+class ClipboardPasteFromV2LibraryTestCase(OpenEdxEventsTestMixin, ModuleStoreTestCase):
     """
-    Test Clipboard Paste functionality with library content
+    Test Clipboard Paste functionality with a "new" (as of Sumac) library
     """
+    ENABLED_OPENEDX_EVENTS = [
+        LIBRARY_BLOCK_DELETED.event_type,
+        XBLOCK_CREATED.event_type,
+        XBLOCK_DELETED.event_type,
+        XBLOCK_UPDATED.event_type,
+    ]
 
     def setUp(self):
         """
@@ -406,14 +419,194 @@ class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
         self.client = APIClient()
         self.client.login(username=self.user.username, password=self.user_password)
         self.store = modulestore()
-        library = self.setup_library()
+
+        self.library = library_api.create_library(
+            org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
+            slug="lib",
+            title="Library",
+        )
+
+        self.lib_block_key = library_api.create_library_block(self.library.key, "problem", "p1").usage_key  # v==1
+        library_api.set_library_block_olx(self.lib_block_key, """
+        <problem display_name="MCQ-published" max_attempts="1">
+            <multiplechoiceresponse>
+                <label>Q</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">Wrong</choice>
+                    <choice correct="true">Right</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """)  # v==2
+        library_api.publish_changes(self.library.key)
+        library_api.set_library_block_olx(self.lib_block_key, """
+        <problem display_name="MCQ-draft" max_attempts="5">
+            <multiplechoiceresponse>
+                <label>Q</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">Wrong</choice>
+                    <choice correct="true">Right</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """)  # v==3
+        lib_block_meta = library_api.get_library_block(self.lib_block_key)
+        assert lib_block_meta.published_version_num == 2
+        assert lib_block_meta.draft_version_num == 3
+
+        self.course = CourseFactory.create(display_name='Course')
+
+        taxonomy_all_org = tagging_api.create_taxonomy(
+            "test_taxonomy",
+            "Test Taxonomy",
+            export_id="ALL_ORGS",
+        )
+        tagging_api.set_taxonomy_orgs(taxonomy_all_org, all_orgs=True)
+        for tag_value in ('tag_1', 'tag_2', 'tag_3', 'tag_4', 'tag_5', 'tag_6', 'tag_7'):
+            tagging_api.add_tag_to_taxonomy(taxonomy_all_org, tag_value)
+
+        self.lib_block_tags = ['tag_1', 'tag_5']
+        tagging_api.tag_object(str(self.lib_block_key), taxonomy_all_org, self.lib_block_tags)
+
+    def test_paste_from_library_read_only_tags(self):
+        """
+        When we copy a v2 lib block into a course, the dest block should have read-only copied tags.
+        """
+
+        copy_response = self.client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(self.lib_block_key)}, format="json")
+        assert copy_response.status_code == 200
+
+        paste_response = self.client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(self.course.usage_key),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+
+        new_block_key = paste_response.json()["locator"]
+
+        object_tags = tagging_api.get_object_tags(new_block_key)
+        assert len(object_tags) == len(self.lib_block_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in self.lib_block_tags
+            assert object_tag.is_copied
+
+        # If we delete the upstream library block...
+        library_api.delete_library_block(self.lib_block_key)
+
+        # ...the copied tags remain, but should no longer be marked as "copied"
+        object_tags = tagging_api.get_object_tags(new_block_key)
+        assert len(object_tags) == len(self.lib_block_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in self.lib_block_tags
+            assert not object_tag.is_copied
+
+    def test_paste_from_library_copies_asset(self):
+        """
+        Assets from a library component copied into a subdir of Files & Uploads.
+        """
+        # This is the binary for a real, 1px webp file – we need actual image
+        # data because contentstore will try to make a thumbnail and grab
+        # metadata.
+        webp_raw_data = b'RIFF\x16\x00\x00\x00WEBPVP8L\n\x00\x00\x00/\x00\x00\x00\x00E\xff#\xfa\x1f'
+
+        # First add the asset.
+        library_api.add_library_block_static_asset_file(
+            self.lib_block_key,
+            "static/1px.webp",
+            webp_raw_data,
+        )  # v==4
+
+        # Now add the reference to the asset
+        library_api.set_library_block_olx(self.lib_block_key, """
+        <problem display_name="MCQ-draft" max_attempts="5">
+            <p>Including this totally real image: <img src="/static/1px.webp" /></p>
+            <multiplechoiceresponse>
+                <label>Q</label>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">Wrong</choice>
+                    <choice correct="true">Right</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """)  # v==5
+
+        copy_response = self.client.post(
+            CLIPBOARD_ENDPOINT,
+            {"usage_key": str(self.lib_block_key)},
+            format="json"
+        )
+        assert copy_response.status_code == 200
+
+        paste_response = self.client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(self.course.usage_key),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+
+        new_block_key = UsageKey.from_string(paste_response.json()["locator"])
+        new_block = modulestore().get_item(new_block_key)
+
+        # Check that the substitution worked.
+        expected_import_path = f"components/{new_block_key.block_type}/{new_block_key.block_id}/1px.webp"
+        assert f"/static/{expected_import_path}" in new_block.data
+
+        # Check that the asset was copied over properly
+        image_asset = contentstore().find(
+            self.course.id.make_asset_key("asset", expected_import_path.replace('/', '_'))
+        )
+        assert image_asset.import_path == expected_import_path
+        assert image_asset.name == "1px.webp"
+        assert image_asset.length == len(webp_raw_data)
+
+    def test_paste_from_course_block_imported_from_library_creates_link(self):
+        """
+        When we copy a course xblock which was imported or copied from v2 lib block into a course,
+        the dest block should be linked up to the original lib block.
+        """
+        def _copy_paste_and_assert_link(key_to_copy):
+            copy_response = self.client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(key_to_copy)}, format="json")
+            assert copy_response.status_code == 200
+
+            paste_response = self.client.post(XBLOCK_ENDPOINT, {
+                "parent_locator": str(self.course.usage_key),
+                "staged_content": "clipboard",
+            }, format="json")
+            assert paste_response.status_code == 200
+
+            new_block_key = UsageKey.from_string(paste_response.json()["locator"])
+            new_block = modulestore().get_item(new_block_key)
+            assert new_block.upstream == str(self.lib_block_key)
+            assert new_block.upstream_version == 3
+            assert new_block.upstream_display_name == "MCQ-draft"
+            return new_block_key
+
+        # first verify link for copied block from library
+        new_block_key = _copy_paste_and_assert_link(self.lib_block_key)
+        # next verify link for copied block from the pasted block
+        _copy_paste_and_assert_link(new_block_key)
+
+
+class ClipboardPasteFromV1LibraryTestCase(ModuleStoreTestCase):
+    """
+    Test Clipboard Paste functionality with legacy (v1) library content
+    """
+
+    def setUp(self):
+        """
+        Set up a v1 Content Library and a library content block
+        """
+        super().setUp()
+        self.client = APIClient()
+        self.client.login(username=self.user.username, password=self.user_password)
+        self.store = modulestore()
+        self.library = self.setup_library()
 
         # Create a library content block (lc), point it out our library, and sync it.
         self.course = CourseFactory.create(display_name='Course')
         self.orig_lc_block = BlockFactory.create(
             parent=self.course,
             category="library_content",
-            source_library_id=str(library.key),
+            source_library_id=str(self.library.context_key),
             display_name="LC Block",
             publish_item=False,
         )
@@ -426,18 +619,15 @@ class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
     @classmethod
     def setup_library(cls):
         """
-        Creates and returns a content library.
+        Creates and returns a legacy content library with 1 problem
         """
-        library = library_api.create_library(
-            library_type=library_api.COMPLEX,
-            org=Organization.objects.create(name="Test Org", short_name="CL-TEST"),
-            slug="lib",
-            title="Library",
-        )
-        # Populate it with a problem:
-        problem_key = library_api.create_library_block(library.key, "problem", "p1").usage_key
-        library_api.set_library_block_olx(problem_key, """
-        <problem display_name="MCQ" max_attempts="1">
+        library = LibraryFactory.create(display_name='Library')
+        lib_block = BlockFactory.create(
+            parent_location=library.usage_key,
+            category="problem",
+            display_name="MCQ",
+            max_attempts=1,
+            data="""
             <multiplechoiceresponse>
                 <label>Q</label>
                 <choicegroup type="MultipleChoice">
@@ -445,9 +635,9 @@ class ClipboardLibraryContentPasteTestCase(ModuleStoreTestCase):
                     <choice correct="true">Right</choice>
                 </choicegroup>
             </multiplechoiceresponse>
-        </problem>
-        """)
-        library_api.publish_changes(library.key)
+            """,
+            publish_item=False,
+        )
         return library
 
     def test_paste_library_content_block(self):

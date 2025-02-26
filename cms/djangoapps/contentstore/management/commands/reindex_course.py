@@ -4,9 +4,10 @@
 import logging
 from textwrap import dedent
 from time import time
-from datetime import date
+from datetime import date, datetime
 
 from django.core.management import BaseCommand, CommandError
+from django.conf import settings
 from elasticsearch import exceptions
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -42,6 +43,10 @@ class Command(BaseCommand):
         parser.add_argument('--active',
                             action='store_true',
                             help='Reindex active courses only')
+        parser.add_argument('--from_inclusion_date',
+                            action='store_true',
+                            help='Reindex courses with a start date greater than COURSEWARE_SEARCH_INCLUSION_DATE'
+                            )
         parser.add_argument('--setup',
                             action='store_true',
                             help='Reindex all courses on developers stack setup')
@@ -70,15 +75,17 @@ class Command(BaseCommand):
         course_ids = options['course_ids']
         all_option = options['all']
         active_option = options['active']
+        inclusion_date_option = options['from_inclusion_date']
         setup_option = options['setup']
         readable_option = options['warning']
         index_all_courses_option = all_option or setup_option
 
-        if ((not course_ids and not (index_all_courses_option or active_option)) or
-                (course_ids and (index_all_courses_option or active_option))):
+        course_option_flag_option = index_all_courses_option or active_option or inclusion_date_option
+
+        if (not course_ids and not course_option_flag_option) or (course_ids and course_option_flag_option):
             raise CommandError((
                 "reindex_course requires one or more <course_id>s"
-                " OR the --all, --active or --setup flags."
+                " OR the --all, --active, --setup, or --from_inclusion_date flags."
             ))
 
         store = modulestore()
@@ -97,14 +104,16 @@ class Command(BaseCommand):
                         logging.exception('Search Engine error - %s', exc)
                         return
 
-                    index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
+                    # Legacy Elasticsearch engine
+                    if hasattr(searcher, '_es'):  # pylint: disable=protected-access
+                        index_exists = searcher._es.indices.exists(index=index_name)  # pylint: disable=protected-access
 
-                    index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
-                        index=index_name,
-                    ) if index_exists else {}
+                        index_mapping = searcher._es.indices.get_mapping(  # pylint: disable=protected-access
+                            index=index_name,
+                        ) if index_exists else {}
 
-                    if index_exists and index_mapping:
-                        return
+                        if index_exists and index_mapping:
+                            return
 
             # if reindexing is done during devstack setup step, don't prompt the user
             if setup_option or query_yes_no(self.CONFIRMATION_PROMPT, default="no"):
@@ -127,6 +136,20 @@ class Command(BaseCommand):
             course_keys = list(map(lambda course: course.id, active_courses))
 
             logging.warning(f'Selected {len(course_keys)} active courses over a total of {len(all_courses)}.')
+        elif inclusion_date_option:
+            # in case of --from_inclusion_date, we get the list of course keys from all courses
+            # that are stored in modulestore and filter out courses with a start date less than
+            # the settings defined COURSEWARE_SEARCH_INCLUSION_DATE
+            all_courses = modulestore().get_courses()
+
+            inclusion_date = datetime.strptime(
+                settings.FEATURES.get('COURSEWARE_SEARCH_INCLUSION_DATE', '2020-01-01'),
+                '%Y-%m-%d'
+            )
+
+            # We keep the courses that has a start date and the start date is greater than the inclusion date
+            active_courses = filter(lambda course: course.start and (course.start >= inclusion_date), all_courses)
+            course_keys = list(map(lambda course: course.id, active_courses))
 
         else:
             # in case course keys are provided as arguments

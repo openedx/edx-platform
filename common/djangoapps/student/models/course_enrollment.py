@@ -717,6 +717,8 @@ class CourseEnrollment(models.Model):
         Also emits relevant events for analytics purposes.
         """
         try:
+            # .. filter_implemented_name: CourseEnrollmentStarted
+            # .. filter_type: org.openedx.learning.course.enrollment.started.v1
             user, course_key, mode = CourseEnrollmentStarted.run_filter(
                 user=user, course_key=course_key, mode=mode,
             )
@@ -1750,7 +1752,7 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
 
 class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
     """
-
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
@@ -1763,6 +1765,8 @@ class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: di
 class BulkChangeEnrollmentConfiguration(ConfigurationModel):
     """
     config model for the bulk_change_enrollment_csv command
+
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],

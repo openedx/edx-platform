@@ -58,10 +58,27 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
         Setup test case
         """
         super().setUp()
-
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
         # Creating a course
         self.course = CourseFactory.create()
 
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread",
+            return_value=self.course.id
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment",
+            return_value=self.course.id
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         # Creating relative discussion and cohort settings
         CourseCohortsSettings.objects.create(course_id=str(self.course.id))
         CourseDiscussionSettings.objects.create(course_id=str(self.course.id), _divided_discussions='[]')
@@ -250,8 +267,26 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         super().setUp()
         httpretty.reset()
         httpretty.enable()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
         self.course = CourseFactory.create()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread",
+            return_value=self.course.id
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment",
+            return_value=self.course.id
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         self.user_1 = UserFactory.create()
         CourseEnrollment.enroll(self.user_1, self.course.id)
         self.user_2 = UserFactory.create()
@@ -270,6 +305,8 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
                 "username": thread.username,
                 "thread_type": 'discussion',
                 "title": thread.title,
+                "commentable_id": thread.commentable_id,
+
             })
         self._register_subscriptions_endpoint()
 
@@ -319,7 +356,11 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'post_title': 'test thread',
             'email_content': self.comment.body,
             'course_name': self.course.display_name,
-            'sender_id': self.user_2.id
+            'sender_id': self.user_2.id,
+            'parent_id': None,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(
@@ -362,11 +403,14 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
             'email_content': self.comment.body,
-            'group_by_id': self.thread_2.id,
             'author_name': 'dummy\'s',
             'author_pronoun': 'dummy\'s',
             'course_name': self.course.display_name,
-            'sender_id': self.user_3.id
+            'sender_id': self.user_3.id,
+            'parent_id': 2,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -383,7 +427,11 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'post_title': self.thread.title,
             'email_content': self.comment.body,
             'course_name': self.course.display_name,
-            'sender_id': self.user_3.id
+            'sender_id': self.user_3.id,
+            'parent_id': 2,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         self.assertDictEqual(args_comment_on_response.context, expected_context)
         self.assertEqual(
@@ -439,12 +487,15 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
         expected_context = {
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
-            'group_by_id': self.thread_2.id,
             'author_name': 'dummy\'s',
             'author_pronoun': 'your',
             'course_name': self.course.display_name,
             'sender_id': self.user_3.id,
-            'email_content': self.comment.body
+            'email_content': self.comment.body,
+            'parent_id': 2,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
@@ -489,6 +540,10 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
             'email_content': self.comment.body,
             'course_name': self.course.display_name,
             'sender_id': self.user_2.id,
+            'parent_id': parent_id,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 4,
         }
         if parent_id:
             expected_context['author_name'] = 'dummy\'s'
@@ -538,8 +593,26 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
         super().setUp()
         httpretty.reset()
         httpretty.enable()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
         self.course = CourseFactory.create()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread",
+            return_value=self.course.id
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment",
+            return_value=self.course.id
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         self.user_1 = UserFactory.create()
         CourseEnrollment.enroll(self.user_1, self.course.id)
         self.user_2 = UserFactory.create()
@@ -573,6 +646,8 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
             "username": thread.username,
             "thread_type": 'discussion',
             "title": thread.title,
+            "commentable_id": thread.commentable_id,
+
         })
         self.register_get_comment_response({
             'id': response.id,
@@ -605,8 +680,26 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
         super().setUp()
         httpretty.reset()
         httpretty.enable()
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
         self.course = CourseFactory.create()
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread",
+            return_value=self.course.id
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment",
+            return_value=self.course.id
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
         self.user_1 = UserFactory.create()
         CourseEnrollment.enroll(self.user_1, self.course.id)
         self.user_2 = UserFactory.create()
@@ -638,6 +731,7 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             "username": thread.username,
             "thread_type": 'discussion',
             "title": thread.title,
+            "commentable_id": thread.commentable_id,
         })
         self.register_get_comment_response({
             'id': 1,
@@ -665,7 +759,11 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             'post_title': 'test thread',
             'course_name': self.course.display_name,
             'sender_id': int(self.user_2.id),
-            'email_content': 'dummy'
+            'email_content': 'dummy',
+            'parent_id': None,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 2,
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))
@@ -683,7 +781,11 @@ class TestResponseEndorsedNotifications(DiscussionAPIViewTestMixin, ModuleStoreT
             'post_title': 'test thread',
             'course_name': self.course.display_name,
             'sender_id': int(response.user_id),
-            'email_content': 'dummy'
+            'email_content': 'dummy',
+            'parent_id': None,
+            'topic_id': None,
+            'thread_id': 1,
+            'comment_id': 2,
         }
         self.assertDictEqual(notification_data.context, expected_context)
         self.assertEqual(notification_data.content_url, _get_mfe_url(self.course.id, thread.id))
