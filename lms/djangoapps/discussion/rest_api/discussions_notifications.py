@@ -381,6 +381,10 @@ class DiscussionNotificationSender:
         self._send_course_wide_notification("content_reported", audience_filters, context)
 
     def _populate_context_with_ids_for_mobile(self, context, notification_type):
+        """
+        Populate notification context with attributes required by mobile apps.
+        """
+
         context['thread_id'] = self.thread.id
         context['topic_id'] = self.thread.commentable_id
 
