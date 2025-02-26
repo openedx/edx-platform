@@ -192,6 +192,11 @@ def enroll_email(
             message_params['email_address'] = student_email
             if previous_state.user:
                 message_params['user_id'] = previous_state.user.id
+                if previous_state.user.email != student_email:
+                    log.error(
+                        'User email does not match the email being enrolled: %s != %s',
+                        previous_state.user.email, student_email
+                    )
             send_mail_to_student(student_email, message_params, language=language)
 
     after_state = EmailEnrollmentState(course_id, student_email)
@@ -566,9 +571,10 @@ def send_mail_to_student(student, param_dict, language=None):
 
     # Extract an LMS user ID for the student, if possible.
     # ACE needs the user ID to be able to send email via Braze.
-    lms_user_id = 0
-    if 'user_id' in param_dict and param_dict['user_id'] is not None and param_dict['user_id'] > 0:
-        lms_user_id = param_dict['user_id']
+    try:
+        lms_user_id = User.objects.get(email=student).id
+    except User.DoesNotExist:
+        lms_user_id = 0
 
     # see if there is an activation email template definition available as configuration,
     # if so, then render that
