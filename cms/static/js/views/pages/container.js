@@ -40,6 +40,7 @@ function($, _, Backbone, gettext, BasePage,
             'change .header-library-checkbox': 'toggleLibraryComponent',
             'click .collapse-button': 'collapseXBlock',
             'click .xblock-view-action-button': 'viewXBlockContent',
+            'click .xblock-view-group-link': 'viewXBlockContent',
         },
 
         options: {
@@ -132,12 +133,15 @@ function($, _, Backbone, gettext, BasePage,
 
             if (this.options.isIframeEmbed) {
                 window.addEventListener('message', (event) => {
-                    const { data } = event;
+                    const { data: initialData } = event;
 
-                    if (!data) return;
+                    if (!initialData) return;
 
                     let xblockElement;
                     let xblockWrapper;
+
+                    const data = { ...initialData };
+                    data.payload = { ...data?.payload, ...data?.payload?.data };
 
                     if (data.payload && data.payload.locator) {
                         xblockElement = $(`[data-locator="${data.payload.locator}"]`);
@@ -183,6 +187,14 @@ function($, _, Backbone, gettext, BasePage,
             } catch (e) {
                 console.error('Failed to post message:', e);
             }
+        },
+
+        postMessageForHideProcessingNotification: function () {
+          this.postMessageToParent({
+              type: 'hideProcessingNotification',
+              message: 'Hide processing notification',
+              payload: {},
+          });
         },
 
         getViewParameters: function() {
@@ -315,6 +327,7 @@ function($, _, Backbone, gettext, BasePage,
             // Do not perform any changes on paste button since they are not
             // rendered on Library or LibraryContent pages
             if (!this.isLibraryPage && !this.isLibraryContentPage && (!this.options.isIframeEmbed || this.isSplitTestContentPage)) {
+                this.postMessageForHideProcessingNotification();
                 // 'data' is the same data returned by the "get clipboard status" API endpoint
                 // i.e. /api/content-staging/v1/clipboard/
                 if (this.options.canEdit && data.content) {
@@ -379,11 +392,7 @@ function($, _, Backbone, gettext, BasePage,
                 });
             }).done((data) => {
                 if (this.options.isIframeEmbed) {
-                    this.postMessageToParent({
-                        type: 'hideProcessingNotification',
-                        message: 'Hide processing notification',
-                        payload: {},
-                    });
+                    this.postMessageForHideProcessingNotification();
                 }
                 const {
                     conflicting_files: conflictingFiles,
@@ -733,13 +742,17 @@ function($, _, Backbone, gettext, BasePage,
             const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
             try {
                 if (this.options.isIframeEmbed) {
-                    return window.parent.postMessage(
+                    window.parent.postMessage(
                         {
-                            type: 'copyXBlock',
+                            type: this.isSplitTestContentPage ? 'copyXBlockLegacy' : 'copyXBlock',
                             message: 'Copy the XBlock',
                             payload: { usageId }
                         }, document.referrer
                     );
+
+                    if (!this.isSplitTestContentPage) {
+                      return;
+                    }
                 }
             } catch (e) {
                 console.error(e);
@@ -781,6 +794,7 @@ function($, _, Backbone, gettext, BasePage,
                         setTimeout(checkStatus, 1_000);
                         return deferred;
                     } else {
+                        this.postMessageForHideProcessingNotification();
                         throw new Error(`Unexpected clipboard status "${status}" in successful API response.`);
                     }
                 });
@@ -917,12 +931,18 @@ function($, _, Backbone, gettext, BasePage,
                 scrollOffset = 0;
             } else {
                 $container = listPanel;
-                scrollOffset = ViewUtils.getScrollOffset(buttonPanel);
+                if (!target.length && iframeMessageData.payload.parent_locator) {
+                  $container = $('.xblock[data-usage-id="' + iframeMessageData.payload.parent_locator + '"]')
+                    .find('ol.reorderable-container.ui-sortable');
+                }
+                if (!iframeMessageData) {
+                    scrollOffset = ViewUtils.getScrollOffset(buttonPanel);
+                }
             }
 
             placeholderElement = $placeholderEl.appendTo($container);
 
-            if (this.options.isIframeEmbed && !this.isSplitTestContentPage) {
+            if (this.options.isIframeEmbed && iframeMessageData) {
               if (iframeMessageData.payload.data && iframeMessageData.type === 'addXBlock') {
                   return this.onNewXBlock(placeholderElement, scrollOffset, false, iframeMessageData.payload.data);
               }
@@ -934,23 +954,27 @@ function($, _, Backbone, gettext, BasePage,
                     message: 'Add new XBlock',
                     payload: {},
                 });
+                if (iframeMessageData) {
+                  return;
+                }
             }
 
             return $.postJSON(this.getURLRoot() + '/', requestData,
                 _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false))
-                .success(function () {
+                .always(function () {
                     if (self.options.isIframeEmbed && self.isSplitTestContentPage) {
                         self.postMessageToParent({
                             type: 'hideProcessingNotification',
                             message: 'Hide processing notification',
                             payload: {}
                         });
+                        return true;
                     }
                 })
                 .fail(function() {
                     // Remove the placeholder if the update failed
                     placeholderElement.remove();
-            });
+                });
         },
 
         duplicateComponent: function(xblockElement) {
@@ -1058,19 +1082,16 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         viewXBlockContent: function(event) {
-            try {
-                if (this.options.isIframeEmbed) {
-                    event.preventDefault();
-                    var usageId = event.currentTarget.href.split('/').pop() || '';
-                    window.parent.postMessage({
-                        type: 'handleViewXBlockContent',
-                        message: 'View the content of the XBlock',
-                        payload: { usageId },
-                    }, document.referrer);
-                    return true;
-                }
-            } catch (e) {
-                console.error(e);
+            if (this.options.isIframeEmbed) {
+                event.preventDefault();
+                const usageId = event.currentTarget.href.split('/').pop() || '';
+                const isViewGroupLink = event.currentTarget.classList.contains('xblock-view-group-link');
+                this.postMessageToParent({
+                    type: isViewGroupLink ? 'handleViewGroupConfigurations' : 'handleViewXBlockContent',
+                    message: isViewGroupLink ? 'View the group configurations page' : 'View the content of the XBlock',
+                    payload: { usageId },
+                });
+                return true;
             }
         },
 
@@ -1133,6 +1154,17 @@ function($, _, Backbone, gettext, BasePage,
                 }
                 else {
                     destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                }
+
+                if (this.options.isIframeEmbed && this.isSplitTestContentPage) {
+                    return this.postMessageToParent({
+                        type: 'handleRedirectToXBlockEditPage',
+                        message: 'Redirect to xBlock edit page',
+                        payload: {
+                            type: blockType[1],
+                            locator: encodeURI(data.locator),
+                        },
+                    });
                 }
 
                 window.location.href = destinationUrl;

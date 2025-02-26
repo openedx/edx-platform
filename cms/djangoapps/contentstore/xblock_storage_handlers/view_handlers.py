@@ -611,6 +611,7 @@ def _create_block(request):
         modulestore().update_item(created_block, request.user.id)
         response["upstreamRef"] = upstream_ref
         response["static_file_notices"] = asdict(static_file_notices)
+        response["parent_locator"] = parent_locator
 
     return JsonResponse(response)
 
