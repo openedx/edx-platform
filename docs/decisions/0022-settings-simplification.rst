@@ -213,21 +213,22 @@ Target settings structure for edx-platform
       in a local venv as well as in CI. Needs to invoke ``derive_settings`` in
       order to render all previously-defined ``Derived`` settings.
 
-    * ``<downstream>/lms_prod.py`` (example path): In order to deploy the LMS,
-      downstream site operators (like edx.org) and tools (like Tutor) will need
-      to separately maintain their own custom settings module derived from
-      ``lms/envs/common.py``, and point their ``DJANGO_SETTINGS_MODULE``
-      environment variable at this module. It is important that this module
-      both (i) replaces the obviously-wrong settings with appropriate
-      production settings, and (ii) invokes ``derive_settings`` to render all
-      previously-defined ``Derived`` settings.
-
     * ``lms/envs/yaml.py`` (only if we decide to retain YAML support):
-      An upstream-maintained alternative to
-      ``<downstream>/lms_prod.py>``. Loads overrides from a YAML file at
-      ``LMS_CFG``, plus some well-defined special handling for mergable values
-      like ``FEATURES``. This is adapted from and replaces
-      lms/envs/production.py. It will invoke ``derive_settings``.
+      Loads overrides from a YAML File at ``LMS_CFG``, plus some well-defined
+      special handling for mergable values like ``FEATURES``. This is adapted
+      from and replaces lms/envs/production.py. It will invoke
+      ``derive_settings``.
+
+    * ``<downstream>/lms_prod.py`` (example path): Open edX sites that do not
+      use ``lms/envs/yaml.py`` will instead have to have their
+      ``DJANGO_SETTINGS_MODULE`` environment variable pointed at a custom
+      settings module, derived from ``lms/envs/common.py``.  It is important
+      that this module both (i) replaces the obviously-wrong settings with
+      appropriate production settings, and (ii) invokes ``derive_settings`` to
+      render all previously-defined ``Derived`` settings. If we decide not to
+      retain YAML support, then *every* Open edX deployment will need to be
+      pointed at such a custom settings module settings file, either maintained
+      by the operator or by a downstream tool (like Tutor).
 
     * ``lms/envs/dev.py``: Override LMS settings so that it can run
       "bare metal" directly on a developer's local machine using debug-friendly
@@ -245,9 +246,9 @@ Target settings structure for edx-platform
 
     * ``cms/envs/test.py``
 
-    * ``<downstream>/cms_prod.py`` (example path)
-
     * ``cms/envs/yaml.py`` (only if we decide to retain YAML support)
+
+    * ``<downstream>/cms_prod.py`` (example path)
 
     * ``cms/envs/dev.py``
 
