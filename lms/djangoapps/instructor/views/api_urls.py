@@ -78,7 +78,7 @@ urlpatterns = [
     path('gradebook/<int:offset>', gradebook_api.spoc_gradebook, name='spoc_gradebook'),
 
     # Cohort management
-    path('add_users_to_cohorts', api.add_users_to_cohorts, name='add_users_to_cohorts'),
+    path('add_users_to_cohorts', api.AddUsersToCohorts.as_view(), name='add_users_to_cohorts'),
 
     # Certificates
     path('enable_certificate_generation', api.enable_certificate_generation, name='enable_certificate_generation'),
