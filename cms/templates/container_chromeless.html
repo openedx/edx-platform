@@ -201,6 +201,7 @@ from openedx.core.release import RELEASE_LINE
                     outlineURL: "${outline_url | n, js_escaped_string}",
                     clipboardData: ${user_clipboard | n, dump_js_escaped_json},
                     isIframeEmbed: true,
+                    libraryContentPickerUrl: "${library_content_picker_url | n, js_escaped_string}",
                 }
             );
         </%static:webpack>

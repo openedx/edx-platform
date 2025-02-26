@@ -46,8 +46,8 @@ body,
         border-radius: 4px;
         display: inline-flex;
         align-items: center;
-        gap: 0.6rem;
-        padding: 0.3rem 1rem;
+        gap: ($baseline * .3);
+        padding: ($baseline * .15) ($baseline / 2);
 
         &:hover {
           background-color: $primary;
@@ -55,7 +55,7 @@ body,
         }
 
         .action-button-text {
-          line-height: 2rem;
+          line-height: 20px;
         }
       }
     }
@@ -224,7 +224,7 @@ body,
         box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
         border-radius: 6px;
         border: none;
-        margin: 3rem 1rem 0;
+        margin: ($baseline * 1.5) ($baseline / 2) 0;
     }
   }
 
@@ -493,8 +493,8 @@ body,
       }
 
       &.xmodule_DoneXBlock {
-        margin-top: 60px;
-        padding: 0 20px;
+        margin-top: ($baseline * 3);
+        padding: 0 $baseline;
       }
 
       .xblock-actions {
@@ -628,7 +628,7 @@ body,
 }
 
 body [class*="view-"] .openassessment_editor_buttons.xblock-actions {
-  padding: 15px 2% 3px 2%;
+  padding: ($baseline * .75) 2% ($baseline * .15) 2%;
 }
 
 [class*="view-"] {
@@ -684,7 +684,7 @@ body [class*="view-"] .openassessment_editor_buttons.xblock-actions {
   .list-input.settings-list {
     .field.comp-setting-entry.is-set .setting-input {
       color: $text-color;
-      margin-bottom: 5px;
+      margin-bottom: ($baseline * .25);
     }
 
     select {
@@ -783,7 +783,7 @@ select {
     #openassessment_editor_header .editor_tabs .oa_editor_tab {
       @extend %light-button;
 
-      padding: 0 10px;
+      padding: 0 ($baseline / 2);
     }
 
     #openassessment_editor_header,
@@ -812,7 +812,7 @@ select {
     #oa_rubric_editor_wrapper .openassessment_criterion_option
     .openassessment_criterion_option_point_wrapper label input {
       min-width: 70px;
-      font-size: 18px;
+      font-size: $base-font-size;
       height: 44px;
     }
 
@@ -885,7 +885,7 @@ select {
     width: 100%;
 
     &.background-url {
-      margin-bottom: 10px;
+      margin-bottom: ($baseline / 2);
     }
 
     &.autozone-layout {
@@ -909,111 +909,103 @@ select {
   }
 }
 
-.xblock-render .add-xblock-component {
-  background: transparent;
-  padding: $baseline;
+.xblock-render {
+  .add-xblock-component {
+    background: transparent;
+    padding: $baseline;
 
-  .new-component {
-    h5 {
-      margin-bottom: ($baseline * 1.2);
-      font-size: 22px;
-      font-weight: 700;
-      color: $black;
-    }
+    .new-component {
+      h5 {
+        margin-bottom: ($baseline * 1.2);
+        font-size: 22px;
+        font-weight: 700;
+        color: $black;
+      }
 
-    .new-component-type {
-      display: flex;
-      flex-wrap: wrap;
-      gap: ($baseline * .6);
-      align-items: center;
-      justify-content: center;
-
-      .add-xblock-component-button {
-        box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
-        width: 17.6rem;
-        height: 11rem;
-        color: $primary;
-        border-color: $primary;
-        background: transparent;
-        margin: 0;
-        display: inline-flex;
+      .new-component-type {
+        display: flex;
+        flex-wrap: wrap;
+        gap: ($baseline * .6);
         align-items: center;
         justify-content: center;
-        flex-direction: column;
-        gap: ($baseline * .4);
 
-        &:hover {
-          color: darken($primary, 10%);
-          background-color: lighten($primary, 80%);
-          border-color: darken($primary, 15%);
-        }
+        .add-xblock-component-button {
+          box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+          width: 176px;
+          height: 110px;
+          color: $primary;
+          border-color: $primary;
+          background: transparent;
+          margin: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: ($baseline * .4);
 
-        .large-template-icon {
-          width: 24px;
-          height: 24px;
-          background: $primary;
+          &:hover {
+            color: darken($primary, 10%);
+            background-color: lighten($primary, 80%);
+            border-color: darken($primary, 15%);
+          }
 
-          @each $name, $file in $template-icon-map {
-            &.large-#{$name}-icon {
-              mask: url("#{$static-path}/images/#{$file}.svg") center no-repeat;
+          .large-template-icon {
+            width: 24px;
+            height: 24px;
+            background: $primary;
+
+            @each $name, $file in $template-icon-map {
+              &.large-#{$name}-icon {
+                mask: url("#{$static-path}/images/#{$file}.svg") center no-repeat;
+              }
             }
           }
-        }
 
-        .name {
-          color: inherit;
-          font-size: 1.575rem;
-          font-weight: 400;
-        }
+          .name {
+            color: inherit;
+            font-size: 15.75px;
+            font-weight: 400;
+          }
 
-        .beta {
-          color: $white;
-          background-color: $primary;
-          padding: 0.2rem 0.8rem 0.4rem;
-          font-size: 1.35rem;
-          font-weight: 700;
-          line-height: 1;
-          margin: -0.6rem 0 0;
+          .beta {
+            color: $white;
+            background-color: $primary;
+            padding: ($baseline * .1) ($baseline * .4) ($baseline * .2);
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1;
+            margin: -($baseline * .3) 0 0;
+          }
         }
+      }
+    }
+
+    .new-component-templates {
+      border: 1px solid $border-color;
+      border-radius: 5px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+      margin: $baseline;
+      overflow: hidden;
+
+      .button-component:hover {
+        background: $primary;
+      }
+
+      .cancel-button {
+        @extend %primary-button;
       }
     }
   }
 }
 
 .paste-component {
-  margin: 2.4rem 1rem 0;
+  margin: ($baseline * 1.2) ($baseline / 2) 0;
 
   .paste-component-whats-in-clipboard .clipboard-details-popup {
-    right: -1rem;
+    right: ($baseline / 2 * -1);
   }
 
   .paste-component-button.button {
-    padding: 9px 16px;
-    color: $primary;
-    border-color: $primary;
-    font-size: 1.8rem;
-    line-height: 1.33;
-    text-shadow: none;
-    font-weight: 400;
-    position: relative;
-
-    &:focus {
-      color: $primary;
-      background: transparent;
-
-      &:before {
-        content: "";
-        position: absolute;
-        inset: -5px;
-        border: 2px solid $primary;
-        border-radius: 1rem;
-      }
-    }
-
-    &:hover {
-      color: darken($primary, 10%);
-      background-color: lighten($primary, 80%);
-      border-color: darken($primary, 15%);
-    }
+    @extend %button-primary-outline;
   }
 }
