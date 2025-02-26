@@ -179,6 +179,10 @@ will either recommend to:
    is an optional alternative to ``DJANGO_SETTINGS_MODULE`` rather than the
    required/preferred configuration method.
 
+At the time, we do not have enough information whether option 1 or 2 would be
+more beneficial overall to the community.
+`The discussion on this sub-decisision will continue on this GitHub issue. <https://github.com/openedx/open-edx-proposals/issues/684>`_.
+
 Target settings structure for edx-platform
 ==========================================
 
@@ -290,7 +294,9 @@ These steps are non-breaking unless noted.
 
 * Propose and, if accepted, implement an update to OEP-45 (Configuring and
   Operating Open edX). `Progress on this update is tracked here`_. As mentioned
-  in the Decision section, this update will either:
+  in the Decision section, based on learning from previous steps and discussion
+  in `"Should we continue to support YAML settings?" <https://github.com/openedx/open-edx-proposals/issues/684>`_
+  this update will either:
 
   1. Revoke the OEP-45 sections regarding YAML. Deprecate and remove
      (cms,lms)/envs/production.py. This is a BREAKING CHANGE for tools and
