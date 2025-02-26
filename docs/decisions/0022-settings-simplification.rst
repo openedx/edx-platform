@@ -181,7 +181,7 @@ will either recommend to:
 
 At the time, we do not have enough information whether option 1 or 2 would be
 more beneficial overall to the community.
-`The discussion on this sub-decisision will continue on this GitHub issue. <https://github.com/openedx/open-edx-proposals/issues/684>`_.
+`The discussion on this sub-decisision will continue on this GitHub issue <https://github.com/openedx/open-edx-proposals/issues/684>`_.
 
 Target settings structure for edx-platform
 ==========================================
@@ -213,18 +213,18 @@ Target settings structure for edx-platform
       in a local venv as well as in CI. Needs to invoke ``derive_settings`` in
       order to render all previously-defined ``Derived`` settings.
 
-    * ``<third_party_repo>/lms_prod.py`` (example path): In order to
-      deploy the LMS, third-party providers (like edx.org) and tools (like
-      Tutor) will need to separately maintain their own custom settings module
-      derived from ``lms/envs/common.py``, and point their
-      ``DJANGO_SETTINGS_MODULE`` environment variable at this module. It is
-      important that this module both (i) replaces the obviously-wrong settings
-      with appropriate production settings, and (ii) invokes
-      ``derive_settings`` to render all previously-defined ``Derived`` settings.
+    * ``<downstream>/lms_prod.py`` (example path): In order to deploy the LMS,
+      downstream site operators (like edx.org) and tools (like Tutor) will need
+      to separately maintain their own custom settings module derived from
+      ``lms/envs/common.py``, and point their ``DJANGO_SETTINGS_MODULE``
+      environment variable at this module. It is important that this module
+      both (i) replaces the obviously-wrong settings with appropriate
+      production settings, and (ii) invokes ``derive_settings`` to render all
+      previously-defined ``Derived`` settings.
 
     * ``lms/envs/yaml.py`` (only if we decide to retain YAML support):
       An upstream-maintained alternative to
-      ``<third_party_repo>/lms_repo.py>``. Loads overrides from a YAML file at
+      ``<downstream>/lms_prod.py>``. Loads overrides from a YAML file at
       ``LMS_CFG``, plus some well-defined special handling for mergable values
       like ``FEATURES``. This is adapted from and replaces
       lms/envs/production.py. It will invoke ``derive_settings``.
@@ -232,11 +232,11 @@ Target settings structure for edx-platform
     * ``lms/envs/dev.py``: Override LMS settings so that it can run
       "bare metal" directly on a developer's local machine using debug-friendly
       settings. Will use ``local.openedx.io`` (which resolves to 127.0.0.1) as
-      a base domain, which should be suitable for third-party tools as well. It
+      a base domain, which should be suitable for downstream tools as well. It
       will invoke ``derive_settings``.
 
-      * ``<third_party_repo>/lms_dev.py`` (example path): In order to
-        run the LMS, third-party tools (like Tutor, and 2U's devstack) will
+      * ``<downstream>/lms_dev.py`` (example path): In order to
+        run the LMS, downstream tools (like Tutor, and 2U's devstack) will
         need to separately maintain their own custom settings module derived
         from ``lms/envs/dev.py``, and point their
         ``DJANGO_SETTINGS_MODULE`` environment variable at this module.
@@ -245,13 +245,13 @@ Target settings structure for edx-platform
 
     * ``cms/envs/test.py``
 
-    * ``<third_party_repo>/cms_prod.py`` (example path)
+    * ``<downstream>/cms_prod.py`` (example path)
 
     * ``cms/envs/yaml.py`` (only if we decide to retain YAML support)
 
     * ``cms/envs/dev.py``
 
-      * ``<third_party_repo>/cms_dev.py`` (example path)
+      * ``<downstream>/cms_dev.py`` (example path)
 
 Plan of action
 ==============
@@ -264,7 +264,7 @@ These steps are non-breaking unless noted.
 
 * Improve edx-platform's API for
   deriving settings, as we are about to depend on it significantly more than we
-  currently do. This is a potentially BREAKING CHANGE to any third-party
+  currently do. This is a potentially BREAKING CHANGE to any downstream
   settings files which imported from ``openedx.core.lib.derived``.
 
 * Remove redundant overrides in (cms,lms)/envs/production.py. Use Derived
@@ -288,14 +288,14 @@ These steps are non-breaking unless noted.
   using these settings.
 
 * Deprecate and remove (cms,lms)/envs/devstack.py. This is a BREAKING CHANGE to
-  third-party development tools (like Tutor and 2U's devstack), as they will
+  downstream development tools (like Tutor and 2U's devstack), as they will
   now either need to maintain local copies of these modules, or "rebase"
   themselves onto (lms,cms)/envs/dev.py.
 
 * Propose and, if accepted, implement an update to OEP-45 (Configuring and
   Operating Open edX). `Progress on this update is tracked here`_. As mentioned
-  in the Decision section, based on learning from previous steps and discussion
-  in `"Should we continue to support YAML settings?" <https://github.com/openedx/open-edx-proposals/issues/684>`_
+  in the Decision section, based on (a) what we learn from previous steps and
+  (b) discussion in `"Should we continue to support YAML settings?" <https://github.com/openedx/open-edx-proposals/issues/684>`_
   this update will either:
 
   1. Revoke the OEP-45 sections regarding YAML. Deprecate and remove
@@ -338,11 +338,11 @@ difficulties with the plan laid out in this ADR.
 
   * ``lms/envs/prod.py``
 
-    * ``$THIRD_PARTY/lms/production.py``
+    * ``<downstream>/lms_prod.py``
 
   * ``cms/envs/prod.py``
 
-    * ``$THIRD_PARTY/cms/production.py``
+    * ``<downstream>/cms_prod.py``
 
   * ``openedx/envs/test.py``
 
@@ -354,8 +354,8 @@ difficulties with the plan laid out in this ADR.
 
     * ``lms/envs/dev.py``
 
-      * ``$THIRD_PARTY/lms/dev.py``
+      * ``<downstream>/lms_dev.py``
 
     * ``cms/envs/dev.py``
 
-      * ``$THIRD_PARTY/cms/dev.py``
+      * ``<downstream>/cms_dev.py``
