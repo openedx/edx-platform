@@ -6,7 +6,11 @@ Contains URLs for the Course Experience API
 from django.conf import settings
 from django.urls import re_path
 
-from openedx.features.course_experience.api.v1.views import reset_course_deadlines, CourseDeadlinesMobileView
+from openedx.features.course_experience.api.v1.views import (
+    reset_course_deadlines,
+    reset_multiple_course_deadlines,
+    CourseDeadlinesMobileView,
+)
 
 urlpatterns = []
 
@@ -17,6 +21,11 @@ urlpatterns += [
         reset_course_deadlines,
         name='course-experience-reset-course-deadlines'
     ),
+    re_path(
+        r'v1/reset_multiple_course_deadlines/',
+        reset_multiple_course_deadlines,
+        name='course-experience-reset-multiple-course-deadlines',
+    )
 ]
 
 # URL for retrieving course deadlines info
