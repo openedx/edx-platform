@@ -192,11 +192,6 @@ def enroll_email(
             message_params['email_address'] = student_email
             if previous_state.user:
                 message_params['user_id'] = previous_state.user.id
-                if previous_state.user.email != student_email:
-                    log.error(
-                        'User email does not match the email being enrolled: %s != %s',
-                        previous_state.user.email, student_email
-                    )
             send_mail_to_student(student_email, message_params, language=language)
 
     after_state = EmailEnrollmentState(course_id, student_email)
@@ -596,18 +591,6 @@ def send_mail_to_student(student, param_dict, language=None):
         language=language,
         user_context=param_dict,
     )
-
-    if message_type == 'allowed_enroll':
-        log_data = {
-            'message': 'allowed_enroll email data log',
-            'message_type': message_type,
-            'student': student,
-            'recipient': message.recipient.email_address,
-            'context_email': message.context.get('email_address'),
-            'lms_user_id': lms_user_id,
-            **param_dict
-        }
-        log.error(log_data)
     ace.send(message)
 
 

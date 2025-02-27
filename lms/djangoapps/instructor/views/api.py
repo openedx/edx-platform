@@ -837,7 +837,7 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
             validate_email(email)  # Raises ValidationError if invalid
             if action == 'enroll':
                 before, after, enrollment_obj = enroll_email(
-                    course_id, email, auto_enroll, email_students, email_params, language=language
+                    course_id, email, auto_enroll, email_students, {**email_params}, language=language
                 )
                 before_enrollment = before.to_dict()['enrollment']
                 before_user_registered = before.to_dict()['user']
@@ -860,7 +860,7 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
 
             elif action == 'unenroll':
                 before, after = unenroll_email(
-                    course_id, email, email_students, email_params, language=language
+                    course_id, email, email_students, {**email_params}, language=language
                 )
                 before_enrollment = before.to_dict()['enrollment']
                 before_allowed = before.to_dict()['allowed']
