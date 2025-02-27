@@ -84,7 +84,6 @@ from cms.djangoapps.contentstore.models import PublishableEntityLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
     PublishableEntityLinksSerializer,
     PublishableEntityLinksSummarySerializer,
-    PublishableEntityLinksUsageKeySerializer,
 )
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
@@ -124,7 +123,15 @@ class DownstreamListPaginator(DefaultPagination):
     page_size = 100
     max_page_size = 1000
 
-    def get_paginated_response(self, data, *args, **kwargs):
+    def paginate_queryset(self, queryset, request, view=None):
+        if 'no_page' in request.query_params:
+            return queryset
+
+        return super().paginate_queryset(queryset, request, view)
+
+    def get_paginated_response(self, data, request, *args, **kwargs):
+        if 'no_page' in request.query_params:
+            return Response(data)
         return Response({
             'next': self.page.next_page_number() if self.page.has_next() else None,
             'previous': self.page.previous_page_number() if self.page.has_previous() else None,
@@ -147,6 +154,7 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
         """
         course_key_string = request.GET.get('course_id')
         ready_to_sync = request.GET.get('ready_to_sync')
+        upstream_usage_key = request.GET.get('upstream_usage_key')
         filter = {}
         paginator = DownstreamListPaginator()
         if course_key_string:
@@ -158,31 +166,16 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
         if ready_to_sync is not None:
             ready_to_sync = BooleanField().to_internal_value(ready_to_sync)
             filter["ready_to_sync"] = ready_to_sync
+        if upstream_usage_key:
+            try:
+                upstream_usage_key = UsageKey.from_string(upstream_usage_key)
+                filter["upstream_usage_key"] = upstream_usage_key
+            except InvalidKeyError as exc:
+                raise ValidationError(detail=f"Malformed usage key: {upstream_usage_key}") from exc
         links = PublishableEntityLink.filter_links(**filter)
         paginated_links = paginator.paginate_queryset(links, self.request, view=self)
         serializer = PublishableEntityLinksSerializer(paginated_links, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-
-@view_auth_classes()
-class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
-    """
-    Serves library block->downstream usage keys
-    """
-    def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
-        """
-        Fetches downstream links for given publishable entity
-        """
-        try:
-            usage_key = UsageKey.from_string(usage_key_string)
-        except InvalidKeyError as exc:
-            raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
-
-        links = PublishableEntityLink.get_by_upstream_usage_key(upstream_usage_key=usage_key)
-
-        serializer = PublishableEntityLinksUsageKeySerializer(links, many=True)
-
-        return Response(serializer.data)
+        return paginator.get_paginated_response(serializer.data, self.request)
 
 
 @view_auth_classes()

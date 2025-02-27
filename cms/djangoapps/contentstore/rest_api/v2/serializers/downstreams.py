@@ -20,18 +20,6 @@ class PublishableEntityLinksSerializer(serializers.ModelSerializer):
         exclude = ['upstream_block', 'uuid']
 
 
-class PublishableEntityLinksUsageKeySerializer(serializers.ModelSerializer):
-    """
-    Serializer for returning a string list of the usage keys.
-    """
-    def to_representation(self, instance: PublishableEntityLink) -> str:
-        return str(instance.downstream_usage_key)
-
-    class Meta:
-        model = PublishableEntityLink
-        fields = ('downstream_usage_key')
-
-
 class PublishableEntityLinksSummarySerializer(serializers.Serializer):
     """
     Serializer for summary for publishable entity links
