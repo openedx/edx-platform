@@ -62,7 +62,7 @@ class _BaseDownstreamViewTestMixin:
         self.video_lib_id = self._add_block_to_library(self.library_id, "video", "video-baz")["id"]
         self._publish_library_block(self.html_lib_id)
         self._publish_library_block(self.video_lib_id)
-        self.mock_upstream_link = f"{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/library/{self.library_id}/components?usageKey={self.video_lib_id}"  # noqa: E501
+        self.mock_upstream_link = f"{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/library/{self.library_id}/components?usageKey={self.video_lib_id}"  # pylint: disable=line-too-long  # noqa: E501
         self.course = CourseFactory.create()
         chapter = BlockFactory.create(category='chapter', parent=self.course)
         sequential = BlockFactory.create(category='sequential', parent=chapter)

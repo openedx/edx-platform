@@ -129,8 +129,8 @@ class DownstreamListPaginator(DefaultPagination):
 
         return super().paginate_queryset(queryset, request, view)
 
-    def get_paginated_response(self, data, request, *args, **kwargs):
-        if 'no_page' in request.query_params:
+    def get_paginated_response(self, data, *args, **kwargs):
+        if 'no_page' in args[0].query_params:
             return Response(data)
         return Response({
             'next': self.page.next_page_number() if self.page.has_next() else None,
@@ -155,24 +155,21 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
         course_key_string = request.GET.get('course_id')
         ready_to_sync = request.GET.get('ready_to_sync')
         upstream_usage_key = request.GET.get('upstream_usage_key')
-        filter = {}
+        link_filter: dict[str, CourseKey | UsageKey | bool] = {}
         paginator = DownstreamListPaginator()
         if course_key_string:
             try:
-                course_key = CourseKey.from_string(course_key_string)
-                filter["downstream_context_key"] = course_key
+                link_filter["downstream_context_key"] = CourseKey.from_string(course_key_string)
             except InvalidKeyError as exc:
                 raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
         if ready_to_sync is not None:
-            ready_to_sync = BooleanField().to_internal_value(ready_to_sync)
-            filter["ready_to_sync"] = ready_to_sync
+            link_filter["ready_to_sync"] = BooleanField().to_internal_value(ready_to_sync)
         if upstream_usage_key:
             try:
-                upstream_usage_key = UsageKey.from_string(upstream_usage_key)
-                filter["upstream_usage_key"] = upstream_usage_key
+                link_filter["upstream_usage_key"] = UsageKey.from_string(upstream_usage_key)
             except InvalidKeyError as exc:
                 raise ValidationError(detail=f"Malformed usage key: {upstream_usage_key}") from exc
-        links = PublishableEntityLink.filter_links(**filter)
+        links = PublishableEntityLink.filter_links(**link_filter)
         paginated_links = paginator.paginate_queryset(links, self.request, view=self)
         serializer = PublishableEntityLinksSerializer(paginated_links, many=True)
         return paginator.get_paginated_response(serializer.data, self.request)
