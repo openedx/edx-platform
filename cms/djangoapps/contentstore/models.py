@@ -195,13 +195,13 @@ class PublishableEntityLink(models.Model):
     @classmethod
     def filter_links(
         cls,
-        **filter,
+        **link_filter,
     ) -> QuerySet["PublishableEntityLink"]:
         """
         Get all links along with sync flag, upstream context title and version, with optional filtering.
         """
-        ready_to_sync = filter.pop('ready_to_sync', None)
-        result = cls.objects.filter(**filter).select_related(
+        ready_to_sync = link_filter.pop('ready_to_sync', None)
+        result = cls.objects.filter(**link_filter).select_related(
             "upstream_block__published__version",
             "upstream_block__learning_package"
         ).annotate(
