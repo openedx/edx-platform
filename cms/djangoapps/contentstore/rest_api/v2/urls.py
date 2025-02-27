@@ -24,11 +24,6 @@ urlpatterns = [
         name="downstream"
     ),
     re_path(
-        f'^upstream/{settings.USAGE_KEY_PATTERN}/downstream-links$',
-        downstreams.DownstreamContextListView.as_view(),
-        name='downstream-link-list'
-    ),
-    re_path(
         f'^downstreams/{settings.COURSE_KEY_PATTERN}/summary$',
         downstreams.DownstreamSummaryView.as_view(),
         name='upstream-summary-list'
