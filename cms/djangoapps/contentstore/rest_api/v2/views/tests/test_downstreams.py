@@ -7,21 +7,23 @@ from unittest.mock import patch
 
 from django.conf import settings
 from freezegun import freeze_time
+from organizations.models import Organization
 
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .. import downstreams as downstreams_views
 
-MOCK_LIB_KEY = "lib:OpenedX:CSPROB3"
-MOCK_UPSTREAM_REF = "lb:OpenedX:CSPROB3:video:843b4c73-1e2d-4ced-a0ff-24e503cdb3e4"
-MOCK_HTML_UPSTREAM_REF = "lb:OpenedX:CSPROB3:html:843b4c73-1e2d-4ced-a0ff-24e503cdb3e4"
 MOCK_UPSTREAM_ERROR = "your LibraryGPT subscription has expired"
+URL_PREFIX = '/api/libraries/v2/'
+URL_LIB_CREATE = URL_PREFIX
+URL_LIB_BLOCKS = URL_PREFIX + '{lib_key}/blocks/'
+URL_LIB_BLOCK_PUBLISH = URL_PREFIX + 'blocks/{block_key}/publish/'
+URL_LIB_BLOCK_OLX = URL_PREFIX + 'blocks/{block_key}/olx/'
 
 
 def _get_upstream_link_good_and_syncable(downstream):
@@ -52,6 +54,14 @@ class _BaseDownstreamViewTestMixin:
         self.addCleanup(freezer.stop)
         freezer.start()
         self.maxDiff = 2000
+
+        self.organization, _ = Organization.objects.get_or_create(
+            short_name="CL-TEST",
+            defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
+        )
+        self.superuser = UserFactory(username="superuser", password="password", is_staff=True, is_superuser=True)
+        self.client.login(username=self.superuser.username, password="password")
+
         self.library_title = "Test Library 1"
         self.library_id = self._create_library(
             slug="testlib1_preview",
@@ -92,10 +102,48 @@ class _BaseDownstreamViewTestMixin:
             )
 
         self.fake_video_key = self.course.id.make_usage_key("video", "NoSuchVideo")
-        self.superuser = UserFactory(username="superuser", password="password", is_staff=True, is_superuser=True)
         self.learner = UserFactory(username="learner", password="password")
         self._set_library_block_olx(self.html_lib_id, "<html><b>Hello world!</b></html>")
         self._publish_library_block(self.html_lib_id)
+
+    def _api(self, method, url, data, expect_response):
+        """
+        Call a REST API
+        """
+        response = getattr(self.client, method)(url, data, format="json")
+        assert response.status_code == expect_response,\
+            'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
+        return response.data
+
+    def _create_library(
+        self, slug, title, description="", org=None,
+        license_type='', expect_response=200,
+    ):
+        """ Create a library """
+        if org is None:
+            org = self.organization.short_name
+        return self._api('post', URL_LIB_CREATE, {
+            "org": org,
+            "slug": slug,
+            "title": title,
+            "description": description,
+            "license": license_type,
+        }, expect_response)
+
+    def _add_block_to_library(self, lib_key, block_type, slug, parent_block=None, expect_response=200):
+        """ Add a new XBlock to the library """
+        data = {"block_type": block_type, "definition_id": slug}
+        if parent_block:
+            data["parent_block"] = parent_block
+        return self._api('post', URL_LIB_BLOCKS.format(lib_key=lib_key), data, expect_response)
+
+    def _publish_library_block(self, block_key, expect_response=200):
+        """ Publish changes from a specified XBlock """
+        return self._api('post', URL_LIB_BLOCK_PUBLISH.format(block_key=block_key), None, expect_response)
+
+    def _set_library_block_olx(self, block_key, new_olx, expect_response=200):
+        """ Overwrite the OLX of a specific block in the library """
+        return self._api('post', URL_LIB_BLOCK_OLX.format(block_key=block_key), {"olx": new_olx}, expect_response)
 
     def call_api(self, usage_key_string):
         raise NotImplementedError
@@ -124,7 +172,7 @@ class SharedErrorTestCases(_BaseDownstreamViewTestMixin):
         assert "not found" in response.data["developer_message"]
 
 
-class GetDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase, ContentLibrariesRestApiTest):
+class GetDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
     """
     Test that `GET /api/v2/contentstore/downstreams/...` inspects a downstream's link to an upstream.
     """
@@ -170,7 +218,7 @@ class GetDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase, Con
         assert response.data['upstream_link'] is None
 
 
-class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase, ContentLibrariesRestApiTest):
+class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
     """
     Test that `PUT /api/v2/contentstore/downstreams/...` edits a downstream's link to an upstream.
     """
@@ -227,7 +275,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase, Con
         assert video_after.upstream is None
 
 
-class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase, ContentLibrariesRestApiTest):
+class DeleteDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
     """
     Test that `DELETE /api/v2/contentstore/downstreams/...` severs a downstream's link to an upstream.
     """
@@ -281,7 +329,7 @@ class _DownstreamSyncViewTestMixin(SharedErrorTestCases):
         assert "is not linked" in response.data["developer_message"][0]
 
 
-class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStoreTestCase, ContentLibrariesRestApiTest):
+class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStoreTestCase):
     """
     Test that `POST /api/v2/contentstore/downstreams/.../sync` initiates a sync from the linked upstream.
     """
@@ -307,7 +355,6 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
 class DeleteDownstreamSyncViewtest(
     _DownstreamSyncViewTestMixin,
     SharedModuleStoreTestCase,
-    ContentLibrariesRestApiTest
 ):
     """
     Test that `DELETE /api/v2/contentstore/downstreams/.../sync` declines a sync from the linked upstream.
@@ -330,7 +377,6 @@ class DeleteDownstreamSyncViewtest(
 class GetUpstreamViewTest(
     _BaseDownstreamViewTestMixin,
     SharedModuleStoreTestCase,
-    ContentLibrariesRestApiTest
 ):
     """
     Test that `GET /api/v2/contentstore/downstreams?...` returns list of links based on the provided filter.
@@ -420,7 +466,6 @@ class GetUpstreamViewTest(
 class GetDownstreamSummaryViewTest(
     _BaseDownstreamViewTestMixin,
     SharedModuleStoreTestCase,
-    ContentLibrariesRestApiTest
 ):
     """
     Test that `GET /api/v2/contentstore/downstreams/<course_id>/summary` returns summary of links in course.
