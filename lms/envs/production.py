@@ -1,9 +1,8 @@
 """
-This is the default template for our main set of AWS servers.
+Override common.py with key-value pairs from YAML (plus some extra defaults & post-processing).
 
-Common traits:
-* Use memcached, and cache-backed sessions
-* Use a MySQL 5.1 database
+This file is in the process of being restructured. Please see:
+https://github.com/openedx/edx-platform/blob/master/docs/decisions/0022-settings-simplification.rst
 """
 
 # We intentionally define lots of variables that aren't used, and
@@ -43,10 +42,13 @@ def get_env_setting(setting):
         raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
 
-################################################# PRODUCTION DEFAULTS ################################################
-# We configure some defaults (beyond what has already been configured in common.py) before loading the YAML file below.
-# DO NOT ADD NEW DEFAULTS HERE! Put any new setting defaults in common.py instead, along with a setting annotation.
-# TODO: Move all these defaults into common.py.
+#######################################################################################################################
+#### PRODUCTION DEFAULTS
+####
+#### Configure some defaults (beyond what has already been configured in common.py) before loading the YAML file.
+#### DO NOT ADD NEW DEFAULTS HERE! Put any new setting defaults in common.py instead, along with a setting annotation.
+#### TODO: Move all these defaults into common.py.
+####
 
 DEBUG = False
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
@@ -87,8 +89,6 @@ PYTHON_LIB_FILENAME = 'python_lib.zip'
 VIDEO_CDN_URL = {}
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
 AWS_STORAGE_BUCKET_NAME = 'edxuploads'
-# Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
-# normally appends to every returned URL.
 AWS_QUERYSTRING_AUTH = True
 AWS_S3_CUSTOM_DOMAIN = 'edxuploads.s3.amazonaws.com'
 MONGODB_LOG = {}
@@ -147,7 +147,6 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PR
 # Queue to use for expiring old entitlements
 ENTITLEMENTS_EXPIRATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
-# Intentional defaults.
 ID_VERIFICATION_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
 PASSWORD_RESET_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
 ACTIVATION_EMAIL_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
@@ -159,28 +158,12 @@ CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_P
 PROGRAM_CERTIFICATES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
 
-############## OPEN EDX ENTERPRISE SERVICE CONFIGURATION ######################
-# The Open edX Enterprise service is currently hosted via the LMS container/process.
-# However, for all intents and purposes this service is treated as a standalone IDA.
-# These configuration settings are specific to the Enterprise service and you should
-# not find references to them within the edx-platform project.
-
-# Publicly-accessible enrollment URL, for use on the client side.
 ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = Derived(
     lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
 )
-
-# Enrollment URL used on the server-side.
 ENTERPRISE_ENROLLMENT_API_URL = Derived(
     lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
 )
-
-############## ENTERPRISE SERVICE API CLIENT CONFIGURATION ######################
-# The LMS communicates with the Enterprise service via the requests.Session() client
-# The below environmental settings are utilized by the LMS when interacting with
-# the service, and override the default parameters which are defined in common.py
-
-
 DEFAULT_ENTERPRISE_API_URL = Derived(
     lambda settings: (
         None if settings.LMS_INTERNAL_ROOT_URL is None
@@ -188,7 +171,6 @@ DEFAULT_ENTERPRISE_API_URL = Derived(
     )
 )
 ENTERPRISE_API_URL = DEFAULT_ENTERPRISE_API_URL
-
 DEFAULT_ENTERPRISE_CONSENT_API_URL = Derived(
     lambda settings: (
         None if settings.LMS_INTERNAL_ROOT_URL is None
@@ -199,6 +181,8 @@ ENTERPRISE_CONSENT_API_URL = DEFAULT_ENTERPRISE_CONSENT_API_URL
 
 
 #######################################################################################################################
+#### YAML LOADING
+####
 
 # A file path to a YAML file from which to load configuration overrides for LMS.
 CONFIG_FILE = get_env_setting('LMS_CFG')
@@ -235,6 +219,11 @@ with codecs.open(CONFIG_FILE, encoding='utf-8') as f:
         ]
     })
 
+
+#######################################################################################################################
+#### LOAD THE EDX-PLATFORM GIT REVISION
+####
+
 try:
     # A file path to a YAML file from which to load all the code revisions currently deployed
     REVISION_CONFIG_FILE = get_env_setting('REVISION_CFG')
@@ -247,7 +236,13 @@ except Exception:  # pylint: disable=broad-except
 # Do NOT calculate this dynamically at startup with git because it's *slow*.
 EDX_PLATFORM_REVISION = REVISION_CONFIG.get('EDX_PLATFORM_REVISION', EDX_PLATFORM_REVISION)
 
-###################################### CELERY  ################################
+
+#######################################################################################################################
+#### POST-PROCESSING OF YAML
+####
+#### This is where we do a bunch of logic to post-process the results of the YAML, including: conditionally setting
+#### updates, merging dicts+lists which we did not override, and in some cases simply ignoring the YAML value in favor
+#### of a specific production value.
 
 # Don't use a connection pool, since connections are dropped by ELB.
 BROKER_POOL_LIMIT = 0
@@ -300,7 +295,6 @@ if 'staticfiles' in CACHES:
 # we need to run asset collection twice, once for local disk and once for S3.
 # Once we have migrated to service assets off S3, then we can convert this back to
 # managed by the yaml file contents
-
 
 # Build a CELERY_QUEUES dict the way that celery expects, based on a couple lists of queue names from the YAML.
 _YAML_CELERY_QUEUES = _YAML_TOKENS.get('CELERY_QUEUES', None)
@@ -537,11 +531,19 @@ ENTERPRISE_EXCLUDED_REGISTRATION_FIELDS = set(ENTERPRISE_EXCLUDED_REGISTRATION_F
 #       next line. See CMS settings for the example of what we want.
 MIDDLEWARE.extend(_YAML_TOKENS.get('EXTRA_MIDDLEWARE_CLASSES', []))
 
-########################## Derive Any Derived Settings  #######################
+
+#######################################################################################################################
+#### DERIVE ANY DERIVED SETTINGS
+####
 
 derive_settings(__name__)
 
-############################### Plugin Settings ###############################
+
+#######################################################################################################################
+#### LOAD SETTINGS FROM DJANGO PLUGINS
+####
+#### This is at the bottom because it is going to load more settings after base settings are loaded
+####
 
 # This is at the bottom because it is going to load more settings after base settings are loaded
 
@@ -559,6 +561,13 @@ ALTERNATE_QUEUE_ENVS = _YAML_ALTERNATE_WORKER_QUEUES
 # Load production.py in plugins
 add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
 
+
+#######################################################################################################################
+#### MORE YAML POST-PROCESSING
+####
+#### More post-processing, but these will not be available Django plugins.
+#### Unclear whether or not these are down here intentionally.
+####
 
 ######################## CELERY ROUTING ########################
 
@@ -642,8 +651,8 @@ EVENT_BUS_PRODUCER_CONFIG = merge_producer_configs(
     _YAML_TOKENS.get('EVENT_BUS_PRODUCER_CONFIG', {})
 )
 
-#####################################################################################################
+#######################################################################################################################
 # HEY! Don't add anything to the end of this file.
 # Add your defaults to common.py instead!
-# If you really need to add post-YAML logic, add it above the "Derive Any Derived Settings" section.
-######################################################################################################
+# If you really need to add post-YAML logic, add it above the "DERIVE ANY DERIVED SETTINGS" section.
+#######################################################################################################################
