@@ -2,12 +2,10 @@
 Views for the download courses API.
 """
 
-from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.shortcuts import get_object_or_404
 from rest_framework import views
 from rest_framework.response import Response
-from urllib.parse import urljoin
 
 from common.djangoapps.student.models import CourseEnrollment, User  # lint-amnesty, pylint: disable=reimported
 from lms.djangoapps.courseware.access import is_mobile_available_for_user
@@ -74,18 +72,19 @@ class DownloadCoursesAPIView(views.APIView):
             for enrollment in user_enrollments
             if is_mobile_available_for_user(user, enrollment.course_overview)
         ]
-        response_data = []
+        course_ids = [enrollment.course_overview.id for enrollment in mobile_available]
+        offline_course_sizes = OfflineCourseSize.objects.filter(course_id__in=course_ids, size__gt=0)
+        size_map = {size.course_id: size.size for size in offline_course_sizes}
 
-        for user_enrollment in mobile_available:
-            course_id = user_enrollment.course_overview.id
-            offline_course_size = OfflineCourseSize.objects.filter(course_id=course_id).first()
-            response_data.append(
-                {
-                    "course_id": str(course_id),
-                    "course_name": user_enrollment.course_overview.display_name,
-                    "course_image": user_enrollment.course_overview.course_image_url,
-                    "total_size": getattr(offline_course_size, "size", 0),
-                }
-            )
+        response_data = [
+            {
+                "course_id": str(user_enrollment.course_overview.id),
+                "course_name": user_enrollment.course_overview.display_name,
+                "course_image": user_enrollment.course_overview.course_image_url,
+                "total_size": size_map.get(user_enrollment.course_overview.id)
+            }
+            for user_enrollment in mobile_available
+            if user_enrollment.course_overview.id in size_map
+        ]
 
         return Response(response_data)
