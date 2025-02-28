@@ -98,6 +98,7 @@ def get_certificate_description(mode, certificate_type, platform_name, course_ke
                                          "the student's identity.").format(cert_type=certificate_type)
     return certificate_type_description
 
+from django.urls import reverse
 
 def _update_certificate_context(context, course, course_overview, user_certificate, platform_name):
     """
@@ -114,6 +115,17 @@ def _update_certificate_context(context, course, course_overview, user_certifica
         uuid=user_certificate.verify_uuid,
         suffix=context.get('certificate_verify_url_suffix')
     )
+
+    certificate_url = "{prefix}{uuid}{suffix}".format(
+        prefix=context.get('certificate_verify_url_prefix', 'https://german-uds.academy/certificates/'),
+        uuid=user_certificate.verify_uuid,
+        suffix=context.get('certificate_verify_url_suffix') or ''
+    )
+    context['certificate_verify_url'] = certificate_url
+
+    # Generate the QR code and store in context
+    context['qr_code_data'] = generate_qr_code_base64(certificate_url)
+    
 
     # We prefer a CourseOverview for this function because it validates and corrects certificate_available_date
     # and certificates_display_behavior values. However, not all certificates are guaranteed to have a CourseOverview
@@ -506,6 +518,33 @@ def render_cert_by_uuid(request, certificate_uuid):
         return render_html_view(request, str(certificate.course_id), certificate)
     except GeneratedCertificate.DoesNotExist as e:
         raise Http404 from e
+    
+import qrcode
+import base64
+from io import BytesIO
+
+def generate_qr_code_base64(data):
+    """
+    Generates a QR code (PNG) for the given 'data', then returns a
+    Base64-encoded string suitable for embedding in an <img> tag.
+    """
+    qr = qrcode.QRCode(
+        version=1,
+        box_size=5,
+        border=2,
+        error_correction=qrcode.constants.ERROR_CORRECT_M
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+
+    img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+    return f"data:image/png;base64,{img_str}"
+
 
 
 @handle_500(
