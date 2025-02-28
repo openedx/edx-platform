@@ -123,6 +123,7 @@ cachecontrol==0.14.2
 cachetools==5.5.1
     # via
     #   -r requirements/edx/base.txt
+    #   edxval
     #   google-auth
     #   tox
 camel-converter[pydantic]==4.0.1
@@ -574,7 +575,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.6.11
+edx-enterprise==5.7.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -655,7 +656,7 @@ edx-when==2.5.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.9.0
+edxval==2.9.1
     # via -r requirements/edx/base.txt
 elasticsearch==7.9.1
     # via

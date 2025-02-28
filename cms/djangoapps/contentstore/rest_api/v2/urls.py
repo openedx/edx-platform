@@ -30,6 +30,11 @@ urlpatterns = [
         name='upstream-list'
     ),
     re_path(
+        f'^upstream/{settings.USAGE_KEY_PATTERN}/downstream-links$',
+        downstreams.DownstreamContextListView.as_view(),
+        name='downstream-link-list'
+    ),
+    re_path(
         fr'^downstreams/{settings.USAGE_KEY_PATTERN}/sync$',
         downstreams.SyncFromUpstreamView.as_view(),
         name="sync_from_upstream"

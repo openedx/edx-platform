@@ -566,9 +566,10 @@ def send_mail_to_student(student, param_dict, language=None):
 
     # Extract an LMS user ID for the student, if possible.
     # ACE needs the user ID to be able to send email via Braze.
-    lms_user_id = 0
-    if 'user_id' in param_dict and param_dict['user_id'] is not None and param_dict['user_id'] > 0:
-        lms_user_id = param_dict['user_id']
+    try:
+        lms_user_id = User.objects.get(email=student).id
+    except User.DoesNotExist:
+        lms_user_id = 0
 
     # see if there is an activation email template definition available as configuration,
     # if so, then render that
@@ -590,18 +591,6 @@ def send_mail_to_student(student, param_dict, language=None):
         language=language,
         user_context=param_dict,
     )
-
-    if message_type == 'allowed_enroll':
-        log_data = {
-            'message': 'allowed_enroll email data log',
-            'message_type': message_type,
-            'student': student,
-            'recipient': message.recipient.email_address,
-            'context_email': message.context.get('email_address'),
-            'lms_user_id': lms_user_id,
-            **param_dict
-        }
-        log.error(log_data)
     ace.send(message)
 
 
