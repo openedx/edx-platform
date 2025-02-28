@@ -545,7 +545,7 @@ def generate_qr_code_base64(data):
     img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
     return f"data:image/png;base64,{img_str}"
 
-
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 
 @handle_500(
     template_path="certificates/server-error.html",
@@ -581,8 +581,24 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
         )
         log.info(error_str, course_id, str(exception))
         return _render_invalid_certificate(request, course_id, platform_name, configuration)
+    
+    
+    
 
     course_overview = get_course_overview_or_none(course_key)
+
+    if course_overview:
+    # This ensures the read method uses CourseOverview (which has .id)
+        course_grade_object = CourseGradeFactory().read(user, course_overview, create_if_needed=True)
+    else:
+        # If no overview, you can’t compute a persistent grade
+        course_grade_object = None
+
+    if course_grade_object and course_grade_object.percent is not None:
+        user_grade = round(course_grade_object.percent * 100, 2)
+    else:
+        user_grade = 0.0
+
 
     # Kick the user back to the "Invalid" screen if the feature is disabled for the course
     if not course.cert_html_view_enabled:
@@ -673,6 +689,8 @@ def render_html_view(request, course_id, certificate=None):  # pylint: disable=t
 
         # Append badge info
         _update_badge_context(context, course, user)
+
+        context['course_grade'] = user_grade
 
         # Add certificate header/footer data to current context
         context.update(get_certificate_header_context(is_secure=request.is_secure()))
