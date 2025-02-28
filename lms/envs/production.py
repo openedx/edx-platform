@@ -51,18 +51,20 @@ def get_env_setting(setting):
 ####
 
 DEBUG = False
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-
-# IMPORTANT: With this enabled, the server must always be behind a proxy that
-# strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
-# a user can fool our server into thinking it was an https connection.
-# See
-# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
-# for other warnings.
+# IMPORTANT: With this enabled, the server must always be behind a proxy that strips the header HTTP_X_FORWARDED_PROTO
+# from client requests. Otherwise, a user can fool our server into thinking it was an https connection. See
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header for other warnings.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# TODO: We believe these were part of the DEPR'd sysadmin dashboard, and can likely be removed.
+SSL_AUTH_EMAIL_DOMAIN = "MIT.EDU"
+SSL_AUTH_DN_FORMAT_STRING = (
+    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
+)
+
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 CELERY_RESULT_BACKEND = 'django-cache'
 BROKER_HEARTBEAT = 60.0
 BROKER_HEARTBEAT_CHECKRATE = 2
@@ -119,65 +121,43 @@ OPENAPI_CACHE_TIMEOUT = 60 * 60
 MAINTENANCE_BANNER_TEXT = None
 DASHBOARD_COURSE_LIMIT = None
 
-# TODO: We believe these were part of the DEPR'd sysadmin dashboard, and can likely be removed.
-SSL_AUTH_EMAIL_DOMAIN = "MIT.EDU"
-SSL_AUTH_DN_FORMAT_STRING = (
-    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
-)
-
-CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
-EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "lms")
-LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
-
-CSRF_TRUSTED_ORIGINS = Derived(lambda settings: settings.CSRF_TRUSTED_ORIGINS_WITH_SCHEME)
-
-# This is the domain that is used to set shared cookies between various sub-domains.
-# By default, it's set to the same thing as the SESSION_COOKIE_DOMAIN
-SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
-
-# We want Bulk Email running on the high-priority queue, so we define the
-# routing key that points to it. At the moment, the name is the same.
-# We have to reset the value here, since we have changed the value of the queue name.
-BULK_EMAIL_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
-
-# We can run smaller jobs on the low priority queue. See note above for why
-# we have to reset the value here.
-BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-
-# Queue to use for expiring old entitlements
-ENTITLEMENTS_EXPIRATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-
-ID_VERIFICATION_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
-PASSWORD_RESET_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+# Derived defaults (alphabetical)
 ACTIVATION_EMAIL_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
-LOGIN_ISSUE_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
-
-# Default queues for various routes
-GRADES_DOWNLOAD_ROUTING_KEY = Derived(lambda settings: settings.HIGH_MEM_QUEUE)
+BULK_EMAIL_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
 CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-PROGRAM_CERTIFICATES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
-
-ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = Derived(
-    lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
-)
-ENTERPRISE_ENROLLMENT_API_URL = Derived(
-    lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
-)
+CSRF_TRUSTED_ORIGINS = Derived(lambda settings: settings.CSRF_TRUSTED_ORIGINS_WITH_SCHEME)
 DEFAULT_ENTERPRISE_API_URL = Derived(
     lambda settings: (
         None if settings.LMS_INTERNAL_ROOT_URL is None
         else settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
     )
 )
-ENTERPRISE_API_URL = DEFAULT_ENTERPRISE_API_URL
 DEFAULT_ENTERPRISE_CONSENT_API_URL = Derived(
     lambda settings: (
         None if settings.LMS_INTERNAL_ROOT_URL is None
         else settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
     )
 )
+ENTERPRISE_API_URL = DEFAULT_ENTERPRISE_API_URL
 ENTERPRISE_CONSENT_API_URL = DEFAULT_ENTERPRISE_CONSENT_API_URL
+ENTERPRISE_ENROLLMENT_API_URL = Derived(
+    lambda settings: (settings.LMS_INTERNAL_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+)
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = Derived(
+    lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+)
+EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "lms")
+ENTITLEMENTS_EXPIRATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+GRADES_DOWNLOAD_ROUTING_KEY = Derived(lambda settings: settings.HIGH_MEM_QUEUE)
+ID_VERIFICATION_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
+LOGIN_ISSUE_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+PASSWORD_RESET_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+PROGRAM_CERTIFICATES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
+SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
 
 
 #######################################################################################################################
