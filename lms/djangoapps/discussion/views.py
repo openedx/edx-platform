@@ -147,7 +147,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         # If the user clicked a sort key, update their default sort key
         cc_user = cc.User.from_django_user(request.user)
         cc_user.default_sort_key = request.GET.get('sort_key')
-        cc_user.save()
+        cc_user.save(params={"course_id": course.id})
 
     #there are 2 dimensions to consider when executing a search with respect to group id
     #is user a moderator
