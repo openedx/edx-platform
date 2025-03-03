@@ -1,7 +1,9 @@
 """
 Test CMS's upstream->downstream syncing system
 """
+import datetime
 import ddt
+from pytz import utc
 
 from organizations.api import ensure_organization
 from organizations.models import Organization
@@ -42,12 +44,47 @@ class UpstreamTestCase(ModuleStoreTestCase):
             title="Test Upstream Library",
         )
         self.upstream_key = libs.create_library_block(self.library.key, "html", "test-upstream").usage_key
-        libs.create_library_block(self.library.key, "video", "video-upstream")
 
         upstream = xblock.load_block(self.upstream_key, self.user)
         upstream.display_name = "Upstream Title V2"
         upstream.data = "<html><body>Upstream content V2</body></html>"
         upstream.save()
+
+        self.upstream_problem_key = libs.create_library_block(self.library.key, "problem", "problem-upstream").usage_key
+        libs.set_library_block_olx(self.upstream_problem_key, (
+            '<problem'
+            ' attempts_before_showanswer_button="1"'
+            ' display_name="Upstream Problem Title V2"'
+            ' due="2024-01-01T00:00:00Z"'
+            ' force_save_button="false"'
+            ' graceperiod="1d"'
+            ' grading_method="last_attempt"'
+            ' matlab_api_key="abc"'
+            ' max_attempts="10"'
+            ' rerandomize="&quot;always&quot;"'
+            ' show_correctness="never"'
+            ' show_reset_button="false"'
+            ' showanswer="on_correct"'
+            ' submission_wait_seconds="10"'
+            ' use_latex_compiler="false"'
+            ' weight="1"'
+            '/>\n'
+        ))
+
+        self.upstream_video_key = libs.create_library_block(self.library.key, "video", "video-upstream").usage_key
+        libs.set_library_block_olx(self.upstream_video_key, (
+            '<video'
+            ' display_name="Video Test"'
+            ' edx_video_id=""'
+            ' end_time="00:00:00"'
+            ' html5_sources="[&quot;https://www.sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4&quot;]"'
+            ' start_time="00:00:00"'
+            ' track=""'
+            ' youtube_id_1_0=""'
+            '>'
+            ' <source src="https://www.sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"/>'
+            '</video>'
+        ))
 
         libs.publish_changes(self.library.key, self.user.id)
 
@@ -178,6 +215,100 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert len(object_tags) == len(new_upstream_tags)
         for object_tag in object_tags:
             assert object_tag.value in new_upstream_tags
+
+    # pylint: disable=too-many-statements
+    def test_sync_updates_to_downstream_only_fields(self):
+        """
+        If we sync to modified content, will it preserve downstream-only fields, and overwrite the rest?
+        """
+        downstream = BlockFactory.create(category='problem', parent=self.unit, upstream=str(self.upstream_problem_key))
+
+        # Initial sync
+        sync_from_upstream(downstream, self.user)
+
+        # These fields are copied from upstream
+        assert downstream.upstream_display_name == "Upstream Problem Title V2"
+        assert downstream.display_name == "Upstream Problem Title V2"
+        assert downstream.rerandomize == '"always"'
+        assert downstream.matlab_api_key == 'abc'
+        assert not downstream.use_latex_compiler
+
+        # These fields are "downstream only", so field defaults are preserved, and values are NOT copied from upstream
+        assert downstream.attempts_before_showanswer_button == 0
+        assert downstream.due is None
+        assert not downstream.force_save_button
+        assert downstream.graceperiod is None
+        assert downstream.grading_method == 'last_score'
+        assert downstream.max_attempts is None
+        assert downstream.show_correctness == 'always'
+        assert not downstream.show_reset_button
+        assert downstream.showanswer == 'finished'
+        assert downstream.submission_wait_seconds == 0
+        assert downstream.weight is None
+
+        # Upstream updates
+        libs.set_library_block_olx(self.upstream_problem_key, (
+            '<problem'
+            ' attempts_before_showanswer_button="10"'
+            ' display_name="Upstream Problem Title V3"'
+            ' due="2024-02-02T00:00:00Z"'
+            ' force_save_button="false"'
+            ' graceperiod=""'
+            ' grading_method="final_attempt"'
+            ' matlab_api_key="def"'
+            ' max_attempts="11"'
+            ' rerandomize="&quot;per_student&quot;"'
+            ' show_correctness="past_due"'
+            ' show_reset_button="false"'
+            ' showanswer="attempted"'
+            ' submission_wait_seconds="11"'
+            ' use_latex_compiler="true"'
+            ' weight="2"'
+            '/>\n'
+        ))
+        libs.publish_changes(self.library.key, self.user.id)
+
+        # Modifing downstream-only fields are "safe" customizations
+        downstream.display_name = "Downstream Title Override"
+        downstream.attempts_before_showanswer_button = 2
+        downstream.due = datetime.datetime(2025, 2, 2, tzinfo=utc)
+        downstream.force_save_button = True
+        downstream.graceperiod = '2d'
+        downstream.grading_method = 'last_score'
+        downstream.max_attempts = 100
+        downstream.show_correctness = 'always'
+        downstream.show_reset_button = True
+        downstream.showanswer = 'on_expired'
+        downstream.submission_wait_seconds = 100
+        downstream.weight = 3
+
+        # Modifying synchronized fields are "unsafe" customizations
+        downstream.rerandomize = '"onreset"'
+        downstream.matlab_api_key = 'hij'
+        downstream.save()
+
+        # Follow-up sync.
+        sync_from_upstream(downstream, self.user)
+
+        # "unsafe" customizations are overridden by upstream
+        assert downstream.upstream_display_name == "Upstream Problem Title V3"
+        assert downstream.rerandomize == '"per_student"'
+        assert downstream.matlab_api_key == 'def'
+        assert downstream.use_latex_compiler
+
+        # but "safe" customizations survive
+        assert downstream.display_name == "Downstream Title Override"
+        assert downstream.attempts_before_showanswer_button == 2
+        assert downstream.due == datetime.datetime(2025, 2, 2, tzinfo=utc)
+        assert downstream.force_save_button
+        assert downstream.graceperiod == '2d'
+        assert downstream.grading_method == 'last_score'
+        assert downstream.max_attempts == 100
+        assert downstream.show_correctness == 'always'
+        assert downstream.show_reset_button
+        assert downstream.showanswer == 'on_expired'
+        assert downstream.submission_wait_seconds == 100
+        assert downstream.weight == 3
 
     def test_sync_updates_to_modified_content(self):
         """
@@ -423,3 +554,16 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert len(object_tags) == len(new_upstream_tags)
         for object_tag in object_tags:
             assert object_tag.value in new_upstream_tags
+
+    def test_sync_video_block(self):
+        downstream = BlockFactory.create(category='video', parent=self.unit, upstream=str(self.upstream_video_key))
+        downstream.edx_video_id = "test_video_id"
+
+        # Sync
+        sync_from_upstream(downstream, self.user)
+        assert downstream.upstream_version == 2
+        assert downstream.upstream_display_name == "Video Test"
+        assert downstream.display_name == "Video Test"
+
+        # `edx_video_id` doesn't change
+        assert downstream.edx_video_id == "test_video_id"

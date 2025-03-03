@@ -837,7 +837,7 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
             validate_email(email)  # Raises ValidationError if invalid
             if action == 'enroll':
                 before, after, enrollment_obj = enroll_email(
-                    course_id, email, auto_enroll, email_students, email_params, language=language
+                    course_id, email, auto_enroll, email_students, {**email_params}, language=language
                 )
                 before_enrollment = before.to_dict()['enrollment']
                 before_user_registered = before.to_dict()['user']
@@ -860,7 +860,7 @@ def students_update_enrollment(request, course_id):  # lint-amnesty, pylint: dis
 
             elif action == 'unenroll':
                 before, after = unenroll_email(
-                    course_id, email, email_students, email_params, language=language
+                    course_id, email, email_students, {**email_params}, language=language
                 )
                 before_enrollment = before.to_dict()['enrollment']
                 before_allowed = before.to_dict()['allowed']
@@ -1609,33 +1609,41 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
             raise FileValidationException(msg)
 
 
-@transaction.non_atomic_requests
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_POST
-@require_course_permission(permissions.ASSIGN_TO_COHORTS)
-@common_exceptions_400
-def add_users_to_cohorts(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class AddUsersToCohorts(DeveloperErrorViewMixin, APIView):
     """
     View method that accepts an uploaded file (using key "uploaded-file")
     containing cohort assignments for users. This method spawns a celery task
     to do the assignments, and a CSV file with results is provided via data downloads.
     """
-    course_key = CourseKey.from_string(course_id)
 
-    try:
-        __, filename = store_uploaded_file(
-            request, 'uploaded-file', ['.csv'],
-            course_and_time_based_filename_generator(course_key, "cohorts"),
-            max_file_size=2000000,  # limit to 2 MB
-            validator=_cohorts_csv_validator
-        )
-        # The task will assume the default file storage.
-        task_api.submit_cohort_students(request, course_key, filename)
-    except (FileValidationException, PermissionDenied) as err:
-        return JsonResponse({"error": str(err)}, status=400)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.ASSIGN_TO_COHORTS
 
-    return JsonResponse()
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        This method spawns a celery task to do the assignments, and a CSV file with results
+         is provided via data downloads.
+        """
+
+        course_key = CourseKey.from_string(course_id)
+
+        try:
+            __, filename = store_uploaded_file(
+                request, 'uploaded-file', ['.csv'],
+                course_and_time_based_filename_generator(course_key, "cohorts"),
+                max_file_size=2000000,  # limit to 2 MB
+                validator=_cohorts_csv_validator
+            )
+            # The task will assume the default file storage.
+            task_api.submit_cohort_students(request, course_key, filename)
+        except (FileValidationException, PermissionDenied, ValueError) as err:
+            return JsonResponse({"error": str(err)}, status=400)
+
+        return JsonResponse()
 
 
 # The non-atomic decorator is required because this view calls a celery
@@ -1683,40 +1691,54 @@ class CohortCSV(DeveloperErrorViewMixin, APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.ENROLLMENT_REPORT)
-@common_exceptions_400
-def get_course_survey_results(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetCourseSurveyResults(DeveloperErrorViewMixin, APIView):
     """
     get the survey results report for the particular course.
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('survey')
-    task_api.submit_course_survey_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.ENROLLMENT_REPORT
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        method to return survey results report for the particular course.
+        """
+        course_key = CourseKey.from_string(course_id)
+        report_type = _('survey')
+        task_api.submit_course_survey_report(request, course_key)
+        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+        return JsonResponse({"status": success_status})
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EXAM_RESULTS)
-@common_exceptions_400
-def get_proctored_exam_results(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetProctoredExamResults(DeveloperErrorViewMixin, APIView):
     """
-    get the proctored exam resultsreport for the particular course.
+    get the proctored exam results report for the particular course.
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('proctored exam results')
-    task_api.submit_proctored_exam_results_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
-    return JsonResponse({"status": success_status})
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EXAM_RESULTS
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        get the proctored exam results report for the particular course.
+        """
+        try:
+            course_key = CourseKey.from_string(course_id)
+            report_type = _('proctored exam results')
+            task_api.submit_proctored_exam_results_report(request, course_key)
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            return JsonResponse({"status": success_status})
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as error:
+            # Return a 400 status code with the error message
+            return JsonResponse({"error": str(error)}, status=400)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
