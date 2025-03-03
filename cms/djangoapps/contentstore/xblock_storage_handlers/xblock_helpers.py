@@ -16,11 +16,17 @@ def usage_key_with_run(usage_key_string):
     return usage_key
 
 
-def get_children_tags_count(xblock):
+def get_children_tags_count(xblock, get_parent=False):
     """
     Returns a map with tag count of each child
+
+    Use `get_parent` to also get the `xblock` tags in the same query
     """
     children = xblock.get_children()
     child_usage_keys = [str(child.location) for child in children]
     tags_count_query = ','.join(child_usage_keys)
+
+    if (get_parent):
+        tags_count_query += f',{xblock.location}'
+
     return get_object_tag_counts(tags_count_query, count_implicit=True)

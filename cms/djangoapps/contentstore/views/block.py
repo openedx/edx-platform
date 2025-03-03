@@ -245,10 +245,10 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
             force_render = request.GET.get("force_render", None)
 
-            # Fetch tags of children components
+            # Fetch tags of xblock and children components
             tags_count_map = {}
             if not is_tagging_feature_disabled():
-                tags_count_map = get_children_tags_count(xblock)
+                tags_count_map = get_children_tags_count(xblock, get_parent=True)
 
             # Set up the context to be passed to each XBlock's render method.
             context = request.GET.dict()
