@@ -29,9 +29,33 @@ ENABLE_CODEJAIL_REST_SERVICE = SettingToggle(
     "ENABLE_CODEJAIL_REST_SERVICE", default=False, module_name=__name__
 )
 
+# .. toggle_name: ENABLE_CODEJAIL_DARKLAUNCH
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: Turn on to send requests to both the codejail service and the installed codejail library for
+#   testing and evaluation purposes. The results from the installed codejail library will be the ones used.
+# .. toggle_warning: This toggle will only behave as expected when ENABLE_CODEJAIL_REST_SERVICE is not enabled and when
+#   CODE_JAIL_REST_SERVICE_REMOTE_EXEC, CODE_JAIL_REST_SERVICE_HOST, CODE_JAIL_REST_SERVICE_READ_TIMEOUT,
+#   and CODE_JAIL_REST_SERVICE_CONNECT_TIMEOUT are configured.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-04-03
+# .. toggle_target_removal_date: 2025-05-01
+ENABLE_CODEJAIL_DARKLAUNCH = SettingToggle(
+    "ENABLE_CODEJAIL_DARKLAUNCH", default=False, module_name=__name__
+)
+
 
 def is_codejail_rest_service_enabled():
     return ENABLE_CODEJAIL_REST_SERVICE.is_enabled()
+
+
+def is_codejail_in_darklaunch():
+    """
+    Returns whether codejail dark launch is enabled.
+
+    Codejail dark launch can only be enabled if ENABLE_CODEJAIL_REST_SERVICE is not enabled.
+    """
+    return not is_codejail_rest_service_enabled() and ENABLE_CODEJAIL_DARKLAUNCH.is_enabled()
 
 
 def get_remote_exec(*args, **kwargs):
