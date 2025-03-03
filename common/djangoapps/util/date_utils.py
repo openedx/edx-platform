@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 import crum
 from django.utils.translation import get_language, gettext, pgettext
-from pytz import UnknownTimeZoneError, timezone, utc
+from pytz import UnknownTimeZoneError, timezone, utc, UTC
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from openedx.core.djangolib.markup import HTML
@@ -229,7 +229,7 @@ def strftime_localized_html(dtime, fmt):
         fmt (str): One of the special enum values that strftime_localized accepts. Only SHORT_DATE supported now.
     """
     locale_prefs = user_timezone_locale_prefs(crum.get_current_request())
-    user_timezone = locale_prefs['user_timezone']
+    user_timezone = str(UTC)
     language = get_language()
 
     # Here we map the enums for strftime_localized into the enums used by date-utils.js when localizing on JS side.
@@ -238,15 +238,15 @@ def strftime_localized_html(dtime, fmt):
     }
     assert fmt in format_mapping.keys(), 'format "%s" not yet supported in strftime_localized_html' % fmt  # pylint: disable=consider-iterating-dictionary
 
-    date_html = '<span class="localized-datetime" data-format="{format}" data-timezone="{user_timezone}" \
-                       data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized}</span>'
+    date_html = '<span class="localized-datetime-2" data-format="{format}" data-timezone="{user_timezone}" \
+                       data-datetime="{formatted_date}" data-language="{language}">{formatted_date_localized} UTC</span>'
 
     return HTML(date_html).format(
         language=language,
         user_timezone=user_timezone,
         format=format_mapping[fmt],
         formatted_date=dtime.isoformat(),
-        formatted_date_localized=strftime_localized(dtime, fmt),
+        formatted_date_localized=dtime.isoformat(),
     )
 
 

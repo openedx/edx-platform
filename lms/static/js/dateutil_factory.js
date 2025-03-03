@@ -47,20 +47,23 @@
                     }
                     context = {
                         datetime: $(this).data('datetime'),
-                        timezone: $(this).data('timezone'),
+                        timezone: "UTC",
                         language: $(this).data('language'),
                         format: dateFormat
                     };
+                    console.log("contextee", context);
                     displayDatetime = stringHandler(
                         localizedTime(context),
                         $(this).data('string'),
                         $(this).data('datetoken')
                     );
+                    console.log("displayDatetime 22", displayDatetime);
                     $(this).text(displayDatetime);
                 } else {
                     displayDatetime = stringHandler(
                         $(this).data('string')
                     );
+                    console.log("displayDatetime 33 else", displayDatetime);
                     $(this).text(displayDatetime);
                 }
             });

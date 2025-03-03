@@ -274,7 +274,9 @@ def save_ccx(request, course, ccx=None):  # lint-amnesty, pylint: disable=too-ma
                     earliest = start
                 override_field_for_ccx(ccx, block, 'start', start)
             else:
-                ccx_ids_to_delete.append(get_override_for_ccx(ccx, block, 'start_id'))
+                ccx_ids_to_del
+                
+                ete.append(get_override_for_ccx(ccx, block, 'start_id'))
                 clear_ccx_field_info_from_ccx_map(ccx, block, 'start')
 
             # Only subsection (aka sequential) and unit (aka vertical) have due dates.
