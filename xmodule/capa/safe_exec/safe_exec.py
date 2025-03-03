@@ -1,13 +1,18 @@
 """Capa's specialized use of codejail.safe_exec."""
+import copy
 import hashlib
+import logging
 
 from codejail.safe_exec import SafeExecException, json_safe
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import safe_exec as codejail_safe_exec
-from edx_django_utils.monitoring import function_trace
+from edx_django_utils.monitoring import function_trace, record_exception
 
 from . import lazymod
-from .remote_exec import is_codejail_rest_service_enabled, get_remote_exec
+from .remote_exec import is_codejail_rest_service_enabled, is_codejail_in_darklaunch, get_remote_exec
+
+log = logging.getLogger(__name__)
+
 
 # Establish the Python environment for Capa.
 # Capa assumes float-friendly division always.
@@ -155,6 +160,7 @@ def safe_exec(
         emsg, exception = get_remote_exec(data)
 
     else:
+
         # Decide which code executor to use.
         if unsafely:
             exec_fn = codejail_not_safe_exec
@@ -177,6 +183,32 @@ def safe_exec(
             emsg = str(e)
         else:
             emsg = None
+
+        # Run the code in both the remote codejail service as well as the local codejail
+        # when in darklaunch mode.
+        if is_codejail_in_darklaunch():
+            try:
+                # Create a copy so the originals are not modified as part of this call.
+                darklaunch_globals = copy.deepcopy(globals_dict)
+                data = {
+                    "code": code_prolog + LAZY_IMPORTS + code,
+                    "globals_dict": darklaunch_globals,
+                    "python_path": python_path,
+                    "limit_overrides_context": limit_overrides_context,
+                    "slug": slug,
+                    "unsafely": unsafely,
+                    "extra_files": extra_files,
+                }
+                remote_emsg, _remote_exception = get_remote_exec(data)
+                log.info(
+                    f"Remote execution in darklaunch mode produces: {darklaunch_globals} or exception: {remote_emsg}"
+                )
+                log.info(f"Local execution in darklaunch mode produces: {globals_dict} or exception: {emsg}")
+            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
+                # Swallows all exceptions and logs it in monitoring so that dark launch doesn't cause issues during
+                # deploy.
+                log.exception("Error occurred while trying to remote exec in dark launch mode.")
+                record_exception()
 
     # Put the result back in the cache.  This is complicated by the fact that
     # the globals dict might not be entirely serializable.
