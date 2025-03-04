@@ -485,6 +485,8 @@ COMPREHENSIVE_THEME_DIRS = [
 "/edx/src/edx-themes/edx-platform",
 "/edx/src/edx-themes/edx-platform",
 "/edx/src/edx-themes/edx-platform",
+"/edx/src/edx-themes/edx-platform",
+"/edx/src/edx-themes/edx-platform",
     "/edx/app/edxapp/edx-platform/themes/",
 ]
 TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
