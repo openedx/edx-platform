@@ -1991,7 +1991,7 @@ social-auth-app-django==5.4.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-auth-backends
-social-auth-core==4.5.6
+social-auth-core==4.5.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
