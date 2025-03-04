@@ -1199,11 +1199,12 @@ def _scan_course_for_links(course_key):
 
     for block in blocks:
         block_id = str(block.usage_key)
-        block_info = get_block_info(block)
-        block_data = block_info['data']
+        if block.category != 'drag-and-drop-v2':
+            block_info = get_block_info(block)
+            block_data = block_info['data']
 
-        url_list = _get_urls(block_data)
-        urls_to_validate += [[block_id, url] for url in url_list]
+            url_list = _get_urls(block_data)
+            urls_to_validate += [[block_id, url] for url in url_list]
 
     return urls_to_validate
 
