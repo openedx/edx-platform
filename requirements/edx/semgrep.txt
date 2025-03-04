@@ -17,7 +17,7 @@ boltons==21.0.0
     #   semgrep
 bracex==2.5.post1
     # via wcmatch
-certifi==2024.12.14
+certifi==2025.1.31
     # via requests
 charset-normalizer==2.0.12
     # via
@@ -44,7 +44,7 @@ face==24.0.0
     # via glom
 glom==22.1.0
     # via semgrep
-googleapis-common-protos==1.66.0
+googleapis-common-protos==1.69.0
     # via opentelemetry-exporter-otlp-proto-http
 idna==3.10
     # via requests
@@ -90,7 +90,7 @@ opentelemetry-util-http==0.46b0
     # via opentelemetry-instrumentation-requests
 packaging==24.2
     # via semgrep
-peewee==3.17.8
+peewee==3.17.9
     # via semgrep
 protobuf==4.25.6
     # via
@@ -108,7 +108,7 @@ requests==2.32.3
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.22.3
+rpds-py==0.23.1
     # via
     #   jsonschema
     #   referencing
@@ -116,7 +116,7 @@ ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.104.0
+semgrep==1.110.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
