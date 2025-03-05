@@ -2925,3 +2925,26 @@ MEILISEARCH_API_KEY = "devkey"
 # .. for now it wil impact country listing in auth flow and user profile.
 # .. eg ['US', 'CA']
 DISABLED_COUNTRIES = []
+
+# .. setting_name: LIBRARY_ENABLED_BLOCKS
+# .. setting_default: ['problem', 'video', 'html', 'drag-and-drop-v2']
+# .. setting_description: List of block types that are ready/enabled to be created/used
+# .. in libraries. Both basic blocks and advanced blocks can be included.
+# .. In the future, we will support individual configuration per library - see
+# .. openedx/core/djangoapps/content_libraries/api.py::get_allowed_block_types()
+LIBRARY_ENABLED_BLOCKS = [
+    'problem',
+    'video',
+    'html',
+    'drag-and-drop-v2',
+    'conditional',
+    'done',
+    'freetextresponse',
+    'google-calendar',
+    'google-document',
+    'invideoquiz',
+    'pdf',
+    'poll',
+    'survey',
+    'word_cloud',
+]
