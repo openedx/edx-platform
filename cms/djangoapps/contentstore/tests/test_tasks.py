@@ -393,14 +393,14 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         def get_block_side_effect(block):
             block_data = getattr(block, 'data', '')
             if isinstance(block_data, str):
-                return {'data' : block_data}
+                return {'data': block_data}
             raise TypeError("expected string or bytes-like object, got 'dict'")
         mock_get_block_info.side_effect = get_block_side_effect
 
         urls = _scan_course_for_links(self.test_course.id)
         # The drag-and-drop block should not appear in the results
         assert all(block_id != str(drag_and_drop_block.usage_key) for block_id, _ in urls), \
-                    "Drag and Drop blocks should be excluded"
+            "Drag and Drop blocks should be excluded"
         assert any(block_id == str(text_block.usage_key) for block_id, _ in urls), "Text block should be included"
 
     @pytest.mark.asyncio
