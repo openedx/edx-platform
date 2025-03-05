@@ -650,18 +650,9 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
 
     @ddt.data(
         (None, None, None, True),
-        ({
-             'name': 'Test Enterprise',
-             'uuid': 'test-uuid'
-         }, None, None, True),
-        ({
-             'name': 'Test Enterprise',
-             'uuid': 'test-uuid'
-         }, 'test-provider', None, True),
-        ({
-             'name': 'Test Enterprise',
-             'uuid': 'test-uuid'
-         }, 'test-provider', True, False),
+        ({'name': 'Test Enterprise', 'uuid': 'test-uuid'}, None, None, True),
+        ({'name': 'Test Enterprise', 'uuid': 'test-uuid'}, 'test-provider', None, True),
+        ({'name': 'Test Enterprise', 'uuid': 'test-uuid'}, 'test-provider', True, False)
     )
     @ddt.unpack
     @override_settings(FEATURES=FEATURES_WITH_AUTHN_MFE_ENABLED)
@@ -676,13 +667,17 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
             self.enable_saml()
             self._configure_testshib_provider('TestShib', provider_id)
 
-        with mock.patch(
-            'openedx.core.djangoapps.user_authn.views.login_form.enterprise_customer_for_request') as mock_ec, \
+        with (
             mock.patch(
-                'openedx.core.djangoapps.user_authn.views.login_form.should_redirect_to_authn_microfrontend') as mock_should_redirect, \
+                'openedx.core.djangoapps.user_authn.views.login_form.enterprise_customer_for_request'
+            ) as mock_ec,
             mock.patch(
-                'openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.utils.is_saml_provider') as mock_is_saml:
-
+                'openedx.core.djangoapps.user_authn.views.login_form.should_redirect_to_authn_microfrontend'
+            ) as mock_should_redirect,
+            mock.patch(
+                'openedx.core.djangoapps.user_authn.views.login_form.third_party_auth.utils.is_saml_provider'
+            ) as mock_is_saml
+        ):
             mock_ec.return_value = enterprise_customer_data
             mock_should_redirect.return_value = should_redirect
             mock_is_saml.return_value = (True, None) if is_saml else (False, None)
