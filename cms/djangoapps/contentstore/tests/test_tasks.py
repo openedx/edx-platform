@@ -29,7 +29,7 @@ from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, R
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from ..tasks import (
     export_olx,
     update_special_exams_and_publish,
@@ -364,6 +364,45 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
 
         _scan_course_for_links(self.test_course.id)
         self.assertEqual(len(expected_blocks), mock_get_urls.call_count)
+
+    @mock.patch('cms.djangoapps.contentstore.tasks.get_block_info', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks.modulestore', autospec=True)
+    def test_scan_course_excludes_drag_and_drop(self, mock_modulestore, mock_get_block_info):
+        """
+        Test that `_scan_course_for_links` excludes blocks of category 'drag-and-drop-v2'.
+        """
+        
+        vertical = BlockFactory.create(
+            category='vertical',
+            parent_location=self.test_course.location
+        )
+        drag_and_drop_block = BlockFactory.create(
+            category='drag-and-drop-v2',
+            parent_location=vertical.location,
+        )
+        text_block = BlockFactory.create(
+            category='html',
+            parent_location=vertical.location,
+            data='Test Link -> <a href="http://example.com">Example.com</a>'
+        )
+
+        mock_modulestore_instance = mock.Mock()
+        mock_modulestore.return_value = mock_modulestore_instance
+        mock_modulestore_instance.get_items.return_value = [vertical]
+        vertical.get_children = mock.Mock(return_value=[drag_and_drop_block, text_block])
+
+        def get_block_side_effect(block):
+            block_data = getattr(block, 'data')
+            if isinstance(block_data, str):
+                return {'data' : block_data}
+            raise TypeError("expected string or bytes-like object, got 'dict'")
+        mock_get_block_info.side_effect = get_block_side_effect
+        
+        urls = _scan_course_for_links(self.test_course.id)
+        
+        # The drag-and-drop block should not appear in the results
+        assert all(block_id != str(drag_and_drop_block.usage_key) for block_id, _ in urls), "Drag and Drop blocks should be excluded"
+        assert any(block_id == str(text_block.usage_key) for block_id, _ in urls), "Text block should be included"
 
     @pytest.mark.asyncio
     async def test_every_detected_link_is_validated(self):
