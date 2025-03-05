@@ -19,7 +19,7 @@ from rest_framework.response import Response
 
 from common.djangoapps.student.auth import has_course_author_access
 from openedx.core import types
-from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+from geoinfo.api import country_code_from_ip
 
 from .models import CountryAccessRule, RestrictedCourse
 

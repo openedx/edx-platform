@@ -2290,7 +2290,7 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
     'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
 
-    'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
+    'geoinfo.middleware.CountryMiddleware',
     'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
 
     # Allows us to use enterprise customer's language as the learner's default language

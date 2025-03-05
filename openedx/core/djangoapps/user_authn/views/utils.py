@@ -15,7 +15,7 @@ from common.djangoapps import third_party_auth
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.models import clean_username
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+from geoinfo.api import country_code_from_ip
 import random
 import string
 from datetime import datetime
