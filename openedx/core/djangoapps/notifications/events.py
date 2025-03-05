@@ -183,7 +183,7 @@ def notification_tray_opened_event(user, unseen_notifications_count):
     )
 
 
-def notification_preference_unsubscribe_event(user):
+def notification_preference_unsubscribe_event(user, is_preference_updated=False):
     """
     Emits an event when user clicks on one-click-unsubscribe url
     """
@@ -193,6 +193,7 @@ def notification_preference_unsubscribe_event(user):
     }
     event_data = context_data.copy()
     event_data['event_type'] = 'email_digest_unsubscribe'
+    event_data['is_preference_updated'] = is_preference_updated
 
     with tracker.get_tracker().context(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, context_data):
         tracker.emit(NOTIFICATION_PREFERENCE_UNSUBSCRIBE, event_data)

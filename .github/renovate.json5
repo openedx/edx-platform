@@ -1,43 +1,45 @@
-// This file is written in "JSON5" (https://json5.org/) so that we can use comments.
 {
-  "extends": [
-    "config:base",
-    "schedule:weekly",
-    ":automergeLinters",
-    ":automergeMinor",
-    ":automergeTesters",
-    ":enableVulnerabilityAlerts",
-    ":semanticCommits",
-    ":updateNotScheduled"
+  extends: [
+    'config:recommended',
+    'schedule:weekly',
+    ':automergeLinters',
+    ':automergeMinor',
+    ':automergeTesters',
+    ':enableVulnerabilityAlerts',
+    ':semanticCommits',
+    ':updateNotScheduled',
   ],
-  "packageRules": [
+  packageRules: [
     {
-      "matchDepTypes": [
-        "devDependencies"
+      matchDepTypes: [
+        'devDependencies',
       ],
-      "matchUpdateTypes": [
-        "lockFileMaintenance",
-        "minor",
-        "patch",
-        "pin"
+      matchUpdateTypes: [
+        'lockFileMaintenance',
+        'minor',
+        'patch',
+        'pin',
       ],
-      "automerge": true
+      automerge: true,
     },
     {
-      "matchPackagePatterns": ["@edx", "@openedx"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    }
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      automerge: true,
+      matchPackageNames: [
+        '/@edx/',
+        '/@openedx/',
+      ],
+    },
   ],
-  // When adding an ignoreDep, please include a reason and a public link that we can use to follow up and ensure
-  // that the ignoreDep is removed.
-  // This can be done as a comment within the ignoreDeps list.
-  "ignoreDeps": [
-    // karma-spec-reporter>0.20.0 does not seem compatible with our super-old 2016 Karma version (0.13.22).
-    // Ticket link: None, as upgrading Karma does not strike as worth the benefit.
-    "karma-spec-reporter"
+  ignoreDeps: [
+    'karma-spec-reporter',
   ],
-  "timezone": "America/New_York",
-  "prConcurrentLimit": 3,
-  "enabledManagers": ["npm"]
+  timezone: 'America/New_York',
+  prConcurrentLimit: 3,
+  enabledManagers: [
+    'npm',
+  ],
 }
