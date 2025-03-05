@@ -10,9 +10,9 @@ attrs==25.1.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.37.5
+boto3==1.37.6
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.37.5
+botocore==1.37.6
     # via
     #   boto3
     #   s3transfer
@@ -136,7 +136,7 @@ requests-toolbelt==1.0.0
     # via zeep
 rsa==4.9
     # via google-auth
-s3transfer==0.11.3
+s3transfer==0.11.4
     # via boto3
 simple-salesforce==1.12.6
     # via -r scripts/user_retirement/requirements/base.in

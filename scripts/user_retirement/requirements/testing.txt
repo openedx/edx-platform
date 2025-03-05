@@ -14,11 +14,11 @@ attrs==25.1.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.37.5
+boto3==1.37.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.37.5
+botocore==1.37.6
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -235,7 +235,7 @@ rsa==4.9
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-s3transfer==0.11.3
+s3transfer==0.11.4
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3

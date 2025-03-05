@@ -6,9 +6,11 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
+-e git+https://github.com/awais786/openedx-geoinfo.git@main#egg=openedx-geoinfo
+    # via -r requirements/edx/base.txt
 acid-xblock==0.4.1
     # via -r requirements/edx/base.txt
-aiohappyeyeballs==2.4.6
+aiohappyeyeballs==2.4.8
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -105,13 +107,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.37.5
+boto3==1.37.6
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.37.5
+botocore==1.37.6
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -322,6 +324,7 @@ django==4.2.19
     #   openedx-events
     #   openedx-filters
     #   openedx-forum
+    #   openedx-geoinfo
     #   openedx-learning
     #   ora2
     #   social-auth-app-django
@@ -377,7 +380,8 @@ django-ipware==7.0.1
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-django-js-asset==3.1.0
+    #   openedx-geoinfo
+django-js-asset==3.1.2
     # via
     #   -r requirements/edx/base.txt
     #   django-mptt
@@ -725,7 +729,9 @@ future==1.0.0
     #   -r requirements/edx/base.txt
     #   pyjwkest
 geoip2==5.0.1
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   openedx-geoinfo
 glob2==0.7
     # via -r requirements/edx/base.txt
 google-api-core[grpc]==2.24.1
@@ -1097,6 +1103,7 @@ path==16.11.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
+    #   openedx-geoinfo
     #   path-py
 path-py==12.5.0
     # via
@@ -1450,7 +1457,7 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.11.3
+s3transfer==0.11.4
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1521,7 +1528,7 @@ social-auth-app-django==5.4.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
-social-auth-core==4.5.4
+social-auth-core==4.5.6
     # via
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
