@@ -15,6 +15,7 @@ import django
 import git
 
 from path import Path
+django.setup()
 
 root = Path('..').abspath()
 
@@ -30,8 +31,6 @@ from repository_docs import RepositoryDocs
 # settings module to use in the on_init() hook of the parent process
 if 'DJANGO_SETTINGS_MODULE' not in os.environ:
     os.environ['DJANGO_SETTINGS_MODULE'] = 'docs.docs_settings'
-
-django.setup()
 
 # -- Project information -----------------------------------------------------
 
