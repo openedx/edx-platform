@@ -1142,6 +1142,25 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
             })
 
+    @override_settings(LIBRARY_ENABLED_BLOCKS=['problem', 'video', 'html'])
+    def test_library_get_enabled_blocks(self):
+        expected = [
+            {"block_type": "html", "display_name": "Text"},
+            {"block_type": "problem", "display_name": "Problem"},
+            {"block_type": "video", "display_name": "Video"},
+        ]
+
+        author = UserFactory.create(username="Author", email="author@example.com", is_staff=True)
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_enabled_blocks",
+                title="Get Enabled Blocks Test Library",
+                description="Testing get enabled blocks from library"
+            )
+            lib_id = lib["id"]
+            block_types = self._get_library_block_types(lib_id)
+            assert [dict(item) for item in block_types] == expected
+
 
 @ddt.ddt
 class ContentLibraryXBlockValidationTest(APITestCase):
