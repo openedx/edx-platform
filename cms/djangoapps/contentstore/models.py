@@ -175,7 +175,12 @@ class PublishableEntityLink(models.Model):
             )
         try:
             link = cls.objects.get(downstream_usage_key=downstream_usage_key)
-            has_changes = False
+            # TODO: until we save modified datetime for course xblocks in index, the modified time for links are updated
+            # everytime a downstream/course block is updated. This allows us to order links[1] based on recently
+            # modified downstream version.
+            # pylint: disable=line-too-long
+            # 1. https://github.com/open-craft/frontend-app-course-authoring/blob/0443d88824095f6f65a3a64b77244af590d4edff/src/course-libraries/ReviewTabContent.tsx#L222-L233
+            has_changes = True  # change to false once above condition is met.
             for key, value in new_values.items():
                 prev = getattr(link, key)
                 # None != None is True, so we need to check for it specially
