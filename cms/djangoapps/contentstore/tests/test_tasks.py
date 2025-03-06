@@ -399,9 +399,14 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
 
         urls = _scan_course_for_links(self.test_course.id)
         # The drag-and-drop block should not appear in the results
-        assert all(block_id != str(drag_and_drop_block.usage_key) for block_id, _ in urls), \
+        self.assertFalse(
+            any(block_id == str(drag_and_drop_block.usage_key) for block_id, _ in urls),
             "Drag and Drop blocks should be excluded"
-        assert any(block_id == str(text_block.usage_key) for block_id, _ in urls), "Text block should be included"
+        )
+        self.assertTrue(
+            any(block_id == str(text_block.usage_key) for block_id, _ in urls),
+            "Text block should be included"
+        )
 
     @pytest.mark.asyncio
     async def test_every_detected_link_is_validated(self):
