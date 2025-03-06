@@ -35,7 +35,7 @@ click==8.1.6
     #   edx-django-utils
 cryptography==43.0.3
     # via pyjwt
-django==4.2.19
+django==4.2.20
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
