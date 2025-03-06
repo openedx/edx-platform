@@ -37,6 +37,13 @@ class MLStripper(HTMLParser):  # lint-amnesty, pylint: disable=abstract-method
         self.reset()
         self.fed = []
 
+    def handle_starttag(self, tag, attrs):
+        if tag != 'img':
+            return
+        for attr in attrs:
+            if len(attr) >= 2 and attr[0] == 'alt':
+                self.fed.append(attr[1])
+
     def handle_data(self, data):
         """takes the data in separate chunks"""
         self.fed.append(data)
