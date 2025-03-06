@@ -1562,7 +1562,7 @@ def _get_release_date(xblock, user=None):
     reset_to_default = False
     try:
         reset_to_default = xblock.start.year < 1900
-    except ValueError:
+    except (ValueError, AttributeError):
         # For old mongo courses, accessing the start attribute calls `to_json()`,
         # which raises a `ValueError` for years < 1900.
         reset_to_default = True
