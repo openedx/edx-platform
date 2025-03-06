@@ -75,8 +75,7 @@ class XQueueInterfaceSubmission:
 
         return student_dict, student_answer, queue_name, grader, score
 
-    def send_to_submission(self, header, body, files_to_upload=None):  # pylint: disable=unexpected-keyword-arg
-
+    def send_to_submission(self, header, body, files_to_upload=None):
         """
         Submits the extracted student data to the edx-submissions system.
         """
@@ -84,7 +83,7 @@ class XQueueInterfaceSubmission:
 
         try:
             student_item, answer, queue_name, grader, score = self.get_submission_params(header, body)
-            return create_submission(
+            return create_submission(  # pylint: disable=unexpected-keyword-arg
                 student_item,
                 answer,
                 queue_name=queue_name,
