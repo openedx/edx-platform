@@ -28,6 +28,7 @@ class HelperTest(unittest.TestCase):
     '''
     Make sure that our helper function works!
     '''
+
     def check(self, d):
         xml = etree.XML(test_capa_system().render_template('blah', d))
         assert d == extract_context(xml)
