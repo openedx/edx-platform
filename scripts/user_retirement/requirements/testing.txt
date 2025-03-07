@@ -41,7 +41,7 @@ charset-normalizer==2.0.12
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests
-click==8.1.6
+click==8.1.8
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
