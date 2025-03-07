@@ -5,6 +5,7 @@ import json
 from collections import OrderedDict
 
 from unittest import mock
+from unittest.mock import patch
 import urllib
 import oauthlib
 from django.conf import settings
@@ -16,6 +17,7 @@ from lms.djangoapps.courseware.views.views import get_course_lti_endpoints
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests.helpers import mock_render_template
 
 
 class TestLTI(BaseTestXmodule):
@@ -115,14 +117,26 @@ class TestLTI(BaseTestXmodule):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-    def test_lti_constructor(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_lti_constructor(self, mock_render_django_template):
         generated_content = self.block.student_view(None).content
-        expected_content = self.runtime.render_template('lti.html', self.expected_context)
+
+        if settings.USE_EXTRACTED_LTI_BLOCK:
+            expected_content = self.runtime.render_template('templates/lti.html', self.expected_context)
+            mock_render_django_template.assert_called_once()
+        else:
+            expected_content = self.runtime.render_template('lti.html', self.expected_context)
         assert generated_content == expected_content
 
-    def test_lti_preview_handler(self):
+    @patch('xblock.utils.resources.ResourceLoader.render_django_template', side_effect=mock_render_template)
+    def test_lti_preview_handler(self, mock_render_django_template):
         generated_content = self.block.preview_handler(None, None).body
-        expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
+
+        if settings.USE_EXTRACTED_LTI_BLOCK:
+            expected_content = self.runtime.render_template('templates/lti_form.html', self.expected_context)
+            mock_render_django_template.assert_called_once()
+        else:
+            expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
         assert generated_content.decode('utf-8') == expected_content
 
 
