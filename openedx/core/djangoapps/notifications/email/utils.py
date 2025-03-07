@@ -428,5 +428,5 @@ def is_notification_type_channel_editable(app_name, notification_type, channel):
     Returns if notification type channel is editable
     """
     if notification_type == 'core':
-        return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
+        return True
     return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
