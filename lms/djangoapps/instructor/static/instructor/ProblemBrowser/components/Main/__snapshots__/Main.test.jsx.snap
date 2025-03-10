@@ -18,7 +18,7 @@ exports[`ProblemBrowser Main component Initial rendering should match snapshot w
         disabled=""
         name="problem-location"
         type="text"
-        value="some-selected-block"
+        value=""
       />
       <button
         class="btn"
