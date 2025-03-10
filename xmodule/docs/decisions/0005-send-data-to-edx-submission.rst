@@ -33,6 +33,7 @@ The following changes have been implemented to redirect student submissions to t
 
 
 Configuration for Xqueue-watcher:
+***************************************
 
 Prerequisites
 -------------
