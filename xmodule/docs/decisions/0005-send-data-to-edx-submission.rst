@@ -12,7 +12,7 @@ Accepted.
 Context
 *******
 
-Traditionally, the Open edX platform has utilized the `XQueue` service to handle student assignment submissions. However, to leverage a more modern and efficient architecture, there is a need to transition these submissions to the `edx-submission` service. This transition aims to improve the scalability and maintainability of the submission handling process.
+Traditionally, the Open edX platform has utilized the ``XQueue`` service to handle student assignment submissions. However, to leverage a more modern and efficient architecture, there is a need to transition these submissions to the ``edx-submission`` service. This transition aims to improve the scalability and maintainability of the submission handling process.
 
 Decision
 ********
