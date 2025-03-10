@@ -40,6 +40,11 @@ https://github.com/openedx/edx-platform/issues/35653):
       400: Downstream block is not linked to upstream content.
       404: Downstream block not found or user lacks permission to edit it.
 
+  /api/contentstore/v2/upstream/{usage_key_string}/downstream-links
+
+    GET: List all downstream blocks linked to a library block.
+        200: A list of downstream usage_keys linked to the library block.
+
   # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
@@ -71,7 +76,10 @@ from xblock.core import XBlock
 
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from cms.djangoapps.contentstore.models import PublishableEntityLink
-from cms.djangoapps.contentstore.rest_api.v2.serializers import PublishableEntityLinksSerializer
+from cms.djangoapps.contentstore.rest_api.v2.serializers import (
+    PublishableEntityLinksSerializer,
+    PublishableEntityLinksUsageKeySerializer,
+)
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
     BadUpstream,
@@ -88,6 +96,7 @@ from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
 )
+from xmodule.video_block.transcripts_utils import clear_transcripts
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -134,6 +143,27 @@ class UpstreamListView(DeveloperErrorViewMixin, APIView):
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
         links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
         serializer = PublishableEntityLinksSerializer(links, many=True)
+        return Response(serializer.data)
+
+
+@view_auth_classes()
+class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves library block->downstream usage keys
+    """
+    def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
+        """
+        Fetches downstream links for given publishable entity
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+        except InvalidKeyError as exc:
+            raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
+
+        links = PublishableEntityLink.get_by_upstream_usage_key(upstream_usage_key=usage_key)
+
+        serializer = PublishableEntityLinksUsageKeySerializer(links, many=True)
+
         return Response(serializer.data)
 
 
@@ -224,6 +254,9 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
         """
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
         try:
+            if downstream.usage_key.block_type == "video":
+                # Delete all transcripts so we can copy new ones from upstream
+                clear_transcripts(downstream)
             upstream = sync_from_upstream(downstream, request.user)
             static_file_notices = import_static_assets_for_library_sync(downstream, upstream, request)
         except UpstreamLinkException as exc:

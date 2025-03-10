@@ -1289,6 +1289,30 @@ class CertificateGenerationCommandConfiguration(ConfigurationModel):
         return str(self.arguments)
 
 
+class PurgeReferencestoPDFCertificatesCommandConfiguration(ConfigurationModel):
+    """
+    Manages configuration for a run of the purge_references_to_pdf_certificates management command.
+
+    .. no_pii:
+    """
+
+    class Meta:
+        app_label = "certificates"
+        verbose_name = "purge_references_to_pdf_certificates argument"
+
+    arguments = models.TextField(
+        blank=True,
+        help_text=(
+            "Arguments for the 'purge_references_to_pdf_certificates' management command. "
+            "Specify like '--certificate_ids <id1> <id2>'"
+        ),
+        default="",
+    )
+
+    def __str__(self):
+        return str(self.arguments)
+
+
 class CertificateDateOverride(TimeStampedModel):
     """
     Model to manually override a given certificate date with the given date.

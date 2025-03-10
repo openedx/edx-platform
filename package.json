@@ -92,13 +92,12 @@
     "scriptjs": "2.5.9",
     "style-loader": "4.0.0",
     "svg-inline-loader": "0.8.2",
-    "uglify-js": "2.7.0",
+    "uglify-js": "3.19.3",
     "underscore": "1.13.7",
     "underscore.string": "3.3.6",
     "webpack": "^5.90.3",
     "webpack-bundle-tracker": "0.4.3",
     "webpack-merge": "4.2.2",
-    "whatwg-fetch": "2.0.4",
     "which-country": "1.0.0"
   },
   "devDependencies": {
@@ -127,7 +126,7 @@
     "karma-webpack": "^5.0.1",
     "plato": "1.7.0",
     "react-test-renderer": "16.14.0",
-    "selenium-webdriver": "4.28.1",
+    "selenium-webdriver": "4.29.0",
     "sinon": "19.0.2",
     "squirejs": "0.1.0",
     "string-replace-loader": "^3.1.0",
