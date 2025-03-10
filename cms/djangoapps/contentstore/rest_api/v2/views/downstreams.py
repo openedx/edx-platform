@@ -132,14 +132,13 @@ class DownstreamListPaginator(DefaultPagination):
     def get_paginated_response(self, data, *args, **kwargs):
         if 'no_page' in args[0].query_params:
             return Response(data)
-        return Response({
+        response = super().get_paginated_response(data)
+        # replace next and previous links by next and previous page number
+        response.data.update({
             'next': self.page.next_page_number() if self.page.has_next() else None,
             'previous': self.page.previous_page_number() if self.page.has_previous() else None,
-            'count': self.page.paginator.count,
-            'num_pages': self.page.paginator.num_pages,
-            'current_page': self.page.number,
-            'results': data
         })
+        return response
 
 
 @view_auth_classes()
