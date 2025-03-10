@@ -524,8 +524,9 @@ edx-search==4.1.3
     #   openedx-forum
 edx-sga==0.25.0
     # via -r requirements/edx/bundled.in
-edx-submissions==3.8.5
+edx-submissions @ git+https://github.com/aulasneo/edx-submissions.git@XQU-15-add-fields-to-submission-model
     # via
+    #   -r requirements/edx/base.in
     #   -r requirements/edx/kernel.in
     #   ora2
 edx-tincan-py35==2.0.0
