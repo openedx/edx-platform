@@ -1213,6 +1213,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Expect that the number of attempts is NOT incremented
         assert block.attempts == 1
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the submit_problem API.
@@ -1263,6 +1264,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         for fpath, fileobj in kwargs['files'].items():
             assert fpath == fileobj.name
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files_as_xblock(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the XBlock API.
@@ -3900,6 +3902,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                                         'group_label': '',
                                         'variant': block.seed}}
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_file_inputs(self, mock_xqueue_post):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
