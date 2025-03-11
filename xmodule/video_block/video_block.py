@@ -471,6 +471,8 @@ class _BuiltInVideoBlock(
 
         bumperize(self)
 
+        is_video_from_same_origin = bool(download_video_link and cdn_url and download_video_link.startswith(cdn_url))
+
         template_context = {
             'autoadvance_enabled': autoadvance_enabled,
             'branding_info': branding_info,
@@ -479,6 +481,7 @@ class _BuiltInVideoBlock(
             'cdn_exp_group': cdn_exp_group,
             'display_name': self.display_name_with_default,
             'download_video_link': download_video_link,
+            'is_video_from_same_origin' : is_video_from_same_origin,
             'handout': self.handout,
             'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
