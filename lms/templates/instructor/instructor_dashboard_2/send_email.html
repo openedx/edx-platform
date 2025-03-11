@@ -10,7 +10,7 @@ from openedx.core.djangolib.markup import HTML, Text
     %if 'communications_mfe_url' in section_data:
     <p>
         <em>
-            ${_("To use the email tool, visit the")} <a href="${section_data['communications_mfe_url']}" target="_blank" rel="noopener">${_("new experience")}</a>.
+            ${_("To use the email tool, visit the")} <a href="${section_data['communications_mfe_url']}" target="_blank" rel="noopener">${_("new experience")}<span class="sr-only">${Text(_("Opens in a new tab"))}</span></a>.
         </em>
     </p>
     %else:

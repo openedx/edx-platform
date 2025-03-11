@@ -315,26 +315,6 @@ class _BuiltInWordCloudBlock(  # pylint: disable=abstract-method
 
         return xblock_body
 
-    @XBlock.json_handler
-    def studio_submit(self, submissions, suffix=''):  # pylint: disable=unused-argument
-        """
-        Change the settings for this XBlock given by the Studio user
-        """
-        if 'display_name' in submissions:
-            self.display_name = submissions['display_name']
-        if 'instructions' in submissions:
-            self.instructions = submissions['instructions']
-        if 'num_inputs' in submissions:
-            self.num_inputs = submissions['num_inputs']
-        if 'num_top_words' in submissions:
-            self.num_top_words = submissions['num_top_words']
-        if 'display_student_percents' in submissions:
-            self.display_student_percents = submissions['display_student_percents'] == 'True'
-
-        return {
-            'result': 'success',
-        }
-
 
 WordCloudBlock = (
     _ExtractedWordCloudBlock if settings.USE_EXTRACTED_WORD_CLOUD_BLOCK
