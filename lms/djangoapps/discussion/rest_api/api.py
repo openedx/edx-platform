@@ -990,7 +990,6 @@ def get_thread_list(
             except ValueError:
                 pass
 
-
     # If no group_id was specified and the user is a TA or non-moderator,
     # get their group ID from the course discussion settings.
     # If the group ID is passed as query params to the forum API, it will filter threads with that group_id.
