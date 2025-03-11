@@ -95,6 +95,7 @@ def test_send_to_queue_with_flag_enabled(mock_send_to_submission, mock_flag):
             "http://example.com/courses/course-v1:test_org+test_course+test_run/"
             "xqueue/block@item_id/type@problem"
         ),
+        "lms_key": "default"
     })
     body = json.dumps({
         "student_info": json.dumps({"anonymous_student_id": "student_id"}),
@@ -105,7 +106,7 @@ def test_send_to_queue_with_flag_enabled(mock_send_to_submission, mock_flag):
     mock_send_to_submission.return_value = {"submission": "mock_submission"}
     error, msg = xqueue_interface.send_to_queue(header, body, files_to_upload)
 
-    mock_send_to_submission.assert_called_once_with(header, body, {})
+    mock_send_to_submission.assert_called_once_with(header, body, "default", {})
 
 
 @pytest.mark.django_db
@@ -123,6 +124,7 @@ def test_send_to_queue_with_flag_disabled(mock_http_post, mock_flag):
             "http://example.com/courses/course-v1:test_org+test_course+test_run/"
             "xqueue/block@item_id/type@problem"
         ),
+        "lms_key": "default"
     })
     body = json.dumps({
         "student_info": json.dumps({"anonymous_student_id": "student_id"}),

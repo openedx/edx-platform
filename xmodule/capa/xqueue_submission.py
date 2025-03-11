@@ -75,7 +75,7 @@ class XQueueInterfaceSubmission:
 
         return student_dict, student_answer, queue_name, grader, score
 
-    def send_to_submission(self, header, body, files_to_upload=None):
+    def send_to_submission(self, header, body, queue_key, files_to_upload=None):
         """
         Submits the extracted student data to the edx-submissions system.
         """
@@ -88,6 +88,7 @@ class XQueueInterfaceSubmission:
                 answer,
                 queue_name=queue_name,
                 grader=grader,
+                queue_key=queue_key,
                 score=score,
                 files=files_to_upload
             )

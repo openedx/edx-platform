@@ -159,9 +159,15 @@ class XQueueInterface:
                 files.update({f.name: f})
 
         course_id = str(self.block.scope_ids.usage_id.context_key)
+        header_info = json.loads(header)
+        queue_key = header_info['lms_key']
+
         if is_flag_active('send_to_submission_course.enable', course_id):
             # Use the new edx-submissions workflow
-            submission = self.submission.send_to_submission(header, body, files)
+            submission = self.submission.send_to_submission(header,
+                                                            body,
+                                                            queue_key,
+                                                            files)
             log.error(submission)
             return None, ''
 
