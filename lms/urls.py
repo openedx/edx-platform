@@ -1055,3 +1055,9 @@ urlpatterns += [
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]
+
+from submissions import urls as submissions_urls
+
+urlpatterns += [
+    path('xqueue/', include((submissions_urls, 'submissions'), namespace='submissions')),
+]

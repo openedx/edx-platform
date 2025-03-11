@@ -82,7 +82,7 @@ def test_send_to_submission(mock_create_external_grader_detail, xqueue_service):
         mock_create_external_grader_detail.return_value = {'submission': 'mock_submission'}
 
         # Call send_to_submission
-        result = xqueue_service.send_to_submission(header, body)
+        result = xqueue_service.send_to_submission(header, body, queue_key='default')
 
         # Assertions
         assert 'submission' in result
@@ -96,6 +96,7 @@ def test_send_to_submission(mock_create_external_grader_detail, xqueue_service):
             },
             'student_answer',
             queue_name='default',
+            queue_key='default',
             grader_file_name='test.py',
             points_possible=xqueue_service.block.max_score(),  # Mocked max_score value
             files=None
@@ -120,7 +121,7 @@ def test_send_to_submission_with_missing_fields(mock_create_external_grader_deta
     })
 
     # Call send_to_submission
-    result = xqueue_service.send_to_submission(header, body)
+    result = xqueue_service.send_to_submission(header, body, queue_key='default')
 
     # Assertions
     assert "error" in result

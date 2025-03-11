@@ -6,6 +6,15 @@
 #
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via -r requirements/edx/base.txt
+-e git+https://github.com/aulasneo/openedx-events.git@XQU-44-add-signal-to-call-xqueue-callback#egg=openedx-events
+    # via
+    #   -r requirements/edx/base.txt
+    #   edx-enterprise
+    #   edx-event-bus-kafka
+    #   edx-event-bus-redis
+    #   edx-name-affirmation
+    #   event-tracking
+    #   ora2
 accessible-pygments==0.0.5
     # via pydata-sphinx-theme
 acid-xblock==0.4.1
@@ -598,7 +607,7 @@ edx-search==4.1.3
     #   openedx-forum
 edx-sga==0.25.3
     # via -r requirements/edx/base.txt
-edx-submissions==3.8.6
+edx-submissions @ git+https://github.com/aulasneo/edx-submissions.git@XQU-44-add-signal-to-call-xqueue-callback
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -976,15 +985,6 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==9.20.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-enterprise
-    #   edx-event-bus-kafka
-    #   edx-event-bus-redis
-    #   edx-name-affirmation
-    #   event-tracking
-    #   ora2
 openedx-filters==2.0.1
     # via
     #   -r requirements/edx/base.txt
