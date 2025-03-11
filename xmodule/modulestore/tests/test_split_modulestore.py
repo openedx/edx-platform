@@ -16,7 +16,6 @@ import ddt
 from ccx_keys.locator import CCXBlockUsageLocator
 from django.core.cache import InvalidCacheBackendError, caches
 from opaque_keys.edx.locator import BlockUsageLocator, CourseKey, CourseLocator, LocalId
-from testfixtures import LogCapture
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin
@@ -842,42 +841,38 @@ class TestCourseStructureCache(CacheIsolationMixin, SplitModuleTest):
         # now make sure that you get the same structure
         assert cached_structure == not_cached_structure
 
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.monitoring.set_custom_attribute')
     @patch('django.core.cache.cache.set')
     @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
-    def test_course_structure_cache_with_data_chunk_greater_than_one_mb(self, mock_get_cache, mock_set_cache):
+    def test_course_structure_cache_with_data_chunk_greater_than_two_mb(self, mock_get_cache, mock_set_cache,
+                                                                        mock_set_custom_attribute):
         enabled_cache = caches['default']
         mock_get_cache.return_value = enabled_cache
-        mock_set_cache.side_effect = Exception
 
         course_cache = CourseStructureCache()
 
-        size = 300000000
+        size = 3000000000
         # this data_chunk will be compressed before being cached
         data_chunk = b'\x00' * size
 
-        logger_name = 'xmodule.modulestore.split_mongo.mongo_connection'
-        expected_message = 'Data caching (course structure) failed on chunk size: 1.25 MB'
-        with LogCapture(logger_name) as capture:
-            course_cache.set('my_data_chunk', data_chunk)
+        course_cache.set('my_data_chunk', data_chunk)
+        mock_set_cache.assert_not_called()
+        mock_set_custom_attribute.assert_called()
 
-        self.assertEqual(capture.records[0].name, logger_name)
-        self.assertEqual(capture.records[0].msg, expected_message)
-        self.assertEqual(capture.records[0].levelname, 'INFO')
-
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.monitoring.set_custom_attribute')
+    @patch('django.core.cache.cache.set')
     @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
-    def test_course_structure_cache_with_data_chunk_lesser_than_one_mb(self, mock_get_cache):
+    def test_course_structure_cache_with_data_chunk_lesser_than_two_mb(self, mock_get_cache, mock_set_cache,
+                                                                       mock_set_custom_attribute):
         enabled_cache = caches['default']
         mock_get_cache.return_value = enabled_cache
         course_cache = CourseStructureCache()
         size = 30000
         data_chunk = b'\x00' * size
 
-        logger_name = 'xmodule.modulestore.split_mongo.mongo_connection'
-        with LogCapture(logger_name) as capture:
-            course_cache.set('my_data_chunk', data_chunk)
-
-        # data chunk was less than 1MB so no logs were added.
-        self.assertEqual(len(capture.records), 0)
+        course_cache.set('my_data_chunk', data_chunk)
+        mock_set_cache.assert_called()
+        mock_set_custom_attribute.assert_not_called()
 
     def _get_structure(self, course):
         """
