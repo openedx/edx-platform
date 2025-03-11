@@ -53,6 +53,21 @@ https://github.com/openedx/edx-platform/issues/35653):
   /api/contentstore/v2/downstreams/<course_key>/summary
       GET: List summary of links by course key
         200: A list of summary of links by course key
+        Example:
+        [
+            {
+                "upstream_context_title": "CS problems 3",
+                "upstream_context_key": "lib:OpenedX:CSPROB3",
+                "ready_to_sync_count": 11,
+                "total_count": 14
+            },
+            {
+                "upstream_context_title": "CS problems 2",
+                "upstream_context_key": "lib:OpenedX:CSPROB2",
+                "ready_to_sync_count": 15,
+                "total_count": 24
+            },
+        ]
 
 UpstreamLink response schema:
   {
@@ -182,6 +197,21 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
     def get(self, request: _AuthenticatedRequest, course_key_string: str):
         """
         Fetches publishable entity links summary for given course key
+        Example:
+        [
+            {
+                "upstream_context_title": "CS problems 3",
+                "upstream_context_key": "lib:OpenedX:CSPROB3",
+                "ready_to_sync_count": 11,
+                "total_count": 14
+            },
+            {
+                "upstream_context_title": "CS problems 2",
+                "upstream_context_key": "lib:OpenedX:CSPROB2",
+                "ready_to_sync_count": 15,
+                "total_count": 24
+            },
+        ]
         """
         try:
             course_key = CourseKey.from_string(course_key_string)

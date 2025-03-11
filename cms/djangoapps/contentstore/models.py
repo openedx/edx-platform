@@ -237,6 +237,21 @@ class PublishableEntityLink(models.Model):
     def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
         """
         Returns a summary of links by upstream context for given downstream_context_key.
+        Example:
+        [
+            {
+                "upstream_context_title": "CS problems 3",
+                "upstream_context_key": "lib:OpenedX:CSPROB3",
+                "ready_to_sync_count": 11,
+                "total_count": 14
+            },
+            {
+                "upstream_context_title": "CS problems 2",
+                "upstream_context_key": "lib:OpenedX:CSPROB2",
+                "ready_to_sync_count": 15,
+                "total_count": 24
+            },
+        ]
         """
         result = cls.filter_links(downstream_context_key=downstream_context_key).values(
             "upstream_context_key",
