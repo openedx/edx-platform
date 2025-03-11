@@ -230,6 +230,9 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
 
 def send_braze_notification_to_mobile_users(audience_ids, notification_object):
+    """
+    Send mobile notifications using Braze api triggered campaigns.
+    """
     if notification_object.app_name != 'discussion':
         return
 
@@ -251,9 +254,9 @@ def send_braze_notification_to_mobile_users(audience_ids, notification_object):
         braze_client = get_braze_client()
         if braze_client:
             braze_client.send_campaign_message(campaign_id=campaign_id, trigger_properties=post_data, emails=emails)
-            logger.info(f'Sent mobile notification for %s with Braze', notification_type)
+            logger.info('Sent mobile notification for %s with Braze', notification_type)
     except Exception as exc:  # pylint: disable=broad-except
-        logger.error(f'Unable to send mobile notification for %s with Braze. Reason: %s', notification_type, str(exc))
+        logger.error('Unable to send mobile notification for %s with Braze. Reason: %s', notification_type, str(exc))
 
 
 def is_notification_valid(notification_type, context):
