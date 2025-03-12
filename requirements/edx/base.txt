@@ -204,6 +204,7 @@ django==4.2.19
     #   edx-ace
     #   edx-api-doc-tools
     #   edx-auth-backends
+    #   edx-braze-client
     #   edx-bulk-grades
     #   edx-celeryutils
     #   edx-completion
@@ -411,7 +412,7 @@ edx-api-doc-tools==2.0.0
     #   edx-name-affirmation
 edx-auth-backends==4.4.0
     # via -r requirements/edx/kernel.in
-edx-braze-client==0.2.5
+edx-braze-client==1.0.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-enterprise
@@ -445,6 +446,7 @@ edx-django-utils==7.2.0
     #   -r requirements/edx/kernel.in
     #   django-config-models
     #   edx-ace
+    #   edx-braze-client
     #   edx-drf-extensions
     #   edx-enterprise
     #   edx-event-bus-kafka
@@ -1055,6 +1057,7 @@ requests==2.32.3
     #   analytics-python
     #   cachecontrol
     #   django-oauth-toolkit
+    #   edx-braze-client
     #   edx-bulk-grades
     #   edx-drf-extensions
     #   edx-enterprise
