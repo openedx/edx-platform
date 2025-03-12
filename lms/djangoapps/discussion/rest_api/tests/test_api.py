@@ -897,7 +897,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
         self.get_thread_list([], course=cohort_course)
         actual_has_group = "group_id" in httpretty.last_request().querystring  # lint-amnesty, pylint: disable=no-member
-        expected_has_group = (course_is_cohorted and role_name == FORUM_ROLE_STUDENT)
+        expected_has_group = (course_is_cohorted and role_name in [FORUM_ROLE_STUDENT, FORUM_ROLE_COMMUNITY_TA])
         assert actual_has_group == expected_has_group
 
     def test_pagination(self):
