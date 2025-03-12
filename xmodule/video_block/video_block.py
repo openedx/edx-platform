@@ -481,7 +481,7 @@ class _BuiltInVideoBlock(
             'cdn_exp_group': cdn_exp_group,
             'display_name': self.display_name_with_default,
             'download_video_link': download_video_link,
-            'is_video_from_same_origin' : is_video_from_same_origin,
+            'is_video_from_same_origin': is_video_from_same_origin,
             'handout': self.handout,
             'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
