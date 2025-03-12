@@ -814,6 +814,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'edx_video_id': edx_video_id,
             'result': {
                 'download_video_link': f'http://fake-video.edx.org/{edx_video_id}.mp4',
+                'is_video_from_same_origin': True,
                 'sources': ['http://fake-video.edx.org/example.mp4', 'http://fake-video.edx.org/example.webm'] +
                            [video['url'] for video in encoded_videos],
             },
