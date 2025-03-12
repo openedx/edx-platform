@@ -887,7 +887,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
             return Response(data=error.enrollment)
         except CourseEnrollmentError:
             log.exception(
-                "An error occurred while creating the new course enrollment for user " "[%s] in course run [%s]",
+                "An error occurred while creating the new course enrollment for user [%s] in course run [%s]",
                 username,
                 course_id,
             )
