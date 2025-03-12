@@ -2,8 +2,7 @@
 Tests for course_to_library_import validators
 """
 
-from unittest import TestCase
-
+from django.test import TestCase
 import pytest
 
 from cms.djangoapps.course_to_library_import.validators import validate_course_ids
@@ -11,7 +10,11 @@ from cms.djangoapps.course_to_library_import.validators import validate_course_i
 
 class TestValidateCourseIds(TestCase):
     """
-    Tests for the validate_course_ids function.
+    Test cases for validate_course_ids function.
+
+    Case 1: Valid course ids
+    Case 2: Invalid course ids
+    Case 3: Duplicate course ids
     """
 
     def test_valid_course_ids(self):
