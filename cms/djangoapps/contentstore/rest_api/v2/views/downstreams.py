@@ -150,8 +150,8 @@ class DownstreamListPaginator(DefaultPagination):
         response = super().get_paginated_response(data)
         # replace next and previous links by next and previous page number
         response.data.update({
-            'next': self.page.next_page_number() if self.page.has_next() else None,
-            'previous': self.page.previous_page_number() if self.page.has_previous() else None,
+            'next_page_num': self.page.next_page_number() if self.page.has_next() else None,
+            'previous_page_num': self.page.previous_page_number() if self.page.has_previous() else None,
         })
         return response
 
