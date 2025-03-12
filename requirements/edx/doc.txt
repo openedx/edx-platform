@@ -10,7 +10,7 @@ accessible-pygments==0.0.5
     # via pydata-sphinx-theme
 acid-xblock==0.4.1
     # via -r requirements/edx/base.txt
-aiohappyeyeballs==2.4.6
+aiohappyeyeballs==2.5.0
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -25,10 +25,6 @@ aiosignal==1.3.2
     #   aiohttp
 alabaster==1.0.0
     # via sphinx
-algoliasearch==3.0.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
 amqp==5.3.1
     # via
     #   -r requirements/edx/base.txt
@@ -105,13 +101,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.37.5
+boto3==1.37.8
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.37.5
+botocore==1.37.8
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -226,7 +222,7 @@ defusedxml==0.7.1
     #   ora2
     #   python3-openid
     #   social-auth-core
-django==4.2.19
+django==4.2.20
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -c requirements/edx/../constraints.txt
@@ -348,7 +344,7 @@ django-ipware==7.0.1
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-django-js-asset==3.1.0
+django-js-asset==3.1.2
     # via
     #   -r requirements/edx/base.txt
     #   django-mptt
@@ -610,7 +606,7 @@ edx-search==4.1.3
     #   openedx-forum
 edx-sga==0.25.0
     # via -r requirements/edx/base.txt
-edx-submissions==3.8.5
+edx-submissions==3.8.6
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -703,7 +699,7 @@ google-api-core[grpc]==2.24.1
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-api-python-client==2.162.0
+google-api-python-client==2.163.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
@@ -742,7 +738,7 @@ google-resumable-media==2.7.2
     # via
     #   -r requirements/edx/base.txt
     #   google-cloud-storage
-googleapis-common-protos==1.69.0
+googleapis-common-protos==1.69.1
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -797,7 +793,7 @@ isodate==0.7.2
     # via
     #   -r requirements/edx/base.txt
     #   python3-saml
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -938,7 +934,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-newrelic==10.6.0
+newrelic==10.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1284,7 +1280,6 @@ regex==2024.11.6
 requests==2.32.3
     # via
     #   -r requirements/edx/base.txt
-    #   algoliasearch
     #   analytics-python
     #   cachecontrol
     #   django-oauth-toolkit
@@ -1332,7 +1327,7 @@ rules==3.5
     #   edx-enterprise
     #   edx-proctoring
     #   openedx-learning
-s3transfer==0.11.3
+s3transfer==0.11.4
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1399,7 +1394,7 @@ social-auth-app-django==5.4.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-auth-backends
-social-auth-core==4.5.4
+social-auth-core==4.5.6
     # via
     #   -r requirements/edx/base.txt
     #   edx-auth-backends

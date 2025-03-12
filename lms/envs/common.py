@@ -1624,6 +1624,7 @@ OPTIMIZELY_FULLSTACK_SDK_KEY = None
 ######################## HOTJAR ###########################
 HOTJAR_SITE_ID = 00000
 
+## TODO: remove algolia refs
 ######################## ALGOLIA SEARCH ###########################
 ALGOLIA_APP_ID = None
 ALGOLIA_SEARCH_API_KEY = None
