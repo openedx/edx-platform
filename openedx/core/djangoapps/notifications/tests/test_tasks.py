@@ -16,7 +16,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFICATION_GROUPING
+from ..config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFICATION_GROUPING, ENABLE_PUSH_NOTIFICATIONS
 from ..models import CourseNotificationPreference, Notification, NotificationBrazeCampaigns
 from ..tasks import (
     create_notification_pref_if_not_exists,
@@ -119,6 +119,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
         )
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     @ddt.data(
         ('discussion', 'new_comment_on_response'),  # core notification
         ('discussion', 'new_response'),  # non core notification
@@ -171,6 +172,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
         self.assertEqual(len(Notification.objects.all()), created_notifications_count)
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     def test_notification_not_send_with_preference_disabled(self):
         """
         Tests notification not send if preference is disabled
@@ -195,6 +197,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
 
     @override_waffle_flag(ENABLE_NOTIFICATION_GROUPING, True)
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     def test_send_notification_with_grouping_enabled(self):
         """
         Test send_notifications with grouping enabled.
@@ -231,6 +234,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
             user_notifications_mock.assert_called_once()
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     @ddt.data(
         ('discussion', 'new_comment_on_response'),  # core notification
         ('discussion', 'new_response'),  # non core notification
@@ -257,6 +261,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
         self.assertIsNone(notification)
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     def test_notification_not_created_when_context_is_incomplete(self):
         try:
             send_notifications([self.user.id], str(self.course_1.id), "discussion", "new_comment", {}, "")
@@ -294,9 +299,10 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         return users
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     @ddt.data(
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 10, 5),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 12, 8),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 10, 6),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 12, 9),
         (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 10, 5),
     )
     @ddt.unpack
@@ -326,6 +332,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         for preference in preferences:
             discussion_config = preference.notification_preference_config['discussion']
             discussion_config['notification_types'][notification_type]['web'] = True
+            discussion_config['notification_types'][notification_type]['push'] = True
             preference.save()
 
         # Creating notifications and asserting query count
@@ -347,7 +354,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "username": "Test Author"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(10):
+            with self.assertNumQueries(11):
                 send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                    context, "http://test.url")
 
@@ -366,9 +373,10 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "replier_name": "Replier Name"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(13):
-                send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
-                                   context, "http://test.url")
+            with override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True):
+                with self.assertNumQueries(13):
+                    send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
+                                       context, "http://test.url")
 
     def _update_user_preference(self, user_id, pref_exists):
         """
@@ -380,6 +388,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             CourseNotificationPreference.objects.filter(user_id=user_id, course_id=self.course.id).delete()
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     @ddt.data(
         ("new_response", True, True, 2),
         ("new_response", False, False, 2),
@@ -411,6 +420,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         self.assertEqual(len(Notification.objects.all()), generated_count)
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     @patch('openedx.core.djangoapps.notifications.tasks.get_braze_client')
     def test_mobile_notification_send(self, mock_braze_client):
         mock_braze_client = mock_braze_client.return_value
@@ -452,6 +462,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             )
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True)
     @patch('openedx.core.djangoapps.notifications.tasks.get_braze_client')
     def test_mobile_notification_braze_error(self, mock_braze_client):
         mock_braze_client = mock_braze_client.return_value
