@@ -780,7 +780,7 @@ edx-name-affirmation==3.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-opaque-keys[django]==2.11.0
+edx-opaque-keys[django] @ git+https://github.com/open-craft/opaque-keys.git@chris/FAL-4108-create-container-keys
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
