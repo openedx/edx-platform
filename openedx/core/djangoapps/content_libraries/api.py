@@ -120,6 +120,9 @@ from . import permissions, tasks
 from .constants import ALL_RIGHTS_RESERVED
 from .models import ContentLibrary, ContentLibraryPermission, ContentLibraryBlockImportTask
 
+# Import Units API Module for use when importing the content_libraries API module
+from .units.api import *
+
 log = logging.getLogger(__name__)
 
 

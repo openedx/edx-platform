@@ -11,6 +11,9 @@ CC_4_BY_NC_SA = 'CC:4.0:BY:NC:SA'
 CC_4_BY_ND = 'CC:4.0:BY:ND'
 CC_4_BY_SA = 'CC:4.0:BY:SA'
 
+# Container types
+CONTAINER_UNIT_TYPE = 'unit'
+
 LICENSE_OPTIONS = (
     (ALL_RIGHTS_RESERVED, _('All Rights Reserved.')),
     (CC_4_BY, _('Creative Commons Attribution 4.0')),
