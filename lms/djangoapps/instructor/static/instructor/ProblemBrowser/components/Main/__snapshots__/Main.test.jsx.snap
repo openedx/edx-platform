@@ -1,5 +1,77 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ProblemBrowser Main component Initial rendering should match snapshot with basic parameters 1`] = `
+<div>
+  <div
+    class="problem-browser-container"
+  >
+    <div
+      class="problem-browser"
+    >
+      <button
+        class="btn"
+        type="button"
+      >
+        Select a section or problem
+      </button>
+      <input
+        disabled=""
+        name="problem-location"
+        type="text"
+        value=""
+      />
+      <button
+        class="btn"
+        name="list-problem-responses-csv"
+        type="button"
+      >
+        Create a report of problem responses
+      </button>
+      <div
+        aria-live="polite"
+        class="report-generation-status"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`ProblemBrowser Main component Initial rendering should match snapshot with selected block 1`] = `
+<div>
+  <div
+    class="problem-browser-container"
+  >
+    <div
+      class="problem-browser"
+    >
+      <button
+        class="btn"
+        type="button"
+      >
+        Select a section or problem
+      </button>
+      <input
+        disabled=""
+        name="problem-location"
+        type="text"
+        value="some-selected-block"
+      />
+      <button
+        class="btn"
+        name="list-problem-responses-csv"
+        type="button"
+      >
+        Create a report of problem responses
+      </button>
+      <div
+        aria-live="polite"
+        class="report-generation-status"
+      />
+    </div>
+  </div>
+</div>
+`;
+
 exports[`ProblemBrowser Main component render with basic parameters 1`] = `
 <div
   className="problem-browser-container"
