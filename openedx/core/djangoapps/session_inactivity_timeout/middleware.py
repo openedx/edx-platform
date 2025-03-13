@@ -9,7 +9,7 @@ To enable this feature, set in a settings.py:
 This was taken from StackOverflow (http://stackoverflow.com/questions/14830669/how-to-expire-django-session-in-5minutes)
 
 If left unset, session expiration will be handled by Django's SESSION_COOKIE_AGE,
-which defauts to 1209600 (2 weeks, in seconds).
+which defaults to 1209600 (2 weeks, in seconds).
 """
 
 
