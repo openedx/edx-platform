@@ -482,7 +482,7 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 # COMPREHENSIVE_THEME_DIRS = [
 #     "/edx/app/edxapp/edx-platform/themes/"
 # ]
-# TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
+# TEMPLATES[1]["DIRS"] = Derived(_make_mako_template_dirs)
 # derive_settings(__name__)
 
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.
