@@ -27,8 +27,6 @@ ADMIN_PORTAL_MICROFRONTEND_URL: https://admin-portal-deploy_host
 AFFILIATE_COOKIE_NAME: sandbox.edx.affiliate_id
 AI_TRANSLATIONS_API_URL: https://ai-translations.localhost/api/v1
 AI_TRANSLATIONS_URL_ROOT: https://ai-translations.localhost
-ALGOLIA_APP_ID: hello
-ALGOLIA_SEARCH_API_KEY: '[encrypted]'
 ALLOWED_HOSTS:
 - hello
 ALLOW_ORPHANED_CONTENT_REMOVAL: true

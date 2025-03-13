@@ -10,9 +10,9 @@ attrs==25.1.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.37.5
+boto3==1.37.8
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.37.5
+botocore==1.37.8
     # via
     #   boto3
     #   s3transfer
@@ -35,7 +35,7 @@ click==8.1.6
     #   edx-django-utils
 cryptography==44.0.2
     # via pyjwt
-django==4.2.19
+django==4.2.20
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
@@ -52,7 +52,7 @@ edx-rest-api-client==6.1.0
     # via -r scripts/user_retirement/requirements/base.in
 google-api-core==2.24.1
     # via google-api-python-client
-google-api-python-client==2.162.0
+google-api-python-client==2.163.0
     # via -r scripts/user_retirement/requirements/base.in
 google-auth==2.38.0
     # via
@@ -61,7 +61,7 @@ google-auth==2.38.0
     #   google-auth-httplib2
 google-auth-httplib2==0.2.0
     # via google-api-python-client
-googleapis-common-protos==1.69.0
+googleapis-common-protos==1.69.1
     # via google-api-core
 httplib2==0.22.0
     # via
@@ -81,7 +81,7 @@ lxml==5.3.1
     # via zeep
 more-itertools==10.6.0
     # via simple-salesforce
-newrelic==10.6.0
+newrelic==10.7.0
     # via edx-django-utils
 pbr==6.1.1
     # via stevedore
@@ -136,7 +136,7 @@ requests-toolbelt==1.0.0
     # via zeep
 rsa==4.9
     # via google-auth
-s3transfer==0.11.3
+s3transfer==0.11.4
     # via boto3
 simple-salesforce==1.12.6
     # via -r scripts/user_retirement/requirements/base.in
