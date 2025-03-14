@@ -19,7 +19,7 @@ from openedx.core.djangoapps.content_libraries.models import (
     ContentLibrary
 )
 from openedx.core.lib.api.serializers import CourseKeyField
-from . import permissions
+from .. import permissions
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
