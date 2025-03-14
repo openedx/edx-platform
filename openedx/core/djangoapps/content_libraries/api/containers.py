@@ -22,6 +22,7 @@ from .libraries import PublishableItem
 # The public API is only the following symbols:
 __all__ = [
     "ContainerMetadata",
+    "get_container",
     "create_container",
 ]
 
@@ -76,6 +77,26 @@ class ContainerMetadata(PublishableItem):
             has_unpublished_changes=authoring_api.contains_unpublished_changes(container.pk),
             collections=associated_collections or [],
         )
+
+
+def get_container(container_key: LibraryContainerLocator) -> ContainerMetadata:
+    """
+    Get a container (a Section, Subsection, or Unit).
+    """
+    assert isinstance(container_key, LibraryContainerLocator)
+    content_library = ContentLibrary.objects.get_by_key(container_key.library_key)
+    learning_package = content_library.learning_package
+    assert learning_package is not None
+    # FIXME: we need an API to get container by key, without needing to get the publishable entity ID first
+    container_pe = authoring_api.get_publishable_entity_by_key(
+        learning_package,
+        key=container_key.container_id,
+    )
+    container = authoring_api.get_container(container_pe.id)
+    # ^ Should be just authoring_api.get_container_by_key(learning_package.id, container_key.container_id)
+    container_meta = ContainerMetadata.from_container(container_key.library_key, container)
+    assert container_meta.container_type.value == container_key.container_type
+    return container_meta
 
 
 def create_container(

@@ -2,16 +2,20 @@
 URL configuration for Studio's Content Libraries REST API
 """
 
-from django.urls import include, path, re_path
+from django.urls import include, path, re_path, register_converter
 
 from rest_framework import routers
 
-from .rest_api import blocks, collections, containers, libraries
+from .rest_api import blocks, collections, containers, libraries, url_converters
 
 
 # Django application name.
 
 app_name = 'openedx.core.djangoapps.content_libraries'
+
+# URL converters
+
+register_converter(url_converters.LibraryContainerLocatorConverter, "lib_container_key")
 
 # Router for importing blocks from courseware.
 
@@ -73,9 +77,9 @@ urlpatterns = [
             # Future: discard changes for just this one block
         ])),
         # Containers are Sections, Subsections, and Units
-        path('containers/<usage_v2:container_key>/', include([
+        path('containers/<lib_container_key:container_key>/', include([
             # Get metadata about a specific container in this library, or delete the container:
-            # path('', views.LibraryContainerView.as_view()),
+            path('', containers.LibraryContainerView.as_view()),
             # Update collections for a given container
             # path('collections/', views.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),
             # path('publish/', views.LibraryContainerPublishView.as_view()),

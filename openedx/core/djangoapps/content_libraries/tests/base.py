@@ -32,6 +32,7 @@ URL_LIB_BLOCK_PUBLISH = URL_LIB_BLOCK + 'publish/'  # Publish changes from a spe
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
+URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
 
 URL_LIB_LTI_PREFIX = URL_PREFIX + 'lti/1.3/'
 URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
@@ -359,3 +360,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             "slug": slug,
             "display_name": display_name,
         }, expect_response)
+
+    def _get_container(self, container_key: str, expect_response=200):
+        """ Get a container (unit etc.) """
+        return self._api('get', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)

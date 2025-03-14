@@ -59,4 +59,9 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
 
         self.assertDictContainsEntries(container_data, expected_data)
 
+        # Fetch the unit:
+        unit_as_read = self._get_container(container_data["container_key"])
+        # make sure it contains the same data when we read it back:
+        self.assertDictContainsEntries(unit_as_read, expected_data)
+
     # TODO: test that a regular user with read-only permissions on the library cannot create units

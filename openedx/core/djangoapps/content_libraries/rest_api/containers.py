@@ -11,7 +11,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
@@ -55,4 +55,29 @@ class LibraryContainersView(GenericAPIView):
             user_id=request.user.id,
         )
 
+        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryContainerView(GenericAPIView):
+    """
+    View to get data about a specific container (a section, subsection, or unit)
+    """
+    serializer_class = serializers.LibraryContainerMetadataSerializer
+
+    @convert_exceptions
+    @swagger_auto_schema(
+        responses={200: serializers.LibraryContainerMetadataSerializer}
+    )
+    def get(self, request, container_key: LibraryContainerLocator):
+        """
+        Get information about a container
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+        )
+        container = api.get_container(container_key)
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)
