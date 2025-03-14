@@ -1,6 +1,7 @@
 """
 Tests for the Studio content search documents (what gets stored in the index)
 """
+from dataclasses import replace
 from datetime import datetime, timezone
 from organizations.models import Organization
 
@@ -427,17 +428,15 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         }
 
         # Verify publish status is set to modified
-        old_modified = self.library_block.modified
-        old_published = self.library_block.last_published
-        self.library_block.modified = datetime(2024, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        self.library_block.last_published = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        doc = searchable_doc_for_library_block(self.library_block)
-        doc.update(searchable_doc_tags(self.library_block.usage_key))
-        doc.update(searchable_doc_collections(self.library_block.usage_key))
+        library_block_modified = replace(
+            self.library_block,
+            modified=datetime(2024, 4, 5, 6, 7, 8, tzinfo=timezone.utc),
+            last_published=datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc),
+        )
+        doc = searchable_doc_for_library_block(library_block_modified)
+        doc.update(searchable_doc_tags(library_block_modified.usage_key))
+        doc.update(searchable_doc_collections(library_block_modified.usage_key))
         assert doc["publish_status"] == "modified"
-
-        self.library_block.modified = old_modified
-        self.library_block.last_published = old_published
 
     def test_collection_with_library(self):
         doc = searchable_doc_for_collection(self.library.key, self.collection.key)
