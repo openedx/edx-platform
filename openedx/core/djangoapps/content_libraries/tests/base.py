@@ -22,6 +22,7 @@ URL_LIB_BLOCK_TYPES = URL_LIB_DETAIL + 'block_types/'  # Get the list of XBlock 
 URL_LIB_LINKS = URL_LIB_DETAIL + 'links/'  # Get the list of links in this library, or add a new one
 URL_LIB_COMMIT = URL_LIB_DETAIL + 'commit/'  # Commit (POST) or revert (DELETE) all pending changes to this library
 URL_LIB_BLOCKS = URL_LIB_DETAIL + 'blocks/'  # Get the list of XBlocks in this library, or add a new one
+URL_LIB_CONTAINERS = URL_LIB_DETAIL + 'containers/'  # Create a new container in this library
 URL_LIB_TEAM = URL_LIB_DETAIL + 'team/'  # Get the list of users/groups authorized to use this library
 URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{username}/'  # Add/edit/remove a user's permission to use this library
 URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
@@ -350,3 +351,11 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
     def _set_library_block_fields(self, block_key, new_fields, expect_response=200):
         """ Set the fields of a specific block in the library. This API is only used by the MFE editors. """
         return self._api('post', URL_BLOCK_FIELDS_URL.format(block_key=block_key), new_fields, expect_response)
+
+    def _create_container(self, lib_key, container_type, slug: str | None, display_name: str, expect_response=200):
+        """ Create a container (unit etc.) """
+        return self._api('post', URL_LIB_CONTAINERS.format(lib_key=lib_key), {
+            "container_type": container_type,
+            "slug": slug,
+            "display_name": display_name,
+        }, expect_response)

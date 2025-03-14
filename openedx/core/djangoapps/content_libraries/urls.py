@@ -6,7 +6,7 @@ from django.urls import include, path, re_path
 
 from rest_framework import routers
 
-from .rest_api import blocks, collections, libraries
+from .rest_api import blocks, collections, containers, libraries
 
 
 # Django application name.
@@ -38,6 +38,8 @@ urlpatterns = [
             path('block_types/', libraries.LibraryBlockTypesView.as_view()),
             # Get the list of XBlocks in this library, or add a new one:
             path('blocks/', blocks.LibraryBlocksView.as_view()),
+            # Add a new container (unit etc.) to this library:
+            path('containers/', containers.LibraryContainersView.as_view()),
             # Publish (POST) or revert (DELETE) all pending changes to this library:
             path('commit/', libraries.LibraryCommitView.as_view()),
             # Get the list of users/groups who have permission to view/edit/administer this library:
@@ -69,6 +71,14 @@ urlpatterns = [
             path('assets/<path:file_path>', blocks.LibraryBlockAssetView.as_view()),
             path('publish/', blocks.LibraryBlockPublishView.as_view()),
             # Future: discard changes for just this one block
+        ])),
+        # Containers are Sections, Subsections, and Units
+        path('containers/<usage_v2:container_key>/', include([
+            # Get metadata about a specific container in this library, or delete the container:
+            # path('', views.LibraryContainerView.as_view()),
+            # Update collections for a given container
+            # path('collections/', views.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),
+            # path('publish/', views.LibraryContainerPublishView.as_view()),
         ])),
         re_path(r'^lti/1.3/', include([
             path('login/', libraries.LtiToolLoginView.as_view(), name='lti-login'),

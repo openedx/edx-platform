@@ -277,24 +277,39 @@ class CollectionMetadata:
 
 
 @dataclass(frozen=True)
-class LibraryXBlockMetadata:
+class LibraryItem:
     """
-    Class that represents the metadata about an XBlock in a content library.
+    Common fields for anything that can be found in a content library.
     """
-    usage_key: LibraryUsageLocatorV2
     created: datetime
     modified: datetime
+    display_name: str
+
+
+@dataclass(frozen=True, kw_only=True)
+class PublishableItem(LibraryItem):
+    """
+    Common fields for anything that can be found in a content library that has
+    draft/publish support.
+    """
     draft_version_num: int
     published_version_num: int | None = None
-    display_name: str = ""
     last_published: datetime | None = None
-    # THe username of the user who last published this.
+    # The username of the user who last published this.
     published_by: str = ""
     last_draft_created: datetime | None = None
     # The username of the user who created the last draft.
     last_draft_created_by: str = ""
     has_unpublished_changes: bool = False
     collections: list[CollectionMetadata] = field(default_factory=list)
+
+
+@dataclass(frozen=True, kw_only=True)
+class LibraryXBlockMetadata(PublishableItem):
+    """
+    Class that represents the metadata about an XBlock in a content library.
+    """
+    usage_key: LibraryUsageLocatorV2
 
     @classmethod
     def from_component(cls, library_key, component, associated_collections=None):
