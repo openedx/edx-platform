@@ -355,11 +355,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
 
     def _create_container(self, lib_key, container_type, slug: str | None, display_name: str, expect_response=200):
         """ Create a container (unit etc.) """
-        return self._api('post', URL_LIB_CONTAINERS.format(lib_key=lib_key), {
-            "container_type": container_type,
-            "slug": slug,
-            "display_name": display_name,
-        }, expect_response)
+        data = {"container_type": container_type, "display_name": display_name}
+        if slug:
+            data["slug"] = slug
+        return self._api('post', URL_LIB_CONTAINERS.format(lib_key=lib_key), data, expect_response)
 
     def _get_container(self, container_key: str, expect_response=200):
         """ Get a container (unit etc.) """

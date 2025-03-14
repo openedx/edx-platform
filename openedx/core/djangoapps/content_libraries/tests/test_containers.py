@@ -65,3 +65,18 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         self.assertDictContainsEntries(unit_as_read, expected_data)
 
     # TODO: test that a regular user with read-only permissions on the library cannot create units
+
+    def test_unit_gets_auto_slugs(self):
+        """
+        Test that we can create units by specifying only a title, and they get
+        unique slugs assigned automatically.
+        """
+        lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+
+        # Create two units, specifying their titles but not their slugs/keys:
+        container1_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
+        container2_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
+        # Notice the container IDs below are slugified from the title: "alpha-bravo-NNNNN"
+        assert container1_data["container_key"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
+        assert container2_data["container_key"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
+        assert container1_data["container_key"] != container2_data["container_key"]

@@ -252,7 +252,7 @@ class LibraryContainerMetadataSerializer(serializers.Serializer):
 
     # When creating a new container in a library, the slug becomes the ID part of
     # the definition key and usage key:
-    slug = serializers.CharField(write_only=True)
+    slug = serializers.CharField(write_only=True, required=False)
 
     def to_representation(self, instance: ContainerMetadata):
         """ Convert to JSON-serializable data types """
