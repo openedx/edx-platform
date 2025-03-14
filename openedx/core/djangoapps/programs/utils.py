@@ -66,7 +66,11 @@ def get_program_urls(program_data):
     from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
 
     program_uuid = program_data.get("uuid")
+    print("----------------------------------------------------------------")
+    print(program_data.get("skus"))
     skus = program_data.get("skus")
+    print(program_data.get("course_run_keys"))
+    course_run_keys = program_data.get("course_run_keys")
     ecommerce_service = EcommerceService()
 
     # TODO: Don't have business logic of course-certificate==record-available here in LMS.
@@ -78,9 +82,10 @@ def get_program_urls(program_data):
         "program_listing_url": reverse("program_listing_view"),
         "track_selection_url": strip_course_id(reverse("course_modes_choose", kwargs={"course_id": FAKE_COURSE_KEY})),
         "commerce_api_url": reverse("commerce_api:v0:baskets:create"),
-        "buy_button_url": ecommerce_service.get_checkout_page_url(*skus),
+        "buy_button_url": ecommerce_service.get_checkout_page_url(*skus, course_run_keys=course_run_keys),
         "program_record_url": program_record_url,
     }
+    print(ecommerce_service.get_checkout_page_url(*skus, course_run_keys=course_run_keys))
     return urls
 
 
@@ -703,6 +708,7 @@ class ProgramDataExtender:
         is_learner_eligible_for_one_click_purchase = self.data["is_program_eligible_for_one_click_purchase"]
         bundle_uuid = self.data.get("uuid")
         skus = []
+        course_run_keys = []
         bundle_variant = "full"
 
         if is_learner_eligible_for_one_click_purchase:  # lint-amnesty, pylint: disable=too-many-nested-blocks
@@ -720,6 +726,11 @@ class ProgramDataExtender:
                     # We add the first entitlement product found with an applicable seat type because, at this time,
                     # we are assuming that, for any given course, there is at most one paid entitlement available.
                     if entitlement["mode"] in applicable_seat_types:
+                        course_runs = course.get("course_runs", [])
+                        print(course_runs)
+                        published_course_runs = [run for run in course_runs if run["status"] == "published"]
+                        if len(published_course_runs) == 1:
+                            course_run_keys.append(published_course_runs[0]['key'])
                         skus.append(entitlement["sku"])
                         entitlement_product = True
                         break
@@ -730,6 +741,7 @@ class ProgramDataExtender:
                         for seat in published_course_runs[0]["seats"]:
                             if seat["type"] in applicable_seat_types and seat["sku"]:
                                 skus.append(seat["sku"])
+                                course_run_keys.append(published_course_runs[0]['key'])
                                 break
                     else:
                         # If a course in the program has more than 1 published course run
@@ -788,6 +800,7 @@ class ProgramDataExtender:
             {
                 "is_learner_eligible_for_one_click_purchase": is_learner_eligible_for_one_click_purchase,
                 "skus": skus,
+                "course_run_keys": course_run_keys,
             }
         )
 
