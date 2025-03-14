@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import contextlib
 import logging
+from typing import ClassVar
 import uuid
 
 from django.contrib.auth import get_user_model
@@ -67,11 +68,11 @@ log = logging.getLogger(__name__)
 User = get_user_model()
 
 
-class ContentLibraryManager(models.Manager):
+class ContentLibraryManager(models.Manager["ContentLibrary"]):
     """
     Custom manager for ContentLibrary class.
     """
-    def get_by_key(self, library_key):
+    def get_by_key(self, library_key) -> "ContentLibrary":
         """
         Get the ContentLibrary for the given LibraryLocatorV2 key.
         """
@@ -92,7 +93,7 @@ class ContentLibrary(models.Model):
 
     .. no_pii:
     """
-    objects: ContentLibraryManager[ContentLibrary] = ContentLibraryManager()
+    objects: ClassVar[ContentLibraryManager] = ContentLibraryManager()
 
     id = models.AutoField(primary_key=True)
     # Every Library is uniquely and permanently identified by an 'org' and a

@@ -1,7 +1,6 @@
 """
 Collections API Views
 """
-
 from __future__ import annotations
 
 from django.db.models import QuerySet
@@ -17,10 +16,10 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
 
-from openedx.core.djangoapps.content_libraries import api, permissions
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary
-from openedx.core.djangoapps.content_libraries.views import convert_exceptions
-from openedx.core.djangoapps.content_libraries.serializers import (
+from .. import api, permissions
+from ..models import ContentLibrary
+from .utils import convert_exceptions
+from .serializers import (
     ContentLibraryCollectionSerializer,
     ContentLibraryCollectionComponentsUpdateSerializer,
     ContentLibraryCollectionUpdateSerializer,
