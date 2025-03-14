@@ -731,6 +731,7 @@ class CourseImportManager(ImportManager):
         Trigger celery task to create upstream links for newly imported blocks.
         """
         # .. event_implemented_name: COURSE_IMPORT_COMPLETED
+        # .. event_type: org.openedx.content_authoring.course.import.completed.v1
         COURSE_IMPORT_COMPLETED.send_event(
             time=datetime.now(timezone.utc),
             course=CourseData(

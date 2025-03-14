@@ -41,6 +41,7 @@ def emit_idv_attempt_created_event(attempt_id, user, status, name, expiration_da
     user_data = _create_user_data(user)
 
     # .. event_implemented_name: IDV_ATTEMPT_CREATED
+    # .. event_type: org.openedx.learning.idv_attempt.created.v1
     IDV_ATTEMPT_CREATED.send_event(
         idv_attempt=VerificationAttemptData(
             attempt_id=attempt_id,
@@ -60,6 +61,7 @@ def emit_idv_attempt_pending_event(attempt_id, user, status, name, expiration_da
     user_data = _create_user_data(user)
 
     # .. event_implemented_name: IDV_ATTEMPT_PENDING
+    # .. event_type: org.openedx.learning.idv_attempt.pending.v1
     IDV_ATTEMPT_PENDING.send_event(
         idv_attempt=VerificationAttemptData(
             attempt_id=attempt_id,
@@ -79,6 +81,7 @@ def emit_idv_attempt_approved_event(attempt_id, user, status, name, expiration_d
     user_data = _create_user_data(user)
 
     # .. event_implemented_name: IDV_ATTEMPT_APPROVED
+    # .. event_type: org.openedx.learning.idv_attempt.approved.v1
     IDV_ATTEMPT_APPROVED.send_event(
         idv_attempt=VerificationAttemptData(
             attempt_id=attempt_id,
@@ -98,6 +101,7 @@ def emit_idv_attempt_denied_event(attempt_id, user, status, name, expiration_dat
     user_data = _create_user_data(user)
 
     # .. event_implemented_name: IDV_ATTEMPT_DENIED
+    # .. event_type: org.openedx.learning.idv_attempt.denied.v1
     IDV_ATTEMPT_DENIED.send_event(
         idv_attempt=VerificationAttemptData(
             attempt_id=attempt_id,
