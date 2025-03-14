@@ -482,7 +482,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
 
             # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
             library = lib_api.get_library(lib_key)
-            collections = authoring_api.get_collections(library.learning_package.id, enabled=True)
+            collections = authoring_api.get_collections(library.learning_package_id, enabled=True)
             num_collections = collections.count()
             num_collections_done = 0
             status_cb(f"{num_collections_done + 1}/{num_collections}. Now indexing collections in library {lib_key}")
@@ -711,7 +711,7 @@ def update_library_components_collections(
     Because there may be a lot of components, we send these updates to Meilisearch in batches.
     """
     library = lib_api.get_library(library_key)
-    components = authoring_api.get_collection_components(library.learning_package.id, collection_key)
+    components = authoring_api.get_collection_components(library.learning_package_id, collection_key)
 
     paginator = Paginator(components, batch_size)
     for page in paginator.page_range:
