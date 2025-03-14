@@ -15,7 +15,11 @@ edx-platform, to be replaced by MFEs.
 Additionally, as of March 2025, edx-platform had more than 700 violations in
 ESLint.
 
-Details of the replacement MFEs are noted in the `MFE Rewrite Tracker`_.
+For more details on the MFE replacement, see:
+
+- Top-level issue for edx-platform: https://github.com/openedx/edx-platform/issues/31620
+- The parent issue of the above issue, which includes IDA frontends: https://github.com/openedx/wg-frontend/issues/156
+- Details of the replacement MFEs are noted in the `MFE Rewrite Tracker`_.
 
 .. _MFE Rewrite Tracker: https://openedx.atlassian.net/wiki/spaces/COMM/pages/4262363137/MFE+Rewrite+Tracker
 
