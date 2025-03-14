@@ -4,16 +4,21 @@
 import datetime
 import textwrap
 import unittest
+from django.conf import settings
 from unittest.mock import Mock
 
 from pytz import UTC
 from xblock.field_data import DictFieldData
 
-from xmodule.lti_2_util import LTIError
 from xmodule.lti_block import LTIBlock
 from xmodule.tests.helpers import StubUserService
 
 from . import get_test_system
+
+if settings.USE_EXTRACTED_LTI_BLOCK:
+    from xblocks_contrib.lti.lti_2_util import LTIError
+else:
+    from xmodule.lti_2_util import LTIError
 
 
 class LTI20RESTResultServiceTest(unittest.TestCase):
