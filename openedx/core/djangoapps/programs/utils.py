@@ -43,6 +43,8 @@ from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
+from edx_django_utils.plugins import pluggable_override
+
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
@@ -691,6 +693,7 @@ class ProgramDataExtender:
 
         return courses_without_enrollments
 
+    @pluggable_override('OVERRIDE_COLLECT_ONE_CLICK_PURCHASE_ELIGIBILITY')
     def _collect_one_click_purchase_eligibility_data(self):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Extend the program data with data about learner's eligibility for one click purchase,
