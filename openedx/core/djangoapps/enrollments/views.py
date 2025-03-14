@@ -1017,7 +1017,7 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         emails = form.cleaned_data.get("email")
 
         if course_id:
-            queryset = queryset.filter(course_id=course_id)
+            queryset = queryset.filter(course__id=course_id)
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
         if emails:
