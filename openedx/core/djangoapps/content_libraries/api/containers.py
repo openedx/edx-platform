@@ -22,8 +22,10 @@ from .libraries import PublishableItem
 # The public API is only the following symbols:
 __all__ = [
     "ContainerMetadata",
+    "ContainerType",
     "get_container",
     "create_container",
+    "get_container_children",
 ]
 
 
@@ -34,7 +36,7 @@ class ContainerType(Enum):
 @dataclass(frozen=True, kw_only=True)
 class ContainerMetadata(PublishableItem):
     """
-    Class that represents the metadata about an XBlock in a content library.
+    Class that represents the metadata about a Container (e.g. Unit) in a content library.
     """
     container_key: LibraryContainerLocator
     container_type: ContainerType
@@ -49,14 +51,17 @@ class ContainerMetadata(PublishableItem):
         assert container.unit is not None
         container_type = ContainerType.Unit
 
-        published_by = None
+        published_by = ""
         if last_publish_log and last_publish_log.published_by:
             published_by = last_publish_log.published_by.username
 
         draft = container.versioning.draft
         published = container.versioning.published
         last_draft_created = draft.created if draft else None
-        last_draft_created_by = draft.publishable_entity_version.created_by.username if draft else ""
+        if draft and draft.publishable_entity_version.created_by:
+            last_draft_created_by = draft.publishable_entity_version.created_by.username
+        else:
+            last_draft_created_by = ""
 
         return cls(
             container_key=LibraryContainerLocator(
@@ -71,7 +76,7 @@ class ContainerMetadata(PublishableItem):
             draft_version_num=draft.version_num,
             published_version_num=published.version_num if published else None,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
-            published_by=published_by or "",
+            published_by=published_by,
             last_draft_created=last_draft_created,
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=authoring_api.contains_unpublished_changes(container.pk),
@@ -132,3 +137,25 @@ def create_container(
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
     return ContainerMetadata.from_container(library_key, container)
+
+
+def get_container_children(
+    container_key: LibraryContainerLocator,
+    published=False,
+) -> list[authoring_api.ContainerEntityListEntry]:
+    """
+    Get the entities contained in the given container (e.g. the components/xblocks in a unit)
+    """
+    assert isinstance(container_key, LibraryContainerLocator)
+    content_library = ContentLibrary.objects.get_by_key(container_key.library_key)
+    learning_package = content_library.learning_package
+    assert learning_package is not None
+    # FIXME: we need an API to get container by key, without needing to get the publishable entity ID first
+    container_pe = authoring_api.get_publishable_entity_by_key(
+        learning_package,
+        key=container_key.container_id,
+    )
+    assert container_pe.container is not None
+    child_entities = authoring_api.get_entities_in_container(container_pe.container, published=published)
+    # TODO: convert the return type to list[ContainerMetadata | LibraryXBlockMetadata] ?
+    return child_entities

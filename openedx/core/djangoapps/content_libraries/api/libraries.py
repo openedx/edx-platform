@@ -97,6 +97,7 @@ from openedx_events.content_authoring.signals import (
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
     Collection,
+    Container,
     Component,
     ComponentVersion,
     MediaType,
@@ -127,6 +128,7 @@ __all__ = [
     # Exceptions - maybe move them to a new file?
     "ContentLibraryNotFound",
     "ContentLibraryCollectionNotFound",
+    "ContentLibraryContainerNotFound",
     "ContentLibraryBlockNotFound",
     "LibraryAlreadyExists",
     "LibraryCollectionAlreadyExists",
@@ -179,6 +181,7 @@ ContentLibraryNotFound = ContentLibrary.DoesNotExist
 
 ContentLibraryCollectionNotFound = Collection.DoesNotExist
 
+ContentLibraryContainerNotFound = Container.DoesNotExist
 
 class ContentLibraryBlockNotFound(XBlockNotFoundError):
     """ XBlock not found in the content library """

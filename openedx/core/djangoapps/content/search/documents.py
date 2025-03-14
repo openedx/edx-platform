@@ -10,7 +10,7 @@ from django.utils.text import slugify
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
 from openedx_learning.api import authoring as authoring_api
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
 from rest_framework.exceptions import NotFound
 
 from openedx.core.djangoapps.content.search.models import SearchAccess
@@ -100,6 +100,7 @@ class DocType:
     """
     course_block = "course_block"
     library_block = "library_block"
+    library_container = "library_container"
     collection = "collection"
 
 
@@ -544,5 +545,58 @@ def searchable_doc_for_collection(
         # so we mark them as _disabled
         if not collection.enabled:
             doc['_disabled'] = True
+
+    return doc
+
+
+def searchable_doc_for_container(
+    container_key: LibraryContainerLocator,
+) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, so that the given collection can be
+    found using faceted search.
+
+    If no container is found for the given container key, the returned document
+    will contain only basic information derived from the container key, and no
+    Fields.type value will be included in the returned dict.
+    """
+    doc = {
+        Fields.id: meili_id_from_opaque_key(container_key),
+        Fields.context_key: str(container_key.library_key),
+        Fields.org: str(container_key.library_key.org),
+        # In the future, this may be either course_container or library_container
+        Fields.type: DocType.library_container,
+        Fields.usage_key: str(container_key),  # Field name isn't exact but this is the closest match
+        Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
+        Fields.access_id: _meili_access_id_from_context_key(container_key.library_key),
+    }
+
+    try:
+        container = lib_api.get_container(container_key)
+    except lib_api.ContentLibraryCollectionNotFound:
+        # Container not found, so we can only return the base doc
+        pass
+
+    if container:
+        # TODO: check if there's a more efficient way to load these num_children counts?
+        draft_num_children = len(lib_api.get_container_children(container_key, published=False))
+
+        doc.update({
+            Fields.display_name: container.display_name,
+            Fields.created: container.created.timestamp(),
+            Fields.modified: container.modified.timestamp(),
+            Fields.num_children: draft_num_children,
+        })
+        library = lib_api.get_library(container_key.library_key)
+        if library:
+            doc[Fields.breadcrumbs] = [{"display_name": library.title}]
+
+        if container.published_version_num is not None:
+            published_num_children = len(lib_api.get_container_children(container_key, published=True))
+            doc[Fields.published] = {
+                # Fields.published_display_name: container_published.title, TODO: set the published title
+                Fields.published_num_children: published_num_children,
+            }
 
     return doc
