@@ -183,6 +183,7 @@ ContentLibraryCollectionNotFound = Collection.DoesNotExist
 
 ContentLibraryContainerNotFound = Container.DoesNotExist
 
+
 class ContentLibraryBlockNotFound(XBlockNotFoundError):
     """ XBlock not found in the content library """
 
