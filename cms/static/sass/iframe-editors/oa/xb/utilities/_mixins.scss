@@ -1,0 +1,79 @@
+// xblock: utilities - Sass mixins
+// ====================
+
+// NOTES:
+// * these are Sass-based mixins (http://sass-lang.com/documentation/file.SASS_REFERENCE.html#mixins) that can be applied to any xblock
+
+
+// --------------------
+// shorthand - absolute position
+// --------------------
+@mixin posAbs ($top: auto, $right: auto, $bottom: auto, $left: auto) {
+  position: absolute;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+// --------------------
+// shorthand - vertically align something
+// --------------------
+@mixin alignVertically {
+  position: relative;
+  top: 50%;
+  @include transform(translateY(-50%));
+}
+
+
+// --------------------
+// fontSize (rems)
+// --------------------
+@mixin fontSize($sizeValue: 16){
+  font-size: $sizeValue + px;
+  // font-size: ($sizeValue/10) + rem; // since we don't control the root element of the DOM, we can't accurately get this fluid unit of measurement to render consistently
+}
+
+
+// --------------------
+// line-height (rems)
+// --------------------
+@mixin lh($fontSize: auto){
+  line-height: ($fontSize*1.50) + px;
+  // line-height: (($fontSize/10)*1.50) + rem; // since we don't control the root element of the DOM, we can't accurately get this fluid unit of measurement to render consistently
+}
+
+// --------------------
+// type setting
+// --------------------
+@mixin typeSet($size) {
+  @if $size == "xsmall" {
+    @include fontSize($f-size-xsmall);
+    @include lh($f-size-xsmall);
+  }
+
+  @if $size == "small" {
+    @include fontSize($f-size-small);
+    @include lh($f-size-small);
+  }
+
+  @if $size == "base" {
+    @include fontSize($f-size-base);
+    @include lh($f-size-base);
+  }
+
+  @if $size == "medium" {
+    @include fontSize($f-size-medium);
+    @include lh($f-size-medium);
+  }
+
+  @if $size == "large" {
+    @include fontSize($f-size-large);
+    @include lh($f-size-large);
+  }
+
+  @if $size == "xlarge" {
+    @include fontSize($f-size-xlarge);
+    @include lh($f-size-xlarge);
+  }
+}

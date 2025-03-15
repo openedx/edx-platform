@@ -1,0 +1,23 @@
+// openassessment: utilities - variables
+// ====================
+
+// NOTES:
+// * these are openassessment-specific variable files
+
+// --------------------
+// layout (neat-based) - forced breakpoints/sizing
+// --------------------
+$grid-size-s: 530px;                                                                    // small
+$grid-size-m: 760px;                                                                    // medium
+$grid-size-l: 925px;                                                                    // large
+$grid-size-x: 1300px;                                                                   // extra large
+$grid-size-f: 1600px;                                                                   // full size
+
+// --------------------
+// layout (neat-based) - mediaqueries
+// --------------------
+$bp-m: new-breakpoint(max-width ($grid-size-s - 1) 4);                                  // mobile devices - make grid 4 columns
+$bp-ds: new-breakpoint(min-width $grid-size-s max-width ($grid-size-m - 1) 6);          // small displays - make grid 6 columns
+$bp-dm: new-breakpoint(min-width $grid-size-m max-width ($grid-size-l - 1) 12);         // medium displays - make grid 12 columns
+$bp-dl: new-breakpoint(min-width $grid-size-l max-width ($grid-size-x - 1) 12);         // large displays - make grid 12 columns
+$bp-dx: new-breakpoint(min-width $grid-size-x 12);                                      // large displays - make grid 12 columns

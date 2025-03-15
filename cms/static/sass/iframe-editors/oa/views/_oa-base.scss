@@ -4,32 +4,6 @@
 // NOTES:
 // * The basic view and all of its states of the openassessment xblock
 
-// openassessment: utilities - variables
-// ====================
-
-// NOTES:
-// * these are openassessment-specific variable files
-
-// --------------------
-// layout (neat-based) - forced breakpoints/sizing
-// --------------------
-$grid-size-s: 530px;                                                                    // small
-$grid-size-m: 760px;                                                                    // medium
-$grid-size-l: 925px;                                                                    // large
-$grid-size-x: 1300px;                                                                   // extra large
-$grid-size-f: 1600px;                                                                   // full size
-
-// --------------------
-// layout (neat-based) - mediaqueries
-// --------------------
-$bp-m: new-breakpoint(max-width ($grid-size-s - 1) 4);                                  // mobile devices - make grid 4 columns
-$bp-ds: new-breakpoint(min-width $grid-size-s max-width ($grid-size-m - 1) 6);          // small displays - make grid 6 columns
-$bp-dm: new-breakpoint(min-width $grid-size-m max-width ($grid-size-l - 1) 12);         // medium displays - make grid 12 columns
-$bp-dl: new-breakpoint(min-width $grid-size-l max-width ($grid-size-x - 1) 12);         // large displays - make grid 12 columns
-$bp-dx: new-breakpoint(min-width $grid-size-x 12);                                      // large displays - make grid 12 columns
-
-
-
 .wrapper--openassessment {
   position: relative;
 }
@@ -43,8 +17,8 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
   }
 
   .ora-loading {
-    background: $uxpl-gray-background;
-    padding: $baseline-horizontal;
+    background: $color-unavailable;
+    padding: $baseline-h;
     text-align: center;
 
     .wrapper--anim {
@@ -53,11 +27,11 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
     .icon {
       display: inline-block;
-      color: $uxpl-gray-base;
+      color: $copy-color;
     }
 
     .copy {
-      color: $uxpl-gray-base;
+      color: $copy-color;
     }
   }
 }
@@ -87,7 +61,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
   // overall actions
   // --------------------
   .list--actions {
-    margin-bottom: ($baseline-vertical/2);
+    margin-bottom: ($baseline-v/2);
     @include text-align(center);
 
     @include media($bp-ds) {
@@ -110,7 +84,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     &.has--error {
 
       .message {
-        margin-bottom: $baseline-vertical;
+        margin-bottom: $baseline-v;
         @include text-align(left);
       }
     }
@@ -118,8 +92,8 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     .action--submit {
       @extend %btn--primary;
       @extend %action-2;
-      @include margin-left($baseline-vertical/2);
-      margin-top: ($baseline-vertical/2);
+      @include margin-left($baseline-v/2);
+      margin-top: ($baseline-v/2);
 
       .copy, .icon {
         display: inline;
@@ -149,7 +123,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     // step title
     .step__title {
       display: inline;
-      margin-bottom: ($baseline-vertical/2);
+      margin-bottom: ($baseline-v/2);
       width: 100%;
       margin-bottom: 0;
 
@@ -159,9 +133,9 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       }
 
       .wrapper--copy {
-        @include margin-left(($baseline-horizontal/2));
-        @include border-left(1px solid $uxpl-gray-background);
-        @include padding-left(($baseline-horizontal/2));
+        @include margin-left(($baseline-h/2));
+        @include border-left(1px solid $color-decorative-tertiary);
+        @include padding-left(($baseline-h/2));
 
         @include media($bp-m) {
           @include margin-left(0);
@@ -186,7 +160,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
           display: none;
           content: counter(item, decimal);
           counter-increment: item;
-          color: $uxpl-gray-base;
+          color: $copy-color;
         }
 
         @include media($bp-dm) {
@@ -227,7 +201,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
       .step__deadline {
         @extend %hd-4;
-        color: $uxpl-gray-base;
+        color: $heading-color;
         margin-left: 5px;
       }
     }
@@ -235,33 +209,33 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     // step status
     .step__status {
       display: inline;
-      margin-top: ($baseline-vertical/4);
+      margin-top: ($baseline-v/4);
 
       @include media($bp-dm) {
         margin-top: 0;
         @include float(right);
         position: relative;
-        top: -($baseline-vertical) - 12;
+        top: -($baseline-v) - 12;
       }
 
       @include media($bp-dl) {
         margin-top: 0;
         @include float(right);
         position: relative;
-        top: -($baseline-vertical) - 12;
+        top: -($baseline-v) - 12;
       }
 
       @include media($bp-dx) {
         margin-top: 0;
         @include float(right);
         position: relative;
-        top: -($baseline-vertical) - 12;
+        top: -($baseline-v) - 12;
       }
 
       .step__status__value {
-        border-radius: ($baseline-vertical/10);
-        padding: ($baseline-vertical/4)-1 ($baseline-horizontal/4);
-        background: $uxpl-gray-background;
+        border-radius: ($baseline-v/10);
+        padding: ($baseline-v/4)-1 ($baseline-h/4);
+        background: $color-decorative-tertiary;
         position: relative;
 
         @include media($bp-ds) {
@@ -285,42 +259,42 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
         @extend %icon-3;
         display: inline-block;
         vertical-align: baseline;
-        @include margin-right(($baseline-horizontal/4));
+        @include margin-right(($baseline-h/4));
       }
 
       .copy {
         @extend %t-score;
-        color: $uxpl-gray-base;
+        color: $heading-color;
       }
     }
 
     // step content wrapper
     .wrapper--step__content {
-      margin-top: ($baseline-vertical/2);
-      padding-top: ($baseline-vertical/2);
-      border-top: 1px solid $uxpl-gray-background;
+      margin-top: ($baseline-v/2);
+      padding-top: ($baseline-v/2);
+      border-top: 1px solid $color-decorative-tertiary;
     }
 
     // step message
     .step__message {
       @include row();
-      margin-bottom: $baseline-vertical;
+      margin-bottom: $baseline-v;
     }
 
     // step instructions
     .step__instruction {
       @extend %copy-2;
-      margin-bottom: $baseline-vertical;
-      color: $uxpl-gray-base;
+      margin-bottom: $baseline-v;
+      color: $copy-color;
     }
 
     // step content
     .step__content {
-      margin-bottom: $baseline-vertical;
+      margin-bottom: $baseline-v;
     }
 
     .step__content__section {
-      margin-bottom: ($baseline-vertical*2);
+      margin-bottom: ($baseline-v*2);
 
       &:last-child {
         @extend %wipe-last-child;
@@ -337,11 +311,11 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       }
 
       .step__counter:before, .step__label, .step__deadline {
-        color: $uxpl-gray-base;
+        color: $copy-color;
       }
 
       .step__status__value {
-        background: $uxpl-gray-background;
+        background: $color-unavailable;
 
         .wrapper--anim {
           @include animation(pulse $tmg-s3 ease-in-out infinite);
@@ -349,11 +323,11 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
         .icon {
           display: inline-block;
-          color: $uxpl-gray-base;
+          color: $copy-color;
         }
 
         .copy {
-          color: $uxpl-gray-base;
+          color: $copy-color;
         }
       }
     }
@@ -362,15 +336,15 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     &.is--incomplete {
 
       .step__counter:before {
-        border-color: rgb(255, 249, 235);
-        color: $uxpl-gray-base;
+        border-color: $color-incomplete;
+        color: $copy-color;
       }
 
       .step__status__value {
-        background: rgb(255, 249, 235);
+        background: $color-incomplete;
 
         .copy, .icon {
-          color: $uxpl-gray-base;
+          color: $copy-color;
         }
       }
     }
@@ -379,19 +353,19 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     &.is--unavailable {
 
       .step__counter:before, .step__label, .step__deadline {
-        color: $uxpl-gray-base;
+        color: $copy-color;
       }
 
       .step__status__value {
-        background: $uxpl-gray-background;
+        background: $color-unavailable;
 
         .icon {
           display: inline-block;
-          color: $uxpl-gray-base;
+          color: $copy-color;
         }
 
         .copy {
-          color: $uxpl-gray-base;
+          color: $copy-color;
         }
       }
     }
@@ -400,28 +374,28 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     &.is--waiting {
 
       .step__counter:before, .step__label, .step__deadline {
-        color: $uxpl-gray-base;
+        color: $copy-color;
       }
 
       .step__status__value {
-        background: $uxpl-gray-background;
+        background: $color-unavailable;
 
         .icon {
           display: inline-block;
-          color: $uxpl-gray-base;
+          color: $copy-color;
         }
 
         .copy {
-          color: $uxpl-gray-base;
+          color: $copy-color;
         }
       }
 
       .step__title .grade__value__title {
-        color: $uxpl-gray-background;
+        color: $color-unavailable;
       }
 
       .step__instruction, .grade__value__description {
-        color: $uxpl-gray-base;
+        color: $copy-color;
       }
     }
 
@@ -429,18 +403,18 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     &.is--complete {
 
       .step__counter:before {
-        color: rgb(0, 129, 0);
+        color: $color-complete;
       }
 
       .step__status__value {
-        background: rgb(0, 129, 0);
+        background: $color-complete;
 
         .icon {
           display: inline-block;
         }
 
         .copy, .icon {
-          color: $white;
+          color: $copy-inverse-color;
         }
       }
 
@@ -453,18 +427,18 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     &.is--in-progress {
 
       .step__counter:before {
-        color: rgb(0, 117, 180);
+        color: $action-primary-color;
       }
 
       .step__status__value {
-        background: rgb(0, 117, 180);
+        background: $action-primary-color;
 
         .icon {
           display: inline-block;
         }
 
         .copy, .icon {
-          color: $white;
+          color: $copy-inverse-color;
         }
       }
 
@@ -485,7 +459,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
         background: $color-error;
 
         .copy, .icon {
-          color: $white;
+          color: $copy-inverse-color;
         }
       }
 
@@ -537,7 +511,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       // Override default button styling.
       @extend %btn-reset;
       background: none;
-      border-radius: ($baseline-vertical/4);
+      border-radius: ($baseline-v/4);
       padding: 5px;
 
       &:active, &:focus:not(:disabled), &:hover:not(:disabled) {
@@ -547,10 +521,10 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       }
 
       &:not([disabled]) {
-        color: rgb(0, 117, 180);
+        color: $action-primary-color;
 
         &:hover, &:focus {
-          color: rgb(0, 117, 180)-focus;
+          color: $action-primary-color-focus;
         }
       }
 
@@ -567,10 +541,10 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
   .submission__answer__part__prompt {
     @extend %ui-well;
     position: relative;
-    margin: ($baseline-vertical/2) 0;
-    border: 1px solid $uxpl-gray-background;
-    @include border-left(($baseline-horizontal/4));
-    @include padding-left(($baseline-horizontal*0.75));
+    margin: ($baseline-v/2) 0;
+    border: 1px solid $color-decorative-tertiary;
+    @include border-left(($baseline-h/4) solid $color-decorative-secondary);
+    @include padding-left(($baseline-h*0.75));
   }
 
   .submission__answer__part__prompt__title {
@@ -579,10 +553,10 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
   .submission__answer__part__prompt__copy {
     @extend %copy-2;
-    color: $uxpl-gray-base;
+    color: $copy-color;
 
     > * {
-      margin-bottom: $baseline-vertical;
+      margin-bottom: $baseline-v;
 
       &:last-child {
         @extend %wipe-last-child;
@@ -599,13 +573,13 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
   }
 
   .submission__answer__part__text__value {
-    margin: ($baseline-vertical/2) 0;
-    border-color: $gray-d4;
+    margin: ($baseline-v/2) 0;
+    border-color: $gray-d7;
 
     &:not(textarea) {
-      border: 1px;
+      border: 1px solid $color-decorative-secondary;
       background-color: $white;
-      padding: $baseline-vertical;
+      padding: $baseline-v;
     }
   }
 
@@ -634,8 +608,9 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
     // response form
     .response__submission {
-      padding: ($baseline-vertical/2) ($baseline-horizontal/4);
-      border-radius: ($baseline-vertical/10);
+      padding: ($baseline-v/2) ($baseline-h/4);
+      background: $color-decorative-quaternary;
+      border-radius: ($baseline-v/10);
     }
 
     .response__submission__content {
@@ -656,26 +631,27 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       .submission__answer__part__text {
         textarea {
           @extend %ui-content-longanswer;
-          min-height: ($baseline-vertical*10);
+          min-height: ($baseline-v*10);
         }
       }
 
       .submission__file__description {
         textarea {
           @extend %ui-content-longanswer;
-          min-height: ($baseline-vertical*4);
+          min-height: ($baseline-v*4);
           width: 70%;
         }
       }
 
       .submission__team__answer__display__file {
-        margin-bottom: ($baseline-vertical/2);
+        margin-bottom: ($baseline-v/2);
       }
 
       .tip {
         @extend %t-score;
-        padding: ($baseline-vertical/4) ($baseline-horizontal/4);
-        color: $white;
+        padding: ($baseline-v/4) ($baseline-h/4);
+        background: $color-decorative-secondary;
+        color: $copy-inverse-color;
       }
     }
 
@@ -708,8 +684,8 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
       .peer-assessment__display__title {
         @extend %t-heading;
-        margin-bottom: ($baseline-vertical/2);
-        color: $uxpl-gray-base;
+        margin-bottom: ($baseline-v/2);
+        color: $heading-color;
       }
     }
 
@@ -718,7 +694,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       @extend %copy-3;
       @extend %ui-content-longanswer;
       @extend %ui-well;
-      color: $uxpl-gray-base;
+      color: $copy-color;
     }
 
     // assessment form
@@ -727,7 +703,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
       // fields
       .assessment__fields {
-        margin-bottom: $baseline-vertical;
+        margin-bottom: $baseline-v;
       }
 
       // rubric question
@@ -744,7 +720,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       .assessment__rubric__question--feedback {
 
         .wrapper--input {
-          margin-top: $baseline-vertical;
+          margin-top: $baseline-v;
         }
 
         .question__title__copy {
@@ -754,7 +730,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
         textarea {
           @extend %ui-content-longanswer;
-          min-height: ($baseline-vertical*5);
+          min-height: ($baseline-v*5);
         }
       }
     }
@@ -777,8 +753,8 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
     .self-assessment__display__title {
       @extend %t-heading;
-      margin-bottom: ($baseline-vertical/2);
-      color: $uxpl-gray-base;
+      margin-bottom: ($baseline-v/2);
+      color: $heading-color;
     }
 
     .self-assessment__display__response {
@@ -786,7 +762,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       @extend %copy-3;
       @extend %ui-content-longanswer;
       @extend %ui-well;
-      color: $uxpl-gray-base;
+      color: $copy-color;
     }
 
     // assessment form
@@ -795,7 +771,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
       // fields
       .assessment__fields {
-        margin-bottom: $baseline-vertical;
+        margin-bottom: $baseline-v;
       }
 
       // rubric question
@@ -813,7 +789,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       .assessment__rubric__question--feedback {
 
         .wrapper--input {
-          margin-top: $baseline-vertical;
+          margin-top: $baseline-v;
         }
 
         .question__title__copy {
@@ -823,7 +799,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
         textarea {
           @extend %ui-content-longanswer;
-          min-height: ($baseline-vertical*5);
+          min-height: ($baseline-v*5);
         }
       }
     }
@@ -837,25 +813,25 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
   .step--grade {
 
     .step__title {
-      // @include media($bp-m) {
-      //   @include bidi-span-columns(4 of 4);
-      // }
-      //
-      // @include media($bp-ds) {
-      //   @include bidi-span-columns(6 of 6);
-      // }
-      //
-      // @include media($bp-dm) {
-      //   @include bidi-span-columns(12 of 12);
-      // }
-      //
-      // @include media($bp-dl) {
-      //   @include bidi-span-columns(12 of 12);
-      // }
-      //
-      // @include media($bp-dx) {
-      //   @include bidi-span-columns(12 of 12);
-      // }
+      @include media($bp-m) {
+        @include bidi-span-columns(4 of 4);
+      }
+
+      @include media($bp-ds) {
+        @include bidi-span-columns(6 of 6);
+      }
+
+      @include media($bp-dm) {
+        @include bidi-span-columns(12 of 12);
+      }
+
+      @include media($bp-dl) {
+        @include bidi-span-columns(12 of 12);
+      }
+
+      @include media($bp-dx) {
+        @include bidi-span-columns(12 of 12);
+      }
 
       .step__counter, .step__counter:before {
         display: none;
@@ -873,7 +849,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       }
 
       .step__label {
-        @include margin-right(($baseline-horizontal/4));
+        @include margin-right(($baseline-h/4));
       }
 
       .grade__value__title {
@@ -891,8 +867,8 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
     .grade__value__description {
       @extend %copy-2;
-      margin-bottom: $baseline-vertical;
-      color: $uxpl-gray-base;
+      margin-bottom: $baseline-v;
+      color: $copy-color;
     }
 
     .grade__summary {
@@ -906,20 +882,20 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
   // --------------------
   .submission__answer__display__title {
     @extend %t-heading;
-    margin-bottom: ($baseline-vertical/2);
-    color: $uxpl-gray-base;
+    margin-bottom: ($baseline-v/2);
+    color: $heading-color;
   }
 
   .submission__answer__display__content {
     @extend %copy-3;
     @extend %ui-subsection-content;
 
-    padding: ($baseline-vertical/2) ($baseline-horizontal/4) $baseline-vertical ($baseline-horizontal/4);
-    border-radius: ($baseline-vertical/10);
+    padding: ($baseline-v/2) ($baseline-h/4) $baseline-v ($baseline-h/4);
+    border-radius: ($baseline-v/10);
     list-style: none;
 
     .submission__answer__part {
-      margin: ($baseline-vertical*1.5) 0px 0px;
+      margin: ($baseline-v*1.5) 0px 0px;
 
       &:first-child {
         margin-top: 0px;
@@ -939,15 +915,15 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
   .submission__peer-evaluations__title {
     @extend %t-heading;
-    margin-bottom: ($baseline-vertical/2);
-    color: $uxpl-gray-base;
+    margin-bottom: ($baseline-v/2);
+    color: $heading-color;
   }
 
   // rubric questions
   .submission__peer-evaluations__questions {
     @extend %no-list;
     @extend %ui-subsection-content;
-    margin-bottom: ($baseline-vertical/2);
+    margin-bottom: ($baseline-v/2);
 
     &:last-child {
       margin-bottom: 0;
@@ -957,15 +933,15 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
     // individual question
     .question {
-      margin-bottom: ($baseline-vertical*1.5);
+      margin-bottom: ($baseline-v*1.5);
       @extend %wipe-last-child;
     }
 
     .question__title {
       @include clearfix();
-      margin-bottom: $baseline-vertical;
-      border-bottom: ($baseline-vertical/10) solid $uxpl-gray-base;
-      padding-bottom: ($baseline-vertical/4);
+      margin-bottom: $baseline-v;
+      border-bottom: ($baseline-v/10) solid $heading-color;
+      padding-bottom: ($baseline-v/4);
 
       .icon {
         @extend %icon-1;
@@ -976,34 +952,34 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
     .question__title__copy {
       @extend %t-heading;
-      @include margin-left(($baseline-horizontal/4));
+      @include margin-left(($baseline-h/4));
       white-space: pre-wrap;
     }
 
     .question__score {
       @extend %t-score;
       @include float(right);
-      @include margin-left($baseline-vertical);
+      @include margin-left($baseline-v);
     }
 
     .question__score__value {
       @extend %t-strong;
-      color: $uxpl-gray-base;
+      color: $heading-color;
 
       &:after {
         content: "/";
-        @include margin-left(($baseline-vertical/4));
-        color: $uxpl-gray-base;
+        @include margin-left(($baseline-v/4));
+        color: $heading-color;
       }
     }
 
     .question__score__potential {
       @extend %t-strong;
-      color: $uxpl-gray-base;
+      color: $heading-color;
 
       .unit {
         @extend %t-strong;
-        @include margin-left(($baseline-vertical/4));
+        @include margin-left(($baseline-v/4));
       }
     }
 
@@ -1016,16 +992,16 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
     // individual answers
     .answer {
-      margin-bottom: $baseline-vertical;
+      margin-bottom: $baseline-v;
       @extend %no-list;
 
       // CASE: self assessment
       &.self-assessment {
-        @include border-left(($baseline-horizontal/8));
-        @include padding-left(($baseline-horizontal/2));
+        @include border-left(($baseline-h/8) solid $color-decorative-quaternary);
+        @include padding-left(($baseline-h/2));
 
         .answer__source {
-          color: $uxpl-gray-background;
+          color: $color-decorative-tertiary;
         }
       }
     }
@@ -1035,18 +1011,18 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       @extend %t-strong;
       @extend %t-titlecase;
       display: block;
-      color: $uxpl-gray-base;
+      color: $heading-color;
 
       .answer__source__value-with-points {
         @extend %t-score;
-        color: $uxpl-gray-base;
+        color: $heading-color;
       }
     }
 
     .answer__value {
       display: block;
-      margin-bottom: ($baseline-vertical/2);
-      color: $uxpl-gray-base;
+      margin-bottom: ($baseline-v/2);
+      color: $heading-color;
 
       .answer__value__raw {
         white-space: pre-wrap;
@@ -1056,15 +1032,15 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     .answer__value__value {
       @extend %hd-2;
       @extend %t-strong;
-      color: $uxpl-gray-base;
+      color: $heading-color;
 
       .ui-hint {
         @extend %trans-color;
-        color: $uxpl-gray-background;
+        color: $color-decorative-tertiary;
 
         // STATE: hover - needed to reset color to what's expected from _navigation.scss (TODO: clean up specificity)
         &:hover, &:focus {
-          color: rgba(0, 117, 180, 0.2);
+          color: $action-primary-color-focus;
         }
       }
     }
@@ -1072,39 +1048,39 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     .answer__score, .answer__score__value {
       @extend %t-score;
       display: block;
-      color: $uxpl-gray-base;
+      color: $heading-color;
     }
   }
 
   // criterion-based feedback
   .answer--feedback {
 
-    // @include media($bp-ds) {
-    //   @include bidi-span-columns(6 of 6);
-    // }
-    //
-    // @include media($bp-dm) {
-    //   @include bidi-span-columns(12 of 12);
-    // }
-    //
-    // @include media($bp-dl) {
-    //   @include bidi-span-columns(12 of 12);
-    // }
-    //
-    // @include media($bp-dx) {
-    //   @include bidi-span-columns(12 of 12);
-    // }
+    @include media($bp-ds) {
+      @include bidi-span-columns(6 of 6);
+    }
+
+    @include media($bp-dm) {
+      @include bidi-span-columns(12 of 12);
+    }
+
+    @include media($bp-dl) {
+      @include bidi-span-columns(12 of 12);
+    }
+
+    @include media($bp-dx) {
+      @include bidi-span-columns(12 of 12);
+    }
 
     .answer--feedback__title {
       @extend %action-2;
     }
 
     .answer--feedback__title__copy {
-      @include margin-left(($baseline-horizontal/4));
+      @include margin-left(($baseline-h/4));
     }
 
     .answer--feedback__content {
-      margin-top: ($baseline-vertical/4);
+      margin-top: ($baseline-v/4);
     }
 
     .action--save {
@@ -1114,7 +1090,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
     .feedback {
       @extend %no-list;
       @extend %wipe-last-child;
-      margin-bottom: $baseline-vertical;
+      margin-bottom: $baseline-v;
     }
 
     .feedback__source {
@@ -1122,7 +1098,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
       @extend %t-strong;
       @extend %t-titlecase;
       display: block;
-      color: $uxpl-gray-base;
+      color: $heading-color;
     }
 
     .feedback__value {
@@ -1145,8 +1121,8 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
   .submission__feedback__title {
     @extend %ui-subsection-title;
     @extend %t-heading;
-    border-bottom-color: solid $uxpl-gray-base;
-    color: $uxpl-gray-base;
+    border-bottom-color: solid $heading-color;
+    color: $heading-color;
 
     .icon {
       @extend %icon-1;
@@ -1157,30 +1133,31 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
   .submission__feedback__title__copy {
     @extend %t-heading;
-    @include margin-left(($baseline-horizontal/4));
+    @include margin-left(($baseline-h/4));
   }
 
   .submission__feedback__content {
     @extend %ui-subsection-content;
-    margin-bottom: $baseline-vertical;
+    margin-bottom: $baseline-v;
   }
 
   .submission__feedback__instructions {
     @extend %copy-2;
-    margin-bottom: $baseline-vertical;
-    color: $uxpl-gray-base;
+    margin-bottom: $baseline-v;
+    color: $copy-color;
   }
 
   .submission__feedback__elements {
-    padding: $baseline-vertical ($baseline-horizontal/2) $baseline-vertical ($baseline-horizontal/2);
-    border-radius: ($baseline-vertical/10);
+    padding: $baseline-v ($baseline-h/2) $baseline-v ($baseline-h/2);
+    background: $color-decorative-quaternary;
+    border-radius: ($baseline-v/10);
   }
 
   .submission__feedback__fields {
-    margin-bottom: $baseline-vertical;
+    margin-bottom: $baseline-v;
 
     .field {
-      margin-bottom: ($baseline-vertical*1.5);
+      margin-bottom: ($baseline-v*1.5);
 
       &:last-child {
         margin-bottom: 0;
@@ -1193,7 +1170,7 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
 
     textarea {
       @extend %ui-content-longanswer;
-      min-height: ($baseline-vertical*10);
+      min-height: ($baseline-v*10);
     }
   }
 
@@ -1209,6 +1186,6 @@ $bp-dx: new-breakpoint(min-width $grid-size-x 12);                              
   .action--submit {
     @extend %btn--secondary;
     @extend %action-2;
-    @include margin-right(($baseline-vertical/2));
+    @include margin-right(($baseline-v/2));
   }
 }

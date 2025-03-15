@@ -1,0 +1,9 @@
+// xblock: elements - layouts
+// ====================
+
+// NOTES:
+// * Grid and common page layout rules
+
+.wrapper--grid {
+  @include outer-container();
+}

@@ -1,0 +1,80 @@
+// edX theme: utilities
+// ====================
+
+// NOTES:
+// * This is where any edX-theme related utilities (variables, mixins, extends) are defined or override previously defined elements
+
+
+// --------------------
+// variables: new
+// --------------------
+$edx-blue: rgb(58, 162, 224);
+$edx-blue-l1: tint($edx-blue,20%);
+
+
+$edx-pink: rgb(182,37,104);
+$edx-pink-d1: shade($edx-pink,20%);
+
+
+$edx-gray: rgb(164, 165, 168);
+$edx-gray-l1: tint($edx-gray,20%);
+$edx-gray-l2: tint($edx-gray,40%);
+$edx-gray-l3: tint($edx-gray,60%);
+$edx-gray-l4: tint($edx-gray,80%);
+$edx-gray-l5: tint($edx-gray,90%);
+$edx-gray-d1: shade($edx-gray,20%);
+$edx-gray-d2: shade($edx-gray,40%);
+$edx-gray-d3: shade($edx-gray,60%);
+$edx-gray-d4: shade($edx-gray,80%);
+$edx-gray-d5: shade($edx-gray,90%);
+$edx-gray-s1: saturate($edx-gray,15%);
+$edx-gray-s2: saturate($edx-gray,30%);
+$edx-gray-s3: saturate($edx-gray,45%);
+$edx-gray-u1: desaturate($edx-gray,15%);
+$edx-gray-u2: desaturate($edx-gray,30%);
+$edx-gray-u3: desaturate($edx-gray,45%);
+$edx-gray-t0: rgba($edx-gray,0.125);
+$edx-gray-t1: rgba($edx-gray,0.25);
+$edx-gray-t2: rgba($edx-gray,0.50);
+$edx-gray-t3: rgba($edx-gray,0.75);
+
+
+// --------------------
+// variables: overrides
+// --------------------
+// fonts
+$f-serif: 'PT Serif', Cambria, Georgia, 'Times New Roman', Times, serif;
+$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+
+// layout - grid
+$max-width: 100%;
+$grid-columns: 12;
+$gutter: $baseline-v;
+
+// application - fonts
+$f-title: $f-sans-serif;
+$f-copy: $f-sans-serif;
+$f-action: $f-sans-serif;
+
+// application - colors: view-based elements
+$bg-view: transparent;
+
+$color-header-main: $black;
+
+$color-content: $gray-d1;
+
+$bg-content-main: $gray-l5;
+$color-content-main: $gray-d1;
+
+// application - colors: staff UI
+$color-decorative-staff: $edx-pink;
+
+// --------------------
+// extends:
+// --------------------
+%hd-problem {
+  @extend %hd-3;
+  @extend %t-titlecase;
+  margin-bottom: $baseline-v;
+  color: $heading-color;
+}

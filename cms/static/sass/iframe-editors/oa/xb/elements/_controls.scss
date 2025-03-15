@@ -1,0 +1,140 @@
+// xblock: elements - controls
+// ====================
+
+// NOTES:
+// * all UI-based controls that can be extends in any xlbock
+
+
+// --------------------
+// links
+// --------------------
+// links - copy
+%link-copy {
+  @include transition(color $tmg-f1 ease-in-out, border $tmg-f1 ease-in-out);
+  border-bottom: 1px solid transparent;
+  color: $action-primary-color;
+  text-decoration: none;
+
+  &:hover, &:focus {
+    color: $action-primary-color-focus;
+    border-color: $action-primary-color-focus;
+  }
+
+  &:active, &.is--current {
+    color: $action-primary-color-active;
+    border-color: $action-primary-color-active;
+  }
+}
+
+// --------------------
+// buttons
+// --------------------
+// buttons - archetypes
+%btn {
+  @include box-sizing(border-box);
+  @include transition(color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover, &:active, &:focus {
+    text-decoration: none;
+  }
+
+  // CASE: icons in buttons
+  .icon {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
+%btn-pill {
+  @extend %btn;
+  border-radius: ($baseline-v/5);
+}
+
+%btn-rounded {
+  @extend %btn;
+  border-radius: ($baseline-v/2);
+}
+
+%btn-edged {
+  @extend %btn;
+  border-radius: ($baseline-v/10);
+}
+
+%btn-reset {
+  font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  -webkit-appearance: none;
+  background-image: none;
+  text-shadow: none;
+  box-shadow: none;
+  border: none;
+  border-image: none;
+}
+
+// buttons - primary
+%btn--primary {
+  @extend %btn-pill;
+  @extend %t-strong;
+  padding: ($baseline-v/2) ($baseline-h);
+  background: $action-primary-color;
+  border: 1px solid $action-primary-color;
+  color: $copy-inverse-color;
+
+  &:hover, &:active, &:focus {
+    background: $action-primary-color-focus;
+    border-color: $action-primary-color-focus;
+  }
+
+  &.current, &.active {
+    background: $action-primary-color-active;
+    border-color: $action-primary-color-active;
+
+    &:hover, &:active, &:focus {
+
+    }
+  }
+
+  &[disabled] {
+    color: $action-primary-color-disabled;
+    border-color: $action-primary-color-disabled;
+    background: $action-primary-color-disabled-back;
+    opacity: 1;
+  }
+}
+
+
+// buttons - secondary
+%btn--secondary {
+  @extend %btn-pill;
+  @extend %t-strong;
+  padding: ($baseline-v/2) ($baseline-h);
+  background: $white;
+  border: 1px solid $uxpl-primary-dark;
+  color: $uxpl-primary-dark;
+
+  &:hover, &:active, &:focus {
+    background: $action-primary-color;
+    border-color: $action-primary-color;
+    color: $copy-inverse-color;
+  }
+
+  &.current, &.active {
+    background: $white;
+    border-color: $uxpl-primary-dark;
+    color: $uxpl-primary-dark;
+
+    &:hover, &:active, &:focus {
+
+    }
+  }
+
+  &[disabled] {
+    background: $white;
+    border-color: $action-primary-color-disabled;
+    color: $action-primary-color-disabled;
+    opacity: 1;
+  }
+}

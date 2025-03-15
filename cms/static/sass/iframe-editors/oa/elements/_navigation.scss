@@ -1,0 +1,39 @@
+// openassessment: elements - navigation
+// ====================
+
+// NOTES:
+// * openassessment-specific navigation UI
+
+// --------------------
+// ui tooltips/hints - based on https://github.com/chinchang/hint.css
+// --------------------
+.has--hints {
+  overflow: visible;
+}
+
+.ui-hint {
+  @extend %fake-link;
+
+  .icon {
+    @include margin-left(($baseline-h/8));
+  }
+
+  // STATE: hover
+  &:hover, &:focus {
+    color: $action-primary-color-focus;
+  }
+
+//   actual tooltip rendered
+  &:after {
+    @include left(0);
+    display: block;
+    white-space: normal;
+    width: ($baseline-h*5);
+    background: $black-t3;
+  }
+
+  &.hint--top:after {
+    @include left(0);
+    @include margin-left(-($baseline-v));
+  }
+}

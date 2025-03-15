@@ -1,0 +1,174 @@
+// xblock: elements - typography
+// ====================
+
+// NOTES:
+// * all typographical settings should be placed here for general xblocks use
+// * typographical scale reference: 0, 14, 18, 24, 32, 43
+
+// --------------------
+// type weights
+// --------------------
+%t-ultrastrong {
+ font-weight: 800;
+}
+%t-strong {
+ font-weight: 600;
+}
+%t-regular {
+ font-weight: 400;
+}
+%t-light {
+ font-weight: 300;
+}
+%t-ultralight {
+ font-weight: 200;
+}
+
+// --------------------
+// type size variants
+// --------------------
+%t-xsmall {
+  @include typeSet(xsmall);
+}
+
+%t-small {
+  @include typeSet(small);
+}
+
+%t-base {
+  @include typeSet(base);
+}
+
+%t-medium {
+  @include typeSet(medium);
+}
+
+%t-large {
+  @include typeSet(large);
+}
+
+%t-xlarge {
+  @include typeSet(xlarge);
+}
+
+
+// --------------------
+// style: titlecase
+// --------------------
+%t-titlecase {
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+
+
+// --------------------
+// canned headings
+// --------------------
+%hd-1 {
+  @extend %t-xlarge;
+  font-family: $f-title;
+}
+
+%hd-2 {
+  @extend %t-large;
+  font-family: $f-title;
+}
+
+%hd-3 {
+  @extend %t-medium;
+  font-family: $f-title;
+}
+
+%hd-4 {
+  @extend %t-base;
+  font-family: $f-title;
+}
+
+%hd-5 {
+  @extend %t-small;
+  font-family: $f-title;
+}
+
+
+// --------------------
+// canned copy
+// --------------------
+%copy-1 {
+  @extend %t-large;
+  font-family: $f-copy;
+}
+
+%copy-2 {
+  @extend %t-medium;
+  font-family: $f-copy;
+}
+
+%copy-3 {
+  @extend %t-base;
+  font-family: $f-copy;
+}
+
+%copy-4 {
+  @extend %t-small;
+  font-family: $f-copy;
+}
+
+%copy-5 {
+  @extend %t-xsmall;
+  font-family: $f-copy;
+}
+
+
+// --------------------
+// canned actions
+// --------------------
+%action-1 {
+  @extend %t-medium;
+  font-family: $f-action;
+}
+
+%action-2 {
+ @extend %t-base;
+  font-family: $f-action;
+}
+
+%action-3 {
+  @extend %t-small;
+  font-family: $f-action;
+}
+
+%action-4 {
+  @extend %t-xsmall;
+  font-family: $f-action;
+}
+
+// --------------------
+// canned icons
+// --------------------
+%icon-0 {
+  @extend %t-xlarge;
+}
+
+%icon-1 {
+  @extend %t-large;
+}
+
+%icon-2 {
+  @extend %t-medium;
+}
+
+%icon-3 {
+  @extend %t-base;
+}
+
+%icon-4 {
+  @extend %t-small;
+}
+
+
+// --------------------
+// visual emphasis
+// --------------------
+%emphasis {
+  @extend %t-strong;
+}

@@ -1,0 +1,181 @@
+// xblock: utilities - Sass extends
+// ====================
+
+// NOTES:
+// * these are Sass-placeholders (http://sass-lang.com/documentation/file.SASS_REFERENCE.html#placeholder_selectors_) that can be applied to any xblock
+
+
+// --------------------
+// utility: nth-type style clearing
+// --------------------
+%wipe-first-child {
+
+  &:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+
+    margin-left: 0;
+    border-left: none;
+    padding-left: 0;
+  }
+}
+
+%wipe-last-child {
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+
+    margin-right: 0;
+    border-right: none;
+    padding-right: 0;
+  }
+}
+
+
+// --------------------
+// utility: wrapper elements
+// --------------------
+%wrapper {
+  @include clearfix();
+  @include box-sizing(border-box);
+  width: 100%;
+}
+
+
+// --------------------
+// utility: list resets
+// --------------------
+// lists
+%no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+}
+
+// --------------------
+// utility: image-replacement hidden text
+// --------------------
+%text-hide {
+  text-indent: 200%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// --------------------
+// utility: hidden elements for screenreaders
+// --------------------
+%text-sr {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+// --------------------
+// utility: text-wrapping
+// --------------------
+%text-wrap {
+  text-wrap: wrap;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  word-wrap: break-word;
+}
+
+
+// --------------------
+// utility: visual text overflow
+// --------------------
+%text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+// --------------------
+// UI: controls
+// --------------------
+%fake-link {
+  cursor: pointer;
+}
+
+%state-disabled {
+  pointer-events: none;
+  outline: none;
+}
+
+%state-enabled {
+  pointer-events: auto;
+}
+
+// --------------------
+// UI: element rendering/visibility
+// --------------------
+%state-hidden {
+  @extend %state-disabled;
+  display: none;
+  visibility: hidden;
+}
+
+
+// --------------------
+// UI: element depth
+// --------------------
+%depth0 { z-index: 0; }
+%depth1 { z-index: 10; }
+%depth2 { z-index: 100; }
+%depth3 { z-index: 1000; }
+%depth4 { z-index: 10000; }
+%depth5 { z-index: 100000; }
+
+
+// --------------------
+// UI: transitions
+// --------------------
+%trans-size {
+  @include transition(width $tmg-f1 ease-in-out, height $tmg-f1 ease-in-out);
+}
+
+%trans-opacity {
+  @include transition(opacity $tmg-f1 ease-in-out);
+}
+
+%trans-color {
+  @include transition(color $tmg-f1 ease-in-out);
+}
+
+
+// --------------------
+// Decorative: shadows
+// --------------------
+%deco-shadow-up {
+  box-shadow: 0 -1px 2px 0 $shadow-d1;
+}
+
+%deco-shadow-down {
+  box-shadow: 0 1px 2px 0 $shadow-d1;
+}
+
+%deco-shadow-subtle-up {
+  box-shadow: 0 -1px 2px 0 $shadow-l1;
+}
+
+%deco-shadow-subtle-down {
+  box-shadow: 0 1px 2px 0 $shadow-l1;
+}
+
+
+// --------------------
+// Decorative: round/circular elements
+// --------------------
+%deco-circle {
+  border-radius: 99999em;
+}
