@@ -142,7 +142,6 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     grouping_function = NotificationRegistry.get_grouper(notification_type)
     waffle_flag_enabled = ENABLE_NOTIFICATION_GROUPING.is_enabled(course_key)
     grouping_enabled = waffle_flag_enabled and group_by_id and grouping_function is not None
-    notifications_generated = False
     generated_notification = None
     sender_id = context.pop('sender_id', None)
     default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', False)
@@ -214,8 +213,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
                 if grouping_enabled and existing_notifications.get(user_id, None):
                     group_user_notifications(new_notification, existing_notifications[user_id])
-                    if not notifications_generated:
-                        notifications_generated = True
+                    if not generated_notification:
                         generated_notification = new_notification
                 else:
                     notifications.append(new_notification)
@@ -223,20 +221,17 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
         # send notification to users but use bulk_create
         notification_objects = Notification.objects.bulk_create(notifications)
-        if notification_objects and not notifications_generated:
-            notifications_generated = True
+        if notification_objects and not generated_notification:
             generated_notification = notification_objects[0]
 
     if email_notification_mapping:
         send_immediate_cadence_email(email_notification_mapping, course_key)
 
-    if notifications_generated:
+    if generated_notification:
         notification_generated_event(
             generated_notification_audience, app_name, notification_type, course_key, content_url,
             generated_notification.content, sender_id=sender_id
         )
-        send_braze_notification_to_mobile_users(push_notification_audience, generated_notification)
-
 
 def is_notification_valid(notification_type, context):
     """
