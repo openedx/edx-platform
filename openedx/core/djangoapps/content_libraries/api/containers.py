@@ -13,6 +13,10 @@ from opaque_keys.edx.locator import (
     LibraryContainerLocator,
 )
 
+from openedx_events.content_authoring.data import LibraryContainerData
+from openedx_events.content_authoring.signals import (
+    LIBRARY_CONTAINER_CREATED,
+)
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api import authoring_models
 
@@ -44,7 +48,7 @@ class ContainerMetadata(PublishableItem):
     @classmethod
     def from_container(cls, library_key, container: authoring_models.Container, associated_collections=None):
         """
-        Construct a LibraryXBlockMetadata from a Component object.
+        Construct a ContainerMetadata object from a Container object.
         """
         last_publish_log = container.versioning.last_publish_log
 
@@ -92,13 +96,10 @@ def get_container(container_key: LibraryContainerLocator) -> ContainerMetadata:
     content_library = ContentLibrary.objects.get_by_key(container_key.library_key)
     learning_package = content_library.learning_package
     assert learning_package is not None
-    # FIXME: we need an API to get container by key, without needing to get the publishable entity ID first
-    container_pe = authoring_api.get_publishable_entity_by_key(
-        learning_package,
+    container = authoring_api.get_container_by_key(
+        learning_package.id,
         key=container_key.container_id,
     )
-    container = authoring_api.get_container(container_pe.id)
-    # ^ Should be just authoring_api.get_container_by_key(learning_package.id, container_key.container_id)
     container_meta = ContainerMetadata.from_container(container_key.library_key, container)
     assert container_meta.container_type.value == container_key.container_type
     return container_meta
@@ -123,7 +124,11 @@ def create_container(
         # Automatically generate a slug. Append a random suffix so it should be unique.
         slug = slugify(title, allow_unicode=True) + '-' + uuid4().hex[-6:]
     # Make sure the slug is valid by first creating a key for the new container:
-    LibraryContainerLocator(library_key=library_key, container_type=container_type.value, container_id=slug)
+    container_key = LibraryContainerLocator(
+        library_key=library_key,
+        container_type=container_type.value,
+        container_id=slug,
+    )
     # Then try creating the actual container:
     match container_type:
         case ContainerType.Unit:
@@ -136,6 +141,14 @@ def create_container(
             )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
+
+    LIBRARY_CONTAINER_CREATED.send_event(
+        library_container=LibraryContainerData(
+            library_key=library_key,
+            container_key=str(container_key),
+        )
+    )
+
     return ContainerMetadata.from_container(library_key, container)
 
 
@@ -150,12 +163,10 @@ def get_container_children(
     content_library = ContentLibrary.objects.get_by_key(container_key.library_key)
     learning_package = content_library.learning_package
     assert learning_package is not None
-    # FIXME: we need an API to get container by key, without needing to get the publishable entity ID first
-    container_pe = authoring_api.get_publishable_entity_by_key(
-        learning_package,
+    container = authoring_api.get_container_by_key(
+        learning_package.id,
         key=container_key.container_id,
     )
-    assert container_pe.container is not None
-    child_entities = authoring_api.get_entities_in_container(container_pe.container, published=published)
+    child_entities = authoring_api.get_entities_in_container(container, published=published)
     # TODO: convert the return type to list[ContainerMetadata | LibraryXBlockMetadata] ?
     return child_entities

@@ -110,3 +110,16 @@ def update_library_components_collections(library_key_str: str, collection_key: 
     log.info("Updating document.collections for library %s collection %s components", library_key, collection_key)
 
     api.update_library_components_collections(library_key, collection_key)
+
+
+@shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
+@set_code_owner_attribute
+def update_library_container_index_doc(library_key_str: str, container_key: str) -> None:
+    """
+    Celery task to update the content index document for a library container
+    """
+    library_key = LibraryLocatorV2.from_string(library_key_str)
+
+    log.info("Updating content index documents for container %s in library%s", container_key, library_key)
+
+    api.upsert_library_container_index_doc(library_key, container_key)

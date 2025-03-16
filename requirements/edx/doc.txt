@@ -988,7 +988,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==9.18.2
+openedx-events @ git+https://github.com/open-craft/openedx-events.git@jill/library-containers
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1004,7 +1004,7 @@ openedx-filters==2.0.1
     #   ora2
 openedx-forum==0.1.8
     # via -r requirements/edx/base.txt
-openedx-learning==0.19.0
+openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@jill/containers-api
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

@@ -5,6 +5,12 @@ from datetime import datetime, timezone
 
 import ddt
 from freezegun import freeze_time
+from unittest import mock
+
+from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_events.content_authoring.data import LibraryContainerData
+from openedx_events.content_authoring.signals import LIBRARY_CONTAINER_CREATED
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from openedx.core.djangolib.testing.utils import skip_unless_cms
@@ -12,7 +18,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 @skip_unless_cms
 @ddt.ddt
-class ContainersTestCase(ContentLibrariesRestApiTest):
+class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
     """
     Tests for containers (Sections, Subsections, Units) in Content Libraries.
 
@@ -30,14 +36,19 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         new fields to an API response, which are backwards compatible, won't
         break any tests, but backwards-incompatible API changes will.
     """
-    # Note: if we need events at some point, add OpenEdxEventsTestMixin and set the list here; see other test suites.
-    # ENABLED_OPENEDX_EVENTS = []
+    ENABLED_OPENEDX_EVENTS = [
+        LIBRARY_CONTAINER_CREATED.event_type,
+    ]
 
     def test_unit_crud(self):
         """
         Test Create, Read, Update, and Delete of a Unit
         """
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+        lib_key = LibraryLocatorV2.from_string(lib["id"])
+
+        create_receiver = mock.Mock()
+        LIBRARY_CONTAINER_CREATED.connect(create_receiver)
 
         # Create a unit:
         create_date = datetime(2024, 9, 8, 7, 6, 5, tzinfo=timezone.utc)
@@ -58,6 +69,18 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         }
 
         self.assertDictContainsEntries(container_data, expected_data)
+        assert create_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_CREATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    lib_key,
+                    container_key="lct:CL-TEST:containers:unit:u1",
+                ),
+            },
+            create_receiver.call_args_list[0].kwargs,
+        )
 
         # Fetch the unit:
         unit_as_read = self._get_container(container_data["container_key"])
