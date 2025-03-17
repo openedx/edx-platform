@@ -471,6 +471,8 @@ class _BuiltInVideoBlock(
 
         bumperize(self)
 
+        is_video_from_same_origin = bool(download_video_link and cdn_url and download_video_link.startswith(cdn_url))
+
         template_context = {
             'autoadvance_enabled': autoadvance_enabled,
             'branding_info': branding_info,
@@ -479,6 +481,7 @@ class _BuiltInVideoBlock(
             'cdn_exp_group': cdn_exp_group,
             'display_name': self.display_name_with_default,
             'download_video_link': download_video_link,
+            'is_video_from_same_origin': is_video_from_same_origin,
             'handout': self.handout,
             'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
@@ -855,11 +858,15 @@ class _BuiltInVideoBlock(
                 if new_transcripts.get('en'):
                     xml.set('sub', '')
 
-                # Update `transcripts` attribute in the xml
-                xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
-
             except edxval_api.ValVideoNotFoundError:
                 pass
+        else:
+            if transcripts.get('en'):
+                xml.set('sub', '')
+
+        if transcripts:
+            # Update `transcripts` attribute in the xml
+            xml.set('transcripts', json.dumps(transcripts, sort_keys=True))
 
             # Sorting transcripts for easy testing of resulting xml
             for transcript_language in sorted(transcripts.keys()):

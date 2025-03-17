@@ -78,7 +78,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
                     el: metadataEditor,
                     collection: new MetadataCollection(models)
                 });
-                if (xblock.setMetadataEditor) {
+                if (xblock && xblock.setMetadataEditor) {
                     xblock.setMetadataEditor(metadataView);
                 }
             }

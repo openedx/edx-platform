@@ -1129,7 +1129,7 @@ def _check_broken_links(task_instance, user_id, course_key_string, language):
     """
     user = _validate_user(task_instance, user_id, language)
 
-    task_instance.status.set_state('Scanning')
+    task_instance.status.set_state(UserTaskStatus.IN_PROGRESS)
     course_key = CourseKey.from_string(course_key_string)
 
     url_list = _scan_course_for_links(course_key)
@@ -1198,10 +1198,13 @@ def _scan_course_for_links(course_key):
         blocks.extend(vertical.get_children())
 
     for block in blocks:
+        # Excluding 'drag-and-drop-v2' as it contains data of object type instead of string, causing errors,
+        # and it doesn't contain user-facing links to scan.
+        if block.category == 'drag-and-drop-v2':
+            continue
         block_id = str(block.usage_key)
         block_info = get_block_info(block)
         block_data = block_info['data']
-
         url_list = _get_urls(block_data)
         urls_to_validate += [[block_id, url] for url in url_list]
 

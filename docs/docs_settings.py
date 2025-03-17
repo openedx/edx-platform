@@ -38,6 +38,7 @@ INSTALLED_APPS.extend(
         "cms.djangoapps.xblock_config.apps.XBlockConfig",
         "lms.djangoapps.lti_provider",
         "openedx.core.djangoapps.content.search",
+        "openedx.core.djangoapps.content_staging",
     ]
 )
 

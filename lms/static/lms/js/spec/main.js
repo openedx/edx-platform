@@ -73,7 +73,6 @@
             '_split': 'js/split',
             'mathjax_delay_renderer': 'js/mathjax_delay_renderer',
             'MathJaxProcessor': 'js/customwmd',
-            'picturefill': 'common/js/vendor/picturefill',
             'bootstrap': 'common/js/vendor/bootstrap.bundle',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
 

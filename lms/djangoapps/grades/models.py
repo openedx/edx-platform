@@ -716,6 +716,7 @@ class PersistentCourseGrade(TimeStampedModel):
         When called emits an event when a persistent grade is created or updated.
         """
         # .. event_implemented_name: PERSISTENT_GRADE_SUMMARY_CHANGED
+        # .. event_type: org.openedx.learning.course.persistent_grade_summary.changed.v1
         PERSISTENT_GRADE_SUMMARY_CHANGED.send_event(
             grade=PersistentCourseGradeData(
                 user_id=user_id,

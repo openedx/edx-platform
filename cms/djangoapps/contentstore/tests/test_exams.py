@@ -1,13 +1,15 @@
 """
 Test the exams service integration into Studio
 """
+import itertools
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch, Mock
 
 import ddt
 from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
-from pytz import UTC
+from freezegun import freeze_time
+from pytz import utc
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
@@ -17,6 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 @ddt.ddt
 @override_waffle_flag(EXAMS_IDA, active=True)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
 @patch('cms.djangoapps.contentstore.exams._patch_course_exams')
 @patch('cms.djangoapps.contentstore.signals.handlers.transaction.on_commit',
@@ -51,27 +54,46 @@ class TestExamService(ModuleStoreTestCase):
             display_name='Homework 1',
             graded=True,
             is_time_limited=False,
-            due=datetime.now(UTC) + timedelta(minutes=60),
+            due=datetime.now(utc) + timedelta(minutes=60),
         )
 
     def _get_exams_url(self, course_id):
         return f'{settings.EXAMS_SERVICE_URL}/exams/course_id/{course_id}/'
 
-    @ddt.data(
-        (False, False, False, 'timed'),
-        (True, False, False, 'proctored'),
-        (True, True, False, 'practice'),
-        (True, True, True, 'onboarding'),
-    )
+    def _get_exam_due_date(self, course, sequential):
+        """
+        Return the expected exam due date for the exam, based on the selected course proctoring provider and the
+        exam due date or the course end date.
+
+        Arguments:
+        * course: the course that the exam subsection is in; may have a course.end attribute
+        * sequential: the exam subsection; may have a sequential.due attribute
+        """
+        if course.proctoring_provider == 'lti_external':
+            return sequential.due.isoformat() if sequential.due else (course.end.isoformat() if course.end else None)
+        elif course.self_paced:
+            return None
+        else:
+            return sequential.due
+
+    @ddt.data(*(tuple(base) + (extra,) for base, extra in itertools.product(
+        [
+            (False, False, False, 'timed'),
+            (True, False, False, 'proctored'),
+            (True, True, False, 'practice'),
+            (True, True, True, 'onboarding'),
+        ],
+        ('null', 'lti_external')
+    )))
     @ddt.unpack
+    @freeze_time('2024-01-01')
     def test_publishing_exam(self, is_proctored_exam, is_practice_exam,
-                             is_onboarding_exam, expected_type, mock_patch_course_exams):
+                             is_onboarding_exam, expected_type, proctoring_provider, mock_patch_course_exams):
         """
         When a course is published it will register all exams sections with the exams service
         """
         default_time_limit_minutes = 10
-        due_date = datetime.now(UTC) + timedelta(minutes=default_time_limit_minutes + 1)
-
+        due_date = datetime.now(utc) + timedelta(minutes=default_time_limit_minutes + 1)
         sequence = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
@@ -86,17 +108,22 @@ class TestExamService(ModuleStoreTestCase):
             is_onboarding_exam=is_onboarding_exam,
         )
 
+        self.course.proctoring_provider = proctoring_provider
+        self.course = self.update_course(self.course, 1)
+
+        expected_due_date = self._get_exam_due_date(self.course, sequence)
+
         expected_exams = [{
             'course_id': self.course_key,
             'content_id': str(sequence.location),
             'exam_name': sequence.display_name,
             'time_limit_mins': sequence.default_time_limit_minutes,
-            'due_date': due_date.isoformat(),
+            'due_date': expected_due_date,
             'exam_type': expected_type,
             'is_active': True,
             'hide_after_due': True,
             # backend is only required for edx-proctoring support edx-exams will maintain LTI backends
-            'backend': 'null',
+            'backend': proctoring_provider,
         }]
         listen_for_course_publish(self, self.course.id)
         mock_patch_course_exams.assert_called_once_with(expected_exams, self.course_key)
@@ -147,23 +174,31 @@ class TestExamService(ModuleStoreTestCase):
         listen_for_course_publish(self, self.course.id)
         mock_patch_course_exams.assert_not_called()
 
-    # MODIFY DUE DATE HERE
     @ddt.data(
-        (True, datetime(2035, 1, 1, 0, 0, tzinfo=timezone.utc)),
-        (False, datetime(2035, 1, 1, 0, 0, tzinfo=timezone.utc)),
-        (True, None),
-        (False, None),
+        *itertools.product(
+            (True, False),
+            (datetime(2035, 1, 1, 0, 0, tzinfo=timezone.utc), None),
+            ('null', 'lti_external'),
+        )
     )
     @ddt.unpack
-    def test_no_due_dates(self, is_self_paced, course_end_date, mock_patch_course_exams):
+    def test_no_due_dates(self, is_self_paced, course_end_date, proctoring_provider, mock_patch_course_exams):
         """
-        Test that the coures end date is registered as the due date when the subsection does not have a due date for
-        both self-paced and instructor-paced exams.
+        Test that the the correct due date is registered for the exam when the subsection does not have a due date,
+        depending on the proctoring provider.
+
+        * lti_external
+          * The course end date is registered as the due date when the subsection does not have a due date for both
+            self-paced and instructor-paced exams.
+        * not lti_external
+          * None is registered as the due date when the subsection does not have a due date for both
+            self-paced and instructor-paced exams.
         """
         self.course.self_paced = is_self_paced
         self.course.end = course_end_date
+        self.course.proctoring_provider = proctoring_provider
         self.course = self.update_course(self.course, 1)
-        BlockFactory.create(
+        sequence = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -179,20 +214,38 @@ class TestExamService(ModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
         called_exams, called_course = mock_patch_course_exams.call_args[0]
-        assert called_exams[0]['due_date'] == (course_end_date.isoformat() if course_end_date else None)
 
-    @ddt.data(True, False)
-    def test_subsection_due_date_prioritized(self, is_self_paced, mock_patch_course_exams):
+        expected_due_date = self._get_exam_due_date(self.course, sequence)
+
+        assert called_exams[0]['due_date'] == expected_due_date
+
+    @ddt.data(*itertools.product((True, False), ('lti_external', 'null')))
+    @ddt.unpack
+    @freeze_time('2024-01-01')
+    def test_subsection_due_date_prioritized(self, is_self_paced, proctoring_provider, mock_patch_course_exams):
         """
         Test that the subsection due date is registered as the due date when both the subsection has a due date and the
         course has an end date for both self-paced and instructor-paced exams.
+
+        Test that the the correct due date is registered for the exam when the subsection has a due date, depending on
+        the proctoring provider.
+
+        * lti_external
+            * The subsection due date is registered as the due date when both the subsection has a due date and the
+              course has an end date for both self-paced and instructor-paced exams
+        * not lti_external
+            * None is registered as the due date when both the subsection has a due date and the course has an end date
+              for self-paced exams.
+            * The subsection due date is registered as the due date when both the subsection has a due date and the
+              course has an end date for instructor-paced exams.
         """
         self.course.self_paced = is_self_paced
         self.course.end = datetime(2035, 1, 1, 0, 0)
+        self.course.proctoring_provider = proctoring_provider
         self.course = self.update_course(self.course, 1)
 
-        sequential_due_date = datetime.now(UTC) + timedelta(minutes=60)
-        BlockFactory.create(
+        sequential_due_date = datetime.now(utc) + timedelta(minutes=60)
+        sequence = BlockFactory.create(
             parent=self.chapter,
             category='sequential',
             display_name='Test Proctored Exam',
@@ -208,4 +261,7 @@ class TestExamService(ModuleStoreTestCase):
 
         listen_for_course_publish(self, self.course.id)
         called_exams, called_course = mock_patch_course_exams.call_args[0]
-        assert called_exams[0]['due_date'] == sequential_due_date.isoformat()
+
+        expected_due_date = self._get_exam_due_date(self.course, sequence)
+
+        assert called_exams[0]['due_date'] == expected_due_date

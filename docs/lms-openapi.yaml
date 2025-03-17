@@ -7134,6 +7134,18 @@ paths:
       tags:
       - notifications
     parameters: []
+  /notifications/configurations/:
+    get:
+      operationId: notifications_configurations_list
+      description: API view for getting the aggregate notification preferences for
+        the current user.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - notifications
+    parameters: []
   /notifications/configurations/{course_key_string}:
     get:
       operationId: notifications_configurations_read
@@ -7309,6 +7321,17 @@ paths:
       in: path
       required: true
       type: string
+  /notifications/preferences/update-all/:
+    post:
+      operationId: notifications_preferences_update-all_create
+      description: Update all notification preferences for the current user.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - notifications
+    parameters: []
   /notifications/preferences/update/{username}/{patch}/:
     get:
       operationId: notifications_preferences_update_read
@@ -9817,6 +9840,26 @@ paths:
       tags:
       - val
     parameters: []
+  /val/v0/videos/video-transcripts/:
+    post:
+      operationId: val_v0_videos_video-transcripts_create
+      description: Creates a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+      - val
+    delete:
+      operationId: val_v0_videos_video-transcripts_delete
+      description: Delete a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+      - val
+    parameters: []
   /val/v0/videos/video-transcripts/create/:
     post:
       operationId: val_v0_videos_video-transcripts_create_create
@@ -9824,6 +9867,15 @@ paths:
       parameters: []
       responses:
         '201':
+          description: ''
+      tags:
+      - val
+    delete:
+      operationId: val_v0_videos_video-transcripts_create_delete
+      description: Delete a video transcript instance with the given information.
+      parameters: []
+      responses:
+        '204':
           description: ''
       tags:
       - val
@@ -9955,6 +10007,21 @@ paths:
       in: path
       required: true
       type: string
+  /xblock/v2/xblocks/{usage_key}/olx/:
+    get:
+      operationId: xblock_v2_xblocks_olx_list
+      description: Get the OLX (XML serialization) of the specified XBlock
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
   /xblock/v2/xblocks/{usage_key}/view/{view_name}/:
     get:
       operationId: xblock_v2_xblocks_view_read
@@ -10051,6 +10118,25 @@ paths:
       required: true
       type: string
     - name: handler_name
+      in: path
+      required: true
+      type: string
+  /xblock/v2/xblocks/{usage_key}@{version}/olx/:
+    get:
+      operationId: xblock_v2_xblocks_olx_list
+      description: Get the OLX (XML serialization) of the specified XBlock
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - xblock
+    parameters:
+    - name: usage_key
+      in: path
+      required: true
+      type: string
+    - name: version
       in: path
       required: true
       type: string
@@ -12071,6 +12157,11 @@ definitions:
         type: string
         format: uri
         maxLength: 200
+        x-nullable: true
+      course_id:
+        title: Course id
+        type: string
+        maxLength: 255
         x-nullable: true
       last_read:
         title: Last read

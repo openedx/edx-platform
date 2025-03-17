@@ -29,7 +29,7 @@ from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, R
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from ..tasks import (
     export_olx,
     update_special_exams_and_publish,
@@ -236,12 +236,68 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         )
         self.mock_urls = [
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@1", "http://example.com/valid"],
-            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid"]
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid"],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3", f'http://{settings.CMS_BASE}/locked'],
         ]
         self.expected_file_contents = [
-            ['block-v1:edX+DemoX+Demo_Course+type@vertical+block@1', 'http://example.com/valid', False],
-            ['block-v1:edX+DemoX+Demo_Course+type@vertical+block@2', 'http://example.com/invalid', False]
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid", False],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3", f"http://{settings.CMS_BASE}/locked", True],
         ]
+
+    @mock.patch('cms.djangoapps.contentstore.tasks.UserTaskArtifact', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks._scan_course_for_links')
+    @mock.patch('cms.djangoapps.contentstore.tasks._save_broken_links_file', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks._write_broken_links_to_file', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches', autospec=True)
+    def test_check_broken_links_stores_broken_and_locked_urls(
+        self,
+        mock_validate_urls,
+        mock_write_broken_links_to_file,
+        mock_save_broken_links_file,
+        mock_scan_course_for_links,
+        mock_user_task_artifact
+    ):
+        '''
+        The test verifies that the check_broken_links task correctly
+        stores broken or locked URLs in the course.
+        The expected behavior is that the after scanning the course,
+        validating the URLs, and filtering the results, the task stores the results in a
+        JSON file.
+        Note that this test mocks all validation functions and therefore
+        does not test link validation or any of its support functions.
+        '''
+        mock_user = UserFactory.create(username='student', password='password')
+        mock_course_key_string = "course-v1:edX+DemoX+Demo_Course"
+        mock_task = MockCourseLinkCheckTask()
+        mock_scan_course_for_links.return_value = self.mock_urls
+        mock_validate_urls.return_value = [
+            {
+                "block_id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@1",
+                "url": "http://example.com/valid",
+                "status": 200,
+            },
+            {
+                "block_id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@2",
+                "url": "http://example.com/invalid",
+                "status": 400,
+            },
+            {
+                "block_id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3",
+                "url": f"http://{settings.CMS_BASE}/locked",
+                "status": 403,
+            },
+        ]
+
+        _check_broken_links(mock_task, mock_user.id, mock_course_key_string, 'en')  # pylint: disable=no-value-for-parameter
+
+        # Check that UserTaskArtifact was called with the correct arguments
+        mock_user_task_artifact.assert_called_once_with(status=mock.ANY, name='BrokenLinks')
+
+        # Check that the correct links are written to the file
+        mock_write_broken_links_to_file.assert_called_once_with(self.expected_file_contents, mock.ANY)
+
+        # Check that _save_broken_links_file was called with the correct arguments
+        mock_save_broken_links_file.assert_called_once_with(mock_user_task_artifact.return_value, mock.ANY)
 
     def test_hash_tags_stripped_from_url_lists(self):
         NUM_HASH_TAG_LINES = 2
@@ -308,6 +364,49 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
 
         _scan_course_for_links(self.test_course.id)
         self.assertEqual(len(expected_blocks), mock_get_urls.call_count)
+
+    @mock.patch('cms.djangoapps.contentstore.tasks.get_block_info', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks.modulestore', autospec=True)
+    def test_scan_course_excludes_drag_and_drop(self, mock_modulestore, mock_get_block_info):
+        """
+        Test that `_scan_course_for_links` excludes blocks of category 'drag-and-drop-v2'.
+        """
+        vertical = BlockFactory.create(
+            category='vertical',
+            parent_location=self.test_course.location
+        )
+        drag_and_drop_block = BlockFactory.create(
+            category='drag-and-drop-v2',
+            parent_location=vertical.location,
+        )
+        text_block = BlockFactory.create(
+            category='html',
+            parent_location=vertical.location,
+            data='Test Link -> <a href="http://example.com">Example.com</a>'
+        )
+
+        mock_modulestore_instance = mock.Mock()
+        mock_modulestore.return_value = mock_modulestore_instance
+        mock_modulestore_instance.get_items.return_value = [vertical]
+        vertical.get_children = mock.Mock(return_value=[drag_and_drop_block, text_block])
+
+        def get_block_side_effect(block):
+            block_data = getattr(block, 'data', '')
+            if isinstance(block_data, str):
+                return {'data': block_data}
+            raise TypeError("expected string or bytes-like object, got 'dict'")
+        mock_get_block_info.side_effect = get_block_side_effect
+
+        urls = _scan_course_for_links(self.test_course.id)
+        # The drag-and-drop block should not appear in the results
+        self.assertFalse(
+            any(block_id == str(drag_and_drop_block.usage_key) for block_id, _ in urls),
+            "Drag and Drop blocks should be excluded"
+        )
+        self.assertTrue(
+            any(block_id == str(text_block.usage_key) for block_id, _ in urls),
+            "Text block should be included"
+        )
 
     @pytest.mark.asyncio
     async def test_every_detected_link_is_validated(self):

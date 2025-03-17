@@ -1,9 +1,5 @@
 # This does not cover all the code in edx-platform but it's a good start.
 
-# Ensure that the team responsible for upgrades sees any PRs that would
-# add GitHub-hosted dependencies to that platform.
-requirements/edx/github.in                                          @openedx/2u-arbi-bom
-
 # Core
 common/djangoapps/student/
 common/djangoapps/student/models/__init__.py                        @openedx/2u-tnl
@@ -62,3 +58,6 @@ lms/envs/minimal.yml                                                 @feanil
 # Ensure that un-necessary changes don't happen to the settings files as we're cleaning them up.
 lms/envs/production.py                                               @feanil @kdmccormick
 cms/envs/production.py                                               @feanil @kdmccormick
+
+# Ensure that this file is only used when strictly necessary
+requirements/edx/github.in                                           @feanil @kdmccormick

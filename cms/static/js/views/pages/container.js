@@ -149,6 +149,9 @@ function($, _, Backbone, gettext, BasePage,
                     case 'refreshXBlock':
                         this.render();
                         break;
+                    case 'completeXBlockEditing':
+                        this.refreshXBlock(xblockElement, false);
+                        break;
                     case 'completeManageXBlockAccess':
                         this.refreshXBlock(xblockElement, false);
                         break;
@@ -507,6 +510,18 @@ function($, _, Backbone, gettext, BasePage,
                     window.location.href = destinationUrl;
                     return;
                 }
+
+                if (this.options.isIframeEmbed) {
+                    return window.parent.postMessage(
+                        {
+                            type: 'editXBlock',
+                            message: 'Sends a message when the legacy modal window is shown',
+                            payload: {
+                                id: this.findXBlockElement(event.target).data('locator')
+                            }
+                        }, document.referrer
+                    );
+                }
             }
 
             var xblockElement = this.findXBlockElement(event.target),
@@ -704,12 +719,13 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         openManageTags: function(event) {
+            const contentId = this.findXBlockElement(event.target).data('locator');
             try {
                 if (this.options.isIframeEmbed) {
                     window.parent.postMessage(
                         {
                             type: 'openManageTags',
-                            payload: {}
+                            payload: { contentId }
                         }, document.referrer
                     );
                 }
@@ -717,7 +733,6 @@ function($, _, Backbone, gettext, BasePage,
                 console.error(e);
             }
             const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
-            const contentId = this.findXBlockElement(event.target).data('locator');
 
             TaggingDrawerUtils.openDrawer(taxonomyTagsWidgetUrl, contentId);
         },
@@ -1050,23 +1065,20 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         viewXBlockContent: function(event) {
-          try {
-            if (this.options.isIframeEmbed) {
-              event.preventDefault();
-              var usageId = event.currentTarget.href.split('/').pop() || '';
-              window.parent.postMessage(
-                {
-                  type: 'handleViewXBlockContent',
-                  payload: {
-                    usageId: usageId,
-                  },
-                }, document.referrer
-              );
-              return true;
+            try {
+                if (this.options.isIframeEmbed) {
+                    event.preventDefault();
+                    var usageId = event.currentTarget.href.split('/').pop() || '';
+                    window.parent.postMessage({
+                        type: 'handleViewXBlockContent',
+                        message: 'View the content of the XBlock',
+                        payload: { usageId },
+                    }, document.referrer);
+                    return true;
+                }
+            } catch (e) {
+                console.error(e);
             }
-          } catch (e) {
-            console.error(e);
-          }
         },
 
         toggleSaveButton: function() {

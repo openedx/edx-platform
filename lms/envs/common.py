@@ -2401,7 +2401,6 @@ base_vendor_js = [
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
     'common/js/vendor/underscore.string.js',
-    'common/js/vendor/picturefill.js',
 
     # Make some edX UI Toolkit utilities available in the global "edx" namespace
     'edx-ui-toolkit/js/utils/global-loader.js',
@@ -4780,6 +4779,7 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
+TRANSCRIPT_LANG_CACHE_TIMEOUT = 60 * 60 * 24  # 24 hours
 
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance

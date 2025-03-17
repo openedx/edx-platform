@@ -1,4 +1,3 @@
-import 'whatwg-fetch';
 import Cookies from 'js-cookie';
 
 const deactivate = (password) => fetch('/api/user/v1/accounts/deactivate_logout/', {

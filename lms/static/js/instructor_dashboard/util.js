@@ -507,7 +507,7 @@
                         return edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML(
                             '<a rel="noopener" target="_blank" href="'), dataContext.url,
                         edx.HtmlUtils.HTML('">'), dataContext.name,
-                        edx.HtmlUtils.HTML('</a>'));
+                        edx.HtmlUtils.HTML('<span class="sr-only">Opens in a new tab</span></a>'));
                     }
                 }
             ];

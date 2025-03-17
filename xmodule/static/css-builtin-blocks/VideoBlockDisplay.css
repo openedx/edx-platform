@@ -525,9 +525,9 @@
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li.is-active .speed-option,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li.is-active .control-lang {
-    border-left: calc(var(--baseline, 20px) / 10) solid #0ea6ec;
+    border-left: calc(var(--baseline, 20px) / 10) solid #90d7f9;
     font-weight: var(--font-bold, 700);
-    color: #0ea6ec;
+    color: #90d7f9;
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container.is-opened .menu {

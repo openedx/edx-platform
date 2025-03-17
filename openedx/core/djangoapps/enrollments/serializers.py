@@ -2,14 +2,12 @@
 Serializers for all Course Enrollment related return objects.
 """
 
-
 import logging
 
 from rest_framework import serializers
 
 from common.djangoapps.course_modes.models import CourseMode
-from common.djangoapps.student.models import (CourseEnrollment,
-                                              CourseEnrollmentAllowed)
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +19,7 @@ class StringListField(serializers.CharField):
     [1,2,3]
 
     """
+
     def field_to_native(self, obj, field_name):  # pylint: disable=unused-argument
         """
         Serialize the object's class name.
@@ -28,7 +27,7 @@ class StringListField(serializers.CharField):
         if not obj.suggested_prices:
             return []
 
-        items = obj.suggested_prices.split(',')
+        items = obj.suggested_prices.split(",")
         return [int(item) for item in items]
 
 
@@ -49,7 +48,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
 
     class Meta:
         # For disambiguating within the drf-yasg swagger schema
-        ref_name = 'enrollment.Course'
+        ref_name = "enrollment.Course"
 
     def __init__(self, *args, **kwargs):
         self.include_expired = kwargs.pop("include_expired", False)
@@ -59,15 +58,8 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         """
         Retrieve course modes associated with the course.
         """
-        course_modes = CourseMode.modes_for_course(
-            obj.id,
-            include_expired=self.include_expired,
-            only_selectable=False
-        )
-        return [
-            ModeSerializer(mode).data
-            for mode in course_modes
-        ]
+        course_modes = CourseMode.modes_for_course(obj.id, include_expired=self.include_expired, only_selectable=False)
+        return [ModeSerializer(mode).data for mode in course_modes]
 
     def get_pacing_type(self, obj):
         """
@@ -83,8 +75,9 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     the Course block and course modes, to give a complete representation of course enrollment.
 
     """
+
     course_details = CourseSerializer(source="course_overview")
-    user = serializers.SerializerMethodField('get_username')
+    user = serializers.SerializerMethodField("get_username")
 
     def get_username(self, model):
         """Retrieves the username from the associated model."""
@@ -92,8 +85,8 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course_details', 'user')
-        lookup_field = 'username'
+        fields = ("created", "mode", "is_active", "course_details", "user")
+        lookup_field = "username"
 
 
 class CourseEnrollmentsApiListSerializer(CourseEnrollmentSerializer):
@@ -101,14 +94,15 @@ class CourseEnrollmentsApiListSerializer(CourseEnrollmentSerializer):
     Serializes CourseEnrollment model and returns a subset of fields returned
     by the CourseEnrollmentSerializer.
     """
-    course_id = serializers.CharField(source='course_overview.id')
+
+    course_id = serializers.CharField(source="course_overview.id")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields.pop('course_details')
+        self.fields.pop("course_details")
 
     class Meta(CourseEnrollmentSerializer.Meta):
-        fields = CourseEnrollmentSerializer.Meta.fields + ('course_id', )
+        fields = CourseEnrollmentSerializer.Meta.fields + ("course_id",)
 
 
 class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -119,6 +113,7 @@ class ModeSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     does not handle the model object itself, but the tuple.
 
     """
+
     slug = serializers.CharField(max_length=100)
     name = serializers.CharField(max_length=255)
     min_price = serializers.IntegerField()
@@ -137,7 +132,8 @@ class CourseEnrollmentAllowedSerializer(serializers.ModelSerializer):
     Aggregates all data from the CourseEnrollmentAllowed table, and pulls in the serialization
     to give a complete representation of course enrollment allowed.
     """
+
     class Meta:
         model = CourseEnrollmentAllowed
-        exclude = ['id']
-        lookup_field = 'user'
+        exclude = ["id"]
+        lookup_field = "user"

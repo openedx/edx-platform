@@ -1,4 +1,3 @@
-import 'whatwg-fetch';
 import Cookies from 'js-cookie';
 
 const HEADERS = {

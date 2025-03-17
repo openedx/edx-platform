@@ -13,16 +13,18 @@ class PublishableEntityLinksSerializer(serializers.ModelSerializer):
     """
     upstream_context_title = serializers.CharField(read_only=True)
     upstream_version = serializers.IntegerField(read_only=True)
-    ready_to_sync = serializers.SerializerMethodField()
-
-    def get_ready_to_sync(self, obj):
-        """Calculate ready_to_sync field"""
-        return bool(
-            obj.upstream_version and
-            obj.upstream_version > (obj.version_synced or 0) and
-            obj.upstream_version > (obj.version_declined or 0)
-        )
+    ready_to_sync = serializers.BooleanField()
 
     class Meta:
         model = PublishableEntityLink
         exclude = ['upstream_block', 'uuid']
+
+
+class PublishableEntityLinksSummarySerializer(serializers.Serializer):
+    """
+    Serializer for summary for publishable entity links
+    """
+    upstream_context_title = serializers.CharField(read_only=True)
+    upstream_context_key = serializers.CharField(read_only=True)
+    ready_to_sync_count = serializers.IntegerField(read_only=True)
+    total_count = serializers.IntegerField(read_only=True)

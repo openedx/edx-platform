@@ -109,6 +109,18 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
             },
 
             hide: function() {
+                try {
+                    window.parent.postMessage(
+                        {
+                            type: 'hideXBlockEditorModal',
+                            message: 'Sends a message when the modal window is hided',
+                            payload: {}
+                        }, document.referrer
+                    );
+                } catch (e) {
+                    console.error(e);
+                }
+
                 // Completely remove the modal from the DOM
                 this.undelegateEvents();
                 this.$el.html('');
@@ -118,6 +130,15 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 if (event) {
                     event.preventDefault();
                     event.stopPropagation(); // Make sure parent modals don't see the click
+                }
+                try {
+                    window.parent.postMessage({
+                        type: 'closeXBlockEditorModal',
+                        message: 'Sends a message when the modal window is closed',
+                        payload: {}
+                    }, document.referrer);
+                } catch (e) {
+                    console.error(e);
                 }
                 this.hide();
             },

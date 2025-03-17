@@ -547,16 +547,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
     'ENABLE_HIDE_FROM_TOC_UI': False,
 
-    # .. toggle_name: FEATURES['ENABLE_HOME_PAGE_COURSE_API_V2']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: Enables the new home page course v2 API, which is a new version of the home page course
-    #   API with pagination, filter and ordering capabilities.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-03-14
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34173
-    'ENABLE_HOME_PAGE_COURSE_API_V2': True,
-
     # .. toggle_name: FEATURES['ENABLE_GRADING_METHOD_IN_PROBLEMS']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1699,6 +1689,8 @@ INSTALLED_APPS = [
     # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
 
+    # Maintenance tools
+    'cms.djangoapps.maintenance',
     'openedx.core.djangoapps.util.apps.UtilConfig',
 
     # Tracking
@@ -2584,6 +2576,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
+TRANSCRIPT_LANG_CACHE_TIMEOUT = 60 * 60 * 24
 
 
 ##### shoppingcart Payment #####
@@ -2932,3 +2925,26 @@ MEILISEARCH_API_KEY = "devkey"
 # .. for now it wil impact country listing in auth flow and user profile.
 # .. eg ['US', 'CA']
 DISABLED_COUNTRIES = []
+
+# .. setting_name: LIBRARY_ENABLED_BLOCKS
+# .. setting_default: ['problem', 'video', 'html', 'drag-and-drop-v2']
+# .. setting_description: List of block types that are ready/enabled to be created/used
+# .. in libraries. Both basic blocks and advanced blocks can be included.
+# .. In the future, we will support individual configuration per library - see
+# .. openedx/core/djangoapps/content_libraries/api.py::get_allowed_block_types()
+LIBRARY_ENABLED_BLOCKS = [
+    'problem',
+    'video',
+    'html',
+    'drag-and-drop-v2',
+    'conditional',
+    'done',
+    'freetextresponse',
+    'google-calendar',
+    'google-document',
+    'invideoquiz',
+    'pdf',
+    'poll',
+    'survey',
+    'word_cloud',
+]

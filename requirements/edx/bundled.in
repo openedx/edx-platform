@@ -31,7 +31,6 @@ edx-i18n-tools>=0.4.6               # Commands for developers and translators to
 ## Third party integrations
 algoliasearch                       # Algolia’s API client for indexed searching
 django-ses                          # Django email backend for Amazon’s Simple Email Service
-edx-braze-client                    # a customer engagement platform used for edx.org
 mailsnake                           # MailChimp API; used for two management commands in the "mailing" djangoapp
 optimizely-sdk                      # Optimizely provides A/B testing and other features, used by edx.org
 
