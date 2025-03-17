@@ -12,6 +12,7 @@ from .assets_management import is_modified, get_offline_course_total_size
 from .constants import MAX_RETRY_ATTEMPTS, OFFLINE_SUPPORTED_XBLOCKS, RETRY_BACKOFF_INITIAL_TIMEOUT
 from .storage_management import OfflineContentGenerator
 from .models import OfflineCourseSize
+from .utils import clear_deleted_content
 
 
 @shared_task
@@ -25,6 +26,8 @@ def generate_offline_content_for_course(course_id):
     course_key = CourseKey.from_string(course_id)
 
     tasks = []
+
+    clear_deleted_content(course_key)
 
     for offline_supported_block_type in OFFLINE_SUPPORTED_XBLOCKS:
         for xblock in modulestore().get_items(course_key, qualifiers={'category': offline_supported_block_type}):
