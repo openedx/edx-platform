@@ -221,6 +221,7 @@ class TestSearchApi(ModuleStoreTestCase):
         self.unit_dict = {
             "id": "lctorg1libunitunit-1-e4527f7c",
             "block_id": "unit-1",
+            "block_type": "unit",
             "usage_key": self.unit_usage_key,
             "type": "library_container",
             "display_name": "Unit 1",

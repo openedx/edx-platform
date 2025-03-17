@@ -515,6 +515,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",
             "block_id": "unit1",
+            "block_type": "unit",
             "usage_key": "lct:edX:2012_Fall:unit:unit1",
             "type": "library_container",
             "org": "edX",

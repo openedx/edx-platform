@@ -18,7 +18,7 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchApiError, MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryCollectionLocator
 from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
@@ -774,17 +774,13 @@ def update_library_components_collections(
         _update_index_docs(docs)
 
 
-def upsert_library_container_index_doc(library_key: LibraryLocatorV2, container_key: str) -> None:
+def upsert_library_container_index_doc(container_key: LibraryContainerLocator) -> None:
     """
     Creates, updates, or deletes the document for the given Library Container in the search index.
 
     TODO: add support for indexing a container's components, like upsert_library_collection_index_doc does.
     """
-    container_metadata = lib_api.ContainerMetadata.from_container(
-        library_key,
-        container_key,
-    )
-    doc = searchable_doc_for_container(container_metadata.container_key)
+    doc = searchable_doc_for_container(container_key)
 
     # Soft-deleted/disabled containers are removed from the index
     # and their components updated.

@@ -567,6 +567,7 @@ def searchable_doc_for_container(
         Fields.org: str(container_key.library_key.org),
         # In the future, this may be either course_container or library_container
         Fields.type: DocType.library_container,
+        Fields.block_type: container_key.container_type,
         Fields.usage_key: str(container_key),  # Field name isn't exact but this is the closest match
         Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
         Fields.access_id: _meili_access_id_from_context_key(container_key.library_key),
