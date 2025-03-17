@@ -2919,6 +2919,13 @@ MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
 MEILISEARCH_INDEX_PREFIX = ""
 MEILISEARCH_API_KEY = "devkey"
 
+# .. setting_name: DISABLED_COUNTRIES
+# .. setting_default: []
+# .. setting_description: List of country codes that should be disabled
+# .. for now it wil impact country listing in auth flow and user profile.
+# .. eg ['US', 'CA']
+DISABLED_COUNTRIES = []
+
 # .. setting_name: LIBRARY_ENABLED_BLOCKS
 # .. setting_default: ['problem', 'video', 'html', 'drag-and-drop-v2']
 # .. setting_description: List of block types that are ready/enabled to be created/used
