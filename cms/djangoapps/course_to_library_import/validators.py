@@ -2,6 +2,8 @@
 Validators for the course_to_library_import app.
 """
 
+from collections import ChainMap
+
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -27,3 +29,10 @@ def validate_course_ids(value: str):
             CourseKey.from_string(course_id)
         except InvalidKeyError as exc:
             raise ValueError(_('Invalid course key: {course_id}').format(course_id=course_id)) from exc
+
+
+def validate_usage_ids(usage_ids, staged_content):
+    available_block_keys = ChainMap(*staged_content.values_list('tags', flat=True))
+    for usage_key in usage_ids:
+        if usage_key not in available_block_keys:
+            raise ValueError(f'Block {usage_key} is not available for import')

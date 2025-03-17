@@ -2,10 +2,12 @@
 Tests for course_to_library_import validators
 """
 
+from unittest.mock import MagicMock
+
 from django.test import TestCase
 import pytest
 
-from cms.djangoapps.course_to_library_import.validators import validate_course_ids
+from cms.djangoapps.course_to_library_import.validators import validate_course_ids, validate_usage_ids
 
 
 class TestValidateCourseIds(TestCase):
@@ -28,4 +30,31 @@ class TestValidateCourseIds(TestCase):
     def test_duplicate_course_ids(self):
         with pytest.raises(ValueError) as exc:
             validate_course_ids('course-v1:edX+DemoX+Demo_Course course-v1:edX+DemoX+Demo_Course')
-            assert str(exc.value) == 'Duplicate course keys are not allowed'
+        assert str(exc.value) == 'Duplicate course keys are not allowed'
+
+
+class TestValidateUsageIds(TestCase):
+    """
+    Test cases for validate_usage_ids function.
+
+    Case 1: Valid usage ids
+    Case 2: Invalid usage ids
+    """
+
+    def test_valid_usage_ids(self):
+        staged_content = MagicMock()
+        staged_content.values_list.return_value = [
+            ['block-v1:edX+DemoX+type@problem+block@12345'],
+            ['block-v1:edX+DemoX+type@video+block@67890'],
+        ]
+        validate_usage_ids(['block-v1:edX+DemoX+type@problem+block@12345'], staged_content)
+
+    def test_invalid_usage_ids(self):
+        staged_content = MagicMock()
+        staged_content.values_list.return_value = [
+            ['block-v1:edX+DemoX+type@problem+block@12345'],
+            ['block-v1:edX+DemoX+type@video+block@67890'],
+        ]
+        with pytest.raises(ValueError) as exc:
+            validate_usage_ids(['block-v1:edX+DemoX+type@discussion+block@54321'], staged_content)
+            assert str(exc.value) == 'Block block-v1:edX+DemoX+type@discussion+block@54321 is not available for import'

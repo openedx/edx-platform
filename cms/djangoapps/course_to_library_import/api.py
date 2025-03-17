@@ -2,18 +2,39 @@
 API for course to library import.
 """
 
-from .tasks import save_courses_to_staged_content_task
+from .constants import COURSE_TO_LIBRARY_IMPORT_PURPOSE
+from .models import CourseToLibraryImport
+from .tasks import (
+    import_library_from_staged_content_task,
+    save_courses_to_staged_content_task,
+)
 
-COURSE_TO_LIBRARY_IMPORT_PURPOSE = "course_to_library_import"
 
-
-def save_courses_to_staged_content(
-    course_ids: list[str],
-    user_id: int,
-    purpose: str = COURSE_TO_LIBRARY_IMPORT_PURPOSE,
-    version_num: int | None = None,
+def import_library_from_staged_content(
+    library_key: str, user_id: int, usage_ids: list[str], course_id: str, override: bool
 ) -> None:
     """
-    Save courses to staged content.
+    Import staged content to a library.
     """
-    save_courses_to_staged_content_task.delay(course_ids, user_id, purpose, version_num)
+    import_library_from_staged_content_task.delay(
+        user_id, usage_ids, library_key, COURSE_TO_LIBRARY_IMPORT_PURPOSE, course_id, override
+    )
+
+
+def create_import(
+    course_ids: list[str], user_id: int, library_key: str, source_type: str
+) -> None:
+    """
+    Create a new import task to import a course to a library.
+    """
+    import_task = CourseToLibraryImport(
+        course_ids=" ".join(course_ids),
+        library_key=library_key,
+        source_type=source_type,
+        user_id=user_id,
+    )
+    import_task.save()
+
+    save_courses_to_staged_content_task.delay(
+        course_ids, user_id, import_task.id, COURSE_TO_LIBRARY_IMPORT_PURPOSE
+    )

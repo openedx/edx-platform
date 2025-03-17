@@ -2,6 +2,8 @@
 Models for the course to library import app.
 """
 
+from typing import Self
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -42,6 +44,13 @@ class CourseToLibraryImport(TimeStampedModel):
     class Meta:
         verbose_name = _('Course to Library Import')
         verbose_name_plural = _('Course to Library Imports')
+
+    @classmethod
+    def get_by_id(cls, import_id: int) -> Self:
+        """
+        Get an import task by its ID.
+        """
+        return cls.objects.filter(id=import_id).first()
 
 
 class ComponentVersionImport(TimeStampedModel):
