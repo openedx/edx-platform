@@ -45,7 +45,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from xmodule.modulestore.django import modulestore
 from edx_django_utils.plugins import pluggable_override
 
-
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
 
