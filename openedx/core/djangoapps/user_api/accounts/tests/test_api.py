@@ -7,19 +7,18 @@ import datetime
 import itertools
 import unicodedata
 from unittest.mock import Mock, patch
-
-import ddt
 import pytest
+import ddt
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import UTC
 from social_django.models import UserSocialAuth
-
 from common.djangoapps.student.models import (
     AccountRecovery,
     PendingEmailChange,
@@ -29,14 +28,14 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 from common.djangoapps.student.views.management import activate_secondary_email
+
 from lms.djangoapps.certificates.data import CertificateStatuses
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
-from openedx.core.djangoapps.embargo.models import Country, GlobalRestrictedCountry
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY
 from openedx.core.djangoapps.user_api.accounts.api import (
     get_account_settings,
-    get_name_validation_error,
-    update_account_settings
+    update_account_settings,
+    get_name_validation_error
 )
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (  # pylint: disable=unused-import
     RetirementTestCase,
@@ -575,14 +574,12 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         assert account_settings['country'] is None
         assert account_settings['state'] is None
 
+    @override_settings(DISABLED_COUNTRIES=['KP'])
     def test_change_to_disabled_country(self):
         """
         Test that changing the country to a disabled country is not allowed
         """
         # First set the country and state
-        country = Country.objects.create(country="KP")
-        GlobalRestrictedCountry.objects.create(country=country)
-
         update_account_settings(self.user, {"country": UserProfile.COUNTRY_WITH_STATES, "state": "MA"})
         account_settings = get_account_settings(self.default_request)[0]
         assert account_settings['country'] == UserProfile.COUNTRY_WITH_STATES
