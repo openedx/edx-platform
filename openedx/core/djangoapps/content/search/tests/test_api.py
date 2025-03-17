@@ -385,7 +385,7 @@ class TestSearchApi(ModuleStoreTestCase):
             [self.unit_dict]
         ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
         mock_logger.assert_any_call(
-            f"Error indexing container unit-1: Failed to generate document"
+            "Error indexing container unit-1: Failed to generate document"
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
