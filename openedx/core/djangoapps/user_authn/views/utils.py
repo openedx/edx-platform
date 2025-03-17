@@ -14,7 +14,6 @@ from text_unidecode import unidecode
 from common.djangoapps import third_party_auth
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.models import clean_username
-from openedx.core.djangoapps.embargo.models import GlobalRestrictedCountry
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 import random
@@ -192,9 +191,6 @@ def remove_disabled_country_from_list(countries: Dict) -> Dict:
     Returns:
     - dict: Dict of countries with disabled countries removed.
     """
-    if not settings.FEATURES.get("EMBARGO", False):
-        return countries
-
-    for country_code in GlobalRestrictedCountry.get_countries():
+    for country_code in settings.DISABLED_COUNTRIES:
         del countries[country_code]
     return countries
