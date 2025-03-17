@@ -96,6 +96,7 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'id': self.block.location.html_id(),
@@ -184,6 +185,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'is_embed': False,
@@ -460,6 +462,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'id': self.block.location.html_id(),
@@ -592,6 +595,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'id': self.block.location.html_id(),
@@ -730,6 +734,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'is_embed': False,
@@ -809,12 +814,16 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'edx_video_id': edx_video_id,
             'result': {
                 'download_video_link': f'http://fake-video.edx.org/{edx_video_id}.mp4',
-                'sources': ['example.mp4', 'example.webm'] + [video['url'] for video in encoded_videos],
+                'is_video_from_same_origin': True,
+                'sources': ['http://fake-video.edx.org/example.mp4', 'http://fake-video.edx.org/example.webm'] +
+                           [video['url'] for video in encoded_videos],
             },
         }
-        # context returned by get_html when provided with above data
-        # expected_context, a dict to assert with context
-        context, expected_context = self.helper_get_html_with_edx_video_id(data)
+        with override_settings(VIDEO_CDN_URL={'default': 'http://fake-video.edx.org'}):
+            # context returned by get_html when provided with above data
+            # expected_context, a dict to assert with context
+            context, expected_context = self.helper_get_html_with_edx_video_id(data)
+
         mako_service = self.block.runtime.service(self.block, 'mako')
         assert get_context_dict_from_string(context) ==\
                get_context_dict_from_string(mako_service.render_lms_template('video.html', expected_context))
@@ -839,12 +848,15 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'edx_video_id': f"{edx_video_id}\t",
             'result': {
                 'download_video_link': f'http://fake-video.edx.org/{edx_video_id}.mp4',
-                'sources': ['example.mp4', 'example.webm'] + [video['url'] for video in encoded_videos],
+                'is_video_from_same_origin': True,
+                'sources': ['http://fake-video.edx.org/example.mp4', 'http://fake-video.edx.org/example.webm'] +
+                           [video['url'] for video in encoded_videos],
             },
         }
-        # context returned by get_html when provided with above data
-        # expected_context, a dict to assert with context
-        context, expected_context = self.helper_get_html_with_edx_video_id(data)
+        with override_settings(VIDEO_CDN_URL={'default': 'http://fake-video.edx.org'}):
+            # context returned by get_html when provided with above data
+            # expected_context, a dict to assert with context
+            context, expected_context = self.helper_get_html_with_edx_video_id(data)
 
         mako_service = self.block.runtime.service(self.block, 'mako')
         assert get_context_dict_from_string(context) ==\
@@ -910,6 +922,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'is_embed': False,
@@ -951,6 +964,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'block_id': str(self.block.location),
             'course_id': str(self.block.location.course_key),
             'download_video_link': data['result']['download_video_link'],
+            'is_video_from_same_origin': data['result']['is_video_from_same_origin'],
             'metadata': json.dumps(expected_context['metadata'])
         })
         return context, expected_context
@@ -1029,6 +1043,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': None,
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'is_embed': False,
@@ -1129,6 +1144,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': None,
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'id': None,
@@ -2382,6 +2398,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'is_embed': False,
@@ -2464,6 +2481,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
             'cdn_exp_group': None,
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
+            'is_video_from_same_origin': False,
             'handout': None,
             'hide_downloads': False,
             'is_embed': False,
