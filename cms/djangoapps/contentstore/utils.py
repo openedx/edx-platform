@@ -1208,6 +1208,7 @@ def duplicate_block(
             store.update_item(parent, user.id)
 
         # .. event_implemented_name: XBLOCK_DUPLICATED
+        # .. event_type: org.openedx.content_authoring.xblock.duplicated.v1
         XBLOCK_DUPLICATED.send_event(
             time=datetime.now(timezone.utc),
             xblock_info=DuplicatedXBlockData(
@@ -2385,7 +2386,7 @@ def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, c
         lib_component = None
     PublishableEntityLink.update_or_create(
         lib_component,
-        upstream_usage_key=xblock.upstream,
+        upstream_usage_key=upstream_usage_key,
         upstream_context_key=str(upstream_usage_key.context_key),
         downstream_context_key=course_key,
         downstream_usage_key=xblock.usage_key,

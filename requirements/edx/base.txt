@@ -411,10 +411,6 @@ edx-api-doc-tools==2.0.0
     #   edx-name-affirmation
 edx-auth-backends==4.4.0
     # via -r requirements/edx/kernel.in
-edx-braze-client==0.2.5
-    # via
-    #   -r requirements/edx/bundled.in
-    #   edx-enterprise
 edx-bulk-grades==1.1.0
     # via
     #   -r requirements/edx/kernel.in
@@ -469,7 +465,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.8.0
+edx-enterprise==5.10.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -544,7 +540,7 @@ edx-when==2.5.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
-edxval==2.9.1
+edxval==2.10.0
     # via -r requirements/edx/kernel.in
 elasticsearch==7.9.1
     # via

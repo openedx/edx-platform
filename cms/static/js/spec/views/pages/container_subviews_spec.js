@@ -581,7 +581,6 @@ describe('Container Subviews', function() {
         });
     });
 
-
     describe('Message Area', function() {
         var messageSelector = '.container-message .warning',
             warningMessage = 'Caution: The last published version of this unit is live. '

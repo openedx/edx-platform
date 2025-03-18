@@ -7,8 +7,10 @@ from datetime import datetime, timezone
 
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import Count, F, Q, QuerySet
 from django.db.models.fields import IntegerField, TextField
+from django.db.models.functions import Coalesce
+from django.db.models.lookups import GreaterThan
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -173,7 +175,12 @@ class PublishableEntityLink(models.Model):
             )
         try:
             link = cls.objects.get(downstream_usage_key=downstream_usage_key)
-            has_changes = False
+            # TODO: until we save modified datetime for course xblocks in index, the modified time for links are updated
+            # everytime a downstream/course block is updated. This allows us to order links[1] based on recently
+            # modified downstream version.
+            # pylint: disable=line-too-long
+            # 1. https://github.com/open-craft/frontend-app-course-authoring/blob/0443d88824095f6f65a3a64b77244af590d4edff/src/course-libraries/ReviewTabContent.tsx#L222-L233
+            has_changes = True  # change to false once above condition is met.
             for key, value in new_values.items():
                 prev = getattr(link, key)
                 # None != None is True, so we need to check for it specially
@@ -191,16 +198,31 @@ class PublishableEntityLink(models.Model):
         return link
 
     @classmethod
-    def get_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet["PublishableEntityLink"]:
+    def filter_links(
+        cls,
+        **link_filter,
+    ) -> QuerySet["PublishableEntityLink"]:
         """
-        Get all links for given downstream context, preselects related published version and learning package.
+        Get all links along with sync flag, upstream context title and version, with optional filtering.
         """
-        return cls.objects.filter(
-            downstream_context_key=downstream_context_key
-        ).select_related(
+        ready_to_sync = link_filter.pop('ready_to_sync', None)
+        result = cls.objects.filter(**link_filter).select_related(
             "upstream_block__published__version",
             "upstream_block__learning_package"
+        ).annotate(
+            ready_to_sync=(
+                GreaterThan(
+                    Coalesce("upstream_block__published__version__version_num", 0),
+                    Coalesce("version_synced", 0)
+                ) & GreaterThan(
+                    Coalesce("upstream_block__published__version__version_num", 0),
+                    Coalesce("version_declined", 0)
+                )
+            )
         )
+        if ready_to_sync is not None:
+            result = result.filter(ready_to_sync=ready_to_sync)
+        return result
 
     @classmethod
     def get_by_upstream_usage_key(cls, upstream_usage_key: UsageKey) -> QuerySet["PublishableEntityLink"]:
@@ -210,6 +232,35 @@ class PublishableEntityLink(models.Model):
         return cls.objects.filter(
             upstream_usage_key=upstream_usage_key,
         )
+
+    @classmethod
+    def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
+        """
+        Returns a summary of links by upstream context for given downstream_context_key.
+        Example:
+        [
+            {
+                "upstream_context_title": "CS problems 3",
+                "upstream_context_key": "lib:OpenedX:CSPROB3",
+                "ready_to_sync_count": 11,
+                "total_count": 14
+            },
+            {
+                "upstream_context_title": "CS problems 2",
+                "upstream_context_key": "lib:OpenedX:CSPROB2",
+                "ready_to_sync_count": 15,
+                "total_count": 24
+            },
+        ]
+        """
+        result = cls.filter_links(downstream_context_key=downstream_context_key).values(
+            "upstream_context_key",
+            upstream_context_title=F("upstream_block__learning_package__title"),
+        ).annotate(
+            ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
+            total_count=Count('id')
+        )
+        return result
 
 
 class LearningContextLinksStatusChoices(models.TextChoices):

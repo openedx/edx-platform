@@ -677,11 +677,6 @@ edx-auth-backends==4.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-braze-client==0.2.5
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   edx-enterprise
 edx-bulk-grades==1.1.0
     # via
     #   -r requirements/edx/doc.txt
@@ -748,7 +743,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.8.0
+edx-enterprise==5.10.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -852,7 +847,7 @@ edx-when==2.5.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-edxval==2.9.1
+edxval==2.10.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -887,7 +882,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.txt
-faker==36.1.1
+faker==37.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy

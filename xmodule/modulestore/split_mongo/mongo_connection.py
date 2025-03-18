@@ -248,17 +248,16 @@ class CourseStructureCache:
 
             # We rely on the course structure cache default timeout, which should be
             # high by default (~ a few days).
-            try:
+            total_bytes_in_one_mb = 1024 * 1024
+            if data_size < total_bytes_in_one_mb * 2:  # Only data with a size smaller than 2MB will be cached
                 self.cache.set(key, compressed_pickled_data)
-            except Exception:  # pylint: disable=broad-except
-                total_bytes_in_one_mb = 1024 * 1024
+            else:
                 chunk_size_in_mbs = round(data_size / total_bytes_in_one_mb, 2)
 
-                # .. custom_attribute_name: split_mongo_compressed_size
+                # .. custom_attribute_name: split_mongo_compressed_size_in_mbs
                 # .. custom_attribute_description: contains the data chunk size in MBs. The size on which
                 #   the memcached client failed to store value in course structure cache.
-                monitoring.set_custom_attribute('split_mongo_compressed_size', chunk_size_in_mbs)
-                log.info('Data caching (course structure) failed on chunk size: {} MB'.format(chunk_size_in_mbs))
+                monitoring.set_custom_attribute('split_mongo_compressed_size_in_mbs', chunk_size_in_mbs)
 
 
 class MongoPersistenceBackend:
