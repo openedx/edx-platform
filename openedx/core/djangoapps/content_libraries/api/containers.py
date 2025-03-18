@@ -30,6 +30,7 @@ __all__ = [
     "get_container",
     "create_container",
     "get_container_children",
+    "library_container_usage_key",
 ]
 
 
@@ -51,9 +52,11 @@ class ContainerMetadata(PublishableItem):
         Construct a ContainerMetadata object from a Container object.
         """
         last_publish_log = container.versioning.last_publish_log
-
-        assert container.unit is not None
-        container_type = ContainerType.Unit
+        container_key = library_container_usage_key(
+            library_key,
+            container=container,
+        )
+        container_type = ContainerType(container_key.container_type)
 
         published_by = ""
         if last_publish_log and last_publish_log.published_by:
@@ -68,11 +71,7 @@ class ContainerMetadata(PublishableItem):
             last_draft_created_by = ""
 
         return cls(
-            container_key=LibraryContainerLocator(
-                library_key,
-                container_type=container_type.value,
-                container_id=container.publishable_entity.key,
-            ),
+            container_key=container_key,
             container_type=container_type,
             display_name=draft.title,
             created=container.created,
@@ -86,6 +85,25 @@ class ContainerMetadata(PublishableItem):
             has_unpublished_changes=authoring_api.contains_unpublished_changes(container.pk),
             collections=associated_collections or [],
         )
+
+
+def library_container_usage_key(
+    library_key: LibraryLocatorV2,
+    container: authoring_models.Container,
+) -> LibraryContainerLocator:
+    """
+    Returns a LibraryContainerLocator for the given library + container.
+
+    Currently only supports Unit-type containers; will support other container types in future.
+    """
+    assert container.unit is not None
+    container_type = ContainerType.Unit
+
+    return LibraryContainerLocator(
+        library_key,
+        container_type=container_type.value,
+        container_id=container.publishable_entity.key,
+    )
 
 
 def get_container(container_key: LibraryContainerLocator) -> ContainerMetadata:

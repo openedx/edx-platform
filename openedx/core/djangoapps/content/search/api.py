@@ -481,13 +481,13 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
             docs = []
             for container in batch:
                 try:
-                    container_metadata = lib_api.ContainerMetadata.from_container(
+                    container_key = lib_api.library_container_usage_key(
                         library_key,
                         container,
                     )
-                    doc = searchable_doc_for_container(container_metadata.container_key)
+                    doc = searchable_doc_for_container(container_key)
                     # TODO: when we add container tags
-                    # doc.update(searchable_doc_tags_for_container(library_key, container.key))
+                    # doc.update(searchable_doc_tags_for_container(container_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing container {container.key}: {err}")
