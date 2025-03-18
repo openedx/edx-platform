@@ -564,9 +564,10 @@ def searchable_doc_for_container(
     doc = {
         Fields.id: meili_id_from_opaque_key(container_key),
         Fields.context_key: str(container_key.library_key),
-        Fields.org: str(container_key.library_key.org),
+        Fields.org: str(container_key.org),
         # In the future, this may be either course_container or library_container
         Fields.type: DocType.library_container,
+        # To check if it is "unit", "section", "subsection", etc..
         Fields.block_type: container_key.container_type,
         Fields.usage_key: str(container_key),  # Field name isn't exact but this is the closest match
         Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
