@@ -7,11 +7,15 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ..middleware import UserTagsEventContextMiddleware
 from ..tests.factories import UserCourseTagFactory
 
 
+# This middleware only gets installed in the LMS so no need to test
+# it in the CMS context.
+@skip_unless_lms
 class TagsMiddlewareTest(TestCase):
     """
     Test the UserTagsEventContextMiddleware
