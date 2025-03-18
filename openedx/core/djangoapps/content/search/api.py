@@ -523,19 +523,19 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                 IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
             status_cb(f"{num_collections_done}/{num_collections} collections indexed for library {lib_key}")
 
-            # Similarly, batch process Units in pages of 100
-            units = authoring_api.get_units(library.learning_package_id)
-            num_units = units.count()
-            num_units_done = 0
-            status_cb(f"{num_units_done}/{num_units}. Now indexing units in library {lib_key}")
-            paginator = Paginator(units, 100)
+            # Similarly, batch process Containers (units, sections, etc) in pages of 100
+            containers = authoring_api.get_containers(library.learning_package_id)
+            num_containers = containers.count()
+            num_containers_done = 0
+            status_cb(f"{num_containers_done}/{num_containers}. Now indexing containers in library {lib_key}")
+            paginator = Paginator(containers, 100)
             for p in paginator.page_range:
-                num_units_done = index_container_batch(
+                num_containers_done = index_container_batch(
                     paginator.page(p).object_list,
-                    num_units_done,
+                    num_containers_done,
                     lib_key,
                 )
-                status_cb(f"{num_units_done}/{num_units} units indexed for library {lib_key}")
+                status_cb(f"{num_containers_done}/{num_containers} containers indexed for library {lib_key}")
             if incremental:
                 IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
 
