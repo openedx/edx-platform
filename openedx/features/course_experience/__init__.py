@@ -104,7 +104,9 @@ def default_course_url(course_key):
     from .url_helpers import get_learning_mfe_home_url
 
     if DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(course_key):
-        return reverse('courseware', args=[str(course_key)])
+        # Prevent a circular dependency
+        from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
+        return make_learning_mfe_courseware_url(course_key)
 
     return get_learning_mfe_home_url(course_key, url_fragment='home')
 
