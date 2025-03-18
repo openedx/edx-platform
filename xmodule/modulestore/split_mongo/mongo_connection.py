@@ -254,10 +254,10 @@ class CourseStructureCache:
             else:
                 chunk_size_in_mbs = round(data_size / total_bytes_in_one_mb, 2)
 
-                # .. custom_attribute_name: split_mongo_compressed_size
+                # .. custom_attribute_name: split_mongo_compressed_size_in_mbs
                 # .. custom_attribute_description: contains the data chunk size in MBs. The size on which
                 #   the memcached client failed to store value in course structure cache.
-                monitoring.set_custom_attribute('split_mongo_compressed_size', chunk_size_in_mbs)
+                monitoring.set_custom_attribute('split_mongo_compressed_size_in_mbs', chunk_size_in_mbs)
 
 
 class MongoPersistenceBackend:
