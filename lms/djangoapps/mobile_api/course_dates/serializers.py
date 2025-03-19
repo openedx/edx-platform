@@ -14,10 +14,11 @@ class ContentDateSerializer(serializers.Serializer):
 
     course_id = serializers.CharField()
     assignment_block_id = serializers.CharField(source="location")
-    due_date = serializers.CharField()
+    due_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
     assignment_title = serializers.SerializerMethodField()
     learner_has_access = serializers.SerializerMethodField()
     course_name = serializers.CharField()
+    relative = serializers.BooleanField()
 
     def get_assignment_title(self, obj):
         return modulestore().get_item(obj.location).display_name
