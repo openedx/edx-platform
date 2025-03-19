@@ -21,10 +21,6 @@ aiosignal==1.3.2
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-algoliasearch==3.0.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
 amqp==5.3.1
     # via
     #   -r requirements/edx/base.txt
@@ -574,7 +570,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.10.1
+edx-enterprise==5.10.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -629,7 +625,7 @@ edx-search==4.1.3
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-edx-sga==0.25.0
+edx-sga==0.25.3
     # via -r requirements/edx/base.txt
 edx-submissions==3.8.5
     # via
@@ -905,7 +901,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.13.2
+lti-consumer-xblock==9.13.3
     # via -r requirements/edx/base.txt
 lxml[html-clean]==5.3.1
     # via
@@ -1399,7 +1395,6 @@ regex==2024.11.6
 requests==2.32.3
     # via
     #   -r requirements/edx/base.txt
-    #   algoliasearch
     #   analytics-python
     #   cachecontrol
     #   django-oauth-toolkit
