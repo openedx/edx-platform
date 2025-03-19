@@ -3,7 +3,7 @@ API views for course dates.
 """
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.db.models import Case, F, OuterRef, Q, Subquery, When
+from django.db.models import Case, F, OuterRef, Q, Subquery, When, BooleanField
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from edx_when.models import ContentDate
@@ -48,7 +48,8 @@ class AllCourseDatesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 "due_date": "2025-02-28 00:00:00+00:00",
                 "assignment_title": "Subsection name",
                 "learner_has_access": true,
-                "course_name": "Course name"
+                "course_name": "Course name",
+                "relative": false
             },
             {
                 "course_id": "course-v1:1+1+1",
@@ -56,7 +57,8 @@ class AllCourseDatesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 "due_date": "2025-03-03 00:30:00+00:00",
                 "assignment_title": "Subsection name",
                 "learner_has_access": true,
-                "course_name": "Course name"
+                "course_name": "Course name",
+                "relative": true
             },
         }
         ```
@@ -104,6 +106,11 @@ class AllCourseDatesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                         then=F("enrollment_created") + F("policy__rel_date"),
                     ),
                     default=F("policy__abs_date"),
+                ),
+                relative=Case(
+                    When(policy__rel_date__isnull=False, then=True),
+                    default=False,
+                    output_field=BooleanField(),
                 ),
             )
             .exclude(

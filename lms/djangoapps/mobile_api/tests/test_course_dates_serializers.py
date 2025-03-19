@@ -47,15 +47,17 @@ class TestContentDateSerializer(MixedSplitTestCase):
         queryset = ContentDate.objects.annotate(
             due_date=F("policy__abs_date"),
             course_name=Value("Test Display Name"),
+            relative=Value(True),
         ).first()
         serializer = ContentDateSerializer(queryset)
         expected_data = {
             "course_id": str(self.course.id),
             "assignment_block_id": str(self.sequential.location),
-            "due_date": str(self.date_policy.abs_date),
+            "due_date": self.date_policy.abs_date.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "assignment_title": self.sequential.display_name,
             "learner_has_access": True,
             "course_name": "Test Display Name",
+            "relative": True,
         }
 
         self.assertEqual(serializer.data, expected_data)

@@ -115,6 +115,7 @@ class TestAllCourseDatesViewSet(
 
         content_date = queryset.filter(location=sequential_2.location).first()
         self.assertEqual(content_date.due_date, self.enrollment_1.created + date_policy_with_relative_date.rel_date)
+        self.assertEqual(content_date.relative, True)
 
     def test_get_queryset_with_past_due_date_not_self_paced_course(self):
         """
