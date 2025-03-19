@@ -134,8 +134,11 @@ class BlockStructureStore:
         to the cache.
         """
         cache_key = self._encode_root_cache_key(bs_model)
-        self._cache.set(cache_key, serialized_data, timeout=config.cache_timeout_in_seconds())
-        logger.info("BlockStructure: Added to cache; %s, size: %d", bs_model, len(serialized_data))
+        total_bytes_in_one_mb = 1024 * 1024
+        if len(serialized_data) < total_bytes_in_one_mb * 2:
+            self._cache.set(cache_key, serialized_data, timeout=config.cache_timeout_in_seconds())
+            data_size_in_mbs = round(len(serialized_data) / total_bytes_in_one_mb, 2)
+            logger.info("BlockStructure: Added to cache; %s, size: %dMB", bs_model, data_size_in_mbs)
 
     def _get_from_cache(self, bs_model):
         """

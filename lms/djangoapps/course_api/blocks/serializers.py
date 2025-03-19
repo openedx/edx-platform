@@ -6,6 +6,7 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from lms.djangoapps.course_blocks.transformers.hidden_content import HiddenContentTransformer
 from lms.djangoapps.course_blocks.transformers.visibility import VisibilityTransformer
 from openedx.core.djangoapps.discussions.transformers import DiscussionsTopicLinkTransformer
 
@@ -81,6 +82,13 @@ SUPPORTED_FIELDS = [
         VisibilityTransformer,
         requested_field_name='visible_to_staff_only',
     ),
+
+    SupportedFieldType(
+        'merged_hide_after_due',
+        HiddenContentTransformer,
+        requested_field_name='hide_after_due'
+    ),
+
     SupportedFieldType(BlockCompletionTransformer.COMPLETION, BlockCompletionTransformer),
     SupportedFieldType(BlockCompletionTransformer.COMPLETE),
     SupportedFieldType(BlockCompletionTransformer.RESUME_BLOCK),

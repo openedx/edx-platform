@@ -6,6 +6,7 @@ import os
 import os.path
 import textwrap
 import unittest
+from unittest.mock import patch
 
 import pytest
 import random2 as random
@@ -20,7 +21,7 @@ from six.moves import range
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa.safe_exec import safe_exec, update_hash
-from xmodule.capa.safe_exec.remote_exec import is_codejail_rest_service_enabled
+from xmodule.capa.safe_exec.remote_exec import is_codejail_in_darklaunch, is_codejail_rest_service_enabled
 
 
 class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -123,6 +124,70 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
         with pytest.raises(SystemExit) as cm:
             safe_exec('import sys; sys.exit(1)', g, unsafely=True)
         assert "SystemExit" in str(cm)
+
+
+class TestCodeJailDarkLaunch(unittest.TestCase):
+    """
+    Test that the behavior of the dark launched code behaves as expected.
+    """
+    @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
+    @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
+    def test_default_code_execution(self, local_exec, remote_exec):
+
+        # Test default only runs local exec.
+        g = {}
+        safe_exec('a=1', g)
+        assert local_exec.called
+        assert not remote_exec.called
+
+    @override_settings(ENABLE_CODEJAIL_REST_SERVICE=True)
+    @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
+    @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
+    def test_code_execution_only_codejail_service(self, local_exec, remote_exec):
+        # Set return values to empty values to indicate no error.
+        remote_exec.return_value = (None, None)
+        # Test with only the service enabled.
+        g = {}
+        safe_exec('a=1', g)
+        assert not local_exec.called
+        assert remote_exec.called
+
+    @override_settings(ENABLE_CODEJAIL_DARKLAUNCH=True)
+    @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
+    @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
+    def test_code_execution_darklaunch(self, local_exec, remote_exec):
+        # Set return values to empty values to indicate no error.
+        remote_exec.return_value = (None, None)
+        g = {}
+
+        # Verify that incorrect config runs only remote and not both.
+        with override_settings(ENABLE_CODEJAIL_REST_SERVICE=True):
+            safe_exec('a=1', g)
+            assert not local_exec.called
+            assert remote_exec.called
+
+        local_exec.reset_mock()
+        remote_exec.reset_mock()
+
+        # Set up side effects to mimic the real behavior of modifying the globals_dict.
+        def local_side_effect(*args, **kwargs):
+            test_globals = args[1]
+            test_globals['test'] = 'local_test'
+
+        def remote_side_effect(*args, **kwargs):
+            test_globals = args[0]['globals_dict']
+            test_globals['test'] = 'remote_test'
+
+        local_exec.side_effect = local_side_effect
+        remote_exec.side_effect = remote_side_effect
+
+        assert is_codejail_in_darklaunch()
+        safe_exec('a=1', g)
+
+        assert local_exec.called
+        assert remote_exec.called
+        # Verify that the local/default behavior currently wins out.
+        assert g['test'] == 'local_test'
 
 
 class TestLimitConfiguration(unittest.TestCase):

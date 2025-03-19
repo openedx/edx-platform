@@ -20,6 +20,7 @@ from lxml import etree
 from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from xmodule.contentstore.content import StaticContent
@@ -498,16 +499,17 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     remove_subs_from_store(video_id, item, lang)
 
         reraised_message = ''
-        for lang in new_langs:  # 3b
-            try:
-                generate_sjson_for_all_speeds(
-                    item,
-                    item.transcripts[lang],
-                    {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
-                    lang,
-                )
-            except TranscriptException:
-                pass
+        if not isinstance(item.usage_key.context_key, LibraryLocatorV2):
+            for lang in new_langs:  # 3b
+                try:
+                    generate_sjson_for_all_speeds(
+                        item,
+                        item.transcripts[lang],
+                        {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
+                        lang,
+                    )
+                except TranscriptException:
+                    pass
         if reraised_message:
             item.save_with_metadata(user)
             raise TranscriptException(reraised_message)
@@ -682,6 +684,18 @@ def convert_video_transcript(file_name, content, output_format):
     converted_transcript = Transcript.convert(content, input_format=input_format, output_format=output_format)
 
     return dict(filename=filename, content=converted_transcript)
+
+
+def clear_transcripts(block):
+    """
+    Deletes all transcripts of a video block from VAL
+    """
+    for language_code in block.transcripts.keys():
+        edxval_api.delete_video_transcript(
+            video_id=block.edx_video_id,
+            language_code=language_code,
+        )
+    block.transcripts = {}
 
 
 class Transcript:
@@ -1038,6 +1052,13 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
         )
 
     return transcript_content, transcript_name, Transcript.mime_types[output_format]
+
+
+def build_components_import_path(usage_key, file_path):
+    """
+    Build components import path
+    """
+    return f"components/{usage_key.block_type}/{usage_key.block_id}/{file_path}"
 
 
 def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):

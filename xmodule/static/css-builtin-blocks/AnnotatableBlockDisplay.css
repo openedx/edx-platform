@@ -11,7 +11,7 @@
 .xmodule_display.xmodule_AnnotatableBlock .annotatable-section {
     position: relative;
     padding: 0.5em 1em;
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
     border-radius: 0.5em;
     margin-bottom: 0.5em;
 }
@@ -29,7 +29,7 @@
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .annotatable-section .annotatable-section-body {
-    border-top: 1px solid var(--gray-l3);
+    border-top: 1px solid var(--gray-l3, #c8c8c8);
     margin-top: 0.5em;
     padding-top: 0.5em;
 }
@@ -151,7 +151,7 @@
     border: 1px solid #333;
     border-radius: 1em;
     background-color: rgba(0, 0, 0, 0.85);
-    color: var(--white);
+    color: var(--white, #fff);
     -webkit-font-smoothing: antialiased;
 }
 
@@ -159,12 +159,12 @@
     font-size: 1em;
     color: inherit;
     background-color: transparent;
-    padding: calc((var(--baseline) / 4)) calc((var(--baseline) / 2));
+    padding: calc((var(--baseline, 20px) / 4)) calc((var(--baseline, 20px) / 2));
     border: none;
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip .ui-tooltip-titlebar .ui-tooltip-title {
-    padding: calc((var(--baseline) / 4)) 0;
+    padding: calc((var(--baseline, 20px) / 4)) 0;
     border-bottom: 2px solid #333;
     font-weight: bold;
 }
@@ -176,7 +176,7 @@
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip .ui-tooltip-titlebar .ui-state-hover {
     color: inherit;
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip .ui-tooltip-content {
@@ -184,7 +184,7 @@
     font-size: 0.875em;
     text-align: left;
     font-weight: 400;
-    padding: 0 calc((var(--baseline) / 2)) calc((var(--baseline) / 2)) calc((var(--baseline) / 2));
+    padding: 0 calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2));
     background-color: transparent;
     border-color: transparent;
 }
@@ -199,12 +199,12 @@
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip-annotatable .ui-tooltip-content {
-    padding: 0 calc((var(--baseline) / 2));
+    padding: 0 calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip-annotatable .ui-tooltip-content .annotatable-comment {
     display: block;
-    margin: 0 0 calc((var(--baseline) / 2)) 0;
+    margin: 0 0 calc((var(--baseline, 20px) / 2)) 0;
     max-height: 225px;
     overflow: auto;
     line-height: normal;
@@ -213,7 +213,7 @@
 .xmodule_display.xmodule_AnnotatableBlock .ui-tooltip.qtip.ui-tooltip-annotatable .ui-tooltip-content .annotatable-reply {
     display: block;
     border-top: 2px solid #333;
-    padding: calc((var(--baseline) / 4)) 0;
+    padding: calc((var(--baseline, 20px) / 4)) 0;
     margin: 0;
     text-align: center;
 }
@@ -226,7 +226,7 @@
     left: 50%;
     height: 0;
     width: 0;
-    margin-left: calc(-1 * (var(--baseline) / 4));
+    margin-left: calc(-1 * (var(--baseline, 20px) / 4));
     border: 10px solid transparent;
     border-top-color: rgba(0, 0, 0, 0.85);
 }

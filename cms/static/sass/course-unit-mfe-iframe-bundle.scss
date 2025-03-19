@@ -1,11 +1,14 @@
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
-body {
-  min-width: 800px;
+html {
+  body {
+    min-width: 800px;
+    background: transparent;
+  }
 }
 
-.wrapper {
+[class*="view-"] .wrapper {
   .inner-wrapper {
     max-width: 100%;
   }
@@ -114,8 +117,7 @@ body {
           background-color: $primary;
           color: $white;
           border-color: $transparent;
-        color: $white;
-      }
+        }
 
         &:focus {
           outline: 2px $transparent;
@@ -123,6 +125,11 @@ body {
           box-shadow: inset 0 0 0 2px $primary;
           color: $primary;
           border-color: $transparent;
+        }
+
+        &.manage-tags-button {
+          width: 100%;
+          border-radius: 0;
         }
       }
     }
@@ -171,6 +178,11 @@ body {
     }
   }
 
+  .edit-xblock-modal select {
+    background-color: $white;
+    width: 100%;
+  }
+
   &.wrapper-modal-window .modal-window .modal-actions a {
     color: $text-color;
     background-color: $transparent;
@@ -200,7 +212,7 @@ body {
     }
   }
 
-  .modal-window.modal-editor {
+  .modal-window.modal-editor, &.xblock-iframe-content {
     background-color: $white;
     border-radius: 6px;
 
@@ -316,6 +328,7 @@ body {
 
       .openassessment_save_button,
       .save-button,
+      .action-save,
       .continue-button {
         color: $white;
         background-color: $primary;
@@ -347,6 +360,7 @@ body {
       }
 
       .openassessment_cancel_button,
+      .action-cancel,
       .cancel-button {
         color: $text-color;
         background-color: $transparent;
@@ -381,6 +395,68 @@ body {
   .modal-lg.modal-window.confirm.openassessment_modal_window {
     height: 635px;
   }
+
+  // Additions for the xblock editor on the Library Authoring
+  &.xblock-iframe-content {
+    height: 100%;
+
+    // Reset the max-height to allow the settings list to grow
+    .wrapper-comp-settings .list-input.settings-list {
+      max-height: unset;
+    }
+
+    // For Google Docs and Google Calendar xblock editor
+    .google-edit-wrapper .xblock-inputs {
+      position: unset;
+      overflow-y: unset;
+    }
+
+    .xblock-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+      position: sticky;
+      bottom: 0;
+
+      .action-item {
+        @extend %t-action3;
+
+        display: inline-block;
+        margin-right: ($baseline*0.75);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+
+    .xblock-v1-studio_view {
+      height: 100%;
+
+      .editor-with-buttons {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+
+        .list-input {
+          height: 90vh;
+        }
+      }
+
+      &.xmodule_DoneXBlock {
+        margin-top: 60px;
+        padding: 0 20px;
+      }
+
+      .xblock-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+  }
+
+  .studio-xblock-wrapper::marker {
+    content: '';
+  }
 }
 
 .view-container .content-primary {
@@ -397,7 +473,7 @@ body {
   @extend %button-styles;
 
   position: relative;
-  top: 7px;
+  top: -7px;
 
   .fa-pencil {
     display: none;
@@ -501,19 +577,40 @@ body {
   }
 }
 
-[class*="view-"] .modal-lg.modal-editor .modal-header .editor-modes .action-item {
-  .editor-button,
-  .settings-button {
-    @extend %light-button;
+body [class*="view-"] .openassessment_editor_buttons.xblock-actions {
+  padding: 15px 2% 3px 2%;
+}
+
+[class*="view-"] {
+  .modal-lg {
+    max-width: 1200px;
+  }
+
+  .modal-lg.modal-editor .modal-header .editor-modes .action-item {
+    .editor-button,
+    .settings-button {
+      @extend %light-button;
+    }
+  }
+
+  .wrapper.wrapper-modal-window .modal-window .modal-actions .action-primary {
+    @extend %primary-button;
+  }
+
+  #openassessment-editor {
+    #oa_basic_settings_editor #openassessment_title_editor_wrapper input, input[type=number] {
+      width: 48%;
+    }
   }
 }
 
-[class*="view-"] .wrapper.wrapper-modal-window .modal-window .modal-actions .action-primary {
-  @extend %primary-button;
-}
-
-.wrapper-comp-settings {
+[class*="view-"] div.wrapper-comp-settings {
   .list-input.settings-list {
+    input:not([type="file"]):not([type="number"]),
+    select {
+      width: 48%;
+    }
+
     .metadata-list-enum .create-setting {
       @extend %modal-actions-button;
 
@@ -537,6 +634,7 @@ body {
   .list-input.settings-list {
     .field.comp-setting-entry.is-set .setting-input {
       color: $text-color;
+      margin-bottom: 5px;
     }
 
     select {
@@ -723,4 +821,40 @@ select {
 
 .wrapper-xblock .xblock-header-primary .header-actions .wrapper-nav-sub {
   z-index: $zindex-dropdown;
+}
+
+.xblock-studio_view-drag-and-drop-v2 .xblock--drag-and-drop--editor {
+  .zone-align-select,
+  .item-styles-form input,
+  .drag-builder textarea,
+  .target-image-form textarea  {
+    width: 100%;
+  }
+
+  .target-image-form input[type="text"] {
+    width: 100%;
+
+    &.background-url {
+      margin-bottom: 10px;
+    }
+
+    &.autozone-layout {
+      &.autozone-layout-cols,
+      &.autozone-layout-rows {
+        width: auto;
+      }
+    }
+
+    &.autozone-size {
+      &.autozone-size-width,
+      &.autozone-size-height {
+        width: auto;
+      }
+    }
+  }
+
+  .feedback-tab input:not([type=checkbox]),
+  .xblock--drag-and-drop--editor .feedback-tab select {
+    width: 100%;
+  }
 }

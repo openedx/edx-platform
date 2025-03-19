@@ -57,7 +57,7 @@ urlpatterns = [
     path('show_student_extensions', api.ShowStudentExtensions.as_view(), name='show_student_extensions'),
 
     # proctored exam downloads...
-    path('get_proctored_exam_results', api.get_proctored_exam_results, name='get_proctored_exam_results'),
+    path('get_proctored_exam_results', api.GetProctoredExamResults.as_view(), name='get_proctored_exam_results'),
 
     # Grade downloads...
     path('list_report_downloads', api.ListReportDownloads.as_view(), name='list_report_downloads'),
@@ -65,7 +65,7 @@ urlpatterns = [
     path('problem_grade_report', api.problem_grade_report, name='problem_grade_report'),
 
     # Reports..
-    path('get_course_survey_results', api.get_course_survey_results, name='get_course_survey_results'),
+    path('get_course_survey_results', api.GetCourseSurveyResults.as_view(), name='get_course_survey_results'),
     path('export_ora2_data', api.export_ora2_data, name='export_ora2_data'),
     path('export_ora2_summary', api.export_ora2_summary, name='export_ora2_summary'),
 
@@ -78,7 +78,7 @@ urlpatterns = [
     path('gradebook/<int:offset>', gradebook_api.spoc_gradebook, name='spoc_gradebook'),
 
     # Cohort management
-    path('add_users_to_cohorts', api.add_users_to_cohorts, name='add_users_to_cohorts'),
+    path('add_users_to_cohorts', api.AddUsersToCohorts.as_view(), name='add_users_to_cohorts'),
 
     # Certificates
     path('enable_certificate_generation', api.enable_certificate_generation, name='enable_certificate_generation'),
@@ -88,7 +88,7 @@ urlpatterns = [
     path('certificate_exception_view/', api.CertificateExceptionView.as_view(), name='certificate_exception_view'),
     re_path(r'^generate_certificate_exceptions/(?P<generate_for>[^/]*)', api.GenerateCertificateExceptions.as_view(),
             name='generate_certificate_exceptions'),
-    path('generate_bulk_certificate_exceptions', api.generate_bulk_certificate_exceptions,
+    path('generate_bulk_certificate_exceptions', api.GenerateBulkCertificateExceptions.as_view(),
          name='generate_bulk_certificate_exceptions'),
     path(
         'certificate_invalidation_view/',

@@ -11,7 +11,7 @@
 .xmodule_display.xmodule_CourseInfoBlock h1,
 .xmodule_display.xmodule_HtmlBlock h1,
 .xmodule_display.xmodule_StaticTabBlock h1 {
-    color: var(--body-color);
+    color: var(--body-color, #313131);
     font: normal 2em/1.4em var(--font-family-sans-serif);
     letter-spacing: 1px;
     margin: 0 0 1.416em;
@@ -24,7 +24,7 @@
     color: #646464;
     font: normal 1.2em/1.2em var(--font-family-sans-serif);
     letter-spacing: 1px;
-    margin-bottom: calc((var(--baseline) * 0.75));
+    margin-bottom: calc((var(--baseline, 20px) * 0.75));
     -webkit-font-smoothing: antialiased;
 }
 
@@ -44,7 +44,7 @@
 .xmodule_display.xmodule_StaticTabBlock h4,
 .xmodule_display.xmodule_StaticTabBlock h5,
 .xmodule_display.xmodule_StaticTabBlock h6 {
-    margin: 0 0 calc((var(--baseline) / 2));
+    margin: 0 0 calc((var(--baseline, 20px) / 2));
     font-weight: 600;
 }
 
@@ -83,7 +83,7 @@
     margin-bottom: 1.416em;
     font-size: 1em;
     line-height: 1.6em !important;
-    color: var(--body-color);
+    color: var(--body-color, #313131);
 }
 
 .xmodule_display.xmodule_AboutBlock em,
@@ -142,14 +142,14 @@
 .xmodule_display.xmodule_StaticTabBlock p+p,
 .xmodule_display.xmodule_StaticTabBlock ul+p,
 .xmodule_display.xmodule_StaticTabBlock ol+p {
-    margin-top: var(--baseline);
+    margin-top: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_AboutBlock blockquote,
 .xmodule_display.xmodule_CourseInfoBlock blockquote,
 .xmodule_display.xmodule_HtmlBlock blockquote,
 .xmodule_display.xmodule_StaticTabBlock blockquote {
-    margin: 1em calc((var(--baseline) * 2));
+    margin: 1em calc((var(--baseline, 20px) * 2));
 }
 
 .xmodule_display.xmodule_AboutBlock ol,
@@ -162,7 +162,7 @@
 .xmodule_display.xmodule_StaticTabBlock ul {
     padding: 0 0 0 1em;
     margin: 1em 0;
-    color: var(--body-color);
+    color: var(--body-color, #313131);
 }
 
 .xmodule_display.xmodule_AboutBlock ol li,
@@ -210,7 +210,7 @@
 .xmodule_display.xmodule_StaticTabBlock a:hover,
 .xmodule_display.xmodule_StaticTabBlock a:active,
 .xmodule_display.xmodule_StaticTabBlock a:focus {
-    color: var(--blue);
+    color: var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_AboutBlock img,
@@ -226,7 +226,7 @@
 .xmodule_display.xmodule_HtmlBlock pre,
 .xmodule_display.xmodule_StaticTabBlock pre {
     margin: 1em 0;
-    color: var(--body-color);
+    color: var(--body-color, #313131);
     font-family: monospace, serif;
     font-size: 1em;
     white-space: pre-wrap;
@@ -237,7 +237,7 @@
 .xmodule_display.xmodule_CourseInfoBlock code,
 .xmodule_display.xmodule_HtmlBlock code,
 .xmodule_display.xmodule_StaticTabBlock code {
-    color: var(--body-color);
+    color: var(--body-color, #313131);
     font-family: monospace, serif;
     background: none;
     padding: 0;
@@ -248,7 +248,7 @@
 .xmodule_display.xmodule_HtmlBlock table,
 .xmodule_display.xmodule_StaticTabBlock table {
     width: 100%;
-    margin: var(--baseline) 0;
+    margin: var(--baseline, 20px) 0;
     border-collapse: collapse;
     font-size: 16px;
 }
@@ -261,9 +261,9 @@
 .xmodule_display.xmodule_HtmlBlock table th,
 .xmodule_display.xmodule_StaticTabBlock table td,
 .xmodule_display.xmodule_StaticTabBlock table th {
-    margin: var(--baseline) 0;
-    padding: calc((var(--baseline) / 2));
-    border: 1px solid var(--gray-l3);
+    margin: var(--baseline, 20px) 0;
+    padding: calc((var(--baseline, 20px) / 2));
+    border: 1px solid var(--gray-l3, #c8c8c8);
     font-size: 14px;
 }
 
@@ -314,12 +314,12 @@
 .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .modal-ui-icon {
     position: absolute;
     display: block;
-    padding: calc((var(--baseline) / 4)) 7px;
+    padding: calc((var(--baseline, 20px) / 4)) 7px;
     border-radius: 5px;
     opacity: 0.9;
-    background: var(--white);
-    color: var(--black);
-    border: 2px solid var(--black);
+    background: var(--white, #fff);
+    color: var(--black, #000);
+    border: 2px solid var(--black, #000);
 }
 
 .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .modal-ui-icon .label,
@@ -446,14 +446,14 @@
 .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-in,
 .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-in,
 .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-in {
-    margin-right: calc((var(--baseline) / 4));
+    margin-right: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-out,
 .xmodule_display.xmodule_CourseInfoBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-out,
 .xmodule_display.xmodule_HtmlBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-out,
 .xmodule_display.xmodule_StaticTabBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.action-zoom-out {
-    margin-left: calc((var(--baseline) / 4));
+    margin-left: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_AboutBlock .wrapper-modal-image .image-modal .image-content .image-controls .image-control .modal-ui-icon.is-disabled,

@@ -44,6 +44,8 @@ def ace_email_sent_handler(sender, **kwargs):
     user_id = recipient.get('user_id', None)
     channel = message.get('channel', None)
     course_id = context.get('course_id', None)
+    message_language = message.get('message_language', None)
+    translation_language = message.get('translation_language', None)
     if not course_id:
         course_email = context.get('course_email', None)
         course_id = course_email.course_id if course_email else None
@@ -56,5 +58,7 @@ def ace_email_sent_handler(sender, **kwargs):
             'course_id': course_id,
             'user_id': user_id,
             'user_email': email_address,
+            'message_language': message_language,
+            'translation_language': translation_language,
         }
     )
