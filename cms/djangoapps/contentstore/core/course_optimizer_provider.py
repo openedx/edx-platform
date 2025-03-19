@@ -5,7 +5,7 @@ import json
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 
-from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask
+from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask, LinkState
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
 
@@ -128,16 +128,16 @@ def generate_broken_links_descriptor(json_content, request_user):
     for item in json_content:
         block_id, link, *rest = item
         if rest:
-            is_locked_flag = bool(rest[0])
+            linkState = rest[0]
         else:
-            is_locked_flag = False
+            linkState = ''
 
         usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
         xblock_node_tree, xblock_dictionary = _update_node_tree_and_dictionary(
             block=block,
             link=link,
-            is_locked=is_locked_flag,
+            linkState=linkState,
             node_tree=xblock_node_tree,
             dictionary=xblock_dictionary
         )
@@ -145,7 +145,7 @@ def generate_broken_links_descriptor(json_content, request_user):
     return _create_dto_recursive(xblock_node_tree, xblock_dictionary)
 
 
-def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictionary):
+def _update_node_tree_and_dictionary(block, link, linkState, node_tree, dictionary):
     """
     Inserts a block into the node tree and add its attributes to the dictionary.
 
@@ -210,8 +210,13 @@ def _update_node_tree_and_dictionary(block, link, is_locked, node_tree, dictiona
         f'/course/{block.course_id}/editor/{block.category}/{block.location}'
     )
 
-    if is_locked:
+    # The linkState == True condition is maintained for backward compatibility.
+    # Previously, the is_locked attribute was used instead of linkStateType.
+    # If is_locked is True, it indicates that the link is locked.
+    if linkState == True or linkState == LinkState.LOCKED:
         updated_dictionary[xblock_id].setdefault('locked_links', []).append(link)
+    elif linkState == LinkState.EXTERNAL_FORBIDDEN:
+        updated_dictionary[xblock_id].setdefault('external_forbidden_links', []).append(link)
     else:
         updated_dictionary[xblock_id].setdefault('broken_links', []).append(link)
 
@@ -268,6 +273,7 @@ def _create_dto_recursive(xblock_node, xblock_dictionary):
                 'url': xblock_data.get('url', ''),
                 'brokenLinks': xblock_data.get('broken_links', []),
                 'lockedLinks': xblock_data.get('locked_links', []),
+                'externalForbiddenLinks': xblock_data.get('external_forbidden_links', [])
             })
         else:   # Non-leaf node
             category = xblock_data.get('category', None)

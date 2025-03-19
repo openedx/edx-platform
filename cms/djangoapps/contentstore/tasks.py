@@ -99,6 +99,14 @@ ALL_ALLOWED_XBLOCKS = frozenset(
     [entry_point.name for entry_point in entry_points(group="xblock.v1")]
 )
 
+class LinkState:
+    """
+    Links State Enumeration
+    """
+    BROKEN = 'broken'
+    LOCKED = 'locked'
+    EXTERNAL_FORBIDDEN = 'external-forbidden'
+
 
 def clone_instance(instance, field_values):
     """ Clones a Django model instance.
@@ -1364,9 +1372,11 @@ def _filter_by_status(results):
         elif status == 200:
             continue
         elif status == 403 and _is_studio_url(url):
-            filtered_results.append([block_id, url, True])
+            filtered_results.append([block_id, url, LinkState.LOCKED])
+        elif status == 403 and not _is_studio_url(url):
+            filtered_results.append([block_id, url, LinkState.EXTERNAL_FORBIDDEN])
         else:
-            filtered_results.append([block_id, url, False])
+            filtered_results.append([block_id, url, LinkState.BROKEN])
 
     return filtered_results, retry_list
 
