@@ -13,7 +13,7 @@ def get_without_builtins():
     xblocks = [
         entry_point.name
         for entry_point in entry_points(group='xblock.v1')
-        if not entry_point.module.startswith('xmodule')
+        if not entry_point.value.startswith('xmodule')
     ]
     return sorted(xblocks)
 

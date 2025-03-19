@@ -29,7 +29,7 @@ from .events import (
     notification_preferences_viewed_event,
     notification_read_event,
     notification_tray_opened_event,
-    notifications_app_all_read_event
+    notifications_app_all_read_event,
 )
 from .models import CourseNotificationPreference, Notification
 from .serializers import (
@@ -523,12 +523,11 @@ class UpdateAllNotificationPreferencesView(APIView):
                                 'error': f'Invalid path: {app}.notification_types.{notification_type}.{channel}'
                             })
 
-                    except Exception as e:
+                    except (KeyError, AttributeError, ValueError) as e:
                         errors.append({
                             'course_id': str(preference.course_id),
                             'error': str(e)
                         })
-
                 response_data = {
                     'status': 'success' if updated_courses else 'partial_success' if errors else 'error',
                     'message': 'Notification preferences update completed',
@@ -542,16 +541,26 @@ class UpdateAllNotificationPreferencesView(APIView):
                         'total_courses': notification_preferences.count()
                     }
                 }
-
                 if errors:
                     response_data['errors'] = errors
-
+                event_data = {
+                    'notification_app': app,
+                    'notification_type': notification_type,
+                    'notification_channel': channel,
+                    'value': value,
+                    'email_cadence': value
+                }
+                notification_preference_update_event(
+                    request.user,
+                    [course['course_id'] for course in updated_courses],
+                    event_data
+                )
                 return Response(
                     response_data,
                     status=status.HTTP_200_OK if updated_courses else status.HTTP_400_BAD_REQUEST
                 )
 
-        except Exception as e:
+        except (KeyError, AttributeError, ValueError) as e:
             return Response({
                 'status': 'error',
                 'message': str(e)
@@ -579,7 +588,7 @@ class AggregatedNotificationPreferences(APIView):
         notification_configs = aggregate_notification_configs(
             notification_configs
         )
-
+        notification_preferences_viewed_event(request)
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved',

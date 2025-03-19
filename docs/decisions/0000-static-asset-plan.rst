@@ -84,7 +84,7 @@ mechanism:
 
 ``openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder``
   Custom finder that accesses and extracts assets from pip-installed XBlocks via
-  ``importlib.resources``.
+  ``pkg_resources``.
 
 ``openedx.core.storage.DevelopmentStorage/ProductionStorage``
   Custom ``FileStorage`` classes that mostly exist for theme-awareness.

@@ -153,6 +153,7 @@ class EcommerceService:
         return None
 
 
+@pluggable_override('OVERRIDE_REFUND_ENTITLEMENT')
 def refund_entitlement(course_entitlement):
     """
     Attempt a refund of a course entitlement. Verify the User before calling this refund method

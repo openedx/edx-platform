@@ -1,6 +1,7 @@
 """
 Tests for the Studio content search documents (what gets stored in the index)
 """
+from dataclasses import replace
 from datetime import datetime, timezone
 from organizations.models import Organization
 
@@ -298,6 +299,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Normal"],
             },
+            "publish_status": "never",
         }
 
     def test_html_published_library_block(self):
@@ -337,6 +339,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "level0": ["Difficulty > Normal"],
             },
             'published': {'display_name': 'Text'},
+            "publish_status": "published",
         }
 
         # Update library block to create a draft
@@ -378,6 +381,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "level0": ["Difficulty > Normal"],
             },
             "published": {"display_name": "Text"},
+            "publish_status": "published",
         }
 
         # Publish new changes
@@ -420,7 +424,19 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "display_name": "Text 2",
                 "description": "This is a Test",
             },
+            "publish_status": "published",
         }
+
+        # Verify publish status is set to modified
+        library_block_modified = replace(
+            self.library_block,
+            modified=datetime(2024, 4, 5, 6, 7, 8, tzinfo=timezone.utc),
+            last_published=datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc),
+        )
+        doc = searchable_doc_for_library_block(library_block_modified)
+        doc.update(searchable_doc_tags(library_block_modified.usage_key))
+        doc.update(searchable_doc_collections(library_block_modified.usage_key))
+        assert doc["publish_status"] == "modified"
 
     def test_collection_with_library(self):
         doc = searchable_doc_for_collection(self.library.key, self.collection.key)

@@ -2,6 +2,7 @@
 Common utility functions useful throughout the contentstore
 """
 from __future__ import annotations
+
 import configparser
 import html
 import logging
@@ -9,12 +10,12 @@ import re
 from collections import defaultdict
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from urllib.parse import quote_plus, urlencode, urlunparse, urlparse
+from urllib.parse import quote_plus, urlencode, urlparse, urlunparse
 from uuid import uuid4
 
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.text import Truncator
@@ -22,32 +23,31 @@ from django.utils.translation import gettext as _
 from eventtracking import tracker
 from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from milestones import api as milestones_api
+from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import LibraryLocator
-
-from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TEAM_SCHEME
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
 from openedx_events.learning.signals import COURSE_NOTIFICATION_REQUESTED
-
-from milestones import api as milestones_api
 from pytz import UTC
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import (
+    enable_course_optimizer,
     exam_setting_view_enabled,
     libraries_v1_enabled,
     libraries_v2_enabled,
     split_library_view_on_dashboard,
     use_new_advanced_settings_page,
-    use_new_course_outline_page,
     use_new_certificates_page,
+    use_new_course_outline_page,
+    use_new_course_team_page,
+    use_new_custom_pages,
     use_new_export_page,
     use_new_files_uploads_page,
     use_new_grading_page,
     use_new_group_configurations_page,
-    use_new_course_team_page,
     use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
@@ -57,16 +57,15 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_updates_page,
     use_new_video_editor,
     use_new_video_uploads_page,
-    use_new_custom_pages,
 )
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
-from common.djangoapps.course_action_state.models import CourseRerunUIStateManager, CourseRerunState
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
+from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
-from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access, STUDIO_EDIT_ROLES
+from common.djangoapps.student.auth import STUDIO_EDIT_ROLES, has_studio_read_access, has_studio_write_access
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -75,15 +74,15 @@ from common.djangoapps.student.roles import (
 )
 from common.djangoapps.track import contexts
 from common.djangoapps.util.course import get_link_for_about_page
+from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.milestones_helpers import (
+    generate_milestone_namespace,
+    get_namespace_choices,
     is_prerequisite_courses_enabled,
     is_valid_course_key,
     remove_prerequisite_course,
     set_prerequisite_courses,
-    get_namespace_choices,
-    generate_milestone_namespace
 )
-from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
@@ -93,23 +92,28 @@ from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_R
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.html_to_text import html_to_text
+from openedx.core.lib.teams_config import CONTENT_GROUPS_FOR_TEAMS, TEAM_SCHEME
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
-from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.data import CertificatesDisplayBehaviors
+from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.services import SettingsService, ConfigurationService, TeamsConfigurationService
+from xmodule.partitions.partitions_service import (
+    get_all_partitions_for_course,  # lint-amnesty, pylint: disable=wrong-import-order
+)
+from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 
+from .models import PublishableEntityLink
 
 IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
 log = logging.getLogger(__name__)
@@ -390,6 +394,19 @@ def get_export_url(course_locator) -> str:
     return export_url
 
 
+def get_optimizer_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for optimizer page view.
+    """
+    optimizer_url = None
+    if enable_course_optimizer(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/optimizer'
+        if mfe_base_url:
+            optimizer_url = course_mfe_url
+    return optimizer_url
+
+
 def get_files_uploads_url(course_locator) -> str:
     """
     Gets course authoring microfrontend URL for files and uploads page view.
@@ -504,6 +521,18 @@ def get_custom_pages_url(course_locator) -> str:
         if mfe_base_url:
             custom_pages_url = course_mfe_url
     return custom_pages_url
+
+
+def get_course_libraries_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for custom pages view.
+    """
+    url = None
+    if libraries_v2_enabled():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        if mfe_base_url:
+            url = f'{mfe_base_url}/course/{course_locator}/libraries'
+    return url
 
 
 def get_taxonomy_list_url() -> str | None:
@@ -1179,6 +1208,7 @@ def duplicate_block(
             store.update_item(parent, user.id)
 
         # .. event_implemented_name: XBLOCK_DUPLICATED
+        # .. event_type: org.openedx.content_authoring.xblock.duplicated.v1
         XBLOCK_DUPLICATED.send_event(
             time=datetime.now(timezone.utc),
             xblock_info=DuplicatedXBlockData(
@@ -2340,3 +2370,27 @@ def get_xblock_render_error(request, xblock):
         return str(exc)
 
     return ""
+
+
+def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, created: datetime | None = None) -> None:
+    """
+    Create or update upstream->downstream link in database for given xblock.
+    """
+    if not xblock.upstream:
+        return None
+    upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
+    try:
+        lib_component = get_component_from_usage_key(upstream_usage_key)
+    except ObjectDoesNotExist:
+        log.error(f"Library component not found for {upstream_usage_key}")
+        lib_component = None
+    PublishableEntityLink.update_or_create(
+        lib_component,
+        upstream_usage_key=upstream_usage_key,
+        upstream_context_key=str(upstream_usage_key.context_key),
+        downstream_context_key=course_key,
+        downstream_usage_key=xblock.usage_key,
+        version_synced=xblock.upstream_version,
+        version_declined=xblock.upstream_version_declined,
+        created=created,
+    )

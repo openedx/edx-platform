@@ -13,6 +13,8 @@ from edx_django_utils.admin.mixins import ReadOnlyAdminMixin
 from cms.djangoapps.contentstore.models import (
     BackfillCourseTabsConfig,
     CleanStaleCertificateAvailabilityDatesConfig,
+    LearningContextLinksStatus,
+    PublishableEntityLink,
     VideoUploadConfig
 )
 from cms.djangoapps.contentstore.outlines_regenerate import CourseOutlineRegenerate
@@ -84,6 +86,71 @@ class CourseOutlineRegenerateAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
 
 class CleanStaleCertificateAvailabilityDatesConfigAdmin(ConfigurationModelAdmin):
     pass
+
+
+@admin.register(PublishableEntityLink)
+class PublishableEntityLinkAdmin(admin.ModelAdmin):
+    """
+    PublishableEntityLink admin.
+    """
+    fields = (
+        "uuid",
+        "upstream_block",
+        "upstream_usage_key",
+        "upstream_context_key",
+        "downstream_usage_key",
+        "downstream_context_key",
+        "version_synced",
+        "version_declined",
+        "created",
+        "updated",
+    )
+    readonly_fields = fields
+    list_display = [
+        "upstream_block",
+        "upstream_usage_key",
+        "downstream_usage_key",
+        "version_synced",
+        "updated",
+    ]
+    search_fields = [
+        "upstream_usage_key",
+        "upstream_context_key",
+        "downstream_usage_key",
+        "downstream_context_key",
+    ]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(LearningContextLinksStatus)
+class LearningContextLinksStatusAdmin(admin.ModelAdmin):
+    """
+    LearningContextLinksStatus admin.
+    """
+    fields = (
+        "context_key",
+        "status",
+        "created",
+        "updated",
+    )
+    readonly_fields = ("created", "updated")
+    list_display = (
+        "context_key",
+        "status",
+        "created",
+        "updated",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(BackfillCourseTabsConfig, ConfigurationModelAdmin)

@@ -394,6 +394,7 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
         ignore_conflicts=True
     )
     preferences = CourseNotificationPreference.objects.filter(**kwargs)
+    is_preference_updated = False
 
     # pylint: disable=too-many-nested-blocks
     for preference in preferences:
@@ -409,11 +410,17 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
                     if not is_name_match(channel, channel_value):
                         continue
                     if is_notification_type_channel_editable(app_name, noti_type, channel):
-                        type_prefs[channel] = pref_value
+                        if type_prefs[channel] != pref_value:
+                            type_prefs[channel] = pref_value
+                            is_preference_updated = True
+
                         if channel == 'email' and pref_value and type_prefs.get('email_cadence') == EmailCadence.NEVER:
-                            type_prefs['email_cadence'] = get_default_cadence_value(app_name, noti_type)
+                            default_cadence = get_default_cadence_value(app_name, noti_type)
+                            if type_prefs['email_cadence'] != default_cadence:
+                                type_prefs['email_cadence'] = default_cadence
+                                is_preference_updated = True
         preference.save()
-    notification_preference_unsubscribe_event(user)
+        notification_preference_unsubscribe_event(user, is_preference_updated)
 
 
 def is_notification_type_channel_editable(app_name, notification_type, channel):

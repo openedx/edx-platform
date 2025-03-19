@@ -514,7 +514,6 @@ class CreditRequirementStatus(TimeStampedModel):
                 )
             )
             log.error(log_msg)
-            return
 
     @classmethod
     def retire_user(cls, retirement):
