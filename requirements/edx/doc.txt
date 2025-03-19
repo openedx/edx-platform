@@ -998,7 +998,7 @@ openedx-filters==2.0.1
     #   ora2
 openedx-forum==0.1.8
     # via -r requirements/edx/base.txt
-openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@jill/containers-api
+openedx-learning==0.19.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
