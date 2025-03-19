@@ -3055,8 +3055,10 @@ class ChangeDueDate(APIView):
         student = serializer_data.validated_data.get('student')
         if not student:
             response_payload = {
-                'error': _('Could not find student matching identifier: {student}').format(student=request.data.get("student"))
-                }
+                'error': _(
+                    'Could not find student matching identifier: {student}'
+                ).format(student=request.data.get("student"))
+            }
             return JsonResponse(response_payload, status=status.HTTP_404_NOT_FOUND)
 
         due_datetime = serializer_data.validated_data.get('due_datetime')
