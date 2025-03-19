@@ -1624,10 +1624,6 @@ OPTIMIZELY_FULLSTACK_SDK_KEY = None
 ######################## HOTJAR ###########################
 HOTJAR_SITE_ID = 00000
 
-######################## ALGOLIA SEARCH ###########################
-ALGOLIA_APP_ID = None
-ALGOLIA_SEARCH_API_KEY = None
-
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 
@@ -5549,15 +5545,6 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_default: empty dictionary
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
-
-
-# .. setting_name: DISABLED_COUNTRIES
-# .. setting_default: []
-# .. setting_description: List of country codes that should be disabled
-# .. for now it wil impact country listing in auth flow and user profile.
-# .. eg ['US', 'CA']
-DISABLED_COUNTRIES = []
-
 
 LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 
