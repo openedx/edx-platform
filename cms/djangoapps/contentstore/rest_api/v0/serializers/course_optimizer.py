@@ -12,6 +12,7 @@ class LinkCheckBlockSerializer(serializers.Serializer):
     url = serializers.CharField(required=True, allow_null=False, allow_blank=False)
     brokenLinks = serializers.ListField(required=False)
     lockedLinks = serializers.ListField(required=False)
+    externalForbiddenLinks = serializers.ListField(required=False)
 
 
 class LinkCheckUnitSerializer(serializers.Serializer):
