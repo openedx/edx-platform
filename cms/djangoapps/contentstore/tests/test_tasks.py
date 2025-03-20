@@ -31,6 +31,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from ..tasks import (
+    LinkState,
     export_olx,
     update_special_exams_and_publish,
     rerun_course,
@@ -239,10 +240,18 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@1", "http://example.com/valid"],
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid"],
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3", f'http://{settings.CMS_BASE}/locked'],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3", 'https://outsider.com/about'],
         ]
         self.expected_file_contents = [
-            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid", False],
-            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3", f"http://{settings.CMS_BASE}/locked", True],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid", LinkState.BROKEN],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3",
+             f"http://{settings.CMS_BASE}/locked",
+             LinkState.LOCKED
+             ],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3",
+             'https://outsider.com/about',
+             LinkState.EXTERNAL_FORBIDDEN
+             ],
         ]
 
     @mock.patch('cms.djangoapps.contentstore.tasks.UserTaskArtifact', autospec=True)
@@ -250,7 +259,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     @mock.patch('cms.djangoapps.contentstore.tasks._save_broken_links_file', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks._write_broken_links_to_file', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches', autospec=True)
-    def test_check_broken_links_stores_broken_and_locked_urls(
+    def test_check_broken_links_stores_broken_locked_and_forbidden_urls(
         self,
         mock_validate_urls,
         mock_write_broken_links_to_file,
@@ -287,6 +296,11 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
                 "url": f"http://{settings.CMS_BASE}/locked",
                 "status": 403,
             },
+            {
+                "block_id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3",
+                "url": "https://outsider.com/about",
+                "status": 403,
+            }
         ]
 
         _check_broken_links(mock_task, mock_user.id, mock_course_key_string, 'en')  # pylint: disable=no-value-for-parameter
@@ -472,6 +486,36 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         assert len(broken_or_locked_urls) == 2  # The inputs with status = 403 and 500
         assert len(retry_list) == 1             # The input with status = None
         assert retry_list[0][1] == '5'      # The only URL fit for a retry operation (status == None)
+
+    def test_filter_by_status(self):
+        """
+        Test the _filter_by_status function to ensure it correctly categorize links
+        based on the given status codes and returns appropriate lists of filtered
+        results and retry attempts.
+        """
+        # Test data
+        results = [
+            {'status': 200, 'block_id': 'block1', 'url': 'https://example.com'},
+            {'status': None, 'block_id': 'block2', 'url': 'https://retry.com'},
+            {'status': 403, 'block_id': 'block3', 'url': 'https://{settings.CMS_BASE}'},
+            {'status': 403, 'block_id': 'block4', 'url': 'https://external.com'},
+            {'status': 404, 'block_id': 'block5', 'url': 'https://broken.com'}
+        ]
+
+        expected_filtered_results = [
+            ['block3', 'https://{settings.CMS_BASE}', LinkState.LOCKED],
+            ['block4', 'https://external.com', LinkState.EXTERNAL_FORBIDDEN],
+            ['block5', 'https://broken.com', LinkState.BROKEN],
+        ]
+
+        expected_retry_list = [
+            ['block2', 'https://retry.com']
+        ]
+
+        filtered_results, retry_list = _filter_by_status(results)
+
+        self.assertEqual(filtered_results, expected_filtered_results)
+        self.assertEqual(retry_list, expected_retry_list)
 
     @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
     @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])

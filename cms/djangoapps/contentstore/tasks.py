@@ -99,6 +99,7 @@ ALL_ALLOWED_XBLOCKS = frozenset(
     [entry_point.name for entry_point in entry_points(group="xblock.v1")]
 )
 
+
 class LinkState:
     """
     Links State Enumeration

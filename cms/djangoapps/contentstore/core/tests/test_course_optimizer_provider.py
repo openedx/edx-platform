@@ -8,6 +8,7 @@ from cms.djangoapps.contentstore.core.course_optimizer_provider import (
     _update_node_tree_and_dictionary,
     _create_dto_recursive
 )
+from cms.djangoapps.contentstore.tasks import LinkState
 
 
 class TestLinkCheckProvider(CourseTestCase):
@@ -61,7 +62,7 @@ class TestLinkCheckProvider(CourseTestCase):
             }
         }
         result_tree, result_dictionary = _update_node_tree_and_dictionary(
-            self.mock_block, 'example_link', True, {}, {}
+            self.mock_block, 'example_link', LinkState.LOCKED, {}, {}
         )
 
         self.assertEqual(expected_tree, result_tree)
@@ -92,7 +93,7 @@ class TestLinkCheckProvider(CourseTestCase):
             }
         }
         result_tree, result_dictionary = _update_node_tree_and_dictionary(
-            self.mock_block, 'example_link', True, {}, {}
+            self.mock_block, 'example_link', LinkState.LOCKED, {}, {}
         )
 
         self.assertEqual(expected_dictionary, result_dictionary)
@@ -118,7 +119,8 @@ class TestLinkCheckProvider(CourseTestCase):
                     'displayName': 'Block Name',
                     'url': '/block/1',
                     'brokenLinks': ['broken_link_1', 'broken_link_2'],
-                    'lockedLinks': ['locked_link']
+                    'lockedLinks': ['locked_link'],
+                    'externalForbiddenLinks': ['forbidden_link_1'],
                 }
             ]
         }
@@ -143,7 +145,8 @@ class TestLinkCheckProvider(CourseTestCase):
                 'display_name': 'Block Name',
                 'url': '/block/1',
                 'broken_links': ['broken_link_1', 'broken_link_2'],
-                'locked_links': ['locked_link']
+                'locked_links': ['locked_link'],
+                'external_forbidden_links': ['forbidden_link_1'],
             }
         }
         expected = _create_dto_recursive(mock_node_tree, mock_dictionary)
@@ -174,7 +177,8 @@ class TestLinkCheckProvider(CourseTestCase):
                                             'displayName': 'Block Name',
                                             'url': '/block/1',
                                             'brokenLinks': ['broken_link_1', 'broken_link_2'],
-                                            'lockedLinks': ['locked_link']
+                                            'lockedLinks': ['locked_link'],
+                                            'externalForbiddenLinks': ['forbidden_link_1'],
                                         }
                                     ]
                                 }
@@ -211,7 +215,8 @@ class TestLinkCheckProvider(CourseTestCase):
                 'display_name': 'Block Name',
                 'url': '/block/1',
                 'broken_links': ['broken_link_1', 'broken_link_2'],
-                'locked_links': ['locked_link']
+                'locked_links': ['locked_link'],
+                'external_forbidden_links': ['forbidden_link_1'],
             }
         }
         expected = _create_dto_recursive(mock_node_tree, mock_dictionary)
