@@ -1234,6 +1234,7 @@ def resolve_language_code_to_transcript_code(transcripts, dest_lang):
             log.debug("language code %s resolved to generic %s", dest_lang, generic_lang_code)
             return generic_lang_code
 
+
 def get_endonym_or_label(language_code):
     """
     Given a language code, attempt to look up the endonym, or local name, for that language
