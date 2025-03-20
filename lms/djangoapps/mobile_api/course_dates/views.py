@@ -96,7 +96,7 @@ class AllCourseDatesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         )
 
         return (
-            ContentDate.objects.filter(course_id__in=course_ids, field="due")
+            ContentDate.objects.filter(active=True, course_id__in=course_ids, field="due")
             .annotate(
                 course_name=course_name_subquery,
                 enrollment_created=enrollment_created_subquery,
