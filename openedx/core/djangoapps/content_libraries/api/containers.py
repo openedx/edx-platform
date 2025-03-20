@@ -13,6 +13,7 @@ from opaque_keys.edx.locator import (
     LibraryContainerLocator,
     LibraryLocatorV2,
     UsageKeyV2,
+    LibraryUsageLocatorV2,
 )
 from openedx_events.content_authoring.data import LibraryContainerData
 from openedx_events.content_authoring.signals import (
@@ -42,6 +43,7 @@ __all__ = [
     "update_container",
     "delete_container",
     "update_container_children",
+    "get_containers_contains_component",
 ]
 
 
@@ -316,3 +318,20 @@ def update_container_children(
     )
 
     return ContainerMetadata.from_container(library_key, new_version.container)
+
+
+def get_containers_contains_component(
+    usage_key: LibraryUsageLocatorV2
+) -> list[ContainerMetadata]:
+    """
+    Get containers that contains the component.
+    """
+    assert isinstance(usage_key, LibraryUsageLocatorV2)
+    component = get_component_from_usage_key(usage_key)
+    containers = authoring_api.get_containers_with_entity(
+        component.publishable_entity.pk,
+    )
+    return [
+        ContainerMetadata.from_container(usage_key.context_key, container)
+        for container in containers
+    ]
