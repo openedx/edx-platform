@@ -35,9 +35,10 @@ def clear_deleted_content(course_key):
     Delete the offline content archive for the blocks that are deleted from the course.
     """
     base_offline_course_path = settings.OFFLINE_CONTENT_PATH_TEMPLATE.format(course_id=str(course_key))
-    if default_storage.exists(base_offline_course_path):
+    try:
         _, file_names = default_storage.listdir(base_offline_course_path)
-    else:
+    except FileNotFoundError:
+        log.info(f"Cannot retrieve folder {base_offline_course_path}")
         return
 
     all_course_offline_archive_names = {

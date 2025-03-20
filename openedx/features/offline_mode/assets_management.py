@@ -194,6 +194,8 @@ def get_offline_course_total_size(course_id):
 
     for file_name in filenames:
         file_full_path = base_path + file_name
-        total_size += default_storage.size(file_full_path)
+
+        if default_storage.exists(file_full_path):
+            total_size += default_storage.size(file_full_path)
 
     return total_size
