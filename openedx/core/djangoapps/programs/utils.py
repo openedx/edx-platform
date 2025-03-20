@@ -754,7 +754,7 @@ class ProgramDataExtender:
                     else:
                         params = dict(sku=skus, username=self.user.username)
 
-                response = get_program_price_info(self.user,  params)
+                response = get_program_price_info(self.user, params)
                 response.raise_for_status()
                 discount_data = response.json()
                 program_discounted_price = discount_data["total_incl_tax"]
