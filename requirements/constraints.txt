@@ -13,13 +13,6 @@
 # This file contains all common constraints for edx-repos
 -c common_constraints.txt
 
-# Date: 2024-08-21
-# Description: This is the major upgrade of algoliasearch python client and it will
-# break one of the edX' platform plugin, so we need to make that compatible first.
-# Ticket: https://github.com/openedx/edx-platform/issues/35334
-algoliasearch<4.0.0
-
-
 # Date: 2020-02-26
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
@@ -80,7 +73,7 @@ django-storages<1.14.4
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==5.8.2
+edx-enterprise==5.10.3
 
 # Date: 2024-05-09
 # This has to be constrained as well because newer versions of edx-i18n-tools need the

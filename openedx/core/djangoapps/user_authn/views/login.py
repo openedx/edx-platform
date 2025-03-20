@@ -329,6 +329,7 @@ def _handle_successful_authentication_and_login(user, request):
         log.debug("Setting user session expiry to 4 weeks")
 
         # .. event_implemented_name: SESSION_LOGIN_COMPLETED
+        # .. event_type: org.openedx.learning.auth.session.login.completed.v1
         SESSION_LOGIN_COMPLETED.send_event(
             user=UserData(
                 pii=UserPersonalData(
