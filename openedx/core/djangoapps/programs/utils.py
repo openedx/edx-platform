@@ -27,7 +27,7 @@ from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.commerce.utils import EcommerceService, get_program_price_info
 from openedx.core.djangoapps.catalog.api import get_programs_by_type
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import (
@@ -35,7 +35,6 @@ from openedx.core.djangoapps.catalog.utils import (
     get_pathways,
     get_programs,
 )
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
 from openedx.core.djangoapps.enrollments.api import get_enrollments
@@ -43,7 +42,6 @@ from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
-from edx_django_utils.plugins import pluggable_override
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
@@ -692,7 +690,6 @@ class ProgramDataExtender:
 
         return courses_without_enrollments
 
-    @pluggable_override('OVERRIDE_COLLECT_ONE_CLICK_PURCHASE_ELIGIBILITY')
     def _collect_one_click_purchase_eligibility_data(self):  # lint-amnesty, pylint: disable=too-many-statements
         """
         Extend the program data with data about learner's eligibility for one click purchase,
@@ -741,16 +738,7 @@ class ProgramDataExtender:
 
         if skus:
             try:
-                api_user = self.user
-                is_anonymous = False
-                if not self.user.is_authenticated:
-                    user = get_user_model()
-                    service_user = user.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-                    api_user = service_user
-                    is_anonymous = True
-
-                api_client = get_ecommerce_api_client(api_user)
-                api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/calculate/")
+                is_anonymous = not self.user.is_authenticated
 
                 # The user specific program price is slow to calculate, so use switch to force the
                 # anonymous price for all users. See LEARNER-5555 for more details.
@@ -765,7 +753,8 @@ class ProgramDataExtender:
                         params = dict(sku=skus, username=self.user.username, bundle=bundle_uuid)
                     else:
                         params = dict(sku=skus, username=self.user.username)
-                response = api_client.get(api_url, params=params)
+
+                response = get_program_price_info(self.user,  params)
                 response.raise_for_status()
                 discount_data = response.json()
                 program_discounted_price = discount_data["total_incl_tax"]
