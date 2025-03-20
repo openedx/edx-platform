@@ -2806,14 +2806,6 @@ WEBPACK_LOADER = {
     }
 }
 
-# .. setting_name: WEBPACK_CONFIG_PATH
-# .. setting_default: "webpack.prod.config.js"
-# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
-#   see: https://github.com/openedx/edx-platform/issues/31895
-WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
-
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
 # We don't enable Django Debug Toolbar universally, but whenever we do, we want
