@@ -5,6 +5,7 @@ Tests for Content Library internal api.
 import base64
 import hashlib
 from unittest import mock
+from datetime import datetime, timezone
 
 from django.test import TestCase
 
@@ -742,3 +743,76 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             },
             event_receiver.call_args_list[1].kwargs,
         )
+
+
+class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
+    """
+    Tests for Content Library API containers methods.
+    """
+    def setUp(self):
+        super().setUp()
+
+        # Create Content Libraries
+        self._create_library("test-lib-cont-1", "Test Library 1")
+
+        # Fetch the created ContentLibrare objects so we can access their learning_package.id
+        self.lib1 = ContentLibrary.objects.get(slug="test-lib-cont-1")
+
+        # Create Units
+        self.unit1 = api.create_container(self.lib1.library_key, api.ContainerType.Unit, 'unit-1', 'Unit 1', None)
+        self.unit2 = api.create_container(self.lib1.library_key, api.ContainerType.Unit, 'unit-2', 'Unit 2', None)
+
+        # Create XBlocks
+        # Create some library blocks in lib1
+        self.problem_block_dict = self._add_block_to_library(
+            self.lib1.library_key, "problem", "problem1",
+        )
+        self.problem_block_usage_key = UsageKey.from_string(self.problem_block_dict["id"])
+        self.html_block_dict = self._add_block_to_library(
+            self.lib1.library_key, "html", "html1",
+        )
+        self.html_block_usage_key = UsageKey.from_string(self.html_block_dict["id"])
+        now = datetime.now(tz=timezone.utc)
+
+        # Add content to units
+        # TODO build API for this
+        self.problem_block_component = api.get_component_from_usage_key(self.problem_block_usage_key)
+        self.html_block_component = api.get_component_from_usage_key(self.html_block_usage_key)
+        self.unit1_container = authoring_api.get_container_by_key(
+            self.lib1.learning_package.id,
+            self.unit1.container_key.container_id,
+        )
+        self.unit2_container = authoring_api.get_container_by_key(
+            self.lib1.learning_package.id,
+            self.unit2.container_key.container_id,
+        )
+        authoring_api.create_next_container_version(
+            self.unit1_container.pk,
+            publishable_entities_pks=[
+                self.problem_block_component.publishable_entity.id,
+                self.html_block_component.publishable_entity.id,
+            ],
+            title=None,
+            entity_version_pks=None,
+            created=now,
+            created_by=None,
+        )
+        authoring_api.create_next_container_version(
+            self.unit2_container.pk,
+            publishable_entities_pks=[self.html_block_component.publishable_entity.id],
+            title=None,
+            entity_version_pks=None,
+            created=now,
+            created_by=None,
+        )
+
+    def test_get_containers_contains_component(self):
+        problem_block_containers = api.get_containers_contains_component(self.problem_block_usage_key)
+        html_block_containers = api.get_containers_contains_component(self.html_block_usage_key)
+
+        assert len(problem_block_containers) == 1
+        assert problem_block_containers[0].container_key == self.unit1.container_key
+
+        assert len(html_block_containers) == 2
+        assert html_block_containers[0].container_key == self.unit1.container_key
+        assert html_block_containers[1].container_key == self.unit2.container_key

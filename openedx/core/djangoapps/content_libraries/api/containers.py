@@ -10,8 +10,10 @@ from uuid import uuid4
 from django.utils.text import slugify
 from opaque_keys.edx.locator import (
     LibraryLocatorV2,
+    LibraryUsageLocatorV2,
     LibraryContainerLocator,
 )
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from openedx_events.content_authoring.data import LibraryContainerData
 from openedx_events.content_authoring.signals import (
@@ -31,6 +33,7 @@ __all__ = [
     "create_container",
     "get_container_children",
     "library_container_usage_key",
+    "get_containers_contains_component",
 ]
 
 
@@ -188,3 +191,20 @@ def get_container_children(
     child_entities = authoring_api.get_entities_in_container(container, published=published)
     # TODO: convert the return type to list[ContainerMetadata | LibraryXBlockMetadata] ?
     return child_entities
+
+
+def get_containers_contains_component(
+    usage_key: LibraryUsageLocatorV2
+) -> list[ContainerMetadata]:
+    """
+    Get containers that contains the component.
+    """
+    assert isinstance(usage_key, LibraryUsageLocatorV2)
+    component = get_component_from_usage_key(usage_key)
+    containers = authoring_api.get_containers_with_entity(
+        component.publishable_entity.pk,
+    )
+    return [
+        ContainerMetadata.from_container(usage_key.context_key, container)
+        for container in containers
+    ]
