@@ -22,6 +22,10 @@ class HelperFunctionTest(unittest.TestCase):
     sample_sourceurl = "http://video-js.zencoder.com/oceans-clip.mp4"
     sample_youtubeurl = "http://www.youtube.com/watch?v=yxLIu-scR9Y"
     sample_html = '<p><b>Testing here</b> and not bolded here</p>'
+    # pylint: disable=line-too-long
+    sample_html_with_image_alt = '''<p>Testing here with image: </p><p><img src="/static/image.jpg" alt="the alt text" width="560" height="315" /></p>'''
+    # pylint: disable=line-too-long
+    sample_html_with_no_image_alt = '''<p>Testing here with image: </p><p><img src="/static/image.jpg" width="560" height="315" /></p>'''
 
     def test_get_instructions(self):
         """
@@ -53,4 +57,14 @@ class HelperFunctionTest(unittest.TestCase):
     def test_html_to_text(self):
         expectedtext = "Testing here and not bolded here"
         result = html_to_text(self.sample_html)
+        assert expectedtext == result
+
+    def test_html_image_with_alt_text(self):
+        expectedtext = "Testing here with image: the alt text"
+        result = html_to_text(self.sample_html_with_image_alt)
+        assert expectedtext == result
+
+    def test_html_image_with_no_alt_text(self):
+        expectedtext = "Testing here with image: "
+        result = html_to_text(self.sample_html_with_no_image_alt)
         assert expectedtext == result

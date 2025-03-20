@@ -48,7 +48,7 @@ class LMSPageURLRequestedFiltersTest(ModuleStoreTestCase):
 
     @override_settings(
         OPEN_EDX_FILTERS_CONFIG={
-            "org.openedx.course_authoring.lms.page.url.requested.v1": {
+            "org.openedx.content_authoring.lms.page.url.requested.v1": {
                 "pipeline": [
                     "common.djangoapps.util.tests.test_filters.TestPageURLRequestedPipelineStep",
                 ],

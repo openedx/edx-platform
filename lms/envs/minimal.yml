@@ -2,7 +2,8 @@
 #
 # This is the minimal settings you need to set to be able to get django to
 # load when using the production.py settings files. It's useful to point
-# LMS_CFG and CMS_CFG to this file to be able to run various paver commands
+# LMS_CFG and CMS_CFG to this file to be able to run various npm commands
+# and make targets (e.g.: building assets, pulling translations, etc.)
 # without needing a full docker setup.
 #
 # Follow up work will likely be done as a part of
@@ -39,3 +40,7 @@ API_ACCESS_MANAGER_EMAIL: "api-access@example.com"
 
 # So that you can login to studio on bare-metal
 SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT: 'http://localhost:18000'
+
+# The celery broker url needs to be set even if you're running in always eager mode.
+CELERY_BROKER_TRANSPORT: 'memory'
+CELERY_BROKER_HOSTNAME: 'localhost'

@@ -195,7 +195,7 @@ def _enforce_password_policy_compliance(request, user):  # lint-amnesty, pylint:
         # Allow login, but warn the user that they will be required to reset their password soon.
         PageLevelMessages.register_warning_message(request, HTML(str(e)))
     except password_policy_compliance.NonCompliantPasswordException as e:
-        # Increment the lockout counter to safguard from further brute force requests
+        # Increment the lockout counter to safeguard from further brute force requests
         # if user's password has been compromised.
         if LoginFailures.is_feature_enabled():
             LoginFailures.increment_lockout_counter(user)
@@ -329,6 +329,7 @@ def _handle_successful_authentication_and_login(user, request):
         log.debug("Setting user session expiry to 4 weeks")
 
         # .. event_implemented_name: SESSION_LOGIN_COMPLETED
+        # .. event_type: org.openedx.learning.auth.session.login.completed.v1
         SESSION_LOGIN_COMPLETED.send_event(
             user=UserData(
                 pii=UserPersonalData(
@@ -354,6 +355,11 @@ def _track_user_login(user, request):
     # .. pii: Username and email are sent to Segment here. Retired directly through Segment API call in Tubular.
     # .. pii_types: email_address, username
     # .. pii_retirement: third_party
+    anonymous_id = ""
+    try:
+        anonymous_id = request.COOKIES.get('ajs_anonymous_id', "")
+    except:  # pylint: disable=bare-except
+        pass
     segment.identify(
         user.id,
         {"email": user.email, "username": user.username},
@@ -367,7 +373,12 @@ def _track_user_login(user, request):
     segment.track(
         user.id,
         "edx.bi.user.account.authenticated",
-        {"category": "conversion", "label": request.POST.get("course_id"), "provider": None},
+        {
+            "category": "conversion",
+            "label": request.POST.get("course_id"),
+            "provider": None,
+            "anonymous_id": anonymous_id,
+        },
     )
 
 

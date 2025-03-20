@@ -63,6 +63,13 @@ class ContentLibrariesStaticAssetsTest(ContentLibrariesRestApiTest):
         file_name = "a////////b"
         self._set_library_block_asset(block_id, file_name, SVG_DATA, expect_response=400)
 
+        # Names with spaces are allowed but replaced with underscores
+        file_name_with_space = "o w o.svg"
+        self._set_library_block_asset(block_id, file_name_with_space, SVG_DATA)
+        file_name = "o_w_o.svg"
+        assert self._get_library_block_asset(block_id, file_name)['path'] == file_name
+        assert self._get_library_block_asset(block_id, file_name)['size'] == file_size
+
     def test_video_transcripts(self):
         """
         Test that video blocks can read transcript files out of learning core.
@@ -168,12 +175,12 @@ class ContentLibrariesComponentVersionAssetTest(ContentLibrariesRestApiTest):
         response = self.client.get(
             f"/library_assets/component_versions/{self.draft_component_version.uuid}/static/test.svg"
         )
-        assert response.status_code == 403
+        assert response.status_code == 401
 
     def test_unauthorized_user(self):
         """User who is not a Content Library staff should not have access."""
         self.client.logout()
-        student = UserFactory.create(
+        UserFactory.create(
             username="student",
             email="student@example.com",
             password="student-pass",

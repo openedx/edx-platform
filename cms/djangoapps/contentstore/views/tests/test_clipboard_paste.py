@@ -6,6 +6,13 @@ APIs.
 import ddt
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
+from openedx_events.content_authoring.signals import (
+    LIBRARY_BLOCK_DELETED,
+    XBLOCK_CREATED,
+    XBLOCK_DELETED,
+    XBLOCK_UPDATED,
+)
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx_tagging.core.tagging.models import Tag
 from organizations.models import Organization
 from xmodule.modulestore.django import contentstore, modulestore
@@ -393,10 +400,16 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.
 
 
-class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
+class ClipboardPasteFromV2LibraryTestCase(OpenEdxEventsTestMixin, ModuleStoreTestCase):
     """
     Test Clipboard Paste functionality with a "new" (as of Sumac) library
     """
+    ENABLED_OPENEDX_EVENTS = [
+        LIBRARY_BLOCK_DELETED.event_type,
+        XBLOCK_CREATED.event_type,
+        XBLOCK_DELETED.event_type,
+        XBLOCK_UPDATED.event_type,
+    ]
 
     def setUp(self):
         """
@@ -455,26 +468,6 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         self.lib_block_tags = ['tag_1', 'tag_5']
         tagging_api.tag_object(str(self.lib_block_key), taxonomy_all_org, self.lib_block_tags)
 
-    def test_paste_from_library_creates_link(self):
-        """
-        When we copy a v2 lib block into a course, the dest block should be linked up to the lib block.
-        """
-        copy_response = self.client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(self.lib_block_key)}, format="json")
-        assert copy_response.status_code == 200
-
-        paste_response = self.client.post(XBLOCK_ENDPOINT, {
-            "parent_locator": str(self.course.usage_key),
-            "staged_content": "clipboard",
-        }, format="json")
-        assert paste_response.status_code == 200
-
-        new_block_key = UsageKey.from_string(paste_response.json()["locator"])
-        new_block = modulestore().get_item(new_block_key)
-        assert new_block.upstream == str(self.lib_block_key)
-        assert new_block.upstream_version == 3
-        assert new_block.upstream_display_name == "MCQ-draft"
-        assert new_block.upstream_max_attempts == 5
-
     def test_paste_from_library_read_only_tags(self):
         """
         When we copy a v2 lib block into a course, the dest block should have read-only copied tags.
@@ -496,6 +489,16 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         for object_tag in object_tags:
             assert object_tag.value in self.lib_block_tags
             assert object_tag.is_copied
+
+        # If we delete the upstream library block...
+        library_api.delete_library_block(self.lib_block_key)
+
+        # ...the copied tags remain, but should no longer be marked as "copied"
+        object_tags = tagging_api.get_object_tags(new_block_key)
+        assert len(object_tags) == len(self.lib_block_tags)
+        for object_tag in object_tags:
+            assert object_tag.value in self.lib_block_tags
+            assert not object_tag.is_copied
 
     def test_paste_from_library_copies_asset(self):
         """
@@ -554,6 +557,33 @@ class ClipboardPasteFromV2LibraryTestCase(ModuleStoreTestCase):
         assert image_asset.import_path == expected_import_path
         assert image_asset.name == "1px.webp"
         assert image_asset.length == len(webp_raw_data)
+
+    def test_paste_from_course_block_imported_from_library_creates_link(self):
+        """
+        When we copy a course xblock which was imported or copied from v2 lib block into a course,
+        the dest block should be linked up to the original lib block.
+        """
+        def _copy_paste_and_assert_link(key_to_copy):
+            copy_response = self.client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(key_to_copy)}, format="json")
+            assert copy_response.status_code == 200
+
+            paste_response = self.client.post(XBLOCK_ENDPOINT, {
+                "parent_locator": str(self.course.usage_key),
+                "staged_content": "clipboard",
+            }, format="json")
+            assert paste_response.status_code == 200
+
+            new_block_key = UsageKey.from_string(paste_response.json()["locator"])
+            new_block = modulestore().get_item(new_block_key)
+            assert new_block.upstream == str(self.lib_block_key)
+            assert new_block.upstream_version == 3
+            assert new_block.upstream_display_name == "MCQ-draft"
+            return new_block_key
+
+        # first verify link for copied block from library
+        new_block_key = _copy_paste_and_assert_link(self.lib_block_key)
+        # next verify link for copied block from the pasted block
+        _copy_paste_and_assert_link(new_block_key)
 
 
 class ClipboardPasteFromV1LibraryTestCase(ModuleStoreTestCase):

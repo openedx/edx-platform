@@ -128,6 +128,11 @@ class VideoEncodingsDownloadView(DeveloperErrorViewMixin, RetrieveAPIView):
     course_key: required argument, needed to authorize course authors and identify relevant videos.
     """
 
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    swagger_schema = None
+
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
         """
@@ -150,6 +155,11 @@ class VideoFeaturesView(DeveloperErrorViewMixin, RetrieveAPIView):
     """
     public rest API endpoint providing a list of enabled video features.
     """
+
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    swagger_schema = None
 
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.

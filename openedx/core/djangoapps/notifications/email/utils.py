@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from pytz import utc
-from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
+from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding.api import get_logo_url_for_email
@@ -28,7 +28,6 @@ from openedx.core.djangoapps.notifications.models import (
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
-
 
 User = get_user_model()
 
@@ -101,7 +100,7 @@ def create_email_template_context(username):
         "mailing_address": settings.CONTACT_MAILING_ADDRESS,
         "logo_url": get_logo_url_for_email(),
         "social_media": social_media_info,
-        "notification_settings_url": f"{settings.ACCOUNT_MICROFRONTEND_URL}/notifications",
+        "notification_settings_url": f"{settings.ACCOUNT_MICROFRONTEND_URL}/#notifications",
         "unsubscribe_url": get_unsubscribe_link(username, patch)
     }
 
@@ -130,17 +129,29 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
         }
         for key, value in app_notifications_dict.items()
     ])
-    email_content = [
-        {
+
+    email_content = []
+    notifications_in_app = 5
+    for key, value in app_notifications_dict.items():
+        total = value['count']
+        app_content = {
             'title': value['title'],
             'help_text': value.get('help_text', ''),
             'help_text_url': value.get('help_text_url', ''),
             'notifications': add_additional_attributes_to_notifications(
                 value.get('notifications', []), courses_data=courses_data
-            )
+            ),
+            'total': total,
+            'show_remaining_count': False,
+            'remaining_count': 0,
+            'url': f'{settings.LEARNER_HOME_MICROFRONTEND_URL}/?showNotifications=true&app={key}'
         }
-        for key, value in app_notifications_dict.items()
-    ]
+        if total > notifications_in_app:
+            app_content['notifications'] = app_content['notifications'][:notifications_in_app]
+            app_content['show_remaining_count'] = True
+            app_content['remaining_count'] = total - notifications_in_app
+        email_content.append(app_content)
+
     context.update({
         "start_date": start_date_str,
         "end_date": end_date_str,
@@ -295,6 +306,7 @@ def filter_notification_with_email_enabled_preferences(notifications, preference
     for notification in notifications:
         if notification.notification_type in enabled_course_prefs[notification.course_id]:
             filtered_notifications.append(notification)
+    filtered_notifications.sort(key=lambda elem: elem.created, reverse=True)
     return filtered_notifications
 
 
@@ -357,14 +369,6 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
         """
         return True if param_name is None else name == param_name
 
-    def is_editable(app_name, notification_type, channel):
-        """
-        Returns if notification type channel is editable
-        """
-        if notification_type == 'core':
-            return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
-        return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
-
     def get_default_cadence_value(app_name, notification_type):
         """
         Returns default email cadence value
@@ -390,6 +394,7 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
         ignore_conflicts=True
     )
     preferences = CourseNotificationPreference.objects.filter(**kwargs)
+    is_preference_updated = False
 
     # pylint: disable=too-many-nested-blocks
     for preference in preferences:
@@ -404,9 +409,24 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
                 for channel in ['web', 'email', 'push']:
                     if not is_name_match(channel, channel_value):
                         continue
-                    if is_editable(app_name, noti_type, channel):
-                        type_prefs[channel] = pref_value
+                    if is_notification_type_channel_editable(app_name, noti_type, channel):
+                        if type_prefs[channel] != pref_value:
+                            type_prefs[channel] = pref_value
+                            is_preference_updated = True
+
                         if channel == 'email' and pref_value and type_prefs.get('email_cadence') == EmailCadence.NEVER:
-                            type_prefs['email_cadence'] = get_default_cadence_value(app_name, noti_type)
+                            default_cadence = get_default_cadence_value(app_name, noti_type)
+                            if type_prefs['email_cadence'] != default_cadence:
+                                type_prefs['email_cadence'] = default_cadence
+                                is_preference_updated = True
         preference.save()
-    notification_preference_unsubscribe_event(user)
+        notification_preference_unsubscribe_event(user, is_preference_updated)
+
+
+def is_notification_type_channel_editable(app_name, notification_type, channel):
+    """
+    Returns if notification type channel is editable
+    """
+    if notification_type == 'core':
+        return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
+    return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']

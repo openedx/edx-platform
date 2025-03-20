@@ -12,11 +12,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-24.04]
         python-version:
           - "3.11"
-        node-version: [18, 20]
-        npm-version: [10.5.x]
+        node-version: [20]
+        npm-version: [10.7.x]
         mongo-version:
           - "7.0"
 

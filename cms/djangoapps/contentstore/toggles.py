@@ -667,3 +667,23 @@ def libraries_v2_enabled():
         search_api.is_meilisearch_enabled() and
         not DISABLE_NEW_LIBRARIES.is_enabled()
     )
+
+
+# .. toggle_name: contentstore.enable_course_optimizer
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the course optimizer tool in the authoring MFE.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-01-17
+# .. toggle_target_removal_date: 2025-05-30
+# .. toggle_tickets: TNL-11837
+ENABLE_COURSE_OPTIMIZER = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.enable_course_optimizer', __name__
+)
+
+
+def enable_course_optimizer(course_id):
+    """
+    Returns a boolean if course optimizer is enabled on the course
+    """
+    return ENABLE_COURSE_OPTIMIZER.is_enabled(course_id)

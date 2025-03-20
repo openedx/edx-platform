@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import ddt
 from django.contrib.auth.models import Group
+from django.test import override_settings
 from django.test.client import Client
 from freezegun import freeze_time
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
@@ -139,6 +140,63 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             'slug': ['Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.'],
         }
 
+    def test_library_org_validation(self):
+        """
+        Staff users can create libraries in any existing or auto-created organization.
+        """
+        assert Organization.objects.filter(short_name='auto-created-org').count() == 0
+        self._create_library(slug="auto-created-org-1", title="Library in an auto-created org", org='auto-created-org')
+        assert Organization.objects.filter(short_name='auto-created-org').count() == 1
+        self._create_library(slug="existing-org-1", title="Library in an existing org", org="CL-TEST")
+
+    @patch(
+        "openedx.core.djangoapps.content_libraries.views.user_can_create_organizations",
+    )
+    @patch(
+        "openedx.core.djangoapps.content_libraries.views.get_allowed_organizations_for_libraries",
+    )
+    @override_settings(ORGANIZATIONS_AUTOCREATE=False)
+    def test_library_org_no_autocreate(self, mock_get_allowed_organizations, mock_can_create_organizations):
+        """
+        When org auto-creation is disabled, user must use one of their allowed orgs.
+        """
+        mock_can_create_organizations.return_value = False
+        mock_get_allowed_organizations.return_value = ["CL-TEST"]
+        assert Organization.objects.filter(short_name='auto-created-org').count() == 0
+        response = self._create_library(
+            slug="auto-created-org-2",
+            org="auto-created-org",
+            title="Library in an auto-created org",
+            expect_response=400,
+        )
+        assert response == {
+            'org': "No such organization 'auto-created-org' found.",
+        }
+
+        Organization.objects.get_or_create(
+            short_name="not-allowed-org",
+            defaults={"name": "Content Libraries Test Org Membership"},
+        )
+        response = self._create_library(
+            slug="not-allowed-org",
+            org="not-allowed-org",
+            title="Library in an not-allowed org",
+            expect_response=400,
+        )
+        assert response == {
+            'org': "User not allowed to create libraries in 'not-allowed-org'.",
+        }
+        assert mock_can_create_organizations.call_count == 1
+        assert mock_get_allowed_organizations.call_count == 1
+
+        self._create_library(
+            slug="allowed-org-2",
+            org="CL-TEST",
+            title="Library in an allowed org",
+        )
+        assert mock_can_create_organizations.call_count == 2
+        assert mock_get_allowed_organizations.call_count == 2
+
     @skip("This endpoint shouldn't support num_blocks and has_unpublished_*.")
     @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootView.pagination_class.page_size", new=2)
     def test_list_library(self):
@@ -259,6 +317,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         Tests with some non-ASCII chars in slugs, titles, descriptions.
         """
+        admin = UserFactory.create(username="Admin", email="admin@example.com", is_staff=True)
+
         lib = self._create_library(slug="téstlꜟط", title="A Tést Lꜟطrary", description="Tésting XBlocks")
         lib_id = lib["id"]
         assert lib['has_unpublished_changes'] is False
@@ -531,7 +591,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         Learning Core data models.
         """
         # Create a few users to use for all of these tests:
-        admin = UserFactory.create(username="Admin", email="admin@example.com")
+        admin = UserFactory.create(username="Admin", email="admin@example.com", is_staff=True)
         author = UserFactory.create(username="Author", email="author@example.com")
         reader = UserFactory.create(username="Reader", email="reader@example.com")
         group = Group.objects.create(name="group1")
@@ -653,14 +713,15 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._get_library_block_asset(block3_key, file_name="static/whatever.png", expect_response=403)
             # Nor can they preview the block:
             self._render_block_view(block3_key, view_name="student_view", expect_response=403)
-        # But if we grant allow_public_read, then they can:
+        # Even if we grant allow_public_read, then they can't:
         with self.as_user(admin):
             self._update_library(lib_id, allow_public_read=True)
             self._set_library_block_asset(block3_key, "static/whatever.png", b"data")
         with self.as_user(random_user):
-            self._get_library_block_olx(block3_key)
+            self._get_library_block_olx(block3_key, expect_response=403)
+            self._get_library_block_fields(block3_key, expect_response=403)
+            # But he can preview the block:
             self._render_block_view(block3_key, view_name="student_view")
-            f = self._get_library_block_fields(block3_key)
             # self._get_library_block_assets(block3_key)
             # self._get_library_block_asset(block3_key, file_name="whatever.png")
 
@@ -702,7 +763,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         """
         Test that administrators cannot be removed if they are the only administrator granted access.
         """
-        admin = UserFactory.create(username="Admin", email="admin@example.com")
+        admin = UserFactory.create(username="Admin", email="admin@example.com", is_staff=True)
         successor = UserFactory.create(username="Successor", email="successor@example.com")
         with self.as_user(admin):
             lib = self._create_library(slug="permtest", title="Permission Test Library", description="Testing")
@@ -1026,7 +1087,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         from openedx.core.djangoapps.content_staging.api import save_xblock_to_user_clipboard
 
         # Create user to perform tests on
-        author = UserFactory.create(username="Author", email="author@example.com")
+        author = UserFactory.create(username="Author", email="author@example.com", is_staff=True)
         with self.as_user(author):
             lib = self._create_library(
                 slug="test_lib_paste_clipboard",
@@ -1066,8 +1127,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._get_library_block_asset(pasted_usage_key, "static/hello.txt")
 
             # Compare the two text files
-            src_data = self.client.get(f"/library_assets/blocks/{usage_key}/static/hello.txt").content
-            dest_data = self.client.get(f"/library_assets/blocks/{pasted_usage_key}/static/hello.txt").content
+            src_data = self.client.get(f"/library_assets/blocks/{usage_key}/static/hello.txt").getvalue()
+            dest_data = self.client.get(f"/library_assets/blocks/{pasted_usage_key}/static/hello.txt").getvalue()
             assert src_data == dest_data
 
             # Check that the new block was created after the paste and it's content matches
@@ -1080,6 +1141,25 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 "modified": paste_data["modified"],
                 "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
             })
+
+    @override_settings(LIBRARY_ENABLED_BLOCKS=['problem', 'video', 'html'])
+    def test_library_get_enabled_blocks(self):
+        expected = [
+            {"block_type": "html", "display_name": "Text"},
+            {"block_type": "problem", "display_name": "Problem"},
+            {"block_type": "video", "display_name": "Video"},
+        ]
+
+        author = UserFactory.create(username="Author", email="author@example.com", is_staff=True)
+        with self.as_user(author):
+            lib = self._create_library(
+                slug="test_lib_enabled_blocks",
+                title="Get Enabled Blocks Test Library",
+                description="Testing get enabled blocks from library"
+            )
+            lib_id = lib["id"]
+            block_types = self._get_library_block_types(lib_id)
+            assert [dict(item) for item in block_types] == expected
 
 
 @ddt.ddt

@@ -1,6 +1,7 @@
 """
 Tests for the Studio content search documents (what gets stored in the index)
 """
+from dataclasses import replace
 from datetime import datetime, timezone
 from organizations.models import Organization
 
@@ -298,6 +299,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Normal"],
             },
+            "publish_status": "never",
         }
 
     def test_html_published_library_block(self):
@@ -337,6 +339,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "level0": ["Difficulty > Normal"],
             },
             'published': {'display_name': 'Text'},
+            "publish_status": "published",
         }
 
         # Update library block to create a draft
@@ -378,6 +381,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "level0": ["Difficulty > Normal"],
             },
             "published": {"display_name": "Text"},
+            "publish_status": "published",
         }
 
         # Publish new changes
@@ -420,7 +424,19 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "display_name": "Text 2",
                 "description": "This is a Test",
             },
+            "publish_status": "published",
         }
+
+        # Verify publish status is set to modified
+        library_block_modified = replace(
+            self.library_block,
+            modified=datetime(2024, 4, 5, 6, 7, 8, tzinfo=timezone.utc),
+            last_published=datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc),
+        )
+        doc = searchable_doc_for_library_block(library_block_modified)
+        doc.update(searchable_doc_tags(library_block_modified.usage_key))
+        doc.update(searchable_doc_collections(library_block_modified.usage_key))
+        assert doc["publish_status"] == "modified"
 
     def test_collection_with_library(self):
         doc = searchable_doc_for_collection(self.library.key, self.collection.key)
@@ -443,5 +459,155 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             'tags': {
                 'taxonomy': ['Difficulty'],
                 'level0': ['Difficulty > Normal']
+            },
+            "published": {
+                "num_children": 0
             }
         }
+
+    def test_collection_with_published_library(self):
+        library_api.publish_changes(self.library.key)
+
+        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
+        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+
+        assert doc == {
+            "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
+            "block_id": self.collection.key,
+            "usage_key": self.collection_usage_key,
+            "type": "collection",
+            "org": "edX",
+            "display_name": "Toy Collection",
+            "description": "my toy collection description",
+            "num_children": 1,
+            "context_key": "lib:edX:2012_Fall",
+            "access_id": self.library_access_id,
+            "breadcrumbs": [{"display_name": "some content_library"}],
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            'tags': {
+                'taxonomy': ['Difficulty'],
+                'level0': ['Difficulty > Normal']
+            },
+            "published": {
+                "num_children": 1
+            }
+        }
+
+    def test_mathjax_plain_text_conversion_for_search(self):
+        """
+        Test how an HTML block with mathjax equations gets converted to plain text in search description.
+        """
+        # pylint: disable=line-too-long
+        eqns = [
+            # (input, expected output)
+            ('Simple addition: \\( 2 + 3 \\)', 'Simple addition:  2 + 3'),
+            ('Simple subtraction: \\( 5 - 2 \\)', 'Simple subtraction:  5 − 2'),
+            ('Simple multiplication: \\( 4 * 6 \\)', 'Simple multiplication:  4 * 6'),
+            ('Simple division: \\( 8 / 2 \\)', 'Simple division:  8 / 2'),
+            ('Mixed arithmetic: \\( 2 + 3  4 \\)', 'Mixed arithmetic:  2 + 3 4'),
+            ('Simple exponentiation: \\[ 2^3 \\]', 'Simple exponentiation:  2³'),
+            ('Root extraction: \\[ 16^{1/2} \\]', 'Root extraction:  16¹^/²'),
+            ('Exponent with multiple terms: \\[ (2 + 3)^2 \\]', 'Exponent with multiple terms:  (2 + 3)²'),
+            ('Nested exponents: \\[ 2^(3^2) \\]', 'Nested exponents:  2⁽3²)'),
+            ('Mixed roots: \\[ 8^{1/2}  3^2 \\]', 'Mixed roots:  8¹^/² 3²'),
+            ('Simple fraction: [mathjaxinline] 3/4 [/mathjaxinline]', 'Simple fraction:  3/4'),
+            (
+                'Decimal to fraction conversion: [mathjaxinline] 0.75 = 3/4 [/mathjaxinline]',
+                'Decimal to fraction conversion:  0.75 = 3/4',
+            ),
+            ('Mixed fractions: [mathjaxinline] 1 1/2 = 3/2 [/mathjaxinline]', 'Mixed fractions:  1 1/2 = 3/2'),
+            (
+                'Converting decimals to mixed fractions: [mathjaxinline] 2.5 = 5/2 [/mathjaxinline]',
+                'Converting decimals to mixed fractions:  2.5 = 5/2',
+            ),
+            (
+                'Trig identities: [mathjaxinline] \\sin(x + y) = \\sin(x)  \\cos(y) + \\cos(x)  \\sin(y) [/mathjaxinline]',
+                'Trig identities:  sin(x + y) = sin(x) cos(y) + cos(x) sin(y)',
+            ),
+            (
+                'Sine, cosine, and tangent: [mathjaxinline] \\sin(x) [/mathjaxinline] [mathjaxinline] \\cos(x) [/mathjaxinline] [mathjaxinline] \\tan(x) [/mathjaxinline]',
+                'Sine, cosine, and tangent:  sin(x)   cos(x)   tan(x)',
+            ),
+            (
+                'Hyperbolic trig functions: [mathjaxinline] \\sinh(x) [/mathjaxinline] [mathjaxinline] \\cosh(x) [/mathjaxinline]',
+                'Hyperbolic trig functions:  sinh(x)   cosh(x)',
+            ),
+            (
+                "Simple derivative: [mathjax] f(x) = x^2, f'(x) = 2x [/mathjax]",
+                "Simple derivative:  f(x) = x², f'(x) = 2x",
+            ),
+            ('Double integral: [mathjax] int\\int (x + y) dxdy [/mathjax]', 'Double integral:  int∫ (x + y) dxdy'),
+            (
+                'Partial derivatives: [mathjax] f(x,y) = xy, \\frac{\\partial f}{\\partial x} = y [/mathjax] [mathjax] \\frac{\\partial f}{\\partial y} = x [/mathjax]',
+                'Partial derivatives:  f(x,y) = xy, (∂ f/∂ x) = y   (∂ f/∂ y) = x',
+            ),
+            (
+                'Mean and standard deviation: [mathjax] mu = 2, \\sigma = 1 [/mathjax]',
+                'Mean and standard deviation:  mu = 2, σ = 1',
+            ),
+            (
+                'Binomial probability: [mathjax] P(X = k) = (\\binom{n}{k} p^k (1-p)^{n-k}) [/mathjax]',
+                'Binomial probability:  P(X = k) = (\\binom{n}{k} pᵏ (1−p)ⁿ⁻ᵏ)',
+            ),
+            ('Gaussian distribution: [mathjax] N(\\mu, \\sigma^2) [/mathjax]', 'Gaussian distribution:  N(μ, σ²)'),
+            (
+                'Greek letters: [mathjaxinline] \\alpha [/mathjaxinline] [mathjaxinline] \\beta [/mathjaxinline] [mathjaxinline] \\gamma [/mathjaxinline]',
+                'Greek letters:  α   β   γ',
+            ),
+            (
+                'Subscripted variables: [mathjaxinline] x_i [/mathjaxinline] [mathjaxinline] y_j [/mathjaxinline]',
+                'Subscripted variables:  xᵢ   yⱼ',
+            ),
+            ('Superscripted variables: [mathjaxinline] x^{i} [/mathjaxinline]', 'Superscripted variables:  xⁱ'),
+            (
+                'Not supported: \\( \\begin{bmatrix} 1 & 0 \\ 0 & 1 \\end{bmatrix} = I \\)',
+                'Not supported:  \\begin{bmatrix} 1 & 0 \\ 0 & 1 \\end{bmatrix} = I',
+            ),
+            (
+                'Bold text: \\( {\\bf a} \\cdot {\\bf b} = |{\\bf a}| |{\\bf b}| \\cos(\\theta) \\)',
+                'Bold text:  a ⋅ b = |a| |b| cos(θ)',
+            ),
+            ('Bold text: \\( \\frac{\\sqrt{\\mathbf{2}+3}}{\\sqrt{4}} \\)', 'Bold text:  (√{2+3}/√{4})'),
+            ('Nested Bold text 1: \\( \\mathbf{ \\frac{1}{2} } \\)', 'Nested Bold text 1:   (1/2)'),
+            (
+                'Nested Bold text 2: \\( \\mathbf{a \\cdot (a \\mathbf{\\times} b)} \\)',
+                'Nested Bold text 2:  a ⋅ (a × b)'
+            ),
+            (
+                'Nested Bold text 3: \\( \\mathbf{a \\cdot (a \\bm{\\times} b)} \\)',
+                'Nested Bold text 3:  a ⋅ (a × b)'
+            ),
+            ('Sqrt test 1: \\(\\sqrt\\)', 'Sqrt test 1: √'),
+            ('Sqrt test 2: \\(x^2 + \\sqrt(y)\\)', 'Sqrt test 2: x² + √(y)'),
+            ('Sqrt test 3: [mathjaxinline]x^2 + \\sqrt(y)[/mathjaxinline]', 'Sqrt test 3: x² + √(y)'),
+            ('Fraction test 1: \\( \\frac{2} {3} \\)', 'Fraction test 1:  (2/3)'),
+            ('Fraction test 2: \\( \\frac{2}{3} \\)', 'Fraction test 2:  (2/3)'),
+            ('Fraction test 3: \\( \\frac{\\frac{2}{3}}{4} \\)', 'Fraction test 3:  ((2/3)/4)'),
+            ('Fraction test 4: \\( \\frac{\\frac{2} {3}}{4} \\)', 'Fraction test 4:  ((2/3)/4)'),
+            ('Fraction test 5: \\( \\frac{\\frac{2} {3}}{\\frac{4}{3}} \\)', 'Fraction test 5:  ((2/3)/(4/3))'),
+            # Invalid equations.
+            ('Fraction error: \\( \\frac{2} \\)', 'Fraction error:  \\frac{2}'),
+            ('Fraction error 2: \\( \\frac{\\frac{2}{3}{4} \\)', 'Fraction error 2:  \\frac{\\frac{2}{3}{4}'),
+            ('Unclosed: [mathjaxinline]x^2', 'Unclosed: [mathjaxinline]x^2'),
+            (
+                'Missing closing bracket: \\( \\frac{\\frac{2} {3}{\\frac{4}{3}} \\)',
+                'Missing closing bracket:  \\frac{\\frac{2} {3}{\\frac{4}{3}}'
+            ),
+            ('No equation: normal text', 'No equation: normal text'),
+        ]
+        # pylint: enable=line-too-long
+        block = BlockFactory.create(
+            parent_location=self.toy_course.location,
+            category="html",
+            display_name="Non-default HTML Block",
+            editor="raw",
+            use_latex_compiler=True,
+            data="|||".join(e[0] for e in eqns),
+        )
+        doc = {}
+        doc.update(searchable_doc_for_course_block(block))
+        doc.update(searchable_doc_tags(block.usage_key))
+        result = doc['description'].split('|||')
+        for i, eqn in enumerate(result):
+            assert eqn.strip() == eqns[i][1]

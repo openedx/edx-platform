@@ -71,7 +71,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
 
     def setUp(self):
         super().setUp()
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx", is_staff=True)
         # Create an organization
         self.organization, _ = Organization.objects.get_or_create(
             short_name="CL-TEST",
@@ -86,11 +86,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """
         Assert that the first dict contains at least all of the same entries as
         the second dict.
-
-        Like python 2's assertDictContainsSubset, but with the arguments in the
-        correct order.
         """
-        assert big_dict.items() >= subset_dict.items()
+        for key, value in subset_dict.items():
+            assert key in big_dict, f"Missing key: {key}"
+            assert big_dict[key] == value, f"Value for key {key} does not match: expected {value}, got {big_dict[key]}"
 
     def assertOrderEqual(self, libraries_list, expected_order):
         """

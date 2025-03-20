@@ -121,7 +121,7 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip('Skipping temporarily to drop column in table')
+    @unittest.skip('Skipping temporarily to add a foreign key')
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """

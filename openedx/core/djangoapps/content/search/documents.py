@@ -14,6 +14,7 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from rest_framework.exceptions import NotFound
 
 from openedx.core.djangoapps.content.search.models import SearchAccess
+from openedx.core.djangoapps.content.search.plain_text_math import process_mathjax
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
@@ -76,10 +77,17 @@ class Fields:
     # Structural XBlocks may use this one day to indicate how many child blocks they ocntain.
     num_children = "num_children"
 
+    # Publish status can be on of:
+    #   "published",
+    #   "modified" (for blocks that were published but have been modified since),
+    #   "never" (for never-published blocks).
+    publish_status = "publish_status"
+
     # Published data (dictionary) of this object
     published = "published"
     published_display_name = "display_name"
     published_description = "description"
+    published_num_children = "num_children"
 
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
@@ -95,6 +103,15 @@ class DocType:
     collection = "collection"
 
 
+class PublishStatus:
+    """
+    Values for the 'publish_status' field on each doc in the search index
+    """
+    never = "never"
+    published = "published"
+    modified = "modified"
+
+
 def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     """
     Meilisearch requires each document to have a primary key that's either an
@@ -106,9 +123,12 @@ def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
     we could use PublishableEntity's primary key / UUID instead.
     """
     # The slugified key _may_ not be unique so we append a hashed string to make it unique:
-    key_bin = str(usage_key).encode()
-    suffix = blake2b(key_bin, digest_size=4).hexdigest()  # When we use Python 3.9+, should add usedforsecurity=False
-    return slugify(str(usage_key)) + "-" + suffix
+    key_str = str(usage_key)
+    key_bin = key_str.encode()
+
+    suffix = blake2b(key_bin, digest_size=4, usedforsecurity=False).hexdigest()
+
+    return f"{slugify(key_str)}-{suffix}"
 
 
 def _meili_access_id_from_context_key(context_key: LearningContextKey) -> int:
@@ -216,7 +236,7 @@ def _fields_from_block(block) -> dict:
         # Generate description from the content
         description = _get_description_from_block_content(block_type, content_data)
         if description:
-            block_data[Fields.description] = description
+            block_data[Fields.description] = process_mathjax(description)
 
     except Exception as err:  # pylint: disable=broad-except
         log.exception(f"Failed to process index_dictionary for {block.usage_key}: {err}")
@@ -302,7 +322,10 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
 
     If the object is in no collections, returns:
         {
-            "collections":  {},
+            "collections":  {
+                "display_name": [],
+                "key": [],
+            },
         }
 
     """
@@ -372,11 +395,15 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     library_name = lib_api.get_library(xblock_metadata.usage_key.context_key).title
     block = xblock_api.load_block(xblock_metadata.usage_key, user=None)
 
+    publish_status = PublishStatus.published
     try:
         block_published = xblock_api.load_block(xblock_metadata.usage_key, user=None, version=LatestVersion.PUBLISHED)
+        if xblock_metadata.last_published and xblock_metadata.last_published < xblock_metadata.modified:
+            publish_status = PublishStatus.modified
     except NotFound:
         # Never published
         block_published = None
+        publish_status = PublishStatus.never
 
     doc = searchable_doc_for_usage_key(xblock_metadata.usage_key)
     doc.update({
@@ -385,6 +412,7 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
         Fields.created: xblock_metadata.created.timestamp(),
         Fields.modified: xblock_metadata.modified.timestamp(),
         Fields.last_published: xblock_metadata.last_published.timestamp() if xblock_metadata.last_published else None,
+        Fields.publish_status: publish_status,
     })
 
     doc.update(_fields_from_block(block))
@@ -485,6 +513,15 @@ def searchable_doc_for_collection(
     if collection:
         assert collection.key == collection_key
 
+        draft_num_children = authoring_api.filter_publishable_entities(
+            collection.entities,
+            has_draft=True,
+        ).count()
+        published_num_children = authoring_api.filter_publishable_entities(
+            collection.entities,
+            has_published=True,
+        ).count()
+
         doc.update({
             Fields.context_key: str(library_key),
             Fields.org: str(library_key.org),
@@ -495,7 +532,10 @@ def searchable_doc_for_collection(
             Fields.description: collection.description,
             Fields.created: collection.created.timestamp(),
             Fields.modified: collection.modified.timestamp(),
-            Fields.num_children: collection.entities.count(),
+            Fields.num_children: draft_num_children,
+            Fields.published: {
+                Fields.published_num_children: published_num_children,
+            },
             Fields.access_id: _meili_access_id_from_context_key(library_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })

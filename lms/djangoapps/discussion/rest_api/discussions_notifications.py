@@ -89,6 +89,7 @@ class DiscussionNotificationSender:
                 "post_title": getattr(self.thread, 'title', ''),
                 "course_name": self.course.display_name,
                 "sender_id": self.creator.id,
+                "group_by_id": str(self.course.id),
                 **extra_context,
             },
             notification_type=notification_type,
@@ -112,11 +113,13 @@ class DiscussionNotificationSender:
         Send notification to users who are subscribed to the main thread/post i.e.
         there is a response to the main thread.
         """
+        notification_type = "new_response"
         if not self.parent_id and self.creator.id != int(self.thread.user_id):
             context = {
                 'email_content': clean_thread_html_body(self.comment.body),
             }
-            self._send_notification([self.thread.user_id], "new_response", extra_context=context)
+            self._populate_context_with_ids_for_mobile(context, notification_type)
+            self._send_notification([self.thread.user_id], notification_type, extra_context=context)
 
     def _response_and_thread_has_same_creator(self) -> bool:
         """
@@ -131,6 +134,7 @@ class DiscussionNotificationSender:
         """
         Send notification to parent thread creator i.e. comment on the response.
         """
+        notification_type = "new_comment"
         if (
             self.parent_response and
             self.creator.id != int(self.thread.user_id)
@@ -154,15 +158,16 @@ class DiscussionNotificationSender:
                 "author_name": str(author_name),
                 "author_pronoun": str(author_pronoun),
                 "email_content": clean_thread_html_body(self.comment.body),
-                "group_by_id": self.parent_response.id
             }
-            self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
+            self._populate_context_with_ids_for_mobile(context, notification_type)
+            self._send_notification([self.thread.user_id], notification_type, extra_context=context)
 
     def send_new_comment_on_response_notification(self):
         """
         Send notification to parent response creator i.e. comment on the response.
         Do not send notification if author of response is same as author of post.
         """
+        notification_type = "new_comment_on_response"
         if (
             self.parent_response and
             self.creator.id != int(self.parent_response.user_id) and not
@@ -171,9 +176,10 @@ class DiscussionNotificationSender:
             context = {
                 "email_content": clean_thread_html_body(self.comment.body),
             }
+            self._populate_context_with_ids_for_mobile(context, notification_type)
             self._send_notification(
                 [self.parent_response.user_id],
-                "new_comment_on_response",
+                notification_type,
                 extra_context=context
             )
 
@@ -202,7 +208,7 @@ class DiscussionNotificationSender:
 
         while has_more_subscribers:
 
-            subscribers = Subscription.fetch(self.thread.id, query_params={'page': page})
+            subscribers = Subscription.fetch(self.thread.id, self.course.id, query_params={'page': page})
             if page <= subscribers.num_pages:
                 for subscriber in subscribers.collection:
                     # Check if the subscriber is not the thread creator or response creator
@@ -216,12 +222,16 @@ class DiscussionNotificationSender:
         # Remove duplicate users from the list of users to send notification
         users = list(set(users))
         if not self.parent_id:
+            context = {
+                "email_content": clean_thread_html_body(self.comment.body),
+            }
+            notification_type = "response_on_followed_post"
+            self._populate_context_with_ids_for_mobile(context, notification_type)
             self._send_notification(
                 users,
-                "response_on_followed_post",
-                extra_context={
-                    "email_content": clean_thread_html_body(self.comment.body),
-                })
+                notification_type,
+                extra_context=context
+            )
         else:
             author_name = f"{self.parent_response.username}'s"
             # use 'their' if comment author is also response author.
@@ -231,14 +241,17 @@ class DiscussionNotificationSender:
                 if self._response_and_comment_has_same_creator()
                 else f"{self.parent_response.username}'s"
             )
+            context = {
+                "author_name": str(author_name),
+                "author_pronoun": str(author_pronoun),
+                "email_content": clean_thread_html_body(self.comment.body),
+            }
+            notification_type = "comment_on_followed_post"
+            self._populate_context_with_ids_for_mobile(context, notification_type)
             self._send_notification(
                 users,
-                "comment_on_followed_post",
-                extra_context={
-                    "author_name": str(author_name),
-                    "author_pronoun": str(author_pronoun),
-                    "email_content": clean_thread_html_body(self.comment.body),
-                }
+                notification_type,
+                extra_context=context
             )
 
     def _create_cohort_course_audience(self):
@@ -290,7 +303,9 @@ class DiscussionNotificationSender:
             context = {
                 "email_content": clean_thread_html_body(self.comment.body)
             }
-            self._send_notification([self.thread.user_id], "response_endorsed_on_thread", extra_context=context)
+            notification_type = "response_endorsed_on_thread"
+            self._populate_context_with_ids_for_mobile(context, notification_type)
+            self._send_notification([self.thread.user_id], notification_type, extra_context=context)
 
     def send_response_endorsed_notification(self):
         """
@@ -299,7 +314,9 @@ class DiscussionNotificationSender:
         context = {
             "email_content": clean_thread_html_body(self.comment.body)
         }
-        self._send_notification([self.creator.id], "response_endorsed", extra_context=context)
+        notification_type = "response_endorsed"
+        self._populate_context_with_ids_for_mobile(context, notification_type)
+        self._send_notification([self.creator.id], notification_type, extra_context=context)
 
     def send_new_thread_created_notification(self):
         """
@@ -330,6 +347,7 @@ class DiscussionNotificationSender:
             'post_title': self.thread.title,
             "email_content": clean_thread_html_body(self.thread.body),
         }
+        self._populate_context_with_ids_for_mobile(context, notification_type)
         self._send_course_wide_notification(notification_type, audience_filters, context)
 
     def send_reported_content_notification(self):
@@ -361,6 +379,21 @@ class DiscussionNotificationSender:
             FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
         ]}
         self._send_course_wide_notification("content_reported", audience_filters, context)
+
+    def _populate_context_with_ids_for_mobile(self, context, notification_type):
+        """
+        Populate notification context with attributes required by mobile apps.
+        """
+
+        context['thread_id'] = self.thread.id
+        context['topic_id'] = self.thread.commentable_id
+
+        if notification_type in ("response_on_followed_post", 'new_response'):
+            context['response_id'] = self.comment_id
+            context['comment_id'] = None
+        else:
+            context['response_id'] = self.parent_id
+            context['comment_id'] = self.comment_id
 
 
 def is_discussion_cohorted(course_key_str):

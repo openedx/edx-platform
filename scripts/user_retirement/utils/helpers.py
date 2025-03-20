@@ -43,12 +43,11 @@ def _fail(kind, code, message):
     """
     _log(kind, message)
 
-    # Try to get a traceback, if there is one. On Python 3.4 this raises an AttributeError
-    # if there is no current exception, so we eat that here.
-    try:
-        _log(kind, traceback.format_exc())
-    except AttributeError:
-        pass
+    # Log the traceback if an exception is currently being handled
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    if exc_type is not None:
+        traceback_str = traceback.format_exception(exc_type, exc_value, exc_traceback)
+        _log(kind, ''.join(traceback_str))
 
     sys.exit(code)
 
@@ -66,16 +65,12 @@ def _get_error_str_from_exception(exc):
     """
     Return a string from an exception that may or may not have a .content (Slumber)
     """
-    exc_msg = text_type(exc)
+    exc_msg = str(exc)
 
     if hasattr(exc, 'content'):
-        # Slumber inconveniently discards the decoded .text attribute from the Response object,
-        # and instead gives us the raw encoded .content attribute, so we need to decode it first.
-        # Python 2 needs the decode, Py3 does not have it.
-        try:
-            exc_msg += '\n' + str(exc.content).decode('utf-8')
-        except AttributeError:
-            exc_msg += '\n' + str(exc.content)
+        # Attempt to decode `exc.content` if it's in bytes, otherwise just convert to str
+        exc_content = exc.content.decode('utf-8') if isinstance(exc.content, bytes) else str(exc.content)
+        exc_msg += '\n' + exc_content
 
     return exc_msg
 

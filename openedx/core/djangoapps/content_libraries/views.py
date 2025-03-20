@@ -80,8 +80,8 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_safe
 from django.views.generic.base import TemplateResponseMixin, View
+from drf_yasg.utils import swagger_auto_schema
 from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, DjangoMessageLaunch, DjangoOIDCLogin
 from pylti1p3.exception import LtiException, OIDCException
 
@@ -100,6 +100,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+from cms.djangoapps.contentstore.views.course import (
+    get_allowed_organizations_for_libraries,
+    user_can_create_organizations,
+)
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.serializers import (
     ContentLibraryBlockImportTaskCreateSerializer,
@@ -123,6 +127,7 @@ import openedx.core.djangoapps.site_configuration.helpers as configuration_helpe
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 from openedx.core.djangoapps.xblock import api as xblock_api
+from openedx.core.types.http import RestRequest
 
 from .models import ContentLibrary, LtiGradedResource, LtiProfile
 
@@ -197,8 +202,10 @@ class LibraryRootView(GenericAPIView):
     """
     Views to list, search for, and create content libraries.
     """
+    serializer_class = ContentLibraryMetadataSerializer
 
     @apidocs.schema(
+        responses={200: ContentLibraryMetadataSerializer(many=True)},
         parameters=[
             *LibraryApiPaginationDocs.apidoc_params,
             apidocs.query_parameter(
@@ -268,6 +275,14 @@ class LibraryRootView(GenericAPIView):
         except InvalidOrganizationException:
             raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
                 detail={"org": f"No such organization '{org_name}' found."}
+            )
+        # Ensure the user is allowed to create libraries under this org
+        if not (
+            user_can_create_organizations(request.user) or
+            org_name in get_allowed_organizations_for_libraries(request.user)
+        ):
+            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
+                detail={"org": f"User not allowed to create libraries in '{org_name}'."}
             )
         org = Organization.objects.get(short_name=org_name)
 
@@ -518,7 +533,13 @@ class LibraryPasteClipboardView(GenericAPIView):
     """
     Paste content of clipboard into Library.
     """
+    serializer_class = LibraryXBlockMetadataSerializer
+
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=LibraryPasteClipboardSerializer,
+        responses={200: LibraryXBlockMetadataSerializer}
+    )
     def post(self, request, lib_key_str):
         """
         Import the contents of the user's clipboard and paste them into the Library
@@ -546,6 +567,7 @@ class LibraryBlocksView(GenericAPIView):
     """
     Views to work with XBlocks in a specific content library.
     """
+    serializer_class = LibraryXBlockMetadataSerializer
 
     @apidocs.schema(
         parameters=[
@@ -583,6 +605,10 @@ class LibraryBlocksView(GenericAPIView):
         return self.get_paginated_response(serializer.data)
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=LibraryXBlockCreationSerializer,
+        responses={200: LibraryXBlockMetadataSerializer}
+    )
     def post(self, request, lib_key_str):
         """
         Add a new XBlock to this content library
@@ -645,6 +671,22 @@ class LibraryBlockView(APIView):
         return Response({})
 
 
+@view_auth_classes()
+class LibraryBlockRestore(APIView):
+    """
+    View to restore soft-deleted library xblocks.
+    """
+    @convert_exceptions
+    def post(self, request, usage_key_str) -> Response:
+        """
+        Restores a soft-deleted library block that belongs to a Content Library
+        """
+        key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
+        api.restore_library_block(key)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
 class LibraryBlockCollectionsView(APIView):
@@ -652,7 +694,7 @@ class LibraryBlockCollectionsView(APIView):
     View to set collections for a component.
     """
     @convert_exceptions
-    def patch(self, request, usage_key_str) -> Response:
+    def patch(self, request: RestRequest, usage_key_str) -> Response:
         """
         Sets Collections for a Component.
 
@@ -673,7 +715,7 @@ class LibraryBlockCollectionsView(APIView):
             library_key=key.lib_key,
             component=component,
             collection_keys=collection_keys,
-            created_by=self.request.user.id,
+            created_by=request.user.id,
             content_library=content_library,
         )
 
@@ -711,6 +753,9 @@ class LibraryBlockOlxView(APIView):
     @convert_exceptions
     def get(self, request, usage_key_str):
         """
+        DEPRECATED. Use get_block_olx_view() in xblock REST-API.
+        Can be removed post-Teak.
+
         Get the block's OLX
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
@@ -781,6 +826,7 @@ class LibraryBlockAssetView(APIView):
         """
         Replace a static asset file belonging to this block.
         """
+        file_path = file_path.replace(" ", "_")  # Messes up url/name correspondence due to URL encoding.
         usage_key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(
             usage_key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
@@ -838,6 +884,9 @@ class LibraryImportTaskViewSet(GenericViewSet):
     Import blocks from Courseware through modulestore.
     """
 
+    queryset = []  # type: ignore[assignment]
+    serializer_class = ContentLibraryBlockImportTaskSerializer
+
     @convert_exceptions
     def list(self, request, lib_key_str):
         """
@@ -857,6 +906,10 @@ class LibraryImportTaskViewSet(GenericViewSet):
         )
 
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=ContentLibraryBlockImportTaskCreateSerializer,
+        responses={200: ContentLibraryBlockImportTaskSerializer}
+    )
     def create(self, request, lib_key_str):
         """
         Create and queue an import tasks for this library.
@@ -1163,8 +1216,7 @@ class LtiToolJwksView(LtiToolView):
         return JsonResponse(self.lti_tool_config.get_jwks(), safe=False)
 
 
-@require_safe
-def component_version_asset(request, component_version_uuid, asset_path):
+def get_component_version_asset(request, component_version_uuid, asset_path):
     """
     Serves static assets associated with particular Component versions.
 
@@ -1201,7 +1253,6 @@ def component_version_asset(request, component_version_uuid, asset_path):
         component_version_uuid,
         asset_path,
         public=False,
-        learner_downloadable_only=False,
     )
 
     # If there was any error, we return that response because it will have the
@@ -1234,16 +1285,34 @@ def component_version_asset(request, component_version_uuid, asset_path):
     )
 
 
-@require_safe
-def component_draft_asset(request, usage_key, asset_path):
+@view_auth_classes()
+class LibraryComponentAssetView(APIView):
+    """
+    Serves static assets associated with particular Component versions.
+    """
+    @convert_exceptions
+    def get(self, request, component_version_uuid, asset_path):
+        """
+        GET API for fetching static asset for given component_version_uuid.
+        """
+        return get_component_version_asset(request, component_version_uuid, asset_path)
+
+
+@view_auth_classes()
+class LibraryComponentDraftAssetView(APIView):
     """
     Serves the draft version of static assets associated with a Library Component.
 
-    See `component_version_asset` for more details
+    See `get_component_version_asset` for more details
     """
-    try:
-        component_version_uuid = api.get_component_from_usage_key(usage_key).versioning.draft.uuid
-    except ObjectDoesNotExist as exc:
-        raise Http404() from exc
+    @convert_exceptions
+    def get(self, request, usage_key, asset_path):
+        """
+        Fetches component_version_uuid for given usage_key and returns component asset.
+        """
+        try:
+            component_version_uuid = api.get_component_from_usage_key(usage_key).versioning.draft.uuid
+        except ObjectDoesNotExist as exc:
+            raise Http404() from exc
 
-    return component_version_asset(request, component_version_uuid, asset_path)
+        return get_component_version_asset(request, component_version_uuid, asset_path)

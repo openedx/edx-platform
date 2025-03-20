@@ -57,6 +57,7 @@ urlpatterns = [
         path('blocks/<str:usage_key_str>/', include([
             # Get metadata about a specific XBlock in this library, or delete the block:
             path('', views.LibraryBlockView.as_view()),
+            path('restore/', views.LibraryBlockRestore.as_view()),
             # Update collections for a given component
             path('collections/', views.LibraryBlockCollectionsView.as_view(), name='update-collections'),
             # Get the LTI URL of a specific XBlock
@@ -79,12 +80,12 @@ urlpatterns = [
     path('library_assets/', include([
         path(
             'component_versions/<uuid:component_version_uuid>/<path:asset_path>',
-            views.component_version_asset,
+            views.LibraryComponentAssetView.as_view(),
             name='library-assets',
         ),
         path(
             'blocks/<usage_v2:usage_key>/<path:asset_path>',
-            views.component_draft_asset,
+            views.LibraryComponentDraftAssetView.as_view(),
             name='library-draft-assets',
         ),
     ])
