@@ -181,7 +181,8 @@ def _update_node_tree_and_dictionary(block, link, linkState, node_tree, dictiona
             'category': 'chapter',
             'url': 'url_1',
             'locked_links': [...],
-            'broken_links': [...]
+            'broken_links': [...],
+            'external_forbidden_links': [...],
         }
         ...,
     }
