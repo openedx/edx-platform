@@ -277,6 +277,7 @@ def refund_seat(course_enrollment, change_mode=False):
 
     return refund_ids
 
+
 @pluggable_override('OVERRIDE_GET_PROGRAM_PRICE_INFO')
 def get_program_price_info(api_user, params):
     """
