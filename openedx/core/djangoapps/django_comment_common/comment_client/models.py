@@ -175,8 +175,8 @@ class Model:
         self._update_from_response(response)
         self.after_save(self)
 
-    def delete(self):
-        course_key = get_course_key(self.attributes.get("course_id"))
+    def delete(self, course_id=None):
+        course_key = get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             response = None
             if self.type == "comment":
