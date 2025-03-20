@@ -1343,7 +1343,8 @@ def _filter_by_status(results):
 
     Statuses:
         200: OK. No need to do more
-        403: Forbidden. Record as locked link.
+        403: Forbidden. Record as locked link if it is studio link.
+        403: Forbidden. Record as external-forbidden link if it is external link
         None: Error. Retry up to 3 times.
         Other: Failure. Record as broken link.
 
@@ -1356,7 +1357,7 @@ def _filter_by_status(results):
 
     Example return:
         [
-            [block_id1, filtered_results_url1, is_locked],
+            [block_id1, filtered_results_url1, linkState],
             ...
         ],
         [
