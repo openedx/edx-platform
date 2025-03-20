@@ -12,8 +12,8 @@ Open edX Platform
 
 Purpose
 *******
-The `Open edX Platform <https://openedx.org>`_ is a service-oriented platform for authoring and
-delivering online learning at any scale.  The platform is written in
+The `Open edX Platform <https://openedx.org>`_ enables the authoring and
+delivery of online learning at any scale.  The platform is written in
 Python and JavaScript and makes extensive use of the Django
 framework. At the highest level, the platform is composed of a
 monolith, some independently deployable applications (IDAs), and
