@@ -79,11 +79,12 @@ def generate_broken_links_descriptor(json_content, request_user):
     Returns a Data Transfer Object for frontend given a list of broken links.
 
     ** Example json_content structure **
-        Note: is_locked is true if the link is a studio link and returns 403
+        Note: linkState is locked if the link is a studio link and returns 403
+              linkState is external-forbidden if the link is not a studio link and returns 403
     [
-        ['block_id_1', 'link_1', is_locked],
-        ['block_id_1', 'link_2', is_locked],
-        ['block_id_2', 'link_3', is_locked],
+        ['block_id_1', 'link_1', linkState],
+        ['block_id_1', 'link_2', linkState],
+        ['block_id_2', 'link_3', linkState],
         ...
     ]
 
@@ -213,7 +214,7 @@ def _update_node_tree_and_dictionary(block, link, linkState, node_tree, dictiona
     # The linkState == True condition is maintained for backward compatibility.
     # Previously, the is_locked attribute was used instead of linkStateType.
     # If is_locked is True, it indicates that the link is locked.
-    if linkState == True or linkState == LinkState.LOCKED:
+    if linkState is True or linkState == LinkState.LOCKED:
         updated_dictionary[xblock_id].setdefault('locked_links', []).append(link)
     elif linkState == LinkState.EXTERNAL_FORBIDDEN:
         updated_dictionary[xblock_id].setdefault('external_forbidden_links', []).append(link)
