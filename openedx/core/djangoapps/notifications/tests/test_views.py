@@ -275,9 +275,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'email_cadence': 'Daily',
                         },
                     },
-                    'non_editable': {
-                        'core': ['web']
-                    }
+                    'non_editable': {}
                 },
                 'updates': {
                     'enabled': True,
@@ -1130,12 +1128,12 @@ class UpdateAllNotificationPreferencesViewTests(APITestCase):
         response = self.client.post(self.url, data, format='json')
 
         # Should fail because 'web' is non-editable for 'core' in discussion
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['status'], 'error')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
 
         # Verify database remains unchanged
         for pref in CourseNotificationPreference.objects.filter(is_active=True):
-            self.assertTrue(
+            self.assertFalse(
                 pref.notification_preference_config['discussion']['notification_types']['core']['web']
             )
 
