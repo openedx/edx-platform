@@ -8,16 +8,22 @@ from .tasks import (
     import_library_from_staged_content_task,
     save_courses_to_staged_content_task,
 )
+from .types import CompositionLevel
 
 
 def import_library_from_staged_content(
-    library_key: str, user_id: int, usage_ids: list[str], course_id: str, override: bool
+    library_key: str,
+    user_id: int,
+    usage_ids: list[str],
+    course_id: str,
+    composition_level: CompositionLevel,
+    override: bool
 ) -> None:
     """
     Import staged content to a library.
     """
     import_library_from_staged_content_task.delay(
-        user_id, usage_ids, library_key, COURSE_TO_LIBRARY_IMPORT_PURPOSE, course_id, override
+        user_id, usage_ids, library_key, COURSE_TO_LIBRARY_IMPORT_PURPOSE, course_id, composition_level, override
     )
 
 

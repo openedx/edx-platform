@@ -2,12 +2,18 @@
 Tests for course_to_library_import validators
 """
 
+from typing import get_args
 from unittest.mock import MagicMock
 
 from django.test import TestCase
 import pytest
 
-from cms.djangoapps.course_to_library_import.validators import validate_course_ids, validate_usage_ids
+from cms.djangoapps.course_to_library_import.validators import (
+    validate_course_ids,
+    validate_usage_ids,
+    validate_composition_level
+)
+from cms.djangoapps.course_to_library_import.types import CompositionLevel
 
 
 class TestValidateCourseIds(TestCase):
@@ -58,3 +64,22 @@ class TestValidateUsageIds(TestCase):
         with pytest.raises(ValueError) as exc:
             validate_usage_ids(['block-v1:edX+DemoX+type@discussion+block@54321'], staged_content)
             assert str(exc.value) == 'Block block-v1:edX+DemoX+type@discussion+block@54321 is not available for import'
+
+
+class TestValidateCompositionLevel(TestCase):
+    """
+    Test cases for validate_composition_level function.
+
+    Case 1: Valid composition level
+    Case 2: Invalid composition level
+    """
+
+    def test_valid_composition_level(self):
+        for level in get_args(CompositionLevel):
+            # Should not raise an exception for valid levels
+            validate_composition_level(level)
+
+    def test_invalid_composition_level(self):
+        with pytest.raises(ValueError) as exc:
+            validate_composition_level('invalid_composition_level')
+        assert 'Invalid composition level: invalid_composition_level' in str(exc.value)

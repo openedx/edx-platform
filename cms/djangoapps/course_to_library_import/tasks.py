@@ -13,9 +13,10 @@ from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.django import modulestore
 
 from .data import CourseToLibraryImportStatus
-from .helpers import flat_import_children, get_block_to_import
+from .helpers import get_block_to_import, import_container
 from .models import CourseToLibraryImport
-from .validators import validate_usage_ids
+from .types import CompositionLevel
+from .validators import validate_composition_level, validate_usage_ids
 
 
 @shared_task
@@ -56,11 +57,18 @@ def save_courses_to_staged_content_task(
 @shared_task
 @set_code_owner_attribute
 def import_library_from_staged_content_task(
-    user_id: int, usage_ids: list[str], library_key: str, purpose: str, course_id: str, override: bool
+    user_id: int,
+    usage_ids: list[str],
+    library_key: str,
+    purpose: str,
+    course_id: str,
+    composition_level: CompositionLevel,
+    override: bool
 ) -> None:
     """
     Import staged content to a library task.
     """
+    validate_composition_level(composition_level)
     staged_content = content_staging_api.get_ready_staged_content_by_user_and_purpose(
         user_id, purpose.format(course_id=course_id)
     )
@@ -76,10 +84,11 @@ def import_library_from_staged_content_task(
                 node = etree.fromstring(staged_content_item.olx, parser=parser)
                 usage_key = UsageKey.from_string(usage_key)
                 block_to_import = get_block_to_import(node, usage_key)
-                if not block_to_import:
+
+                if block_to_import is None:
                     continue
-                flat_import_children(
-                    block_to_import, library_key, user_id, staged_content_item, override
+                import_container(
+                    usage_key, block_to_import, library_key, user_id, staged_content_item, composition_level, override
                 )
 
         CourseToLibraryImport.objects.filter(

@@ -57,14 +57,15 @@ class TestImportLibraryFromStagedContentTask(TestCase):
         'cms.djangoapps.course_to_library_import.tasks.content_staging_api.get_ready_staged_content_by_user_and_purpose'
     )
     @patch('cms.djangoapps.course_to_library_import.tasks.get_block_to_import')
-    @patch('cms.djangoapps.course_to_library_import.tasks.flat_import_children')
+    @patch('cms.djangoapps.course_to_library_import.tasks.import_container')
     @patch('cms.djangoapps.course_to_library_import.tasks.etree')
     def test_import_library_from_staged_content_task(
-        self, mock_etree, mock_flat_import_children, mock_get_block_to_import,
+        self, mock_etree, mock_import_container, mock_get_block_to_import,
         mock_get_ready_staged_content, mock_validate_usage_ids
     ):
         user = UserFactory()
         usage_ids = ['block-v1:edX+Demo+2023+type@vertical+block@12345']
+        usage_key = UsageKey.from_string(usage_ids[0])
         library_key = 'lib:TestOrg:TestLib'
         purpose = 'import_from_{course_id}'
         course_id = 'course-v1:edX+Demo+2023'
@@ -90,7 +91,7 @@ class TestImportLibraryFromStagedContentTask(TestCase):
         )
 
         import_library_from_staged_content_task(
-            user.id, usage_ids, library_key, purpose, course_id, override
+            user.id, usage_ids, library_key, purpose, course_id, 'xblock', override
         )
 
         mock_get_ready_staged_content.assert_called_once_with(
@@ -101,9 +102,9 @@ class TestImportLibraryFromStagedContentTask(TestCase):
         mock_etree.fromstring.assert_called_once_with(mock_content_item.olx, parser=mock_etree.XMLParser())
 
         mock_staged_content.filter.assert_called_once_with(tags__icontains=usage_ids[0])
-        mock_get_block_to_import.assert_called_once_with(mock_node, UsageKey.from_string(usage_ids[0]))
-        mock_flat_import_children.assert_called_once_with(
-            mock_block, library_locator, user.id, mock_content_item, override
+        mock_get_block_to_import.assert_called_once_with(mock_node, usage_key)
+        mock_import_container.assert_called_once_with(
+            usage_key, mock_block, library_locator, user.id, mock_content_item, 'xblock', override
         )
 
         course_to_library_import.refresh_from_db()
@@ -145,5 +146,5 @@ class TestImportLibraryFromStagedContentTask(TestCase):
 
         with self.assertRaises(ValueError):
             import_library_from_staged_content_task(
-                user.id, usage_ids, library_key, purpose, course_id, override
+                user.id, usage_ids, library_key, purpose, course_id, 'xblock', override
             )

@@ -59,8 +59,8 @@ def test_import_library_from_staged_content(override):
     with patch(
         "cms.djangoapps.course_to_library_import.api.import_library_from_staged_content_task"
     ) as import_library_from_staged_content_task_mock:
-        import_library_from_staged_content(library_key, user.id, usage_ids, course_id, override)
+        import_library_from_staged_content(library_key, user.id, usage_ids, course_id, 'xblock', override)
 
     import_library_from_staged_content_task_mock.delay.assert_called_once_with(
-        user.id, usage_ids, library_key, COURSE_TO_LIBRARY_IMPORT_PURPOSE, course_id, override
+        user.id, usage_ids, library_key, COURSE_TO_LIBRARY_IMPORT_PURPOSE, course_id, 'xblock', override
     )

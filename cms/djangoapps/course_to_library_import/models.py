@@ -72,3 +72,24 @@ class ComponentVersionImport(TimeStampedModel):
     class Meta:
         verbose_name = _('Component Version Import')
         verbose_name_plural = _('Component Version Imports')
+
+
+class ContainerVersionImport(TimeStampedModel):
+    """
+    Represents a container version that has been imported into a content library.
+    This is a many-to-many relationship between a container version and a course to library import.
+    """
+
+    container_version = models.OneToOneField(
+        to='oel_publishing.ContainerVersion',
+        on_delete=models.CASCADE
+    )
+    source_usage_key = UsageKeyField(max_length=255)
+    library_import = models.ForeignKey(CourseToLibraryImport, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.container_version} - {self.source_usage_key}'
+
+    class Meta:
+        verbose_name = _('Container Version Import')
+        verbose_name_plural = _('Container Version Imports')
