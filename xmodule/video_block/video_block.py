@@ -63,6 +63,7 @@ from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
     clean_video_id,
+    get_endonym_or_label,
     get_html5_ids,
     get_transcript,
     subs_filename
@@ -182,12 +183,13 @@ class _BuiltInVideoBlock(
                 track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
 
         transcript_language = self.get_default_transcript_language(transcripts, dest_lang)
-        native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
-        languages = {
-            lang: native_languages.get(lang, display)
-            for lang, display in settings.ALL_LANGUAGES
-            if lang in other_lang
-        }
+        languages = {}
+        for lang_code in other_lang:
+            try:
+                label = get_endonym_or_label(lang_code)
+                languages[lang_code] = label
+            except NotFoundError:
+                continue
 
         if not other_lang or (other_lang and sub):
             languages['en'] = 'English'
