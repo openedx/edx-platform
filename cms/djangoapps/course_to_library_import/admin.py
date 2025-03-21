@@ -20,11 +20,9 @@ class CourseToLibraryImportAdmin(admin.ModelAdmin):
         'status',
         'course_ids',
         'library_key',
-        'source_type',
     )
     list_filter = (
         'status',
-        'source_type',
     )
     search_fields = (
         'course_ids',

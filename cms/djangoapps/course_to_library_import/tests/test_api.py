@@ -26,16 +26,14 @@ def test_create_import():
     ]
     user = UserFactory()
     library_key = "lib:edX:DemoLib"
-    source_type = "test_source_type"
     with patch(
         "cms.djangoapps.course_to_library_import.api.save_courses_to_staged_content_task"
     ) as save_courses_to_staged_content_task_mock:
-        create_import(course_ids, user.id, library_key, source_type)
+        create_import(course_ids, user.id, library_key)
 
     import_task = CourseToLibraryImport.objects.get()
     assert import_task.course_ids == " ".join(course_ids)
     assert import_task.library_key == library_key
-    assert import_task.source_type == source_type
     assert import_task.user_id == user.id
     save_courses_to_staged_content_task_mock.delay.assert_called_once_with(
         course_ids, user.id, import_task.id, COURSE_TO_LIBRARY_IMPORT_PURPOSE

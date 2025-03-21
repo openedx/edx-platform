@@ -2,6 +2,7 @@
 Models for the course to library import app.
 """
 
+import uuid as uuid_tools
 from typing import Self
 
 from django.contrib.auth import get_user_model
@@ -23,6 +24,7 @@ class CourseToLibraryImport(TimeStampedModel):
     Represents a course import into a content library.
     """
 
+    uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True, db_index=True)
     status = models.CharField(
         max_length=100,
         choices=CourseToLibraryImportStatus.choices,
@@ -34,7 +36,6 @@ class CourseToLibraryImport(TimeStampedModel):
         validators=[validate_course_ids]
     )
     library_key = models.CharField(max_length=100)
-    source_type = models.CharField(max_length=30)
     metadata = models.JSONField(default=dict, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

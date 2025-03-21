@@ -27,16 +27,13 @@ def import_library_from_staged_content(
     )
 
 
-def create_import(
-    course_ids: list[str], user_id: int, library_key: str, source_type: str
-) -> None:
+def create_import(course_ids: list[str], user_id: int, library_key: str) -> None:
     """
     Create a new import task to import a course to a library.
     """
     import_task = CourseToLibraryImport(
         course_ids=" ".join(course_ids),
         library_key=library_key,
-        source_type=source_type,
         user_id=user_id,
     )
     import_task.save()
@@ -44,3 +41,4 @@ def create_import(
     save_courses_to_staged_content_task.delay(
         course_ids, user_id, import_task.id, COURSE_TO_LIBRARY_IMPORT_PURPOSE
     )
+    return import_task
