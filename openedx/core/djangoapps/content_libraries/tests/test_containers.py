@@ -178,3 +178,35 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         assert container1_data["container_key"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
         assert container2_data["container_key"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
         assert container1_data["container_key"] != container2_data["container_key"]
+
+    def test_unit_add_children(self):
+        """
+        Test that we can add and get unit children components
+        """
+        lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+
+        container_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
+        problem_block = self._add_block_to_library(lib["id"], "problem", "Problem1", can_stand_alone=False)
+        html_block = self._add_block_to_library(lib["id"], "html", "Html1", can_stand_alone=False)
+        self._add_container_components(
+            container_data["container_key"],
+            children_ids=[problem_block["id"], html_block["id"]]
+        )
+        data = self._get_container_components(container_data["container_key"])
+        assert len(data) == 2
+        assert data[0]['id'] == problem_block['id']
+        assert not data[0]['can_stand_alone']
+        assert data[1]['id'] == html_block['id']
+        assert not data[1]['can_stand_alone']
+        problem_block_2 = self._add_block_to_library(lib["id"], "problem", "Problem2", can_stand_alone=False)
+        html_block_2 = self._add_block_to_library(lib["id"], "html", "Html2")
+        self._add_container_components(
+            container_data["container_key"],
+            children_ids=[problem_block_2["id"], html_block_2["id"]]
+        )
+        data = self._get_container_components(container_data["container_key"])
+        assert len(data) == 4
+        assert data[2]['id'] == problem_block_2['id']
+        assert not data[2]['can_stand_alone']
+        assert data[3]['id'] == html_block_2['id']
+        assert data[3]['can_stand_alone']

@@ -33,6 +33,7 @@ URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specifie
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
 URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
+URL_LIB_CONTAINER_COMPONENTS = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
 
 URL_LIB_LTI_PREFIX = URL_PREFIX + 'lti/1.3/'
 URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
@@ -229,9 +230,21 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             expect_response
         )
 
-    def _add_block_to_library(self, lib_key, block_type, slug, parent_block=None, expect_response=200):
+    def _add_block_to_library(
+        self,
+        lib_key,
+        block_type,
+        slug,
+        parent_block=None,
+        can_stand_alone=True,
+        expect_response=200,
+    ):
         """ Add a new XBlock to the library """
-        data = {"block_type": block_type, "definition_id": slug}
+        data = {
+            "block_type": block_type,
+            "definition_id": slug,
+            "can_stand_alone": can_stand_alone,
+        }
         if parent_block:
             data["parent_block"] = parent_block
         return self._api('post', URL_LIB_BLOCKS.format(lib_key=lib_key), data, expect_response)
@@ -372,3 +385,26 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
     def _delete_container(self, container_key: str, expect_response=204):
         """ Delete a container (unit etc.) """
         return self._api('delete', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)
+
+    def _get_container_components(self, container_key: str, expect_response=200):
+        """ Get container components"""
+        return self._api(
+            'get',
+            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            None,
+            expect_response
+        )
+
+    def _add_container_components(
+        self,
+        container_key: str,
+        children_ids: list[str],
+        expect_response=200,
+    ):
+        """ Add container components"""
+        return self._api(
+            'post',
+            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            {'usage_keys': children_ids},
+            expect_response
+        )

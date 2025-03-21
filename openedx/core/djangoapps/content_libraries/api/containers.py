@@ -2,6 +2,7 @@
 API for containers (Sections, Subsections, Units) in Content Libraries
 """
 from __future__ import annotations
+
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -9,10 +10,10 @@ from uuid import uuid4
 
 from django.utils.text import slugify
 from opaque_keys.edx.locator import (
-    LibraryLocatorV2,
     LibraryContainerLocator,
+    LibraryLocatorV2,
+    UsageKeyV2,
 )
-
 from openedx_events.content_authoring.data import LibraryContainerData
 from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_CREATED,
@@ -22,8 +23,10 @@ from openedx_events.content_authoring.signals import (
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container
 
+from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
+
 from ..models import ContentLibrary
-from .libraries import PublishableItem
+from .libraries import LibraryXBlockMetadata, PublishableItem
 
 
 # The public API is only the following symbols:
@@ -37,6 +40,7 @@ __all__ = [
     "library_container_locator",
     "update_container",
     "delete_container",
+    "add_container_children",
 ]
 
 
@@ -252,14 +256,47 @@ def get_container_children(
     """
     Get the entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    assert isinstance(container_key, LibraryContainerLocator)
-    content_library = ContentLibrary.objects.get_by_key(container_key.library_key)
-    learning_package = content_library.learning_package
-    assert learning_package is not None
-    container = authoring_api.get_container_by_key(
-        learning_package.id,
-        key=container_key.container_id,
+    container = get_container(container_key)
+    if container_key.container_type == ContainerType.Unit.value:
+        child_entities = authoring_api.get_components_in_unit(container.unit, published=published)
+        return [LibraryXBlockMetadata.from_component(
+            container_key.library_key,
+            entry.component
+        ) for entry in child_entities]
+    else:
+        child_entities = authoring_api.get_entities_in_container(container, published=published)
+        return [ContainerMetadata.from_container(entry.entity) for entry in child_entities]
+
+
+def add_container_children(
+    container_key: LibraryContainerLocator,
+    children_ids: list[UsageKeyV2] | list[LibraryContainerLocator],
+    user_id: int | None,
+):
+    """
+    Adds children components or containers to given container.
+    """
+    library_key = container_key.library_key
+    container_type = container_key.container_type
+    container = get_container(container_key)
+    match container_type:
+        case ContainerType.Unit.value:
+            components = [get_component_from_usage_key(key) for key in children_ids]
+            new_version = authoring_api.create_next_unit_version(
+                container.unit,
+                components=components,
+                created=datetime.now(),
+                created_by=user_id,
+                entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+            )
+        case _:
+            raise ValueError(f"Invalid container type: {container_type}")
+
+    LIBRARY_CONTAINER_UPDATED.send_event(
+        library_container=LibraryContainerData(
+            library_key=library_key,
+            container_key=str(container_key),
+        )
     )
-    child_entities = authoring_api.get_entities_in_container(container, published=published)
-    # TODO: convert the return type to list[ContainerMetadata | LibraryXBlockMetadata] ?
-    return child_entities
+
+    return ContainerMetadata.from_container(library_key, new_version.container)

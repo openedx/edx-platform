@@ -80,7 +80,103 @@ class LibraryContainerView(GenericAPIView):
             request.user,
             permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
         )
-        container = api.get_container(container_key)
+        container = api.get_container_metadata(container_key)
+        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryContainerChildrenView(GenericAPIView):
+    """
+    View to get or update children of specific container (a section, subsection, or unit)
+    """
+    serializer_class = serializers.LibraryXBlockMetadataSerializer
+
+    @convert_exceptions
+    @swagger_auto_schema(
+        responses={200: list[serializers.LibraryXBlockMetadataSerializer]}
+    )
+    def get(self, request, container_key: LibraryContainerLocator):
+        """
+        Get children components of given container
+        Example:
+        GET /api/libraries/v2/containers/<container_key>/children/
+        Result:
+        [
+            {
+                'block_type': 'problem',
+                'can_stand_alone': True,
+                'collections': [],
+                'created': '2025-03-21T13:53:55Z',
+                'def_key': None,
+                'display_name': 'Blank Problem',
+                'has_unpublished_changes': True,
+                'id': 'lb:CL-TEST:containers:problem:Problem1',
+                'last_draft_created': '2025-03-21T13:53:55Z',
+                'last_draft_created_by': 'Bob',
+                'last_published': None,
+                'modified': '2025-03-21T13:53:55Z',
+                'published_by': None,
+            },
+            {
+                'block_type': 'html',
+                'can_stand_alone': False,
+                'collections': [],
+                'created': '2025-03-21T13:53:55Z',
+                'def_key': None,
+                'display_name': 'Text',
+                'has_unpublished_changes': True,
+                'id': 'lb:CL-TEST:containers:html:Html1',
+                'last_draft_created': '2025-03-21T13:53:55Z',
+                'last_draft_created_by': 'Bob',
+                'last_published': None,
+                'modified': '2025-03-21T13:53:55Z',
+                'published_by': None,
+            }
+        ]
+        """
+        published = request.GET.get('published', False)
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+        )
+        child_entities = api.get_container_children(container_key, published)
+        if container_key.container_type == api.ContainerType.Unit.value:
+            data = serializers.LibraryXBlockMetadataSerializer(child_entities, many=True).data
+        else:
+            data = serializers.LibraryContainerMetadataSerializer(child_entities, many=True).data
+        return Response(data)
+
+    @convert_exceptions
+    @swagger_auto_schema(
+        request_body=serializers.ContentLibraryComponentKeysSerializer,
+        responses={200: serializers.LibraryContainerMetadataSerializer}
+    )
+    def post(self, request, container_key: LibraryContainerLocator):
+        """
+        Add components to unit
+        Example:
+        POST /api/libraries/v2/containers/<container_key>/children/
+        Request body:
+        {"usage_keys": ['lb:CL-TEST:containers:problem:Problem1', 'lb:CL-TEST:containers:html:Html1']}
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
+        serializer = serializers.ContentLibraryComponentKeysSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Only components under units are supported for now.
+        assert container_key.container_type == api.ContainerType.Unit.value
+
+        container = api.add_container_children(
+            container_key,
+            children_ids=serializer.validated_data["usage_keys"],
+            user_id=request.user.id,
+        )
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
     @convert_exceptions
