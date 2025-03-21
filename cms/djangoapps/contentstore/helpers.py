@@ -82,6 +82,22 @@ def is_unit(xblock, parent_xblock=None):
     return False
 
 
+def is_library_content(xblock):
+    """
+    Returns true if the specified xblock is library content.
+    """
+    return xblock.category == 'library_content'
+
+
+def get_parent_if_split_test(xblock):
+    """
+    Returns the parent of the specified xblock if it is a split test, otherwise returns None.
+    """
+    parent_xblock = get_parent_xblock(xblock)
+    if parent_xblock and parent_xblock.category == 'split_test':
+        return parent_xblock
+
+
 def xblock_has_own_studio_page(xblock, parent_xblock=None):
     """
     Returns true if the specified xblock has an associated Studio page. Most xblocks do

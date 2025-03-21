@@ -8,6 +8,11 @@ html {
   }
 }
 
+body,
+#main {
+    background-color: transparent;
+}
+
 [class*="view-"] .wrapper {
   .inner-wrapper {
     max-width: 100%;
@@ -39,67 +44,105 @@ html {
 
       .actions-list .action-item .action-button {
         border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: ($baseline * .3);
+        padding: ($baseline * .15) ($baseline / 2);
 
         &:hover {
           background-color: $primary;
           color: $white;
         }
-      }
-    }
 
-    &.level-page .xblock-message {
-      padding: ($baseline * .75) ($baseline * 1.2);
-      border-radius: 0 0 4px 4px;
-
-      &.information {
-        color: $text-color;
-        background-color: $xblock-message-info-bg;
-        border-color: $xblock-message-info-border-color;
-      }
-
-      &.validation.has-warnings {
-        color: $black;
-        background-color: $xblock-message-warning-bg;
-        border-color: $xblock-message-warning-border-color;
-        border-top-width: 1px;
-
-        .icon {
-          color: $xblock-message-warning-border-color;
+        .action-button-text {
+          line-height: 20px;
         }
       }
-
-      a {
-        color: $primary;
-      }
     }
 
-    .xblock-author_view-library_content > .wrapper-xblock-message .xblock-message {
-      font-size: 16px;
-      line-height: 22px;
-      border-radius: 4px;
-      padding: ($baseline * 1.2);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
-      margin-bottom: ($baseline * 1.4);
+    &.level-page {
+        .xblock-message {
+            padding: ($baseline * .75) ($baseline * 1.2);
+            border-radius: 0 0 4px 4px;
+
+            .xblock-message-list {
+                color: $black;
+            }
+
+            &.information,
+            &.validation.has-warnings,
+            &.validation.has-errors {
+                color: $black;
+                border-width: 0;
+                font-size: 16px;
+                line-height: 22px;
+                padding: ($baseline * 1.2);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+            }
+
+            &.information {
+                background-color: $xblock-message-info-bg;
+
+                .icon {
+                    color: $xblock-message-info-icon-color;
+                }
+            }
+
+            &.validation.has-warnings {
+                background-color: $xblock-message-warning-bg;
+
+                .icon {
+                    color: $xblock-message-warning-icon-color;
+                }
+            }
+
+            &.validation.has-errors {
+                background-color: $xblock-message-error-bg;
+
+                .icon {
+                    color: $xblock-message-error-icon-color;
+                }
+            }
+
+            a {
+                color: $primary;
+            }
+        }
+
+        &.studio-xblock-wrapper > .wrapper-xblock-message .xblock-message,
+        .xblock > .wrapper-xblock-message .xblock-message {
+            border-radius: 4px;
+            margin-bottom: ($baseline * 1.4);
+        }
+    }
+
+    .xblock-author_view-split_test .wrapper-xblock {
+      background: $white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
     }
 
     &.level-element {
       box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
       margin: 0 0 ($baseline * 1.4) 0;
-    }
 
-    &.level-element .xblock-header-primary {
-      background-color: $white;
-    }
+        .xblock-header-primary {
+            background-color: $white;
+        }
 
-    &.level-element .xblock-render {
-      background: $white;
-      margin: 0;
-      padding: $baseline;
-      border-bottom-left-radius: 6px;
-      border-bottom-right-radius: 6px;
+        .xblock-render {
+            background: $white;
+            margin: 0;
+            padding: $baseline;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
     }
 
     .wrapper-xblock .header-actions .actions-list {
+      .wrapper-nav-sub {
+        z-index: 11;
+      }
+
       .action-actions-menu:last-of-type .nav-sub {
         right: 120px;
       }
@@ -175,6 +218,13 @@ html {
           margin-bottom: 0;
         }
       }
+    }
+
+    .wrapper-groups.is-inactive {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .15), 0 2px 8px rgba(0, 0, 0, .15);
+        border-radius: 6px;
+        border: none;
+        margin: ($baseline * 1.5) ($baseline / 2) 0;
     }
   }
 
@@ -443,8 +493,8 @@ html {
       }
 
       &.xmodule_DoneXBlock {
-        margin-top: 60px;
-        padding: 0 20px;
+        margin-top: ($baseline * 3);
+        padding: 0 $baseline;
       }
 
       .xblock-actions {
@@ -578,7 +628,7 @@ html {
 }
 
 body [class*="view-"] .openassessment_editor_buttons.xblock-actions {
-  padding: 15px 2% 3px 2%;
+  padding: ($baseline * .75) 2% ($baseline * .15) 2%;
 }
 
 [class*="view-"] {
@@ -634,7 +684,7 @@ body [class*="view-"] .openassessment_editor_buttons.xblock-actions {
   .list-input.settings-list {
     .field.comp-setting-entry.is-set .setting-input {
       color: $text-color;
-      margin-bottom: 5px;
+      margin-bottom: ($baseline * .25);
     }
 
     select {
@@ -733,7 +783,7 @@ select {
     #openassessment_editor_header .editor_tabs .oa_editor_tab {
       @extend %light-button;
 
-      padding: 0 10px;
+      padding: 0 ($baseline / 2);
     }
 
     #openassessment_editor_header,
@@ -762,7 +812,7 @@ select {
     #oa_rubric_editor_wrapper .openassessment_criterion_option
     .openassessment_criterion_option_point_wrapper label input {
       min-width: 70px;
-      font-size: 18px;
+      font-size: $base-font-size;
       height: 44px;
     }
 
@@ -835,7 +885,7 @@ select {
     width: 100%;
 
     &.background-url {
-      margin-bottom: 10px;
+      margin-bottom: ($baseline / 2);
     }
 
     &.autozone-layout {
@@ -856,5 +906,106 @@ select {
   .feedback-tab input:not([type=checkbox]),
   .xblock--drag-and-drop--editor .feedback-tab select {
     width: 100%;
+  }
+}
+
+.xblock-render {
+  .add-xblock-component {
+    background: transparent;
+    padding: $baseline;
+
+    .new-component {
+      h5 {
+        margin-bottom: ($baseline * 1.2);
+        font-size: 22px;
+        font-weight: 700;
+        color: $black;
+      }
+
+      .new-component-type {
+        display: flex;
+        flex-wrap: wrap;
+        gap: ($baseline * .6);
+        align-items: center;
+        justify-content: center;
+
+        .add-xblock-component-button {
+          box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+          width: 176px;
+          height: 110px;
+          color: $primary;
+          border-color: $primary;
+          background: transparent;
+          margin: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: ($baseline * .4);
+
+          &:hover {
+            color: darken($primary, 10%);
+            background-color: lighten($primary, 80%);
+            border-color: darken($primary, 15%);
+          }
+
+          .large-template-icon {
+            width: 24px;
+            height: 24px;
+            background: $primary;
+
+            @each $name, $file in $template-icon-map {
+              &.large-#{$name}-icon {
+                mask: url("#{$static-path}/images/#{$file}.svg") center no-repeat;
+              }
+            }
+          }
+
+          .name {
+            color: inherit;
+            font-size: 15.75px;
+            font-weight: 400;
+          }
+
+          .beta {
+            color: $white;
+            background-color: $primary;
+            padding: ($baseline * .1) ($baseline * .4) ($baseline * .2);
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1;
+            margin: -($baseline * .3) 0 0;
+          }
+        }
+      }
+    }
+
+    .new-component-templates {
+      border: 1px solid $border-color;
+      border-radius: 5px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .15), 0 1px 4px rgba(0, 0, 0, .15);
+      margin: $baseline;
+      overflow: hidden;
+
+      .button-component:hover {
+        background: $primary;
+      }
+
+      .cancel-button {
+        @extend %primary-button;
+      }
+    }
+  }
+}
+
+.paste-component {
+  margin: ($baseline * 1.2) ($baseline / 2) 0;
+
+  .paste-component-whats-in-clipboard .clipboard-details-popup {
+    right: ($baseline / 2 * -1);
+  }
+
+  .paste-component-button.button {
+    @extend %button-primary-outline;
   }
 }
