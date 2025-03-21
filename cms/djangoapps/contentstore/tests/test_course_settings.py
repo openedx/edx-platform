@@ -1,7 +1,15 @@
 """
 Tests for Studio Course Settings.
-"""
 
+# TODO: Remove each `override_waffle_flag(toggles.LEGACY_STUDIO_*)` by Ulmo. For each occurance:
+#  * If the test case is just testing the legacy frontend, and we've got the underlying
+#    functionality tested elsewhere, then just delete the whole test case.
+#  * Otherwise (i.e., the test is using the legacy UI test a unique backend behavior), then
+#    rewrite the test to make assertions about the output of the Python API (preferred) or
+#    REST API (if necessary) so that we can delete the legacy UI without sacrificing the test
+#    coverage.
+# Part of https://github.com/openedx/edx-platform/issues/36275.
+"""
 
 import copy
 import datetime
@@ -20,6 +28,7 @@ from milestones.models import MilestoneRelationshipType
 from milestones.tests.utils import MilestonesTestCaseMixin
 from pytz import UTC
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.models.settings.course_grading import (
     GRADING_POLICY_CHANGED_EVENT_TYPE,
@@ -115,6 +124,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         CourseStaffRole(self.course.id).add_users(self.nonstaff)
 
     @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
+    @override_waffle_flag(toggles.LEGACY_STUDIO_ADVANCED_SETTINGS, True)
     def test_mobile_field_available(self):
 
         """
@@ -137,6 +147,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         (False, True, True)
     )
     @ddt.unpack
+    @override_waffle_flag(toggles.LEGACY_STUDIO_ADVANCED_SETTINGS, True)
     def test_discussion_fields_available(self, is_pages_and_resources_enabled,
                                          is_legacy_discussion_setting_enabled, fields_visible):
         """
@@ -152,6 +163,16 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 self.assertEqual('discussion_topics' in response, fields_visible)
 
     @ddt.data(False, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_ADVANCED_SETTINGS, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_IMPORT, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_EXPORT, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_FILES_UPLOADS, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_GRADING, True)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True)
     def test_disable_advanced_settings_feature(self, disable_advanced_settings):
         """
         If this feature is enabled, only Django Staff/Superuser should be able to access the "Advanced Settings" page.
@@ -292,6 +313,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         (True, True),
     )
     @ddt.unpack
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_upgrade_deadline(self, has_verified_mode, has_expiration_date):
         if has_verified_mode:
             deadline = None
@@ -310,6 +332,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertEqual(b"Upgrade Deadline Date" in response.content, has_expiration_date and has_verified_mode)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_pre_requisite_course_list_present(self):
         settings_details_url = get_url(self.course.id)
         response = self.client.get_html(settings_details_url)
@@ -370,6 +393,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         (False, True, False),
         (True, True, True),
     )
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_visibility_of_entrance_exam_section(self, feature_flags):
         """
         Tests entrance exam section is available if ENTRANCE_EXAMS feature is enabled no matter any other
@@ -386,6 +410,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 b'<h3 id="heading-entrance-exam">' in resp.content
             )
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_marketing_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
@@ -593,6 +618,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         assert milestones_helpers.any_unfulfilled_milestones(self.course.id, self.user.id), \
             'The entrance exam should be required.'
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_editable_short_description_fetch(self):
         settings_details_url = get_url(self.course.id)
 
@@ -631,6 +657,7 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(course_details.overview, '<p>&nbsp;</p>')
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
@@ -1504,7 +1531,6 @@ class CourseMetadataEditingTest(CourseTestCase):
             'test_proctoring_provider': {},
             'proctortrack': {}
         },
-        FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True},
     )
     def test_validate_update_requires_escalation_email_for_proctortrack(self, include_blank_email):
         json_data = {
@@ -1552,7 +1578,6 @@ class CourseMetadataEditingTest(CourseTestCase):
             'DEFAULT': 'proctortrack',
             'proctortrack': {}
         },
-        FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True},
     )
     def test_validate_update_cannot_unset_escalation_email_when_proctortrack_is_provider(self):
         course = CourseFactory.create()
@@ -1982,6 +2007,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
             self.assertNotContains(response, element)
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': False})
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_disabled_setting_global_staff(self):
         """
         Test that user enrollment end date is editable in response.
@@ -1992,6 +2018,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         self._verify_editable(self._get_course_details_response(True))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': False})
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_disabled_setting_non_global_staff(self):
         """
         Test that user enrollment end date is editable in response.
@@ -2002,6 +2029,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
         self._verify_editable(self._get_course_details_response(False))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': True})
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_enabled_setting_global_staff(self):
         """
         Test that user enrollment end date is editable in response.
@@ -2013,6 +2041,7 @@ id=\"course-enrollment-end-time\" value=\"\" placeholder=\"HH:MM\" autocomplete=
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PUBLISHER': True})
     @override_settings(PLATFORM_NAME='edX')
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_enabled_setting_non_global_staff(self):
         """
         Test that user enrollment end date is not editable in response.

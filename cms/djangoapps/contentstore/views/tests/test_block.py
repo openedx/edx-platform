@@ -12,6 +12,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
@@ -56,6 +57,7 @@ from xmodule.partitions.partitions import (
 from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import (
     reverse_course_url,
@@ -2852,6 +2854,7 @@ class TestComponentHandler(TestCase):
         assert mocked_get_aside_from_xblock.called is is_get_aside_called
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_PROBLEM_EDITOR, True)
 class TestComponentTemplates(CourseTestCase):
     """
     Unit tests for the generation of the component templates for a course.
