@@ -270,7 +270,7 @@ def get_proctored_exam_settings_url(course_locator) -> str:
     Gets course authoring microfrontend URL for links to proctored exam settings page
     """
     proctored_exam_settings_url = ''
-    if exam_setting_view_enabled():
+    if exam_setting_view_enabled(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
         if mfe_base_url:
@@ -283,7 +283,7 @@ def get_editor_page_base_url(course_locator) -> str:
     Gets course authoring microfrontend URL for links to the new base editors
     """
     editor_url = None
-    if use_new_text_editor() or use_new_video_editor():
+    if use_new_text_editor(course_locator) or use_new_video_editor(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
         course_mfe_url = f'{mfe_base_url}/course/{course_locator}/editor'
         if mfe_base_url:

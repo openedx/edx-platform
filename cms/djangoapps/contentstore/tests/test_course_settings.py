@@ -1504,7 +1504,6 @@ class CourseMetadataEditingTest(CourseTestCase):
             'test_proctoring_provider': {},
             'proctortrack': {}
         },
-        FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True},
     )
     def test_validate_update_requires_escalation_email_for_proctortrack(self, include_blank_email):
         json_data = {
@@ -1552,7 +1551,6 @@ class CourseMetadataEditingTest(CourseTestCase):
             'DEFAULT': 'proctortrack',
             'proctortrack': {}
         },
-        FEATURES={'ENABLE_EXAM_SETTINGS_HTML_VIEW': True},
     )
     def test_validate_update_cannot_unset_escalation_email_when_proctortrack_is_provider(self):
         course = CourseFactory.create()
