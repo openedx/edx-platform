@@ -1,0 +1,64 @@
+// xblock: elements - base
+// ====================
+
+// NOTES:
+// * all base set-up styles that can be applied to any xblock
+
+// --------------------
+// fonts
+// --------------------
+.wrapper--xblock {
+  background: $bg-view;
+}
+
+// --------------------
+// layout
+// --------------------
+// [class^="wrapper--"] {
+//   @extend %wrapper;
+//   padding: 0;
+// }
+
+
+// --------------------
+// semantic elements, but visually hidden
+// --------------------
+.sr,
+hr.divider,
+.nav--contents {
+  @extend %text-sr;
+}
+
+// --------------------
+// system-needed elements, but visually hidden
+// --------------------
+.system__element {
+  @extend %text-sr;
+}
+
+
+// --------------------
+// toggling visibility
+// --------------------
+.is--hidden {
+  @extend %state-hidden;  
+}
+
+
+// --------------------
+// semantic lists used for UI
+// --------------------
+.list--actions,
+.list--docs,
+.list--steps,
+.list--fields,
+.list--controls,
+.list--fields,
+.list--help,
+.list--options,
+.nav--wizard,
+.list--tips,
+.field--group {
+  @extend %no-list;
+  @extend %wipe-last-child;
+}

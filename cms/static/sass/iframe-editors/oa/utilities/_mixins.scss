@@ -1,0 +1,49 @@
+// openassessment: utilities - mixins
+// ====================
+
+@mixin single-box-shadow($offset-x, $offset-y, $blur-radius: 0, $spread-radius: 0, $color: grey, $inset: null) {
+  $shadow : "";
+  @if $bi-app-direction == ltr {
+    $shadow: $offset-x $offset-y $blur-radius $spread-radius $color;
+  } @else {
+    $shadow: -($offset-x) $offset-y $blur-radius $spread-radius $color;
+  }
+
+  @if $inset == inset {
+    $shadow: inset $shadow;
+  }
+  box-shadow: $shadow;
+}
+
+@function bidi-rotate-angle($degrees) {
+  @if $bi-app-direction == ltr {
+    @return $degrees;
+  } @else {
+    @return 180deg - $degrees;
+  }
+}
+
+// Bidi versions of neat mixins.
+@mixin  bidi-omega($query: block, $direction: default) {
+  @if $bi-app-direction == ltr {
+    @include direction-context(left-to-right) {
+      @include omega($query: $query, $direction: $direction);
+    }
+  } @else {
+    @include direction-context(right-to-left) {
+      @include omega($query: $query, $direction: $direction);
+    }
+  }
+}
+
+@mixin bidi-span-columns($span: $columns of $container-columns, $display: block) {
+  @if $bi-app-direction == ltr {
+    @include direction-context(left-to-right) {
+      @include span-columns($span: $span, $display: $display);
+    }
+  } @else {
+    @include direction-context(right-to-left) {
+      @include span-columns($span: $span, $display: $display);
+    }
+  }
+}

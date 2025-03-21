@@ -1,0 +1,17 @@
+// edX theme: base
+// ====================
+
+// NOTES:
+// * This is where any edX-theme related base styling is defined
+
+.wrapper--xblock {
+
+  .problem {
+
+  }
+
+  .problem__header {
+    @extend %hd-problem;
+  }
+}
+
