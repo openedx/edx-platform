@@ -9,7 +9,7 @@ from django.core.mail.message import EmailMultiAlternatives
 from django.core.management.base import BaseCommand, CommandError
 from django.template.loader import get_template
 
-from lms.djangoapps.utils import get_braze_client
+from lms.djangoapps.utils import get_email_client
 
 logger = logging.getLogger(__name__)
 
@@ -69,12 +69,12 @@ class Command(BaseCommand):
         logger.info(f'Retrieving unsubscribed emails from {start_date} to {end_date}')
 
         try:
-            braze_client = get_braze_client()
-            if not braze_client:
-                logger.info('No Braze client found. Unable to retrieve unsubscribed emails.')
+            email_client = get_email_client()
+            if not email_client:
+                logger.info('No Email client found. Unable to retrieve unsubscribed emails.')
                 return
 
-            emails = braze_client.retrieve_unsubscribed_emails(
+            emails = email_client.retrieve_unsubscribed_emails(
                 start_date=start_date,
                 end_date=end_date,
             )
