@@ -9,7 +9,6 @@ from rest_framework.generics import (
 )
 from rest_framework.parsers import (MultiPartParser, FormParser)
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from openedx.core.lib.api.parsers import TypedFileUploadParser
@@ -27,12 +26,10 @@ from cms.djangoapps.contentstore.rest_api.v1.serializers import (
     VideoUploadSerializer,
     VideoImageSerializer,
 )
-import cms.djangoapps.contentstore.toggles as contentstore_toggles
 from .utils import validate_request_with_serializer
 
 
 log = logging.getLogger(__name__)
-toggles = contentstore_toggles
 
 
 @view_auth_classes()
@@ -43,17 +40,6 @@ class VideosUploadsView(DeveloperErrorViewMixin, RetrieveAPIView, DestroyAPIView
     video_id: required argument, needed to identify the video.
     """
     serializer_class = VideoUploadSerializer
-
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     @course_author_access_required
     def retrieve(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
@@ -73,17 +59,6 @@ class VideosCreateUploadView(DeveloperErrorViewMixin, CreateAPIView):
     """
     serializer_class = VideoUploadSerializer
 
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
-
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
@@ -101,17 +76,6 @@ class VideoImagesView(DeveloperErrorViewMixin, CreateAPIView):
     """
     serializer_class = VideoImageSerializer
     parser_classes = (MultiPartParser, FormParser, TypedFileUploadParser)
-
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     @csrf_exempt
     @course_author_access_required
@@ -133,17 +97,6 @@ class VideoEncodingsDownloadView(DeveloperErrorViewMixin, RetrieveAPIView):
     # does not specify a serializer class.
     swagger_schema = None
 
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
-
     @csrf_exempt
     @course_author_access_required
     def retrieve(self, request, course_key):  # pylint: disable=arguments-differ
@@ -160,17 +113,6 @@ class VideoFeaturesView(DeveloperErrorViewMixin, RetrieveAPIView):
     # This view is excluded from Swagger doc generation because it
     # does not specify a serializer class.
     swagger_schema = None
-
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     @csrf_exempt
     def retrieve(self, request):  # pylint: disable=arguments-differ
