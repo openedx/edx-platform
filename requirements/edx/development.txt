@@ -812,7 +812,7 @@ edx-sga==0.25.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions==3.8.5
+edx-submissions @ git+https://github.com/aulasneo/edx-submissions.git@XQU-15-add-fields-to-submission-model
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

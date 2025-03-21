@@ -145,7 +145,7 @@ class UtilTest(unittest.TestCase):
         Test for markup removal with nh3.
         """
         assert remove_markup('The <mark>Truth</mark> is <em>Out There</em> & you need to <strong>find</strong> it') ==\
-               'The Truth is Out There &amp; you need to find it'
+            'The Truth is Out There &amp; you need to find it'
 
     @ddt.data(
         'When the root level failš the whole hierarchy won’t work anymore.',
