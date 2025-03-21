@@ -7,6 +7,7 @@ from unittest.mock import patch
 from django.urls import reverse
 
 from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
+from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
@@ -121,7 +122,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.create_course_page(self.toy)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': str(self.toy.id)})
+        referer = make_learning_mfe_courseware_url(self.toy.id)
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
 
@@ -141,7 +142,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
 
         self.login(self.student, self.password)
         course_wiki_page = reverse('wiki:get', kwargs={'path': self.toy.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': str(self.toy.id)})
+        referer = make_learning_mfe_courseware_url(self.toy.id)
 
         # When not enrolled, we should get a 302
         resp = self.client.get(course_wiki_page, follow=False, HTTP_REFERER=referer)
@@ -195,7 +196,7 @@ class WikiRedirectTestCase(EnterpriseTestConsentRequired, LoginEnrollmentTestCas
         self.create_course_page(course)
 
         course_wiki_page = reverse('wiki:get', kwargs={'path': course.wiki_slug + '/'})
-        referer = reverse("courseware", kwargs={'course_id': str(course.id)})
+        referer = make_learning_mfe_courseware_url(self.toy.id)
 
         resp = self.client.get(course_wiki_page, follow=True, HTTP_REFERER=referer)
         assert resp.status_code == 200
