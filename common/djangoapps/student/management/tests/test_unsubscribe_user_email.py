@@ -37,8 +37,8 @@ class UnsubscribeUserEmailTests(TestCase):
         csv.seek(0)
         return csv
 
-    @patch("common.djangoapps.student.management.commands.unsubscribe_user_email.get_braze_client")
-    def test_unsubscribe_user_email(self, mock_get_braze_client):
+    @patch("common.djangoapps.student.management.commands.unsubscribe_user_email.get_email_client")
+    def test_unsubscribe_user_email(self, mock_get_email_client):
         """ Test CSV file to unsubscribe user's email"""
 
         with NamedTemporaryFile() as csv:
@@ -50,7 +50,7 @@ class UnsubscribeUserEmailTests(TestCase):
                 csv.name
             )
 
-        mock_get_braze_client.assert_called_once()
+        mock_get_email_client.assert_called_once()
 
     def test_command_error_for_csv_path(self):
         """ Test command error raised if csv_path is not valid"""
