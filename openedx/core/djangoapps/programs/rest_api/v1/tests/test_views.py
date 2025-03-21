@@ -51,7 +51,9 @@ class TestProgramProgressDetailView(ProgramsApiConfigMixin, SharedModuleStoreTes
     """Unit tests for the program progress detail page."""
 
     program_uuid = str(uuid4())
-    url = reverse_lazy("programs_api:v0:program_progress_detail", kwargs={"program_uuid": program_uuid})
+    url = reverse_lazy(
+        "openedx.core.djangoapps.programs:v0:program_progress_detail", kwargs={"program_uuid": program_uuid}
+    )
 
     @classmethod
     def setUpClass(cls):
@@ -139,12 +141,13 @@ class TestProgramProgressDetailView(ProgramsApiConfigMixin, SharedModuleStoreTes
         assert response.data["error_code"] == "No program data available."
 
 
+@skip_unless_lms
 class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
     """Unit tests for the program details page."""
 
     enterprise_uuid = str(uuid4())
     program_uuid = str(uuid4())
-    url = reverse_lazy("programs_api:v0:program_list", kwargs={"enterprise_uuid": enterprise_uuid})
+    url = reverse_lazy("openedx.core.djangoapps.programs:v0:program_list", kwargs={"enterprise_uuid": enterprise_uuid})
 
     @classmethod
     def setUpClass(cls):

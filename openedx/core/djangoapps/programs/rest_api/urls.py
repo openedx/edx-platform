@@ -14,7 +14,7 @@ from openedx.core.djangoapps.programs.rest_api.v1 import (
     urls as v1_programs_rest_api_urls,
 )
 
-app_name = "programs_api"
+app_name = "openedx.core.djangoapps.programs"
 
 urlpatterns = [
     path("v0/", include((v1_programs_rest_api_urls, "v0"), namespace="v0")),
