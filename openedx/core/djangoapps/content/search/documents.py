@@ -575,7 +575,7 @@ def searchable_doc_for_container(
     }
 
     try:
-        container = lib_api.get_container(container_key)
+        container = lib_api.get_container_metadata(container_key)
     except lib_api.ContentLibraryCollectionNotFound:
         # Container not found, so we can only return the base doc
         pass

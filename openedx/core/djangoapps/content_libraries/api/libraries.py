@@ -302,6 +302,7 @@ class PublishableItem(LibraryItem):
     last_draft_created_by: str = ""
     has_unpublished_changes: bool = False
     collections: list[CollectionMetadata] = field(default_factory=list)
+    can_stand_alone: bool = True
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -343,6 +344,7 @@ class LibraryXBlockMetadata(PublishableItem):
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=component.versioning.has_unpublished_changes,
             collections=associated_collections or [],
+            can_stand_alone=component.publishable_entity.can_stand_alone,
         )
 
 
@@ -958,7 +960,13 @@ def validate_can_add_block_to_library(
     return content_library, usage_key
 
 
-def create_library_block(library_key, block_type, definition_id, user_id=None):
+def create_library_block(
+    library_key: LibraryLocatorV2,
+    block_type: str,
+    definition_id: str,
+    user_id: int | None = None,
+    can_stand_alone: bool = True,
+):
     """
     Create a new XBlock in this library of the specified type (e.g. "html").
     """
@@ -969,7 +977,7 @@ def create_library_block(library_key, block_type, definition_id, user_id=None):
 
     content_library, usage_key = validate_can_add_block_to_library(library_key, block_type, block_id)
 
-    _create_component_for_block(content_library, usage_key, user_id)
+    _create_component_for_block(content_library, usage_key, user_id, can_stand_alone)
 
     # Now return the metadata about the new block:
     LIBRARY_BLOCK_CREATED.send_event(
@@ -1135,6 +1143,7 @@ def _create_component_for_block(
     content_lib: ContentLibrary,
     usage_key: LibraryUsageLocatorV2,
     user_id: int | None = None,
+    can_stand_alone: bool = True,
 ):
     """
     Create a Component for an XBlock type, initialize it, and return the ComponentVersion.
@@ -1168,6 +1177,7 @@ def _create_component_for_block(
             title=display_name,
             created=now,
             created_by=user_id,
+            can_stand_alone=can_stand_alone,
         )
         content = authoring_api.get_or_create_text_content(
             learning_package.id,
