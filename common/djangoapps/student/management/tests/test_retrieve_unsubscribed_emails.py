@@ -39,14 +39,14 @@ class RetrieveUnsubscribedEmailsTests(TestCase):
         BRAZE_UNSUBSCRIBED_EMAILS_RECIPIENT_EMAIL=['test@example.com']
     )
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.EmailMultiAlternatives.send')
-    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_braze_client')
+    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_email_client')
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.logger.info')
-    def test_retrieve_unsubscribed_emails_command(self, mock_logger_info, mock_get_braze_client, mock_send):
+    def test_retrieve_unsubscribed_emails_command(self, mock_logger_info, mock_get_email_client, mock_send):
         """
         Test the retrieve_unsubscribed_emails command
         """
-        mock_braze_client = mock_get_braze_client.return_value
-        mock_braze_client.retrieve_unsubscribed_emails.return_value = [
+        mock_email_client = mock_get_email_client.return_value
+        mock_email_client.retrieve_unsubscribed_emails.return_value = [
             {'email': 'test1@example.com', 'unsubscribed_at': '2023-06-01 10:00:00'},
             {'email': 'test2@example.com', 'unsubscribed_at': '2023-06-02 12:00:00'},
         ]
@@ -81,14 +81,14 @@ class RetrieveUnsubscribedEmailsTests(TestCase):
         BRAZE_UNSUBSCRIBED_EMAILS_RECIPIENT_EMAIL=['test@example.com']
     )
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.EmailMultiAlternatives.send')
-    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_braze_client')
+    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_email_client')
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.logger.info')
-    def test_retrieve_unsubscribed_emails_command_with_dates(self, mock_logger_info, mock_get_braze_client, mock_send):
+    def test_retrieve_unsubscribed_emails_command_with_dates(self, mock_logger_info, mock_get_email_client, mock_send):
         """
         Test the retrieve_unsubscribed_emails command with custom start and end dates.
         """
-        mock_braze_client = mock_get_braze_client.return_value
-        mock_braze_client.retrieve_unsubscribed_emails.return_value = [
+        mock_email_client = mock_get_email_client.return_value
+        mock_email_client.retrieve_unsubscribed_emails.return_value = [
             {'email': 'test3@example.com', 'unsubscribed_at': '2023-06-03 08:00:00'},
             {'email': 'test4@example.com', 'unsubscribed_at': '2023-06-04 14:00:00'},
         ]
@@ -123,15 +123,15 @@ class RetrieveUnsubscribedEmailsTests(TestCase):
                 self.assertIn('test4@example.com,2023-06-04 14:00:00', csv_data)
 
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.EmailMultiAlternatives.send')
-    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_braze_client')
+    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_email_client')
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.logger.exception')
-    def test_retrieve_unsubscribed_emails_command_braze_exception(self, mock_logger_exception, mock_get_braze_client,
+    def test_retrieve_unsubscribed_emails_command_braze_exception(self, mock_logger_exception, mock_get_email_client,
                                                                   mock_send):
         """
         Test the retrieve_unsubscribed_emails command when an exception is raised.
         """
-        mock_braze_client = mock_get_braze_client.return_value
-        mock_braze_client.retrieve_unsubscribed_emails.side_effect = Exception('Braze API error')
+        mock_email_client = mock_get_email_client.return_value
+        mock_email_client.retrieve_unsubscribed_emails.side_effect = Exception('Braze API error')
         mock_send.return_value = MagicMock()
 
         with self.assertRaises(CommandError):
@@ -143,14 +143,14 @@ class RetrieveUnsubscribedEmailsTests(TestCase):
         mock_send.assert_not_called()
 
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.EmailMultiAlternatives.send')
-    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_braze_client')
+    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_email_client')
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.logger.info')
-    def test_retrieve_unsubscribed_emails_command_no_data(self, mock_logger_info, mock_get_braze_client, mock_send):
+    def test_retrieve_unsubscribed_emails_command_no_data(self, mock_logger_info, mock_get_email_client, mock_send):
         """
         Test the retrieve_unsubscribed_emails command when no unsubscribed emails are returned.
         """
-        mock_braze_client = mock_get_braze_client.return_value
-        mock_braze_client.retrieve_unsubscribed_emails.return_value = []
+        mock_email_client = mock_get_email_client.return_value
+        mock_email_client.retrieve_unsubscribed_emails.return_value = []
         mock_send.return_value = MagicMock()
 
         call_command('retrieve_unsubscribed_emails')
@@ -166,15 +166,15 @@ class RetrieveUnsubscribedEmailsTests(TestCase):
         BRAZE_UNSUBSCRIBED_EMAILS_RECIPIENT_EMAIL=['test@example.com']
     )
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.EmailMultiAlternatives.send')
-    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_braze_client')
+    @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.get_email_client')
     @patch('common.djangoapps.student.management.commands.retrieve_unsubscribed_emails.logger.exception')
     def test_retrieve_unsubscribed_emails_command_error_sending_email(self, mock_logger_exception,
-                                                                      mock_get_braze_client, mock_send):
+                                                                      mock_get_email_client, mock_send):
         """
         Test the retrieve_unsubscribed_emails command when an error occurs during email sending.
         """
-        mock_braze_client = mock_get_braze_client.return_value
-        mock_braze_client.retrieve_unsubscribed_emails.return_value = [
+        mock_email_client = mock_get_email_client.return_value
+        mock_email_client.retrieve_unsubscribed_emails.return_value = [
             {'email': 'test1@example.com', 'unsubscribed_at': '2023-06-01 10:00:00'},
         ]
         mock_send.side_effect = Exception('Email sending error')
