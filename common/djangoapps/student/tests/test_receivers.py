@@ -72,11 +72,11 @@ class ReceiversTest(SharedModuleStoreTestCase):
         assert profile.name == new_name
 
     @skip_unless_lms
-    @patch('common.djangoapps.student.signals.receivers.get_braze_client')
-    def test_listen_for_user_email_changed(self, mock_get_braze_client):
+    @patch('common.djangoapps.student.signals.receivers.get_email_client')
+    def test_listen_for_user_email_changed(self, mock_get_email_client):
         """
         Ensure that USER_EMAIL_CHANGED signal triggers correct calls to
-        get_braze_client and update email in session.
+        get_email_client and update email in session.
         """
         user = UserFactory(email='email@test.com', username='jdoe')
         request = get_mock_request(user=user)
@@ -88,5 +88,5 @@ class ReceiversTest(SharedModuleStoreTestCase):
 
         USER_EMAIL_CHANGED.send(sender=None, user=user, request=request)
 
-        assert mock_get_braze_client.called
+        assert mock_get_email_client.called
         assert request.session.get('email', None) == user.email

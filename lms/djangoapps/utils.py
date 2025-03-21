@@ -27,7 +27,7 @@ def _get_key(key_or_id, key_cls):
     )
 
 
-def get_braze_client():
+def get_email_client():
     """ Returns a Braze client. """
     if not BrazeClient:
         return None
