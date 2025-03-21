@@ -9,7 +9,7 @@ from .course_team import CourseTeamSerializer
 from .course_waffle_flags import CourseWaffleFlagsSerializer
 from .grading import CourseGradingModelSerializer, CourseGradingSerializer
 from .group_configurations import CourseGroupConfigurationsSerializer
-from .home import StudioHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
+from .home import StudioHomeSerializer, LibraryTabSerializer
 from .proctoring import (
     LimitedProctoredExamSettingsSerializer,
     ProctoredExamConfigurationSerializer,
