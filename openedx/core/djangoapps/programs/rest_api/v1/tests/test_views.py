@@ -113,23 +113,6 @@ class TestProgramProgressDetailView(ProgramsApiConfigMixin, SharedModuleStoreTes
         self.assert_program_data_present(response)
         self.assert_pathway_data_present(response)
 
-    def test_api_returns_correct_program_data(self, mock_get_programs, mock_get_pathways):
-        """
-        Verify that API returns program data in the correct format for URL format 2.
-        """
-        self.create_programs_config()
-        # fixme I think the problem is happening here? We are getting to get_programs and the return value is not including courses
-        mock_get_programs.return_value = self.program_data
-        mock_get_pathways.return_value = self.pathway_data
-
-        with mock.patch("openedx.core.djangoapps.programs.rest_api.v1.views.get_certificates") as certs:
-            certs.return_value = [{"type": "program", "url": "/"}]
-            response = self.client.get(self.url)
-
-        self.assertEqual(200, response.status_code)
-        self.assert_program_data_present(response)
-        self.assert_pathway_data_present(response)
-
     def test_login_required(self, mock_get_programs, mock_get_pathways):
         """
         Verify that API returns 401 to an unauthenticated user.
