@@ -237,6 +237,7 @@
       "cms/djangoapps/api/",
       "cms/djangoapps/cms_user_tasks/",
       "cms/djangoapps/course_creators/",
+      "cms/djangoapps/course_to_library_import/",
       "cms/djangoapps/export_course_metadata/",
       "cms/djangoapps/maintenance/",
       "cms/djangoapps/models/",
