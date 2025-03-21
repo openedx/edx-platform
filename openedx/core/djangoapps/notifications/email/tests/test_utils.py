@@ -8,7 +8,7 @@ import pytest
 from django.http.response import Http404
 from itertools import product
 from pytz import utc
-from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
+from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.notifications.base_notification import (
@@ -42,6 +42,7 @@ class TestUtilFunctions(ModuleStoreTestCase):
     """
     Test utils functions
     """
+
     def setUp(self):
         """
         Setup
@@ -102,6 +103,7 @@ class TestContextFunctions(ModuleStoreTestCase):
     """
     Test template context functions in utils.py
     """
+
     def setUp(self):
         """
         Setup
@@ -172,6 +174,7 @@ class TestWaffleFlag(ModuleStoreTestCase):
     """
     Test user level email notifications waffle flag
     """
+
     def setUp(self):
         """
         Setup
@@ -224,6 +227,7 @@ class TestEncryption(ModuleStoreTestCase):
     """
     Tests all encryption methods
     """
+
     def test_string_encryption(self):
         """
         Tests if decrypted string is equal original string
@@ -250,6 +254,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
     """
     Tests if preferences are update according to patch data
     """
+
     def setUp(self):
         """
         Setup test cases
