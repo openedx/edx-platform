@@ -39,7 +39,8 @@ from .serializers import (
     UserNotificationPreferenceUpdateAllSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
-from .utils import get_is_new_notification_view_enabled, get_show_notifications_tray, aggregate_notification_configs
+from .utils import get_is_new_notification_view_enabled, get_show_notifications_tray, aggregate_notification_configs, \
+    filter_out_visible_preferences_by_course_ids
 
 
 @allow_any_authenticated_user()
@@ -587,6 +588,11 @@ class AggregatedNotificationPreferences(APIView):
         notification_configs = notification_preferences.values_list('notification_preference_config', flat=True)
         notification_configs = aggregate_notification_configs(
             notification_configs
+        )
+        filter_out_visible_preferences_by_course_ids(
+            request.user,
+            notification_configs,
+            notification_preferences.values_list('course_id', flat=True),
         )
         notification_preferences_viewed_event(request)
         return Response({

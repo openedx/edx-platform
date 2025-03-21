@@ -1215,7 +1215,7 @@ def _get_urls(content):
     """
     Finds and returns a list of URLs in the given content.
     Includes strings following 'href=' and 'src='.
-    Excludes strings that are only '#'.
+    Excludes strings that are only '#' or start with 'data:'.
 
     Arguments:
         content (str): entire content of a block
@@ -1223,7 +1223,7 @@ def _get_urls(content):
     Returns:
         list: urls
     """
-    regex = r'\s+(?:href|src)=["\'](?!#)([^"\']*)["\']'
+    regex = r'\s+(?:href|src)=["\'](?!#|data:)([^"\']*)["\']'
     url_list = re.findall(regex, content)
     return url_list
 
@@ -1297,11 +1297,14 @@ def _convert_to_standard_url(url, course_key):
             ...asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
         /static/getting-started_x250.png
         /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
+        /jump_to_id/2152d4a4aadc4cb0af5256394a3d1fc7
     """
     if _is_studio_url_without_base(url):
         if url.startswith('/static/'):
             processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
             return 'https://' + settings.CMS_BASE + processed_url
+        elif url.startswith('/jump_to_id/'):
+            return f'https://{settings.LMS_BASE}/courses/{course_key}{url}'
         elif url.startswith('/'):
             return 'https://' + settings.CMS_BASE + url
         else:

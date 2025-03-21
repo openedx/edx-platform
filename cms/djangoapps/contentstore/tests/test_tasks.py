@@ -39,7 +39,8 @@ from ..tasks import (
     _get_urls,
     _check_broken_links,
     _is_studio_url,
-    _scan_course_for_links
+    _scan_course_for_links,
+    _convert_to_standard_url
 )
 
 logging = logging.getLogger(__name__)
@@ -548,3 +549,56 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         mock_filter.assert_called_once_with(validated_url_list)
         if retry_list:
             mock_retry_validation.assert_called_once_with(retry_list, course_key, retry_count=3)
+
+    def test_convert_to_standard_url(self):
+        """Test _convert_to_standard_url function with expected URLs."""
+        course_key = CourseKey.from_string("course-v1:test+course1+run1")
+        test_cases = [
+            (
+                "/static/getting-started_x250.png",
+                f"https://{settings.CMS_BASE}/asset-v1:test+course1+run1+type@asset+block/getting-started_x250.png",
+            ),
+            (
+                "/jump_to_id/123abc",
+                f"https://{settings.LMS_BASE}/courses/{course_key}/jump_to_id/123abc",
+            ),
+            (
+                "/container/block-v1:test+course1+type@vertical+block@123",
+                f"https://{settings.CMS_BASE}/container/block-v1:test+course1+type@vertical+block@123",
+            ),
+            ("/unknown/path", f"https://{settings.CMS_BASE}/unknown/path"),
+            ("https://external.com/some/path", "https://external.com/some/path"),
+            ("studio-url", "https://localhost:8001/container/studio-url"),
+        ]
+
+        for url, expected in test_cases:
+            self.assertEqual(
+                _convert_to_standard_url(url, course_key),
+                expected,
+                f"Failed for URL: {url}",
+            )
+
+    def test_get_urls(self):
+        """Test _get_urls function for correct URL extraction."""
+
+        content = '''
+            <a href="https://example.com">Link</a>
+            <img src="https://images.com/pic.jpg">
+            <link href="https://fonts.googleapis.com/css?family=Roboto">
+            <a href="#">Home</a>
+            <a href="https://validsite.com">Valid</a>
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...">
+            <a href="data:application/pdf;base64,JVBERi0xLjQK...">
+            <a href="https://another-valid.com">Another</a>
+            <p>No links here!</p>
+            <img alt="Just an image without src">
+        '''
+
+        expected = [
+            "https://example.com",
+            "https://images.com/pic.jpg",
+            "https://fonts.googleapis.com/css?family=Roboto",
+            "https://validsite.com",
+            "https://another-valid.com"
+        ]
+        self.assertEqual(_get_urls(content), expected)
