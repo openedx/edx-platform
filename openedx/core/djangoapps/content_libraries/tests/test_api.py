@@ -65,11 +65,11 @@ class EdxModulestoreImportClientTest(TestCase):
         with self.assertRaises(ValueError):
             self.client.import_blocks_from_course('foobar', lambda *_: None)
 
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.create_library_block')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.get_library_block')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.get_library_block_static_asset_files')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.publish_changes')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.set_library_block_olx')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.create_library_block')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.get_library_block')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.get_library_block_static_asset_files')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.publish_changes')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.set_library_block_olx')
     def test_import_blocks_from_course_on_block_with_olx(
             self,
             mock_set_library_block_olx,
@@ -101,9 +101,9 @@ class EdxModulestoreImportClientTest(TestCase):
             mock.ANY, 'fake-olx')
         mock_publish_changes.assert_called_once()
 
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.create_library_block')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.get_library_block_static_asset_files')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.set_library_block_olx')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.create_library_block')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.get_library_block_static_asset_files')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.set_library_block_olx')
     def test_import_block_when_called_twice_same_block_but_different_course(
             self,
             mock_set_library_block_olx,
@@ -138,7 +138,7 @@ class EdxModulestoreImportClientTest(TestCase):
         mock_set_library_block_olx.assert_called_once()
 
 
-@mock.patch('openedx.core.djangoapps.content_libraries.api.OAuthAPIClient')
+@mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.OAuthAPIClient')
 class EdxApiImportClientTest(TestCase):
     """
     Tests for EdxApiImportClient.
@@ -195,11 +195,11 @@ class EdxApiImportClientTest(TestCase):
             return mock_response, mock_content
         return mock_response
 
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.add_library_block_static_asset_file')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.create_library_block')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.get_library_block_static_asset_files')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.publish_changes')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.set_library_block_olx')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.add_library_block_static_asset_file')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.create_library_block')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.get_library_block_static_asset_files')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.publish_changes')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.set_library_block_olx')
     def test_import_block_when_url_is_from_studio(
             self,
             mock_set_library_block_olx,

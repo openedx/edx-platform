@@ -75,7 +75,7 @@ edx-event-bus-kafka>=5.6.0          # Kafka implementation of event bus
 edx-event-bus-redis
 edx-milestones
 edx-name-affirmation
-edx-opaque-keys
+git+https://github.com/open-craft/opaque-keys.git@chris/FAL-4108-create-container-keys#egg=edx-opaque-keys
 edx-organizations
 edx-proctoring>=2.0.1
 # using hash to support django42
