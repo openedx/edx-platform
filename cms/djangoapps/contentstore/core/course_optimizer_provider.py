@@ -79,12 +79,12 @@ def generate_broken_links_descriptor(json_content, request_user):
     Returns a Data Transfer Object for frontend given a list of broken links.
 
     ** Example json_content structure **
-        Note: linkState is locked if the link is a studio link and returns 403
-              linkState is external-forbidden if the link is not a studio link and returns 403
+        Note: link_state is locked if the link is a studio link and returns 403
+              link_state is external-forbidden if the link is not a studio link and returns 403
     [
-        ['block_id_1', 'link_1', linkState],
-        ['block_id_1', 'link_2', linkState],
-        ['block_id_2', 'link_3', linkState],
+        ['block_id_1', 'link_1', link_state],
+        ['block_id_1', 'link_2', link_state],
+        ['block_id_2', 'link_3', link_state],
         ...
     ]
 
@@ -129,16 +129,16 @@ def generate_broken_links_descriptor(json_content, request_user):
     for item in json_content:
         block_id, link, *rest = item
         if rest:
-            linkState = rest[0]
+            link_state = rest[0]
         else:
-            linkState = ''
+            link_state = ''
 
         usage_key = usage_key_with_run(block_id)
         block = get_xblock(usage_key, request_user)
         xblock_node_tree, xblock_dictionary = _update_node_tree_and_dictionary(
             block=block,
             link=link,
-            linkState=linkState,
+            link_state=link_state,
             node_tree=xblock_node_tree,
             dictionary=xblock_dictionary
         )
@@ -146,7 +146,7 @@ def generate_broken_links_descriptor(json_content, request_user):
     return _create_dto_recursive(xblock_node_tree, xblock_dictionary)
 
 
-def _update_node_tree_and_dictionary(block, link, linkState, node_tree, dictionary):
+def _update_node_tree_and_dictionary(block, link, link_state, node_tree, dictionary):
     """
     Inserts a block into the node tree and add its attributes to the dictionary.
 
@@ -212,12 +212,12 @@ def _update_node_tree_and_dictionary(block, link, linkState, node_tree, dictiona
         f'/course/{block.course_id}/editor/{block.category}/{block.location}'
     )
 
-    # The linkState == True condition is maintained for backward compatibility.
-    # Previously, the is_locked attribute was used instead of linkStateType.
+    # The link_state == True condition is maintained for backward compatibility.
+    # Previously, the is_locked attribute was used instead of link_state.
     # If is_locked is True, it indicates that the link is locked.
-    if linkState is True or linkState == LinkState.LOCKED:
+    if link_state is True or link_state == LinkState.LOCKED:
         updated_dictionary[xblock_id].setdefault('locked_links', []).append(link)
-    elif linkState == LinkState.EXTERNAL_FORBIDDEN:
+    elif link_state == LinkState.EXTERNAL_FORBIDDEN:
         updated_dictionary[xblock_id].setdefault('external_forbidden_links', []).append(link)
     else:
         updated_dictionary[xblock_id].setdefault('broken_links', []).append(link)

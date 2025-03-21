@@ -1357,7 +1357,7 @@ def _filter_by_status(results):
 
     Example return:
         [
-            [block_id1, filtered_results_url1, linkState],
+            [block_id1, filtered_results_url1, link_state],
             ...
         ],
         [
