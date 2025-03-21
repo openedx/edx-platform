@@ -1465,13 +1465,16 @@ def create_or_update_upstream_links(
     if replace:
         PublishableEntityLink.objects.filter(downstream_context_key=course_key).delete()
     try:
-        xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
+        linked_xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
+        lc_xblocks = store.get_items(course_key, block_type="library_content", depth=2)
     except ItemNotFoundError:
         LOGGER.exception(f'Could not find items for given course: {course_key}')
         course_status.update_status(LearningContextLinksStatusChoices.FAILED)
         return
-    for xblock in xblocks:
+    for xblock in linked_xblocks:
         create_or_update_xblock_upstream_link(xblock, course_key_str, created)
+    for lc in lc_xblocks:
+        create_or_update_legacy_library_content_children_upstream_links(lc, created)
     course_status.update_status(LearningContextLinksStatusChoices.COMPLETED)
 
 

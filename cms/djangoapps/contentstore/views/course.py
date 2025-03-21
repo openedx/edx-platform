@@ -669,15 +669,40 @@ def library_listing(request):
 def _format_library_for_view(library, request):
     """
     Return a dict of the data which the view requires for each library
-    """
 
+    @@TODO This is a hacky prototype implementation. In a real implementation, we'd probably want to change the schema
+           of this API to include both the old an (if migrate) new library metadata, and then leave the messaging and
+           URL-building logic to frontend-app-authoring.
+    """
+    # @@TODO: Either put ContentLibraryMigration behind a Python API, or move it to the contentstore app.
+    #         That way, this app doesn't need to import from another app's models.
+    from openedx.core.djangoapps.content_libraries.models import ContentLibraryMigration
+    try:
+        migration = ContentLibraryMigration.objects.select_related(
+            "target", "target__learning_package", "target_collection"
+        ).get(source_key=library.id)
+    except ContentLibraryMigration.DoesNotExist:
+        # Library is not yet migrated. Point to legacy legacyy.
+        display_name = library.display_name
+        url = reverse_library_url('library_handler', str(library.location.library_key))
+        key_for_access_check = library.context_key
+    else:
+        url = f"{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/library/{migration.target.library_key}"
+        new_library_title = migration.target.learning_package.title
+        if migration.target_collection:
+            url = f"{url}/collection/{migration.target_collection.key}"
+            collection_title = migration.target_collection.title
+            display_name = f"{library.display_name} (migrated to '{collection_title}' in '{new_library_title}')"
+        else:
+            display_name = f"{library.display_name} (migrated to '{new_library_title}')"
+        key_for_access_check = migration.target.library_key
     return {
-        'display_name': library.display_name,
+        'display_name': display_name,
+        'url': url,
         'library_key': str(library.location.library_key),
-        'url': reverse_library_url('library_handler', str(library.location.library_key)),
         'org': library.display_org_with_default,
         'number': library.display_number_with_default,
-        'can_edit': has_studio_write_access(request.user, library.location.library_key),
+        'can_edit': has_studio_write_access(request.user, key_for_access_check),
     }
 
 
