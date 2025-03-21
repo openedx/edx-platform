@@ -30,7 +30,7 @@ __all__ = [
     "get_container",
     "create_container",
     "get_container_children",
-    "library_container_usage_key",
+    "library_container_locator",
 ]
 
 
@@ -52,7 +52,7 @@ class ContainerMetadata(PublishableItem):
         Construct a ContainerMetadata object from a Container object.
         """
         last_publish_log = container.versioning.last_publish_log
-        container_key = library_container_usage_key(
+        container_key = library_container_locator(
             library_key,
             container=container,
         )
@@ -87,7 +87,7 @@ class ContainerMetadata(PublishableItem):
         )
 
 
-def library_container_usage_key(
+def library_container_locator(
     library_key: LibraryLocatorV2,
     container: authoring_models.Container,
 ) -> LibraryContainerLocator:
