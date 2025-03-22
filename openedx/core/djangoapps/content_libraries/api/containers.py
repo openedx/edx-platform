@@ -23,7 +23,7 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api import authoring_models
 
 from ..models import ContentLibrary
-from .libraries import PublishableItem
+from .dataclass import PublishableItem
 
 # The public API is only the following symbols:
 __all__ = [

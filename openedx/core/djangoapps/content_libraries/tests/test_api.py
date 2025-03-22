@@ -17,12 +17,14 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
     LibraryCollectionData,
+    LibraryContainerData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     LIBRARY_COLLECTION_CREATED,
     LIBRARY_COLLECTION_DELETED,
     LIBRARY_COLLECTION_UPDATED,
+    LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx_learning.api import authoring as authoring_api
@@ -808,3 +810,37 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
         assert len(html_block_containers) == 2
         assert html_block_containers[0].container_key == self.unit1.container_key
         assert html_block_containers[1].container_key == self.unit2.container_key
+
+
+    def test_call_container_update_signal_when_delete_component(self):
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+
+        api.delete_library_block(self.html_block_usage_key)
+
+        assert container_update_event_receiver.call_count == 2
+
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    library_key=self.lib1.library_key,
+                    container_key=self.unit1.container_pk,
+                    background=True,
+                )
+            },
+            container_update_event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    library_key=self.lib1.library_key,
+                    container_key=self.unit2.container_pk,
+                    background=True,
+                )
+            },
+            container_update_event_receiver.call_args_list[1].kwargs,
+        )
