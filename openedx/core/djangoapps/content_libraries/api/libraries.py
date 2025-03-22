@@ -82,6 +82,7 @@ from openedx_events.content_authoring.data import (
     ContentLibraryData,
     LibraryBlockData,
     LibraryCollectionData,
+    LibraryContainerData,
     ContentObjectChangedData,
 )
 from openedx_events.content_authoring.signals import (
@@ -92,6 +93,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
+    LIBRARY_CONTAINER_UPDATED,
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
 from openedx_learning.api import authoring as authoring_api
@@ -113,6 +115,7 @@ from openedx.core.djangoapps.xblock.api import (
     xblock_type_display_name,
 )
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.types import User as UserType
 from xmodule.modulestore.django import modulestore
 
@@ -1205,6 +1208,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     component = get_component_from_usage_key(usage_key)
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
+    affected_containers = lib_api.get_containers_contains_component(usage_key)
 
     authoring_api.soft_delete_draft(component.pk)
 
@@ -1224,6 +1228,19 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
             library_collection=LibraryCollectionData(
                 library_key=library_key,
                 collection_key=collection.key,
+                background=True,
+            )
+        )
+
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    #
+    # To update the components count in containers
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                library_key=library_key,
+                container_key=container.container_pk,
                 background=True,
             )
         )
