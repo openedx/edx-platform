@@ -584,11 +584,19 @@ def searchable_doc_for_container(
         # TODO: check if there's a more efficient way to load these num_children counts?
         draft_num_children = len(lib_api.get_container_children(container_key, published=False))
 
+        publish_status = PublishStatus.published
+
+        if container.last_published is None:
+            publish_status = PublishStatus.never
+        elif authoring_api.contains_unpublished_changes(container.container_pk):
+            publish_status = PublishStatus.modified
+
         doc.update({
             Fields.display_name: container.display_name,
             Fields.created: container.created.timestamp(),
             Fields.modified: container.modified.timestamp(),
             Fields.num_children: draft_num_children,
+            Fields.publish_status: publish_status,
         })
         library = lib_api.get_library(container_key.library_key)
         if library:
