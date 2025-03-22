@@ -15,6 +15,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
+from openedx_learning.api import authoring as authoring_api
+
 try:
     # This import errors in the lms because content.search is not an installed app there.
     from ..documents import (
@@ -528,6 +530,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "access_id": self.library_access_id,
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
+            "publish_status": "never",
             "modified": 1680674828.0,
             # "tags" should be here but we haven't implemented them yet
             # "published" is not set since we haven't published it yet

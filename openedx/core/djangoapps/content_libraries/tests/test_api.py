@@ -778,16 +778,8 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
         # TODO build API for this
         self.problem_block_component = api.get_component_from_usage_key(self.problem_block_usage_key)
         self.html_block_component = api.get_component_from_usage_key(self.html_block_usage_key)
-        self.unit1_container = authoring_api.get_container_by_key(
-            self.lib1.learning_package.id,
-            self.unit1.container_key.container_id,
-        )
-        self.unit2_container = authoring_api.get_container_by_key(
-            self.lib1.learning_package.id,
-            self.unit2.container_key.container_id,
-        )
         authoring_api.create_next_container_version(
-            self.unit1_container.pk,
+            self.unit1.container_pk,
             publishable_entities_pks=[
                 self.problem_block_component.publishable_entity.id,
                 self.html_block_component.publishable_entity.id,
@@ -798,7 +790,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
             created_by=None,
         )
         authoring_api.create_next_container_version(
-            self.unit2_container.pk,
+            self.unit2.container_pk,
             publishable_entities_pks=[self.html_block_component.publishable_entity.id],
             title=None,
             entity_version_pks=None,
