@@ -1831,6 +1831,9 @@ INSTALLED_APPS = [
     # Search
     'openedx.core.djangoapps.content.search',
 
+    # For Programs API
+    'lms.djangoapps.program_enrollments',
+
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
