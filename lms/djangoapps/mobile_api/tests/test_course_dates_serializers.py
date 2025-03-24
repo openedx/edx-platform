@@ -2,6 +2,8 @@
 Tests for the course dates serializers.
 """
 
+from unittest.mock import patch
+
 from django.db.models import F, Value
 from django.utils import timezone
 from edx_when.models import ContentDate, DatePolicy
@@ -16,6 +18,8 @@ class TestContentDateSerializer(MixedSplitTestCase):
     """
     Tests for the ContentDateSerializer.
     """
+
+    CREATE_USER = True
 
     def setUp(self):
         """
@@ -40,10 +44,12 @@ class TestContentDateSerializer(MixedSplitTestCase):
             policy=self.date_policy,
         )
 
-    def test_content_date_serializer(self):
+    @patch("lms.djangoapps.mobile_api.course_dates.serializers.get_current_user")
+    def test_content_date_serializer(self, mock_get_current_user):
         """
         Test the serializer for ContentDate model.
         """
+        mock_get_current_user.return_value = self.user
         queryset = ContentDate.objects.annotate(
             due_date=F("policy__abs_date"),
             course_name=Value("Test Display Name"),
@@ -52,12 +58,13 @@ class TestContentDateSerializer(MixedSplitTestCase):
         serializer = ContentDateSerializer(queryset)
         expected_data = {
             "course_id": str(self.course.id),
-            "assignment_block_id": str(self.sequential.location),
+            "location": str(self.sequential.location),
             "due_date": self.date_policy.abs_date.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "assignment_title": self.sequential.display_name,
             "learner_has_access": True,
             "course_name": "Test Display Name",
             "relative": True,
+            "first_component_block_id": None,
         }
 
         self.assertEqual(serializer.data, expected_data)
