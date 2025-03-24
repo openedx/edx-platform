@@ -904,6 +904,18 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
         )
     )
 
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                library_key=usage_key.lib_key,
+                container_key=container.container_pk,
+                background=True,
+            )
+        )
+
     return new_component_version
 
 

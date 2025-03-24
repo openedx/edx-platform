@@ -812,14 +812,8 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
         assert html_block_containers[1].container_key == self.unit2.container_key
 
 
-    def test_call_container_update_signal_when_delete_component(self):
-        container_update_event_receiver = mock.Mock()
-        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
-
-        api.delete_library_block(self.html_block_usage_key)
-
-        assert container_update_event_receiver.call_count == 2
-
+    def _validate_calls_of_html_block(self, event_mock):
+        assert event_mock.call_count == 2
         self.assertDictContainsSubset(
             {
                 "signal": LIBRARY_CONTAINER_UPDATED,
@@ -830,7 +824,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
                     background=True,
                 )
             },
-            container_update_event_receiver.call_args_list[0].kwargs,
+            event_mock.call_args_list[0].kwargs,
         )
         self.assertDictContainsSubset(
             {
@@ -842,5 +836,29 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
                     background=True,
                 )
             },
-            container_update_event_receiver.call_args_list[1].kwargs,
+            event_mock.call_args_list[1].kwargs,
         )
+
+    def test_call_container_update_signal_when_delete_component(self):
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+
+        api.delete_library_block(self.html_block_usage_key)
+        self._validate_calls_of_html_block(container_update_event_receiver)
+        
+
+    def test_call_container_update_signal_when_update_olx(self):
+        block_olx = "<html><b>Hello world!</b></html>"
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+
+        self._set_library_block_olx(self.html_block_usage_key, block_olx)
+        self._validate_calls_of_html_block(container_update_event_receiver)
+
+    def test_call_container_update_signal_when_update_component(self):
+        block_olx = "<html><b>Hello world!</b></html>"
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+
+        self._set_library_block_fields(self.html_block_usage_key, {"data": block_olx, "metadata": {}})
+        self._validate_calls_of_html_block(container_update_event_receiver)
