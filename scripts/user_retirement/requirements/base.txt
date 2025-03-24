@@ -6,13 +6,13 @@
 #
 asgiref==3.8.1
     # via django
-attrs==25.1.0
+attrs==25.3.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.37.5
+boto3==1.37.17
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.37.5
+botocore==1.37.17
     # via
     #   boto3
     #   s3transfer
@@ -28,14 +28,13 @@ charset-normalizer==2.0.12
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   requests
-click==8.1.6
+click==8.1.8
     # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
 cryptography==44.0.2
     # via pyjwt
-django==4.2.19
+django==4.2.20
     # via
     #   -c scripts/user_retirement/requirements/../../../requirements/common_constraints.txt
     #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
@@ -50,9 +49,9 @@ edx-django-utils==7.2.0
     # via edx-rest-api-client
 edx-rest-api-client==6.1.0
     # via -r scripts/user_retirement/requirements/base.in
-google-api-core==2.24.1
+google-api-core==2.24.2
     # via google-api-python-client
-google-api-python-client==2.162.0
+google-api-python-client==2.165.0
     # via -r scripts/user_retirement/requirements/base.in
 google-auth==2.38.0
     # via
@@ -61,7 +60,7 @@ google-auth==2.38.0
     #   google-auth-httplib2
 google-auth-httplib2==0.2.0
     # via google-api-python-client
-googleapis-common-protos==1.69.0
+googleapis-common-protos==1.69.2
     # via google-api-core
 httplib2==0.22.0
     # via
@@ -71,7 +70,7 @@ idna==3.10
     # via requests
 isodate==0.7.2
     # via zeep
-jenkinsapi==0.3.13
+jenkinsapi==0.3.14
     # via -r scripts/user_retirement/requirements/base.in
 jmespath==1.0.1
     # via
@@ -81,15 +80,15 @@ lxml==5.3.1
     # via zeep
 more-itertools==10.6.0
     # via simple-salesforce
-newrelic==10.6.0
+newrelic==10.7.0
     # via edx-django-utils
 pbr==6.1.1
     # via stevedore
-platformdirs==4.3.6
+platformdirs==4.3.7
     # via zeep
-proto-plus==1.26.0
+proto-plus==1.26.1
     # via google-api-core
-protobuf==5.29.3
+protobuf==6.30.1
     # via
     #   google-api-core
     #   googleapis-common-protos
@@ -136,7 +135,7 @@ requests-toolbelt==1.0.0
     # via zeep
 rsa==4.9
     # via google-auth
-s3transfer==0.11.3
+s3transfer==0.11.4
     # via boto3
 simple-salesforce==1.12.6
     # via -r scripts/user_retirement/requirements/base.in

@@ -8,10 +8,8 @@ cffi==1.17.1
     # via cryptography
 chem==1.3.0
     # via -r requirements/edx-sandbox/base.in
-click==8.1.6
-    # via
-    #   -c requirements/edx-sandbox/../constraints.txt
-    #   nltk
+click==8.1.8
+    # via nltk
 codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/base.in
 contourpy==1.3.1

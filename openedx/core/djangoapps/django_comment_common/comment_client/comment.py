@@ -63,19 +63,23 @@ class Comment(models.Model):
         else:
             return super().url(action, params)
 
-    def flagAbuse(self, user, voteable):
+    def flagAbuse(self, user, voteable, course_id=None):
         if voteable.type == 'thread':
             url = _url_for_flag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
             url = _url_for_flag_abuse_comment(voteable.id)
         else:
             raise CommentClientRequestError("Can only flag/unflag threads or comments")
-        course_key = get_course_key(self.attributes.get("course_id"))
+        course_key = get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             if voteable.type == 'thread':
-                response = forum_api.update_thread_flag(voteable.id, "flag", user.id, str(course_key))
+                response = forum_api.update_thread_flag(
+                    voteable.id, "flag", user_id=user.id, course_id=str(course_key)
+                )
             else:
-                response = forum_api.update_comment_flag(voteable.id, "flag", user.id, str(course_key))
+                response = forum_api.update_comment_flag(
+                    voteable.id, "flag", user_id=user.id, course_id=str(course_key)
+                )
         else:
             params = {'user_id': user.id}
             response = perform_request(
@@ -87,14 +91,14 @@ class Comment(models.Model):
             )
         voteable._update_from_response(response)
 
-    def unFlagAbuse(self, user, voteable, removeAll):
+    def unFlagAbuse(self, user, voteable, removeAll, course_id=None):
         if voteable.type == 'thread':
             url = _url_for_unflag_abuse_thread(voteable.id)
         elif voteable.type == 'comment':
             url = _url_for_unflag_abuse_comment(voteable.id)
         else:
             raise CommentClientRequestError("Can flag/unflag for threads or comments")
-        course_key = get_course_key(self.attributes.get("course_id"))
+        course_key = get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             if voteable.type == "thread":
                 response = forum_api.update_thread_flag(
