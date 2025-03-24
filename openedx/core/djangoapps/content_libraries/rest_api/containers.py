@@ -83,6 +83,48 @@ class LibraryContainerView(GenericAPIView):
         container = api.get_container_metadata(container_key)
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
+    @convert_exceptions
+    @swagger_auto_schema(
+        request_body=serializers.LibraryContainerUpdateSerializer,
+        responses={200: serializers.LibraryContainerMetadataSerializer}
+    )
+    def patch(self, request, container_key: LibraryContainerLocator):
+        """
+        Update a Container.
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+        serializer = serializers.LibraryContainerUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        container = api.update_container(
+            container_key,
+            display_name=serializer.validated_data['display_name'],
+            user_id=request.user.id,
+        )
+
+        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
+
+    @convert_exceptions
+    def delete(self, request, container_key: LibraryContainerLocator):
+        """
+        Delete a Container (soft delete).
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+
+        api.delete_container(
+            container_key,
+        )
+
+        return Response({}, status=HTTP_204_NO_CONTENT)
+
 
 @method_decorator(non_atomic_requests, name="dispatch")
 @view_auth_classes()
@@ -148,18 +190,32 @@ class LibraryContainerChildrenView(GenericAPIView):
             data = serializers.LibraryContainerMetadataSerializer(child_entities, many=True).data
         return Response(data)
 
-    def _check_perm_and_serialize(self, request, library_key, perm):
+    def _update_component_children(
+        self,
+        request,
+        container_key: LibraryContainerLocator,
+        action: authoring_api.ChildrenEntitiesAction,
+    ):
         """
-        Helper function to check permission and serialize data.
+        Helper function to update children in container.
         """
         api.require_permission_for_library_key(
-            library_key,
+            container_key.library_key,
             request.user,
-            perm,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
         serializer = serializers.ContentLibraryComponentKeysSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return serializer
+        # Only components under units are supported for now.
+        assert container_key.container_type == api.ContainerType.Unit.value
+
+        container = api.update_container_children(
+            container_key,
+            children_ids=serializer.validated_data["usage_keys"],
+            user_id=request.user.id,
+            entities_action=action,
+        )
+        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
     @convert_exceptions
     @swagger_auto_schema(
@@ -174,21 +230,11 @@ class LibraryContainerChildrenView(GenericAPIView):
         Request body:
         {"usage_keys": ['lb:CL-TEST:containers:problem:Problem1', 'lb:CL-TEST:containers:html:Html1']}
         """
-        serializer = self._check_perm_and_serialize(
+        return self._update_component_children(
             request,
-            container_key.library_key,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
-        # Only components under units are supported for now.
-        assert container_key.container_type == api.ContainerType.Unit.value
-
-        container = api.update_container_children(
             container_key,
-            children_ids=serializer.validated_data["usage_keys"],
-            user_id=request.user.id,
-            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+            action=authoring_api.ChildrenEntitiesAction.APPEND,
         )
-        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
     @convert_exceptions
     @swagger_auto_schema(
@@ -203,21 +249,11 @@ class LibraryContainerChildrenView(GenericAPIView):
         Request body:
         {"usage_keys": ['lb:CL-TEST:containers:problem:Problem1', 'lb:CL-TEST:containers:html:Html1']}
         """
-        serializer = self._check_perm_and_serialize(
+        return self._update_component_children(
             request,
-            container_key.library_key,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
-        # Only components under units are supported for now.
-        assert container_key.container_type == api.ContainerType.Unit.value
-
-        container = api.update_container_children(
             container_key,
-            children_ids=serializer.validated_data["usage_keys"],
-            user_id=request.user.id,
-            entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
+            action=authoring_api.ChildrenEntitiesAction.REMOVE,
         )
-        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
     @convert_exceptions
     @swagger_auto_schema(
@@ -232,60 +268,8 @@ class LibraryContainerChildrenView(GenericAPIView):
         Request body:
         {"usage_keys": ['lb:CL-TEST:containers:problem:Problem1', 'lb:CL-TEST:containers:html:Html1']}
         """
-        serializer = self._check_perm_and_serialize(
+        return self._update_component_children(
             request,
-            container_key.library_key,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
-        )
-        # Only components under units are supported for now.
-        assert container_key.container_type == api.ContainerType.Unit.value
-
-        container = api.update_container_children(
             container_key,
-            children_ids=serializer.validated_data["usage_keys"],
-            user_id=request.user.id,
-            entities_action=authoring_api.ChildrenEntitiesAction.REPLACE,
+            action=authoring_api.ChildrenEntitiesAction.REPLACE,
         )
-        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
-
-    @convert_exceptions
-    @swagger_auto_schema(
-        request_body=serializers.LibraryContainerUpdateSerializer,
-        responses={200: serializers.LibraryContainerMetadataSerializer}
-    )
-    def patch(self, request, container_key: LibraryContainerLocator):
-        """
-        Update a Container.
-        """
-        api.require_permission_for_library_key(
-            container_key.library_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
-        serializer = serializers.LibraryContainerUpdateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        container = api.update_container(
-            container_key,
-            display_name=serializer.validated_data['display_name'],
-            user_id=request.user.id,
-        )
-
-        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
-
-    @convert_exceptions
-    def delete(self, request, container_key: LibraryContainerLocator):
-        """
-        Delete a Container (soft delete).
-        """
-        api.require_permission_for_library_key(
-            container_key.library_key,
-            request.user,
-            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
-        )
-
-        api.delete_container(
-            container_key,
-        )
-
-        return Response({}, status=HTTP_204_NO_CONTENT)
