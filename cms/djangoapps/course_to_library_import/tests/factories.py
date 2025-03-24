@@ -2,6 +2,8 @@
 Factories for CourseToLibraryImport model.
 """
 
+import uuid
+
 import factory
 from factory.django import DjangoModelFactory
 
@@ -18,6 +20,7 @@ class CourseToLibraryImportFactory(DjangoModelFactory):
         model = CourseToLibraryImport
 
     course_ids = ' '.join([f'course-v1:edX+DemoX+Demo_Course{i}' for i in range(1, 3)])
-    library_key = 'library-key'
+    uuid = factory.LazyFunction(lambda: str(uuid.uuid4()))
+    library_key = 'lib:TestOrg:TestLib'
     metadata = {}
     user = factory.SubFactory(UserFactory)

@@ -47,11 +47,18 @@ class CourseToLibraryImport(TimeStampedModel):
         verbose_name_plural = _('Course to Library Imports')
 
     @classmethod
-    def get_by_id(cls, import_id: int) -> Self:
+    def get_by_id(cls, import_id: int) -> Self | None:
         """
         Get an import task by its ID.
         """
         return cls.objects.filter(id=import_id).first()
+
+    @classmethod
+    def get_ready_by_uuid(cls, import_uuid: str) -> Self | None:
+        """
+        Get an import task by its UUID.
+        """
+        return cls.objects.filter(uuid=import_uuid, status=CourseToLibraryImportStatus.READY).first()
 
 
 class ComponentVersionImport(TimeStampedModel):

@@ -13,8 +13,6 @@ from cms.djangoapps.course_to_library_import.tasks import (
     import_library_from_staged_content_task,
     save_courses_to_staged_content_task,
 )
-from common.djangoapps.student.tests.factories import UserFactory
-
 from .factories import CourseToLibraryImportFactory
 
 
@@ -63,10 +61,11 @@ class TestImportLibraryFromStagedContentTask(TestCase):
         self, mock_etree, mock_import_container, mock_get_block_to_import,
         mock_get_ready_staged_content, mock_validate_usage_ids
     ):
-        user = UserFactory()
+        ctli = CourseToLibraryImportFactory(status=CourseToLibraryImportStatus.READY)
+        library_key = ctli.library_key
+        user = ctli.user
         usage_ids = ['block-v1:edX+Demo+2023+type@vertical+block@12345']
         usage_key = UsageKey.from_string(usage_ids[0])
-        library_key = 'lib:TestOrg:TestLib'
         purpose = 'import_from_{course_id}'
         course_id = 'course-v1:edX+Demo+2023'
         override = True
@@ -84,14 +83,9 @@ class TestImportLibraryFromStagedContentTask(TestCase):
         mock_get_block_to_import.return_value = mock_block
 
         library_locator = LibraryLocatorV2.from_string(library_key)
-        course_to_library_import = CourseToLibraryImportFactory(
-            user=user,
-            library_key=library_locator,
-            status=CourseToLibraryImportStatus.READY
-        )
 
         import_library_from_staged_content_task(
-            user.id, usage_ids, library_key, purpose, course_id, 'xblock', override
+            user.id, usage_ids, library_key, purpose, course_id, ctli.uuid, 'xblock', override
         )
 
         mock_get_ready_staged_content.assert_called_once_with(
@@ -107,8 +101,8 @@ class TestImportLibraryFromStagedContentTask(TestCase):
             usage_key, mock_block, library_locator, user.id, mock_content_item, 'xblock', override
         )
 
-        course_to_library_import.refresh_from_db()
-        self.assertEqual(course_to_library_import.status, CourseToLibraryImportStatus.IMPORTED)
+        ctli.refresh_from_db()
+        self.assertEqual(ctli.status, CourseToLibraryImportStatus.IMPORTED)
         mock_staged_content.delete.assert_called_once()
 
     @patch(
@@ -119,9 +113,10 @@ class TestImportLibraryFromStagedContentTask(TestCase):
     def test_import_library_block_not_found(
         self, mock_etree, mock_get_block_to_import, mock_get_ready_staged_content
     ):
-        user = UserFactory()
+        ctli = CourseToLibraryImportFactory()
+        library_key = ctli.library_key
+        user = ctli.user
         usage_ids = ['block-v1:edX+Demo+2023+type@vertical+block@12345']
-        library_key = 'lib:TestOrg:TestLib'
         purpose = 'import_from_{course_id}'
         course_id = 'course-v1:edX+Demo+2023'
         override = True
@@ -146,5 +141,5 @@ class TestImportLibraryFromStagedContentTask(TestCase):
 
         with self.assertRaises(ValueError):
             import_library_from_staged_content_task(
-                user.id, usage_ids, library_key, purpose, course_id, 'xblock', override
+                user.id, usage_ids, library_key, purpose, course_id, ctli.uuid, 'xblock', override
             )

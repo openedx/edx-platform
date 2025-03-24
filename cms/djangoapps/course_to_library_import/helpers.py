@@ -52,8 +52,7 @@ def create_block_in_library(block_to_import, usage_key, library_key, user_id, st
                 component_version = _handle_component_override(
                     content_library, usage_key, etree.tostring(block_to_import)
                 )
-
-        if not override:
+        else:
             # Create component (regardless of override path)
             _, library_usage_key = api.validate_can_add_block_to_library(
                 library_key,
