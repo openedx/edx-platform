@@ -259,11 +259,11 @@ def get_container_children(
     """
     container = get_container(container_key)
     if container_key.container_type == ContainerType.Unit.value:
-        child_entities = authoring_api.get_components_in_unit(container.unit, published=published)
+        child_components = authoring_api.get_components_in_unit(container.unit, published=published)
         return [LibraryXBlockMetadata.from_component(
             container_key.library_key,
             entry.component
-        ) for entry in child_entities]
+        ) for entry in child_components]
     else:
         child_entities = authoring_api.get_entities_in_container(container, published=published)
         return [ContainerMetadata.from_container(
@@ -297,10 +297,10 @@ def update_container_children(
     container = get_container(container_key)
     match container_type:
         case ContainerType.Unit.value:
-            components = [get_component_from_usage_key(key) for key in children_ids]
+            components = [get_component_from_usage_key(key) for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_unit_version(
                 container.unit,
-                components=components,
+                components=components,  # type: ignore[arg-type]
                 created=datetime.now(),
                 created_by=user_id,
                 entities_action=entities_action,
