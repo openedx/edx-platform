@@ -408,3 +408,31 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             {'usage_keys': children_ids},
             expect_response
         )
+
+    def _remove_container_components(
+        self,
+        container_key: str,
+        children_ids: list[str],
+        expect_response=200,
+    ):
+        """ Remove container components"""
+        return self._api(
+            'delete',
+            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            {'usage_keys': children_ids},
+            expect_response
+        )
+
+    def _patch_container_components(
+        self,
+        container_key: str,
+        children_ids: list[str],
+        expect_response=200,
+    ):
+        """ Update container components"""
+        return self._api(
+            'patch',
+            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            {'usage_keys': children_ids},
+            expect_response
+        )

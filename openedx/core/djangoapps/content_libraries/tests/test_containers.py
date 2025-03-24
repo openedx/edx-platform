@@ -2,10 +2,10 @@
 Tests for Learning-Core-based Content Libraries
 """
 from datetime import datetime, timezone
+from unittest import mock
 
 import ddt
 from freezegun import freeze_time
-from unittest import mock
 
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_events.content_authoring.data import LibraryContainerData
@@ -185,6 +185,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         """
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
 
+        # Create container and add some components
         container_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
         problem_block = self._add_block_to_library(lib["id"], "problem", "Problem1", can_stand_alone=False)
         html_block = self._add_block_to_library(lib["id"], "html", "Html1", can_stand_alone=False)
@@ -200,13 +201,90 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         assert not data[1]['can_stand_alone']
         problem_block_2 = self._add_block_to_library(lib["id"], "problem", "Problem2", can_stand_alone=False)
         html_block_2 = self._add_block_to_library(lib["id"], "html", "Html2")
+        # Add two more components
         self._add_container_components(
             container_data["container_key"],
             children_ids=[problem_block_2["id"], html_block_2["id"]]
         )
         data = self._get_container_components(container_data["container_key"])
+        # Verify total number of components to be 2 + 2 = 4
         assert len(data) == 4
         assert data[2]['id'] == problem_block_2['id']
         assert not data[2]['can_stand_alone']
         assert data[3]['id'] == html_block_2['id']
         assert data[3]['can_stand_alone']
+
+    def test_unit_remove_children(self):
+        """
+        Test that we can remove unit children components
+        """
+        lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+
+        # Create container and add some components
+        container_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
+        problem_block = self._add_block_to_library(lib["id"], "problem", "Problem1", can_stand_alone=False)
+        html_block = self._add_block_to_library(lib["id"], "html", "Html1", can_stand_alone=False)
+        problem_block_2 = self._add_block_to_library(lib["id"], "problem", "Problem2", can_stand_alone=False)
+        html_block_2 = self._add_block_to_library(lib["id"], "html", "Html2")
+        self._add_container_components(
+            container_data["container_key"],
+            children_ids=[problem_block["id"], html_block["id"], problem_block_2["id"], html_block_2["id"]]
+        )
+        data = self._get_container_components(container_data["container_key"])
+        assert len(data) == 4
+        # Remove both problem blocks.
+        self._remove_container_components(
+            container_data["container_key"],
+            children_ids=[problem_block_2["id"], problem_block["id"]]
+        )
+        data = self._get_container_components(container_data["container_key"])
+        assert len(data) == 2
+        assert data[0]['id'] == html_block['id']
+        assert data[1]['id'] == html_block_2['id']
+
+    def test_unit_replace_children(self):
+        """
+        Test that we can completely replace/reorder unit children components.
+        """
+        lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+
+        # Create container and add some components
+        container_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
+        problem_block = self._add_block_to_library(lib["id"], "problem", "Problem1", can_stand_alone=False)
+        html_block = self._add_block_to_library(lib["id"], "html", "Html1", can_stand_alone=False)
+        problem_block_2 = self._add_block_to_library(lib["id"], "problem", "Problem2", can_stand_alone=False)
+        html_block_2 = self._add_block_to_library(lib["id"], "html", "Html2")
+        self._add_container_components(
+            container_data["container_key"],
+            children_ids=[problem_block["id"], html_block["id"], problem_block_2["id"], html_block_2["id"]]
+        )
+        data = self._get_container_components(container_data["container_key"])
+        assert len(data) == 4
+        assert data[0]['id'] == problem_block['id']
+        assert data[1]['id'] == html_block['id']
+        assert data[2]['id'] == problem_block_2['id']
+        assert data[3]['id'] == html_block_2['id']
+
+        # Reorder the components
+        self._patch_container_components(
+            container_data["container_key"],
+            children_ids=[problem_block["id"], problem_block_2["id"], html_block["id"], html_block_2["id"]]
+        )
+        data = self._get_container_components(container_data["container_key"])
+        assert len(data) == 4
+        assert data[0]['id'] == problem_block['id']
+        assert data[1]['id'] == problem_block_2['id']
+        assert data[2]['id'] == html_block['id']
+        assert data[3]['id'] == html_block_2['id']
+
+        # Replace with new components
+        new_problem_block = self._add_block_to_library(lib["id"], "problem", "New_Problem", can_stand_alone=False)
+        new_html_block = self._add_block_to_library(lib["id"], "html", "New_Html", can_stand_alone=False)
+        self._patch_container_components(
+            container_data["container_key"],
+            children_ids=[new_problem_block["id"], new_html_block["id"]],
+        )
+        data = self._get_container_components(container_data["container_key"])
+        assert len(data) == 2
+        assert data[0]['id'] == new_problem_block['id']
+        assert data[1]['id'] == new_html_block['id']

@@ -40,7 +40,7 @@ __all__ = [
     "library_container_locator",
     "update_container",
     "delete_container",
-    "add_container_children",
+    "update_container_children",
 ]
 
 
@@ -268,10 +268,11 @@ def get_container_children(
         return [ContainerMetadata.from_container(entry.entity) for entry in child_entities]
 
 
-def add_container_children(
+def update_container_children(
     container_key: LibraryContainerLocator,
     children_ids: list[UsageKeyV2] | list[LibraryContainerLocator],
     user_id: int | None,
+    entities_action: authoring_api.ChildrenEntitiesAction = authoring_api.ChildrenEntitiesAction.REPLACE,
 ):
     """
     Adds children components or containers to given container.
@@ -287,7 +288,7 @@ def add_container_children(
                 components=components,
                 created=datetime.now(),
                 created_by=user_id,
-                entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+                entities_action=entities_action,
             )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
