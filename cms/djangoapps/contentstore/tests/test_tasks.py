@@ -513,7 +513,6 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         ]
 
         filtered_results, retry_list = _filter_by_status(results)
-        print(filtered_results)
 
         self.assertEqual(filtered_results, expected_filtered_results)
         self.assertEqual(retry_list, expected_retry_list)
