@@ -3,12 +3,13 @@ Tests for the Studio content search documents (what gets stored in the index)
 """
 from dataclasses import replace
 from datetime import datetime, timezone
-from organizations.models import Organization
 
 from freezegun import freeze_time
+from openedx_learning.api import authoring as authoring_api
+from organizations.models import Organization
 
-from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_libraries import api as library_api
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -17,13 +18,13 @@ from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 try:
     # This import errors in the lms because content.search is not an installed app there.
     from ..documents import (
-        searchable_doc_for_course_block,
-        searchable_doc_tags,
-        searchable_doc_tags_for_collection,
         searchable_doc_collections,
         searchable_doc_for_collection,
         searchable_doc_for_container,
+        searchable_doc_for_course_block,
         searchable_doc_for_library_block,
+        searchable_doc_tags,
+        searchable_doc_tags_for_collection,
     )
     from ..models import SearchAccess
 except RuntimeError:
@@ -522,11 +523,112 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "display_name": "A Unit in the Search Index",
             # description is not set for containers
             "num_children": 0,
+            "publish_status": "never",
             "context_key": "lib:edX:2012_Fall",
             "access_id": self.library_access_id,
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
+            # "tags" should be here but we haven't implemented them yet
+            # "published" is not set since we haven't published it yet
+        }
+
+    def test_published_container(self):
+        """
+        Test creating a search document for a published container
+        """
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            container_meta = library_api.create_container(
+                self.library.key,
+                container_type=library_api.ContainerType.Unit,
+                slug="unit1",
+                title="A Unit in the Search Index",
+                user_id=None,
+            )
+            library_api.update_container_children(
+                container_meta.container_key,
+                [self.library_block.usage_key],
+                user_id=None,
+            )
+        library_api.publish_changes(self.library.key)
+
+        doc = searchable_doc_for_container(container_meta.container_key)
+
+        assert doc == {
+            "id": "lctedx2012_fallunitunit1-edd13a0c",
+            "block_id": "unit1",
+            "block_type": "unit",
+            "usage_key": "lct:edX:2012_Fall:unit:unit1",
+            "type": "library_container",
+            "org": "edX",
+            "display_name": "A Unit in the Search Index",
+            # description is not set for containers
+            "num_children": 1,
+            "publish_status": "published",
+            "context_key": "lib:edX:2012_Fall",
+            "access_id": self.library_access_id,
+            "breadcrumbs": [{"display_name": "some content_library"}],
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            "published": {"num_children": 1},
+            # "tags" should be here but we haven't implemented them yet
+            # "published" is not set since we haven't published it yet
+        }
+
+    def test_published_container_with_changes(self):
+        """
+        Test creating a search document for a published container
+        """
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            container_meta = library_api.create_container(
+                self.library.key,
+                container_type=library_api.ContainerType.Unit,
+                slug="unit1",
+                title="A Unit in the Search Index",
+                user_id=None,
+            )
+            library_api.update_container_children(
+                container_meta.container_key,
+                [self.library_block.usage_key],
+                user_id=None,
+            )
+        library_api.publish_changes(self.library.key)
+        block_2 = library_api.create_library_block(
+            self.library.key,
+            "html",
+            "text3",
+        )
+
+        # Add another component after publish
+        with freeze_time(created_date):
+            library_api.update_container_children(
+                container_meta.container_key,
+                [block_2.usage_key],
+                user_id=None,
+                entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+            )
+
+        doc = searchable_doc_for_container(container_meta.container_key)
+
+        assert doc == {
+            "id": "lctedx2012_fallunitunit1-edd13a0c",
+            "block_id": "unit1",
+            "block_type": "unit",
+            "usage_key": "lct:edX:2012_Fall:unit:unit1",
+            "type": "library_container",
+            "org": "edX",
+            "display_name": "A Unit in the Search Index",
+            # description is not set for containers
+            "num_children": 2,
+            "publish_status": "modified",
+            "context_key": "lib:edX:2012_Fall",
+            "access_id": self.library_access_id,
+            "breadcrumbs": [{"display_name": "some content_library"}],
+            "created": 1680674828.0,
+            "modified": 1680674828.0,
+            "published": {"num_children": 1},
             # "tags" should be here but we haven't implemented them yet
             # "published" is not set since we haven't published it yet
         }
