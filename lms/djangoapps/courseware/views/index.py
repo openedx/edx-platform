@@ -48,7 +48,6 @@ from openedx.features.course_experience import (
     default_course_url
 )
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
-from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
 from ..access import has_access
@@ -453,9 +452,6 @@ class CoursewareIndex(View):
             self.course,
             table_of_contents['chapters'],
         )
-
-        courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
-            request, course=self.course)
 
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)
