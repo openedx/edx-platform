@@ -33,7 +33,6 @@ __all__ = [
     "create_container",
     "get_container_children",
     "get_containers_contains_component",
-    "library_container_usage_key",
     "library_container_locator",
 ]
 
