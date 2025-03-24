@@ -37,6 +37,7 @@ __all__ = [
     "get_container",
     "create_container",
     "get_container_children",
+    "get_container_children_count",
     "library_container_locator",
     "update_container",
     "delete_container",
@@ -269,6 +270,17 @@ def get_container_children(
             container_key.library_key,
             entry.entity
         ) for entry in child_entities]
+
+
+def get_container_children_count(
+    container_key: LibraryContainerLocator,
+    published=False,
+) -> int:
+    """
+    Get the count of entities contained in the given container (e.g. the components/xblocks in a unit)
+    """
+    container = get_container(container_key)
+    return authoring_api.get_container_children_count(container, published=published)
 
 
 def update_container_children(
