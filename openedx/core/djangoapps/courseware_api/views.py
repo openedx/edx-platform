@@ -55,7 +55,6 @@ from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
-from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -126,10 +125,6 @@ class CoursewareMeta:
             user=self.effective_user,
             course_key=self.course_key,
         )
-
-    @property
-    def can_show_upgrade_sock(self):
-        return DISPLAY_COURSE_SOCK_FLAG.is_enabled(self.course_key)
 
     @property
     def license(self):
