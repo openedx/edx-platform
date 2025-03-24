@@ -265,7 +265,10 @@ def get_container_children(
         ) for entry in child_entities]
     else:
         child_entities = authoring_api.get_entities_in_container(container, published=published)
-        return [ContainerMetadata.from_container(entry.entity) for entry in child_entities]
+        return [ContainerMetadata.from_container(
+            container_key.library_key,
+            entry.entity
+        ) for entry in child_entities]
 
 
 def update_container_children(
