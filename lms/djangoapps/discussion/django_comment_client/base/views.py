@@ -715,7 +715,7 @@ def delete_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     thread = cc.Thread.find(thread_id)
-    thread.delete()
+    thread.delete(course_id=course_id)
     thread_deleted.send(sender=None, user=request.user, post=thread)
 
     track_thread_deleted_event(request, course, thread)
@@ -781,7 +781,7 @@ def openclose_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     close_thread = request.POST.get('closed', 'false').lower() == 'true'
     thread.closed = close_thread
-    thread.save()
+    thread.save(params={"course_id": course_id})
 
     track_thread_lock_unlock_event(request, course, thread, None, close_thread)
     return JsonResponse({
@@ -976,7 +976,7 @@ def pin_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.pin(user, thread_id)
+    thread.pin(user, thread_id, course_id)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -992,7 +992,7 @@ def un_pin_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.un_pin(user, thread_id)
+    thread.un_pin(user, thread_id, course_id)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -1021,7 +1021,7 @@ def follow_commentable(request, course_id, commentable_id):  # lint-amnesty, pyl
     """
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
-    user.follow(commentable)
+    user.follow(commentable, course_id=course_id)
     return JsonResponse({})
 
 
@@ -1053,7 +1053,7 @@ def unfollow_commentable(request, course_id, commentable_id):  # lint-amnesty, p
     """
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
-    user.unfollow(commentable)
+    user.unfollow(commentable, course_id=course_id)
     return JsonResponse({})
 
 
