@@ -8,10 +8,10 @@ import logging
 from django.contrib.auth import get_user_model
 from django.db.transaction import non_atomic_requests
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _
 from drf_yasg.utils import swagger_auto_schema
 
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
+from openedx_learning.api import authoring as authoring_api
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -148,6 +148,19 @@ class LibraryContainerChildrenView(GenericAPIView):
             data = serializers.LibraryContainerMetadataSerializer(child_entities, many=True).data
         return Response(data)
 
+    def _check_perm_and_serialize(self, request, library_key, perm):
+        """
+        Helper function to check permission and serialize data.
+        """
+        api.require_permission_for_library_key(
+            library_key,
+            request.user,
+            perm,
+        )
+        serializer = serializers.ContentLibraryComponentKeysSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return serializer
+
     @convert_exceptions
     @swagger_auto_schema(
         request_body=serializers.ContentLibraryComponentKeysSerializer,
@@ -161,21 +174,77 @@ class LibraryContainerChildrenView(GenericAPIView):
         Request body:
         {"usage_keys": ['lb:CL-TEST:containers:problem:Problem1', 'lb:CL-TEST:containers:html:Html1']}
         """
-        api.require_permission_for_library_key(
+        serializer = self._check_perm_and_serialize(
+            request,
             container_key.library_key,
-            request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
-        serializer = serializers.ContentLibraryComponentKeysSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
         # Only components under units are supported for now.
         assert container_key.container_type == api.ContainerType.Unit.value
 
-        container = api.add_container_children(
+        container = api.update_container_children(
             container_key,
             children_ids=serializer.validated_data["usage_keys"],
             user_id=request.user.id,
+            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+        )
+        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
+
+    @convert_exceptions
+    @swagger_auto_schema(
+        request_body=serializers.ContentLibraryComponentKeysSerializer,
+        responses={200: serializers.LibraryContainerMetadataSerializer}
+    )
+    def delete(self, request, container_key: LibraryContainerLocator):
+        """
+        Remove components from unit
+        Example:
+        DELETE /api/libraries/v2/containers/<container_key>/children/
+        Request body:
+        {"usage_keys": ['lb:CL-TEST:containers:problem:Problem1', 'lb:CL-TEST:containers:html:Html1']}
+        """
+        serializer = self._check_perm_and_serialize(
+            request,
+            container_key.library_key,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
+        # Only components under units are supported for now.
+        assert container_key.container_type == api.ContainerType.Unit.value
+
+        container = api.update_container_children(
+            container_key,
+            children_ids=serializer.validated_data["usage_keys"],
+            user_id=request.user.id,
+            entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
+        )
+        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
+
+    @convert_exceptions
+    @swagger_auto_schema(
+        request_body=serializers.ContentLibraryComponentKeysSerializer,
+        responses={200: serializers.LibraryContainerMetadataSerializer}
+    )
+    def patch(self, request, container_key: LibraryContainerLocator):
+        """
+        Replace components in unit, can be used to reorder components as well.
+        Example:
+        PATCH /api/libraries/v2/containers/<container_key>/children/
+        Request body:
+        {"usage_keys": ['lb:CL-TEST:containers:problem:Problem1', 'lb:CL-TEST:containers:html:Html1']}
+        """
+        serializer = self._check_perm_and_serialize(
+            request,
+            container_key.library_key,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
+        # Only components under units are supported for now.
+        assert container_key.container_type == api.ContainerType.Unit.value
+
+        container = api.update_container_children(
+            container_key,
+            children_ids=serializer.validated_data["usage_keys"],
+            user_id=request.user.id,
+            entities_action=authoring_api.ChildrenEntitiesAction.REPLACE,
         )
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
