@@ -241,7 +241,7 @@ COURSE_NOTIFICATION_APPS = {
         'core_email': True,
         'core_push': True,
         'core_email_cadence': EmailCadence.DAILY,
-        'non_editable': ['web']
+        'non_editable': []
     },
     'updates': {
         'enabled': True,

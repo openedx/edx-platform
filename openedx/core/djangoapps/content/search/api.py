@@ -481,7 +481,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
             docs = []
             for container in batch:
                 try:
-                    container_key = lib_api.library_container_usage_key(
+                    container_key = lib_api.library_container_locator(
                         library_key,
                         container,
                     )

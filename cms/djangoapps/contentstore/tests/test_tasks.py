@@ -577,3 +577,28 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
                 expected,
                 f"Failed for URL: {url}",
             )
+
+    def test_get_urls(self):
+        """Test _get_urls function for correct URL extraction."""
+
+        content = '''
+            <a href="https://example.com">Link</a>
+            <img src="https://images.com/pic.jpg">
+            <link href="https://fonts.googleapis.com/css?family=Roboto">
+            <a href="#">Home</a>
+            <a href="https://validsite.com">Valid</a>
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...">
+            <a href="data:application/pdf;base64,JVBERi0xLjQK...">
+            <a href="https://another-valid.com">Another</a>
+            <p>No links here!</p>
+            <img alt="Just an image without src">
+        '''
+
+        expected = [
+            "https://example.com",
+            "https://images.com/pic.jpg",
+            "https://fonts.googleapis.com/css?family=Roboto",
+            "https://validsite.com",
+            "https://another-valid.com"
+        ]
+        self.assertEqual(_get_urls(content), expected)

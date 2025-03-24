@@ -1215,7 +1215,7 @@ def _get_urls(content):
     """
     Finds and returns a list of URLs in the given content.
     Includes strings following 'href=' and 'src='.
-    Excludes strings that are only '#'.
+    Excludes strings that are only '#' or start with 'data:'.
 
     Arguments:
         content (str): entire content of a block
@@ -1223,7 +1223,7 @@ def _get_urls(content):
     Returns:
         list: urls
     """
-    regex = r'\s+(?:href|src)=["\'](?!#)([^"\']*)["\']'
+    regex = r'\s+(?:href|src)=["\'](?!#|data:)([^"\']*)["\']'
     url_list = re.findall(regex, content)
     return url_list
 

@@ -269,3 +269,21 @@ def aggregate_notification_configs(existing_user_configs: List[Dict]) -> Dict:
                 result_config[app]["notification_types"][type_key]["email_cadence"] = (
                     result_config[app]["notification_types"][type_key]["email_cadence"].pop())
     return result_config
+
+
+def filter_out_visible_preferences_by_course_ids(user, preferences: Dict, course_ids: List) -> Dict:
+    """
+    Filter out notifications visible to forum roles from user preferences.
+    """
+    forum_roles = Role.objects.filter(users__id=user.id).values_list('name', flat=True)
+    course_roles = CourseAccessRole.objects.filter(
+        user=user,
+        course_id__in=course_ids
+    ).values_list('role', flat=True)
+    notification_types_with_visibility = get_notification_types_with_visibility_settings()
+    return filter_out_visible_notifications(
+        preferences,
+        notification_types_with_visibility,
+        forum_roles,
+        course_roles
+    )

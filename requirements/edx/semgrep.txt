@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-attrs==25.1.0
+attrs==25.3.0
     # via
     #   glom
     #   jsonschema
@@ -23,9 +23,8 @@ charset-normalizer==2.0.12
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests
-click==8.1.6
+click==8.1.8
     # via
-    #   -c requirements/edx/../constraints.txt
     #   click-option-group
     #   semgrep
 click-option-group==0.5.6
@@ -44,7 +43,7 @@ face==24.0.0
     # via glom
 glom==22.1.0
     # via semgrep
-googleapis-common-protos==1.69.0
+googleapis-common-protos==1.69.2
     # via opentelemetry-exporter-otlp-proto-http
 idna==3.10
     # via requests
@@ -116,7 +115,7 @@ ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.110.0
+semgrep==1.114.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
