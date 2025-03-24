@@ -19,7 +19,7 @@ from openedx.core.djangoapps.programs.utils import (
 
 if TYPE_CHECKING:
     from django.http import HttpRequest, HttpResponse
-    from django.contrib.auth.models import AnonymousUser, User
+    from django.contrib.auth.models import AnonymousUser, User  # ignore: imported-auth-user
     from django.contrib.sites.models import Site
 
 logger = logging.getLogger(__name__)
@@ -161,7 +161,10 @@ class Programs(APIView):
         for program_data in programs_data:
             program = {}
             for program_data_key in program_data_keys:
-                program[program_data_key] = transform(program_data_key, program_data[program_data_key])  # type: ignore[index]
+                program[program_data_key] = transform(
+                    program_data_key,
+                    program_data[program_data_key],  # type: ignore[index]
+                )
 
             programs.append(program)
 
