@@ -106,6 +106,8 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .wrapper-download-transcripts .list-download-transcripts .transcript-option {
+    display: flex;
+    align-items: center;
     margin: 0;
 }
 
@@ -113,6 +115,7 @@
 .xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .wrapper-download-transcripts .list-download-transcripts .transcript-option a.btn-link {
     font-size: 16px !important;
     font-weight: unset;
+    padding-left: 4px;
 }
 
 .xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .branding {
