@@ -68,13 +68,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/kernel.in
-boto3==1.37.17
+boto3==1.37.19
     # via
     #   -r requirements/edx/kernel.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.37.17
+botocore==1.37.19
     # via
     #   -r requirements/edx/kernel.in
     #   boto3
@@ -477,7 +477,7 @@ edx-milestones==0.6.0
     # via -r requirements/edx/kernel.in
 edx-name-affirmation==3.0.1
     # via -r requirements/edx/kernel.in
-edx-opaque-keys[django]==2.11.0
+edx-opaque-keys[django]==2.12.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-bulk-grades
@@ -683,7 +683,7 @@ jwcrypto==1.5.6
     # via
     #   django-oauth-toolkit
     #   pylti1p3
-kombu==5.5.0
+kombu==5.5.1
     # via celery
 laboratory==1.0.2
     # via -r requirements/edx/kernel.in
@@ -956,7 +956,7 @@ pynliner==0.8.0
     # via -r requirements/edx/kernel.in
 pyopenssl==25.0.0
     # via snowflake-connector-python
-pyparsing==3.2.1
+pyparsing==3.2.2
     # via
     #   chem
     #   httplib2
@@ -992,7 +992,7 @@ python3-openid==3.2.0 ; python_version >= "3"
     #   social-auth-core
 python3-saml==1.16.0
     # via -r requirements/edx/kernel.in
-pytz==2025.1
+pytz==2025.2
     # via
     #   -r requirements/edx/kernel.in
     #   djangorestframework
