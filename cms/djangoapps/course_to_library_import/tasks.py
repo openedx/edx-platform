@@ -40,11 +40,14 @@ def save_courses_to_staged_content_task(
             course_key = CourseKey.from_string(course_id)
             sections = modulestore().get_items(
                 course_key, qualifiers={"category": "chapter"}
-            )
+            ) or []
+            static_tabs = modulestore().get_items(
+                course_key, qualifiers={"category": "static_tab"}
+            ) or []
 
-            for section in sections:
+            for item in sections + static_tabs:
                 content_staging_api.stage_xblock_temporarily(
-                    section,
+                    item,
                     user_id,
                     purpose=purpose.format(course_id=course_id),
                     version_num=version_num,
@@ -89,7 +92,14 @@ def import_library_from_staged_content_task(
                 if block_to_import is None:
                     continue
                 import_container(
-                    usage_key, block_to_import, library_key, user_id, staged_content_item, composition_level, override
+                    usage_key,
+                    block_to_import,
+                    library_key,
+                    user_id,
+                    staged_content_item,
+                    composition_level,
+                    import_id,
+                    override,
                 )
 
         ctli = CourseToLibraryImport.get_ready_by_uuid(import_id)

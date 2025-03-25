@@ -4,7 +4,7 @@ Tests for the course_to_library_import helper functions.
 
 from datetime import datetime, timezone
 from unittest import mock
-
+from uuid import uuid4
 
 from lxml import etree
 from django.db.utils import IntegrityError
@@ -46,6 +46,8 @@ class TestFlatImportChildren(TestCase):
             "block-v1:TestOrg+TestCourse+Run1+type@video+block@video1": {},
         }
 
+        self.import_id = str(uuid4())
+
     @mock.patch('cms.djangoapps.course_to_library_import.helpers.create_block_in_library')
     @mock.patch('cms.djangoapps.course_to_library_import.helpers.ContentLibrary')
     def test_flat_import_children_basic(self, mock_content_library, mock_create_block):
@@ -60,7 +62,9 @@ class TestFlatImportChildren(TestCase):
         mock_library = mock.MagicMock()
         mock_content_library.objects.filter.return_value.first.return_value = mock_library
 
-        import_children(block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', False)
+        import_children(
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', self.import_id, False
+        )
 
         self.assertEqual(mock_create_block.call_count, 2)
 
@@ -68,10 +72,10 @@ class TestFlatImportChildren(TestCase):
         usage_key_html = UsageKey.from_string("block-v1:TestOrg+TestCourse+Run1+type@html+block@html1")
 
         mock_create_block.assert_any_call(
-            mock.ANY, usage_key_problem, self.library_key, self.user_id, self.staged_content.id, False
+            mock.ANY, usage_key_problem, self.library_key, self.user_id, self.staged_content.id, self.import_id, False
         )
         mock_create_block.assert_any_call(
-            mock.ANY, usage_key_html, self.library_key, self.user_id, self.staged_content.id, False
+            mock.ANY, usage_key_html, self.library_key, self.user_id, self.staged_content.id, self.import_id, False
         )
 
     @mock.patch('cms.djangoapps.course_to_library_import.helpers.create_block_in_library')
@@ -87,11 +91,13 @@ class TestFlatImportChildren(TestCase):
         mock_library = mock.MagicMock()
         mock_content_library.objects.filter.return_value.first.return_value = mock_library
 
-        import_children(block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', True)
+        import_children(
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', self.import_id, True
+        )
 
         usage_key_problem = UsageKey.from_string("block-v1:TestOrg+TestCourse+Run1+type@problem+block@problem1")
         mock_create_block.assert_called_with(
-            mock.ANY, usage_key_problem, self.library_key, self.user_id, self.staged_content.id, True
+            mock.ANY, usage_key_problem, self.library_key, self.user_id, self.staged_content.id, self.import_id, True
         )
 
     @mock.patch('cms.djangoapps.course_to_library_import.helpers.ContentLibrary')
@@ -106,7 +112,9 @@ class TestFlatImportChildren(TestCase):
         mock_content_library.objects.filter.return_value.first.return_value = None
 
         with self.assertRaises(ValueError):
-            import_children(block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', False)
+            import_children(
+                block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', self.import_id, False
+            )
 
     @mock.patch('cms.djangoapps.course_to_library_import.helpers.create_block_in_library')
     @mock.patch('cms.djangoapps.course_to_library_import.helpers.ContentLibrary')
@@ -121,7 +129,9 @@ class TestFlatImportChildren(TestCase):
         mock_library = mock.MagicMock()
         mock_content_library.objects.filter.return_value.first.return_value = mock_library
 
-        import_children(block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', False)
+        import_children(
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', self.import_id, False
+        )
 
         mock_create_block.assert_not_called()
 
@@ -167,7 +177,13 @@ class TestCreateBlockInLibrary(TestCase):
         mock_content_staging_api.get_staged_content_static_files.return_value = []
 
         create_block_in_library(
-            self.block_to_import, self.usage_key, self.library_key, self.user_id, self.staged_content_id, False
+            self.block_to_import,
+            self.usage_key,
+            self.library_key,
+            self.user_id,
+            self.staged_content_id,
+            str(uuid4()),
+            False,
         )
 
         mock_content_library.objects.get_by_key.assert_called_once_with(self.library_key)
@@ -208,11 +224,17 @@ class TestCreateBlockInLibrary(TestCase):
 
         mock_content_staging_api.get_staged_content_static_files.return_value = []
 
-        CourseToLibraryImportFactory(
+        ctli = CourseToLibraryImportFactory(
             status=CourseToLibraryImportStatus.READY, library_key=self.library_key, user_id=self.user_id
         )
         create_block_in_library(
-            self.block_to_import, self.usage_key, self.library_key, self.user_id, self.staged_content_id, True
+            self.block_to_import,
+            self.usage_key,
+            self.library_key,
+            self.user_id,
+            self.staged_content_id,
+            str(ctli.uuid),
+            True,
         )
 
         mock_content_library.objects.get_by_key.assert_called_once_with(self.library_key)
@@ -242,7 +264,13 @@ class TestCreateBlockInLibrary(TestCase):
         mock_content_staging_api.get_staged_content_static_files.return_value = []
 
         create_block_in_library(
-            self.block_to_import, self.usage_key, self.library_key, self.user_id, self.staged_content_id, False
+            self.block_to_import,
+            self.usage_key,
+            self.library_key,
+            self.user_id,
+            self.staged_content_id,
+            str(uuid4()),
+            False,
         )
 
         mock_content_library.objects.get_by_key.assert_called_once_with(self.library_key)
@@ -272,13 +300,21 @@ class TestCreateBlockInLibrary(TestCase):
         mock_file_data = [mock.MagicMock()]
         mock_content_staging_api.get_staged_content_static_files.return_value = mock_file_data
 
+        import_id = str(uuid4())
+
         create_block_in_library(
-            self.block_to_import, self.usage_key, self.library_key, self.user_id, self.staged_content_id, True
+            self.block_to_import,
+            self.usage_key,
+            self.library_key,
+            self.user_id,
+            self.staged_content_id,
+            import_id,
+            True,
         )
 
         mock_content_library.objects.get_by_key.assert_called_once_with(self.library_key)
         mock_update_component.assert_called_once_with(
-            mock_component_version, self.usage_key, self.library_key, self.user_id
+            mock_component_version, self.usage_key, import_id,
         )
         mock_process_files.assert_called_once()
 
@@ -347,7 +383,7 @@ class TestProcessStagedContentFiles(TestCase):
         mock_authoring_api.create_component_version_content.assert_called_once_with(
             mock_component_version.pk,
             mock_content.id,
-            key=f"static/{str(self.usage_key)}"
+            key=f"static/{mock_file_data.filename}",
         )
         mock_get_or_create.assert_called_once()
 
@@ -734,9 +770,11 @@ class TestImportContainer(TestCase):
         mock_get_import = mock.MagicMock()
         mock_course_import.objects.get.return_value = mock_get_import
 
+        import_id = str(uuid4())
+
         import_container(
             self.usage_key, block_to_import, self.library_key, self.user_id,
-            self.staged_content, 'chapter', False
+            self.staged_content, 'chapter', import_id, False
         )
 
         mock_create_container.assert_called_once_with(
@@ -744,7 +782,7 @@ class TestImportContainer(TestCase):
         )
         mock_import_children.assert_called_once_with(
             block_to_import, self.library_key, self.user_id, self.staged_content,
-            'chapter', False
+            'chapter', import_id, False
         )
         mock_update_container.assert_called_once_with(
             mock_container_version, mock_component_versions, self.user_id
@@ -768,14 +806,16 @@ class TestImportContainer(TestCase):
         """
         block_to_import = etree.fromstring(xml)
 
+        import_id = str(uuid4())
+
         import_container(
             self.usage_key, block_to_import, self.library_key, self.user_id,
-            self.staged_content, 'xblock', False
+            self.staged_content, 'xblock', import_id, False
         )
 
         mock_import_children.assert_called_once_with(
             block_to_import, self.library_key, self.user_id, self.staged_content,
-            'xblock', False
+            'xblock', import_id, False
         )
 
     @mock.patch('cms.djangoapps.course_to_library_import.helpers.ContainerVersionImport')
@@ -788,7 +828,7 @@ class TestImportContainer(TestCase):
         xml = """<chapter url_name="chapter1" display_name="Test Chapter"></chapter>"""
         block_to_import = etree.fromstring(xml)
 
-        CourseToLibraryImportFactory(
+        ctli = CourseToLibraryImportFactory(
             library_key=self.library_key,
             user_id=self.user_id,
             status=CourseToLibraryImportStatus.READY,
@@ -801,7 +841,7 @@ class TestImportContainer(TestCase):
 
         import_container(
             self.usage_key, block_to_import, self.library_key, self.user_id,
-            self.staged_content, 'chapter', False
+            self.staged_content, 'chapter', str(ctli.uuid), False
         )
 
         mock_create_container.assert_called_once()
@@ -849,7 +889,7 @@ class TestImportChildren(TestCase):
         mock_create_block.return_value = mock_component_version
 
         result = import_children(
-            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', False
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', str(uuid4()), False
         )
 
         self.assertEqual(mock_create_block.call_count, 2)
@@ -885,7 +925,7 @@ class TestImportChildren(TestCase):
         mock_create_container.return_value = mock_container_version
 
         result = import_children(
-            block_to_import, self.library_key, self.user_id, self.staged_content, 'chapter', False
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'chapter', str(uuid4()), False
         )
 
         self.assertEqual(mock_create_container.call_count, 2)
@@ -906,7 +946,7 @@ class TestImportChildren(TestCase):
         mock_create_block.return_value = mock_component_version
 
         result = import_children(
-            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', False
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', str(uuid4()), False
         )
 
         mock_create_block.assert_called_once()
@@ -922,8 +962,10 @@ class TestImportChildren(TestCase):
         mock_library = mock.MagicMock()
         mock_content_library.objects.filter.return_value.first.return_value = mock_library
 
+        import_id = str(uuid4())
+
         import_children(
-            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', True
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', import_id, True
         )
 
         mock_create_block.assert_called_once_with(
@@ -932,6 +974,7 @@ class TestImportChildren(TestCase):
             self.library_key,
             self.user_id,
             self.staged_content.id,
+            import_id,
             True,
         )
 
@@ -944,7 +987,7 @@ class TestImportChildren(TestCase):
 
         with self.assertRaises(ValueError):
             import_children(
-                block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', False
+                block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', str(uuid4()), False
             )
 
     def test_import_children_no_matching_children(self):
@@ -957,7 +1000,7 @@ class TestImportChildren(TestCase):
         block_to_import = etree.fromstring(xml)
 
         result = import_children(
-            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', False
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', str(uuid4()), False
         )
 
         self.assertEqual(result, [])
@@ -988,11 +1031,11 @@ class TestImportChildren(TestCase):
         mock_create_container.return_value = mock_container_version
 
         result_xblock = import_children(
-            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', False
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'xblock', str(uuid4()), False
         )
 
         result_chapter = import_children(
-            block_to_import, self.library_key, self.user_id, self.staged_content, 'chapter', False
+            block_to_import, self.library_key, self.user_id, self.staged_content, 'chapter', str(uuid4()), False
         )
 
         self.assertTrue(all(not isinstance(item, ContainerVersion) for item in result_xblock))

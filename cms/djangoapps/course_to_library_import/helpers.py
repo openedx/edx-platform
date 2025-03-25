@@ -28,7 +28,7 @@ import os
 log = logging.getLogger(__name__)
 
 
-def create_block_in_library(block_to_import, usage_key, library_key, user_id, staged_content_id, override):
+def create_block_in_library(block_to_import, usage_key, library_key, user_id, staged_content_id, import_id, override):
     """
     Create a block in a library from a staged content block.
     """
@@ -73,7 +73,7 @@ def create_block_in_library(block_to_import, usage_key, library_key, user_id, st
         overrided_component_version_import = False
         if override:
             _update_component_version_import(
-                component_version, usage_key, library_key, user_id
+                component_version, usage_key, import_id
             )
             overrided_component_version_import = True
 
@@ -103,18 +103,14 @@ def _handle_component_override(content_library, usage_key, new_content):
     return component_version
 
 
-def _update_component_version_import(component_version, usage_key, library_key, user_id):
+def _update_component_version_import(component_version, usage_key, import_id):
     """
     Update component version import records for overridden components.
     """
     return ComponentVersionImport.objects.create(
         component_version=component_version,
         source_usage_key=usage_key,
-        library_import=CourseToLibraryImport.objects.get(
-            library_key=library_key,
-            user_id=user_id,
-            status=CourseToLibraryImportStatus.READY
-        ),
+        library_import=CourseToLibraryImport.get_ready_by_uuid(import_id),
     )
 
 
@@ -138,9 +134,10 @@ def _process_staged_content_files(
     for staged_content_file_data in staged_content_files:
         original_filename = staged_content_file_data.filename
         file_basename = os.path.basename(original_filename)
+        file_basename_no_ext, _ = os.path.splitext(file_basename)
 
         # Skip files not referenced in the block
-        if file_basename not in block_olx:
+        if file_basename not in block_olx and file_basename_no_ext not in block_olx:
             log.info(f"Skipping file {original_filename} as it is not referenced in block {usage_key}")
             continue
 
@@ -155,7 +152,7 @@ def _process_staged_content_files(
             )
             continue
 
-        filename = f"static/{str(usage_key)}"
+        filename = f"static/{file_basename}"
         media_type_str, _ = mimetypes.guess_type(filename)
         if not media_type_str:
             media_type_str = "application/octet-stream"
@@ -203,7 +200,7 @@ def _update_container_components(container_version, component_versions, user_id)
     )
 
 
-def _process_xblock(child, library_key, user_id, staged_content, override):
+def _process_xblock(child, library_key, user_id, staged_content, import_id, override):
     """
     Process an xblock and create a block in the library.
     """
@@ -219,11 +216,12 @@ def _process_xblock(child, library_key, user_id, staged_content, override):
             library_key,
             user_id,
             staged_content.id,
+            import_id,
             override,
         )
 
 
-def import_children(block_to_import, library_key, user_id, staged_content, composition_level, override):
+def import_children(block_to_import, library_key, user_id, staged_content, composition_level, import_id, override):
     """
     Import children of a block from staged content into a library.
     Creates appropriate container hierarchy based on composition_level.
@@ -231,7 +229,7 @@ def import_children(block_to_import, library_key, user_id, staged_content, compo
     result = []
 
     if block_to_import.tag not in ('chapter', 'sequential', 'vertical'):
-        component_version = _process_xblock(block_to_import, library_key, user_id, staged_content, override)
+        component_version = _process_xblock(block_to_import, library_key, user_id, staged_content, import_id, override)
         if component_version:
             return [component_version]
 
@@ -251,6 +249,7 @@ def import_children(block_to_import, library_key, user_id, staged_content, compo
                 user_id,
                 staged_content,
                 composition_level,
+                import_id,
                 override,
             )
 
@@ -259,7 +258,7 @@ def import_children(block_to_import, library_key, user_id, staged_content, compo
 
             result.append(container_version)
         else:
-            component_version = _process_xblock(child, library_key, user_id, staged_content, override)
+            component_version = _process_xblock(child, library_key, user_id, staged_content, import_id, override)
             if component_version is not None:
                 result.append(component_version)
 
@@ -304,7 +303,9 @@ def create_container(container_type, key, display_name, library_key, user_id):
         return container_version
 
 
-def import_container(usage_key, block_to_import, library_key, user_id, staged_content, composition_level, override):
+def import_container(
+    usage_key, block_to_import, library_key, user_id, staged_content, composition_level, import_id, override
+):
     """
     Import a blocks hierarchy into a library, creating proper container structure.
     """
@@ -328,6 +329,7 @@ def import_container(usage_key, block_to_import, library_key, user_id, staged_co
             user_id,
             staged_content,
             composition_level,
+            import_id,
             override,
         )
 
@@ -351,6 +353,7 @@ def import_container(usage_key, block_to_import, library_key, user_id, staged_co
             user_id,
             staged_content,
             composition_level,
+            import_id,
             override,
         )
 

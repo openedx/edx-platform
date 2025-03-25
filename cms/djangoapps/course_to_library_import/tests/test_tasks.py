@@ -24,14 +24,20 @@ class TestSaveCourseSectionsToStagedContentTask(TestCase):
     @patch('cms.djangoapps.course_to_library_import.tasks.modulestore')
     @patch('openedx.core.djangoapps.content_staging.api.stage_xblock_temporarily')
     def test_save_courses_to_staged_content_task(self, mock_stage_xblock_temporarily, mock_modulestore):
-        course_to_library_import = CourseToLibraryImportFactory()
+        course_to_library_import = CourseToLibraryImportFactory(status=CourseToLibraryImportStatus.PENDING)
         course_ids = course_to_library_import.course_ids.split(' ')
         user_id = course_to_library_import.user.id
         purpose = 'test_purpose'
         version_num = 1
 
         mock_course_keys = [CourseKey.from_string(course_id) for course_id in course_ids]
-        mock_modulestore().get_items.return_value = sections = ['section1', 'section2']
+
+        def mock_get_items_side_effect(*args, **kwargs):
+            if kwargs.get('qualifiers', {}).get('category') == 'chapter':
+                return ['section1', 'section2']
+
+        mock_modulestore().get_items.side_effect = mock_get_items_side_effect
+        sections = ['section1', 'section2']
 
         self.assertEqual(course_to_library_import.status, CourseToLibraryImportStatus.PENDING)
 
@@ -98,7 +104,7 @@ class TestImportLibraryFromStagedContentTask(TestCase):
         mock_staged_content.filter.assert_called_once_with(tags__icontains=usage_ids[0])
         mock_get_block_to_import.assert_called_once_with(mock_node, usage_key)
         mock_import_container.assert_called_once_with(
-            usage_key, mock_block, library_locator, user.id, mock_content_item, 'xblock', override
+            usage_key, mock_block, library_locator, user.id, mock_content_item, 'xblock', ctli.uuid, override
         )
 
         ctli.refresh_from_db()
