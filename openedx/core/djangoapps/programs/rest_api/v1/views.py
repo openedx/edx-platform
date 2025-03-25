@@ -19,7 +19,7 @@ from openedx.core.djangoapps.programs.utils import (
 
 if TYPE_CHECKING:
     from django.http import HttpRequest, HttpResponse
-    from django.contrib.auth.models import AnonymousUser, User  # ignore: imported-auth-user
+    from django.contrib.auth.models import AnonymousUser, User  # pylint: disable=imported-auth-user
     from django.contrib.sites.models import Site
 
 logger = logging.getLogger(__name__)
