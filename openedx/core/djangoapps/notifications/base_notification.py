@@ -196,13 +196,15 @@ COURSE_NOTIFICATION_TYPES = {
         'name': 'ora_staff_notification',
         'is_core': False,
         'info': '',
-        'web': False,
+        'web': True,
         'email': False,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new open response submission awaiting for review for '
+        'content_template': _('<{p}>You have a new open response submission awaiting review for '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}>You have multiple submissions awaiting review for '
+                                      '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',
         },
