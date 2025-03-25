@@ -8,6 +8,8 @@ from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from cms.djangoapps.contentstore.tasks import CourseLinkCheckTask, LinkState
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import get_xblock
 from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers import usage_key_with_run
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 
 
 # Restricts status in the REST API to only those which the requesting user has permission to view.
@@ -285,3 +287,22 @@ def _create_dto_recursive(xblock_node, xblock_dictionary):
         xblock_children.append(xblock_entry)
 
     return {level: xblock_children} if level else None
+
+
+def get_sorted_sections(course_key, data):
+    """Retrieve and sort course sections based on the published course structure."""
+    course_blocks = modulestore().get_items(
+        course_key,
+        qualifiers={'category': 'course'},
+        revision=ModuleStoreEnum.RevisionOption.published_only
+    )
+
+    if not course_blocks:
+        return data  # Return unchanged data if no verticals found
+
+    sorted_section_ids = [section.location.block_id for section in course_blocks[0].get_children()]
+
+    sections_map = {section['id']: section for section in data['LinkCheckOutput']['sections']}
+    sorted_sections = [sections_map[section_id] for section_id in sorted_section_ids if section_id in sections_map]
+
+    return sorted_sections
