@@ -52,7 +52,6 @@ BLOCK_STRUCTURES_SETTINGS:
   TASK_DEFAULT_RETRY_DELAY: 30
   TASK_MAX_RETRIES: 5
 BRANCH_IO_KEY: test_BRANCH_IO_KEY
-BRAZE_COURSE_ENROLLMENT_CANVAS_ID: test_canvas_id
 BUGS_EMAIL: bugs@example.com
 BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@courseupdates.localhost
 BULK_EMAIL_LOG_SENT_EMAILS: true
@@ -329,8 +328,6 @@ ECOMMERCE_API_SIGNING_KEY: test_secret_key
 ECOMMERCE_API_URL: https://ecommerce.localhost/api/v2/
 ECOMMERCE_PUBLIC_URL_ROOT: https://ecommerce.localhost
 EDXMKTG_USER_INFO_COOKIE_NAME: user-info
-EDX_BRAZE_API_KEY: test_braze_key
-EDX_BRAZE_API_SERVER: https://braze.com
 EDX_REST_API_CLIENT_NAME: edxapp-cms
 ELASTIC_SEARCH_CONFIG:
 - host: test.amazonaws.com
