@@ -222,7 +222,7 @@ class Thread(models.Model):
             url = _url_for_unflag_abuse_thread(voteable.id)
         else:
             raise utils.CommentClientRequestError("Can only flag/unflag for threads or comments")
-        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             response = forum_api.update_thread_flag(
                 thread_id=voteable.id,
@@ -246,8 +246,8 @@ class Thread(models.Model):
             )
         voteable._update_from_response(response)
 
-    def pin(self, user, thread_id):
-        course_key = utils.get_course_key(self.attributes.get("course_id"))
+    def pin(self, user, thread_id, course_id=None):
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             response = forum_api.pin_thread(
                 user_id=user.id,
@@ -266,8 +266,8 @@ class Thread(models.Model):
             )
         self._update_from_response(response)
 
-    def un_pin(self, user, thread_id):
-        course_key = utils.get_course_key(self.attributes.get("course_id"))
+    def un_pin(self, user, thread_id, course_id):
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             response = forum_api.unpin_thread(
                 user_id=user.id,

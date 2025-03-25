@@ -127,7 +127,7 @@ class User(models.Model):
             url = _url_for_vote_comment(voteable.id)
         else:
             raise utils.CommentClientRequestError("Can only vote / unvote for threads or comments")
-        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             if voteable.type == 'thread':
                 response = forum_api.delete_thread_vote(

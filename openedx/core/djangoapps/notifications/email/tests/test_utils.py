@@ -16,6 +16,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
     COURSE_NOTIFICATION_TYPES,
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.email.utils import (
     add_additional_attributes_to_notifications,
@@ -32,6 +33,7 @@ from openedx.core.djangoapps.notifications.email.utils import (
     is_email_notification_flag_enabled,
     update_user_preferences_from_patch,
 )
+from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -441,3 +443,17 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
         enc_patch = encrypt_object({"value": True})
         with pytest.raises(Http404):
             update_user_preferences_from_patch(enc_username, enc_patch)
+
+    def test_user_preference_created_on_email_unsubscribe(self):
+        """
+        Test that the user's email unsubscribe preference is correctly created after unsubscribing digest email.
+        """
+        encrypted_username = encrypt_string(self.user.username)
+        encrypted_patch = encrypt_object({
+            'channel': 'email',
+            'value': False
+        })
+        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
+        self.assertTrue(
+            UserPreference.objects.filter(user=self.user, key=ONE_CLICK_EMAIL_UNSUB_KEY).exists()
+        )
