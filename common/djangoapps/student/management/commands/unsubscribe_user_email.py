@@ -4,7 +4,7 @@ import logging
 
 from django.core.management.base import BaseCommand, CommandError
 
-from lms.djangoapps.utils import get_email_client
+from lms.djangoapps.utils import get_braze_client
 
 logger = logging.getLogger(__name__)
 CHUNK_SIZE = 50
@@ -63,10 +63,10 @@ class Command(BaseCommand):
         chunks = self._chunk_list(emails)
 
         try:
-            email_client = get_email_client()
-            if email_client:
+            braze_client = get_braze_client()
+            if braze_client:
                 for i, chunk in enumerate(chunks):
-                    email_client.unsubscribe_user_email(
+                    braze_client.unsubscribe_user_email(
                         email=chunk,
                     )
                     logger.info(f"Successfully unsubscribed for chunk-{i + 1} consist of {len(chunk)} emails")
