@@ -211,7 +211,7 @@ class ProgramProgressMeter:
         return inverted_programs
 
     @cached_property
-    def engaged_programs(self):
+    def engaged_programs(self) -> list[dict | None]:
         """Derive a list of programs in which the given user is engaged.
 
         Returns:
@@ -271,7 +271,7 @@ class ProgramProgressMeter:
         # An upgrade deadline of None means the course is always upgradeable.
         return any(not deadline or deadline and parse(deadline) > now for deadline in upgrade_deadlines)
 
-    def progress(self, programs=None, count_only=True):
+    def progress(self, programs: list[dict | None] | None = None, count_only: bool = True) -> list[dict | None]:
         """Gauge a user's progress towards program completion.
 
         Keyword Arguments:
