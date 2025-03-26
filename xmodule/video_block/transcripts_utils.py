@@ -1241,16 +1241,16 @@ def get_endonym_or_label(language_code):
     """
 
     lowercase_code = language_code.lower()
-    # LANGUAGES_DICT is an edx-configured mapping of language codes to endonym. It's a bit more
+    # LANGUAGE_DICT is an edx-configured mapping of language codes to endonym. It's a bit more
     # specific than the django utility, so try that first. All language codes in this dict will
     # be lowercase
-    if local_name := settings.LANGUAGES_DICT.get(lowercase_code):
+    if local_name := settings.LANGUAGE_DICT.get(lowercase_code):
         return local_name
 
     # get_language_info attempts to look up language info in a hardcoded list in
     # django.conf.translations. It will do automatic "generalizations", i.e. it doesn't
     # have `es-419` so it then tries `es`. That's why we only do this after checking
-    # LANGUAGES_DICT
+    # LANGUAGE_DICT
     try:
         lang_info = get_language_info(language_code)
         return lang_info['name_local']

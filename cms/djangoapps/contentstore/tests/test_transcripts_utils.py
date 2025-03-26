@@ -1038,7 +1038,7 @@ class TestGetEndonymOrLabel(unittest.TestCase):
     LANG_LABEL = 'ab-cd language english label'
     GENERIC_LABEL = 'ab language english label'
 
-    TEST_LANGUAGES_DICT = {LANG_CODE: LANG_ENTONYM}
+    TEST_LANGUAGE_DICT = {LANG_CODE: LANG_ENTONYM}
     TEST_ALL_LANGUAGES = (
         ["aa", "Afar"],
         [GENERIC_CODE, GENERIC_LABEL],
@@ -1058,7 +1058,7 @@ class TestGetEndonymOrLabel(unittest.TestCase):
 
     def test_language_in_languages(self):
         """ If language is found in LANGUAGE_DICT that value should be returned """
-        with override_settings(LANGUAGES_DICT=self.TEST_LANGUAGES_DICT):
+        with override_settings(LANGUAGE_DICT=self.TEST_LANGUAGE_DICT):
             self.assertEqual(
                 transcripts_utils.get_endonym_or_label(self.LANG_CODE),
                 self.LANG_ENTONYM
@@ -1069,7 +1069,7 @@ class TestGetEndonymOrLabel(unittest.TestCase):
         If language is not found in LANGUAGE_DICT, check get_language_info and return that
         local name if found
         """
-        with override_settings(LANGUAGES_DICT={}):
+        with override_settings(LANGUAGE_DICT={}):
             with self.mock_django_get_language_info() as mock_get_language_info:
                 self.assertEqual(
                     transcripts_utils.get_endonym_or_label(self.LANG_CODE),
@@ -1078,10 +1078,10 @@ class TestGetEndonymOrLabel(unittest.TestCase):
 
     def test_language_exact_in_all_languages(self):
         """
-        If not found in LANGUAGES_DICT or get_language_info, check in
+        If not found in LANGUAGE_DICT or get_language_info, check in
         ALL_LANGUAGES for the English language name
         """
-        with override_settings(LANGUAGES_DICT={}):
+        with override_settings(LANGUAGE_DICT={}):
             with self.mock_django_get_language_info(side_effect=KeyError):
                 with override_settings(ALL_LANGUAGES=self.TEST_ALL_LANGUAGES):
                     label = transcripts_utils.get_endonym_or_label(self.LANG_CODE)
@@ -1089,7 +1089,7 @@ class TestGetEndonymOrLabel(unittest.TestCase):
 
     def test_language_generic_in_all_languages(self):
         """
-        If not found in LANGUAGES_DICT or get_language_info, and the exact code
+        If not found in LANGUAGE_DICT or get_language_info, and the exact code
         wasn't found in ALL_LANGUAGES, use the generic code if it is found in ALL_LANGUAGES.
         """
         all_languages = (
@@ -1098,7 +1098,7 @@ class TestGetEndonymOrLabel(unittest.TestCase):
             self.TEST_ALL_LANGUAGES[3]
         )
 
-        with override_settings(LANGUAGES_DICT={}):
+        with override_settings(LANGUAGE_DICT={}):
             with self.mock_django_get_language_info(side_effect=KeyError):
                 with override_settings(ALL_LANGUAGES=all_languages):
                     label = transcripts_utils.get_endonym_or_label(self.LANG_CODE)
@@ -1109,7 +1109,7 @@ class TestGetEndonymOrLabel(unittest.TestCase):
         Raise a NotFoundError if the language isn't found anywhere
         """
         all_languages = (self.TEST_ALL_LANGUAGES[0], self.TEST_ALL_LANGUAGES[3])
-        with override_settings(LANGUAGES_DICT={}):
+        with override_settings(LANGUAGE_DICT={}):
             with self.mock_django_get_language_info(side_effect=KeyError):
                 with override_settings(ALL_LANGUAGES=all_languages):
                     with self.assertRaises(NotFoundError):
