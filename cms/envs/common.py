@@ -1831,6 +1831,9 @@ INSTALLED_APPS = [
     # Search
     'openedx.core.djangoapps.content.search',
 
+    # For Programs API
+    'lms.djangoapps.program_enrollments',
+
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
@@ -2801,13 +2804,6 @@ INACTIVE_USER_URL = f'http://{CMS_BASE}'
 
 # String length for the configurable part of the auto-generated username
 AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
-
-######################## BRAZE API SETTINGS ########################
-
-EDX_BRAZE_API_KEY = None
-EDX_BRAZE_API_SERVER = None
-
-BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 ######################## Discussion Forum settings ########################
 
