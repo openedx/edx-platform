@@ -100,6 +100,15 @@ ALL_ALLOWED_XBLOCKS = frozenset(
 )
 
 
+class LinkState:
+    """
+    Links State Enumeration
+    """
+    BROKEN = 'broken'
+    LOCKED = 'locked'
+    EXTERNAL_FORBIDDEN = 'external-forbidden'
+
+
 def clone_instance(instance, field_values):
     """ Clones a Django model instance.
 
@@ -1215,7 +1224,7 @@ def _get_urls(content):
     """
     Finds and returns a list of URLs in the given content.
     Includes strings following 'href=' and 'src='.
-    Excludes strings that are only '#'.
+    Excludes strings that are only '#' or start with 'data:'.
 
     Arguments:
         content (str): entire content of a block
@@ -1223,7 +1232,7 @@ def _get_urls(content):
     Returns:
         list: urls
     """
-    regex = r'\s+(?:href|src)=["\'](?!#)([^"\']*)["\']'
+    regex = r'\s+(?:href|src)=["\'](?!#|data:)([^"\']*)["\']'
     url_list = re.findall(regex, content)
     return url_list
 
@@ -1297,11 +1306,14 @@ def _convert_to_standard_url(url, course_key):
             ...asset-v1:edX+DemoX+Demo_Course+type@asset+block/getting-started_x250.png
         /static/getting-started_x250.png
         /container/block-v1:edX+DemoX+Demo_Course+type@vertical+block@2152d4a4aadc4cb0af5256394a3d1fc7
+        /jump_to_id/2152d4a4aadc4cb0af5256394a3d1fc7
     """
     if _is_studio_url_without_base(url):
         if url.startswith('/static/'):
             processed_url = replace_static_urls(f'\"{url}\"', course_id=course_key)[1:-1]
             return 'https://' + settings.CMS_BASE + processed_url
+        elif url.startswith('/jump_to_id/'):
+            return f'https://{settings.LMS_BASE}/courses/{course_key}{url}'
         elif url.startswith('/'):
             return 'https://' + settings.CMS_BASE + url
         else:
@@ -1331,7 +1343,8 @@ def _filter_by_status(results):
 
     Statuses:
         200: OK. No need to do more
-        403: Forbidden. Record as locked link.
+        403: Forbidden. Record as locked link if it is studio link.
+        403: Forbidden. Record as external-forbidden link if it is external link
         None: Error. Retry up to 3 times.
         Other: Failure. Record as broken link.
 
@@ -1344,7 +1357,7 @@ def _filter_by_status(results):
 
     Example return:
         [
-            [block_id1, filtered_results_url1, is_locked],
+            [block_id1, filtered_results_url1, link_state],
             ...
         ],
         [
@@ -1361,9 +1374,11 @@ def _filter_by_status(results):
         elif status == 200:
             continue
         elif status == 403 and _is_studio_url(url):
-            filtered_results.append([block_id, url, True])
+            filtered_results.append([block_id, url, LinkState.LOCKED])
+        elif status == 403 and not _is_studio_url(url):
+            filtered_results.append([block_id, url, LinkState.EXTERNAL_FORBIDDEN])
         else:
-            filtered_results.append([block_id, url, False])
+            filtered_results.append([block_id, url, LinkState.BROKEN])
 
     return filtered_results, retry_list
 

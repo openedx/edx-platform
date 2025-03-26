@@ -39,7 +39,10 @@ from .serializers import (
     UserNotificationPreferenceUpdateAllSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
-from .utils import get_is_new_notification_view_enabled, get_show_notifications_tray, aggregate_notification_configs
+from .utils import get_is_new_notification_view_enabled, get_show_notifications_tray, aggregate_notification_configs, \
+    filter_out_visible_preferences_by_course_ids
+from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 
 
 @allow_any_authenticated_user()
@@ -227,6 +230,12 @@ class UserNotificationPreferenceView(APIView):
         )
         preference_update.is_valid(raise_exception=True)
         updated_notification_preferences = preference_update.save()
+
+        if request.data.get('notification_channel', '') == 'email' and request.data.get('value', False):
+            UserPreference.objects.filter(
+                user_id=request.user.id,
+                key=ONE_CLICK_EMAIL_UNSUB_KEY
+            ).delete()
         notification_preference_update_event(request.user, course_id, preference_update.validated_data)
 
         serializer_context = {
@@ -587,6 +596,11 @@ class AggregatedNotificationPreferences(APIView):
         notification_configs = notification_preferences.values_list('notification_preference_config', flat=True)
         notification_configs = aggregate_notification_configs(
             notification_configs
+        )
+        filter_out_visible_preferences_by_course_ids(
+            request.user,
+            notification_configs,
+            notification_preferences.values_list('course_id', flat=True),
         )
         notification_preferences_viewed_event(request)
         return Response({

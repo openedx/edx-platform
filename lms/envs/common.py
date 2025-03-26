@@ -1624,10 +1624,6 @@ OPTIMIZELY_FULLSTACK_SDK_KEY = None
 ######################## HOTJAR ###########################
 HOTJAR_SITE_ID = 00000
 
-######################## ALGOLIA SEARCH ###########################
-ALGOLIA_APP_ID = None
-ALGOLIA_SEARCH_API_KEY = None
-
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 
@@ -4917,13 +4913,6 @@ OPTIONAL_FIELD_API_RATELIMIT = '10/h'
 PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
-
-#### BRAZE API SETTINGS ####
-
-EDX_BRAZE_API_KEY = None
-EDX_BRAZE_API_SERVER = None
-BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
-
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
 
@@ -5548,15 +5537,6 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_default: empty dictionary
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
-
-
-# .. setting_name: DISABLED_COUNTRIES
-# .. setting_default: []
-# .. setting_description: List of country codes that should be disabled
-# .. for now it wil impact country listing in auth flow and user profile.
-# .. eg ['US', 'CA']
-DISABLED_COUNTRIES = []
-
 
 LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 

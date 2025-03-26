@@ -1831,6 +1831,9 @@ INSTALLED_APPS = [
     # Search
     'openedx.core.djangoapps.content.search',
 
+    # For Programs API
+    'lms.djangoapps.program_enrollments',
+
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
@@ -2802,13 +2805,6 @@ INACTIVE_USER_URL = f'http://{CMS_BASE}'
 # String length for the configurable part of the auto-generated username
 AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
 
-######################## BRAZE API SETTINGS ########################
-
-EDX_BRAZE_API_KEY = None
-EDX_BRAZE_API_SERVER = None
-
-BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
-
 ######################## Discussion Forum settings ########################
 
 # Feedback link in upgraded discussion notification alert
@@ -2918,13 +2914,6 @@ MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
 # See https://www.meilisearch.com/docs/learn/security/tenant_tokens
 MEILISEARCH_INDEX_PREFIX = ""
 MEILISEARCH_API_KEY = "devkey"
-
-# .. setting_name: DISABLED_COUNTRIES
-# .. setting_default: []
-# .. setting_description: List of country codes that should be disabled
-# .. for now it wil impact country listing in auth flow and user profile.
-# .. eg ['US', 'CA']
-DISABLED_COUNTRIES = []
 
 # .. setting_name: LIBRARY_ENABLED_BLOCKS
 # .. setting_default: ['problem', 'video', 'html', 'drag-and-drop-v2']
