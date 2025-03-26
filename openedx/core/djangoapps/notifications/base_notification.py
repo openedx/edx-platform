@@ -196,7 +196,7 @@ COURSE_NOTIFICATION_TYPES = {
         'name': 'ora_staff_notification',
         'is_core': False,
         'info': '',
-        'web': True,
+        'web': False,
         'email': False,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
