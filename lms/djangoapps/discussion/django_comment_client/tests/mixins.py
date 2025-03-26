@@ -65,3 +65,38 @@ class MockForumApiMixin:
         setattr(
             self.mock_forum_api, function_name, mock.Mock(return_value=return_value)
         )
+
+    def set_mock_side_effect(self, function_name, side_effect_fn):
+        """
+        Set a side effect for a specific method in forum_api mock.
+
+        Args:
+            function_name (str): The method name in the mock to set a side effect for.
+            side_effect_fn (Callable): A function to be called when the mock is called.
+        """
+        setattr(
+            self.mock_forum_api, function_name, mock.Mock(side_effect=side_effect_fn)
+        )
+
+    def check_mock_called_with(self, function_name, index, *parms, **kwargs):
+        """
+        Check if a specific method in forum_api mock was called with the given parameters.
+
+        Args:
+            function_name (str): The method name in the mock to check.
+            parms (tuple): The parameters to check the method was called with.
+        """
+        call_args = getattr(self.mock_forum_api, function_name).call_args_list[index]
+        assert call_args == mock.call(*parms, **kwargs)
+
+    def check_mock_called(self, function_name):
+        """
+        Check if a specific method in the forum_api mock was called.
+
+        Args:
+            function_name (str): The method name in the mock to check.
+
+        Returns:
+            bool: True if the method was called, False otherwise.
+        """
+        return getattr(self.mock_forum_api, function_name).called
