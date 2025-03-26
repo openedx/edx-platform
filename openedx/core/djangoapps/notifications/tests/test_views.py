@@ -1059,6 +1059,7 @@ def remove_notifications_with_visibility_settings(expected_response):
     return expected_response
 
 
+@ddt.ddt
 class UpdateAllNotificationPreferencesViewTests(APITestCase):
     """
     Tests for the UpdateAllNotificationPreferencesView.
@@ -1312,6 +1313,23 @@ class UpdateAllNotificationPreferencesViewTests(APITestCase):
         for test_case in test_cases:
             response = self.client.post(self.url, test_case, format='json')
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @ddt.data(*itertools.product(('email', 'web'), (True, False)))
+    @ddt.unpack
+    def test_unsub_user_preferences_removal_on_account_email_enabled(self, channel, value):
+        """
+        Test one click unsub user preference should be removed on email enable for any app through account preferences
+        """
+        UserPreference.objects.create(user=self.user, key=ONE_CLICK_EMAIL_UNSUB_KEY)
+        payload = {
+            'notification_app': 'grading',
+            'notification_type': 'core',
+            'notification_channel': channel,
+            'value': value
+        }
+        self.client.post(self.url, payload, format='json')
+        result = 0 if channel == 'email' and value else 1
+        self.assertEqual(UserPreference.objects.count(), result)
 
 
 class GetAggregateNotificationPreferencesTest(APITestCase):
