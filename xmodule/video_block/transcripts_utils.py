@@ -884,7 +884,7 @@ class VideoTranscriptsMixin:
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
 
-        if other_lang:
+        if dest_lang:
             resolved_transcript_dest_lang = resolve_language_code_to_transcript_code(transcripts, dest_lang)
             if resolved_transcript_dest_lang:
                 return resolved_transcript_dest_lang
