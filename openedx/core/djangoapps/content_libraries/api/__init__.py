@@ -1,7 +1,9 @@
 """
 Python API for working with content libraries
 """
+from .collections import *
 from .containers import *
+from .courseware_import import *
 from .libraries import *
 from .blocks import *
 from . import permissions

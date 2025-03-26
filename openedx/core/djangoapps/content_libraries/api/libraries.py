@@ -38,28 +38,13 @@ components in content libraries and may not be appropriate for other learning
 contexts so they are implemented here in the library API only.  In the future,
 if we find a need for these in most other learning contexts then those methods
 could be promoted to the core XBlock API and made generic.
-
-Import from Courseware
-----------------------
-
-Content Libraries can import blocks from Courseware (Modulestore).  The import
-can be done per-course, by listing its content, and supports both access to
-remote platform instances as well as local modulestore APIs.  Additionally,
-there are Celery-based interfaces suitable for background processing controlled
-through RESTful APIs (see :mod:`.views`).
 """
 from __future__ import annotations
 
-import abc
-import collections
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field as dataclass_field
 from datetime import datetime, timezone
-import base64
-import hashlib
 import logging
 import mimetypes
-
-import requests
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, AnonymousUser, Group
@@ -68,15 +53,12 @@ from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
 from django.db.models import Q, QuerySet
 from django.utils.translation import gettext as _
-from edx_rest_api_client.client import OAuthAPIClient
 from django.urls import reverse
 from lxml import etree
-from opaque_keys.edx.keys import BlockTypeKey, UsageKey, UsageKeyV2
+from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import (
     LibraryLocatorV2,
     LibraryUsageLocatorV2,
-    LibraryLocator as LibraryLocatorV1,
-    LibraryCollectionLocator,
 )
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
@@ -98,12 +80,10 @@ from openedx_events.content_authoring.signals import (
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
-    Collection,
     Component,
     ComponentVersion,
     MediaType,
     LearningPackage,
-    PublishableEntity,
 )
 from organizations.models import Organization
 from xblock.core import XBlock
@@ -114,14 +94,12 @@ from openedx.core.djangoapps.xblock.api import (
     get_xblock_app_config,
     xblock_type_display_name,
 )
-from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.types import User as UserType
-from xmodule.modulestore.django import modulestore
 
-from .. import permissions, tasks
+from .. import permissions
 from ..constants import ALL_RIGHTS_RESERVED
-from ..models import ContentLibrary, ContentLibraryPermission, ContentLibraryBlockImportTask
+from ..models import ContentLibrary, ContentLibraryPermission
 
 log = logging.getLogger(__name__)
 
@@ -129,10 +107,8 @@ log = logging.getLogger(__name__)
 __all__ = [
     # Exceptions - maybe move them to a new file?
     "ContentLibraryNotFound",
-    "ContentLibraryCollectionNotFound",
     "ContentLibraryBlockNotFound",
     "LibraryAlreadyExists",
-    "LibraryCollectionAlreadyExists",
     "LibraryBlockAlreadyExists",
     "BlockLimitReachedError",
     "IncompatibleTypesError",
@@ -160,17 +136,6 @@ __all__ = [
     "get_allowed_block_types",
     "publish_changes",
     "revert_changes",
-    # Collections - TODO: move to a new file
-    "create_library_collection",
-    "update_library_collection",
-    "update_library_collection_components",
-    "set_library_component_collections",
-    "get_library_collection_usage_key",
-    "get_library_collection_from_usage_key",
-    # Import - TODO: move to a new file
-    "EdxModulestoreImportClient",
-    "EdxApiImportClient",
-    "import_blocks_create_task",
 ]
 
 
@@ -180,8 +145,6 @@ __all__ = [
 
 ContentLibraryNotFound = ContentLibrary.DoesNotExist
 
-ContentLibraryCollectionNotFound = Collection.DoesNotExist
-
 
 class ContentLibraryBlockNotFound(XBlockNotFoundError):
     """ XBlock not found in the content library """
@@ -189,10 +152,6 @@ class ContentLibraryBlockNotFound(XBlockNotFoundError):
 
 class LibraryAlreadyExists(KeyError):
     """ A library with the specified slug already exists """
-
-
-class LibraryCollectionAlreadyExists(IntegrityError):
-    """ A Collection with that key already exists in the library """
 
 
 class LibraryBlockAlreadyExists(KeyError):
@@ -304,7 +263,7 @@ class PublishableItem(LibraryItem):
     # The username of the user who created the last draft.
     last_draft_created_by: str = ""
     has_unpublished_changes: bool = False
-    collections: list[CollectionMetadata] = field(default_factory=list)
+    collections: list[CollectionMetadata] = dataclass_field(default_factory=list)
     can_stand_alone: bool = True
 
 
@@ -1556,536 +1515,3 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
                 changes=["collections"],
             ),
         )
-
-
-def create_library_collection(
-    library_key: LibraryLocatorV2,
-    collection_key: str,
-    title: str,
-    *,
-    description: str = "",
-    created_by: int | None = None,
-    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
-    content_library: ContentLibrary | None = None,
-) -> Collection:
-    """
-    Creates a Collection in the given ContentLibrary.
-
-    If you've already fetched a ContentLibrary for the given library_key, pass it in here to avoid refetching.
-    """
-    if not content_library:
-        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    assert content_library
-    assert content_library.learning_package_id
-    assert content_library.library_key == library_key
-
-    try:
-        collection = authoring_api.create_collection(
-            learning_package_id=content_library.learning_package_id,
-            key=collection_key,
-            title=title,
-            description=description,
-            created_by=created_by,
-        )
-    except IntegrityError as err:
-        raise LibraryCollectionAlreadyExists from err
-
-    return collection
-
-
-def update_library_collection(
-    library_key: LibraryLocatorV2,
-    collection_key: str,
-    *,
-    title: str | None = None,
-    description: str | None = None,
-    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
-    content_library: ContentLibrary | None = None,
-) -> Collection:
-    """
-    Updates a Collection in the given ContentLibrary.
-    """
-    if not content_library:
-        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    assert content_library
-    assert content_library.learning_package_id
-    assert content_library.library_key == library_key
-
-    try:
-        collection = authoring_api.update_collection(
-            learning_package_id=content_library.learning_package_id,
-            key=collection_key,
-            title=title,
-            description=description,
-        )
-    except Collection.DoesNotExist as exc:
-        raise ContentLibraryCollectionNotFound from exc
-
-    return collection
-
-
-def update_library_collection_components(
-    library_key: LibraryLocatorV2,
-    collection_key: str,
-    *,
-    usage_keys: list[UsageKeyV2],
-    created_by: int | None = None,
-    remove=False,
-    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
-    content_library: ContentLibrary | None = None,
-) -> Collection:
-    """
-    Associates the Collection with Components for the given UsageKeys.
-
-    By default the Components are added to the Collection.
-    If remove=True, the Components are removed from the Collection.
-
-    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
-
-    Raises:
-    * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
-    * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
-
-    Returns the updated Collection.
-    """
-    if not content_library:
-        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    assert content_library
-    assert content_library.learning_package_id
-    assert content_library.library_key == library_key
-
-    # Fetch the Component.key values for the provided UsageKeys.
-    component_keys = []
-    for usage_key in usage_keys:
-        # Parse the block_family from the key to use as namespace.
-        block_type = BlockTypeKey.from_string(str(usage_key))
-
-        try:
-            component = authoring_api.get_component_by_key(
-                content_library.learning_package_id,
-                namespace=block_type.block_family,
-                type_name=usage_key.block_type,
-                local_key=usage_key.block_id,
-            )
-        except Component.DoesNotExist as exc:
-            raise ContentLibraryBlockNotFound(usage_key) from exc
-
-        component_keys.append(component.key)
-
-    # Note: Component.key matches its PublishableEntity.key
-    entities_qset = PublishableEntity.objects.filter(
-        key__in=component_keys,
-    )
-
-    if remove:
-        collection = authoring_api.remove_from_collection(
-            content_library.learning_package_id,
-            collection_key,
-            entities_qset,
-        )
-    else:
-        collection = authoring_api.add_to_collection(
-            content_library.learning_package_id,
-            collection_key,
-            entities_qset,
-            created_by=created_by,
-        )
-
-    return collection
-
-
-def set_library_component_collections(
-    library_key: LibraryLocatorV2,
-    component: Component,
-    *,
-    collection_keys: list[str],
-    created_by: int | None = None,
-    # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
-    content_library: ContentLibrary | None = None,
-) -> Component:
-    """
-    It Associates the component with collections for the given collection keys.
-
-    Only collections in queryset are associated with component, all previous component-collections
-    associations are removed.
-
-    If you've already fetched the ContentLibrary, pass it in to avoid refetching.
-
-    Raises:
-    * ContentLibraryCollectionNotFound if any of the given collection_keys don't match Collections in the given library.
-
-    Returns the updated Component.
-    """
-    if not content_library:
-        content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    assert content_library
-    assert content_library.learning_package_id
-    assert content_library.library_key == library_key
-
-    # Note: Component.key matches its PublishableEntity.key
-    collection_qs = authoring_api.get_collections(content_library.learning_package_id).filter(
-        key__in=collection_keys
-    )
-
-    affected_collections = authoring_api.set_collections(
-        content_library.learning_package_id,
-        component,
-        collection_qs,
-        created_by=created_by,
-    )
-
-    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
-    # collection indexing asynchronously.
-    for collection in affected_collections:
-        LIBRARY_COLLECTION_UPDATED.send_event(
-            library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
-                background=True,
-            )
-        )
-
-    return component
-
-
-def get_library_collection_usage_key(
-    library_key: LibraryLocatorV2,
-    collection_key: str,
-) -> LibraryCollectionLocator:
-    """
-    Returns the LibraryCollectionLocator associated to a collection
-    """
-
-    return LibraryCollectionLocator(library_key, collection_key)
-
-
-def get_library_collection_from_usage_key(
-    collection_usage_key: LibraryCollectionLocator,
-) -> Collection:
-    """
-    Return a Collection using the LibraryCollectionLocator
-    """
-
-    library_key = collection_usage_key.library_key
-    collection_key = collection_usage_key.collection_id
-    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    assert content_library.learning_package_id is not None  # shouldn't happen but it's technically possible.
-    try:
-        return authoring_api.get_collection(
-            content_library.learning_package_id,
-            collection_key,
-        )
-    except Collection.DoesNotExist as exc:
-        raise ContentLibraryCollectionNotFound from exc
-
-
-# Import from Courseware
-# ======================
-
-
-class BaseEdxImportClient(abc.ABC):
-    """
-    Base class for all courseware import clients.
-
-    Import clients are wrappers tailored to implement the steps used in the
-    import APIs and can leverage different backends.  It is not aimed towards
-    being a generic API client for Open edX.
-    """
-
-    EXPORTABLE_BLOCK_TYPES = {
-        "drag-and-drop-v2",
-        "problem",
-        "html",
-        "video",
-    }
-
-    def __init__(self, library_key=None, library=None, use_course_key_as_block_id_suffix=True):
-        """
-        Initialize an import client for a library.
-
-        The method accepts either a library object or a key to a library object.
-        """
-        self.use_course_key_as_block_id_suffix = use_course_key_as_block_id_suffix
-        if bool(library_key) == bool(library):
-            raise ValueError('Provide at least one of `library_key` or '
-                             '`library`, but not both.')
-        if library is None:
-            library = ContentLibrary.objects.get_by_key(library_key)
-        self.library = library
-
-    @abc.abstractmethod
-    def get_block_data(self, block_key):
-        """
-        Get the block's OLX and static files, if any.
-        """
-
-    @abc.abstractmethod
-    def get_export_keys(self, course_key):
-        """
-        Get all exportable block keys of a given course.
-        """
-
-    @abc.abstractmethod
-    def get_block_static_data(self, asset_file):
-        """
-        Get the contents of an asset_file..
-        """
-
-    def import_block(self, modulestore_key):
-        """
-        Import a single modulestore block.
-        """
-        block_data = self.get_block_data(modulestore_key)
-
-        # Get or create the block in the library.
-        #
-        # To dedup blocks from different courses with the same ID, we hash the
-        # course key into the imported block id.
-
-        course_key_id = base64.b32encode(
-            hashlib.blake2s(
-                str(modulestore_key.course_key).encode()
-            ).digest()
-        )[:16].decode().lower()
-
-        # add the course_key_id if use_course_key_as_suffix is enabled to increase the namespace.
-        # The option exists to not use the course key as a suffix because
-        # in order to preserve learner state in the v1 to v2 libraries migration,
-        # the v2 and v1 libraries' child block ids must be the same.
-        block_id = (
-            # Prepend 'c' to allow changing hash without conflicts.
-            f"{modulestore_key.block_id}_c{course_key_id}"
-            if self.use_course_key_as_block_id_suffix
-            else f"{modulestore_key.block_id}"
-        )
-
-        log.info('Importing to library block: id=%s', block_id)
-        try:
-            library_block = create_library_block(
-                self.library.library_key,
-                modulestore_key.block_type,
-                block_id,
-            )
-            dest_key = library_block.usage_key
-        except LibraryBlockAlreadyExists:
-            dest_key = LibraryUsageLocatorV2(
-                lib_key=self.library.library_key,
-                block_type=modulestore_key.block_type,
-                usage_id=block_id,
-            )
-            get_library_block(dest_key)
-            log.warning('Library block already exists: Appending static files '
-                        'and overwriting OLX: %s', str(dest_key))
-
-        # Handle static files.
-
-        files = [
-            f.path for f in
-            get_library_block_static_asset_files(dest_key)
-        ]
-        for filename, static_file in block_data.get('static_files', {}).items():
-            if filename in files:
-                # Files already added, move on.
-                continue
-            file_content = self.get_block_static_data(static_file)
-            add_library_block_static_asset_file(dest_key, filename, file_content)
-            files.append(filename)
-
-        # Import OLX.
-
-        set_library_block_olx(dest_key, block_data['olx'])
-
-    def import_blocks_from_course(self, course_key, progress_callback):
-        """
-        Import all eligible blocks from course key.
-
-        Progress is reported through ``progress_callback``, guaranteed to be
-        called within an exception handler if ``exception is not None``.
-        """
-
-        # Query the course and rerieve all course blocks.
-
-        export_keys = self.get_export_keys(course_key)
-        if not export_keys:
-            raise ValueError(f"The courseware course {course_key} does not have "
-                             "any exportable content.  No action taken.")
-
-        # Import each block, skipping the ones that fail.
-
-        for index, block_key in enumerate(export_keys):
-            try:
-                log.info('Importing block: %s/%s: %s', index + 1, len(export_keys), block_key)
-                self.import_block(block_key)
-            except Exception as exc:  # pylint: disable=broad-except
-                log.exception("Error importing block: %s", block_key)
-                progress_callback(block_key, index + 1, len(export_keys), exc)
-            else:
-                log.info('Successfully imported: %s/%s: %s', index + 1, len(export_keys), block_key)
-                progress_callback(block_key, index + 1, len(export_keys), None)
-
-        log.info("Publishing library: %s", self.library.library_key)
-        publish_changes(self.library.library_key)
-
-
-class EdxModulestoreImportClient(BaseEdxImportClient):
-    """
-    An import client based on the local instance of modulestore.
-    """
-
-    def __init__(self, modulestore_instance=None, **kwargs):
-        """
-        Initialize the client with a modulestore instance.
-        """
-        super().__init__(**kwargs)
-        self.modulestore = modulestore_instance or modulestore()
-
-    def get_block_data(self, block_key):
-        """
-        Get block OLX by serializing it from modulestore directly.
-        """
-        block = self.modulestore.get_item(block_key)
-        data = serialize_modulestore_block_for_learning_core(block)
-        return {'olx': data.olx_str,
-                'static_files': {s.name: s for s in data.static_files}}
-
-    def get_export_keys(self, course_key):
-        """
-        Retrieve the course from modulestore and traverse its content tree.
-        """
-        course = self.modulestore.get_course(course_key)
-        if isinstance(course_key, LibraryLocatorV1):
-            course = self.modulestore.get_library(course_key)
-        export_keys = set()
-        blocks_q = collections.deque(course.get_children())
-        while blocks_q:
-            block = blocks_q.popleft()
-            usage_id = block.scope_ids.usage_id
-            if usage_id in export_keys:
-                continue
-            if usage_id.block_type in self.EXPORTABLE_BLOCK_TYPES:
-                export_keys.add(usage_id)
-            if block.has_children:
-                blocks_q.extend(block.get_children())
-        return list(export_keys)
-
-    def get_block_static_data(self, asset_file):
-        """
-        Get static content from its URL if available, otherwise from its data.
-        """
-        if asset_file.data:
-            return asset_file.data
-        resp = requests.get(f"http://{settings.CMS_BASE}" + asset_file.url)
-        resp.raise_for_status()
-        return resp.content
-
-
-class EdxApiImportClient(BaseEdxImportClient):
-    """
-    An import client based on a remote Open Edx API interface.
-
-    TODO: Look over this class. We'll probably need to completely re-implement
-    the import process.
-    """
-
-    URL_COURSES = "/api/courses/v1/courses/{course_key}"
-
-    URL_MODULESTORE_BLOCK_OLX = "/api/olx-export/v1/xblock/{block_key}/"
-
-    def __init__(self, lms_url, studio_url, oauth_key, oauth_secret, *args, **kwargs):
-        """
-        Initialize the API client with URLs and OAuth keys.
-        """
-        super().__init__(**kwargs)
-        self.lms_url = lms_url
-        self.studio_url = studio_url
-        self.oauth_client = OAuthAPIClient(
-            self.lms_url,
-            oauth_key,
-            oauth_secret,
-        )
-
-    def get_block_data(self, block_key):
-        """
-        See parent's docstring.
-        """
-        olx_path = self.URL_MODULESTORE_BLOCK_OLX.format(block_key=block_key)
-        resp = self._get(self.studio_url + olx_path)
-        return resp['blocks'][str(block_key)]
-
-    def get_export_keys(self, course_key):
-        """
-        See parent's docstring.
-        """
-        course_blocks_url = self._get_course(course_key)['blocks_url']
-        course_blocks = self._get(
-            course_blocks_url,
-            params={'all_blocks': True, 'depth': 'all'})['blocks']
-        export_keys = []
-        for block_info in course_blocks.values():
-            if block_info['type'] in self.EXPORTABLE_BLOCK_TYPES:
-                export_keys.append(UsageKey.from_string(block_info['id']))
-        return export_keys
-
-    def get_block_static_data(self, asset_file):
-        """
-        See parent's docstring.
-        """
-        if (asset_file['url'].startswith(self.studio_url)
-                and 'export-file' in asset_file['url']):
-            # We must call download this file with authentication. But
-            # we only want to pass the auth headers if this is the same
-            # studio instance, or else we could leak credentials to a
-            # third party.
-            path = asset_file['url'][len(self.studio_url):]
-            resp = self._call('get', path)
-        else:
-            resp = requests.get(asset_file['url'])
-            resp.raise_for_status()
-        return resp.content
-
-    def _get(self, *args, **kwargs):
-        """
-        Perform a get request to the client.
-        """
-        return self._json_call('get', *args, **kwargs)
-
-    def _get_course(self, course_key):
-        """
-        Request details for a course.
-        """
-        course_url = self.lms_url + self.URL_COURSES.format(course_key=course_key)
-        return self._get(course_url)
-
-    def _json_call(self, method, *args, **kwargs):
-        """
-        Wrapper around request calls that ensures valid json responses.
-        """
-        return self._call(method, *args, **kwargs).json()
-
-    def _call(self, method, *args, **kwargs):
-        """
-        Wrapper around request calls.
-        """
-        response = getattr(self.oauth_client, method)(*args, **kwargs)
-        response.raise_for_status()
-        return response
-
-
-def import_blocks_create_task(library_key, course_key, use_course_key_as_block_id_suffix=True):
-    """
-    Create a new import block task.
-
-    This API will schedule a celery task to perform the import, and it returns a
-    import task object for polling.
-    """
-    library = ContentLibrary.objects.get_by_key(library_key)
-    import_task = ContentLibraryBlockImportTask.objects.create(
-        library=library,
-        course_id=course_key,
-    )
-    result = tasks.import_blocks_from_course.apply_async(
-        args=(import_task.pk, str(course_key), use_course_key_as_block_id_suffix)
-    )
-    log.info(f"Import block task created: import_task={import_task} "
-             f"celery_task={result.id}")
-    return import_task
