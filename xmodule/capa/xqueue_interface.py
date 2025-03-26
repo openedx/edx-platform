@@ -32,8 +32,20 @@ def is_flag_active(flag_name, course_id):
     Look for the waffle flag by name and course_id.
     """
     from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel as waffle
-    flag = waffle.objects.filter(waffle_flag=flag_name, course_id=course_id, enabled=True).first()
-    return flag and flag.enabled
+    overrides = waffle.objects.filter(
+        waffle_flag=flag_name,
+        course_id=course_id
+    ).order_by('-change_date')
+
+    latest = overrides.first()
+
+    if latest and overrides.count() > 1:
+        overrides.exclude(id=latest.id).delete()
+
+    if latest and latest.enabled and latest.override_choice:
+        return True
+
+    return False
 
 
 def make_hashkey(seed):
