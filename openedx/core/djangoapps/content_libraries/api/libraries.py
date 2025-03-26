@@ -911,7 +911,7 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 library_key=usage_key.lib_key,
-                container_key=container.container_pk,
+                container_key=str(container.container_key),
                 background=True,
             )
         )
@@ -1252,7 +1252,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 library_key=library_key,
-                container_key=container.container_pk,
+                container_key=str(container.container_key),
                 background=True,
             )
         )

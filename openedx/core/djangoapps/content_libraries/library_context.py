@@ -126,7 +126,7 @@ class LibraryContextImpl(LearningContext):
             LIBRARY_CONTAINER_UPDATED.send_event(
                 library_container=LibraryContainerData(
                     library_key=usage_key.lib_key,
-                    container_key=container.container_pk,
+                    container_key=str(container.container_key),
                     background=True,
                 )
             )
