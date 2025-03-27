@@ -307,4 +307,3 @@ def sort_course_sections(course_key, data):
     data['LinkCheckOutput']['sections'] = sorted_sections
 
     return data
-
