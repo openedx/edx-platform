@@ -59,7 +59,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import LazySequence
-from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.cache_utils import request_cached, zpickle
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_duration_limits.access import AuditExpiredError
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
@@ -794,7 +794,7 @@ def get_assignments_grades(user, course_id, cache_timeout):
             collected_block_structure = get_block_structure_manager(course_id).get_collected()
 
             total_bytes_in_one_mb = 1024 * 1024
-            data_size_in_mbs = round(len(collected_block_structure) / total_bytes_in_one_mb, 2)
+            data_size_in_mbs = round(len(zpickle(collected_block_structure)) / total_bytes_in_one_mb, 2)
             if data_size_in_mbs < total_bytes_in_one_mb * 2:
                 cache.set(cache_key, collected_block_structure, cache_timeout)
             else:
