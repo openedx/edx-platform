@@ -213,6 +213,24 @@ class DateSummary:
         """
         return self.date_html(date_format='shortTime')
 
+    @property
+    def is_relative(self):
+        """
+        Returns whether the date is relative or not.
+        """
+        return (
+            self.course.self_paced
+            and RELATIVE_DATES_FLAG.is_enabled(self.course_id)
+            and bool(self.course.relative_weeks_due)
+        )
+
+    @property
+    def location(self):
+        """
+        Returns the location of the block.
+        """
+        return str(self.course_id)
+
     def __repr__(self):
         return 'DateSummary: "{title}" {date} is_enabled={is_enabled}'.format(
             title=self.title,
@@ -343,6 +361,7 @@ class CourseAssignmentDate(DateSummary):
         self.complete = None
         self.past_due = None
         self._extra_info = None
+        self._location = ''
 
     @property
     def date(self):
@@ -383,6 +402,14 @@ class CourseAssignmentDate(DateSummary):
                 '<a href="{assignment_link}">{assignment_title}</a>'
             ).format(assignment_link=link, assignment_title=title)
         self.assignment_title = title
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, location):
+        self._location = str(location)
 
 
 class CourseExpiredDate(DateSummary):

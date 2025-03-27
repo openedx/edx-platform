@@ -551,6 +551,7 @@ def get_course_assignment_date_blocks(course, user, request, num_return=None,
         date_block.link = _get_absolute_url(request, assignment.url)
         date_block.set_title(assignment.title, link=assignment.url)
         date_block._extra_info = assignment.extra_info  # pylint: disable=protected-access
+        date_block._location = assignment.block_key  # pylint: disable=protected-access
         date_blocks.append(date_block)
     date_blocks = sorted((b for b in date_blocks if b.is_enabled or include_past_dates), key=date_block_key_fn)
     if num_return:

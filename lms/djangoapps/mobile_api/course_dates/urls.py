@@ -3,14 +3,10 @@ URLs for course_dates API
 """
 
 from django.conf import settings
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from django.urls import re_path
 
-from .views import AllCourseDatesViewSet
-
-router = DefaultRouter()
-router.register(rf"^{settings.USERNAME_PATTERN}", AllCourseDatesViewSet, basename="course-dates")
+from .views import AllCourseDatesAPIView
 
 urlpatterns = [
-    path("", include(router.urls)),
+    re_path(rf"^{settings.USERNAME_PATTERN}", AllCourseDatesAPIView.as_view(), name="all-course-dates"),
 ]
