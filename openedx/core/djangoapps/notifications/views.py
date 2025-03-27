@@ -537,6 +537,11 @@ class UpdateAllNotificationPreferencesView(APIView):
                             'course_id': str(preference.course_id),
                             'error': str(e)
                         })
+                if channel == 'email' and value:
+                    UserPreference.objects.filter(
+                        user_id=request.user,
+                        key=ONE_CLICK_EMAIL_UNSUB_KEY
+                    ).delete()
                 response_data = {
                     'status': 'success' if updated_courses else 'partial_success' if errors else 'error',
                     'message': 'Notification preferences update completed',
