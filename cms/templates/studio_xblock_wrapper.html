@@ -47,17 +47,14 @@ upstream_info = UpstreamLink.try_get_for_block(xblock)
         ${bool(block_is_unit) | n, dump_js_escaped_json},  // block_is_unit will be None or a boolean
         $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
     );
-</script>
-
-<%static:webpack entry="js/factories/tag_count">
     TagCountFactory({
-        tags_count: "${tags_count | n, js_escaped_string}",
-        content_id: "${xblock.location | n, js_escaped_string}",
-        course_authoring_url: "${course_authoring_url | n, js_escaped_string}",
-    },
+            tags_count: "${tags_count | n, js_escaped_string}",
+            content_id: "${xblock.location | n, js_escaped_string}",
+            course_authoring_url: "${course_authoring_url | n, js_escaped_string}",
+        },
         $('li.tag-count[data-locator="${xblock.location | n, js_escaped_string}"]')
     );
-</%static:webpack>
+</script>
 
 % if not is_root:
     % if is_reorderable:
