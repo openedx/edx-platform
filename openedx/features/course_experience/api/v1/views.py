@@ -16,6 +16,7 @@ from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthenticat
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 
+from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.courseware.courses import get_course_with_access
 
@@ -80,12 +81,11 @@ def reset_course_deadlines(request):
     JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser,
 ))
 @permission_classes((IsAuthenticated,))
-def reset_multiple_course_deadlines(request):
+def reset_all_relative_course_deadlines(request):
     """
-    Set the start_date of a schedule to today for multiple courses
+    Set the start_date of a schedule to today for all enrolled courses
 
     Request Parameters:
-        course_keys: list of course keys
         research_event_data: any data that should be included in the research tracking event
             Example: sending the location of where the reset deadlines banner (i.e. outline-tab)
 
@@ -93,11 +93,8 @@ def reset_multiple_course_deadlines(request):
         success_course_keys: list of course keys for which deadlines were successfully reset
         failed_course_keys: list of course keys for which deadlines could not be reset
     """
-    course_keys = request.data.get('course_keys', [])
     research_event_data = request.data.get('research_event_data', {})
-
-    if not course_keys:
-        raise ParseError(_("'course_keys' is required."))
+    course_keys = CourseEnrollment.enrollments_for_user(request.user).select_related("course").values_list("course_id", flat=True)
 
     failed_course_keys = []
     succes_course_keys = []
@@ -105,10 +102,10 @@ def reset_multiple_course_deadlines(request):
     for course_key in course_keys:
         try:
             reset_deadlines_for_course(request, course_key, research_event_data)
-            succes_course_keys.append(course_key)
+            succes_course_keys.append(str(course_key))
         except Exception:  # pylint: disable=broad-exception-caught
             log.exception(f'Error occurred while trying to reset deadlines for course {course_key}!')
-            failed_course_keys.append(course_key)
+            failed_course_keys.append(str(course_key))
             continue
 
     return Response({
