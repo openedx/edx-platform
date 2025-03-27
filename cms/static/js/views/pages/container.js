@@ -272,13 +272,15 @@ function($, _, Backbone, gettext, BasePage,
 
         renderAddXBlockComponents: function() {
             var self = this;
-            if (self.options.canEdit && !self.options.isIframeEmbed) {
+            var isSplitTest = self.model.attributes.category == 'split_test';
+            if (self.options.canEdit && (!self.options.isIframeEmbed || isSplitTest)) {
                 this.$('.add-xblock-component').each(function(index, element) {
                     var component = new AddXBlockComponent({
                         el: element,
                         createComponent: _.bind(self.createComponent, self),
                         collection: self.options.templates,
                         libraryContentPickerUrl: self.options.libraryContentPickerUrl,
+                        isIframeEmbed: self.options.isIframeEmbed,
                     });
                     component.render();
                 });

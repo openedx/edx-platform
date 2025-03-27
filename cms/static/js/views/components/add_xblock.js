@@ -45,6 +45,20 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Add
             var type;
             event.preventDefault();
             event.stopPropagation();
+
+            try {
+                if (this.options.isIframeEmbed) {
+                    window.parent.postMessage(
+                        {
+                            type: 'showComponentTemplates',
+                            payload: {}
+                        }, document.referrer
+                    );
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
             type = $(event.currentTarget).data('type');
             this.$('.new-component').slideUp(250);
             this.$('.new-component-' + type).slideDown(250);
@@ -68,6 +82,19 @@ function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, Add
                 oldOffset = ViewUtils.getScrollOffset(this.$el);
             event.preventDefault();
             this.closeNewComponent(event);
+
+            try {
+                if (this.options.isIframeEmbed) {
+                    window.parent.postMessage(
+                        {
+                            type: 'createNewComponent',
+                            payload: {}
+                        }, document.referrer
+                    );
+                }
+            } catch (e) {
+                console.error(e);
+            }
 
             if (saveData.type === 'library_v2') {
                 var modal = new AddLibraryContent();
