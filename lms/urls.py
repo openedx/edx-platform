@@ -50,6 +50,9 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.features.enterprise_support.api import enterprise_enabled
+from django.contrib import admin
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -1046,4 +1049,10 @@ urlpatterns += [
 
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
+]
+
+# studio-content-api specific API docs (using drf-spectacular and openapi-v3)
+urlpatterns += [
+    re_path('^lms-api/ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    re_path('^lms-api/schema/', SpectacularAPIView.as_view(), name='schema'),
 ]
