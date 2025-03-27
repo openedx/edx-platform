@@ -217,12 +217,12 @@ class TestSearchApi(ModuleStoreTestCase):
                 title="Unit 1",
                 user_id=None,
             )
-            self.unit_usage_key = "lct:org1:lib:unit:unit-1"
+            self.unit_key = "lct:org1:lib:unit:unit-1"
         self.unit_dict = {
             "id": "lctorg1libunitunit-1-e4527f7c",
             "block_id": "unit-1",
             "block_type": "unit",
-            "usage_key": self.unit_usage_key,
+            "usage_key": self.unit_key,
             "type": "library_container",
             "display_name": "Unit 1",
             # description is not set for containers
