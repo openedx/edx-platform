@@ -78,7 +78,7 @@ urlpatterns = [
         ])),
         # Containers are Sections, Subsections, and Units
         path('containers/<lib_container_key:container_key>/', include([
-            # Get metadata about a specific container in this library, or delete the container:
+            # Get metadata about a specific container in this library, update or delete the container:
             path('', containers.LibraryContainerView.as_view()),
             # Update collections for a given container
             # path('collections/', views.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),

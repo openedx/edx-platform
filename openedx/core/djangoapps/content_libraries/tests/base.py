@@ -363,3 +363,12 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
     def _get_container(self, container_key: str, expect_response=200):
         """ Get a container (unit etc.) """
         return self._api('get', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)
+
+    def _update_container(self, container_key: str, display_name: str, expect_response=200):
+        """ Update a container (unit etc.) """
+        data = {"display_name": display_name}
+        return self._api('patch', URL_LIB_CONTAINER.format(container_key=container_key), data, expect_response)
+
+    def _delete_container(self, container_key: str, expect_response=204):
+        """ Delete a container (unit etc.) """
+        return self._api('delete', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)

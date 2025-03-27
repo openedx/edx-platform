@@ -16,22 +16,31 @@ from opaque_keys.edx.locator import (
 from openedx_events.content_authoring.data import LibraryContainerData
 from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_CREATED,
+    LIBRARY_CONTAINER_DELETED,
+    LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api import authoring_models
+from openedx_learning.api.authoring_models import Container
 
 from ..models import ContentLibrary
 from .libraries import PublishableItem
 
+
 # The public API is only the following symbols:
 __all__ = [
+    "ContentLibraryContainerNotFound",
     "ContainerMetadata",
     "ContainerType",
     "get_container",
     "create_container",
     "get_container_children",
     "library_container_locator",
+    "update_container",
+    "delete_container",
 ]
+
+
+ContentLibraryContainerNotFound = Container.DoesNotExist
 
 
 class ContainerType(Enum):
@@ -47,7 +56,7 @@ class ContainerMetadata(PublishableItem):
     container_type: ContainerType
 
     @classmethod
-    def from_container(cls, library_key, container: authoring_models.Container, associated_collections=None):
+    def from_container(cls, library_key, container: Container, associated_collections=None):
         """
         Construct a ContainerMetadata object from a Container object.
         """
@@ -89,7 +98,7 @@ class ContainerMetadata(PublishableItem):
 
 def library_container_locator(
     library_key: LibraryLocatorV2,
-    container: authoring_models.Container,
+    container: Container,
 ) -> LibraryContainerLocator:
     """
     Returns a LibraryContainerLocator for the given library + container.
@@ -106,9 +115,11 @@ def library_container_locator(
     )
 
 
-def get_container(container_key: LibraryContainerLocator) -> ContainerMetadata:
+def _get_container(container_key: LibraryContainerLocator) -> Container:
     """
-    Get a container (a Section, Subsection, or Unit).
+    Internal method to fetch the Container object from its LibraryContainerLocator
+
+    Raises ContentLibraryContainerNotFound if no container found, or if the container has been soft deleted.
     """
     assert isinstance(container_key, LibraryContainerLocator)
     content_library = ContentLibrary.objects.get_by_key(container_key.library_key)
@@ -118,6 +129,16 @@ def get_container(container_key: LibraryContainerLocator) -> ContainerMetadata:
         learning_package.id,
         key=container_key.container_id,
     )
+    if container and container.versioning.draft:
+        return container
+    raise ContentLibraryContainerNotFound
+
+
+def get_container(container_key: LibraryContainerLocator) -> ContainerMetadata:
+    """
+    Get a container (a Section, Subsection, or Unit).
+    """
+    container = _get_container(container_key)
     container_meta = ContainerMetadata.from_container(container_key.library_key, container)
     assert container_meta.container_type.value == container_key.container_type
     return container_meta
@@ -168,6 +189,60 @@ def create_container(
     )
 
     return ContainerMetadata.from_container(library_key, container)
+
+
+def update_container(
+    container_key: LibraryContainerLocator,
+    display_name: str,
+    user_id: int | None,
+) -> ContainerMetadata:
+    """
+    Update a container (e.g. a Unit) title.
+    """
+    container = _get_container(container_key)
+    library_key = container_key.library_key
+
+    assert container.unit
+    unit_version = authoring_api.create_next_unit_version(
+        container.unit,
+        title=display_name,
+        created=datetime.now(),
+        created_by=user_id,
+    )
+
+    LIBRARY_CONTAINER_UPDATED.send_event(
+        library_container=LibraryContainerData(
+            library_key=library_key,
+            container_key=str(container_key),
+        )
+    )
+
+    return ContainerMetadata.from_container(library_key, unit_version.container)
+
+
+def delete_container(
+    container_key: LibraryContainerLocator,
+) -> None:
+    """
+    Delete a container (e.g. a Unit) (soft delete).
+
+    No-op if container doesn't exist or has already been soft-deleted.
+    """
+    try:
+        container = _get_container(container_key)
+    except ContentLibraryContainerNotFound:
+        return
+
+    authoring_api.soft_delete_draft(container.pk)
+
+    LIBRARY_CONTAINER_DELETED.send_event(
+        library_container=LibraryContainerData(
+            library_key=container_key.library_key,
+            container_key=str(container_key),
+        )
+    )
+
+    # TODO: trigger a LIBRARY_COLLECTION_UPDATED for each collection the container was in
 
 
 def get_container_children(

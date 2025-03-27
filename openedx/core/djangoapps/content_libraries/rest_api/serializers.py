@@ -270,6 +270,13 @@ class LibraryContainerMetadataSerializer(serializers.Serializer):
         return result
 
 
+class LibraryContainerUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for updating metadata for Containers like Sections, Subsections, Units
+    """
+    display_name = serializers.CharField()
+
+
 class ContentLibraryBlockImportTaskSerializer(serializers.ModelSerializer):
     """
     Serializer for a Content Library block import task.

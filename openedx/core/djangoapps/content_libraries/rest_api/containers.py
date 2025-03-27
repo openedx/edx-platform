@@ -14,6 +14,7 @@ from drf_yasg.utils import swagger_auto_schema
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryContainerLocator
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.status import HTTP_204_NO_CONTENT
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -62,7 +63,7 @@ class LibraryContainersView(GenericAPIView):
 @view_auth_classes()
 class LibraryContainerView(GenericAPIView):
     """
-    View to get data about a specific container (a section, subsection, or unit)
+    View to retrieve or update data about a specific container (a section, subsection, or unit)
     """
     serializer_class = serializers.LibraryContainerMetadataSerializer
 
@@ -81,3 +82,45 @@ class LibraryContainerView(GenericAPIView):
         )
         container = api.get_container(container_key)
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)
+
+    @convert_exceptions
+    @swagger_auto_schema(
+        request_body=serializers.LibraryContainerUpdateSerializer,
+        responses={200: serializers.LibraryContainerMetadataSerializer}
+    )
+    def patch(self, request, container_key: LibraryContainerLocator):
+        """
+        Update a Container.
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+        serializer = serializers.LibraryContainerUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        container = api.update_container(
+            container_key,
+            display_name=serializer.validated_data['display_name'],
+            user_id=request.user.id,
+        )
+
+        return Response(serializers.LibraryContainerMetadataSerializer(container).data)
+
+    @convert_exceptions
+    def delete(self, request, container_key: LibraryContainerLocator):
+        """
+        Delete a Container (soft delete).
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+
+        api.delete_container(
+            container_key,
+        )
+
+        return Response({}, status=HTTP_204_NO_CONTENT)
