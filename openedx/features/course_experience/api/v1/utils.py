@@ -3,7 +3,6 @@
 Course Experience API utilities.
 """
 from eventtracking import tracker
-from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
@@ -24,7 +23,6 @@ def reset_deadlines_for_course(request, course_key, research_event_data={}):  # 
             Example: sending the location of where the reset deadlines banner (i.e. outline-tab)
     """
 
-    course_key = CourseKey.from_string(course_key)
     course_masquerade, user = setup_masquerade(
         request,
         course_key,
