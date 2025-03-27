@@ -80,7 +80,7 @@ class LibraryContainerView(GenericAPIView):
             request.user,
             permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
         )
-        container = api.get_container_metadata(container_key)
+        container = api.get_container(container_key)
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
     @convert_exceptions
