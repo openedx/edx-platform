@@ -183,7 +183,10 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         """
         Test that we can add and get unit children components
         """
+        update_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(update_receiver)
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+        lib_key = LibraryLocatorV2.from_string(lib["id"])
 
         # Create container and add some components
         container_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
@@ -206,6 +209,17 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
             container_data["container_key"],
             children_ids=[problem_block_2["id"], html_block_2["id"]]
         )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    lib_key,
+                    container_key=container_data["container_key"],
+                ),
+            },
+            update_receiver.call_args_list[0].kwargs,
+        )
         data = self._get_container_components(container_data["container_key"])
         # Verify total number of components to be 2 + 2 = 4
         assert len(data) == 4
@@ -218,7 +232,10 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         """
         Test that we can remove unit children components
         """
+        update_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(update_receiver)
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+        lib_key = LibraryLocatorV2.from_string(lib["id"])
 
         # Create container and add some components
         container_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
@@ -241,12 +258,26 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         assert len(data) == 2
         assert data[0]['id'] == html_block['id']
         assert data[1]['id'] == html_block_2['id']
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    lib_key,
+                    container_key=container_data["container_key"],
+                ),
+            },
+            update_receiver.call_args_list[0].kwargs,
+        )
 
     def test_unit_replace_children(self):
         """
         Test that we can completely replace/reorder unit children components.
         """
+        update_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(update_receiver)
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+        lib_key = LibraryLocatorV2.from_string(lib["id"])
 
         # Create container and add some components
         container_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
@@ -288,3 +319,14 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         assert len(data) == 2
         assert data[0]['id'] == new_problem_block['id']
         assert data[1]['id'] == new_html_block['id']
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    lib_key,
+                    container_key=container_data["container_key"],
+                ),
+            },
+            update_receiver.call_args_list[0].kwargs,
+        )
