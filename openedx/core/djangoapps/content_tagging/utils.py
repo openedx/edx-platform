@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from edx_django_utils.cache import RequestCache
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey, LibraryCollectionKey
+from opaque_keys.edx.keys import CourseKey, UsageKey, LibraryItemKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
@@ -28,11 +28,11 @@ def get_content_key_from_string(key_str: str) -> ContentKey:
                 return UsageKey.from_string(key_str)
             except InvalidKeyError:
                 try:
-                    return LibraryCollectionKey.from_string(key_str)
+                    return LibraryItemKey.from_string(key_str)
                 except InvalidKeyError as usage_key_error:
                     raise ValueError(
                         "object_id must be one of the following "
-                        "keys: CourseKey, LibraryLocatorV2, UsageKey or LibCollectionKey"
+                        "keys: CourseKey, LibraryLocatorV2, UsageKey or LibraryItemKey"
                     ) from usage_key_error
 
 
@@ -44,8 +44,8 @@ def get_context_key_from_key(content_key: ContentKey) -> ContextKey:
     if isinstance(content_key, (CourseKey, LibraryLocatorV2)):
         return content_key
 
-    # If the content key is a LibraryCollectionKey, return the LibraryLocatorV2
-    if isinstance(content_key, LibraryCollectionKey):
+    # If the content key is a LibraryItemKey, return the LibraryLocatorV2
+    if isinstance(content_key, LibraryItemKey):
         return content_key.library_key
 
     # If the content key is a UsageKey, return the context key

@@ -4,6 +4,7 @@ Tests for the Studio content search documents (what gets stored in the index)
 from dataclasses import replace
 from datetime import datetime, timezone
 from organizations.models import Organization
+from unittest.mock import patch
 
 from freezegun import freeze_time
 
@@ -14,6 +15,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
+from openedx_learning.api import authoring as authoring_api
+
 try:
     # This import errors in the lms because content.search is not an installed app there.
     from ..documents import (
@@ -22,6 +25,7 @@ try:
         searchable_doc_tags_for_collection,
         searchable_doc_collections,
         searchable_doc_for_collection,
+        searchable_doc_for_container,
         searchable_doc_for_library_block,
     )
     from ..models import SearchAccess
@@ -30,6 +34,7 @@ except RuntimeError:
     searchable_doc_tags = lambda x: x
     searchable_doc_tags_for_collection = lambda x: x
     searchable_doc_for_collection = lambda x: x
+    searchable_doc_for_container = lambda x: x
     searchable_doc_for_library_block = lambda x: x
     SearchAccess = {}
 
@@ -492,6 +497,96 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "published": {
                 "num_children": 1
             }
+        }
+
+    def test_draft_container(self):
+        """
+        Test creating a search document for a draft-only container
+        """
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            container_meta = library_api.create_container(
+                self.library.key,
+                container_type=library_api.ContainerType.Unit,
+                slug="unit1",
+                title="A Unit in the Search Index",
+                user_id=None,
+            )
+
+        doc = searchable_doc_for_container(container_meta.container_key)
+
+        assert doc == {
+            "id": "lctedx2012_fallunitunit1-edd13a0c",
+            "block_id": "unit1",
+            "block_type": "unit",
+            "usage_key": "lct:edX:2012_Fall:unit:unit1",
+            "type": "library_container",
+            "org": "edX",
+            "display_name": "A Unit in the Search Index",
+            # description is not set for containers
+            "num_children": 0,
+            "context_key": "lib:edX:2012_Fall",
+            "access_id": self.library_access_id,
+            "breadcrumbs": [{"display_name": "some content_library"}],
+            "created": 1680674828.0,
+            "publish_status": "never",
+            "modified": 1680674828.0,
+            # "tags" should be here but we haven't implemented them yet
+            # "published" is not set since we haven't published it yet
+        }
+
+    @patch('openedx.core.djangoapps.content_libraries.api.get_container')
+    def test_modified_container(self, mock_get_container):
+        """
+        Test creating a search document for a published container
+        """
+        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(created_date):
+            container_meta = library_api.create_container(
+                self.library.key,
+                container_type=library_api.ContainerType.Unit,
+                slug="unit1",
+                title="A Unit in the Search Index",
+                user_id=None,
+            )
+
+            # Simulate that is published
+            # TODO Modify this with the API to publish container in the future
+            mock_get_container.return_value = replace(
+                container_meta,
+                last_published=created_date,
+            )
+
+            # Edit the container
+            authoring_api.create_next_container_version(
+                container_meta.container_pk,
+                publishable_entities_pks=None,
+                title="New unit title",
+                entity_version_pks=None,
+                created=created_date,
+                created_by=None,
+            )
+
+            doc = searchable_doc_for_container(container_meta.container_key)
+
+        assert doc == {
+            "id": "lctedx2012_fallunitunit1-edd13a0c",
+            "block_id": "unit1",
+            "block_type": "unit",
+            "usage_key": "lct:edX:2012_Fall:unit:unit1",
+            "type": "library_container",
+            "org": "edX",
+            "display_name": "A Unit in the Search Index",
+            # description is not set for containers
+            "num_children": 0,
+            "context_key": "lib:edX:2012_Fall",
+            "access_id": self.library_access_id,
+            "breadcrumbs": [{"display_name": "some content_library"}],
+            "created": 1680674828.0,
+            "publish_status": "modified",
+            "modified": 1680674828.0,
+            # "tags" should be here but we haven't implemented them yet
+            # "published" is not set since we haven't published it yet
         }
 
     def test_mathjax_plain_text_conversion_for_search(self):
