@@ -289,7 +289,7 @@ def _create_dto_recursive(xblock_node, xblock_dictionary):
     return {level: xblock_children} if level else None
 
 
-def get_sorted_sections(course_key, data):
+def sort_course_sections(course_key, data):
     """Retrieve and sort course sections based on the published course structure."""
     course_blocks = modulestore().get_items(
         course_key,
@@ -297,12 +297,14 @@ def get_sorted_sections(course_key, data):
         revision=ModuleStoreEnum.RevisionOption.published_only
     )
 
-    if not course_blocks:
-        return data  # Return unchanged data if no verticals found
+    if not course_blocks or 'LinkCheckOutput' not in data or 'sections' not in data['LinkCheckOutput']:
+        return data  # Return unchanged data if course_blocks or required keys are missing
 
     sorted_section_ids = [section.location.block_id for section in course_blocks[0].get_children()]
 
     sections_map = {section['id']: section for section in data['LinkCheckOutput']['sections']}
     sorted_sections = [sections_map[section_id] for section_id in sorted_section_ids if section_id in sections_map]
+    data['LinkCheckOutput']['sections'] = sorted_sections
 
-    return sorted_sections
+    return data
+
