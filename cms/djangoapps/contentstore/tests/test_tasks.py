@@ -498,18 +498,20 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             {'status': 200, 'block_id': 'block1', 'url': 'https://example.com'},
             {'status': None, 'block_id': 'block2', 'url': 'https://retry.com'},
             {'status': 403, 'block_id': 'block3', 'url': 'https://' + settings.CMS_BASE},
+            {'status': None, 'block_id': 'block3', 'url': 'https://' + settings.CMS_BASE},
             {'status': 403, 'block_id': 'block4', 'url': 'https://external.com'},
             {'status': 404, 'block_id': 'block5', 'url': 'https://broken.com'}
         ]
 
         expected_filtered_results = [
+            ['block2', 'https://retry.com', LinkState.EXTERNAL_FORBIDDEN],
             ['block3', 'https://' + settings.CMS_BASE, LinkState.LOCKED],
             ['block4', 'https://external.com', LinkState.EXTERNAL_FORBIDDEN],
             ['block5', 'https://broken.com', LinkState.BROKEN],
         ]
 
         expected_retry_list = [
-            ['block2', 'https://retry.com']
+            ['block3', 'https://' + settings.CMS_BASE]
         ]
 
         filtered_results, retry_list = _filter_by_status(results)
