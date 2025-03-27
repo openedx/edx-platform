@@ -1135,6 +1135,43 @@ class CertificatesApiTestCase(TestCase):
             assert date == display_date_for_certificate(self.course, self.certificate)
             assert maybe_avail == available_date_for_certificate(self.course, self.certificate)
 
+    def test_display_date_for_certificate_cdb_early_no_info(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the last modified date of a
+        certificate instance when the display behavior is set to EARLY_NO_INFO.
+        """
+        with configure_waffle_namespace(True):
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
+            assert display_date_for_certificate(self.course, self.certificate) == self.certificate.modified_date
+
+    def test_display_date_for_certificate_cdb_end_with_date(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the certificate available date
+        associated with the course when the display behavior is set to END_WITH_DATE.
+        """
+        with configure_waffle_namespace(True):
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
+            self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
+            assert display_date_for_certificate(self.course, self.certificate) == self.course.certificate_available_date
+
+    def test_display_date_for_certificate_cdb_end(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the end date of the course run
+        when the display behavior is set to END.
+        """
+        with configure_waffle_namespace(True):
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END
+            assert display_date_for_certificate(self.course, self.certificate) == self.course.end
+
+    def test_display_date_for_certificate_date_override(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the certificate override date
+        if-and-only-if date override associated with the certificate instance.
+        """
+        with configure_waffle_namespace(True):
+            self.certificate.date_override = datetime(2016, 1, 1, tzinfo=pytz.UTC)
+            assert display_date_for_certificate(self.course, self.certificate) == self.certificate.date_override.date
+
 
 @ddt.ddt
 class CertificatesMessagingTestCase(ModuleStoreTestCase):
