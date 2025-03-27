@@ -257,7 +257,7 @@ def get_container_children(
     """
     Get the entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    container = get_container(container_key)
+    container = _get_container(container_key)
     if container_key.container_type == ContainerType.Unit.value:
         child_components = authoring_api.get_components_in_unit(container.unit, published=published)
         return [LibraryXBlockMetadata.from_component(
@@ -279,7 +279,7 @@ def get_container_children_count(
     """
     Get the count of entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    container = get_container(container_key)
+    container = _get_container(container_key)
     return authoring_api.get_container_children_count(container, published=published)
 
 
@@ -294,7 +294,7 @@ def update_container_children(
     """
     library_key = container_key.library_key
     container_type = container_key.container_type
-    container = get_container(container_key)
+    container = _get_container(container_key)
     match container_type:
         case ContainerType.Unit.value:
             components = [get_component_from_usage_key(key) for key in children_ids]  # type: ignore[arg-type]
