@@ -5,8 +5,8 @@ import tempfile
 import ddt
 from django.test.testcases import TestCase
 from fs.osfs import OSFS
-from opaque_keys.edx.keys import CourseKey, UsageKey, LibraryCollectionKey
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
 from .test_objecttag_export_helpers import TestGetAllObjectTagsMixin, TaggedCourseMixin
@@ -381,7 +381,7 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
             self._test_copy_object_tags(src_key, dst_key, expected_tags)
 
     def test_tag_collection(self):
-        collection_key = LibraryCollectionKey.from_string("lib-collection:orgA:libX:1")
+        collection_key = LibraryCollectionLocator.from_string("lib-collection:orgA:libX:1")
 
         api.tag_object(
             object_id=str(collection_key),

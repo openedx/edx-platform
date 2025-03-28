@@ -62,8 +62,6 @@ the api module instead.
     to Learning Core) atomic:
         https://github.com/openedx/edx-platform/pull/30456
 """
-
-from functools import wraps
 import itertools
 import json
 import logging
@@ -86,7 +84,6 @@ from pylti1p3.contrib.django import DjangoCacheDataStorage, DjangoDbToolConf, Dj
 from pylti1p3.exception import LtiException, OIDCException
 
 import edx_api_doc_tools as apidocs
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_learning.api import authoring
 from organizations.api import ensure_organization
@@ -105,7 +102,7 @@ from cms.djangoapps.contentstore.views.course import (
     user_can_create_organizations,
 )
 from openedx.core.djangoapps.content_libraries import api, permissions
-from openedx.core.djangoapps.content_libraries.serializers import (
+from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
     ContentLibraryBlockImportTaskCreateSerializer,
     ContentLibraryBlockImportTaskSerializer,
     ContentLibraryFilterSerializer,
@@ -129,48 +126,12 @@ from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.types.http import RestRequest
 
-from .models import ContentLibrary, LtiGradedResource, LtiProfile
+from .utils import convert_exceptions
+from ..models import ContentLibrary, LtiGradedResource, LtiProfile
 
 
 User = get_user_model()
 log = logging.getLogger(__name__)
-
-
-def convert_exceptions(fn):
-    """
-    Catch any Content Library API exceptions that occur and convert them to
-    DRF exceptions so DRF will return an appropriate HTTP response
-    """
-
-    @wraps(fn)
-    def wrapped_fn(*args, **kwargs):
-        try:
-            return fn(*args, **kwargs)
-        except InvalidKeyError as exc:
-            log.exception(str(exc))
-            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.ContentLibraryNotFound:
-            log.exception("Content library not found")
-            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.ContentLibraryBlockNotFound:
-            log.exception("XBlock not found in content library")
-            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.ContentLibraryCollectionNotFound:
-            log.exception("Collection not found in content library")
-            raise NotFound  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.LibraryCollectionAlreadyExists as exc:
-            log.exception(str(exc))
-            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.LibraryBlockAlreadyExists as exc:
-            log.exception(str(exc))
-            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.InvalidNameError as exc:
-            log.exception(str(exc))
-            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
-        except api.BlockLimitReachedError as exc:
-            log.exception(str(exc))
-            raise ValidationError(str(exc))  # lint-amnesty, pylint: disable=raise-missing-from
-    return wrapped_fn
 
 
 class LibraryApiPaginationDocs:
