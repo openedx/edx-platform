@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from .base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES
-from .models import CourseNotificationPreference, Notification
+from .models import CourseNotificationPreference, Notification, NotificationBrazeCampaigns
 
 
 class NotificationAppNameListFilter(admin.SimpleListFilter):
@@ -106,6 +106,18 @@ class CourseNotificationPreferenceAdmin(admin.ModelAdmin):
             queryset = queryset.all()
 
         return queryset, True
+
+
+@admin.register(NotificationBrazeCampaigns)
+class NotificationBrazeCampaignsAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the NotificationBrazeCampaigns model.
+    """
+    list_display = ('notification_type', 'braze_campaign_id', 'created', 'modified')
+    readonly_fields = ['created', 'modified']
+
+    class Meta:
+        model = NotificationBrazeCampaigns
 
 
 admin.site.register(Notification, NotificationAdmin)
