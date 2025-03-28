@@ -18,7 +18,7 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchApiError, MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryCollectionLocator
 from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
@@ -40,6 +40,7 @@ from .documents import (
     meili_id_from_opaque_key,
     searchable_doc_for_course_block,
     searchable_doc_for_collection,
+    searchable_doc_for_container,
     searchable_doc_for_library_block,
     searchable_doc_for_usage_key,
     searchable_doc_collections,
@@ -475,6 +476,31 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     status_cb(f"Error indexing collection batch {p}: {err}")
             return num_done
 
+        ############## Containers ##############
+        def index_container_batch(batch, num_done, library_key) -> int:
+            docs = []
+            for container in batch:
+                try:
+                    container_key = lib_api.library_container_locator(
+                        library_key,
+                        container,
+                    )
+                    doc = searchable_doc_for_container(container_key)
+                    # TODO: when we add container tags
+                    # doc.update(searchable_doc_tags_for_container(container_key))
+                    docs.append(doc)
+                except Exception as err:  # pylint: disable=broad-except
+                    status_cb(f"Error indexing container {container.key}: {err}")
+                num_done += 1
+
+            if docs:
+                try:
+                    # Add docs in batch of 100 at once (usually faster than adding one at a time):
+                    _wait_for_meili_task(client.index(index_name).add_documents(docs))
+                except (TypeError, KeyError, MeilisearchError) as err:
+                    status_cb(f"Error indexing container batch {p}: {err}")
+            return num_done
+
         for lib_key in lib_keys:
             status_cb(f"{num_contexts_done + 1}/{num_contexts}. Now indexing blocks in library {lib_key}")
             lib_docs = index_library(lib_key)
@@ -496,6 +522,22 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
             if incremental:
                 IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
             status_cb(f"{num_collections_done}/{num_collections} collections indexed for library {lib_key}")
+
+            # Similarly, batch process Containers (units, sections, etc) in pages of 100
+            containers = authoring_api.get_containers(library.learning_package_id)
+            num_containers = containers.count()
+            num_containers_done = 0
+            status_cb(f"{num_containers_done}/{num_containers}. Now indexing containers in library {lib_key}")
+            paginator = Paginator(containers, 100)
+            for p in paginator.page_range:
+                num_containers_done = index_container_batch(
+                    paginator.page(p).object_list,
+                    num_containers_done,
+                    lib_key,
+                )
+                status_cb(f"{num_containers_done}/{num_containers} containers indexed for library {lib_key}")
+            if incremental:
+                IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
 
             num_contexts_done += 1
 
@@ -730,6 +772,30 @@ def update_library_components_collections(
             f" page {page} / {paginator.num_pages}"
         )
         _update_index_docs(docs)
+
+
+def upsert_library_container_index_doc(container_key: LibraryContainerLocator) -> None:
+    """
+    Creates, updates, or deletes the document for the given Library Container in the search index.
+
+    TODO: add support for indexing a container's components, like upsert_library_collection_index_doc does.
+    """
+    doc = searchable_doc_for_container(container_key)
+
+    # Soft-deleted/disabled containers are removed from the index
+    # and their components updated.
+    if doc.get('_disabled'):
+
+        _delete_index_doc(doc[Fields.id])
+
+    # Hard-deleted containers are also deleted from the index
+    elif not doc.get(Fields.type):
+
+        _delete_index_doc(doc[Fields.id])
+
+    # Otherwise, upsert the container.
+    else:
+        _update_index_docs([doc])
 
 
 def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:

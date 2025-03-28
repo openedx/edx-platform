@@ -150,10 +150,10 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         self._create_library(slug="existing-org-1", title="Library in an existing org", org="CL-TEST")
 
     @patch(
-        "openedx.core.djangoapps.content_libraries.views.user_can_create_organizations",
+        "openedx.core.djangoapps.content_libraries.rest_api.libraries.user_can_create_organizations",
     )
     @patch(
-        "openedx.core.djangoapps.content_libraries.views.get_allowed_organizations_for_libraries",
+        "openedx.core.djangoapps.content_libraries.rest_api.libraries.get_allowed_organizations_for_libraries",
     )
     @override_settings(ORGANIZATIONS_AUTOCREATE=False)
     def test_library_org_no_autocreate(self, mock_get_allowed_organizations, mock_can_create_organizations):
@@ -198,7 +198,10 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert mock_get_allowed_organizations.call_count == 2
 
     @skip("This endpoint shouldn't support num_blocks and has_unpublished_*.")
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryRootView.pagination_class.page_size", new=2)
+    @patch(
+        "openedx.core.djangoapps.content_libraries.rest_api.libraries.LibraryRootView.pagination_class.page_size",
+        new=2,
+    )
     def test_list_library(self):
         """
         Test the /libraries API and its pagination
@@ -496,7 +499,10 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         assert 'resources' in fragment
         assert 'Hello world!' in fragment['content']
 
-    @patch("openedx.core.djangoapps.content_libraries.views.LibraryBlocksView.pagination_class.page_size", new=2)
+    @patch(
+        "openedx.core.djangoapps.content_libraries.rest_api.libraries.LibraryBlocksView.pagination_class.page_size",
+        new=2,
+    )
     def test_list_library_blocks(self):
         """
         Test the /libraries/{lib_key_str}/blocks API and its pagination
