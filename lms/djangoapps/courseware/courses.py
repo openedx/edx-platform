@@ -4,6 +4,7 @@ courseware.
 """
 
 import logging
+import pickle
 from collections import defaultdict, namedtuple
 from datetime import datetime
 
@@ -794,7 +795,7 @@ def get_assignments_grades(user, course_id, cache_timeout):
             collected_block_structure = get_block_structure_manager(course_id).get_collected()
 
             total_bytes_in_one_mb = 1024 * 1024
-            data_size_in_mbs = round(len(collected_block_structure) / total_bytes_in_one_mb, 2)
+            data_size_in_mbs = round(len(pickle.dumps(collected_block_structure)) / total_bytes_in_one_mb, 2)
             if data_size_in_mbs < total_bytes_in_one_mb * 2:
                 cache.set(cache_key, collected_block_structure, cache_timeout)
             else:
