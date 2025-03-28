@@ -303,6 +303,10 @@ def sort_course_sections(course_key, data):
     sorted_section_ids = [section.location.block_id for section in course_blocks[0].get_children()]
 
     sections_map = {section['id']: section for section in data['LinkCheckOutput']['sections']}
-    data['LinkCheckOutput']['sections'] = [sections_map[section_id] for section_id in sorted_section_ids if section_id in sections_map]
+    data['LinkCheckOutput']['sections'] = [
+        sections_map[section_id]
+        for section_id in sorted_section_ids
+        if section_id in sections_map
+        ]
 
     return data
