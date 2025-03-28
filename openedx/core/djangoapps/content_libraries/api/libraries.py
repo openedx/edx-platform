@@ -969,6 +969,8 @@ def create_library_block(
 ):
     """
     Create a new XBlock in this library of the specified type (e.g. "html").
+
+    Set can_stand_alone = False when a component is created under a container, like unit.
     """
     # It's in the serializer as ``definition_id``, but for our purposes, it's
     # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
@@ -1152,6 +1154,8 @@ def _create_component_for_block(
     in the OLX will have no attributes, e.g. `<problem />`. This first version
     will be set as the current draft. This function does not publish the
     Component.
+
+    Set can_stand_alone = False when a component is created under a container, like unit.
 
     TODO: We should probably shift this to openedx.core.djangoapps.xblock.api
     (along with its caller) since it gives runtime storage specifics. The
