@@ -187,7 +187,7 @@ class CoursewareIndex(View):
                 unit_key = None
         except InvalidKeyError:
             unit_key = None
-        is_preview = settings.FEATURES.get('PREVIEW_LMS_BASE') == get_current_request_hostname()
+        is_preview = False
         url = make_learning_mfe_courseware_url(
             self.course_key,
             self.section.location if self.section else None,
