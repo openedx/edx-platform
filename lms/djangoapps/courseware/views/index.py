@@ -63,7 +63,7 @@ from ..masquerade import check_content_start_date_for_masquerade_user, setup_mas
 from ..model_data import FieldDataCache
 from ..block_render import get_block_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
-from ..toggles import ENABLE_OPTIMIZELY_IN_COURSEWARE, courseware_mfe_is_active
+from ..toggles import ENABLE_OPTIMIZELY_IN_COURSEWARE
 from .views import CourseTabView
 
 log = logging.getLogger("edx.courseware.views.index")
@@ -171,8 +171,7 @@ class CoursewareIndex(View):
         Can the user access this sequence in the courseware MFE? If so, redirect to MFE.
         """
         # If the MFE is active, prefer that
-        if courseware_mfe_is_active():
-            raise Redirect(self.microfrontend_url)
+        raise Redirect(self.microfrontend_url)
 
     @property
     def microfrontend_url(self):
