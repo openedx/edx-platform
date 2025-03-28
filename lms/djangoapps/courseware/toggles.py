@@ -173,10 +173,7 @@ def courseware_mfe_is_active() -> bool:
     """
     Should we serve the Learning MFE as the canonical courseware experience?
     """
-    from lms.djangoapps.courseware.access_utils import in_preview_mode  # avoid a circular import
-
-    # We only use legacy views for the Studio "preview mode" feature these days, while everyone else gets the MFE
-    return not in_preview_mode()
+    return True
 
 
 def course_exit_page_is_active(course_key):
