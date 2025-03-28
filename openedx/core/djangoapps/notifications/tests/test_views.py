@@ -793,6 +793,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         Notification.objects.create(user=self.user, app_name='App Name 1', notification_type='Type B')
         Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
+        Notification.objects.create(user=self.user, app_name='App Name 4', notification_type='Type D', web=False)
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.unpack
