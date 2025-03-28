@@ -21,8 +21,8 @@ from ..models import ContentLibrary
 from .utils import convert_exceptions
 from .serializers import (
     ContentLibraryCollectionSerializer,
-    ContentLibraryCollectionComponentsUpdateSerializer,
     ContentLibraryCollectionUpdateSerializer,
+    ContentLibraryComponentKeysSerializer,
 )
 from openedx.core.types.http import RestRequest
 
@@ -200,7 +200,7 @@ class LibraryCollectionsView(ModelViewSet):
         content_library = self.get_content_library()
         collection_key = kwargs["key"]
 
-        serializer = ContentLibraryCollectionComponentsUpdateSerializer(data=request.data)
+        serializer = ContentLibraryComponentKeysSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         usage_keys = serializer.validated_data["usage_keys"]

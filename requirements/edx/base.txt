@@ -820,7 +820,7 @@ openedx-filters==2.0.1
     #   ora2
 openedx-forum==0.1.9
     # via -r requirements/edx/kernel.in
-openedx-learning==0.19.1
+openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@navin/fal-4109/add-components-to-container
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in

@@ -159,6 +159,7 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
     tags_count = serializers.IntegerField(read_only=True)
 
     collections = CollectionMetadataSerializer(many=True, required=False)
+    can_stand_alone = serializers.BooleanField(read_only=True)
 
 
 class LibraryXBlockTypeSerializer(serializers.Serializer):
@@ -192,6 +193,9 @@ class LibraryXBlockCreationSerializer(serializers.Serializer):
     # Optional param specified when pasting data from clipboard instead of
     # creating new block from scratch
     staged_content = serializers.CharField(required=False)
+
+    # Optional param defaults to True, set to False if block is being created under a container.
+    can_stand_alone = serializers.BooleanField(required=False, default=True)
 
 
 class LibraryPasteClipboardSerializer(serializers.Serializer):
@@ -345,7 +349,7 @@ class UsageKeyV2Serializer(serializers.BaseSerializer):
             raise ValidationError from err
 
 
-class ContentLibraryCollectionComponentsUpdateSerializer(serializers.Serializer):
+class ContentLibraryComponentKeysSerializer(serializers.Serializer):
     """
     Serializer for adding/removing Components to/from a Collection.
     """
