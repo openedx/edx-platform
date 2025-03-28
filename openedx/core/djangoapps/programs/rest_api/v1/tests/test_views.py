@@ -1,11 +1,12 @@
 """
-Unit tests for Learner Dashboard REST APIs and Views
+Unit tests for Programs REST APIs and Views
 """
 
 from unittest import mock
 from uuid import uuid4
 
 from django.core.cache import cache
+from django.test.utils import override_settings
 from django.urls import reverse_lazy
 from enterprise.models import EnterpriseCourseEnrollment
 
@@ -31,6 +32,7 @@ from openedx.core.djangoapps.site_configuration.tests.test_util import (
     with_site_configuration,
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
+from openedx.features.enterprise_support.api import enterprise_is_enabled
 from openedx.features.enterprise_support.tests.factories import (
     EnterpriseCourseEnrollmentFactory,
     EnterpriseCustomerFactory,
@@ -192,6 +194,8 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
         )
 
     @with_site_configuration(configuration={"COURSE_CATALOG_API_URL": "foo"})
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
+    @enterprise_is_enabled()
     def test_program_list(self):
         """
         Verify API returns proper response.
@@ -221,6 +225,8 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
         }
 
     @with_site_configuration(configuration={"COURSE_CATALOG_API_URL": "foo"})
+    @override_settings(FEATURES=dict(ENABLE_ENTERPRISE_INTEGRATION=True))
+    @enterprise_is_enabled()
     def test_program_empty_list_if_no_enterprise_enrollments(self):
         """
         Verify API returns empty response if no enterprise enrollments exists for a learner.
