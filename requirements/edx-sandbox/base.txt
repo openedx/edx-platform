@@ -61,7 +61,7 @@ pillow==11.1.0
     # via matplotlib
 pycparser==2.22
     # via cffi
-pyparsing==3.2.1
+pyparsing==3.2.2
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem

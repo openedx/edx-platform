@@ -14,11 +14,11 @@ attrs==25.3.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.37.17
+boto3==1.37.19
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.37.17
+botocore==1.37.19
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -184,7 +184,7 @@ pynacl==1.5.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-pyparsing==3.2.1
+pyparsing==3.2.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
@@ -195,7 +195,7 @@ python-dateutil==2.9.0.post0
     #   -r scripts/user_retirement/requirements/base.txt
     #   botocore
     #   moto
-pytz==2025.1
+pytz==2025.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   jenkinsapi

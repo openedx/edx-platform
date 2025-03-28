@@ -10,9 +10,9 @@ attrs==25.3.0
     # via zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.in
-boto3==1.37.17
+boto3==1.37.19
     # via -r scripts/user_retirement/requirements/base.in
-botocore==1.37.17
+botocore==1.37.19
     # via
     #   boto3
     #   s3transfer
@@ -109,11 +109,11 @@ pyjwt[crypto]==2.10.1
     #   simple-salesforce
 pynacl==1.5.0
     # via edx-django-utils
-pyparsing==3.2.1
+pyparsing==3.2.2
     # via httplib2
 python-dateutil==2.9.0.post0
     # via botocore
-pytz==2025.1
+pytz==2025.2
     # via
     #   jenkinsapi
     #   zeep
