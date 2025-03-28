@@ -186,7 +186,7 @@ class Programs(APIView):
             .values_list("course_id", flat=True)
         )
 
-        course_enrollments = get_course_enrollments(user, True, (enterprise_enrollment_course_ids))
+        course_enrollments = get_course_enrollments(user, True, list(enterprise_enrollment_course_ids))
 
         return course_enrollments
 
