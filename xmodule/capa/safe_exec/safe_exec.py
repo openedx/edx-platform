@@ -31,7 +31,13 @@ os.environ["OPENBLAS_NUM_THREADS"] = "1"
 # the ./tmp directory that codejail creates in each sandbox, rather than trying
 # to use a global temp dir (which should be blocked by AppArmor anyhow).
 # This is needed for matplotlib among other things.
+#
+# matplotlib will complain on stderr about the non-standard temp dir if we
+# don't explicitly tell it "no really, use this". This pollutes the output
+# when codejail returns an error message (which includes stderr). So we also
+# set MPLCONFIGDIR as a special case.
 os.environ["TMPDIR"] = os.getcwd() + "/tmp"
+os.environ["MPLCONFIGDIR"] = os.environ["TMPDIR"]
 
 import random2 as random_module
 import sys
