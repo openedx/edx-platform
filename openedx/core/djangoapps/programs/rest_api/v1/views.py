@@ -3,12 +3,12 @@
 from typing import Any, TYPE_CHECKING
 import logging
 
-from enterprise.models import EnterpriseCourseEnrollment
+from django.db.models.query import EmptyQuerySet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.api import get_course_enrollments
 from openedx.core.djangoapps.programs.utils import (
     ProgramProgressMeter,
     get_certificates,
@@ -16,11 +16,14 @@ from openedx.core.djangoapps.programs.utils import (
     get_program_and_course_data,
     get_program_urls,
 )
+from openedx.features.enterprise_support.api import get_enterprise_course_enrollments, enterprise_is_enabled
 
 if TYPE_CHECKING:
     from django.http import HttpRequest, HttpResponse
     from django.contrib.auth.models import AnonymousUser, User  # pylint: disable=imported-auth-user
     from django.contrib.sites.models import Site
+    from django.db.models.query import QuerySet
+    from common.djangoapps.student.models import CourseEnrollment
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +89,7 @@ class Programs(APIView):
         """
         user: "AnonymousUser | User" = request.user
 
-        enrollments = self._get_enterprise_course_enrollments(enterprise_uuid, user)
+        enrollments = list(self._get_enterprise_course_enrollments(enterprise_uuid, user))
         # return empty reponse if no enterprise enrollments exists for a user
         if not enrollments:
             return Response([])
@@ -170,26 +173,22 @@ class Programs(APIView):
 
         return programs
 
+    @enterprise_is_enabled(otherwise=EmptyQuerySet)
     def _get_enterprise_course_enrollments(
         self, enterprise_uuid: str, user: "AnonymousUser | User"
-    ) -> list[CourseEnrollment]:
+    ) -> "QuerySet[CourseEnrollment]":
         """
         Return only enterprise enrollments for a user.
         """
-        enterprise_enrollment_course_ids = list(
-            EnterpriseCourseEnrollment.objects.filter(
-                enterprise_customer_user__user_id=user.id,
-                enterprise_customer_user__enterprise_customer__uuid=enterprise_uuid,
-            ).values_list("course_id", flat=True)
+        enterprise_enrollment_course_ids = (
+            get_enterprise_course_enrollments(user)
+            .filter(enterprise_customer_user__enterprise_customer__uuid=enterprise_uuid)
+            .values_list("course_id", flat=True)
         )
 
-        course_enrollments = (
-            CourseEnrollment.enrollments_for_user(user)
-            .filter(course_id__in=enterprise_enrollment_course_ids)
-            .select_related("course")
-        )
+        course_enrollments = get_course_enrollments(user, True, list(enterprise_enrollment_course_ids))
 
-        return list(course_enrollments)
+        return course_enrollments
 
 
 class ProgramProgressDetailView(APIView):
