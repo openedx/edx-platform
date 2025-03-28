@@ -317,6 +317,23 @@ $dark: #212529;
 $zindex-dropdown: 100;
 
 $xblock-message-info-bg: #eff8fa;
-$xblock-message-info-border-color: #9cd2e6;
+$xblock-message-info-icon-color: #9cd2e6;
+
 $xblock-message-warning-bg: #fffdf0;
-$xblock-message-warning-border-color: #fff6bf;
+$xblock-message-warning-icon-color: #ffd900;
+
+$xblock-message-error-bg: #fbf2f3;
+$xblock-message-error-icon-color: #c32d3a;
+
+$template-icon-map: (
+  "library": "library-icon",
+  "library_v2": "library_v2-icon",
+  "itembank": "itembank-icon",
+  "advanced": "advanced-icon",
+  "html": "text-icon",
+  "openassessment": "openassessment-icon",
+  "problem": "problem-icon",
+  "video": "video-icon",
+  "drag-and-drop-v2": "drag-and-drop-v2-icon",
+  "text": "text-icon"
+);
