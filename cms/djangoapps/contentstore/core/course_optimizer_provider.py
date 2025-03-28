@@ -307,6 +307,6 @@ def sort_course_sections(course_key, data):
         sections_map[section_id]
         for section_id in sorted_section_ids
         if section_id in sections_map
-        ]
+    ]
 
     return data
