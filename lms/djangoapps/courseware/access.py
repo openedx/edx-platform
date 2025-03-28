@@ -34,7 +34,6 @@ from lms.djangoapps.courseware.access_utils import (
     check_course_open_for_learner,
     check_start_date,
     debug,
-    in_preview_mode
 )
 from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
@@ -158,10 +157,6 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    # Preview mode is only accessible by staff.
-    if in_preview_mode() and course_key:
-        if not has_staff_access_to_preview_mode(user, course_key):
-            return ACCESS_DENIED
 
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)

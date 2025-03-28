@@ -138,7 +138,7 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
     if start_dates_disabled and not masquerading_as_student:
         return ACCESS_GRANTED
     else:
-        if start is None or in_preview_mode() or get_course_masquerade(user, course_key):
+        if start is None or get_course_masquerade(user, course_key):
             return ACCESS_GRANTED
 
         if now is None:
@@ -158,11 +158,6 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
         return StartDateError(start, display_error_to_user=display_error_to_user)
 
 
-def in_preview_mode():
-    """
-    Returns whether the user is in preview mode or not.
-    """
-    return False
 
 
 def check_course_open_for_learner(user, course):
