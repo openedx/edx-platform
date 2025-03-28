@@ -332,7 +332,7 @@ class NotificationCountView(APIView):
         # Get the unseen notifications count for each app name.
         count_by_app_name = (
             Notification.objects
-            .filter(user_id=request.user, last_seen__isnull=True)
+            .filter(user_id=request.user, last_seen__isnull=True, web=True)
             .values('app_name')
             .annotate(count=Count('*'))
         )
