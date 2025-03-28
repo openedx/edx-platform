@@ -419,24 +419,6 @@ class BaseViewsTestCase(ModuleStoreTestCase, MasqueradeMixin):
         self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
         assert self.client.login(username=self.global_staff.username, password=TEST_PASSWORD)
 
-    def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        lms_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course_key),
-                'chapter': str(self.chapter.location.block_id),
-                'section': str(self.section2.location.block_id),
-            },
-        ) + '?foo=b$r'
-        mfe_url = '{}/course/{}/{}?foo=b%24r'.format(
-            settings.LEARNING_MICROFRONTEND_URL,
-            self.course_key,
-            self.section2.location
-        )
-        preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + lms_url
-
-        return lms_url, mfe_url, preview_url
-
 
 @ddt.ddt
 class CoursewareIndexTestCase(BaseViewsTestCase):
