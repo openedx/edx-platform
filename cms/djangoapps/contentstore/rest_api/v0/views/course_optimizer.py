@@ -6,7 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from user_tasks.models import UserTaskStatus
 
-from cms.djangoapps.contentstore.core.course_optimizer_provider import get_link_check_data
+from cms.djangoapps.contentstore.core.course_optimizer_provider import get_link_check_data, sort_course_sections
 from cms.djangoapps.contentstore.rest_api.v0.serializers.course_optimizer import LinkCheckSerializer
 from cms.djangoapps.contentstore.tasks import check_broken_links
 from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access
@@ -139,6 +139,7 @@ class LinkCheckStatusView(DeveloperErrorViewMixin, APIView):
             self.permission_denied(request)
 
         data = get_link_check_data(request, course_id)
-        serializer = LinkCheckSerializer(data)
+        data = sort_course_sections(course_key, data)
 
+        serializer = LinkCheckSerializer(data)
         return Response(serializer.data)
