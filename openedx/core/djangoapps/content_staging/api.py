@@ -8,6 +8,7 @@ import logging
 
 from django.core.files.base import ContentFile
 from django.db import transaction
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, UsageKey
@@ -53,17 +54,18 @@ def _save_xblock_to_staged_content(
 
     expired_ids = []
     with transaction.atomic():
-        # Mark all of the user's existing StagedContent rows as EXPIRED
-        to_expire = _StagedContent.objects.filter(
-            user_id=user_id,
-            purpose=purpose,
-        ).exclude(
-            status=StagedContentStatus.EXPIRED,
-        )
-        for sc in to_expire:
-            expired_ids.append(sc.id)
-            sc.status = StagedContentStatus.EXPIRED
-            sc.save()
+        if purpose == CLIPBOARD_PURPOSE:
+            # Mark all of the user's existing StagedContent rows as EXPIRED
+            to_expire = _StagedContent.objects.filter(
+                user_id=user_id,
+                purpose=purpose,
+            ).exclude(
+                status=StagedContentStatus.EXPIRED,
+            )
+            for sc in to_expire:
+                expired_ids.append(sc.id)
+                sc.status = StagedContentStatus.EXPIRED
+                sc.save()
         # Insert a new StagedContent row for this
         staged_content = _StagedContent.objects.create(
             user_id=user_id,
@@ -248,6 +250,13 @@ def _user_clipboard_model_to_data(clipboard: _UserClipboard) -> UserClipboardDat
         source_usage_key=clipboard.source_usage_key,
         source_context_title=clipboard.get_source_context_title(),
     )
+
+
+def get_ready_staged_content_by_user_and_purpose(user_id: int, purpose: str) -> QuerySet[_StagedContent]:
+    """
+    Get all staged content for the given user and purpose that are READY to use.
+    """
+    return _StagedContent.objects.filter(user_id=user_id, purpose=purpose, status=StagedContentStatus.READY)
 
 
 def get_staged_content_olx(staged_content_id: int) -> str | None:

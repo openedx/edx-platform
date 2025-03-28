@@ -141,6 +141,9 @@ urlpatterns = oauth2_urlpatterns + [
     # rest api for course import/export
     path('api/courses/', include('cms.djangoapps.contentstore.api.urls', namespace='courses_api')
          ),
+    path('api/course_to_library_import/',
+         include('cms.djangoapps.course_to_library_import.views.urls', namespace='course_to_library_import_api'),
+         ),
     re_path(fr'^export/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_handler,
             name='export_handler'),
     re_path(fr'^export_output/{COURSELIKE_KEY_PATTERN}$', contentstore_views.export_output_handler,
