@@ -1,0 +1,28 @@
+// xblock: utilities - CSS animations
+// ====================
+
+
+// --------------------
+// pulse
+// --------------------
+
+@include keyframes(pulse) {
+
+  0% {
+    opacity: 0.50;
+  }
+
+  50% {
+    opacity: 1.0;
+  }
+
+  100% {
+    opacity: 0.50;
+  }
+
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-pulse {
+  @include animation(pulse $tmg-f1 ease-in-out 1);
+}

@@ -1,0 +1,120 @@
+// xblock: elements - forms
+// ====================
+
+// NOTES:
+// * basic form element (fields, fieldsets/wrappers, actions, and states) styling for all xblocks
+
+// contains all form elements inside of the main xblock wrapper
+.wrapper--xblock {
+
+
+  // forms - general
+
+  // placeholder transitions
+  [placeholder]:focus::-webkit-input-placeholder {
+    @extend %trans-opacity;
+    opacity: 0.0;
+  }
+
+  // common inputs
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    @extend %t-strong;
+    border: 1px solid $color-decorative-secondary;
+    padding: ($baseline-v/2);
+    color: $copy-color;
+
+    @include placeholder {
+      @extend %t-regular;
+      color: $copy-color;
+    }
+
+    // STATE: focus
+    &:focus {
+      box-shadow: 0 0 6px 0 rgba(29,157,217,0.4),inset 0 0 4px 0 rgba(0,0,0,0.15);
+      border-color: $selected-color;
+    }
+  }
+
+  // general field UI
+  .field {
+    font-family: $f-copy;
+
+    label, .label, .field-group__label {
+      @extend %copy-3;
+    }
+
+    .field-group__label {
+      display: block;
+      margin-bottom: ($baseline-v/2);
+    }
+
+    textarea {
+      width: 100%;
+    }
+
+    .tip {
+      display: block;
+      @extend %copy-4;
+      color: $copy-color;
+    }
+  }
+
+  // TYPE: textarea fields
+  .field--textarea {
+
+    .label, label {
+      @extend %t-strong;
+      margin-bottom: ($baseline-v/2);
+    }
+  }
+
+  // TYPE: field-group
+  .field-group {
+
+  }
+
+  .field-group__label {
+    @extend %t-strong;
+    margin-bottom: ($baseline-v/2);
+  }
+
+  // TYPE: radio/checkbox fields
+  .field--radio, .field--checkbox {
+
+    // general option UI
+    .option {
+      margin-bottom: ($baseline-v/4);
+
+      &:last-child {
+        @extend %wipe-last-child;
+      }
+    }
+
+    .option__input, .option__label {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .option__label {
+      @extend %copy-3;
+      @extend %t-strong;
+      margin-bottom: 0; // FIX: need to reset base label style
+      color: $copy-color;
+    }
+
+    .option__input {
+      @include margin-right(($baseline-v/2));
+
+      // STATE: checked
+      &:checked {
+
+        + .option__label {
+          color: $selected-color;
+        }
+      }
+    }
+  }
+}

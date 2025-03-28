@@ -1,0 +1,166 @@
+// xblock: elements - system feedback
+// ====================
+
+// NOTES:
+// * General system feedback UI archetypes - messages, transitions, etc.
+
+.wrapper--xblock {
+
+  // --------------------
+  // messages
+  // --------------------
+  .message {
+    margin-bottom: $baseline-v;
+    border-radius: ($baseline-v/10);
+    padding: $baseline-v ($baseline-h/2);
+    background: $color-decorative-quaternary;
+
+    .message__title {
+      @extend %t-heading;
+      margin-bottom: ($baseline-v/4);
+      border-bottom: ($baseline-v/10) solid $color-decorative-tertiary;
+      padding-bottom: ($baseline-v/4);
+    }
+
+    .message__content {
+      @extend %copy-3;
+      color: $copy-color;
+
+      p {
+        margin-bottom: ($baseline-v/2);
+
+        &:last-child {
+          @extend %wipe-last-child;
+        }
+      }
+
+      a {
+        @extend %link-copy;
+      }
+    }
+  }
+
+  // TYPE: error
+  .message--error {
+    background: $color-error-back;
+
+    .message__title {
+      color: $copy-color;
+      border-bottom-color: $color-error;
+    }
+  }
+
+  // TYPE: warning
+  .message--warning {
+    background: $color-warning-back;
+
+    .message__title {
+      color: $copy-color;
+      border-bottom-color: $color-warning;
+    }
+  }
+
+  // TYPE: complete
+  .message--complete {
+    background: $color-complete-back;
+
+    .message__title {
+      color: $copy-color;
+      border-bottom-color: $color-complete;
+    }
+  }
+
+  // TYPE: incomplete
+  .message--incomplete {
+    background: $color-incomplete-back;
+
+    .message__title {
+      color: $copy-color;
+      border-bottom-color: $color-incomplete;
+    }
+  }
+
+  // CASE: showing errors is shown
+  .message--error {
+    @extend %trans-opacity;
+    display: none;
+    opacity: 0.0;
+  }
+
+  .has--error {
+
+    .message--error {
+      display: block;
+      opacity: 1.0;
+    }
+  }
+
+  // TYPE: inline message
+  .message--inline {
+    padding: ($baseline-v/2) ($baseline-h/2);
+    background: tint($color-confirm, 15%);
+
+    .message__title {
+      margin-bottom: 0;
+      border: none;
+      padding-bottom: 0;
+      color: $copy-inverse-color;
+    }
+
+    &.message--error {
+      background: $color-error;
+
+      .message__content {
+        color: $copy-inverse-color;
+      }
+    }
+
+    &.message--warning {
+      background: $color-warning;
+
+      .message__content {
+        color: $uxpl-gray-dark;
+      }
+
+      .message__title {
+        color: $uxpl-gray-dark;
+      }
+    }
+  }
+
+
+  // --------------------
+  // transitions
+  // --------------------
+  .is--transitioning {
+    @extend %state-disabled;
+    padding: ($baseline-v*2) ($baseline-h);
+    background: $color-decorative-quaternary;
+
+    .transition__status {
+      @include alignVertically();
+      text-align: center;
+
+      .wrapper--anim {
+        display: block;
+        @include animation(pulse $tmg-s3 ease-in-out infinite);
+      }
+
+      .icon, .copy {
+        display: block;
+        color: $copy-color;
+      }
+
+      .icon {
+        @extend %icon-0;
+        margin-bottom: ($baseline-v/2);
+      }
+
+      .copy {
+        @extend %hd-2;
+        @extend %t-strong;
+        @extend %t-titlecase;
+      }
+    }
+  }
+}
