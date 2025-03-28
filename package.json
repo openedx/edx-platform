@@ -33,6 +33,9 @@
     "test-common-vanilla": "npm run test-karma-conf -- common/static/karma_common.conf.js",
     "test-common-require": "npm run test-karma-conf -- common/static/karma_common_requirejs.conf.js"
   },
+  "browserslist": [
+    "extends @edx/browserslist-config"
+  ],
   "dependencies": {
     "@babel/core": "7.26.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
