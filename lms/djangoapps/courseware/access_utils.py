@@ -25,7 +25,6 @@ from lms.djangoapps.courseware.access_response import (
 from lms.djangoapps.courseware.masquerade import get_course_masquerade, is_masquerading_as_student
 from openedx.features.course_experience import COURSE_ENABLE_UNENROLLED_ACCESS_FLAG, COURSE_PRE_START_ACCESS_FLAG
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-order
 
 DEBUG_ACCESS = False
 log = getLogger(__name__)
@@ -138,7 +137,7 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
     if start_dates_disabled and not masquerading_as_student:
         return ACCESS_GRANTED
     else:
-        if start is None or in_preview_mode() or get_course_masquerade(user, course_key):
+        if start is None or get_course_masquerade(user, course_key):
             return ACCESS_GRANTED
 
         if now is None:
@@ -156,13 +155,6 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
             return StartDateEnterpriseLearnerError(start, display_error_to_user=display_error_to_user)
 
         return StartDateError(start, display_error_to_user=display_error_to_user)
-
-
-def in_preview_mode():
-    """
-    Returns whether the user is in preview mode or not.
-    """
-    return False
 
 
 def check_course_open_for_learner(user, course):
