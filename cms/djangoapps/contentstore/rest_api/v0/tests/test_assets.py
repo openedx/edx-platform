@@ -60,13 +60,8 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
             }
         ),
     )
-    @patch(
-        f"cms.djangoapps.contentstore.rest_api.{VERSION}.views.xblock.toggles.use_studio_content_api",
-        return_value=True,
-    )
     def make_request(
         self,
-        mock_use_studio_content_api,
         mock_handle_assets,
         run_assertions=None,
         course_id=None,

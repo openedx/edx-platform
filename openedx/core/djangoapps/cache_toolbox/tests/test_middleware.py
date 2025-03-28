@@ -27,32 +27,6 @@ class CachedAuthMiddlewareTestCase(TestCase):
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()  # preparing cookies
 
-    def _test_change_session_hash(self, test_url, redirect_url, target_status_code=200):
-        """
-        Verify that if a user's session auth hash and the request's hash
-        differ, the user is logged out. The URL to test and the
-        expected redirect are passed in, since we want to test this
-        behavior in both LMS and CMS, but the two systems have
-        different URLconfs.
-        """
-        response = self.client.get(test_url)
-        assert response.status_code == 200
-
-        with patch(
-            "openedx.core.djangoapps.cache_toolbox.middleware.set_custom_attribute"
-        ) as mock_set_custom_attribute:
-            with patch.object(User, 'get_session_auth_hash', return_value='abc123', autospec=True):
-                # Django 3.2 has _legacy_get_session_auth_hash, and Django 4 does not
-                # Remove once we reach Django 4
-                if hasattr(User, '_legacy_get_session_auth_hash'):
-                    with patch.object(User, '_legacy_get_session_auth_hash', return_value='abc123'):
-                        response = self.client.get(test_url)
-                else:
-                    response = self.client.get(test_url)
-
-        self.assertRedirects(response, redirect_url, target_status_code=target_status_code)
-        mock_set_custom_attribute.assert_any_call('failed_session_verification', True)
-
     def _test_custom_attribute_after_changing_hash(self, test_url, mock_set_custom_attribute):
         """verify that set_custom_attribute is called with expected values"""
         password = 'test-password'
@@ -102,16 +76,44 @@ class CachedAuthMiddlewareTestCase(TestCase):
 
     @skip_unless_lms
     def test_session_change_lms(self):
-        """Test session verification with LMS-specific URLs."""
+        """
+        Verify (from the LMS side) that if a user's session auth hash and the request's
+        hash differ, the user is logged out.
+        """
         dashboard_url = reverse('dashboard')
-        self._test_change_session_hash(dashboard_url, reverse('signin_user') + '?next=' + dashboard_url)
+        response = self.client.get(dashboard_url)
+        assert response.status_code == 200
+
+        with patch(
+            "openedx.core.djangoapps.cache_toolbox.middleware.set_custom_attribute"
+        ) as mock_set_custom_attribute:
+            with patch.object(User, 'get_session_auth_hash', return_value='abc123', autospec=True):
+                response = self.client.get(dashboard_url)
+
+        redirect_url = reverse('signin_user') + '?next=' + dashboard_url
+        self.assertRedirects(response, redirect_url, target_status_code=200)
+        mock_set_custom_attribute.assert_any_call('failed_session_verification', True)
 
     @skip_unless_cms
     def test_session_change_cms(self):
-        """Test session verification with CMS-specific URLs."""
+        """
+        Verify (from the CMS side) that if a user's session auth hash and the request's
+        hash differ, the user is logged out.
+        """
         home_url = reverse('home')
-        # Studio login redirects to LMS login
-        self._test_change_session_hash(home_url, settings.LOGIN_URL + '?next=' + home_url, target_status_code=302)
+        response = self.client.get(home_url)
+        assert response.status_code == 302
+        assert response.url == "http://course-authoring-mfe/home"
+
+        with patch(
+            "openedx.core.djangoapps.cache_toolbox.middleware.set_custom_attribute"
+        ) as mock_set_custom_attribute:
+            with patch.object(User, 'get_session_auth_hash', return_value='abc123', autospec=True):
+                response = self.client.get(home_url)
+
+        redirect_url = settings.LOGIN_URL + '?next=' + home_url
+        self.assertRedirects(response, redirect_url, target_status_code=302)
+        mock_set_custom_attribute.assert_any_call('failed_session_verification', True)
 
     @skip_unless_lms
     @patch("openedx.core.djangoapps.cache_toolbox.middleware.set_custom_attribute")
