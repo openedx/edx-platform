@@ -124,9 +124,11 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     openassessment_path = Path(openassessment.__path__[0])
     oa_manifest_path = openassessment_path / "xblock" / "static" / "dist" / "manifest.json"
 
-    with open(oa_manifest_path, "r") as f:
-        oa_manifest = json.load(f)
-        oa_studio_css = oa_manifest.get("openassessment-ltr.css", "")
+    oa_studio_css = ""
+    if oa_manifest_path.exists():
+        with open(oa_manifest_path, "r") as f:
+            oa_manifest = json.load(f)
+            oa_studio_css = oa_manifest.get("openassessment-ltr.css", "")
 
     context = {
         'fragment': fragment,
