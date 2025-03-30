@@ -433,9 +433,6 @@ html {
       }
     }
 
-    // For openassessment xblock editor. Copied from edx-ora2 repo.
-    @import 'iframe-editors/oa';
-
     // openassessment xblock mods for mfe iframe
     .openassessment_editor_buttons.xblock-actions {
       padding: ($baseline*0.75) 2% ($baseline/2) 2%;
