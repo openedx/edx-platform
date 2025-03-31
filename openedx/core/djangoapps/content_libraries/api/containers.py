@@ -283,6 +283,8 @@ def create_container(
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_CREATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.created.v1
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
@@ -348,6 +350,8 @@ def update_container(
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
     # Send event related to the updated container
+    # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
@@ -357,6 +361,8 @@ def update_container(
     # Send events related to the containers that contains the updated container.
     # This is to update the children display names used in the section/subsection previews.
     for affected_container in affected_containers:
+        # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 container_key=affected_container.container_key,
@@ -366,6 +372,8 @@ def update_container(
     # All subsections under a section have section key in index that needs to be updated.
     # So if parent section name has been changed, it needs to be reflected in sections key of children
     for child in children:
+        # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             content_object=ContentObjectChangedData(
                 object_id=str(getattr(child, child_key_name)),
@@ -400,6 +408,8 @@ def delete_container(
     )
     authoring_api.soft_delete_draft(container.pk)
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_DELETED
+    # .. event_type: org.openedx.content_authoring.content_library.container.deleted.v1
     LIBRARY_CONTAINER_DELETED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
@@ -640,6 +650,8 @@ def update_container_children(
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
