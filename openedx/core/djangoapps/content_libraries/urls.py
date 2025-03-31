@@ -80,6 +80,8 @@ urlpatterns = [
         path('containers/<lib_container_key:container_key>/', include([
             # Get metadata about a specific container in this library, update or delete the container:
             path('', containers.LibraryContainerView.as_view()),
+            # update components under container
+            path('children/', containers.LibraryContainerChildrenView.as_view()),
             # Update collections for a given container
             # path('collections/', views.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),
             # path('publish/', views.LibraryContainerPublishView.as_view()),
