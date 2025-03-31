@@ -84,6 +84,8 @@ def library_collection_saved(sender, instance, created, **kwargs):
         return
 
     if created:
+        # .. event_implemented_name: LIBRARY_COLLECTION_CREATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.created.v1
         LIBRARY_COLLECTION_CREATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library.library_key,
@@ -91,6 +93,8 @@ def library_collection_saved(sender, instance, created, **kwargs):
             )
         )
     else:
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library.library_key,
@@ -110,6 +114,8 @@ def library_collection_deleted(sender, instance, **kwargs):
         log.error("{instance} is not associated with a content library.")
         return
 
+    # .. event_implemented_name: LIBRARY_COLLECTION_DELETED
+    # .. event_type: org.openedx.content_authoring.content_library.collection.deleted.v1
     LIBRARY_COLLECTION_DELETED.send_event(
         library_collection=LibraryCollectionData(
             library_key=library.library_key,
@@ -142,6 +148,8 @@ def _library_collection_component_changed(
         library_key,
         component,
     )
+    # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+    # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
             object_id=str(usage_key),

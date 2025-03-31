@@ -487,6 +487,8 @@ def create_library(
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
 
+    # .. event_implemented_name: CONTENT_LIBRARY_CREATED
+    # .. event_type: org.openedx.content_authoring.content_library.created.v1
     CONTENT_LIBRARY_CREATED.send_event(
         content_library=ContentLibraryData(
             library_key=ref.library_key
@@ -624,6 +626,8 @@ def update_library(
                 description=description,
             )
 
+    # .. event_implemented_name: CONTENT_LIBRARY_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.updated.v1
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
             library_key=content_lib.library_key
@@ -649,6 +653,8 @@ def delete_library(library_key: LibraryLocatorV2) -> None:
         if learning_package:
             learning_package.delete()
 
+    # .. event_implemented_name: CONTENT_LIBRARY_DELETED
+    # .. event_type: org.openedx.content_authoring.content_library.deleted.v1
     CONTENT_LIBRARY_DELETED.send_event(
         content_library=ContentLibraryData(
             library_key=library_key
@@ -707,6 +713,8 @@ def publish_changes(library_key: LibraryLocatorV2, user_id: int | None = None):
     assert learning_package is not None  # shouldn't happen but it's technically possible.
     authoring_api.publish_all_drafts(learning_package.id, published_by=user_id)
 
+    # .. event_implemented_name: CONTENT_LIBRARY_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.updated.v1
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
             library_key=library_key,
@@ -724,6 +732,8 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     assert learning_package is not None  # shouldn't happen but it's technically possible.
     authoring_api.reset_drafts_to_published(learning_package.id)
 
+    # .. event_implemented_name: CONTENT_LIBRARY_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.updated.v1
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
             library_key=library_key,
@@ -737,6 +747,8 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     # This is to update component counts in all library collections,
     # because there may be components that have been discarded in the revert.
     for collection in authoring_api.get_collections(learning_package.id):
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library_key,
@@ -757,6 +769,8 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     for component in components_in_collections:
         usage_key = library_component_usage_key(library_key, component)
 
+        # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             content_object=ContentObjectChangedData(
                 object_id=str(usage_key),

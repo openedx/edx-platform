@@ -216,6 +216,8 @@ def set_library_component_collections(
     # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
     # collection indexing asynchronously.
     for collection in affected_collections:
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library_key,
