@@ -147,7 +147,9 @@ class CourseRunSerializer(serializers.Serializer):
     def to_representation(self, instance):
         """Serialize the courserun instance to be able to update the values before the API finishes rendering."""
         serialized_courserun = super().to_representation(instance)
-        serialized_courserun = CourseRunAPIRenderStarted().run_filter(
+        # .. filter_implemented_name: CourseRunAPIRenderStarted
+        # .. filter_type: org.openedx.learning.home.courserun.api.rendered.started.v1
+        serialized_courserun = CourseRunAPIRenderStarted.run_filter(
             serialized_courserun=serialized_courserun,
         )
         return serialized_courserun
@@ -264,7 +266,9 @@ class EnrollmentSerializer(serializers.Serializer):
     def to_representation(self, instance):
         """Serialize the enrollment instance to be able to update the values before the API finishes rendering."""
         serialized_enrollment = super().to_representation(instance)
-        course_key, serialized_enrollment = CourseEnrollmentAPIRenderStarted().run_filter(
+        # .. filter_implemented_name: CourseEnrollmentAPIRenderStarted
+        # .. filter_type: org.openedx.learning.home.enrollment.api.rendered.v1
+        course_key, serialized_enrollment = CourseEnrollmentAPIRenderStarted.run_filter(
             course_key=instance.course_id,
             serialized_enrollment=serialized_enrollment,
         )

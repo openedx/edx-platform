@@ -595,6 +595,8 @@ def login_user(request, api_version="v1"):  # pylint: disable=too-many-statement
         possibly_authenticated_user = user
 
         try:
+            # .. filter_implemented_name: StudentLoginRequested
+            # .. filter_type: org.openedx.learning.student.login.requested.v1
             possibly_authenticated_user = StudentLoginRequested.run_filter(user=possibly_authenticated_user)
         except StudentLoginRequested.PreventLogin as exc:
             raise AuthFailedError(
