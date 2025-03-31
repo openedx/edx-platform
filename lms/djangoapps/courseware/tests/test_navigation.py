@@ -15,12 +15,11 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase, set_preview_mode
+from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.features.course_experience import DISABLE_COURSE_OUTLINE_PAGE_FLAG
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 
 
-@set_preview_mode(True)
 class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.
@@ -73,6 +72,13 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         super().setUp()
         self.login(self.user.email, 'test')
+        self.patcher = patch(
+            'lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+        self.mock_redirect = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+        super().tearDown()
 
     def assertTabActive(self, tabname, response):
         ''' Check if the progress tab is active in the tab set '''
