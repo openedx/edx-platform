@@ -5,7 +5,6 @@ Tests for Content Library internal api.
 import base64
 import hashlib
 from unittest import mock
-from datetime import datetime, timezone
 
 from django.test import TestCase
 
@@ -800,6 +799,10 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
 
 
     def _validate_calls_of_html_block(self, event_mock):
+        """
+        Validate that the `event_mock` has been called twice
+        using the `LIBRARY_CONTAINER_UPDATED` signal.
+        """
         assert event_mock.call_count == 2
         self.assertDictContainsSubset(
             {
@@ -832,7 +835,6 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
 
         api.delete_library_block(self.html_block_usage_key)
         self._validate_calls_of_html_block(container_update_event_receiver)
-        
 
     def test_call_container_update_signal_when_update_olx(self):
         block_olx = "<html><b>Hello world!</b></html>"
