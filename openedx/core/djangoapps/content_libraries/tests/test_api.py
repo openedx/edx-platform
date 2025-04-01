@@ -797,7 +797,6 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
         assert html_block_containers[0].container_key == self.unit1.container_key
         assert html_block_containers[1].container_key == self.unit2.container_key
 
-
     def _validate_calls_of_html_block(self, event_mock):
         """
         Validate that the `event_mock` has been called twice
