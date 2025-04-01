@@ -87,7 +87,7 @@ class ContainerMetadata(PublishableItem):
             last_draft_created_by = ""
 
         return cls(
-            container_key=container_key,  # LibraryContainerLocator
+            container_key=container_key,
             container_type=container_type,
             display_name=draft.title,
             created=container.created,
