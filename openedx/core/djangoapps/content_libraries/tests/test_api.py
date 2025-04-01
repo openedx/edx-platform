@@ -766,38 +766,25 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
 
         # Create XBlocks
         # Create some library blocks in lib1
-        self.problem_block_dict = self._add_block_to_library(
+        self.problem_block = self._add_block_to_library(
             self.lib1.library_key, "problem", "problem1",
         )
-        self.problem_block_usage_key = UsageKey.from_string(self.problem_block_dict["id"])
-        self.html_block_dict = self._add_block_to_library(
+        self.problem_block_usage_key = UsageKey.from_string(self.problem_block["id"])
+        self.html_block = self._add_block_to_library(
             self.lib1.library_key, "html", "html1",
         )
-        self.html_block_usage_key = UsageKey.from_string(self.html_block_dict["id"])
-        now = datetime.now(tz=timezone.utc)
+        self.html_block_usage_key = UsageKey.from_string(self.html_block["id"])
 
         # Add content to units
-        # TODO build API for this
-        self.problem_block_component = api.get_component_from_usage_key(self.problem_block_usage_key)
-        self.html_block_component = api.get_component_from_usage_key(self.html_block_usage_key)
-        authoring_api.create_next_container_version(
-            self.unit1.container_pk,
-            publishable_entities_pks=[
-                self.problem_block_component.publishable_entity.id,
-                self.html_block_component.publishable_entity.id,
-            ],
-            title=None,
-            entity_version_pks=None,
-            created=now,
-            created_by=None,
+        api.update_container_children(
+            self.unit1.container_key,
+            [self.problem_block_usage_key, self.html_block_usage_key],
+            None,
         )
-        authoring_api.create_next_container_version(
-            self.unit2.container_pk,
-            publishable_entities_pks=[self.html_block_component.publishable_entity.id],
-            title=None,
-            entity_version_pks=None,
-            created=now,
-            created_by=None,
+        api.update_container_children(
+            self.unit2.container_key,
+            [self.html_block_usage_key],
+            None,
         )
 
     def test_get_containers_contains_component(self):
