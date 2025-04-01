@@ -369,8 +369,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                     'enabled': True,
                     'core_notification_types': [],
                     'notification_types': {
-                        'ora_staff_notification': {
-                            'web': False,
+                        'ora_staff_notifications': {
+                            'web': True,
                             'email': False,
                             'push': False,
                             'email_cadence': 'Daily',
@@ -1088,7 +1088,7 @@ class UpdateAllNotificationPreferencesViewTests(APITestCase):
                         "email": True,
                         "email_cadence": "Daily"
                     },
-                    "ora_staff_notification": {
+                    "ora_staff_notifications": {
                         "web": False,
                         "push": False,
                         "email": False,
