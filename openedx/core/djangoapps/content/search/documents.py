@@ -572,6 +572,7 @@ def searchable_doc_for_container(
         Fields.usage_key: str(container_key),  # Field name isn't exact but this is the closest match
         Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
         Fields.access_id: _meili_access_id_from_context_key(container_key.library_key),
+        Fields.publish_status: PublishStatus.never,
     }
 
     try:
