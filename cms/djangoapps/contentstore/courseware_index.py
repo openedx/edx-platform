@@ -19,6 +19,8 @@ from openedx.core.lib.courses import course_image_url
 from xmodule.annotator_mixin import html_to_text  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.library_tools import normalize_key_for_search  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.roles import CourseInstructorRole
+
 
 # REINDEX_AGE is the default amount of time that we look back for changes
 # that might have happened. If we are provided with a time at which the
@@ -616,12 +618,23 @@ class CourseAboutSearchIndexer(CoursewareSearchIndexer):
             return
 
         course_id = str(course.id)
+        instructors = CourseInstructorRole(course.id).users_with_role()
+
+        # Format names
+        instructor_names = []
+        for instructor in instructors:
+            name = (
+                getattr(instructor, "profile", None) and instructor.profile.name
+            ) or f"{instructor.first_name} {instructor.last_name}"
+            instructor_names.append(name)
+
         course_info = {
             'id': course_id,
             'course': course_id,
             'content': {},
             'image_url': course_image_url(course),
-            'self_paced': course.self_paced
+            'self_paced': course.self_paced,
+            'instructor': ", ".join(instructor_names) if instructor_names else None,
         }
 
         # load data for all of the 'about' blocks for this course into a dictionary
