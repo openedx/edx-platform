@@ -113,7 +113,7 @@ class PublishStatus:
     modified = "modified"
 
 
-def meili_id_from_opaque_key(usage_key: OpaqueKey) -> str:
+def meili_id_from_opaque_key(key: OpaqueKey) -> str:
     """
     Meilisearch requires each document to have a primary key that's either an
     integer or a string composed of alphanumeric characters (a-z A-Z 0-9),
@@ -124,7 +124,7 @@ def meili_id_from_opaque_key(usage_key: OpaqueKey) -> str:
     we could use PublishableEntity's primary key / UUID instead.
     """
     # The slugified key _may_ not be unique so we append a hashed string to make it unique:
-    key_str = str(usage_key)
+    key_str = str(key)
     key_bin = key_str.encode()
 
     suffix = blake2b(key_bin, digest_size=4, usedforsecurity=False).hexdigest()
@@ -140,12 +140,12 @@ def _meili_access_id_from_context_key(context_key: LearningContextKey) -> int:
     return access.id
 
 
-def searchable_doc_for_usage_key(usage_key: OpaqueKey) -> dict:
+def searchable_doc_for_key(key: OpaqueKey) -> dict:
     """
-    Generates a base document identified by its usage key.
+    Generates a base document identified by its opaque key.
     """
     return {
-        Fields.id: meili_id_from_opaque_key(usage_key),
+        Fields.id: meili_id_from_opaque_key(key),
     }
 
 
@@ -406,7 +406,7 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
         block_published = None
         publish_status = PublishStatus.never
 
-    doc = searchable_doc_for_usage_key(xblock_metadata.usage_key)
+    doc = searchable_doc_for_key(xblock_metadata.usage_key)
     doc.update({
         Fields.type: DocType.library_block,
         Fields.breadcrumbs: [],
@@ -432,7 +432,7 @@ def searchable_doc_tags(usage_key: UsageKey) -> dict:
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the tags data for the given content object.
     """
-    doc = searchable_doc_for_usage_key(usage_key)
+    doc = searchable_doc_for_key(usage_key)
     doc.update(_tags_for_content_object(usage_key))
 
     return doc
@@ -443,7 +443,7 @@ def searchable_doc_collections(usage_key: UsageKey) -> dict:
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the collections data for the given content object.
     """
-    doc = searchable_doc_for_usage_key(usage_key)
+    doc = searchable_doc_for_key(usage_key)
     doc.update(_collections_for_content_object(usage_key))
 
     return doc
@@ -461,7 +461,7 @@ def searchable_doc_tags_for_collection(
         library_key,
         collection_key,
     )
-    doc = searchable_doc_for_usage_key(collection_usage_key)
+    doc = searchable_doc_for_key(collection_usage_key)
     doc.update(_tags_for_content_object(collection_usage_key))
 
     return doc
@@ -473,7 +473,7 @@ def searchable_doc_for_course_block(block) -> dict:
     like Meilisearch or Elasticsearch, so that the given course block can be
     found using faceted search.
     """
-    doc = searchable_doc_for_usage_key(block.usage_key)
+    doc = searchable_doc_for_key(block.usage_key)
     doc.update({
         Fields.type: DocType.course_block,
     })
@@ -503,7 +503,7 @@ def searchable_doc_for_collection(
         collection_key,
     )
 
-    doc = searchable_doc_for_usage_key(collection_usage_key)
+    doc = searchable_doc_for_key(collection_usage_key)
 
     try:
         collection = collection or lib_api.get_library_collection_from_usage_key(collection_usage_key)

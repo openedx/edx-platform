@@ -42,7 +42,7 @@ from .documents import (
     searchable_doc_for_collection,
     searchable_doc_for_container,
     searchable_doc_for_library_block,
-    searchable_doc_for_usage_key,
+    searchable_doc_for_key,
     searchable_doc_collections,
     searchable_doc_tags,
     searchable_doc_tags_for_collection,
@@ -613,14 +613,14 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
     _update_index_docs(docs)
 
 
-def delete_index_doc(usage_key: OpaqueKey) -> None:
+def delete_index_doc(key: OpaqueKey) -> None:
     """
     Deletes the document for the given XBlock from the search index
 
     Args:
-        usage_key (OpaqueKey): The usage key of the XBlock to be removed from the index
+        key (OpaqueKey): The opaque key of the XBlock/Container to be removed from the index
     """
-    doc = searchable_doc_for_usage_key(usage_key)
+    doc = searchable_doc_for_key(key)
     _delete_index_doc(doc[Fields.id])
 
 
