@@ -17,7 +17,7 @@ from django.core.paginator import Paginator
 from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchApiError, MeilisearchError
 from meilisearch.models.task import TaskInfo
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, OpaqueKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryCollectionLocator
 from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
@@ -613,12 +613,12 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
     _update_index_docs(docs)
 
 
-def delete_index_doc(usage_key: UsageKey) -> None:
+def delete_index_doc(usage_key: OpaqueKey) -> None:
     """
     Deletes the document for the given XBlock from the search index
 
     Args:
-        usage_key (UsageKey): The usage key of the XBlock to be removed from the index
+        usage_key (OpaqueKey): The usage key of the XBlock to be removed from the index
     """
     doc = searchable_doc_for_usage_key(usage_key)
     _delete_index_doc(doc[Fields.id])

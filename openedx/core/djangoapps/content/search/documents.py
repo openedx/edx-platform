@@ -8,7 +8,7 @@ from hashlib import blake2b
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
-from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from opaque_keys.edx.keys import LearningContextKey, UsageKey, OpaqueKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
@@ -113,7 +113,7 @@ class PublishStatus:
     modified = "modified"
 
 
-def meili_id_from_opaque_key(usage_key: UsageKey) -> str:
+def meili_id_from_opaque_key(usage_key: OpaqueKey) -> str:
     """
     Meilisearch requires each document to have a primary key that's either an
     integer or a string composed of alphanumeric characters (a-z A-Z 0-9),
@@ -140,7 +140,7 @@ def _meili_access_id_from_context_key(context_key: LearningContextKey) -> int:
     return access.id
 
 
-def searchable_doc_for_usage_key(usage_key: UsageKey) -> dict:
+def searchable_doc_for_usage_key(usage_key: OpaqueKey) -> dict:
     """
     Generates a base document identified by its usage key.
     """
