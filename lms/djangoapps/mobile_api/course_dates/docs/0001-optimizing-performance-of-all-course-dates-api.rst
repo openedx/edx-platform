@@ -20,7 +20,9 @@ were enrolled in large courses containing numerous blocks. The function:
     get_course_date_blocks(course, user, request, include_access=True, include_past_dates=True)
 
 took more than one second to return data for a single course in these cases.
-When multiple such courses were present, the API response time became unacceptably slow.
+This is because the function iterates through all blocks of a course, passing them through multiple
+transformers, making it highly inefficient for large courses. For example, in a course with thousands
+of blocks, the execution time increases drastically, impacting the API's overall response time.
 
 Problem Statement
 -----------------
@@ -35,6 +37,11 @@ Additionally, the existing models from `edx-when` do not fully meet our requirem
 As a result, we need to make multiple calls to modulestore to gather this data, which further
 exacerbates the performance issues.
 
+*   `assignment_title` is necessary for displaying meaningful date information in the UI, helping
+    users understand the context of each date.
+*   `first_component_block_id` is crucial for proper mobile functionality, ensuring that when a user clicks on a date,
+    they are correctly navigated to the relevant course component.
+
 
 Decision
 --------
@@ -45,7 +52,13 @@ To optimize performance, we decided to introduce a new model, `DateBlockInfo`, w
 *   Include additional fields such as `first_component_block_id` and `assignment_title`.
 *   Be populated whenever a course is published, using the `SignalHandler.course_published` signal to iterate over
     all blocks and create instances of this model.
-*   Be leveraged in the All Course Dates API to fetch instances associated with the user and perform access checks efficiently.
+*   Be leveraged in the All Course Dates API to:
+
+    *   Fetch instances associated with the user and perform access checks efficiently.
+    *   Implement pagination and sorting, allowing us to retrieve only the necessary subset of data without
+        loading everything at once.
+    *   Overcome limitations of using flat blocks, which do not support proper pagination without prefetching
+        all data beforehand.
 
 Consequences
 ------------
@@ -58,7 +71,7 @@ Positive:
 
 Negative:
 
-*   Additional storage space required for `DateBlockInfo` entries.
+*   Additional storage space required for `DateBlockInfo` records and additional complexity to keep the records up to date.
 *   Extra processing during course publishing due to model instance creation.
 
 This approach balances performance and maintainability, ensuring a better user experience in the mobile application while keeping data access efficient.
