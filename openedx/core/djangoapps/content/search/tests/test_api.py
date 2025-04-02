@@ -866,3 +866,14 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
             doc_problem_without_collection,
         ])
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_delete_index_container(self, mock_meilisearch):
+        """
+        Test delete a container index.
+        """
+        library_api.delete_container(self.unit.container_key)
+
+        mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
+            self.unit_dict["id"],
+        )
