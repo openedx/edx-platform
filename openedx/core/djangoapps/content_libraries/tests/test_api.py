@@ -746,10 +746,14 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
 
 
-class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
+class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
     """
     Tests for Content Library API containers methods.
     """
+    ENABLED_OPENEDX_EVENTS = [
+        LIBRARY_CONTAINER_UPDATED.event_type,
+    ]
+
     def setUp(self):
         super().setUp()
 

@@ -27,17 +27,17 @@ from edx_rest_api_client.client import OAuthAPIClient
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from xmodule.modulestore.django import modulestore
 
-from .libraries import (
+from .. import tasks
+from ..models import ContentLibrary, ContentLibraryBlockImportTask
+from .blocks import (
     LibraryBlockAlreadyExists,
     add_library_block_static_asset_file,
     create_library_block,
     get_library_block_static_asset_files,
     get_library_block,
     set_library_block_olx,
-    publish_changes,
 )
-from .. import tasks
-from ..models import ContentLibrary, ContentLibraryBlockImportTask
+from .libraries import publish_changes
 
 log = logging.getLogger(__name__)
 

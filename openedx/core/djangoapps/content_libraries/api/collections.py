@@ -19,7 +19,7 @@ from openedx_learning.api.authoring_models import (
     PublishableEntity,
 )
 
-from .libraries import ContentLibraryBlockNotFound
+from .blocks import ContentLibraryBlockNotFound
 from ..models import ContentLibrary
 
 
