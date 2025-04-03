@@ -21,8 +21,8 @@ In the LMS, the following technologies can be used to access course content and 
 
 .. _edX DDD Ubiquitous Language: https://openedx.atlassian.net/wiki/spaces/AC/pages/188032048/edX+DDD+Ubiquitous+Language
 .. _Course Overviews: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/content/course_overviews/__init__.py
-.. _Course Blocks: https://openedx.atlassian.net/wiki/display/EDUCATOR/Course+Blocks
-.. _Modulestore: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/modulestores/index.html
+.. _Course Blocks: https://openedx.atlassian.net/wiki/spaces/AC/pages/158321366/Course+Blocks+aka+xblocks+components
+.. _Modulestore: https://docs.openedx.org/projects/edx-platform/en/latest/references/docs/xmodule/modulestore/docs/overview.html
 
 Decisions
 =========

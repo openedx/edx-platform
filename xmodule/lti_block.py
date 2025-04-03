@@ -98,7 +98,7 @@ log = logging.getLogger(__name__)
 
 DOCS_ANCHOR_TAG_OPEN = (
     "<a rel='noopener' target='_blank' "
-    "href='https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html'>"
+    "href='https://docs.openedx.org/en/latest/educators/navigation/components_activities.html#lti-component'>"
 )
 BREAK_TAG = '<br />'
 

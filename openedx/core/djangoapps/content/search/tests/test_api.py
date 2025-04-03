@@ -227,6 +227,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Unit 1",
             # description is not set for containers
             "num_children": 0,
+            "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
             "created": created_date.timestamp(),

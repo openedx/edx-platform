@@ -258,7 +258,7 @@ def main():
     epilog += "understand and fix any violations, read the docs here:\n"
     epilog += "\n"
     # pylint: disable=line-too-long
-    epilog += "  https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/preventing_xss.html#xss-linter\n"
+    epilog += "  https://docs.openedx.org/en/latest/developers/references/developer_guide/preventing_xss/preventing_xss.html#xss-linter\n"
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,

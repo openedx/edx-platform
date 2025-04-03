@@ -82,6 +82,7 @@ from openedx_events.content_authoring.data import (
     ContentLibraryData,
     LibraryBlockData,
     LibraryCollectionData,
+    LibraryContainerData,
     ContentObjectChangedData,
 )
 from openedx_events.content_authoring.signals import (
@@ -92,6 +93,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
+    LIBRARY_CONTAINER_UPDATED,
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
 from openedx_learning.api import authoring as authoring_api
@@ -113,6 +115,7 @@ from openedx.core.djangoapps.xblock.api import (
     xblock_type_display_name,
 )
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.types import User as UserType
 from xmodule.modulestore.django import modulestore
 
@@ -302,6 +305,7 @@ class PublishableItem(LibraryItem):
     last_draft_created_by: str = ""
     has_unpublished_changes: bool = False
     collections: list[CollectionMetadata] = field(default_factory=list)
+    can_stand_alone: bool = True
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -343,6 +347,7 @@ class LibraryXBlockMetadata(PublishableItem):
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=component.versioning.has_unpublished_changes,
             collections=associated_collections or [],
+            can_stand_alone=component.publishable_entity.can_stand_alone,
         )
 
 
@@ -899,6 +904,18 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
         )
     )
 
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                library_key=usage_key.lib_key,
+                container_key=str(container.container_key),
+                background=True,
+            )
+        )
+
     return new_component_version
 
 
@@ -958,9 +975,17 @@ def validate_can_add_block_to_library(
     return content_library, usage_key
 
 
-def create_library_block(library_key, block_type, definition_id, user_id=None):
+def create_library_block(
+    library_key: LibraryLocatorV2,
+    block_type: str,
+    definition_id: str,
+    user_id: int | None = None,
+    can_stand_alone: bool = True,
+):
     """
     Create a new XBlock in this library of the specified type (e.g. "html").
+
+    Set can_stand_alone = False when a component is created under a container, like unit.
     """
     # It's in the serializer as ``definition_id``, but for our purposes, it's
     # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
@@ -969,7 +994,7 @@ def create_library_block(library_key, block_type, definition_id, user_id=None):
 
     content_library, usage_key = validate_can_add_block_to_library(library_key, block_type, block_id)
 
-    _create_component_for_block(content_library, usage_key, user_id)
+    _create_component_for_block(content_library, usage_key, user_id, can_stand_alone)
 
     # Now return the metadata about the new block:
     LIBRARY_BLOCK_CREATED.send_event(
@@ -1135,6 +1160,7 @@ def _create_component_for_block(
     content_lib: ContentLibrary,
     usage_key: LibraryUsageLocatorV2,
     user_id: int | None = None,
+    can_stand_alone: bool = True,
 ):
     """
     Create a Component for an XBlock type, initialize it, and return the ComponentVersion.
@@ -1143,6 +1169,8 @@ def _create_component_for_block(
     in the OLX will have no attributes, e.g. `<problem />`. This first version
     will be set as the current draft. This function does not publish the
     Component.
+
+    Set can_stand_alone = False when a component is created under a container, like unit.
 
     TODO: We should probably shift this to openedx.core.djangoapps.xblock.api
     (along with its caller) since it gives runtime storage specifics. The
@@ -1168,6 +1196,7 @@ def _create_component_for_block(
             title=display_name,
             created=now,
             created_by=user_id,
+            can_stand_alone=can_stand_alone,
         )
         content = authoring_api.get_or_create_text_content(
             learning_package.id,
@@ -1191,6 +1220,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     component = get_component_from_usage_key(usage_key)
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
+    affected_containers = lib_api.get_containers_contains_component(usage_key)
 
     authoring_api.soft_delete_draft(component.pk)
 
@@ -1210,6 +1240,19 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
             library_collection=LibraryCollectionData(
                 library_key=library_key,
                 collection_key=collection.key,
+                background=True,
+            )
+        )
+
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    #
+    # To update the components count in containers
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                library_key=library_key,
+                container_key=str(container.container_key),
                 background=True,
             )
         )
