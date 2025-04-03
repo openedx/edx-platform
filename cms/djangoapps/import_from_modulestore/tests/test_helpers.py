@@ -98,7 +98,7 @@ class TestImportClient(ModuleStoreTestCase):
             composition_level='xblock',
             override=False
         )
-        import_client.create_container(
+        import_client.get_or_create_container(
             container_to_import.category,
             container_to_import.location.block_id,
             container_to_import.display_name
@@ -117,7 +117,7 @@ class TestImportClient(ModuleStoreTestCase):
             override=False
         )
         with self.assertRaises(ValueError):
-            import_client.create_container(
+            import_client.get_or_create_container(
                 self.problem.category,
                 self.problem.location.block_id,
                 self.problem.display_name

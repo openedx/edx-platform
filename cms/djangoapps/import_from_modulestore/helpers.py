@@ -37,16 +37,16 @@ class ImportClient:
     specified composition level.
     """
 
-    CONTAINER_GETTERS_MAP = {
-        'chapter': authoring_api.get_unit_version,  # TODO: replace with get_module_and_version
-        'sequential': authoring_api.get_unit_version,  # TODO: replace with get_section_and_version
-        'vertical': authoring_api.get_unit_version,
-    }
-
     CONTAINER_CREATORS_MAP = {
         'chapter': authoring_api.create_unit_and_version,  # TODO: replace with create_module_and_version
         'sequential': authoring_api.create_unit_and_version,  # TODO: replace with create_section_and_version
         'vertical': authoring_api.create_unit_and_version,
+    }
+
+    CONTAINER_OVERRIDERS_MAP = {
+        'chapter': authoring_api.create_next_unit_version,  # TODO: replace with create_next_module_version
+        'sequential': authoring_api.create_next_unit_version,  # TODO: replace with create_next_section_version
+        'vertical': authoring_api.create_next_unit_version,
     }
 
     def __init__(self, import_event, block_usage_id_to_import, staged_content, composition_level, override=False):
@@ -73,34 +73,36 @@ class ImportClient:
 
         self._process_import(self.block_usage_id_to_import, block_to_import)
 
-    def create_container(self, container_type, key, display_name):
+    def get_or_create_container(self, container_type, key, display_name):
         """
         Create a container of the specified type.
 
         Creates a container (e.g., chapter, sequential, vertical) in the
         content library.
-        # TODO: add get or create logic and process override
         """
         container_creator_func = self.CONTAINER_CREATORS_MAP.get(container_type)
-        container_getter_func = self.CONTAINER_GETTERS_MAP.get(container_type)
-        if not container_creator_func or not container_getter_func:
+        container_override_func = self.CONTAINER_OVERRIDERS_MAP.get(container_type)
+        if not all((container_creator_func, container_override_func)):
             raise ValueError(f"Unknown container type: {container_type}")
 
-        # container_version = container_getter_func(self.content_library.learning_package.id, key)
-        # if container_version and self.override:
-        #     create_next_unit_version
-        # elif not container_version:
-        #     container_creator_func
-        # else:
-        #     return container_version
-        _, container_version = container_creator_func(
-            self.import_event.target_id,
-            key=key or secrets.token_hex(16),
-            title=display_name or f"New {container_type}",
-            components=[],
-            created=datetime.now(tz=timezone.utc),
-            created_by=self.import_event.user_id,
-        )
+        container_version = self.content_library.learning_package.publishable_entities.filter(key=key).first()
+        if container_version and self.override:
+            container_version = container_override_func(
+                container_version.container,
+                title=display_name or f"New {container_type}",
+                components=[],
+                created=datetime.now(tz=timezone.utc),
+                created_by=self.import_event.user_id,
+            )
+        elif not container_version:
+            _, container_version = container_creator_func(
+                self.import_event.target_id,
+                key=key or secrets.token_hex(16),
+                title=display_name or f"New {container_type}",
+                components=[],
+                created=datetime.now(tz=timezone.utc),
+                created_by=self.import_event.user_id,
+            )
 
         return container_version
 
@@ -162,7 +164,7 @@ class ImportClient:
         if self.composition_level in CompositionLevel.FLAT_LEVELS.value:
             return self._process_import(child_usage_id, child)
 
-        container_version = self.create_container(
+        container_version = self.get_or_create_container(
             child.tag,
             child.get('url_name'),
             child.get('display_name', child.tag)
