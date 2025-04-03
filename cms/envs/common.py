@@ -1317,16 +1317,6 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ##### custom vendor plugin variables #####
 
-# .. setting_name: JS_ENV_EXTRA_CONFIG
-# .. setting_default: {}
-# .. setting_description: JavaScript code can access this dictionary using `process.env.JS_ENV_EXTRA_CONFIG`
-#   One of the current use cases for this is enabling custom TinyMCE plugins
-#   (TINYMCE_ADDITIONAL_PLUGINS) and overriding the TinyMCE configuration (TINYMCE_CONFIG_OVERRIDES).
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the JS_ENV_EXTRA_CONFIG environment variable to an equivalent JSON
-#   string instead. For details, see: https://github.com/openedx/edx-platform/issues/31895
-JS_ENV_EXTRA_CONFIG = json.loads(os.environ.get('JS_ENV_EXTRA_CONFIG', '{}'))
-
 ############################### PIPELINE #######################################
 
 PIPELINE = {
@@ -1507,14 +1497,6 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
-
-# .. setting_name: WEBPACK_CONFIG_PATH
-# .. setting_default: "webpack.prod.config.js"
-# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
-#   see: https://github.com/openedx/edx-platform/issues/31895
-WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
 
 
 ############################ SERVICE_VARIANT ##################################

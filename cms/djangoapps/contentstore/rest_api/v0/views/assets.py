@@ -4,7 +4,6 @@ Public rest API endpoints for the CMS API Assets.
 import logging
 from rest_framework.generics import CreateAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from common.djangoapps.util.json_request import expect_json_in_class_view
@@ -12,7 +11,6 @@ from common.djangoapps.util.json_request import expect_json_in_class_view
 from cms.djangoapps.contentstore.api import course_author_access_required
 
 from cms.djangoapps.contentstore.asset_storage_handlers import handle_assets
-import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 from ..serializers.assets import AssetSerializer
 from .utils import validate_request_with_serializer
@@ -20,7 +18,6 @@ from rest_framework.parsers import (MultiPartParser, FormParser, JSONParser)
 from openedx.core.lib.api.parsers import TypedFileUploadParser
 
 log = logging.getLogger(__name__)
-toggles = contentstore_toggles
 
 
 @view_auth_classes()
@@ -32,17 +29,6 @@ class AssetsCreateRetrieveView(DeveloperErrorViewMixin, CreateAPIView, RetrieveA
     """
     serializer_class = AssetSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser, TypedFileUploadParser)
-
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     @csrf_exempt
     @course_author_access_required
@@ -65,17 +51,6 @@ class AssetsUpdateDestroyView(DeveloperErrorViewMixin, UpdateAPIView, DestroyAPI
     """
     serializer_class = AssetSerializer
     parser_classes = (JSONParser, MultiPartParser, FormParser, TypedFileUploadParser)
-
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     @course_author_access_required
     @expect_json_in_class_view

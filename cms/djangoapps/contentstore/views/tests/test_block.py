@@ -560,9 +560,6 @@ class GetItemTest(ItemTest):
             else:
                 self.assertNotIn("ancestors", response)
                 xblock_info = get_block_info(xblock)
-                # TODO: remove after beta testing for the new problem editor parser
-                if xblock_info["category"] == "problem":
-                    xblock_info["metadata"]["default_to_advanced"] = False
                 self.assertEqual(xblock_info, response)
 
 

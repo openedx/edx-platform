@@ -501,7 +501,6 @@ IDA_LOGOUT_URI_LIST:
 - https://discovery.localhost/logout/
 - https://commerce-coordinator.localhost/logout/
 ID_VERIFICATION_SUPPORT_LINK: https://support.localhost/hc/en-us/articles/206503858-How-do-I-complete-photo-verification-
-JS_ENV_EXTRA_CONFIG: {}
 JWT_AUTH:
   JWT_AUDIENCE: test_jwt_audience
   JWT_AUTH_COOKIE_HEADER_PAYLOAD: jwt-cookie-header-payload
