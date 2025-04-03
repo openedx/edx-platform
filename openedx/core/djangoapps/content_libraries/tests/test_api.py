@@ -754,6 +754,18 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
         LIBRARY_CONTAINER_UPDATED.event_type,
     ]
 
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
+              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
+              so we're following a pattern here. But that pattern doesn't really make sense.
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
     def setUp(self):
         super().setUp()
 
