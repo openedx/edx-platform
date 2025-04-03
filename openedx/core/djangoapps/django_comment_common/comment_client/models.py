@@ -61,8 +61,8 @@ class Model:
     def get(self, *args, **kwargs):
         return self.attributes.get(*args, **kwargs)
 
-    def to_dict(self):
-        self.retrieve()
+    def to_dict(self, course_id=None):
+        self.retrieve(course_id=course_id)
         return self.attributes
 
     def retrieve(self, *args, **kwargs):

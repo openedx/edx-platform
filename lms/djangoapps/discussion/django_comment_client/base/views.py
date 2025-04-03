@@ -584,7 +584,7 @@ def create_thread(request, course_id, commentable_id):
 
     if follow:
         cc_user = cc.User.from_django_user(user)
-        cc_user.follow(thread)
+        cc_user.follow(thread, course_id)
         thread_followed.send(sender=None, user=user, post=thread)
 
     data = thread.to_dict()
