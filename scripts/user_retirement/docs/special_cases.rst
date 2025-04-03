@@ -1,6 +1,5 @@
 .. _handling-special-cases:
 
-######################
 Handling Special Cases
 ######################
 
@@ -20,6 +19,7 @@ retirement errored during forums retirement, so we manually reset their state
 from ``ERRORED`` to ``ENROLLMENTS_COMPLETE``.
 
 .. digraph:: retirement_states_example
+
    :align: center
 
       //rankdir=LR;  // Rank Direction Left to Right

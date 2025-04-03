@@ -1,6 +1,5 @@
 .. _driver-setup:
 
-#############################################
 Setting Up the User Retirement Driver Scripts
 #############################################
 
@@ -65,19 +64,16 @@ For example: ``['RETIRING_CREDENTIALS', 'CREDENTIALS_COMPLETE', 'CREDENTIALS',
 a pre-instantiated ``retire_learner`` method in the ``CredentialsApi``, then set
 the user's state to ``CREDENTIALS_COMPLETE``.
 
-********
 Examples
 ********
 
 The following are some examples of how to use the driver scripts.
 
-==================
 Set Up Environment
 ==================
 
 Follow this `readme <https://github.com/openedx/edx-platform/tree/master/scripts/user_retirement#readme>`_ to set up your execution environment.
 
-=========================
 List of Targeted Learners
 =========================
 
@@ -93,7 +89,6 @@ state for the time specified ``cool_off_days``).
        --output_dir=learners_to_retire \
        --cool_off_days=5
 
-=====================
 Run Retirement Script
 =====================
 
@@ -109,7 +104,6 @@ several INI files, each containing a single line in the form of ``USERNAME
        --username=<username-of-learner-to-retire>
 
 
-**************************************************
 Using the Driver Scripts in an Automated Framework
 **************************************************
 
@@ -131,4 +125,3 @@ And check out the Groovy DSL files we use to seed these jobs:
 * `platform/jobs/RetirementJobEdxTriggers.groovy in edx/jenkins-job-dsl <https://github.com/edx/jenkins-job-dsl/blob/master/platform/jobs/RetirementJobEdxTriggers.groovy>`_
 
 .. include:: ../../../../links/links.rst
-
