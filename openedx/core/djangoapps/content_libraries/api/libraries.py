@@ -75,16 +75,15 @@ from openedx.core.types import User as UserType
 from .. import permissions
 from ..constants import ALL_RIGHTS_RESERVED
 from ..models import ContentLibrary, ContentLibraryPermission
+from .exceptions import (
+    LibraryAlreadyExists,
+    LibraryPermissionIntegrityError,
+)
 
 log = logging.getLogger(__name__)
 
 # The public API is only the following symbols:
 __all__ = [
-    # Exceptions - maybe move them to a new file?
-    "ContentLibraryNotFound",
-    "LibraryAlreadyExists",
-    "IncompatibleTypesError",
-    "LibraryPermissionIntegrityError",
     # Library Models
     "ContentLibrary",  # Should this be public or not?
     "ContentLibraryMetadata",
@@ -110,25 +109,6 @@ __all__ = [
     "publish_changes",
     "revert_changes",
 ]
-
-
-# Exceptions
-# ==========
-
-
-ContentLibraryNotFound = ContentLibrary.DoesNotExist
-
-
-class LibraryAlreadyExists(KeyError):
-    """ A library with the specified slug already exists """
-
-
-class IncompatibleTypesError(Exception):
-    """ Library type constraint violated """
-
-
-class LibraryPermissionIntegrityError(IntegrityError):
-    """ Thrown when an operation would cause insane permissions. """
 
 
 # Models

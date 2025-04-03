@@ -19,14 +19,15 @@ from openedx_learning.api.authoring_models import (
     PublishableEntity,
 )
 
-from .blocks import ContentLibraryBlockNotFound
+from .exceptions import (
+    ContentLibraryBlockNotFound,
+    ContentLibraryCollectionNotFound,
+    LibraryCollectionAlreadyExists,
+)
 from ..models import ContentLibrary
-
 
 # The public API is only the following symbols:
 __all__ = [
-    "ContentLibraryCollectionNotFound",
-    "LibraryCollectionAlreadyExists",
     "create_library_collection",
     "update_library_collection",
     "update_library_collection_components",
@@ -34,13 +35,6 @@ __all__ = [
     "get_library_collection_usage_key",
     "get_library_collection_from_usage_key",
 ]
-
-
-ContentLibraryCollectionNotFound = Collection.DoesNotExist
-
-
-class LibraryCollectionAlreadyExists(IntegrityError):
-    """ A Collection with that key already exists in the library """
 
 
 def create_library_collection(

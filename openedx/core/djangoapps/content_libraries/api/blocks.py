@@ -33,7 +33,6 @@ from openedx_events.content_authoring.signals import (
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
 from xblock.core import XBlock
-from xblock.exceptions import XBlockNotFoundError
 
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
@@ -53,6 +52,12 @@ from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from ..models import ContentLibrary
 from ..permissions import CAN_EDIT_THIS_CONTENT_LIBRARY
+from .exceptions import (
+    BlockLimitReachedError,
+    ContentLibraryBlockNotFound,
+    InvalidNameError,
+    LibraryBlockAlreadyExists,
+)
 from .libraries import (
     library_component_usage_key,
     require_permission_for_library_key,
@@ -63,12 +68,10 @@ log = logging.getLogger(__name__)
 
 # The public API is only the following symbols:
 __all__ = [
-    "ContentLibraryBlockNotFound",
-    "BlockLimitReachedError",
-    "LibraryBlockAlreadyExists",
-    "InvalidNameError",
+    # Models
     "LibraryXBlockMetadata",
     "LibraryXBlockStaticFile",
+    # API methods
     "get_library_components",
     "get_library_block",
     "set_library_block_olx",
@@ -84,22 +87,6 @@ __all__ = [
     "delete_library_block_static_asset_file",
     "publish_component_changes",
 ]
-
-
-class ContentLibraryBlockNotFound(XBlockNotFoundError):
-    """ XBlock not found in the content library """
-
-
-class BlockLimitReachedError(Exception):
-    """ Maximum number of allowed XBlocks in the library reached """
-
-
-class LibraryBlockAlreadyExists(KeyError):
-    """ An XBlock with that ID already exists in the library """
-
-
-class InvalidNameError(ValueError):
-    """ The specified name/identifier is not valid """
 
 
 @dataclass(frozen=True, kw_only=True)
