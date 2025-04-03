@@ -100,6 +100,15 @@ ALL_ALLOWED_XBLOCKS = frozenset(
 )
 
 
+class LinkState:
+    """
+    Links State Enumeration
+    """
+    BROKEN = 'broken'
+    LOCKED = 'locked'
+    EXTERNAL_FORBIDDEN = 'external-forbidden'
+
+
 def clone_instance(instance, field_values):
     """ Clones a Django model instance.
 
@@ -1334,7 +1343,8 @@ def _filter_by_status(results):
 
     Statuses:
         200: OK. No need to do more
-        403: Forbidden. Record as locked link.
+        403: Forbidden. Record as locked link if it is studio link.
+        403: Forbidden. Record as external-forbidden link if it is external link
         None: Error. Retry up to 3 times.
         Other: Failure. Record as broken link.
 
@@ -1347,7 +1357,7 @@ def _filter_by_status(results):
 
     Example return:
         [
-            [block_id1, filtered_results_url1, is_locked],
+            [block_id1, filtered_results_url1, link_state],
             ...
         ],
         [
@@ -1359,14 +1369,16 @@ def _filter_by_status(results):
     retry_list = []
     for result in results:
         status, block_id, url = result['status'], result['block_id'], result['url']
-        if status is None:
+        if status is None and _is_studio_url(url):
             retry_list.append([block_id, url])
         elif status == 200:
             continue
         elif status == 403 and _is_studio_url(url):
-            filtered_results.append([block_id, url, True])
+            filtered_results.append([block_id, url, LinkState.LOCKED])
+        elif status in [403, None] and not _is_studio_url(url):
+            filtered_results.append([block_id, url, LinkState.EXTERNAL_FORBIDDEN])
         else:
-            filtered_results.append([block_id, url, False])
+            filtered_results.append([block_id, url, LinkState.BROKEN])
 
     return filtered_results, retry_list
 

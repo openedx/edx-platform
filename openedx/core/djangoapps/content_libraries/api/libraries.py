@@ -62,7 +62,7 @@ import mimetypes
 import requests
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import AbstractUser, AnonymousUser, Group
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.validators import validate_unicode_slug
 from django.db import IntegrityError, transaction
@@ -82,6 +82,7 @@ from openedx_events.content_authoring.data import (
     ContentLibraryData,
     LibraryBlockData,
     LibraryCollectionData,
+    LibraryContainerData,
     ContentObjectChangedData,
 )
 from openedx_events.content_authoring.signals import (
@@ -92,6 +93,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
+    LIBRARY_CONTAINER_UPDATED,
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
 from openedx_learning.api import authoring as authoring_api
@@ -113,14 +115,63 @@ from openedx.core.djangoapps.xblock.api import (
     xblock_type_display_name,
 )
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.types import User as UserType
 from xmodule.modulestore.django import modulestore
 
-from . import permissions, tasks
-from .constants import ALL_RIGHTS_RESERVED
-from .models import ContentLibrary, ContentLibraryPermission, ContentLibraryBlockImportTask
+from .. import permissions, tasks
+from ..constants import ALL_RIGHTS_RESERVED
+from ..models import ContentLibrary, ContentLibraryPermission, ContentLibraryBlockImportTask
 
 log = logging.getLogger(__name__)
+
+# The public API is only the following symbols:
+__all__ = [
+    # Exceptions - maybe move them to a new file?
+    "ContentLibraryNotFound",
+    "ContentLibraryCollectionNotFound",
+    "ContentLibraryBlockNotFound",
+    "LibraryAlreadyExists",
+    "LibraryCollectionAlreadyExists",
+    "LibraryBlockAlreadyExists",
+    "BlockLimitReachedError",
+    "IncompatibleTypesError",
+    "InvalidNameError",
+    "LibraryPermissionIntegrityError",
+    # Library Models
+    "ContentLibrary",  # Should this be public or not?
+    "ContentLibraryMetadata",
+    "AccessLevel",
+    "ContentLibraryPermissionEntry",
+    "CollectionMetadata",
+    # Library API methods
+    "user_can_create_library",
+    "get_libraries_for_user",
+    "get_metadata",
+    "require_permission_for_library_key",
+    "get_library",
+    "create_library",
+    "get_library_team",
+    "get_library_user_permissions",
+    "set_library_user_permissions",
+    "set_library_group_permissions",
+    "update_library",
+    "delete_library",
+    "get_allowed_block_types",
+    "publish_changes",
+    "revert_changes",
+    # Collections - TODO: move to a new file
+    "create_library_collection",
+    "update_library_collection",
+    "update_library_collection_components",
+    "set_library_component_collections",
+    "get_library_collection_usage_key",
+    "get_library_collection_from_usage_key",
+    # Import - TODO: move to a new file
+    "EdxModulestoreImportClient",
+    "EdxApiImportClient",
+    "import_blocks_create_task",
+]
 
 
 # Exceptions
@@ -229,24 +280,40 @@ class CollectionMetadata:
 
 
 @dataclass(frozen=True)
-class LibraryXBlockMetadata:
+class LibraryItem:
     """
-    Class that represents the metadata about an XBlock in a content library.
+    Common fields for anything that can be found in a content library.
     """
-    usage_key: LibraryUsageLocatorV2
     created: datetime
     modified: datetime
+    display_name: str
+
+
+@dataclass(frozen=True, kw_only=True)
+class PublishableItem(LibraryItem):
+    """
+    Common fields for anything that can be found in a content library that has
+    draft/publish support.
+    """
     draft_version_num: int
     published_version_num: int | None = None
-    display_name: str = ""
     last_published: datetime | None = None
-    # THe username of the user who last published this.
+    # The username of the user who last published this.
     published_by: str = ""
     last_draft_created: datetime | None = None
     # The username of the user who created the last draft.
     last_draft_created_by: str = ""
     has_unpublished_changes: bool = False
     collections: list[CollectionMetadata] = field(default_factory=list)
+    can_stand_alone: bool = True
+
+
+@dataclass(frozen=True, kw_only=True)
+class LibraryXBlockMetadata(PublishableItem):
+    """
+    Class that represents the metadata about an XBlock in a content library.
+    """
+    usage_key: LibraryUsageLocatorV2
 
     @classmethod
     def from_component(cls, library_key, component, associated_collections=None):
@@ -280,6 +347,7 @@ class LibraryXBlockMetadata:
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=component.versioning.has_unpublished_changes,
             collections=associated_collections or [],
+            can_stand_alone=component.publishable_entity.can_stand_alone,
         )
 
 
@@ -416,6 +484,7 @@ def get_library(library_key: LibraryLocatorV2) -> ContentLibraryMetadata:
     """
     ref = ContentLibrary.objects.get_by_key(library_key)
     learning_package = ref.learning_package
+    assert learning_package is not None  # Shouldn't happen - this is just for the type checker
     num_blocks = authoring_api.get_all_drafts(learning_package.id).count()
     last_publish_log = authoring_api.get_last_publish(learning_package.id)
     last_draft_log = authoring_api.get_entities_with_unpublished_changes(learning_package.id) \
@@ -455,7 +524,7 @@ def get_library(library_key: LibraryLocatorV2) -> ContentLibraryMetadata:
     return ContentLibraryMetadata(
         key=library_key,
         title=learning_package.title,
-        description=ref.learning_package.description,
+        description=learning_package.description,
         num_blocks=num_blocks,
         version=version,
         last_published=None if last_publish_log is None else last_publish_log.published_at,
@@ -557,6 +626,8 @@ def get_library_user_permissions(library_key: LibraryLocatorV2, user: UserType) 
     Fetch the specified user's access information. Will return None if no
     permissions have been granted.
     """
+    if isinstance(user, AnonymousUser):
+        return None  # Mostly here for the type checker
     ref = ContentLibrary.objects.get_by_key(library_key)
     grant = ref.permission_grants.filter(user=user).first()
     if grant is None:
@@ -574,6 +645,8 @@ def set_library_user_permissions(library_key: LibraryLocatorV2, user: UserType, 
 
     access_level should be one of the AccessLevel values defined above.
     """
+    if isinstance(user, AnonymousUser):
+        raise TypeError("Invalid user type")  # Mostly here for the type checker
     ref = ContentLibrary.objects.get_by_key(library_key)
     current_grant = get_library_user_permissions(library_key, user)
     if current_grant and current_grant.access_level == AccessLevel.ADMIN_LEVEL:
@@ -633,6 +706,8 @@ def update_library(
         return
 
     content_lib = ContentLibrary.objects.get_by_key(library_key)
+    learning_package_id = content_lib.learning_package_id
+    assert learning_package_id is not None
 
     with transaction.atomic():
         # We need to make updates to both the ContentLibrary and its linked
@@ -643,12 +718,12 @@ def update_library(
             if allow_public_read is not None:
                 content_lib.allow_public_read = allow_public_read
             if library_license is not None:
-                content_lib.library_license = library_license
+                content_lib.license = library_license
             content_lib.save()
 
         if learning_pkg_changed:
             authoring_api.update_learning_package(
-                content_lib.learning_package_id,
+                learning_package_id,
                 title=title,
                 description=description,
             )
@@ -675,7 +750,8 @@ def delete_library(library_key: LibraryLocatorV2) -> None:
         # TODO: We should eventually detach the LearningPackage and delete it
         #       asynchronously, especially if we need to delete a bunch of stuff
         #       on the filesystem for it.
-        learning_package.delete()
+        if learning_package:
+            learning_package.delete()
 
     CONTENT_LIBRARY_DELETED.send_event(
         content_library=ContentLibraryData(
@@ -709,6 +785,7 @@ def get_library_components(
     """
     lib = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     learning_package = lib.learning_package
+    assert learning_package is not None
     components = authoring_api.get_components(
         learning_package.id,
         draft=True,
@@ -827,6 +904,18 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
         )
     )
 
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                library_key=usage_key.lib_key,
+                container_key=str(container.container_key),
+                background=True,
+            )
+        )
+
     return new_component_version
 
 
@@ -860,7 +949,8 @@ def validate_can_add_block_to_library(
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
 
     # If adding a component would take us over our max, return an error.
-    component_count = authoring_api.get_all_drafts(content_library.learning_package.id).count()
+    assert content_library.learning_package_id is not None
+    component_count = authoring_api.get_all_drafts(content_library.learning_package_id).count()
     if component_count + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY:
         raise BlockLimitReachedError(
             _("Library cannot have more than {} Components").format(
@@ -885,9 +975,17 @@ def validate_can_add_block_to_library(
     return content_library, usage_key
 
 
-def create_library_block(library_key, block_type, definition_id, user_id=None):
+def create_library_block(
+    library_key: LibraryLocatorV2,
+    block_type: str,
+    definition_id: str,
+    user_id: int | None = None,
+    can_stand_alone: bool = True,
+):
     """
     Create a new XBlock in this library of the specified type (e.g. "html").
+
+    Set can_stand_alone = False when a component is created under a container, like unit.
     """
     # It's in the serializer as ``definition_id``, but for our purposes, it's
     # the block_id. See the comments in ``LibraryXBlockCreationSerializer`` for
@@ -896,7 +994,7 @@ def create_library_block(library_key, block_type, definition_id, user_id=None):
 
     content_library, usage_key = validate_can_add_block_to_library(library_key, block_type, block_id)
 
-    _create_component_for_block(content_library, usage_key, user_id)
+    _create_component_for_block(content_library, usage_key, user_id, can_stand_alone)
 
     # Now return the metadata about the new block:
     LIBRARY_BLOCK_CREATED.send_event(
@@ -1062,6 +1160,7 @@ def _create_component_for_block(
     content_lib: ContentLibrary,
     usage_key: LibraryUsageLocatorV2,
     user_id: int | None = None,
+    can_stand_alone: bool = True,
 ):
     """
     Create a Component for an XBlock type, initialize it, and return the ComponentVersion.
@@ -1070,6 +1169,8 @@ def _create_component_for_block(
     in the OLX will have no attributes, e.g. `<problem />`. This first version
     will be set as the current draft. This function does not publish the
     Component.
+
+    Set can_stand_alone = False when a component is created under a container, like unit.
 
     TODO: We should probably shift this to openedx.core.djangoapps.xblock.api
     (along with its caller) since it gives runtime storage specifics. The
@@ -1095,6 +1196,7 @@ def _create_component_for_block(
             title=display_name,
             created=now,
             created_by=user_id,
+            can_stand_alone=can_stand_alone,
         )
         content = authoring_api.get_or_create_text_content(
             learning_package.id,
@@ -1118,6 +1220,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     component = get_component_from_usage_key(usage_key)
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
+    affected_containers = lib_api.get_containers_contains_component(usage_key)
 
     authoring_api.soft_delete_draft(component.pk)
 
@@ -1137,6 +1240,19 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
             library_collection=LibraryCollectionData(
                 library_key=library_key,
                 collection_key=collection.key,
+                background=True,
+            )
+        )
+
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    #
+    # To update the components count in containers
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                library_key=library_key,
+                container_key=str(container.container_key),
                 background=True,
             )
         )
@@ -1356,7 +1472,7 @@ def publish_changes(library_key: LibraryLocatorV2, user_id: int | None = None):
     Publish all pending changes to the specified library.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
-
+    assert learning_package is not None  # shouldn't happen but it's technically possible.
     authoring_api.publish_all_drafts(learning_package.id, published_by=user_id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
@@ -1398,6 +1514,7 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     last published version.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
+    assert learning_package is not None  # shouldn't happen but it's technically possible.
     authoring_api.reset_drafts_to_published(learning_package.id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
@@ -1652,6 +1769,7 @@ def get_library_collection_from_usage_key(
     library_key = collection_usage_key.library_key
     collection_key = collection_usage_key.collection_id
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    assert content_library.learning_package_id is not None  # shouldn't happen but it's technically possible.
     try:
         return authoring_api.get_collection(
             content_library.learning_package_id,

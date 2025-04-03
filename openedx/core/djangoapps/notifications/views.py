@@ -41,6 +41,8 @@ from .serializers import (
 )
 from .utils import get_is_new_notification_view_enabled, get_show_notifications_tray, aggregate_notification_configs, \
     filter_out_visible_preferences_by_course_ids
+from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 
 
 @allow_any_authenticated_user()
@@ -228,6 +230,12 @@ class UserNotificationPreferenceView(APIView):
         )
         preference_update.is_valid(raise_exception=True)
         updated_notification_preferences = preference_update.save()
+
+        if request.data.get('notification_channel', '') == 'email' and request.data.get('value', False):
+            UserPreference.objects.filter(
+                user_id=request.user.id,
+                key=ONE_CLICK_EMAIL_UNSUB_KEY
+            ).delete()
         notification_preference_update_event(request.user, course_id, preference_update.validated_data)
 
         serializer_context = {
@@ -324,7 +332,7 @@ class NotificationCountView(APIView):
         # Get the unseen notifications count for each app name.
         count_by_app_name = (
             Notification.objects
-            .filter(user_id=request.user, last_seen__isnull=True)
+            .filter(user_id=request.user, last_seen__isnull=True, web=True)
             .values('app_name')
             .annotate(count=Count('*'))
         )
@@ -529,6 +537,11 @@ class UpdateAllNotificationPreferencesView(APIView):
                             'course_id': str(preference.course_id),
                             'error': str(e)
                         })
+                if channel == 'email' and value:
+                    UserPreference.objects.filter(
+                        user_id=request.user,
+                        key=ONE_CLICK_EMAIL_UNSUB_KEY
+                    ).delete()
                 response_data = {
                     'status': 'success' if updated_courses else 'partial_success' if errors else 'error',
                     'message': 'Notification preferences update completed',

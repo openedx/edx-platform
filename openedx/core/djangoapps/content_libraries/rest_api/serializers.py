@@ -10,6 +10,7 @@ from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys import InvalidKeyError
 
 from openedx_learning.api.authoring_models import Collection
+from openedx.core.djangoapps.content_libraries.api.containers import ContainerMetadata, ContainerType
 from openedx.core.djangoapps.content_libraries.constants import (
     ALL_RIGHTS_RESERVED,
     LICENSE_OPTIONS,
@@ -19,7 +20,7 @@ from openedx.core.djangoapps.content_libraries.models import (
     ContentLibrary
 )
 from openedx.core.lib.api.serializers import CourseKeyField
-from . import permissions
+from .. import permissions
 
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
@@ -158,6 +159,7 @@ class LibraryXBlockMetadataSerializer(serializers.Serializer):
     tags_count = serializers.IntegerField(read_only=True)
 
     collections = CollectionMetadataSerializer(many=True, required=False)
+    can_stand_alone = serializers.BooleanField(read_only=True)
 
 
 class LibraryXBlockTypeSerializer(serializers.Serializer):
@@ -191,6 +193,9 @@ class LibraryXBlockCreationSerializer(serializers.Serializer):
     # Optional param specified when pasting data from clipboard instead of
     # creating new block from scratch
     staged_content = serializers.CharField(required=False)
+
+    # Optional param defaults to True, set to False if block is being created under a container.
+    can_stand_alone = serializers.BooleanField(required=False, default=True)
 
 
 class LibraryPasteClipboardSerializer(serializers.Serializer):
@@ -228,6 +233,52 @@ class LibraryXBlockStaticFilesSerializer(serializers.Serializer):
     Serializes a LibraryXBlockStaticFile (or a BundleFile)
     """
     files = LibraryXBlockStaticFileSerializer(many=True)
+
+
+class LibraryContainerMetadataSerializer(serializers.Serializer):
+    """
+    Serializer for Containers like Sections, Subsections, Units
+
+    Converts from ContainerMetadata to JSON-compatible data
+    """
+    container_key = serializers.CharField(read_only=True)
+    container_type = serializers.CharField()
+    display_name = serializers.CharField()
+    last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    published_by = serializers.CharField(read_only=True)
+    last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    last_draft_created_by = serializers.CharField(read_only=True)
+    has_unpublished_changes = serializers.BooleanField(read_only=True)
+    created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    modified = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
+    tags_count = serializers.IntegerField(read_only=True)
+    collections = CollectionMetadataSerializer(many=True, required=False, read_only=True)
+
+    # When creating a new container in a library, the slug becomes the ID part of
+    # the definition key and usage key:
+    slug = serializers.CharField(write_only=True, required=False)
+
+    def to_representation(self, instance: ContainerMetadata):
+        """ Convert to JSON-serializable data types """
+        data = super().to_representation(instance)
+        data["container_type"] = instance.container_type.value  # Force to a string, not an enum value instance
+        return data
+
+    def to_internal_value(self, data):
+        """
+        Convert JSON-ish data back to native python types.
+        Returns a dictionary, not a ContainerMetadata instance.
+        """
+        result = super().to_internal_value(data)
+        result["container_type"] = ContainerType(data["container_type"])
+        return result
+
+
+class LibraryContainerUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for updating metadata for Containers like Sections, Subsections, Units
+    """
+    display_name = serializers.CharField()
 
 
 class ContentLibraryBlockImportTaskSerializer(serializers.ModelSerializer):
@@ -298,7 +349,7 @@ class UsageKeyV2Serializer(serializers.BaseSerializer):
             raise ValidationError from err
 
 
-class ContentLibraryCollectionComponentsUpdateSerializer(serializers.Serializer):
+class ContentLibraryComponentKeysSerializer(serializers.Serializer):
     """
     Serializer for adding/removing Components to/from a Collection.
     """

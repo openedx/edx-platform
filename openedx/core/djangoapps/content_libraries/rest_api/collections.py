@@ -1,7 +1,6 @@
 """
 Collections API Views
 """
-
 from __future__ import annotations
 
 from django.db.models import QuerySet
@@ -17,13 +16,13 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
 
-from openedx.core.djangoapps.content_libraries import api, permissions
-from openedx.core.djangoapps.content_libraries.models import ContentLibrary
-from openedx.core.djangoapps.content_libraries.views import convert_exceptions
-from openedx.core.djangoapps.content_libraries.serializers import (
+from .. import api, permissions
+from ..models import ContentLibrary
+from .utils import convert_exceptions
+from .serializers import (
     ContentLibraryCollectionSerializer,
-    ContentLibraryCollectionComponentsUpdateSerializer,
     ContentLibraryCollectionUpdateSerializer,
+    ContentLibraryComponentKeysSerializer,
 )
 from openedx.core.types.http import RestRequest
 
@@ -201,7 +200,7 @@ class LibraryCollectionsView(ModelViewSet):
         content_library = self.get_content_library()
         collection_key = kwargs["key"]
 
-        serializer = ContentLibraryCollectionComponentsUpdateSerializer(data=request.data)
+        serializer = ContentLibraryComponentKeysSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         usage_keys = serializer.validated_data["usage_keys"]

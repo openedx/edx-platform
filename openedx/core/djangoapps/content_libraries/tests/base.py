@@ -22,6 +22,7 @@ URL_LIB_BLOCK_TYPES = URL_LIB_DETAIL + 'block_types/'  # Get the list of XBlock 
 URL_LIB_LINKS = URL_LIB_DETAIL + 'links/'  # Get the list of links in this library, or add a new one
 URL_LIB_COMMIT = URL_LIB_DETAIL + 'commit/'  # Commit (POST) or revert (DELETE) all pending changes to this library
 URL_LIB_BLOCKS = URL_LIB_DETAIL + 'blocks/'  # Get the list of XBlocks in this library, or add a new one
+URL_LIB_CONTAINERS = URL_LIB_DETAIL + 'containers/'  # Create a new container in this library
 URL_LIB_TEAM = URL_LIB_DETAIL + 'team/'  # Get the list of users/groups authorized to use this library
 URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{username}/'  # Add/edit/remove a user's permission to use this library
 URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
@@ -31,6 +32,8 @@ URL_LIB_BLOCK_PUBLISH = URL_LIB_BLOCK + 'publish/'  # Publish changes from a spe
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
+URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
+URL_LIB_CONTAINER_COMPONENTS = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
 
 URL_LIB_LTI_PREFIX = URL_PREFIX + 'lti/1.3/'
 URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
@@ -227,9 +230,21 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             expect_response
         )
 
-    def _add_block_to_library(self, lib_key, block_type, slug, parent_block=None, expect_response=200):
+    def _add_block_to_library(
+        self,
+        lib_key,
+        block_type,
+        slug,
+        parent_block=None,
+        can_stand_alone=True,
+        expect_response=200,
+    ):
         """ Add a new XBlock to the library """
-        data = {"block_type": block_type, "definition_id": slug}
+        data = {
+            "block_type": block_type,
+            "definition_id": slug,
+            "can_stand_alone": can_stand_alone,
+        }
         if parent_block:
             data["parent_block"] = parent_block
         return self._api('post', URL_LIB_BLOCKS.format(lib_key=lib_key), data, expect_response)
@@ -350,3 +365,74 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
     def _set_library_block_fields(self, block_key, new_fields, expect_response=200):
         """ Set the fields of a specific block in the library. This API is only used by the MFE editors. """
         return self._api('post', URL_BLOCK_FIELDS_URL.format(block_key=block_key), new_fields, expect_response)
+
+    def _create_container(self, lib_key, container_type, slug: str | None, display_name: str, expect_response=200):
+        """ Create a container (unit etc.) """
+        data = {"container_type": container_type, "display_name": display_name}
+        if slug:
+            data["slug"] = slug
+        return self._api('post', URL_LIB_CONTAINERS.format(lib_key=lib_key), data, expect_response)
+
+    def _get_container(self, container_key: str, expect_response=200):
+        """ Get a container (unit etc.) """
+        return self._api('get', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)
+
+    def _update_container(self, container_key: str, display_name: str, expect_response=200):
+        """ Update a container (unit etc.) """
+        data = {"display_name": display_name}
+        return self._api('patch', URL_LIB_CONTAINER.format(container_key=container_key), data, expect_response)
+
+    def _delete_container(self, container_key: str, expect_response=204):
+        """ Delete a container (unit etc.) """
+        return self._api('delete', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)
+
+    def _get_container_components(self, container_key: str, expect_response=200):
+        """ Get container components"""
+        return self._api(
+            'get',
+            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            None,
+            expect_response
+        )
+
+    def _add_container_components(
+        self,
+        container_key: str,
+        children_ids: list[str],
+        expect_response=200,
+    ):
+        """ Add container components"""
+        return self._api(
+            'post',
+            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            {'usage_keys': children_ids},
+            expect_response
+        )
+
+    def _remove_container_components(
+        self,
+        container_key: str,
+        children_ids: list[str],
+        expect_response=200,
+    ):
+        """ Remove container components"""
+        return self._api(
+            'delete',
+            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            {'usage_keys': children_ids},
+            expect_response
+        )
+
+    def _patch_container_components(
+        self,
+        container_key: str,
+        children_ids: list[str],
+        expect_response=200,
+    ):
+        """ Update container components"""
+        return self._api(
+            'patch',
+            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            {'usage_keys': children_ids},
+            expect_response
+        )

@@ -208,6 +208,36 @@ class TestSearchApi(ModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "Library"}],
         }
 
+        # Create a unit:
+        with freeze_time(created_date):
+            self.unit = library_api.create_container(
+                library_key=self.library.key,
+                container_type=library_api.ContainerType.Unit,
+                slug="unit-1",
+                title="Unit 1",
+                user_id=None,
+            )
+            self.unit_key = "lct:org1:lib:unit:unit-1"
+        self.unit_dict = {
+            "id": "lctorg1libunitunit-1-e4527f7c",
+            "block_id": "unit-1",
+            "block_type": "unit",
+            "usage_key": self.unit_key,
+            "type": "library_container",
+            "display_name": "Unit 1",
+            # description is not set for containers
+            "num_children": 0,
+            "publish_status": "never",
+            "context_key": "lib:org1:lib",
+            "org": "org1",
+            "created": created_date.timestamp(),
+            "modified": created_date.timestamp(),
+            "access_id": lib_access.id,
+            "breadcrumbs": [{"display_name": "Library"}],
+            # "tags" should be here but we haven't implemented them yet
+            # "published" is not set since we haven't published it yet
+        }
+
     @override_settings(MEILISEARCH_ENABLED=False)
     def test_reindex_meilisearch_disabled(self, mock_meilisearch):
         with self.assertRaises(RuntimeError):
@@ -231,14 +261,16 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem2["collections"] = {'display_name': [], 'key': []}
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
+        doc_unit = copy.deepcopy(self.unit_dict)
 
         api.rebuild_index()
-        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 3
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
         mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
             [
                 call([doc_sequential, doc_vertical]),
                 call([doc_problem1, doc_problem2]),
                 call([doc_collection]),
+                call([doc_unit]),
             ],
             any_order=True,
         )
@@ -259,14 +291,16 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem2["collections"] = {"display_name": [], "key": []}
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
+        doc_unit = copy.deepcopy(self.unit_dict)
 
         api.rebuild_index(incremental=True)
-        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 3
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
         mock_meilisearch.return_value.index.return_value.add_documents.assert_has_calls(
             [
                 call([doc_sequential, doc_vertical]),
                 call([doc_problem1, doc_problem2]),
                 call([doc_collection]),
+                call([doc_unit]),
             ],
             any_order=True,
         )
@@ -280,13 +314,13 @@ class TestSearchApi(ModuleStoreTestCase):
         with pytest.raises(Exception, match="Simulated interruption"):
             api.rebuild_index(simulated_interruption, incremental=True)
 
-        # two more calls due to collections
-        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 5
+        # three more calls due to collections and containers
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 7
         assert IncrementalIndexCompleted.objects.all().count() == 1
         api.rebuild_index(incremental=True)
         assert IncrementalIndexCompleted.objects.all().count() == 0
         # one missing course indexed
-        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 6
+        assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 8
 
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_reset_meilisearch_index(self, mock_meilisearch):
@@ -338,6 +372,22 @@ class TestSearchApi(ModuleStoreTestCase):
         ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
         mock_logger.assert_any_call(
             f"Error indexing collection {self.collection}: Failed to generate document"
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    @patch(
+        "openedx.core.djangoapps.content.search.api.searchable_doc_for_container",
+        Mock(side_effect=Exception("Failed to generate document")),
+    )
+    def test_reindex_meilisearch_container_error(self, mock_meilisearch):
+
+        mock_logger = Mock()
+        api.rebuild_index(mock_logger)
+        assert call(
+            [self.unit_dict]
+        ) not in mock_meilisearch.return_value.index.return_value.add_documents.mock_calls
+        mock_logger.assert_any_call(
+            "Error indexing container unit-1: Failed to generate document"
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)

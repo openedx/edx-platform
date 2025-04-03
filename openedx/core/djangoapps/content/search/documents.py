@@ -6,11 +6,12 @@ from __future__ import annotations
 import logging
 from hashlib import blake2b
 
-from django.utils.text import slugify
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.text import slugify
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
-from opaque_keys.edx.locator import LibraryLocatorV2
+from openedx_learning.api.authoring_models import Collection
 from rest_framework.exceptions import NotFound
 
 from openedx.core.djangoapps.content.search.models import SearchAccess
@@ -19,7 +20,6 @@ from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangoapps.xblock.data import LatestVersion
-from openedx_learning.api.authoring_models import Collection
 
 log = logging.getLogger(__name__)
 
@@ -100,6 +100,7 @@ class DocType:
     """
     course_block = "course_block"
     library_block = "library_block"
+    library_container = "library_container"
     collection = "collection"
 
 
@@ -544,5 +545,65 @@ def searchable_doc_for_collection(
         # so we mark them as _disabled
         if not collection.enabled:
             doc['_disabled'] = True
+
+    return doc
+
+
+def searchable_doc_for_container(
+    container_key: LibraryContainerLocator,
+) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, so that the given container can be
+    found using faceted search.
+
+    If no container is found for the given container key, the returned document
+    will contain only basic information derived from the container key, and no
+    Fields.type value will be included in the returned dict.
+    """
+    doc = {
+        Fields.id: meili_id_from_opaque_key(container_key),
+        Fields.context_key: str(container_key.library_key),
+        Fields.org: str(container_key.org),
+        # In the future, this may be either course_container or library_container
+        Fields.type: DocType.library_container,
+        # To check if it is "unit", "section", "subsection", etc..
+        Fields.block_type: container_key.container_type,
+        Fields.usage_key: str(container_key),  # Field name isn't exact but this is the closest match
+        Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
+        Fields.access_id: _meili_access_id_from_context_key(container_key.library_key),
+        Fields.publish_status: PublishStatus.never,
+    }
+
+    try:
+        container = lib_api.get_container(container_key)
+    except lib_api.ContentLibraryContainerNotFound:
+        # Container not found, so we can only return the base doc
+        return doc
+
+    draft_num_children = lib_api.get_container_children_count(container_key, published=False)
+    publish_status = PublishStatus.published
+    if container.last_published is None:
+        publish_status = PublishStatus.never
+    elif container.has_unpublished_changes:
+        publish_status = PublishStatus.modified
+
+    doc.update({
+        Fields.display_name: container.display_name,
+        Fields.created: container.created.timestamp(),
+        Fields.modified: container.modified.timestamp(),
+        Fields.num_children: draft_num_children,
+        Fields.publish_status: publish_status,
+    })
+    library = lib_api.get_library(container_key.library_key)
+    if library:
+        doc[Fields.breadcrumbs] = [{"display_name": library.title}]
+
+    if container.published_version_num is not None:
+        published_num_children = lib_api.get_container_children_count(container_key, published=True)
+        doc[Fields.published] = {
+            # Fields.published_display_name: container_published.title, TODO: set the published title
+            Fields.published_num_children: published_num_children,
+        }
 
     return doc

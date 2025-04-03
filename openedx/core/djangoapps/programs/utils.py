@@ -211,7 +211,7 @@ class ProgramProgressMeter:
         return inverted_programs
 
     @cached_property
-    def engaged_programs(self):
+    def engaged_programs(self) -> list[dict | None]:
         """Derive a list of programs in which the given user is engaged.
 
         Returns:
@@ -271,7 +271,7 @@ class ProgramProgressMeter:
         # An upgrade deadline of None means the course is always upgradeable.
         return any(not deadline or deadline and parse(deadline) > now for deadline in upgrade_deadlines)
 
-    def progress(self, programs=None, count_only=True):
+    def progress(self, programs: list[dict | None] | None = None, count_only: bool = True) -> list[dict | None]:
         """Gauge a user's progress towards program completion.
 
         Keyword Arguments:
@@ -701,6 +701,7 @@ class ProgramDataExtender:
         is_learner_eligible_for_one_click_purchase = self.data["is_program_eligible_for_one_click_purchase"]
         bundle_uuid = self.data.get("uuid")
         skus = []
+        course_keys = []
         bundle_variant = "full"
 
         if is_learner_eligible_for_one_click_purchase:  # lint-amnesty, pylint: disable=too-many-nested-blocks
@@ -719,6 +720,7 @@ class ProgramDataExtender:
                     # we are assuming that, for any given course, there is at most one paid entitlement available.
                     if entitlement["mode"] in applicable_seat_types:
                         skus.append(entitlement["sku"])
+                        course_keys.append(course.get("key"))
                         entitlement_product = True
                         break
                 if not entitlement_product:
@@ -728,6 +730,7 @@ class ProgramDataExtender:
                         for seat in published_course_runs[0]["seats"]:
                             if seat["type"] in applicable_seat_types and seat["sku"]:
                                 skus.append(seat["sku"])
+                                course_keys.append(course.get("key"))
                                 break
                     else:
                         # If a course in the program has more than 1 published course run
@@ -744,14 +747,14 @@ class ProgramDataExtender:
                 if is_anonymous or ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.is_enabled():
                     # The bundle uuid is necessary to see the program's discounted price
                     if bundle_uuid:
-                        params = dict(sku=skus, is_anonymous=True, bundle=bundle_uuid)
+                        params = dict(sku=skus, is_anonymous=True, bundle=bundle_uuid, course_key=course_keys)
                     else:
-                        params = dict(sku=skus, is_anonymous=True)
+                        params = dict(sku=skus, is_anonymous=True, course_key=course_keys)
                 else:
                     if bundle_uuid:
-                        params = dict(sku=skus, username=self.user.username, bundle=bundle_uuid)
+                        params = dict(sku=skus, username=self.user.username, bundle=bundle_uuid, course_key=course_keys)
                     else:
-                        params = dict(sku=skus, username=self.user.username)
+                        params = dict(sku=skus, username=self.user.username, course_key=course_keys)
 
                 response = get_program_price_info(self.user, params)
                 response.raise_for_status()

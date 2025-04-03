@@ -40,6 +40,7 @@ function($, _, Backbone, gettext, BasePage,
             'change .header-library-checkbox': 'toggleLibraryComponent',
             'click .collapse-button': 'collapseXBlock',
             'click .xblock-view-action-button': 'viewXBlockContent',
+            'click .xblock-view-group-link': 'viewXBlockContent',
         },
 
         options: {
@@ -60,8 +61,9 @@ function($, _, Backbone, gettext, BasePage,
         initialize: function(options) {
             BasePage.prototype.initialize.call(this, options);
             this.viewClass = options.viewClass || this.defaultViewClass;
-            this.isLibraryPage = (this.model.attributes.category === 'library');
-            this.isLibraryContentPage = (this.model.attributes.category === 'library_content');
+            this.isLibraryPage = this.model.attributes.category === 'library';
+            this.isLibraryContentPage = this.model.attributes.category === 'library_content';
+            this.isSplitTestContentPage = this.model.attributes.category === 'split_test';
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),
                 model: this.model
@@ -131,12 +133,15 @@ function($, _, Backbone, gettext, BasePage,
 
             if (this.options.isIframeEmbed) {
                 window.addEventListener('message', (event) => {
-                    const { data } = event;
+                    const { data: initialData } = event;
 
-                    if (!data) return;
+                    if (!initialData) return;
 
                     let xblockElement;
                     let xblockWrapper;
+
+                    const data = { ...initialData };
+                    data.payload = { ...data?.payload, ...data?.payload?.data };
 
                     if (data.payload && data.payload.locator) {
                         xblockElement = $(`[data-locator="${data.payload.locator}"]`);
@@ -171,6 +176,25 @@ function($, _, Backbone, gettext, BasePage,
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
+        },
+
+        postMessageToParent: function(body, callbackFn = null) {
+            try {
+                window.parent.postMessage(body, document.referrer);
+                if (callbackFn) {
+                  callbackFn();
+                }
+            } catch (e) {
+                console.error('Failed to post message:', e);
+            }
+        },
+
+        postMessageForHideProcessingNotification: function () {
+          this.postMessageToParent({
+              type: 'hideProcessingNotification',
+              message: 'Hide processing notification',
+              payload: {},
+          });
         },
 
         getViewParameters: function() {
@@ -237,18 +261,14 @@ function($, _, Backbone, gettext, BasePage,
                         const scrollOffset = scrollOffsetString ? parseInt(scrollOffsetString, 10) : 0;
 
                         if (scrollOffset) {
-                            try {
-                                    window.parent.postMessage(
-                                        {
-                                            type: 'scrollToXBlock',
-                                            message: 'Scroll to XBlock',
-                                            payload: { scrollOffset }
-                                        }, document.referrer
-                                    );
-                                    localStorage.removeItem('modalEditLastYPosition');
-                            } catch (e) {
-                                console.error(e);
-                            }
+                            self.postMessageToParent(
+                                {
+                                    type: 'scrollToXBlock',
+                                    message: 'Scroll to XBlock',
+                                    payload: { scrollOffset }
+                                },
+                                () => localStorage.removeItem('modalEditLastYPosition')
+                            );
                         }
                     }
                 },
@@ -272,13 +292,14 @@ function($, _, Backbone, gettext, BasePage,
 
         renderAddXBlockComponents: function() {
             var self = this;
-            if (self.options.canEdit && !self.options.isIframeEmbed) {
+            if (self.options.canEdit && (!self.options.isIframeEmbed || self.isSplitTestContentPage)) {
                 this.$('.add-xblock-component').each(function(index, element) {
                     var component = new AddXBlockComponent({
                         el: element,
                         createComponent: _.bind(self.createComponent, self),
                         collection: self.options.templates,
                         libraryContentPickerUrl: self.options.libraryContentPickerUrl,
+                        isIframeEmbed: self.options.isIframeEmbed,
                     });
                     component.render();
                 });
@@ -288,7 +309,7 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         initializePasteButton() {
-            if (this.options.canEdit && !this.options.isIframeEmbed) {
+            if (this.options.canEdit && (!this.options.isIframeEmbed || this.isSplitTestContentPage)) {
                 // We should have the user's clipboard status.
                 const data = this.options.clipboardData;
                 this.refreshPasteButton(data);
@@ -305,7 +326,8 @@ function($, _, Backbone, gettext, BasePage,
         refreshPasteButton(data) {
             // Do not perform any changes on paste button since they are not
             // rendered on Library or LibraryContent pages
-            if (!this.isLibraryPage && !this.isLibraryContentPage && !this.options.isIframeEmbed) {
+            if (!this.isLibraryPage && !this.isLibraryContentPage && (!this.options.isIframeEmbed || this.isSplitTestContentPage)) {
+                this.postMessageForHideProcessingNotification();
                 // 'data' is the same data returned by the "get clipboard status" API endpoint
                 // i.e. /api/content-staging/v1/clipboard/
                 if (this.options.canEdit && data.content) {
@@ -340,17 +362,11 @@ function($, _, Backbone, gettext, BasePage,
         /** The user has clicked on the "Paste Component button" */
         pasteComponent(event) {
             event.preventDefault();
-            try {
-                if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
-                        {
-                            type: 'pasteComponent',
-                            payload: {}
-                        }, document.referrer
-                    );
-                }
-            } catch (e) {
-                console.error(e);
+            if (this.options.isIframeEmbed) {
+                this.postMessageToParent({
+                  type: 'pasteComponent',
+                  payload: {},
+                });
             }
             // Get the ID of the container (usually a unit/vertical) that we're pasting into:
             const parentElement = this.findXBlockElement(event.target);
@@ -375,6 +391,9 @@ function($, _, Backbone, gettext, BasePage,
                     placeholderElement.remove();
                 });
             }).done((data) => {
+                if (this.options.isIframeEmbed) {
+                    this.postMessageForHideProcessingNotification();
+                }
                 const {
                     conflicting_files: conflictingFiles,
                     error_files: errorFiles,
@@ -646,17 +665,11 @@ function($, _, Backbone, gettext, BasePage,
             subMenu.classList.toggle('is-shown');
 
             if (!subMenu.classList.contains('is-shown') && this.options.isIframeEmbed) {
-                try {
-                    window.parent.postMessage(
-                        {
-                            type: 'toggleCourseXBlockDropdown',
-                            message: 'Adjust the height of the dropdown menu',
-                            payload: { courseXBlockDropdownHeight: 0 }
-                        }, document.referrer
-                    );
-                } catch (error) {
-                    console.error(error);
-                }
+                this.postMessageToParent({
+                    type: 'toggleCourseXBlockDropdown',
+                    message: 'Adjust the height of the dropdown menu',
+                    payload: { courseXBlockDropdownHeight: 0 }
+                });
             }
 
             // Calculate the viewport height and the dropdown menu height.
@@ -668,33 +681,21 @@ function($, _, Backbone, gettext, BasePage,
 
             if (courseUnitXBlockIframeHeight < courseXBlockDropdownHeight) {
                 // If the dropdown menu is taller than the iframe, adjust the height of the dropdown menu.
-                try {
-                    window.parent.postMessage(
-                        {
-                            type: 'toggleCourseXBlockDropdown',
-                            message: 'Adjust the height of the dropdown menu',
-                            payload: { courseXBlockDropdownHeight },
-                        }, document.referrer
-                    );
-                } catch (error) {
-                    console.error(error);
-                }
+                this.postMessageToParent({
+                    type: 'toggleCourseXBlockDropdown',
+                    message: 'Adjust the height of the dropdown menu',
+                    payload: { courseXBlockDropdownHeight },
+                });
             } else if ((courseXBlockDropdownHeight + clickYPosition) > courseUnitXBlockIframeHeight) {
                 if (courseXBlockDropdownHeight > courseUnitXBlockIframeHeight / 2) {
                     // If the dropdown menu is taller than half the iframe, send a message to adjust its height.
-                    try {
-                        window.parent.postMessage(
-                            {
-                                type: 'toggleCourseXBlockDropdown',
-                                message: 'Adjust the height of the dropdown menu',
-                                payload: {
-                                    courseXBlockDropdownHeight: courseXBlockDropdownHeight / 2,
-                                },
-                            }, document.referrer
-                        );
-                    } catch (error) {
-                        console.error(error);
-                    }
+                    this.postMessageToParent({
+                      type: 'toggleCourseXBlockDropdown',
+                      message: 'Adjust the height of the dropdown menu',
+                      payload: {
+                        courseXBlockDropdownHeight: courseXBlockDropdownHeight / 2,
+                      },
+                    });
                 } else {
                     // Move the dropdown menu upward to prevent it from overflowing out of the viewport.
                     if (this.options.isIframeEmbed) {
@@ -719,18 +720,12 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         openManageTags: function(event) {
-            const contentId = this.findXBlockElement(event.target).data('locator');
-            try {
-                if (this.options.isIframeEmbed) {
-                    window.parent.postMessage(
-                        {
-                            type: 'openManageTags',
-                            payload: { contentId }
-                        }, document.referrer
-                    );
-                }
-            } catch (e) {
-                console.error(e);
+          const contentId = this.findXBlockElement(event.target).data('locator');
+            if (this.options.isIframeEmbed) {
+                this.postMessageToParent({
+                    type: 'openManageTags',
+                    payload: { contentId },
+                });
             }
             const taxonomyTagsWidgetUrl = this.model.get('taxonomy_tags_widget_url');
 
@@ -747,13 +742,17 @@ function($, _, Backbone, gettext, BasePage,
             const usageId = encodeURI(primaryHeader.attr('data-usage-id'));
             try {
                 if (this.options.isIframeEmbed) {
-                    return window.parent.postMessage(
+                    window.parent.postMessage(
                         {
-                            type: 'copyXBlock',
+                            type: this.isSplitTestContentPage ? 'copyXBlockLegacy' : 'copyXBlock',
                             message: 'Copy the XBlock',
                             payload: { usageId }
                         }, document.referrer
                     );
+
+                    if (!this.isSplitTestContentPage) {
+                      return;
+                    }
                 }
             } catch (e) {
                 console.error(e);
@@ -795,6 +794,7 @@ function($, _, Backbone, gettext, BasePage,
                         setTimeout(checkStatus, 1_000);
                         return deferred;
                     } else {
+                        this.postMessageForHideProcessingNotification();
                         throw new Error(`Unexpected clipboard status "${status}" in successful API response.`);
                     }
                 });
@@ -909,15 +909,12 @@ function($, _, Backbone, gettext, BasePage,
             this.deleteComponent(this.findXBlockElement(event.target));
         },
 
-        createPlaceholderElement: function() {
-            return $('<div/>', {class: 'studio-xblock-wrapper'});
-        },
-
         createComponent: function(template, target, iframeMessageData) {
             // A placeholder element is created in the correct location for the new xblock
             // and then onNewXBlock will replace it with a rendering of the xblock. Note that
             // for xblocks that can't be replaced inline, the entire parent will be refreshed.
             var parentElement = this.findXBlockElement(target),
+                self = this,
                 parentLocator = parentElement.data('locator'),
                 buttonPanel = target?.closest('.add-xblock-component'),
                 listPanel = buttonPanel?.prev(),
@@ -929,28 +926,55 @@ function($, _, Backbone, gettext, BasePage,
                 placeholderElement,
                 $container;
 
-            if (this.options.isIframeEmbed) {
+            if (this.options.isIframeEmbed && !this.isSplitTestContentPage) {
                 $container = $('ol.reorderable-container.ui-sortable');
                 scrollOffset = 0;
             } else {
                 $container = listPanel;
-                scrollOffset = ViewUtils.getScrollOffset(buttonPanel);
+                if (!target.length && iframeMessageData.payload.parent_locator) {
+                  $container = $('.xblock[data-usage-id="' + iframeMessageData.payload.parent_locator + '"]')
+                    .find('ol.reorderable-container.ui-sortable');
+                }
+                if (!iframeMessageData) {
+                    scrollOffset = ViewUtils.getScrollOffset(buttonPanel);
+                }
             }
 
             placeholderElement = $placeholderEl.appendTo($container);
 
-            if (this.options.isIframeEmbed) {
-                if (iframeMessageData.payload.data && iframeMessageData.type === 'addXBlock') {
-                    return this.onNewXBlock(placeholderElement, scrollOffset, false, iframeMessageData.payload.data);
+            if (this.options.isIframeEmbed && iframeMessageData) {
+              if (iframeMessageData.payload.data && iframeMessageData.type === 'addXBlock') {
+                  return this.onNewXBlock(placeholderElement, scrollOffset, false, iframeMessageData.payload.data);
+              }
+            }
+
+            if (this.options.isIframeEmbed && this.isSplitTestContentPage) {
+                this.postMessageToParent({
+                    type: 'addNewComponent',
+                    message: 'Add new XBlock',
+                    payload: {},
+                });
+                if (iframeMessageData) {
+                  return;
                 }
             }
 
             return $.postJSON(this.getURLRoot() + '/', requestData,
                 _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false))
+                .always(function () {
+                    if (self.options.isIframeEmbed && self.isSplitTestContentPage) {
+                        self.postMessageToParent({
+                            type: 'hideProcessingNotification',
+                            message: 'Hide processing notification',
+                            payload: {}
+                        });
+                        return true;
+                    }
+                })
                 .fail(function() {
                     // Remove the placeholder if the update failed
                     placeholderElement.remove();
-            });
+                });
         },
 
         duplicateComponent: function(xblockElement) {
@@ -966,17 +990,11 @@ function($, _, Backbone, gettext, BasePage,
             placeholderElement = $placeholderEl.insertAfter(xblockElement);
 
             if (this.options.isIframeEmbed) {
-                try {
-                    window.parent.postMessage(
-                        {
-                            type: 'scrollToXBlock',
-                            message: 'Scroll to XBlock',
-                            payload: { scrollOffset: xblockElement.height() }
-                        }, document.referrer
-                    );
-                } catch (e) {
-                    console.error(e);
-                }
+                this.postMessageToParent({
+                    type: 'scrollToXBlock',
+                    message: 'Scroll to XBlock',
+                    payload: { scrollOffset: xblockElement.height() }
+                });
 
                 const messageHandler = ({ data }) => {
                     if (data && data.type === 'completeXBlockDuplicating') {
@@ -1028,7 +1046,6 @@ function($, _, Backbone, gettext, BasePage,
         getSelectedLibraryComponents: function() {
             var self = this;
             var locator = this.$el.find('.studio-xblock-wrapper').data('locator');
-            console.log(ModuleUtils);
             $.getJSON(
                 ModuleUtils.getUpdateUrl(locator) + '/handler/get_block_ids',
                 function(data) {
@@ -1065,19 +1082,16 @@ function($, _, Backbone, gettext, BasePage,
         },
 
         viewXBlockContent: function(event) {
-            try {
-                if (this.options.isIframeEmbed) {
-                    event.preventDefault();
-                    var usageId = event.currentTarget.href.split('/').pop() || '';
-                    window.parent.postMessage({
-                        type: 'handleViewXBlockContent',
-                        message: 'View the content of the XBlock',
-                        payload: { usageId },
-                    }, document.referrer);
-                    return true;
-                }
-            } catch (e) {
-                console.error(e);
+            if (this.options.isIframeEmbed) {
+                event.preventDefault();
+                const usageId = event.currentTarget.href.split('/').pop() || '';
+                const isViewGroupLink = event.currentTarget.classList.contains('xblock-view-group-link');
+                this.postMessageToParent({
+                    type: isViewGroupLink ? 'handleViewGroupConfigurations' : 'handleViewXBlockContent',
+                    message: isViewGroupLink ? 'View the group configurations page' : 'View the content of the XBlock',
+                    payload: { usageId },
+                });
+                return true;
             }
         },
 
@@ -1140,6 +1154,17 @@ function($, _, Backbone, gettext, BasePage,
                 }
                 else {
                     destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                }
+
+                if (this.options.isIframeEmbed && this.isSplitTestContentPage) {
+                    return this.postMessageToParent({
+                        type: 'handleRedirectToXBlockEditPage',
+                        message: 'Redirect to xBlock edit page',
+                        payload: {
+                            type: blockType[1],
+                            locator: encodeURI(data.locator),
+                        },
+                    });
                 }
 
                 window.location.href = destinationUrl;
