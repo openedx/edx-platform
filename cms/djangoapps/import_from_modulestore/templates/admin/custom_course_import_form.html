@@ -1,0 +1,49 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="{{ action_name }}">
+        
+        {% for obj in queryset %}
+            <input type="hidden" name="_selected_action" value="{{ obj.pk }}">
+        {% endfor %}
+        
+        <div>
+            {% if form.errors %}
+                <p class="errornote">
+                    Please correct the error{{ form.errors|pluralize }} below.
+                </p>
+            {% endif %}
+            
+            <fieldset class="module">
+                {% for field in form %}
+                    <div class="form-row">
+                        <br>
+                        {{ field.label_tag }}
+                        {% if field.widget_type == 'textarea' %}
+                            <br>
+                        {% endif %}
+                        {{ field }}
+                        
+                        {% if field.help_text %}
+                            <p class="help">{{ field.help_text }}</p>
+                        {% endif %}
+                        
+                        {% if field.errors %}
+                            <ul class="errorlist">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </fieldset>
+            
+            <div class="submit-row">
+                <input type="submit" name="apply" value="Apply">
+                <a href="{% url 'admin:index' %}" class="cancellink">Cancel</a>
+            </div>
+        </div>
+    </form>
+{% endblock %}
