@@ -7,7 +7,7 @@ from unittest.mock import patch
 from cms.djangoapps.import_from_modulestore.data import ImportStatus
 from cms.djangoapps.import_from_modulestore.tasks import (
     import_course_staged_content_to_library_task,
-    save_courses_to_staged_content_task,
+    save_legacy_content_to_staged_content_task,
 )
 from openedx.core.djangoapps.content_libraries import api as content_libraries_api
 from openedx.core.djangoapps.content_libraries.api import ContentLibrary
@@ -60,12 +60,12 @@ class TestSaveCourseSectionsToStagedContentTask(ImportCourseToLibraryMixin):
     Test cases for save_course_sections_to_staged_content_task.
     """
 
-    def test_save_courses_to_staged_content_task(self):
+    def test_save_legacy_content_to_staged_content_task(self):
         """
-        End-to-end test for save_courses_to_staged_content_task.
+        End-to-end test for save_legacy_content_to_staged_content_task.
         """
         course_chapters_to_import = [self.chapter, self.chapter2]
-        save_courses_to_staged_content_task(self.import_event.uuid)
+        save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
         self.import_event.refresh_from_db()
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(course_chapters_to_import))
@@ -75,11 +75,11 @@ class TestSaveCourseSectionsToStagedContentTask(ImportCourseToLibraryMixin):
         """ Checking that repeated saving of the same content does not create duplicates. """
         course_chapters_to_import = [self.chapter, self.chapter2]
 
-        save_courses_to_staged_content_task(self.import_event.uuid)
+        save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(course_chapters_to_import))
 
-        save_courses_to_staged_content_task(self.import_event.uuid)
+        save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(course_chapters_to_import))
 
@@ -96,7 +96,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         """ End-to-end test for import_course_staged_content_to_library_task. """
         self.assertEqual(self.library.learning_package.content_set.count(), 0)
         expected_imported_xblocks = [self.problem, self.problem2, self.video, self.video2]
-        save_courses_to_staged_content_task(self.import_event.uuid)
+        save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
         import_course_staged_content_to_library_task(
             [str(self.chapter.location), str(self.chapter2.location)],
@@ -117,7 +117,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
     def test_import_library_block_not_found(self, mock_import_client):
         """ Test that if a block is not found in the staged content, it is not imported. """
         non_existent_usage_ids = ['block-v1:edX+Demo+2023+type@vertical+block@12345']
-        save_courses_to_staged_content_task(self.import_event.uuid)
+        save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
         import_course_staged_content_to_library_task(
             non_existent_usage_ids,
@@ -135,7 +135,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         """
         chapters_to_import = [self.chapter, self.chapter2]
         expected_imported_xblocks = [self.problem, self.video]
-        save_courses_to_staged_content_task(self.import_event.uuid)
+        save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
         self.import_event.refresh_from_db()
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(chapters_to_import))

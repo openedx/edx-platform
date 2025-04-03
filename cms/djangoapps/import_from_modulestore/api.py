@@ -2,7 +2,7 @@
 API for course to library import.
 """
 from .models import Import as _Import
-from .tasks import import_course_staged_content_to_library_task, save_courses_to_staged_content_task
+from .tasks import import_course_staged_content_to_library_task, save_legacy_content_to_staged_content_task
 
 
 def import_course_staged_content_to_library(
@@ -34,5 +34,5 @@ def create_import(source_key, user_id: int, learning_package_id: int) -> _Import
         user_id=user_id,
     )
     import_from_modulestore.save()
-    save_courses_to_staged_content_task.delay(import_from_modulestore.uuid)
+    save_legacy_content_to_staged_content_task.delay(import_from_modulestore.uuid)
     return import_from_modulestore

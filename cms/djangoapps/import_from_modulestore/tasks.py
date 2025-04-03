@@ -19,7 +19,7 @@ log = get_task_logger(__name__)
 
 @shared_task
 @set_code_owner_attribute
-def save_courses_to_staged_content_task(import_uuid: str) -> None:
+def save_legacy_content_to_staged_content_task(import_uuid: str) -> None:
     """
     Save courses to staged content task.
     """
