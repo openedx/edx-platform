@@ -286,7 +286,7 @@ def _emit_course_passing_status_update(user, course_id, is_passing):
                     pii=UserPersonalData(
                         username=user.username,
                         email=user.email,
-                        name=user.get_full_name(),
+                        name=user.get_full_name() or user.profile.name,
                     ),
                     id=user.id,
                     is_active=user.is_active,
@@ -305,7 +305,7 @@ def _emit_course_passing_status_update(user, course_id, is_passing):
                     pii=UserPersonalData(
                         username=user.username,
                         email=user.email,
-                        name=user.get_full_name(),
+                        name=user.get_full_name() or user.profile.name,
                     ),
                     id=user.id,
                     is_active=user.is_active,
