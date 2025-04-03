@@ -1817,6 +1817,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
         cert = _get_user_certificate(mock_request, self.user, self.course.id, self.course)
         assert cert is None
 
+
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
     """
     Test events emitted by certificate handling.
