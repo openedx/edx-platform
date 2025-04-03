@@ -599,6 +599,20 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
             )
         )
 
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    #
+    # To update the components count in containers
+    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                library_key=library_key,
+                container_key=str(container.container_key),
+                background=True,
+            )
+        )
+
 
 def get_library_block_static_asset_files(usage_key: LibraryUsageLocatorV2) -> list[LibraryXBlockStaticFile]:
     """

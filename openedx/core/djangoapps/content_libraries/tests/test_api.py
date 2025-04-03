@@ -839,6 +839,15 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
         api.delete_library_block(self.html_block_usage_key)
         self._validate_calls_of_html_block(container_update_event_receiver)
 
+    def test_call_container_update_signal_when_restore_component(self):
+        api.delete_library_block(self.html_block_usage_key)
+
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+        api.restore_library_block(self.html_block_usage_key)
+
+        self._validate_calls_of_html_block(container_update_event_receiver)
+
     def test_call_container_update_signal_when_update_olx(self):
         block_olx = "<html><b>Hello world!</b></html>"
         container_update_event_receiver = mock.Mock()
