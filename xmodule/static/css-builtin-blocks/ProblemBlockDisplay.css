@@ -179,6 +179,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup {
+    margin: var(--baseline, 20px) 0 0 0;
     min-width: 100px;
     width: auto !important;
     width: 100px;
@@ -405,7 +406,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="checkbox"] {
     left: 0.5625em;
     position: absolute;
-    top: 0.35em;
+    top: 0.43em;
     width: calc(var(--baseline, 20px) * 1.1);
     height: calc(var(--baseline, 20px) * 1.1);
     z-index: 1;
@@ -636,10 +637,10 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status .grading {
-    margin: 0px 7px 0 0;
+    margin: 0 7px 0 0;
     padding-left: 25px;
     background: var(--icon-info) left center no-repeat;
-    text-indent: 0px;
+    text-indent: 0;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status p {
@@ -701,7 +702,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .submit-message-container {
-    margin: var(--baseline, 20px) 0px;
+    margin: var(--baseline, 20px) 0;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.inline>span {
@@ -878,6 +879,11 @@
     content: "";
 }
 
+.xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted,
+.xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.submitted {
+    margin: var(--baseline, 20px) 0 0 0;
+}
+
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.submitted input {
     border: 2px solid var(--submitted, #0075b4);
@@ -914,7 +920,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input {
-    margin: 0 0 0 0 !important;
+    margin: var(--baseline, 20px) 0 0 0 !important;
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.option-input .indicator-container {
@@ -975,7 +981,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror-scroll {
-    margin-right: 0px;
+    margin-right: 0;
 }
 
 .xmodule_display.xmodule_ProblemBlock .capa-message {
