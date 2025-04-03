@@ -1375,7 +1375,7 @@ def _filter_by_status(results):
             continue
         elif status == 403 and _is_studio_url(url):
             filtered_results.append([block_id, url, LinkState.LOCKED])
-        elif status in [403, None] and not _is_studio_url(url):
+        elif status in [403, 500, None] and not _is_studio_url(url):
             filtered_results.append([block_id, url, LinkState.EXTERNAL_FORBIDDEN])
         else:
             filtered_results.append([block_id, url, LinkState.BROKEN])
