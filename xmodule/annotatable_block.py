@@ -140,9 +140,8 @@ class _BuiltInAnnotatableBlock(
         """ Renders annotatable content with annotation spans and returns HTML. """
 
         xmltree = etree.fromstring(self.data)
-        content = etree.tostring(xmltree, encoding='unicode')
+        self._extract_instructions(xmltree)
 
-        xmltree = etree.fromstring(content)
         xmltree.tag = 'div'
         if 'display_name' in xmltree.attrib:
             del xmltree.attrib['display_name']
