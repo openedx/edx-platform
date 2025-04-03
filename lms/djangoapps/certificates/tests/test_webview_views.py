@@ -3,7 +3,7 @@
 
 import datetime
 from unittest import skipUnless
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from urllib.parse import urlencode
 from uuid import uuid4
 
@@ -35,6 +35,7 @@ from lms.djangoapps.certificates.tests.factories import (
     GeneratedCertificateFactory,
     LinkedInAddToProfileConfigurationFactory
 )
+from lms.djangoapps.certificates.views.webview import _get_user_certificate
 from lms.djangoapps.certificates.utils import get_certificate_url
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.site_configuration.tests.test_util import (
@@ -46,9 +47,9 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from openedx.features.name_affirmation_api.utils import get_name_affirmation_service
-from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.data import CertificatesDisplayBehaviors
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
@@ -1706,6 +1707,115 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
             else:
                 self.assertNotContains(response, 'identity of the learner has been checked and is valid')
                 self.assertContains(response, 'IDV disabled')
+
+    @patch("lms.djangoapps.certificates.views.webview.datetime")
+    def test_get_user_certificate_preview_instructor_paced_early_no_info(self, mock_datetime):
+        """
+        A test to verify that the _get_user_certificate utility function returns the expected date for an instructor
+        paced course with a display behavior of 'EARLY_NO_INFO' when the certificate is being previewed.
+        """
+        expected_date = datetime.date(2024, 5, 2)
+        mock_datetime.now.return_value.date.return_value = expected_date
+
+        mock_request = Mock()
+        mock_request.user.has_perm.return_value = True
+
+        self.course.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
+        self.course.certificate_available_date = None
+        self.course.self_paced = False
+
+        cert = _get_user_certificate(mock_request, self.user, self.course.id, self.course, preview_mode='verified')
+        assert cert.modified_date == expected_date
+
+    def test_get_user_certificate_preview_instructor_paced_end(self):
+        """
+        A test to verify that the _get_user_certificate utility function returns the expected date for an instructor
+        paced course with a display behavior of 'END' when the certificate is being previewed.
+        """
+        course_run_end_date = datetime.datetime(2024, 8, 19, 0, 0, 0)
+
+        mock_request = Mock()
+        mock_request.user.has_perm.return_value = True
+
+        self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END
+        self.course.certificate_available_date = None
+        self.course.self_paced = False
+        self.course.end = course_run_end_date
+
+        cert = _get_user_certificate(mock_request, self.user, self.course.id, self.course, preview_mode='verified')
+        assert cert.modified_date == course_run_end_date
+
+    def test_get_user_certificate_preview_instructor_paced_end_with_date(self):
+        """
+        A test to verify that the _get_user_certificate utility function returns the expected date for an instructor
+        paced course with a display behavior of 'END_WITH_DATE' when the certificate is being previewed.
+        """
+        course_run_certificate_available_date = datetime.datetime(2024, 3, 14, 0, 0, 0)
+
+        mock_request = Mock()
+        mock_request.user.has_perm.return_value = True
+
+        self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
+        self.course.certificate_available_date = course_run_certificate_available_date
+        self.course.self_paced = False
+
+        cert = _get_user_certificate(mock_request, self.user, self.course.id, self.course, preview_mode='verified')
+        assert cert.modified_date == course_run_certificate_available_date
+
+    @patch("lms.djangoapps.certificates.views.webview.datetime")
+    def test_get_user_certificate_preview_self_paced(self, mock_datetime):
+        """
+        A test to verify that the _get_user_certificate utility function returns the expected date for a self paced
+        course when the certificate is being previewed.
+        """
+        expected_date = datetime.date(2024, 3, 10)
+        mock_datetime.now.return_value.date.return_value = expected_date
+
+        mock_request = Mock()
+        mock_request.user.has_perm.return_value = True
+
+        self.course.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
+        self.course.certificate_available_date = None
+        self.course.self_paced = True
+
+        cert = _get_user_certificate(mock_request, self.user, self.course.id, self.course, preview_mode='verified')
+        assert cert.modified_date == expected_date
+
+    def test_get_user_certificate(self):
+        """
+        A test to verify that the _get_user_certificate utility function returns the correct certificate when requested.
+        """
+        mock_request = Mock()
+
+        cert = _get_user_certificate(mock_request, self.user, self.course.id, self.course)
+        assert cert.course_id == self.course.id
+        assert cert.user == self.user
+        assert cert.status == CertificateStatuses.downloadable
+
+    def test_get_user_certificate_no_eligible_cert(self):
+        """
+        A test to verify the behavior of the _get_user_certificate utility function when there is no eligible
+        certificate to retrieve.
+        """
+        self.cert.status = CertificateStatuses.unavailable
+        self.cert.save()
+
+        mock_request = Mock()
+
+        cert = _get_user_certificate(mock_request, self.user, self.course.id, self.course)
+        assert cert is None
+
+    def test_get_user_certificate_no_cert(self):
+        """
+        A test to verify the behavior of the _get_user_certificate utility function when there is no certificate to
+        retrieve.
+        """
+        GeneratedCertificate.objects.all().delete()
+
+        mock_request = Mock()
+
+        cert = _get_user_certificate(mock_request, self.user, self.course.id, self.course)
+        assert cert is None
 
 
 class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
