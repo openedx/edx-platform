@@ -2,7 +2,7 @@
 Course to Library Import
 ========================
 
-The new Django application `course_to_library_import` is designed to
+The new Django application `import_from_modulestore` is designed to
 automate the process of importing course OLX content from Modulestore to
 Content Libraries. The application allows users to easily and quickly
 migrate existing course content, minimizing the manual work and potential
