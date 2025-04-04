@@ -162,8 +162,6 @@
 
             var finalHtml = "";
             _.each(quartersToShow, function(qObj, idx) {
-                var courses = quarterToCourses[qObj.label];
-                if (!courses || !courses.length) return; // Skip empty quarters
                 var headingTitle = (idx === 0) ? "Current modules and micro-degrees" : "Upcoming modules and micro-degrees";
                 var quarterLabel = qObj.label;
                 var quarterLabelDescription = "The courses are modules of our M.Sc. and MBA programs. However, anyone can book these courses as stand-alone Micro Degree programs for a fee of €900."
@@ -171,8 +169,20 @@
                 var itemsHtml = "";
                 _.each(quarterToCourses[qObj.label], function(courseModel) {
                     var cardView = new CourseCardView({ model: courseModel });
-                    itemsHtml += '<li class="courses-listing-item">' + cardView.render().el.outerHTML + '</li>';
+                    // itemsHtml += '<li class="courses-listing-item">' + cardView.render().el.outerHTML + '</li>';
+                    var rendered = cardView.render().el.outerHTML;
+                    // Only include cards that rendered actual content
+                    if (rendered.trim()) {
+                        itemsHtml += '<li class="courses-listing-item">' + rendered + '</li>';
+                    }
                 });
+
+                if (itemsHtml) {
+                    console.log("Rendering quarter:", qObj.label);
+                    finalHtml += `...`;
+                } else {
+                    console.log("Skipping quarter with no valid courses:", qObj.label);
+                }
 
                 finalHtml += '<div class="quarter-section">';
                 finalHtml += '<h2 class="quarter-label">' + headingTitle + ': ' + quarterLabel + '</h2>';
