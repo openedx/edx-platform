@@ -59,6 +59,7 @@ from .exceptions import (
     LibraryBlockAlreadyExists,
 )
 from .libraries import (
+    library_collection_locator,
     library_component_usage_key,
     require_permission_for_library_key,
     PublishableItem,
@@ -527,8 +528,10 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     for collection in affected_collections:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
                 background=True,
             )
         )
@@ -580,8 +583,10 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     for collection in affected_collections:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
                 background=True,
             )
         )

@@ -352,8 +352,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_CREATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib2.library_key,
-                    collection_key="COL4",
+                    collection_key=api.library_collection_locator(
+                        self.lib2.library_key,
+                        collection_key="COL4",
+                    ),
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -388,8 +390,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key="COL1",
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key="COL1",
+                    ),
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -418,8 +422,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_DELETED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key="COL1",
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key="COL1",
+                    ),
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -493,8 +499,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key="COL1",
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key="COL1",
+                    ),
                 ),
             },
             event_receiver.call_args_list[2].kwargs,
@@ -544,8 +552,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib2.library_key,
-                    collection_key=self.col2.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib2.library_key,
+                        collection_key=self.col2.key,
+                    ),
                     background=True,
                 ),
             },
@@ -556,8 +566,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib2.library_key,
-                    collection_key=self.col3.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib2.library_key,
+                        collection_key=self.col3.key,
+                    ),
                     background=True,
                 ),
             },
@@ -585,8 +597,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
@@ -614,8 +628,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
@@ -656,8 +672,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
@@ -715,8 +733,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
