@@ -567,8 +567,8 @@ class SequenceBlock(
                     'id': str(usage_id),
                     'type': child.scope_ids.block_type,
                     'display_name': child.display_name_with_default,
-                    'is_gated': True,  # Mark as blocked
-                    'content': '',  # Real content not included
+                    'is_gated': True,  #Mark as blocked
+                    'content': '',  #Real content not included
                 })
 
         params = {
