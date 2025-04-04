@@ -46,6 +46,7 @@ from .documents import (
     searchable_doc_collections,
     searchable_doc_tags,
     searchable_doc_tags_for_collection,
+    searchable_doc_tags_for_container,
 )
 
 log = logging.getLogger(__name__)
@@ -486,8 +487,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                         container,
                     )
                     doc = searchable_doc_for_container(container_key)
-                    # TODO: when we add container tags
-                    # doc.update(searchable_doc_tags_for_container(container_key))
+                    doc.update(searchable_doc_tags_for_container(container_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing container {container.key}: {err}")
@@ -511,7 +511,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
             collections = authoring_api.get_collections(library.learning_package_id, enabled=True)
             num_collections = collections.count()
             num_collections_done = 0
-            status_cb(f"{num_collections_done + 1}/{num_collections}. Now indexing collections in library {lib_key}")
+            status_cb(f"{num_collections_done}/{num_collections}. Now indexing collections in library {lib_key}")
             paginator = Paginator(collections, 100)
             for p in paginator.page_range:
                 num_collections_done = index_collection_batch(
@@ -835,6 +835,15 @@ def upsert_collection_tags_index_docs(collection_usage_key: LibraryCollectionLoc
     """
 
     doc = searchable_doc_tags_for_collection(collection_usage_key.library_key, collection_usage_key.collection_id)
+    _update_index_docs([doc])
+
+
+def upsert_container_tags_index_docs(container_key: LibraryContainerLocator):
+    """
+    Updates the tags data in documents for the given library container
+    """
+
+    doc = searchable_doc_tags_for_container(container_key)
     _update_index_docs([doc])
 
 

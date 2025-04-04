@@ -244,7 +244,7 @@ def _fields_from_block(block) -> dict:
     return block_data
 
 
-def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
+def _tags_for_content_object(object_id: str) -> dict:
     """
     Given an XBlock, course, library, etc., get the tag data for its index doc.
 
@@ -271,7 +271,7 @@ def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
     # Note that we could improve performance for indexing many components from the same library/course,
     # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
     # tags for each component separately.
-    all_tags = tagging_api.get_object_tags(str(object_id)).all()
+    all_tags = tagging_api.get_object_tags(object_id).all()
     if not all_tags:
         # Clear out tags in the index when unselecting all tags for the block, otherwise
         # it would remain the last value if a cleared Fields.tags field is not included
@@ -427,13 +427,13 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     return doc
 
 
-def searchable_doc_tags(usage_key: UsageKey) -> dict:
+def searchable_doc_tags(usage_key: UsageKey) -> dict:  # TODO: find a better name/type for usage_key
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the tags data for the given content object.
     """
     doc = searchable_doc_for_usage_key(usage_key)
-    doc.update(_tags_for_content_object(usage_key))
+    doc.update(_tags_for_content_object(str(usage_key)))
 
     return doc
 
@@ -462,7 +462,20 @@ def searchable_doc_tags_for_collection(
         collection_key,
     )
     doc = searchable_doc_for_usage_key(collection_usage_key)
-    doc.update(_tags_for_content_object(collection_usage_key))
+    doc.update(_tags_for_content_object(str(collection_usage_key)))
+
+    return doc
+
+
+def searchable_doc_tags_for_container(
+    container_key: LibraryContainerLocator,
+) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the tags data for the given library container.
+    """
+    doc = searchable_doc_for_usage_key(container_key)
+    doc.update(_tags_for_content_object(str(container_key)))
 
     return doc
 

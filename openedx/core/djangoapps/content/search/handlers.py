@@ -8,7 +8,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryCollectionLocator
+from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
     ContentObjectChangedData,
@@ -43,6 +43,7 @@ from .api import (
     upsert_block_collections_index_docs,
     upsert_block_tags_index_docs,
     upsert_collection_tags_index_docs,
+    upsert_container_tags_index_docs,
 )
 from .tasks import (
     delete_library_block_index_doc,
@@ -218,14 +219,21 @@ def content_object_associations_changed_handler(**kwargs) -> None:
             # Check if valid if library collection
             usage_key = LibraryCollectionLocator.from_string(str(content_object.object_id))
         except InvalidKeyError:
-            log.error("Received invalid content object id")
-            return
+            try:
+                # Check if valid if library container
+                usage_key = LibraryContainerLocator.from_string(str(content_object.object_id))
+            except InvalidKeyError:
+                # Invalid content object id
+                log.error("Received invalid content object id")
+                return
 
     # This event's changes may contain both "tags" and "collections", but this will happen rarely, if ever.
     # So we allow a potential double "upsert" here.
     if not content_object.changes or "tags" in content_object.changes:
         if isinstance(usage_key, LibraryCollectionLocator):
             upsert_collection_tags_index_docs(usage_key)
+        elif isinstance(usage_key, LibraryContainerLocator):
+            upsert_container_tags_index_docs(usage_key)
         else:
             upsert_block_tags_index_docs(usage_key)
     if not content_object.changes or "collections" in content_object.changes:

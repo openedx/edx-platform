@@ -314,6 +314,7 @@ def set_exported_object_tags(
         )
 
         # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+        # FIXME: Should we remove this event?
         CONTENT_OBJECT_TAGS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectData(object_id=content_key_str)
@@ -421,6 +422,7 @@ def tag_object(
         )
 
         # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+        # FIXME: Should we remove this event?
         CONTENT_OBJECT_TAGS_CHANGED.send_event(
             time=now(),
             content_object=ContentObjectData(object_id=object_id)

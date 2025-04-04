@@ -173,6 +173,7 @@ class ObjectTagOrgView(ObjectTagView):
             )
 
             # Emit a (deprecated) CONTENT_OBJECT_TAGS_CHANGED event too
+            # FIXME: Should we remove this event?
             CONTENT_OBJECT_TAGS_CHANGED.send_event(
                 content_object=ContentObjectData(object_id=object_id)
             )
