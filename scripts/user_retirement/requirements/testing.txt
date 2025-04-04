@@ -14,11 +14,11 @@ attrs==25.3.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.37.17
+boto3==1.37.24
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.37.17
+botocore==1.37.24
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -76,7 +76,7 @@ google-api-core==2.24.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.165.0
+google-api-python-client==2.166.0
     # via -r scripts/user_retirement/requirements/base.txt
 google-auth==2.38.0
     # via
@@ -132,7 +132,7 @@ more-itertools==10.6.0
     #   simple-salesforce
 moto==4.2.14
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==10.7.0
+newrelic==10.8.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
@@ -152,7 +152,7 @@ proto-plus==1.26.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==6.30.1
+protobuf==6.30.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -167,7 +167,7 @@ pyasn1==0.6.1
     #   -r scripts/user_retirement/requirements/base.txt
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.4.1
+pyasn1-modules==0.4.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
@@ -184,7 +184,7 @@ pynacl==1.5.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-pyparsing==3.2.1
+pyparsing==3.2.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   httplib2
@@ -195,7 +195,7 @@ python-dateutil==2.9.0.post0
     #   -r scripts/user_retirement/requirements/base.txt
     #   botocore
     #   moto
-pytz==2025.1
+pytz==2025.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   jenkinsapi
@@ -256,7 +256,7 @@ stevedore==5.4.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-typing-extensions==4.12.2
+typing-extensions==4.13.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce

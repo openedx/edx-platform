@@ -12,7 +12,7 @@ aiohappyeyeballs==2.6.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-aiohttp==3.11.14
+aiohttp==3.11.12
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -101,13 +101,13 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.37.17
+boto3==1.37.24
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.37.17
+botocore==1.37.24
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -128,7 +128,7 @@ camel-converter[pydantic]==4.0.1
     # via
     #   -r requirements/edx/base.txt
     #   meilisearch
-celery==5.4.0
+celery==5.5.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -209,7 +209,7 @@ codejail-includes==1.0.0
     # via -r requirements/edx/base.txt
 colorama==0.4.6
     # via tox
-coverage[toml]==7.7.0
+coverage[toml]==7.8.0
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -530,7 +530,7 @@ edx-celeryutils==1.3.0
     #   super-csv
 edx-codejail==3.5.2
     # via -r requirements/edx/base.txt
-edx-completion==4.7.10
+edx-completion==4.7.11
     # via -r requirements/edx/base.txt
 edx-django-release-util==1.4.0
     # via
@@ -625,7 +625,7 @@ edx-search==4.1.3
     #   openedx-forum
 edx-sga==0.25.3
     # via -r requirements/edx/base.txt
-edx-submissions==3.8.6
+edx-submissions==3.8.7
     # via
     #   -r requirements/edx/base.txt
     #   ora2
@@ -675,9 +675,9 @@ execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.in
-faker==37.0.2
+faker==37.1.0
     # via factory-boy
-fastapi==0.115.11
+fastapi==0.115.12
     # via pact-python
 fastavro==1.10.0
     # via
@@ -726,7 +726,7 @@ google-api-core[grpc]==2.24.2
     #   google-cloud-core
     #   google-cloud-firestore
     #   google-cloud-storage
-google-api-python-client==2.165.0
+google-api-python-client==2.166.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
@@ -756,7 +756,7 @@ google-cloud-storage==3.1.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-crc32c==1.7.0
+google-crc32c==1.7.1
     # via
     #   -r requirements/edx/base.txt
     #   google-cloud-storage
@@ -804,7 +804,7 @@ httpretty==1.1.4
     # via -r requirements/edx/testing.in
 httpx==0.23.3
     # via pact-python
-icalendar==6.1.2
+icalendar==6.1.3
     # via -r requirements/edx/base.txt
 idna==3.10
     # via
@@ -882,7 +882,7 @@ jwcrypto==1.5.6
     #   -r requirements/edx/base.txt
     #   django-oauth-toolkit
     #   pylti1p3
-kombu==5.5.0
+kombu==5.5.2
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -975,7 +975,7 @@ msgpack==1.1.0
     # via
     #   -r requirements/edx/base.txt
     #   cachecontrol
-multidict==6.2.0
+multidict==6.3.0
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -984,7 +984,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-newrelic==10.7.0
+newrelic==10.8.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1058,7 +1058,7 @@ openedx-mongodbproxy==0.2.2
     # via -r requirements/edx/base.txt
 optimizely-sdk==5.2.0
     # via -r requirements/edx/base.txt
-ora2==6.14.7
+ora2==6.14.8
     # via -r requirements/edx/base.txt
 packaging==24.2
     # via
@@ -1131,7 +1131,7 @@ prompt-toolkit==3.0.50
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
-propcache==0.3.0
+propcache==0.3.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -1167,7 +1167,7 @@ pyasn1==0.6.1
     #   pgpy
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.4.1
+pyasn1-modules==0.4.2
     # via
     #   -r requirements/edx/base.txt
     #   google-auth
@@ -1187,12 +1187,12 @@ pycryptodomex==3.22.0
     #   edx-proctoring
     #   lti-consumer-xblock
     #   pyjwkest
-pydantic==2.10.6
+pydantic==2.11.1
     # via
     #   -r requirements/edx/base.txt
     #   camel-converter
     #   fastapi
-pydantic-core==2.27.2
+pydantic-core==2.33.0
     # via
     #   -r requirements/edx/base.txt
     #   pydantic
@@ -1264,7 +1264,7 @@ pyopenssl==25.0.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-pyparsing==3.2.1
+pyparsing==3.2.3
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1341,7 +1341,7 @@ python3-openid==3.2.0 ; python_version >= "3"
     #   social-auth-core
 python3-saml==1.16.0
     # via -r requirements/edx/base.txt
-pytz==2025.1
+pytz==2025.2
     # via
     #   -r requirements/edx/base.txt
     #   djangorestframework
@@ -1421,7 +1421,7 @@ requests-oauthlib==2.0.0
     #   social-auth-core
 rfc3986[idna2008]==1.5.0
     # via httpx
-rpds-py==0.23.1
+rpds-py==0.24.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1566,14 +1566,14 @@ tomlkit==0.13.2
     #   -r requirements/edx/base.txt
     #   pylint
     #   snowflake-connector-python
-tox==4.24.2
+tox==4.25.0
     # via -r requirements/edx/testing.in
 tqdm==4.67.1
     # via
     #   -r requirements/edx/base.txt
     #   nltk
     #   openai
-typing-extensions==4.12.2
+typing-extensions==4.13.0
     # via
     #   -r requirements/edx/base.txt
     #   anyio
@@ -1590,10 +1590,14 @@ typing-extensions==4.12.2
     #   pyopenssl
     #   referencing
     #   snowflake-connector-python
-tzdata==2025.1
+    #   typing-inspection
+typing-inspection==0.4.0
     # via
     #   -r requirements/edx/base.txt
-    #   celery
+    #   pydantic
+tzdata==2025.2
+    # via
+    #   -r requirements/edx/base.txt
     #   faker
     #   icalendar
     #   kombu
@@ -1630,7 +1634,7 @@ vine==5.1.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.29.3
+virtualenv==20.30.0
     # via tox
 voluptuous==0.15.2
     # via
