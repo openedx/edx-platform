@@ -72,6 +72,7 @@ class ImportAdmin(admin.ModelAdmin):
 
     list_display = (
         'uuid',
+        'created',
         'status',
         'source_key',
         'target',
