@@ -414,7 +414,7 @@ FEATURES = {
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
     # Maximum number of rows to include in the csv file for downloading problem responses.
-    'MAX_PROBLEM_RESPONSES_COUNT': 5000,
+    'MAX_PROBLEM_RESPONSES_COUNT': 10000,
 
     'ENABLED_PAYMENT_REPORTS': [
         "refund_report",
