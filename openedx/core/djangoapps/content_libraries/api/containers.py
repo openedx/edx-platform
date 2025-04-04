@@ -27,14 +27,16 @@ from openedx_learning.api.authoring_models import Container
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
+from .exceptions import ContentLibraryContainerNotFound
 from .libraries import LibraryXBlockMetadata, PublishableItem
 
 
 # The public API is only the following symbols:
 __all__ = [
-    "ContentLibraryContainerNotFound",
+    # Models
     "ContainerMetadata",
     "ContainerType",
+    # API methods
     "get_container",
     "create_container",
     "get_container_children",
@@ -45,9 +47,6 @@ __all__ = [
     "update_container_children",
     "get_containers_contains_component",
 ]
-
-
-ContentLibraryContainerNotFound = Container.DoesNotExist
 
 
 class ContainerType(Enum):
@@ -190,8 +189,7 @@ def create_container(
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
-            library_key=library_key,
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 
@@ -219,8 +217,7 @@ def update_container(
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
-            library_key=library_key,
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 
@@ -244,8 +241,7 @@ def delete_container(
 
     LIBRARY_CONTAINER_DELETED.send_event(
         library_container=LibraryContainerData(
-            library_key=container_key.library_key,
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 
@@ -312,8 +308,7 @@ def update_container_children(
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
-            library_key=library_key,
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 

@@ -7,7 +7,7 @@ from unittest import mock
 import ddt
 from freezegun import freeze_time
 
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2
 from openedx_events.content_authoring.data import LibraryContainerData
 from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_CREATED,
@@ -83,13 +83,15 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
 
         self.assertDictContainsEntries(container_data, expected_data)
         assert create_receiver.call_count == 1
+        container_key = LibraryContainerLocator.from_string(
+            "lct:CL-TEST:containers:unit:u1",
+        )
         self.assertDictContainsSubset(
             {
                 "signal": LIBRARY_CONTAINER_CREATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    lib_key,
-                    container_key="lct:CL-TEST:containers:unit:u1",
+                    container_key,
                 ),
             },
             create_receiver.call_args_list[0].kwargs,
@@ -114,8 +116,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "signal": LIBRARY_CONTAINER_UPDATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    lib_key,
-                    container_key="lct:CL-TEST:containers:unit:u1",
+                    container_key,
                 ),
             },
             update_receiver.call_args_list[0].kwargs,
@@ -135,8 +136,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "signal": LIBRARY_CONTAINER_DELETED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    lib_key,
-                    container_key="lct:CL-TEST:containers:unit:u1",
+                    container_key,
                 ),
             },
             delete_receiver.call_args_list[0].kwargs,
@@ -214,8 +214,9 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "signal": LIBRARY_CONTAINER_UPDATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    lib_key,
-                    container_key=container_data["container_key"],
+                    container_key=LibraryContainerLocator.from_string(
+                        container_data["container_key"],
+                    ),
                 ),
             },
             update_receiver.call_args_list[0].kwargs,
@@ -263,8 +264,9 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "signal": LIBRARY_CONTAINER_UPDATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    lib_key,
-                    container_key=container_data["container_key"],
+                    container_key=LibraryContainerLocator.from_string(
+                        container_data["container_key"],
+                    ),
                 ),
             },
             update_receiver.call_args_list[0].kwargs,
@@ -324,8 +326,9 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "signal": LIBRARY_CONTAINER_UPDATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    lib_key,
-                    container_key=container_data["container_key"],
+                    container_key=LibraryContainerLocator.from_string(
+                        container_data["container_key"],
+                    ),
                 ),
             },
             update_receiver.call_args_list[0].kwargs,

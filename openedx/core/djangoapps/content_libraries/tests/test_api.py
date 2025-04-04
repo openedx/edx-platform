@@ -67,11 +67,11 @@ class EdxModulestoreImportClientTest(TestCase):
         with self.assertRaises(ValueError):
             self.client.import_blocks_from_course('foobar', lambda *_: None)
 
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.create_library_block')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.get_library_block')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.get_library_block_static_asset_files')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.publish_changes')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.set_library_block_olx')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.create_library_block')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.get_library_block')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.get_library_block_static_asset_files')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.publish_changes')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.set_library_block_olx')
     def test_import_blocks_from_course_on_block_with_olx(
             self,
             mock_set_library_block_olx,
@@ -103,9 +103,9 @@ class EdxModulestoreImportClientTest(TestCase):
             mock.ANY, 'fake-olx')
         mock_publish_changes.assert_called_once()
 
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.create_library_block')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.get_library_block_static_asset_files')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.set_library_block_olx')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.create_library_block')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.get_library_block_static_asset_files')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.set_library_block_olx')
     def test_import_block_when_called_twice_same_block_but_different_course(
             self,
             mock_set_library_block_olx,
@@ -140,7 +140,7 @@ class EdxModulestoreImportClientTest(TestCase):
         mock_set_library_block_olx.assert_called_once()
 
 
-@mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.OAuthAPIClient')
+@mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.OAuthAPIClient')
 class EdxApiImportClientTest(TestCase):
     """
     Tests for EdxApiImportClient.
@@ -197,11 +197,11 @@ class EdxApiImportClientTest(TestCase):
             return mock_response, mock_content
         return mock_response
 
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.add_library_block_static_asset_file')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.create_library_block')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.get_library_block_static_asset_files')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.publish_changes')
-    @mock.patch('openedx.core.djangoapps.content_libraries.api.libraries.set_library_block_olx')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.add_library_block_static_asset_file')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.create_library_block')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.get_library_block_static_asset_files')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.publish_changes')
+    @mock.patch('openedx.core.djangoapps.content_libraries.api.courseware_import.set_library_block_olx')
     def test_import_block_when_url_is_from_studio(
             self,
             mock_set_library_block_olx,
@@ -352,8 +352,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_CREATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib2.library_key,
-                    collection_key="COL4",
+                    collection_key=api.library_collection_locator(
+                        self.lib2.library_key,
+                        collection_key="COL4",
+                    ),
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -388,8 +390,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key="COL1",
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key="COL1",
+                    ),
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -418,8 +422,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_DELETED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key="COL1",
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key="COL1",
+                    ),
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -493,8 +499,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key="COL1",
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key="COL1",
+                    ),
                 ),
             },
             event_receiver.call_args_list[2].kwargs,
@@ -544,8 +552,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib2.library_key,
-                    collection_key=self.col2.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib2.library_key,
+                        collection_key=self.col2.key,
+                    ),
                     background=True,
                 ),
             },
@@ -556,8 +566,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib2.library_key,
-                    collection_key=self.col3.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib2.library_key,
+                        collection_key=self.col3.key,
+                    ),
                     background=True,
                 ),
             },
@@ -585,8 +597,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
@@ -614,8 +628,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
@@ -656,8 +672,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
@@ -715,8 +733,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
@@ -746,10 +766,26 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
 
 
-class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
+class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
     """
     Tests for Content Library API containers methods.
     """
+    ENABLED_OPENEDX_EVENTS = [
+        LIBRARY_CONTAINER_UPDATED.event_type,
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up class method for the Test class.
+
+        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
+              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
+              so we're following a pattern here. But that pattern doesn't really make sense.
+        """
+        super().setUpClass()
+        cls.start_events_isolation()
+
     def setUp(self):
         super().setUp()
 
@@ -808,8 +844,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
                 "signal": LIBRARY_CONTAINER_UPDATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    library_key=self.lib1.library_key,
-                    container_key=str(self.unit1.container_key),
+                    container_key=self.unit1.container_key,
                     background=True,
                 )
             },
@@ -820,8 +855,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
                 "signal": LIBRARY_CONTAINER_UPDATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    library_key=self.lib1.library_key,
-                    container_key=str(self.unit2.container_key),
+                    container_key=self.unit2.container_key,
                     background=True,
                 )
             },
@@ -833,6 +867,15 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, TestCase):
         LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
 
         api.delete_library_block(self.html_block_usage_key)
+        self._validate_calls_of_html_block(container_update_event_receiver)
+
+    def test_call_container_update_signal_when_restore_component(self):
+        api.delete_library_block(self.html_block_usage_key)
+
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+        api.restore_library_block(self.html_block_usage_key)
+
         self._validate_calls_of_html_block(container_update_event_receiver)
 
     def test_call_container_update_signal_when_update_olx(self):
