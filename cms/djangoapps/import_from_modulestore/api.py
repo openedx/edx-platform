@@ -15,12 +15,14 @@ def import_course_staged_content_to_library(
     """
     Import staged content to a library.
     """
-    import_course_staged_content_to_library_task.delay(
-        usage_ids,
-        import_uuid,
-        user_id,
-        composition_level,
-        override,
+    import_course_staged_content_to_library_task.apply_async(
+        kwargs={
+            'usage_ids': usage_ids,
+            'import_uuid': import_uuid,
+            'user_id': user_id,
+            'composition_level': composition_level,
+            'override': override,
+        },
     )
 
 
@@ -34,5 +36,5 @@ def create_import(source_key, user_id: int, learning_package_id: int) -> _Import
         user_id=user_id,
     )
     import_from_modulestore.save()
-    save_legacy_content_to_staged_content_task.delay(import_from_modulestore.uuid)
+    save_legacy_content_to_staged_content_task.apply_async(kwargs={'import_uuid': import_from_modulestore.uuid})
     return import_from_modulestore

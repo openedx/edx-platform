@@ -41,7 +41,9 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
         assert import_event.source_key == CourseKey.from_string(course_id)
         assert import_event.target == self.library.learning_package
         assert import_event.user_id == user.id
-        save_legacy_content_to_staged_content_task_mock.delay.assert_called_once_with(import_event.uuid)
+        save_legacy_content_to_staged_content_task_mock.apply_async.assert_called_once_with(
+            kwargs={'import_uuid': import_event.uuid}
+        )
 
     def test_import_course_staged_content_to_library(self):
         """
@@ -68,10 +70,12 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
                 override
             )
 
-        import_course_staged_content_to_library_task_mock.delay.assert_called_once_with(
-            usage_ids,
-            import_event.uuid,
-            import_event.user.id,
-            'xblock',
-            override
+        import_course_staged_content_to_library_task_mock.apply_async.assert_called_once_with(
+            kwargs={
+                'usage_ids': usage_ids,
+                'import_uuid': import_event.uuid,
+                'user_id': import_event.user.id,
+                'composition_level': 'xblock',
+                'override': override,
+            },
         )
