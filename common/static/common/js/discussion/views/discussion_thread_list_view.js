@@ -203,8 +203,8 @@
                     this.$('.forum-nav-filter-main').addClass('is-hidden');
                 }
                 this.$('.forum-nav-sort-control option').removeProp('selected');
-                this.$('.forum-nav-sort-control option[value=' + this.collection.sort_preference + ']')
-                    .prop('selected', true);
+                var sortValue = this.collection.sort_preference || 'default';
+                this.$('.forum-nav-sort-control option[value=' + sortValue + ']').prop('selected', true);
                 this.displayedCollection.on('reset', this.renderThreads);
                 this.displayedCollection.on('thread:remove', this.renderThreads);
                 this.displayedCollection.on('change:commentable_id', function() {
