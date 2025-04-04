@@ -976,7 +976,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==9.20.0
+openedx-events @ git+https://github.com/openedx/openedx-events.git@refs/pull/487/head
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
