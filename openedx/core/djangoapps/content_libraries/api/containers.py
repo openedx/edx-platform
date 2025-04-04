@@ -27,14 +27,16 @@ from openedx_learning.api.authoring_models import Container
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
+from .exceptions import ContentLibraryContainerNotFound
 from .libraries import LibraryXBlockMetadata, PublishableItem
 
 
 # The public API is only the following symbols:
 __all__ = [
-    "ContentLibraryContainerNotFound",
+    # Models
     "ContainerMetadata",
     "ContainerType",
+    # API methods
     "get_container",
     "create_container",
     "get_container_children",
@@ -45,9 +47,6 @@ __all__ = [
     "update_container_children",
     "get_containers_contains_component",
 ]
-
-
-ContentLibraryContainerNotFound = Container.DoesNotExist
 
 
 class ContainerType(Enum):
