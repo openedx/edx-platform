@@ -571,7 +571,6 @@ class SequenceBlock(
                     'content': '',  # Real content not included
                 })
 
-
         params = {
             'items': blocks,
             'element_id': self.location.html_id(),
