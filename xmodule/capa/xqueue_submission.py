@@ -5,7 +5,7 @@ to an external grading system through XQueue.
 
 import json
 import logging
-
+from submissions.api import create_external_grader_detail
 from xmodule.capa.errors import (
     GetSubmissionParamsError,
     JSONParsingError,
@@ -25,7 +25,19 @@ class XQueueInterfaceSubmission:
         self.block = block
 
     def _parse_json(self, data, name):
-        """Helper function to parse JSON safely."""
+        """
+        Helper function to safely parse data that may or may not be a JSON string.
+        This is necessary because some callers may already provide parsed Python dicts
+        (e.g., during internal calls or test cases), while other sources may send raw JSON strings.
+        This helper ensures consistent behavior regardless of input format.
+        Args:
+            data: The input to parse, either a JSON string or a Python dict.
+            name: Name of the field (used for error reporting).
+        Returns:
+            Parsed Python object or original data if already parsed.
+        Raises:
+            JSONParsingError: If `data` is a string and cannot be parsed as JSON.
+        """
         try:
             return json.loads(data) if isinstance(data, str) else data
         except json.JSONDecodeError as e:
@@ -45,10 +57,9 @@ class XQueueInterfaceSubmission:
 
         course_id = str(self.block.scope_ids.usage_id.context_key)
         item_type = self.block.scope_ids.block_type
-        block_id = self.block.scope_ids.def_id.block_id
         points_possible = self.block.max_score()
 
-        item_id = f"block-v1:{course_id.replace('course-v1:', '')}+type@{item_type}+block@{block_id}"
+        item_id = str(self.block.scope_ids.usage_id)
 
         try:
             grader_payload = self._parse_json(payload["grader_payload"], "grader_payload")
@@ -79,8 +90,6 @@ class XQueueInterfaceSubmission:
         """
         Submits the extracted student data to the edx-submissions system.
         """
-        from submissions.api import create_external_grader_detail
-
         try:
             student_item, answer, queue_name, grader_file_name, points_possible = (
                 self.get_submission_params(header, body)

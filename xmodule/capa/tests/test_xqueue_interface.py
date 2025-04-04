@@ -39,7 +39,7 @@ class XQueueServiceTest(TestCase):
         assert self.service.interface.session.auth.username == "anant"
         assert self.service.interface.session.auth.password == "agarwal"
 
-    @patch("xmodule.capa.xqueue_interface.is_flag_active", return_value=True)
+    @patch("xmodule.capa.xqueue_interface.use_edx_submissions_for_xqueue", return_value=True)
     def test_construct_callback_with_flag_enabled(self, mock_flag):
         """Test construct_callback when the waffle flag is enabled."""
         usage_id = self.block.scope_ids.usage_id
@@ -55,7 +55,7 @@ class XQueueServiceTest(TestCase):
         with override_settings(XQUEUE_INTERFACE={**settings.XQUEUE_INTERFACE, "callback_url": custom_callback_url}):
             assert self.service.construct_callback() == f"{custom_callback_url}/{callback_url}/score_update"
 
-    @patch("xmodule.capa.xqueue_interface.is_flag_active", return_value=False)
+    @patch("xmodule.capa.xqueue_interface.use_edx_submissions_for_xqueue", return_value=False)
     def test_construct_callback_with_flag_disabled(self, mock_flag):
         """Test construct_callback when the waffle flag is disabled."""
         usage_id = self.block.scope_ids.usage_id
@@ -81,7 +81,7 @@ class XQueueServiceTest(TestCase):
 
 
 @pytest.mark.django_db
-@patch("xmodule.capa.xqueue_interface.is_flag_active", return_value=True)
+@patch("xmodule.capa.xqueue_interface.use_edx_submissions_for_xqueue", return_value=True)
 @patch("xmodule.capa.xqueue_submission.XQueueInterfaceSubmission.send_to_submission")
 def test_send_to_queue_with_flag_enabled(mock_send_to_submission, mock_flag):
     """Test send_to_queue when the waffle flag is enabled."""
@@ -109,7 +109,7 @@ def test_send_to_queue_with_flag_enabled(mock_send_to_submission, mock_flag):
 
 
 @pytest.mark.django_db
-@patch("xmodule.capa.xqueue_interface.is_flag_active", return_value=False)
+@patch("xmodule.capa.xqueue_interface.use_edx_submissions_for_xqueue", return_value=False)
 @patch("xmodule.capa.xqueue_interface.XQueueInterface._http_post")
 def test_send_to_queue_with_flag_disabled(mock_http_post, mock_flag):
     """Test send_to_queue when the waffle flag is disabled."""

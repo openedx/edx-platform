@@ -12,6 +12,7 @@ from django.conf import settings
 from django.urls import reverse
 from requests.auth import HTTPBasicAuth
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from opaque_keys.edx.keys import CourseKey
 from xmodule.capa.xqueue_submission import XQueueInterfaceSubmission
 
 if TYPE_CHECKING:
@@ -33,25 +34,27 @@ READ_TIMEOUT = 10  # seconds
 # .. toggle_default: False
 # .. toggle_use_cases: opt_in
 # .. toggle_creation_date: 2024-04-03
-# .. toggle_expiration_date: None
+# .. toggle_expiration_date: 2025-08-12
 # .. toggle_will_remain_in_codebase: True
 # .. toggle_tickets: none
 # .. toggle_status: supported
 SEND_TO_SUBMISSION_COURSE_FLAG = CourseWaffleFlag('send_to_submission_course.enable', __name__)
 
 
-def is_flag_active(flag_name, course_id):
+def use_edx_submissions_for_xqueue(course_key: CourseKey | None = None) -> bool:
     """
-    Look for the waffle flag by name and course_id.
+    Determines whether edx-submissions should be used instead of legacy XQueue.
+
+    This helper abstracts the toggle logic so that the rest of the codebase is not tied
+    to specific feature flag mechanics or rollout strategies.
+
+    Args:
+        course_key (CourseKey | None): Optional course key. If None, fallback to site-level toggle.
+
+    Returns:
+        bool: True if edx-submissions should be used, False otherwise.
     """
-    from opaque_keys.edx.keys import CourseKey
-
-    course_key = CourseKey.from_string(course_id)
-
-    if flag_name == 'send_to_submission_course.enable':
-        return SEND_TO_SUBMISSION_COURSE_FLAG.is_enabled(course_key)
-
-    raise ValueError(f"Flag {flag_name} is not supported.")
+    return SEND_TO_SUBMISSION_COURSE_FLAG.is_enabled(course_key)
 
 
 def make_hashkey(seed):
@@ -176,19 +179,19 @@ class XQueueInterface:
             for f in files_to_upload:
                 files.update({f.name: f})
 
-        course_id = str(self.block.scope_ids.usage_id.context_key)
-        if is_flag_active('send_to_submission_course.enable', course_id):
-            # Use the new edx-submissions workflow
+        if self.block is None:
+            # XQueueInterface: if self.block is None, falling back to legacy xqueue submission.
+            return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
+
+        course_key = self.block.scope_ids.usage_id.context_key
+
+        if use_edx_submissions_for_xqueue(course_key):
             submission = self.submission.send_to_submission(header, body, files)
-            log.error(submission)
             return None, ''
 
-        else:
-            return self._http_post(
-                self.url + '/xqueue/submit/', payload, files=files
-            )
+        return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
-    def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _http_post(self, url, data, files=None): # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             response = self.session.post(
                 url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
@@ -236,20 +239,20 @@ class XQueueService:
         """
         Return a fully qualified callback URL for the external queueing system.
         """
-        course_id = str(self._block.scope_ids.usage_id.context_key)
+        course_key = self._block.scope_ids.usage_id.context_key
         userid = str(self._block.scope_ids.user_id)
         mod_id = str(self._block.scope_ids.usage_id)
 
         callback_type = (
             "callback_submission"
-            if is_flag_active("send_to_submission_course.enable", course_id)
+            if use_edx_submissions_for_xqueue(course_key)
             else "xqueue_callback"
         )
 
         relative_xqueue_callback_url = reverse(
             callback_type,
             kwargs={
-                "course_id": course_id,
+                "course_id": str(course_key),
                 "userid": userid,
                 "mod_id": mod_id,
                 "dispatch": dispatch,
