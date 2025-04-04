@@ -80,7 +80,6 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     """
 
     access_expiration = serializers.DictField()
-    can_show_upgrade_sock = serializers.BooleanField()
     content_type_gating_enabled = serializers.BooleanField()
     course_goals = CourseGoalsSerializer()
     effort = serializers.CharField()
