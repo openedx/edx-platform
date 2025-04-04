@@ -191,7 +191,7 @@ class XQueueInterface:
 
         return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
 
-    def _http_post(self, url, data, files=None): # lint-amnesty, pylint: disable=missing-function-docstring
+    def _http_post(self, url, data, files=None):  # lint-amnesty, pylint: disable=missing-function-docstring
         try:
             response = self.session.post(
                 url, data=data, files=files, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT)
