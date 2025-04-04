@@ -164,6 +164,7 @@
             _.each(quartersToShow, function(qObj, idx) {
                 var headingTitle = (idx === 0) ? "Current modules and micro-degrees" : "Upcoming modules and micro-degrees";
                 var quarterLabel = qObj.label;
+                var quarterLabelDescription = "The courses are modules of our M.Sc. and MBA programs. However, anyone can book these courses as stand-alone Micro Degree programs for a fee of €900."
 
                 var itemsHtml = "";
                 _.each(quarterToCourses[qObj.label], function(courseModel) {
@@ -173,6 +174,7 @@
 
                 finalHtml += '<div class="quarter-section">';
                 finalHtml += '<h2 class="quarter-label">' + headingTitle + ': ' + quarterLabel + '</h2>';
+                finalHtml += '<p class="quarter-label-description">' + quarterLabelDescription + '</p>';
                 finalHtml += '<ul class="courses-listing courses-list">' + itemsHtml + '</ul>';
                 finalHtml += '</div>';
             });
