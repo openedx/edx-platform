@@ -591,6 +591,8 @@ def create_library(
     except IntegrityError:
         raise LibraryAlreadyExists(slug)  # lint-amnesty, pylint: disable=raise-missing-from
 
+    # .. event_implemented_name: CONTENT_LIBRARY_CREATED
+    # .. event_type: org.openedx.content_authoring.content_library.created.v1
     CONTENT_LIBRARY_CREATED.send_event(
         content_library=ContentLibraryData(
             library_key=ref.library_key
@@ -728,6 +730,8 @@ def update_library(
                 description=description,
             )
 
+    # .. event_implemented_name: CONTENT_LIBRARY_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.updated.v1
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
             library_key=content_lib.library_key
@@ -753,6 +757,8 @@ def delete_library(library_key: LibraryLocatorV2) -> None:
         if learning_package:
             learning_package.delete()
 
+    # .. event_implemented_name: CONTENT_LIBRARY_DELETED
+    # .. event_type: org.openedx.content_authoring.content_library.deleted.v1
     CONTENT_LIBRARY_DELETED.send_event(
         content_library=ContentLibraryData(
             library_key=library_key
@@ -897,6 +903,8 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
             created=now,
         )
 
+    # .. event_implemented_name: LIBRARY_BLOCK_UPDATED
+    # .. event_type: org.openedx.content_authoring.library_block.updated.v1
     LIBRARY_BLOCK_UPDATED.send_event(
         library_block=LibraryBlockData(
             library_key=usage_key.context_key,
@@ -997,6 +1005,8 @@ def create_library_block(
     _create_component_for_block(content_library, usage_key, user_id, can_stand_alone)
 
     # Now return the metadata about the new block:
+    # .. event_implemented_name: LIBRARY_BLOCK_CREATED
+    # .. event_type: org.openedx.content_authoring.library_block.created.v1
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
             library_key=content_library.library_key,
@@ -1133,6 +1143,8 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
             )
 
     # Emit library block created event
+    # .. event_implemented_name: LIBRARY_BLOCK_CREATED
+    # .. event_type: org.openedx.content_authoring.library_block.created.v1
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
             library_key=content_library.library_key,
@@ -1224,6 +1236,8 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
 
     authoring_api.soft_delete_draft(component.pk)
 
+    # .. event_implemented_name: LIBRARY_BLOCK_DELETED
+    # .. event_type: org.openedx.content_authoring.library_block.deleted.v1
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
             library_key=library_key,
@@ -1236,6 +1250,8 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     #
     # To delete the component on collections
     for collection in affected_collections:
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library_key,
@@ -1249,6 +1265,8 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     #
     # To update the components count in containers
     for container in affected_containers:
+        # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 library_key=library_key,
@@ -1269,6 +1287,8 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     # Set draft version back to the latest available component version id.
     authoring_api.set_draft_version(component.pk, component.versioning.latest.pk)
 
+    # .. event_implemented_name: LIBRARY_BLOCK_CREATED
+    # .. event_type: org.openedx.content_authoring.library_block.created.v1
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
             library_key=library_key,
@@ -1277,6 +1297,8 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     )
 
     # Add tags and collections back to index
+    # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+    # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
             object_id=str(usage_key),
@@ -1289,6 +1311,8 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     #
     # To restore the component in the collections
     for collection in affected_collections:
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library_key,
@@ -1383,6 +1407,8 @@ def add_library_block_static_asset_file(
             created_by=user.id if user else None,
         )
         transaction.on_commit(
+            # .. event_implemented_name: LIBRARY_BLOCK_UPDATED
+            # .. event_type: org.openedx.content_authoring.library_block.updated.v1
             lambda: LIBRARY_BLOCK_UPDATED.send_event(
                 library_block=LibraryBlockData(
                     library_key=usage_key.context_key,
@@ -1429,6 +1455,8 @@ def delete_library_block_static_asset_file(usage_key, file_path, user=None):
             created_by=user.id if user else None,
         )
         transaction.on_commit(
+            # .. event_implemented_name: LIBRARY_BLOCK_UPDATED
+            # .. event_type: org.openedx.content_authoring.library_block.updated.v1
             lambda: LIBRARY_BLOCK_UPDATED.send_event(
                 library_block=LibraryBlockData(
                     library_key=usage_key.context_key,
@@ -1475,6 +1503,8 @@ def publish_changes(library_key: LibraryLocatorV2, user_id: int | None = None):
     assert learning_package is not None  # shouldn't happen but it's technically possible.
     authoring_api.publish_all_drafts(learning_package.id, published_by=user_id)
 
+    # .. event_implemented_name: CONTENT_LIBRARY_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.updated.v1
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
             library_key=library_key,
@@ -1500,6 +1530,8 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
         entity__key=component.key
     )
     authoring_api.publish_from_drafts(learning_package.id, draft_qset=drafts_to_publish, published_by=user.id)
+    # .. event_implemented_name: LIBRARY_BLOCK_UPDATED
+    # .. event_type: org.openedx.content_authoring.library_block.updated.v1
     LIBRARY_BLOCK_UPDATED.send_event(
         library_block=LibraryBlockData(
             library_key=usage_key.lib_key,
@@ -1517,6 +1549,8 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     assert learning_package is not None  # shouldn't happen but it's technically possible.
     authoring_api.reset_drafts_to_published(learning_package.id)
 
+    # .. event_implemented_name: CONTENT_LIBRARY_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.updated.v1
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
             library_key=library_key,
@@ -1530,6 +1564,8 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     # This is to update component counts in all library collections,
     # because there may be components that have been discarded in the revert.
     for collection in authoring_api.get_collections(learning_package.id):
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library_key,
@@ -1550,6 +1586,8 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     for component in components_in_collections:
         usage_key = library_component_usage_key(library_key, component)
 
+        # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             content_object=ContentObjectChangedData(
                 object_id=str(usage_key),
@@ -1737,6 +1775,8 @@ def set_library_component_collections(
     # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
     # collection indexing asynchronously.
     for collection in affected_collections:
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 library_key=library_key,

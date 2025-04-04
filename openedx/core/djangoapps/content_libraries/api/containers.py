@@ -188,6 +188,8 @@ def create_container(
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_CREATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.created.v1
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
             library_key=library_key,
@@ -217,6 +219,8 @@ def update_container(
         created_by=user_id,
     )
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
             library_key=library_key,
@@ -242,6 +246,8 @@ def delete_container(
 
     authoring_api.soft_delete_draft(container.pk)
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_DELETED
+    # .. event_type: org.openedx.content_authoring.content_library.container.deleted.v1
     LIBRARY_CONTAINER_DELETED.send_event(
         library_container=LibraryContainerData(
             library_key=container_key.library_key,
@@ -310,6 +316,8 @@ def update_container_children(
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
             library_key=library_key,
