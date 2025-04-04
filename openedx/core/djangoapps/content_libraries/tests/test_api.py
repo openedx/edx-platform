@@ -844,8 +844,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "signal": LIBRARY_CONTAINER_UPDATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    library_key=self.lib1.library_key,
-                    container_key=str(self.unit1.container_key),
+                    container_key=self.unit1.container_key,
                     background=True,
                 )
             },
@@ -856,8 +855,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "signal": LIBRARY_CONTAINER_UPDATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    library_key=self.lib1.library_key,
-                    container_key=str(self.unit2.container_key),
+                    container_key=self.unit2.container_key,
                     background=True,
                 )
             },

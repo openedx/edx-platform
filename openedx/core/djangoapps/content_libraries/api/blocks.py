@@ -285,8 +285,7 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
-                library_key=usage_key.lib_key,
-                container_key=str(container.container_key),
+                container_key=container.container_key,
                 background=True,
             )
         )
@@ -543,8 +542,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
-                library_key=library_key,
-                container_key=str(container.container_key),
+                container_key=container.container_key,
                 background=True,
             )
         )
@@ -599,8 +597,7 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
-                library_key=library_key,
-                container_key=str(container.container_key),
+                container_key=container.container_key,
                 background=True,
             )
         )

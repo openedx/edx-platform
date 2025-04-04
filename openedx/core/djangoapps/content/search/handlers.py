@@ -245,7 +245,6 @@ def library_container_updated_handler(**kwargs) -> None:
 
     if library_container.background:
         update_library_container_index_doc.delay(
-            str(library_container.library_key),
             library_container.container_key,
         )
     else:
@@ -253,6 +252,5 @@ def library_container_updated_handler(**kwargs) -> None:
         # the frontend invalidates/refetches index.
         # See content_library_updated_handler for more details.
         update_library_container_index_doc.apply(args=[
-            str(library_container.library_key),
             library_container.container_key,
         ])
