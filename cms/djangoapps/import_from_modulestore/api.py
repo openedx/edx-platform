@@ -30,11 +30,10 @@ def create_import(source_key, user_id: int, learning_package_id: int) -> _Import
     """
     Create a new import task to import a course to a library.
     """
-    import_from_modulestore = _Import(
+    import_from_modulestore = _Import.objects.create(
         source_key=source_key,
         target_id=learning_package_id,
         user_id=user_id,
     )
-    import_from_modulestore.save()
     save_legacy_content_to_staged_content_task.apply_async(kwargs={'import_uuid': import_from_modulestore.uuid})
     return import_from_modulestore

@@ -16,4 +16,4 @@ class ImportFromModulestoreConfig(AppConfig):
         """
         Connect handlers to signals.
         """
-        from . import signals  # pylint: disable=unused-import, import-outside-toplevel
+        from . import signals, tasks  # pylint: disable=unused-import, import-outside-toplevel
