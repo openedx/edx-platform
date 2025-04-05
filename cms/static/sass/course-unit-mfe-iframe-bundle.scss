@@ -10,6 +10,9 @@ html {
   body {
     min-width: 800px;
     background: transparent;
+    &.openassessment_full_height.view-container {
+        overflow-y: hidden;
+    }
   }
 }
 
