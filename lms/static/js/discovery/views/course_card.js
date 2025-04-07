@@ -57,6 +57,7 @@
                     userLanguage,
                     userTimezone
                 );
+                data.instructor = this.model.get('instructor');
                 HtmlUtils.setHtml(
                     this.$el,
                     this.tpl(data)
