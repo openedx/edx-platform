@@ -234,7 +234,6 @@ class TestSearchApi(ModuleStoreTestCase):
             "modified": created_date.timestamp(),
             "access_id": lib_access.id,
             "breadcrumbs": [{"display_name": "Library"}],
-            # "tags" should be here but we haven't implemented them yet
             # "published" is not set since we haven't published it yet
         }
 
@@ -262,6 +261,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
         doc_unit = copy.deepcopy(self.unit_dict)
+        doc_unit["tags"] = {}
 
         api.rebuild_index()
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
@@ -292,6 +292,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
         doc_unit = copy.deepcopy(self.unit_dict)
+        doc_unit["tags"] = {}
 
         api.rebuild_index(incremental=True)
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
