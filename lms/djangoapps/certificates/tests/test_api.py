@@ -1141,6 +1141,7 @@ class CertificatesApiTestCase(TestCase):
         certificate instance when the display behavior is set to EARLY_NO_INFO.
         """
         with configure_waffle_namespace(True):
+            self.course.self_paced = False
             self.course.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
             assert display_date_for_certificate(self.course, self.certificate) == self.certificate.modified_date
 
@@ -1150,6 +1151,7 @@ class CertificatesApiTestCase(TestCase):
         associated with the course when the display behavior is set to END_WITH_DATE.
         """
         with configure_waffle_namespace(True):
+            self.course.self_paced = False
             self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
             self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
             assert display_date_for_certificate(self.course, self.certificate) == self.course.certificate_available_date
@@ -1160,6 +1162,7 @@ class CertificatesApiTestCase(TestCase):
         when the display behavior is set to END.
         """
         with configure_waffle_namespace(True):
+            self.course.self_paced = False
             self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END
             assert display_date_for_certificate(self.course, self.certificate) == self.course.end
 
@@ -1171,6 +1174,27 @@ class CertificatesApiTestCase(TestCase):
         with configure_waffle_namespace(True):
             self.certificate.date_override = datetime(2016, 1, 1, tzinfo=pytz.UTC)
             assert display_date_for_certificate(self.course, self.certificate) == self.certificate.date_override.date
+
+    def test_display_date_for_self_paced_course_run(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the last modified date of a
+        certificate instance when the display behavior is set to EARLY_NO_INFO and the course run is self-paced.
+        """
+        with configure_waffle_namespace(True):
+            self.course.self_paced = True
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
+            assert display_date_for_certificate(self.course, self.certificate) == self.certificate.modified_date
+
+    def test_display_date_for_self_paced_course_run_with_cdb_end(self):
+        """
+        Test for a bug fix and some defensive coding. It is possible for self-paced course runs to end up with a display
+        behavior of END. This test ensures that we select the correct issue date even when the course run's
+        configuration is unexpected.
+        """
+        with configure_waffle_namespace(True):
+            self.course.self_paced = True
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END
+            assert display_date_for_certificate(self.course, self.certificate) == self.certificate.modified_date
 
 
 @ddt.ddt

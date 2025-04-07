@@ -880,7 +880,14 @@ def display_date_for_certificate(course, certificate):
 
     if _course_uses_available_date(course) and course.certificate_available_date < datetime.now(UTC):
         return course.certificate_available_date
-    elif course.certificates_display_behavior == CertificatesDisplayBehaviors.END and course.end:
+    # It is possible for a self-paced course run to end up configured with a display behavior of "END" even though it
+    # shouldn't be a valid option. We must check if the course is instructor-paced here to ensure that we are selecting
+    # the correct date to display.
+    elif (
+        not course.self_paced
+        and course.certificates_display_behavior == CertificatesDisplayBehaviors.END
+        and course.end
+    ):
         return course.end
     else:
         return certificate.modified_date

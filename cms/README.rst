@@ -1,7 +1,7 @@
 CMS
 ===
 
-This directory contains code relating to the Open edX Content Management System ("CMS"). It allows learning content to be created, edited, versioned, and eventually published to the `Open edX Learning Mangement System <../lms>`_ ("LMS"). The main user-facing application that CMS powers is the `Open edX Studio <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/getting_started/CA_get_started_Studio.html#>`_
+This directory contains code relating to the Open edX Content Management System ("CMS"). It allows learning content to be created, edited, versioned, and eventually published to the `Open edX Learning Mangement System <../lms>`_ ("LMS"). The main user-facing application that CMS powers is the `Open edX Studio <https://docs.openedx.org/en/latest/educators/concepts/open_edx_platform/what_is_studio.html>`_
 
 See also
 --------
