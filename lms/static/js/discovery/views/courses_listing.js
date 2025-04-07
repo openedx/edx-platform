@@ -179,16 +179,17 @@
 
                 if (itemsHtml) {
                     console.log("Rendering quarter:", qObj.label);
-                    finalHtml += `...`;
+                    // finalHtml += `...`;
+                    finalHtml += '<div class="quarter-section">';
+                    finalHtml += '<h2 class="quarter-label">' + headingTitle + ': ' + quarterLabel + '</h2>';
+                    finalHtml += '<p class="quarter-label-description">' + quarterLabelDescription + '</p>';
+                    finalHtml += '<ul class="courses-listing courses-list">' + itemsHtml + '</ul>';
+                    finalHtml += '</div>';
                 } else {
                     console.log("Skipping quarter with no valid courses:", qObj.label);
                 }
 
-                finalHtml += '<div class="quarter-section">';
-                finalHtml += '<h2 class="quarter-label">' + headingTitle + ': ' + quarterLabel + '</h2>';
-                finalHtml += '<p class="quarter-label-description">' + quarterLabelDescription + '</p>';
-                finalHtml += '<ul class="courses-listing courses-list">' + itemsHtml + '</ul>';
-                finalHtml += '</div>';
+                
             });
 
             var $container = this.$el.find('.courses-listing.courses-list');
