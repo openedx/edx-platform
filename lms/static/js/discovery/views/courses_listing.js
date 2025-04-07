@@ -176,8 +176,8 @@
                         itemsHtml += '<li class="courses-listing-item">' + rendered + '</li>';
                     }
                 });
-
-                if (itemsHtml) {
+                 console.log("Items ",itemsHtml)
+                if (itemsHtml !== "") {
                     console.log("Rendering quarter:", qObj.label);
                     // finalHtml += `...`;
                     finalHtml += '<div class="quarter-section">';
