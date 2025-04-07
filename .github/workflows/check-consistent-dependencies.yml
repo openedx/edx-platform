@@ -54,7 +54,7 @@ jobs:
           make compile-requirements
 
       - name: Fail if compiling requirements caused changes
-        if: ${{ env.RELEVANT == 'true' }}
+        if: ${{ env.RELEVANT == 'true' && github.repository == 'openedx/edx-platform' }}
         run: |
           SUMMARY_HELP=$(cat <<'EOMARKDOWN'
           # Inconsistent Python dependencies

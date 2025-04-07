@@ -1406,7 +1406,7 @@ openedx-events==10.5.0
     #   edx-event-bus-redis
     #   event-tracking
     #   ora2
-openedx-filters==2.1.0
+openedx-filters @ git+https://github.com/Pearson-Advance/openedx-filters.git@pearson/ulmo#egg=openedx-filters  # Pearson Ulmo fork of Open edX Filters
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
