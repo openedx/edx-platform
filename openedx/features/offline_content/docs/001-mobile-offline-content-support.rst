@@ -1,4 +1,4 @@
-Offline content generation for mobile OeX app
+1. Offline content generation for mobile OeX app
 =============================================
 
 Status
@@ -18,8 +18,10 @@ It is possible to provide different kind of content using the Open edX platform,
 videos, and assessments. Therefore to provide the whole course experience in offline mode it's required to
 make all these types of content available offline. Of course it won't be feasible to recreate grading
 algorithms in mobile, so it's possible to save submission on the mobile app and execute synchronization
-of the user progres as not limited conectivity is back.
+of the user progres as not limited connectivity is back.
+
 From the product perspective the following Figma designs and product requirements should be considered:
+
 * `Download and Delete (Figma)`_
 * `Downloads (Figma)`_
 
@@ -31,13 +33,13 @@ Decision
 
 The implementation of the offline content support require addition of the following features to the edx-platform:
 
-* It's necessary to generate an archive with all necessary HTML and assets for a student view of an xBlock,
-   so it's possible to display an xBlock using mobile WebView.
+* It's necessary to generate an archive with all necessary HTML and assets for a student view of an xBlock, so it's possible to display an xBlock using mobile WebView.
+* Implement a new standard XBlock view called `offline_view` which would generate user-agnostic fragments suitable for offline use. This view will avoid any dependence on student-specific state, focusing solely on content and settings.
+* XBlock classes can opt into supporting `offline_view`. They can implement this view fully or partially. For example, a block that relies on user-specific randomization or interactive elements that require online connectivity would not be rendered offline.
 * The generated offline content should be provided to mobile device through mobile API.
 * To support CAPA problems and other kinds of assessments in offline mode it's necessary to create an additional
   JavaScript layer that will allow communication with Mobile applications by sending JSON messages
   using Android and IOS Bridge.
-
 
 
 Offline content generation
@@ -46,7 +48,7 @@ Offline content generation
 Generating zip archive with xBlock data for HTML and CAPA problems
 When content is published in CMS and offline generation is enabled for the course or entire platform using waffle flags, the content generation task should be started for supported blocks.
 Every time block content republished ZIP archive with offline content should be regenerated.
-The xBlock should be rendered the same way it’s rendered for a student using /xblock/{locator.id} endpoint in LMS.
+Supported XBlock class should implement `offline_view` method that will be used to generate the content.
 HTML should be processed, all related assets files, images and scripts should be included in the generated ZIP archive with offline content
 The Generation process should work with local media storage as well as s3.
 If error retrieving block happened, the generation task will be scheduled for retry 2 more times, with progressive delay.
@@ -54,19 +56,30 @@ If error retrieving block happened, the generation task will be scheduled for re
     .. image:: _images/mobile_offline_content_generation.svg
         :alt: Mobile Offline Content Generation Process Diagram
 
+
+Offline content deletion
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+When the course is published and some blocks are removed from the course, related ZIP archive should be deleted.
+When some blocks are removed from the course without publishing the course, the related ZIP archive shouldn't be deleted.
+
+
 Mobile API extension
 ~~~~~~~~~~~~~~~~~~~~
 
 Extend the Course Home mobile API endpoint, and add a new version of the API (url /api/mobile/v4/course_info/blocks/)
 to return information about offline content available for download for supported blocks
-{
-...
-"offline_download": {
-    "file_url": "{file_url}" or null,
-    "last_modified": "{DT}" or null,
-    "file_size": ""
-  }
-}
+
+.. code-block:: json
+    {
+        ...
+        "offline_download": {
+            "file_url": "{file_url}" or null,
+            "last_modified": "{DT}" or null,
+            "file_size": ""
+          }
+    }
+
 
 JavaScript Bridge for interaction with mobile applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -121,6 +134,8 @@ Consequences
 * Enhanced learner experience with flexible access to course materials.
 * Increased accessibility for learners in regions with poor internet connectivity.
 * Improved engagement and completion rates due to uninterrupted access to content.
+* Simplified Maintenance by using a unified rendering view (`offline_view`), the complexity of maintaining separate renderers for online and offline content is significantly reduced.
+* The proposed approach not only caters to the current needs of mobile users but also sets a foundation for expanding offline access to other platforms and uses.
 * Potential increase in app size due to locally stored content.
 * Increased complexity in managing content synchronization and updates.
 * Need for continuous monitoring and updates to handle new content types and formats.
@@ -128,8 +143,11 @@ Consequences
 Rejected Solutions
 ------------------
 
-Store common .js and .css files of blocks in a separate folder:
+* **Store common .js and .css files of blocks in a separate folder:**
     * This solution was rejected because it is unclear how to track potential changes to these files and re-generate the content of the blocks.
 
-Generate content on the fly when the user requests it:
+* **Generate content on the fly when the user requests it:**
     * This solution was rejected because it would require a significant amount of processing power and time to generate content for each block when requested.
+
+* **Separate Offline Renderer**:
+    * The initial proposal of creating a separate renderer for offline content was rejected due to the increased complexity and potential for inconsistent behavior between online and offline content.
