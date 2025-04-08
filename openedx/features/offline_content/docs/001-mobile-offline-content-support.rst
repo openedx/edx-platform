@@ -89,11 +89,11 @@ This script should expose markCompleted JS function so mobile can change state o
 
 
 * **Implement of a mechanism for generating and storing on a server or external storage**: The course content should be pre-generated and saved to the storage for later download.
-    * **Render content**: Generate HTML content of block as it does for LMS.
+    * **Render block fragment**: Implement a new standard XBlock view called `offline_view` which would generate user-agnostic fragments suitable for offline use. This view will avoid any dependence on student-specific state, focusing solely on content and settings.
     * **Replace static and media**: Save static and media assets files used in block to temporary directory and replace their static paths with local paths.
     * **Archive and store content**: Archive the generated content and store it on the server or external storage.
 * **Mechanism for updating the generated data**: When updating course blocks (namely when publishing) the content that has been changed should be re-generated.
-    * **Track course publishing events on LMS side**: Add a new signal `course_cache_updated` to be called after the course structure cache update in `update_course_in_cache_v2`. Add a signal that listens to `course_cache_updated` and starts block generation.
+    * **Track course publishing events on CMS side**: Add a new signal `course_cache_updated` to be called after the course structure cache update in `update_course_in_cache_v2`. Add a signal that listens to `course_cache_updated` and starts block generation.
     * **Update archive**: Check generated archive creation date and update it if less than course publishing date.
 * **Implement a Mobile Local Storage Mechanism**: Use the device's local storage to save course content for offline access.
     * **Extend blocks API**: Add links to download blocks content and  where it is possible.
