@@ -338,9 +338,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
         lib_key = LibraryLocatorV2.from_string(lib["id"])
 
-        create_receiver = mock.Mock()
-        LIBRARY_CONTAINER_CREATED.connect(create_receiver)
-
         # Create a unit:
         create_date = datetime(2024, 9, 8, 7, 6, 5, tzinfo=timezone.utc)
         with freeze_time(create_date):
@@ -348,6 +345,9 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
 
         # Delete the unit
         self._delete_container(container_data["container_key"])
+
+        create_receiver = mock.Mock()
+        LIBRARY_CONTAINER_CREATED.connect(create_receiver)
 
         # Restore container
         self._restore_container(container_data["container_key"])
@@ -368,7 +368,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
 
         self.assertDictContainsEntries(new_container_data, expected_data)
 
-        assert create_receiver.call_count == 2
+        assert create_receiver.call_count == 1
         self.assertDictContainsSubset(
             {
                 "signal": LIBRARY_CONTAINER_CREATED,
@@ -379,15 +379,4 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 ),
             },
             create_receiver.call_args_list[0].kwargs,
-        )
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_CREATED,
-                "sender": None,
-                "library_container": LibraryContainerData(
-                    lib_key,
-                    container_key="lct:CL-TEST:containers:unit:u1",
-                ),
-            },
-            create_receiver.call_args_list[1].kwargs,
         )
