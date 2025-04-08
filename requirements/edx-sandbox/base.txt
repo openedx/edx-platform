@@ -18,13 +18,13 @@ cryptography==44.0.2
     # via -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.56.0
+fonttools==4.57.0
     # via matplotlib
 joblib==1.4.2
     # via nltk
 kiwisolver==1.4.8
     # via matplotlib
-lxml[html-clean,html_clean]==5.3.1
+lxml[html-clean,html_clean]==5.3.2
     # via
     #   -r requirements/edx-sandbox/base.in
     #   lxml-html-clean
@@ -61,7 +61,7 @@ pillow==11.1.0
     # via matplotlib
 pycparser==2.22
     # via cffi
-pyparsing==3.2.1
+pyparsing==3.2.3
     # via
     #   -r requirements/edx-sandbox/base.in
     #   chem
