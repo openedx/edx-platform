@@ -403,19 +403,21 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
 
     @ddt.data(
         # Instructor-paced course: Use course start date
-        (False, datetime(2025, 1, 10, tzinfo=utc), datetime(2025, 1, 12, tzinfo=utc),
-            datetime(2025, 1, 10, tzinfo=utc), 'Course starts'),
+        (False, datetime(2025, 1, 10, tzinfo=ZoneInfo('UTC')),
+            datetime(2025, 1, 12, tzinfo=ZoneInfo('UTC')),
+            datetime(2025, 1, 10, tzinfo=ZoneInfo('UTC')), 'Course starts'),
 
         # Self-paced course: Enrollment created later than course start
-        (True, datetime(2025, 1, 10, tzinfo=utc), datetime(2025, 1, 12), datetime(2025, 1, 12, tzinfo=utc),
-            'Enrollment Date'),
+        (True, datetime(2025, 1, 10, tzinfo=ZoneInfo('UTC')), datetime(2025, 1, 12),
+            datetime(2025, 1, 12, tzinfo=ZoneInfo('UTC')), 'Enrollment Date'),
 
         # Self-paced course: Enrollment created earlier than course start
-        (True, datetime(2025, 1, 10, tzinfo=utc), datetime(2025, 1, 8), datetime(2025, 1, 10, tzinfo=utc),
-            'Course starts'),
+        (True, datetime(2025, 1, 10, tzinfo=ZoneInfo('UTC')), datetime(2025, 1, 8),
+            datetime(2025, 1, 10, tzinfo=ZoneInfo('UTC')), 'Course starts'),
 
         # Self-paced course: No enrollment
-        (True, datetime(2025, 1, 10, tzinfo=utc), None, datetime(2025, 1, 10, tzinfo=utc), 'Course starts'),
+        (True, datetime(2025, 1, 10, tzinfo=ZoneInfo('UTC')), None,
+            datetime(2025, 1, 10, tzinfo=ZoneInfo('UTC')), 'Course starts'),
     )
     @ddt.unpack
     def test_course_start_date_label(self, self_paced, course_start, enrollment_created, expected_date, expected_title):

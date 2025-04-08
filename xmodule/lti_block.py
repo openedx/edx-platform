@@ -71,6 +71,7 @@ from oauthlib.oauth1.rfc5849 import signature
 from opaque_keys.edx.keys import CourseKey
 from zoneinfo import ZoneInfo
 from web_fragments.fragment import Fragment
+from webob import Response
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
 from xblocks_contrib.lti import LTIBlock as _ExtractedLTIBlock

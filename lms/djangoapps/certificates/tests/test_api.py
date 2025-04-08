@@ -1153,7 +1153,7 @@ class CertificatesApiTestCase(TestCase):
         with configure_waffle_namespace(True):
             self.course.self_paced = False
             self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
-            self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
+            self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=ZoneInfo('UTC'))
             assert display_date_for_certificate(self.course, self.certificate) == self.course.certificate_available_date
 
     def test_display_date_for_certificate_cdb_end(self):
@@ -1172,7 +1172,7 @@ class CertificatesApiTestCase(TestCase):
         if-and-only-if date override associated with the certificate instance.
         """
         with configure_waffle_namespace(True):
-            self.certificate.date_override = datetime(2016, 1, 1, tzinfo=pytz.UTC)
+            self.certificate.date_override = datetime(2016, 1, 1, tzinfo=ZoneInfo('UTC'))
             assert display_date_for_certificate(self.course, self.certificate) == self.certificate.date_override.date
 
     def test_display_date_for_self_paced_course_run(self):

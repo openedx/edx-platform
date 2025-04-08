@@ -4,7 +4,7 @@ Unit tests for the asset upload endpoint.
 from datetime import datetime
 from urllib.parse import urljoin
 
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from django.test import override_settings
 from cms.djangoapps.contentstore import asset_storage_handlers
@@ -38,7 +38,7 @@ class LMSPageURLRequestedFiltersTest(ModuleStoreTestCase):
 
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp()
-        self.upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
+        self.upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=ZoneInfo('UTC'))
         self.content_type = 'image/jpg'
         self.course_key = CourseLocator('org', 'class', 'run')
         self.location = self.course_key.make_asset_key('asset', 'my_file_name.jpg')

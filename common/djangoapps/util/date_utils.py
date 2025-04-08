@@ -95,8 +95,6 @@ def from_timestamp(timestamp):
     """
     try:
         return datetime.fromtimestamp(int(timestamp), tz=ZoneInfo("UTC"))
-        # replacing this depreciated 1099
-        # return datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=ZoneInfo("UTC"))
     except (ValueError, TypeError):
         return None
 

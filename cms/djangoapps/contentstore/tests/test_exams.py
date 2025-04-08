@@ -7,7 +7,8 @@ from unittest.mock import patch, Mock
 
 import ddt
 from django.conf import settings
-from edx_toggles.toggles.testutils import override_waffle_flagfrom freezegun import freeze_time
+from edx_toggles.toggles.testutils import override_waffle_flag
+from freezegun import freeze_time
 from zoneinfo import ZoneInfo
 
 from cms.djangoapps.contentstore.signals.handlers import listen_for_course_publish
