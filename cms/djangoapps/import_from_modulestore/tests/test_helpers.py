@@ -47,12 +47,12 @@ class TestImportClient(ModuleStoreTestCase):
             display_name='Video',
             data="""<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>""",
         )
-
-        self.import_event = api.create_import(
-            source_key=self.course.id,
-            learning_package_id=self.library.learning_package.id,
-            user_id=self.user.id,
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            self.import_event = api.create_import(
+                source_key=self.course.id,
+                learning_package_id=self.library.learning_package.id,
+                user_id=self.user.id,
+            )
         self.parser = etree.XMLParser(strip_cdata=False)
 
     def test_import_from_staged_content(self):

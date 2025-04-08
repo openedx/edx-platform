@@ -9,6 +9,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
 from cms.djangoapps.import_from_modulestore.api import create_import, import_course_staged_content_to_library
+from cms.djangoapps.import_from_modulestore.data import ImportStatus
 from cms.djangoapps.import_from_modulestore.models import Import
 from openedx.core.djangoapps.content_libraries.tests import factories
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -32,18 +33,13 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
         """
         course_id = "course-v1:edX+DemoX+Demo_Course"
         user = UserFactory()
-        with patch(
-            "cms.djangoapps.import_from_modulestore.api.save_legacy_content_to_staged_content_task"
-        ) as save_legacy_content_to_staged_content_task_mock:
-            create_import(course_id, user.id, self.library.learning_package_id)
+        create_import(course_id, user.id, self.library.learning_package_id)
 
         import_event = Import.objects.get()
         assert import_event.source_key == CourseKey.from_string(course_id)
         assert import_event.target == self.library.learning_package
         assert import_event.user_id == user.id
-        save_legacy_content_to_staged_content_task_mock.apply_async.assert_called_once_with(
-            kwargs={'import_uuid': import_event.uuid}
-        )
+        assert import_event.status == ImportStatus.PENDING
 
     def test_import_course_staged_content_to_library(self):
         """

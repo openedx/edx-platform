@@ -44,11 +44,12 @@ class TestCourseToLibraryImportViewsMixin(SharedModuleStoreTestCase):
         self.vertical = BlockFactory.create(category='vertical', parent=self.sequential)
         self.problem = BlockFactory.create(category='problem', parent=self.vertical)
 
-        self.import_event = api.create_import(
-            user_id=self.admin_user.pk,
-            learning_package_id=self.library.learning_package.id,
-            source_key=self.course.id,
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            self.import_event = api.create_import(
+                user_id=self.admin_user.pk,
+                learning_package_id=self.library.learning_package.id,
+                source_key=self.course.id,
+            )
 
 
 class ImportBlocksViewTest(TestCourseToLibraryImportViewsMixin):
