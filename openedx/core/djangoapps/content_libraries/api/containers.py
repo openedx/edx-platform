@@ -235,10 +235,7 @@ def delete_container(
 
     No-op if container doesn't exist or has already been soft-deleted.
     """
-    try:
-        container = _get_container(container_key)
-    except ContentLibraryContainerNotFound:
-        return
+    container = _get_container(container_key)
 
     authoring_api.soft_delete_draft(container.pk)
 
@@ -256,10 +253,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     """
     Restore the specified library container.
     """
-    try:
-        container = _get_container(container_key, isDeleted=True)
-    except ContentLibraryContainerNotFound:
-        return
+    container = _get_container(container_key, isDeleted=True)
 
     authoring_api.set_draft_version(container.pk, container.versioning.latest.pk)
 
