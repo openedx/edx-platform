@@ -25,14 +25,12 @@ try:
         searchable_doc_for_library_block,
         searchable_doc_tags,
         searchable_doc_tags_for_collection,
-        searchable_doc_tags_for_container,
     )
     from ..models import SearchAccess
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
     searchable_doc_tags = lambda x: x
     searchable_doc_tags_for_collection = lambda x: x
-    searchable_doc_tags_for_container = lambda x: x
     searchable_doc_for_collection = lambda x: x
     searchable_doc_for_container = lambda x: x
     searchable_doc_for_library_block = lambda x: x
@@ -513,7 +511,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         Test creating a search document for a draft-only container
         """
         doc = searchable_doc_for_container(self.container.container_key)
-        doc.update(searchable_doc_tags_for_container(self.container.container_key))
+        doc.update(searchable_doc_tags(self.container.container_key))
 
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",
@@ -552,7 +550,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         library_api.publish_changes(self.library.key)
 
         doc = searchable_doc_for_container(self.container.container_key)
-        doc.update(searchable_doc_tags_for_container(self.container.container_key))
+        doc.update(searchable_doc_tags(self.container.container_key))
 
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",
@@ -603,7 +601,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             )
 
         doc = searchable_doc_for_container(self.container.container_key)
-        doc.update(searchable_doc_tags_for_container(self.container.container_key))
+        doc.update(searchable_doc_tags(self.container.container_key))
 
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",

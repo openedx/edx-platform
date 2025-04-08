@@ -17,6 +17,7 @@ from django.core.paginator import Paginator
 from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchApiError, MeilisearchError
 from meilisearch.models.task import TaskInfo
+from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryCollectionLocator
 from openedx_learning.api import authoring as authoring_api
@@ -42,11 +43,10 @@ from .documents import (
     searchable_doc_for_collection,
     searchable_doc_for_container,
     searchable_doc_for_library_block,
-    searchable_doc_for_usage_key,
+    searchable_doc_for_key,
     searchable_doc_collections,
     searchable_doc_tags,
     searchable_doc_tags_for_collection,
-    searchable_doc_tags_for_container,
 )
 
 log = logging.getLogger(__name__)
@@ -487,7 +487,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                         container,
                     )
                     doc = searchable_doc_for_container(container_key)
-                    doc.update(searchable_doc_tags_for_container(container_key))
+                    doc.update(searchable_doc_tags(container_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing container {container.key}: {err}")
@@ -620,7 +620,7 @@ def delete_index_doc(usage_key: UsageKey) -> None:
     Args:
         usage_key (UsageKey): The usage key of the XBlock to be removed from the index
     """
-    doc = searchable_doc_for_usage_key(usage_key)
+    doc = searchable_doc_for_key(usage_key)
     _delete_index_doc(doc[Fields.id])
 
 
@@ -811,12 +811,12 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     _update_index_docs(docs)
 
 
-def upsert_block_tags_index_docs(usage_key: UsageKey):
+def upsert_content_object_tags_index_doc(key: OpaqueKey):
     """
-    Updates the tags data in documents for the given Course/Library block
+    Updates the tags data in document for the given Course/Library item
     """
-    doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
-    doc.update(searchable_doc_tags(usage_key))
+    doc = {Fields.id: meili_id_from_opaque_key(key)}
+    doc.update(searchable_doc_tags(key))
     _update_index_docs([doc])
 
 
@@ -835,15 +835,6 @@ def upsert_collection_tags_index_docs(collection_usage_key: LibraryCollectionLoc
     """
 
     doc = searchable_doc_tags_for_collection(collection_usage_key.library_key, collection_usage_key.collection_id)
-    _update_index_docs([doc])
-
-
-def upsert_container_tags_index_docs(container_key: LibraryContainerLocator):
-    """
-    Updates the tags data in documents for the given library container
-    """
-
-    doc = searchable_doc_tags_for_container(container_key)
     _update_index_docs([doc])
 
 

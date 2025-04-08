@@ -41,9 +41,8 @@ from openedx.core.djangoapps.content.search.models import SearchAccess
 from .api import (
     only_if_meilisearch_enabled,
     upsert_block_collections_index_docs,
-    upsert_block_tags_index_docs,
+    upsert_content_object_tags_index_doc,
     upsert_collection_tags_index_docs,
-    upsert_container_tags_index_docs,
 )
 from .tasks import (
     delete_library_block_index_doc,
@@ -232,10 +231,8 @@ def content_object_associations_changed_handler(**kwargs) -> None:
     if not content_object.changes or "tags" in content_object.changes:
         if isinstance(usage_key, LibraryCollectionLocator):
             upsert_collection_tags_index_docs(usage_key)
-        elif isinstance(usage_key, LibraryContainerLocator):
-            upsert_container_tags_index_docs(usage_key)
         else:
-            upsert_block_tags_index_docs(usage_key)
+            upsert_content_object_tags_index_doc(usage_key)
     if not content_object.changes or "collections" in content_object.changes:
         upsert_block_collections_index_docs(usage_key)
 
