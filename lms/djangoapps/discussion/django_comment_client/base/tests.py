@@ -191,17 +191,6 @@ class ThreadActionGroupIdTestCase(
         response = self.call_view("delete_thread", mock_is_forum_v2_enabled, mock_request)
         self._assert_json_response_contains_group_info(response)
 
-    def test_vote(self, mock_is_forum_v2_enabled, mock_request):
-        response = self.call_view(
-            "vote_for_thread",
-            mock_is_forum_v2_enabled,
-            mock_request,
-            view_args={"value": "up"}
-        )
-        self._assert_json_response_contains_group_info(response)
-        response = self.call_view("undo_vote_for_thread", mock_is_forum_v2_enabled, mock_request)
-        self._assert_json_response_contains_group_info(response)
-
     def test_openclose(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
             "openclose_thread",
@@ -790,25 +779,6 @@ class ViewsTestCase(
             timeout=ANY,
             data={"body": updated_body, "course_id": str(self.course_id)}
         )
-
-    @ddt.data(
-        ('upvote_thread', 'thread_id', 'thread_voted'),
-        ('upvote_comment', 'comment_id', 'comment_voted'),
-        ('downvote_thread', 'thread_id', 'thread_voted'),
-        ('downvote_comment', 'comment_id', 'comment_voted')
-    )
-    @ddt.unpack
-    def test_voting(self, view_name, item_id, signal, mock_is_forum_v2_enabled, mock_request):
-        mock_is_forum_v2_enabled.return_value = False
-        self._setup_mock_request(mock_request)
-        with self.assert_discussion_signals(signal):
-            response = self.client.post(
-                reverse(
-                    view_name,
-                    kwargs={item_id: 'dummy', 'course_id': str(self.course_id)}
-                )
-            )
-        assert response.status_code == 200
 
     def test_endorse_comment(self, mock_is_forum_v2_enabled, mock_request):
         mock_is_forum_v2_enabled.return_value = False
@@ -1453,33 +1423,6 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
 
     @ddt.data(*ddt_permissions_args)
     @ddt.unpack
-    def test_comment_actions(self, user, commentable_id, status_code, mock_is_forum_v2_enabled, mock_request):
-        """
-        Verify that voting and flagging of comments is limited to members of the team or users with
-        'edit_content' permission.
-        """
-        commentable_id = getattr(self, commentable_id)
-        self._setup_mock(
-            user, mock_is_forum_v2_enabled, mock_request,
-            {
-                "closed": False,
-                "commentable_id": commentable_id,
-                "thread_id": "dummy_thread",
-                "body": 'dummy body',
-                "course_id": str(self.course.id)
-            },
-        )
-        for action in ["upvote_comment", "downvote_comment"]:
-            response = self.client.post(
-                reverse(
-                    action,
-                    kwargs={"course_id": str(self.course.id), "comment_id": "dummy_comment"}
-                )
-            )
-            assert response.status_code == status_code
-
-    @ddt.data(*ddt_permissions_args)
-    @ddt.unpack
     def test_threads_actions(self, user, commentable_id, status_code, mock_is_forum_v2_enabled, mock_request):
         """
         Verify that voting, flagging, and following of threads is limited to members of the team or users with
@@ -1490,7 +1433,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
             user, mock_is_forum_v2_enabled, mock_request,
             {"closed": False, "commentable_id": commentable_id, "body": "dummy body", "course_id": str(self.course.id)}
         )
-        for action in ["upvote_thread", "downvote_thread", "follow_thread", "unfollow_thread"]:
+        for action in ["follow_thread", "unfollow_thread"]:
             response = self.client.post(
                 reverse(
                     action,
@@ -1689,42 +1632,6 @@ class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockReque
             "thread",
             event_receiver.call_args.kwargs
         )
-
-    @ddt.data(
-        ('vote_for_thread', 'thread_id', 'thread'),
-        ('undo_vote_for_thread', 'thread_id', 'thread'),
-        ('vote_for_comment', 'comment_id', 'response'),
-        ('undo_vote_for_comment', 'comment_id', 'response'),
-    )
-    @ddt.unpack
-    @patch('eventtracking.tracker.emit')
-    @patch('openedx.core.djangoapps.django_comment_common.comment_client.utils.requests.request', autospec=True)
-    @patch('openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled', autospec=True)
-    def test_thread_voted_event(self, view_name, obj_id_name, obj_type, mock_is_forum_v2_enabled, mock_request, mock_emit):
-        undo = view_name.startswith('undo')
-
-        mock_is_forum_v2_enabled.return_value = False
-        self._set_mock_request_data(mock_request, {
-            'closed': False,
-            'commentable_id': 'test_commentable_id',
-            'username': 'gumprecht',
-        })
-        request = RequestFactory().post('dummy_url', {})
-        request.user = self.student
-        request.view_name = view_name
-        view_function = getattr(views, view_name)
-        kwargs = dict(course_id=str(self.course.id))
-        kwargs[obj_id_name] = obj_id_name
-        if not undo:
-            kwargs.update(value='up')
-        view_function(request, **kwargs)
-
-        assert mock_emit.called
-        event_name, event = mock_emit.call_args[0]
-        assert event_name == f'edx.forum.{obj_type}.voted'
-        assert event['target_username'] == 'gumprecht'
-        assert event['undo_vote'] == undo
-        assert event['vote_value'] == 'up'
 
     @ddt.data('follow_thread', 'unfollow_thread',)
     @patch('eventtracking.tracker.emit')
