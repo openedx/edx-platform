@@ -72,6 +72,23 @@ class TestEmailDigestForUser(ModuleStoreTestCase):
             send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
         assert not mock_func.called
 
+    @ddt.data(True, False)
+    @patch('edx_ace.ace.send')
+    def test_email_not_send_to_disable_user(self, value, mock_func):
+        """
+        Tests email is not sent to disabled user
+        """
+        created_date = datetime.datetime.now() - datetime.timedelta(days=1)
+        create_notification(self.user, self.course.id, created=created_date)
+        start_date, end_date = get_start_end_date(EmailCadence.DAILY)
+        if value:
+            self.user.set_password("12345678")
+        else:
+            self.user.set_unusable_password()
+        with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+            send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
+        assert mock_func.called is value
+
     @patch('edx_ace.ace.send')
     def test_notification_not_send_if_created_day_before_yesterday(self, mock_func):
         """
