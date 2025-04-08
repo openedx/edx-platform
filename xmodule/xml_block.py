@@ -396,7 +396,6 @@ class XmlMixin:
             if aside.scope_ids.block_type in asides_tags:
                 block.add_aside(aside)
 
-
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):
         """
