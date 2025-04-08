@@ -4,7 +4,6 @@
 import logging
 from urllib.parse import urljoin
 
-from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -24,6 +23,7 @@ from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 
 from ...constants import Messages
 from ...http import DetailResponse
@@ -122,7 +122,7 @@ class BasketsView(APIView):
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_key):
             return JsonResponse(
                 {
-                    'redirect_destination': reverse('courseware', args=[str(course_id)]),
+                    'redirect_destination': make_learning_mfe_courseware_url(course_id),
                 },
             )
 

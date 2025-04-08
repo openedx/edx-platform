@@ -246,7 +246,6 @@ def get_library_collection_from_locator(
     """
     Return a Collection using the LibraryCollectionLocator
     """
-
     library_key = collection_locator.library_key
     collection_key = collection_locator.collection_id
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
