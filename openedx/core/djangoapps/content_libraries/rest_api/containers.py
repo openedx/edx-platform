@@ -273,3 +273,23 @@ class LibraryContainerChildrenView(GenericAPIView):
             container_key,
             action=authoring_api.ChildrenEntitiesAction.REPLACE,
         )
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryContainerRestore(GenericAPIView):
+    """
+    View to restore soft-deleted library containers.
+    """
+    @convert_exceptions
+    def post(self, request, container_key: LibraryContainerLocator) -> Response:
+        """
+        Restores a soft-deleted library container
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+        api.restore_container(container_key)
+        return Response(None, status=HTTP_204_NO_CONTENT)

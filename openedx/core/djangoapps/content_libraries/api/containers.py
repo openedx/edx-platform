@@ -44,6 +44,7 @@ __all__ = [
     "library_container_locator",
     "update_container",
     "delete_container",
+    "restore_container",
     "update_container_children",
     "get_containers_contains_component",
 ]
@@ -121,7 +122,7 @@ def library_container_locator(
     )
 
 
-def _get_container(container_key: LibraryContainerLocator) -> Container:
+def _get_container(container_key: LibraryContainerLocator, isDeleted=False) -> Container:
     """
     Internal method to fetch the Container object from its LibraryContainerLocator
 
@@ -135,7 +136,7 @@ def _get_container(container_key: LibraryContainerLocator) -> Container:
         learning_package.id,
         key=container_key.container_id,
     )
-    if container and container.versioning.draft:
+    if container and (isDeleted or container.versioning.draft):
         return container
     raise ContentLibraryContainerNotFound
 
@@ -249,6 +250,25 @@ def delete_container(
     )
 
     # TODO: trigger a LIBRARY_COLLECTION_UPDATED for each collection the container was in
+
+
+def restore_container(container_key: LibraryContainerLocator) -> None:
+    """
+    Restore the specified library container.
+    """
+    try:
+        container = _get_container(container_key, isDeleted=True)
+    except ContentLibraryContainerNotFound:
+        return
+
+    authoring_api.set_draft_version(container.pk, container.versioning.latest.pk)
+
+    LIBRARY_CONTAINER_CREATED.send_event(
+        library_container=LibraryContainerData(
+            library_key=container_key.library_key,
+            container_key=str(container_key),
+        )
+    )
 
 
 def get_container_children(
