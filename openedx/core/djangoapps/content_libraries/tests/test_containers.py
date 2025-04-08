@@ -348,7 +348,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
 
         # Delete the unit
         self._delete_container(container_data["container_key"])
-    
+
         # Restore container
         self._restore_container(container_data["container_key"])
         new_container_data = self._get_container(container_data["container_key"])
