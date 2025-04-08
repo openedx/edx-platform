@@ -75,11 +75,15 @@ def reset_course_deadlines(request):
         log.exception('Error occurred while trying to reset deadlines!')
         raise UnableToResetDeadlines from reset_deadlines_exception
 
-
-@api_view(['POST'])
-@authentication_classes((
-    JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser,
-))
+    
+@api_view(["POST"])
+@authentication_classes(
+    (
+        JwtAuthentication,
+        BearerAuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+)
 @permission_classes((IsAuthenticated,))
 def reset_all_relative_course_deadlines(request):
     """
@@ -93,8 +97,10 @@ def reset_all_relative_course_deadlines(request):
         success_course_keys: list of course keys for which deadlines were successfully reset
         failed_course_keys: list of course keys for which deadlines could not be reset
     """
-    research_event_data = request.data.get('research_event_data', {})
-    course_keys = CourseEnrollment.enrollments_for_user(request.user).select_related("course").values_list("course_id", flat=True)
+    research_event_data = request.data.get("research_event_data", {})
+    course_keys = (
+        CourseEnrollment.enrollments_for_user(request.user).select_related("course").values_list("course_id", flat=True)
+    )
 
     failed_course_keys = []
     succes_course_keys = []
@@ -104,14 +110,16 @@ def reset_all_relative_course_deadlines(request):
             reset_deadlines_for_course(request, course_key, research_event_data)
             succes_course_keys.append(str(course_key))
         except Exception:  # pylint: disable=broad-exception-caught
-            log.exception(f'Error occurred while trying to reset deadlines for course {course_key}!')
+            log.exception(f"Error occurred while trying to reset deadlines for course {course_key}!")
             failed_course_keys.append(str(course_key))
             continue
 
-    return Response({
-        "success_course_keys": succes_course_keys,
-        "failed_course_keys": failed_course_keys,
-    })
+    return Response(
+        {
+            "success_course_keys": succes_course_keys,
+            "failed_course_keys": failed_course_keys,
+        }
+    )
 
 
 class CourseDeadlinesMobileView(RetrieveAPIView):
