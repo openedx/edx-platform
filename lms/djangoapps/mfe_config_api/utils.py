@@ -18,6 +18,20 @@ def get_mfe_config_for_site(request=None, site=None, mfe=None):
                 mfe_config = site_configuration.get_value("MFE_CONFIG")
             else:
                 mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+
+            scheme = 'https' if request.is_secure() else 'http'
+            if site_domain.find('apps') == -1:
+                microite_mfe_host = f"{scheme}://apps.{site_domain}"
+            else:
+                microite_mfe_host = f"{scheme}://{site_domain}"
+
+            lms_microsite = f"{scheme}://{site_domain}"
+            mfe_config["DISCUSSIONS_MFE_BASE_URL"] = mfe_config.get("DISCUSSIONS_MFE_BASE_URL",f"{microite_mfe_host}/discussions")
+            default_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
+            default_config.update(mfe_config)
+            mfe_config = default_config
+
+
         except SiteConfiguration.DoesNotExist:
             mfe_config = configuration_helpers.get_value('MFE_CONFIG', settings.MFE_CONFIG)
 
