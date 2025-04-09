@@ -1,3 +1,4 @@
+{% load i18n %}
 {% extends "admin/base_site.html" %}
 {% block content %}
     <form method="post">
@@ -11,7 +12,11 @@
         <div>
             {% if form.errors %}
                 <p class="errornote">
-                    Please correct the error{{ form.errors|pluralize }} below.
+                    {% blocktranslate count counter=form.errors|length|escape %}
+                        Please correct the error below.
+                    {% plural %}
+                        Please correct the errors below.
+                    {% endblocktranslate %}
                 </p>
             {% endif %}
             
@@ -41,8 +46,8 @@
             </fieldset>
             
             <div class="submit-row">
-                <input type="submit" name="apply" value="Apply">
-                <a href="{% url 'admin:index' %}" class="cancellink">Cancel</a>
+                <input type="submit" name="apply" value="{% translate 'Apply'|escape %}">
+                <a href="{% url 'admin:index' %}" class="cancellink">{% translate 'Cancel'|escape %}</a>
             </div>
         </div>
     </form>
