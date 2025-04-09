@@ -245,12 +245,12 @@ def library_container_updated_handler(**kwargs) -> None:
 
     if library_container.background:
         update_library_container_index_doc.delay(
-            library_container.container_key,
+            str(library_container.container_key),
         )
     else:
         # Update container index synchronously to make sure that search index is updated before
         # the frontend invalidates/refetches index.
         # See content_library_updated_handler for more details.
         update_library_container_index_doc.apply(args=[
-            library_container.container_key,
+            str(library_container.container_key),
         ])
