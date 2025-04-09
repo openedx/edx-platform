@@ -211,15 +211,15 @@ def content_object_associations_changed_handler(**kwargs) -> None:
         return
 
     try:
-        # Check if valid if course or library block
+        # Check if valid course or library block
         usage_key = UsageKey.from_string(str(content_object.object_id))
     except InvalidKeyError:
         try:
-            # Check if valid if library collection
+            # Check if valid library collection
             usage_key = LibraryCollectionLocator.from_string(str(content_object.object_id))
         except InvalidKeyError:
             try:
-                # Check if valid if library container
+                # Check if valid library container
                 usage_key = LibraryContainerLocator.from_string(str(content_object.object_id))
             except InvalidKeyError:
                 # Invalid content object id
