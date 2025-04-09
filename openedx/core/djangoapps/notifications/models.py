@@ -109,6 +109,7 @@ class Notification(TimeStampedModel):
     content_url = models.URLField(null=True, blank=True)
     web = models.BooleanField(default=True, null=False, blank=False)
     email = models.BooleanField(default=False, null=False, blank=False)
+    push = models.BooleanField(default=False, null=False, blank=False)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     group_by_id = models.CharField(max_length=42, db_index=True, null=False, default="")
@@ -274,3 +275,25 @@ class CourseNotificationPreference(TimeStampedModel):
         }
         """
         return self.get_notification_types(app_name).get('core', {})
+
+
+class NotificationBrazeCampaigns(TimeStampedModel):
+    """
+    Model to store campaign ids for notifications
+    """
+    notification_type = models.CharField(max_length=64)
+    braze_campaign_id = models.CharField(max_length=128)
+
+    @classmethod
+    def get_notification_campaign_id(cls, notification_type):
+        """
+        Returns the braze campaign id for the given notification type.
+        """
+        try:
+            return cls.objects.get(notification_type=notification_type).braze_campaign_id
+        except cls.DoesNotExist:
+            log.info("No campaign id found for notification type %s", notification_type)
+            return
+        except cls.MultipleObjectsReturned:
+            log.error("Multiple campaign ids found for notification type %s", notification_type)
+            return
