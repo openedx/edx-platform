@@ -210,6 +210,7 @@ class LibraryXBlockMetadata(PublishableItem):
     Class that represents the metadata about an XBlock in a content library.
     """
     usage_key: LibraryUsageLocatorV2
+    # TODO: move tags_count to LibraryItem as all objects under a library can be tagged.
     tags_count: int = 0
 
     @classmethod
