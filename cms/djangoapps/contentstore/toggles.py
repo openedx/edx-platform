@@ -5,6 +5,7 @@ from edx_toggles.toggles import SettingDictToggle, WaffleFlag
 from openedx.core.djangoapps.content.search import api as search_api
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
+
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
@@ -178,30 +179,6 @@ def individualize_anonymous_user_id(course_id):
     Returns a boolean if individualized anonymous_user_id is enabled on the course
     """
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
-
-
-# .. toggle_name: contentstore.enable_studio_content_api
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Enables the new (experimental and unsafe!) Studio Content REST API for course authors,
-# .. which provides CRUD capabilities for course content and xblock editing.
-# .. Use at your own peril - you can easily delete learner data when editing running courses.
-# .. This can be triggered by deleting blocks, editing subsections, problems, assignments, discussions,
-# .. creating new problems or graded sections, and by other things you do.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-05-26
-# .. toggle_tickets: TNL-10208
-ENABLE_STUDIO_CONTENT_API = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.enable_studio_content_api',
-    __name__,
-)
-
-
-def use_studio_content_api():
-    """
-    Returns a boolean if studio editing API is enabled
-    """
-    return ENABLE_STUDIO_CONTENT_API.is_enabled()
 
 
 # .. toggle_name: new_studio_mfe.use_new_home_page
