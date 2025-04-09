@@ -3,6 +3,7 @@ Tests for the import_from_modulestore helper functions.
 """
 import ddt
 from organizations.models import Organization
+from unittest import mock
 from unittest.mock import patch
 
 from lxml import etree
@@ -166,3 +167,199 @@ class TestImportClient(ModuleStoreTestCase):
         self.assertEqual(self.library.learning_package.content_set.count(), len(expected_imported_xblocks))
         self.assertEqual(len(result), len(expected_imported_xblocks))
         self.assertEqual(self.import_event.publishableentityimport_set.count(), len(expected_imported_xblocks))
+
+    @ddt.data(True, False)
+    def test_process_import_with_override(self, override):
+        block_to_import = self.problem
+        block_usage_id_to_import = str(block_to_import.location)
+        staged_content = self.import_event.get_staged_content_by_block_usage_id(block_usage_id_to_import)
+
+        import_client = ImportClient(
+            import_event=self.import_event,
+            staged_content=staged_content,
+            block_usage_id_to_import=block_usage_id_to_import,
+            composition_level='xblock',
+            override=False
+        )
+
+        block_xml = etree.fromstring(block_to_import.data, parser=self.parser)
+        # pylint: disable=protected-access
+        result1 = import_client._process_import(block_usage_id_to_import, block_xml)
+        self.assertEqual(len(result1), 1)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            new_import_event = api.create_import(
+                source_key=self.course.id,
+                learning_package_id=self.library.learning_package.id,
+                user_id=self.user.id,
+            )
+        new_staged_content = new_import_event.get_staged_content_by_block_usage_id(block_usage_id_to_import)
+        import_client = ImportClient(
+            import_event=new_import_event,
+            staged_content=new_staged_content,
+            block_usage_id_to_import=block_usage_id_to_import,
+            composition_level='xblock',
+            override=override
+        )
+
+        if override:
+            modified_data = block_to_import.data.replace('DisplayName', 'ModifiedName')
+            modified_block = BlockFactory.create(
+                category='problem',
+                parent=self.vertical,
+                display_name='Modified Problem',
+                data=modified_data,
+            )
+            block_xml = etree.fromstring(modified_block.data, parser=self.parser)
+
+            # pylint: disable=protected-access
+            result2 = import_client._process_import(block_usage_id_to_import, block_xml)
+            self.assertEqual(len(result2), 1)
+            assert result2[0].title == 'ModifiedName'
+        else:
+            # pylint: disable=protected-access
+            result2 = import_client._process_import(block_usage_id_to_import, block_xml)
+            self.assertEqual(result2, [])
+
+    @patch('cms.djangoapps.import_from_modulestore.helpers.authoring_api')
+    def test_container_override(self, mock_authoring_api):
+        container_to_import = self.vertical
+        block_usage_id_to_import = str(container_to_import.location)
+        staged_content = self.import_event.get_staged_content_by_block_usage_id(block_usage_id_to_import)
+
+        import_client = ImportClient(
+            import_event=self.import_event,
+            staged_content=staged_content,
+            block_usage_id_to_import=block_usage_id_to_import,
+            composition_level='vertical',
+            override=False
+        )
+
+        container_version = import_client.get_or_create_container(
+            'vertical',
+            container_to_import.location.block_id,
+            container_to_import.display_name
+        )
+        assert container_version is not None
+        assert container_version.title == container_to_import.display_name
+
+        import_client = ImportClient(
+            import_event=self.import_event,
+            staged_content=staged_content,
+            block_usage_id_to_import=block_usage_id_to_import,
+            composition_level='vertical',
+            override=True
+        )
+        overrided_container_version = import_client.get_or_create_container(
+            'vertical',
+            container_to_import.location.block_id,
+            'New Display Name'
+        )
+        assert overrided_container_version is not None
+        assert overrided_container_version.title == 'New Display Name'
+
+    @ddt.data('xblock', 'vertical')
+    def test_composition_levels(self, composition_level):
+        expected_imported_blocks = [self.problem, self.video] if composition_level == 'xblock' else [self.vertical]
+
+        container_to_import = self.vertical
+        block_usage_id_to_import = str(container_to_import.location)
+        staged_content = self.import_event.get_staged_content_by_block_usage_id(block_usage_id_to_import)
+
+        import_client = ImportClient(
+            import_event=self.import_event,
+            staged_content=staged_content,
+            block_usage_id_to_import=block_usage_id_to_import,
+            composition_level=composition_level,
+            override=False
+        )
+
+        block_xml = etree.fromstring(staged_content.olx, parser=self.parser)
+        # pylint: disable=protected-access
+        result = import_client._process_import(block_usage_id_to_import, block_xml)
+
+        self.assertEqual(len(result), len(expected_imported_blocks))
+
+    @patch('cms.djangoapps.import_from_modulestore.helpers.content_staging_api')
+    def test_process_staged_content_files(self, mock_content_staging_api):
+        block_to_import = self.problem
+        block_usage_id_to_import = str(block_to_import.location)
+        staged_content = self.import_event.get_staged_content_by_block_usage_id(block_usage_id_to_import)
+
+        import_client = ImportClient(
+            import_event=self.import_event,
+            staged_content=staged_content,
+            block_usage_id_to_import=block_usage_id_to_import,
+            composition_level='xblock',
+            override=False
+        )
+
+        mock_file_data = b'file content'
+        mock_file = mock.MagicMock()
+        mock_file.filename = 'test.png'
+        mock_content_staging_api.get_staged_content_static_files.return_value = [mock_file]
+        mock_content_staging_api.get_staged_content_static_file_data.return_value = mock_file_data
+
+        modified_data = '<problem url_name="" display_name="ProblemWithImage"><img src="test.png"/></problem>'
+        modified_block = BlockFactory.create(
+            category='problem',
+            parent=self.vertical,
+            display_name='Problem With Image',
+            data=modified_data,
+        )
+
+        with patch('cms.djangoapps.import_from_modulestore.helpers.authoring_api') as mock_authoring_api:
+            mock_component_type = mock.MagicMock()
+            mock_component_version = mock.MagicMock()
+            mock_media_type = mock.MagicMock()
+            mock_file_content = mock.MagicMock()
+
+            mock_authoring_api.get_or_create_component_type.return_value = mock_component_type
+            mock_authoring_api.get_components.return_value.filter.return_value.exists.return_value = False
+            mock_authoring_api.get_or_create_media_type.return_value = mock_media_type
+            mock_authoring_api.get_or_create_file_content.return_value = mock_file_content
+
+            with patch('cms.djangoapps.import_from_modulestore.helpers.api') as mock_api:
+                mock_api.validate_can_add_block_to_library.return_value = (None, None)
+                mock_api.set_library_block_olx.return_value = mock_component_version
+
+                with patch('cms.djangoapps.import_from_modulestore.helpers._create_publishable_entity_import'):
+                    block_xml = etree.fromstring(modified_data, parser=self.parser)
+
+                    # pylint: disable=protected-access
+                    import_client._create_block_in_library(block_xml, modified_block.location)
+
+                    mock_content_staging_api.get_staged_content_static_file_data.assert_called_once_with(
+                        staged_content.id, 'test.png'
+                    )
+                    mock_authoring_api.get_or_create_file_content.assert_called_once()
+                    mock_authoring_api.create_component_version_content.assert_called_once()
+
+    def test_update_container_components(self):
+        container_to_import = self.vertical
+        block_usage_id_to_import = str(container_to_import.location)
+        staged_content = self.import_event.get_staged_content_by_block_usage_id(block_usage_id_to_import)
+
+        import_client = ImportClient(
+            import_event=self.import_event,
+            staged_content=staged_content,
+            block_usage_id_to_import=block_usage_id_to_import,
+            composition_level='container',
+            override=False
+        )
+
+        with patch('cms.djangoapps.import_from_modulestore.helpers.authoring_api') as mock_authoring_api:
+            mock_container_version = mock.MagicMock()
+            mock_component_version1 = mock.MagicMock()
+            mock_component_version2 = mock.MagicMock()
+            mock_component_versions = [mock_component_version1, mock_component_version2]
+
+            # pylint: disable=protected-access
+            import_client._update_container_components(mock_container_version, mock_component_versions)
+
+            mock_authoring_api.create_next_container_version.assert_called_once()
+            call_args = mock_authoring_api.create_next_container_version.call_args[1]
+            self.assertEqual(call_args['container_pk'], mock_container_version.container.pk)
+            self.assertEqual(call_args['title'], mock_container_version.title)
+            self.assertEqual(len(call_args['publishable_entities_pks']), 2)
+            self.assertEqual(call_args['created_by'], self.user.id)
