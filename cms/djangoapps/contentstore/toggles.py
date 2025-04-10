@@ -219,6 +219,24 @@ def use_new_custom_pages(course_key):
     """
     return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled(course_key)
 
+# .. toggle_name: contentstore.new_studio_mfe.use_markdown_editor
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the Markdown editor when creating or editing problems.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-4-10
+# .. toggle_target_removal_date: 2025-8-31
+# .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4517232656/Re-enable+Markdown+editing+of+CAPA+problems+to+meet+various+use+cases
+# .. toggle_warning:
+ENABLE_MARKDOWN_EDITOR = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_markdown_editor', __name__)
+
+
+def use_markdown_editor(course_key):
+    """
+    Returns a boolean if new studio custom pages mfe is enabled
+    """
+    return ENABLE_MARKDOWN_EDITOR.is_enabled(course_key)
 
 # .. toggle_name: contentstore.new_studio_mfe.use_new_schedule_details_page
 # .. toggle_implementation: CourseWaffleFlag

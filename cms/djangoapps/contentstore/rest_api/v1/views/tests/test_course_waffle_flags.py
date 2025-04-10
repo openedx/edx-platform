@@ -34,6 +34,7 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         "use_new_certificates_page",
         "use_new_textbooks_page",
         "use_new_group_configurations_page",
+        "use_markdown_editor"
     ]
 
     other_expected_waffle_flags = ["enable_course_optimizer"]
