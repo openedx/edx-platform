@@ -155,9 +155,7 @@ def handle_xblock(request, usage_key_string=None):
     This method is used both by the internal xblock_handler API and by
     the public CMS API.
     """
-    print("\n\n\n In handle_xblock\n\n\n")
     if usage_key_string:
-        print("\n\n\nIn usage key string\n\n\n")
 
         usage_key = usage_key_with_run(usage_key_string)
 
@@ -203,7 +201,6 @@ def handle_xblock(request, usage_key_string=None):
             return modified_xblock
 
     elif request.method in ("PUT", "POST"):
-        print("\n\n\nIn put post\n\n\n")
         if "duplicate_source_locator" in request.json:
             parent_usage_key = usage_key_with_run(request.json["parent_locator"])
             duplicate_source_usage_key = usage_key_with_run(
@@ -360,7 +357,7 @@ def _save_xblock(
         if fields:
             for field_name in fields:
                 setattr(xblock, field_name, fields[field_name])
-        print(xblock.__dict__)
+
         if children_strings is not None:
             children = []
             for child_string in children_strings:
@@ -529,7 +526,6 @@ def create_item(request):
 @expect_json
 def _create_block(request):
     """View for create blocks."""
-    print("\n\n\n\n\nhere\n\n\n\n\n")
     parent_locator = request.json["parent_locator"]
     usage_key = usage_key_with_run(parent_locator)
     if not has_studio_write_access(request.user, usage_key.course_key):
