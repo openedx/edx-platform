@@ -49,6 +49,7 @@ from ..permissions import CAN_EDIT_THIS_CONTENT_LIBRARY
 from .exceptions import (
     BlockLimitReachedError,
     ContentLibraryBlockNotFound,
+    IncompatibleTypesError,
     InvalidNameError,
     LibraryBlockAlreadyExists,
 )
@@ -315,7 +316,9 @@ def validate_can_add_block_to_library(
     # Make sure the proposed ID will be valid:
     validate_unicode_slug(block_id)
     # Ensure the XBlock type is valid and installed:
-    XBlock.load_class(block_type)  # Will raise an exception if invalid
+    block_class = XBlock.load_class(block_type)  # Will raise an exception if invalid
+    if block_class.has_children:
+        raise IncompatibleTypesError("XBlocks with children are not supported in content libraries")
     # Make sure the new ID is not taken already:
     usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
         lib_key=library_key,

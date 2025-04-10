@@ -509,7 +509,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         """
         lib = self._create_library(slug="list_blocks-slug", title="Library 1")
         block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
-        self._add_block_to_library(lib["id"], "unit", "unit1")
+        self._add_block_to_library(lib["id"], "html", "html1")
 
         response = self._get_library_blocks(lib["id"])
         result = response['results']
@@ -792,7 +792,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 description="Testing XBlocks limits in a library"
             )
             lib_id = lib["id"]
-            self._add_block_to_library(lib_id, "unit", "unit1")
+            self._add_block_to_library(lib_id, "html", "html1")
             # Second block should throw error
             self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
 
@@ -981,14 +981,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         library_key = LibraryLocatorV2.from_string(lib_id)
 
-        block = self._add_block_to_library(lib_id, "unit", "u1")
+        block = self._add_block_to_library(lib_id, "html", "h1")
         block_id = block["id"]
         self._set_library_block_asset(block_id, "static/test.txt", b"data")
 
         usage_key = LibraryUsageLocatorV2(
             lib_key=library_key,
-            block_type="unit",
-            usage_id="u1"
+            block_type="html",
+            usage_id="h1"
         )
 
         event_receiver.assert_called_once()
@@ -1020,7 +1020,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         library_key = LibraryLocatorV2.from_string(lib_id)
 
-        block = self._add_block_to_library(lib_id, "unit", "u1")
+        block = self._add_block_to_library(lib_id, "html", "h321")
         block_id = block["id"]
         self._set_library_block_asset(block_id, "static/test.txt", b"data")
 
@@ -1028,8 +1028,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         usage_key = LibraryUsageLocatorV2(
             lib_key=library_key,
-            block_type="unit",
-            usage_id="u1"
+            block_type="html",
+            usage_id="h321"
         )
 
         event_receiver.assert_called()
