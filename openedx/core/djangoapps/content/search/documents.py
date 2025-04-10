@@ -244,7 +244,7 @@ def _fields_from_block(block) -> dict:
     return block_data
 
 
-def _tags_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
+def _tags_for_content_object(object_id: OpaqueKey) -> dict:
     """
     Given an XBlock, course, library, etc., get the tag data for its index doc.
 
@@ -427,13 +427,13 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     return doc
 
 
-def searchable_doc_tags(usage_key: UsageKey) -> dict:
+def searchable_doc_tags(key: OpaqueKey) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the tags data for the given content object.
     """
-    doc = searchable_doc_for_key(usage_key)
-    doc.update(_tags_for_content_object(usage_key))
+    doc = searchable_doc_for_key(key)
+    doc.update(_tags_for_content_object(key))
 
     return doc
 
