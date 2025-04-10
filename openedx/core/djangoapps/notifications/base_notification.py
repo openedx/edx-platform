@@ -191,12 +191,12 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
-    'ora_staff_notification': {
+    'ora_staff_notifications': {
         'notification_app': 'grading',
-        'name': 'ora_staff_notification',
+        'name': 'ora_staff_notifications',
         'is_core': False,
         'info': '',
-        'web': False,
+        'web': True,
         'email': False,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
