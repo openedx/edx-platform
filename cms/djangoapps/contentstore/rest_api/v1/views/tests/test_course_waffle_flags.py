@@ -72,7 +72,11 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         """
         for flag in flags:
             WaffleFlagCourseOverrideModel.objects.create(
-                waffle_flag=f"contentstore.new_studio_mfe.{flag}" if flag != "react_markdown_editor" else "contentstore.react_markdown_editor",
+                waffle_flag=(
+                    f"contentstore.new_studio_mfe.{flag}"
+                    if flag != "react_markdown_editor"
+                    else "contentstore.react_markdown_editor"
+                ),
                 course_id=self.course.id,
                 enabled=enabled,
             )
