@@ -992,7 +992,7 @@ openedx-filters==2.0.1
     #   ora2
 openedx-forum==0.2.0
     # via -r requirements/edx/base.txt
-openedx-learning==0.19.2
+openedx-learning @ git+https://github.com/open-craft/openedx-learning@rpenido/fal-4111/move-set-collections-api
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt

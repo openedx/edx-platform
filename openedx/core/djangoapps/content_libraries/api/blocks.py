@@ -3,66 +3,51 @@ Content libraries API methods related to XBlocks/Components.
 
 These methods don't enforce permissions (only the REST APIs do).
 """
-from dataclasses import dataclass
-from datetime import datetime, timezone
 import logging
 import mimetypes
+from dataclasses import dataclass
+from datetime import datetime, timezone
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import validate_unicode_slug
-from django.db.models import QuerySet
 from django.db import transaction
-from django.utils.translation import gettext as _
+from django.db.models import QuerySet
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from lxml import etree
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
+    ContentObjectChangedData,
     LibraryBlockData,
     LibraryCollectionData,
-    LibraryContainerData,
-    ContentObjectChangedData,
+    LibraryContainerData
 )
 from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
-    LIBRARY_CONTAINER_UPDATED,
-    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    LIBRARY_CONTAINER_UPDATED
 )
+from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring_models import Component, ComponentVersion, LearningPackage, MediaType
 from xblock.core import XBlock
 
-from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import (
-    Component,
-    ComponentVersion,
-    LearningPackage,
-    MediaType,
-)
-
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.xblock.api import (
     get_component_from_usage_key,
     get_xblock_app_config,
-    xblock_type_display_name,
+    xblock_type_display_name
 )
 from openedx.core.types import User as UserType
-from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from ..models import ContentLibrary
 from ..permissions import CAN_EDIT_THIS_CONTENT_LIBRARY
-from .exceptions import (
-    BlockLimitReachedError,
-    ContentLibraryBlockNotFound,
-    InvalidNameError,
-    LibraryBlockAlreadyExists,
-)
-from .libraries import (
-    library_component_usage_key,
-    require_permission_for_library_key,
-    PublishableItem,
-)
+from .exceptions import BlockLimitReachedError, ContentLibraryBlockNotFound, InvalidNameError, LibraryBlockAlreadyExists
+from .libraries import PublishableItem, library_component_usage_key, require_permission_for_library_key
 
 log = logging.getLogger(__name__)
 
