@@ -1964,7 +1964,10 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
                    self._get_anonymous_id(CourseKey.from_string(course_id), block_class, True)
 
     @ddt.data(*PER_COURSE_ANONYMIZED_XBLOCKS)
-    def test_per_course_anonymized_id(self, xblock_class):
+    @patch('xmodule.x_module.XModuleMixin.bind_for_student')
+    def test_per_course_anonymized_id(self, xblock_class, mock_bind_for_student):
+        if settings.USE_EXTRACTED_LTI_BLOCK and not hasattr(xblock_class, 'bind_for_student'):
+            xblock_class.bind_for_student = mock_bind_for_student
         assert '0c706d119cad686d28067412b9178454' == \
                self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), xblock_class, False)
 
