@@ -97,10 +97,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             cls.container_usage_key = "lct:edX:2012_Fall:unit:unit1"
 
             # Add the problem block to the collection
-            library_api.update_library_collection_components(
+            library_api.update_library_collection_items(
                 cls.library.key,
                 collection_key="TOY_COLLECTION",
-                usage_keys=[
+                opaque_keys=[
                     cls.library_block.usage_key,
                 ]
             )

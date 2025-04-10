@@ -3,35 +3,28 @@ Python API for library collections
 ==================================
 """
 from django.db import IntegrityError
+from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import BlockTypeKey, UsageKeyV2
-from opaque_keys.edx.locator import (
-    LibraryLocatorV2,
-    LibraryCollectionLocator,
-)
-
+from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator, LibraryLocatorV2
 from openedx_events.content_authoring.data import LibraryCollectionData
 from openedx_events.content_authoring.signals import LIBRARY_COLLECTION_UPDATED
-
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import (
-    Collection,
-    Component,
-    PublishableEntity,
-)
+from openedx_learning.api.authoring_models import Collection, Component, PublishableEntity
 
+from ..models import ContentLibrary
 from .exceptions import (
     ContentLibraryBlockNotFound,
     ContentLibraryCollectionNotFound,
+    ContentLibraryContainerNotFound,
     LibraryCollectionAlreadyExists,
 )
-from ..models import ContentLibrary
 
 # The public API is only the following symbols:
 __all__ = [
     "create_library_collection",
     "update_library_collection",
-    "update_library_collection_components",
-    "set_library_component_collections",
+    "update_library_collection_items",
+    "set_library_item_collections",
     "get_library_collection_usage_key",
     "get_library_collection_from_usage_key",
 ]
@@ -103,27 +96,28 @@ def update_library_collection(
     return collection
 
 
-def update_library_collection_components(
+def update_library_collection_items(
     library_key: LibraryLocatorV2,
     collection_key: str,
     *,
-    usage_keys: list[UsageKeyV2],
+    opaque_keys: list[OpaqueKey],
     created_by: int | None = None,
     remove=False,
     # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
     content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
-    Associates the Collection with Components for the given UsageKeys.
+    Associates the Collection with items (XBlocks, Units) for the given OpaqueKeys.
 
-    By default the Components are added to the Collection.
-    If remove=True, the Components are removed from the Collection.
+    By default the items are added to the Collection.
+    If remove=True, the items are removed from the Collection.
 
     If you've already fetched the ContentLibrary, pass it in to avoid refetching.
 
     Raises:
     * ContentLibraryCollectionNotFound if no Collection with the given pk is found in the given library.
-    * ContentLibraryBlockNotFound if any of the given usage_keys don't match Components in the given library.
+    * ContentLibraryBlockNotFound if any of the given opaque_keys don't match Components in the given library.
+    * ContentLibraryContainerNotFound if any of the given opaque_keys don't match Containers in the given library.
 
     Returns the updated Collection.
     """
@@ -134,26 +128,39 @@ def update_library_collection_components(
     assert content_library.library_key == library_key
 
     # Fetch the Component.key values for the provided UsageKeys.
-    component_keys = []
-    for usage_key in usage_keys:
-        # Parse the block_family from the key to use as namespace.
-        block_type = BlockTypeKey.from_string(str(usage_key))
+    item_keys = []
+    for opaque_key in opaque_keys:
+        if isinstance(opaque_key, LibraryContainerLocator):
+            try:
+                container = authoring_api.get_container_by_key(
+                    content_library.learning_package_id,
+                    key=opaque_key.container_id,
+                )
+            except Collection.DoesNotExist as exc:
+                raise ContentLibraryContainerNotFound(opaque_key) from exc
 
-        try:
-            component = authoring_api.get_component_by_key(
-                content_library.learning_package_id,
-                namespace=block_type.block_family,
-                type_name=usage_key.block_type,
-                local_key=usage_key.block_id,
-            )
-        except Component.DoesNotExist as exc:
-            raise ContentLibraryBlockNotFound(usage_key) from exc
+            item_keys.append(container.key)
+        elif isinstance(opaque_key, UsageKeyV2):
+            # Parse the block_family from the key to use as namespace.
+            block_type = BlockTypeKey.from_string(str(opaque_key))
+            try:
+                component = authoring_api.get_component_by_key(
+                    content_library.learning_package_id,
+                    namespace=block_type.block_family,
+                    type_name=opaque_key.block_type,
+                    local_key=opaque_key.block_id,
+                )
+            except Component.DoesNotExist as exc:
+                raise ContentLibraryBlockNotFound(opaque_key) from exc
 
-        component_keys.append(component.key)
+            item_keys.append(component.key)
+        else:
+            # This should never happen, but just in case.
+            raise ValueError(f"Invalid opaque_key: {opaque_key}")
 
     # Note: Component.key matches its PublishableEntity.key
     entities_qset = PublishableEntity.objects.filter(
-        key__in=component_keys,
+        key__in=item_keys,
     )
 
     if remove:
@@ -173,19 +180,19 @@ def update_library_collection_components(
     return collection
 
 
-def set_library_component_collections(
+def set_library_item_collections(
     library_key: LibraryLocatorV2,
-    component: Component,
+    publishable_entity: PublishableEntity,
     *,
     collection_keys: list[str],
     created_by: int | None = None,
     # As an optimization, callers may pass in a pre-fetched ContentLibrary instance
     content_library: ContentLibrary | None = None,
-) -> Component:
+) -> PublishableEntity:
     """
-    It Associates the component with collections for the given collection keys.
+    It Associates the publishable_entity with collections for the given collection keys.
 
-    Only collections in queryset are associated with component, all previous component-collections
+    Only collections in queryset are associated with publishable_entity, all previous publishable_entity-collections
     associations are removed.
 
     If you've already fetched the ContentLibrary, pass it in to avoid refetching.
@@ -193,7 +200,7 @@ def set_library_component_collections(
     Raises:
     * ContentLibraryCollectionNotFound if any of the given collection_keys don't match Collections in the given library.
 
-    Returns the updated Component.
+    Returns the updated PublishableEntity.
     """
     if not content_library:
         content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
@@ -208,7 +215,7 @@ def set_library_component_collections(
 
     affected_collections = authoring_api.set_collections(
         content_library.learning_package_id,
-        component,
+        publishable_entity,
         collection_qs,
         created_by=created_by,
     )
@@ -224,7 +231,7 @@ def set_library_component_collections(
             )
         )
 
-    return component
+    return publishable_entity
 
 
 def get_library_collection_usage_key(

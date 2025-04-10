@@ -6,7 +6,9 @@ from django.core.validators import validate_unicode_slug
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from opaque_keys import OpaqueKey
 from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.locator import LibraryContainerLocator
 from opaque_keys import InvalidKeyError
 
 from openedx_learning.api.authoring_models import Collection
@@ -357,9 +359,42 @@ class ContentLibraryComponentKeysSerializer(serializers.Serializer):
     usage_keys = serializers.ListField(child=UsageKeyV2Serializer(), allow_empty=False)
 
 
-class ContentLibraryComponentCollectionsUpdateSerializer(serializers.Serializer):
+class OpaqueKeySerializer(serializers.BaseSerializer):
     """
-    Serializer for adding/removing Collections to/from a Component.
+    Serializes a OpaqueKey with the correct class.
+    """
+    def to_representation(self, value: OpaqueKey) -> str:
+        """
+        Returns the OpaqueKey value as a string.
+        """
+        return str(value)
+
+    def to_internal_value(self, value: str) -> OpaqueKey:
+        """
+        Returns a UsageKeyV2 or a LibraryContainerLocator from the string value.
+
+        Raises ValidationError if invalid UsageKeyV2 or LibraryContainerLocator.
+        """
+        try:
+            return UsageKeyV2.from_string(value)
+        except InvalidKeyError:
+            try:
+                return LibraryContainerLocator.from_string(value)
+            except InvalidKeyError as err:
+                raise ValidationError from err
+
+
+class ContentLibraryItemKeysSerializer(serializers.Serializer):
+    """
+    Serializer for adding/removing items to/from a Collection.
+    """
+
+    usage_keys = serializers.ListField(child=OpaqueKeySerializer(), allow_empty=False)
+
+
+class ContentLibraryItemCollectionsUpdateSerializer(serializers.Serializer):
+    """
+    Serializer for adding/removing Collections to/from a Library Item (component, unit, etc..).
     """
 
     collection_keys = serializers.ListField(child=serializers.CharField(), allow_empty=True)

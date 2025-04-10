@@ -309,7 +309,7 @@ def _tags_for_content_object(object_id: OpaqueKey) -> dict:
     return {Fields.tags: result}
 
 
-def _collections_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
+def _collections_for_content_object(object_id: OpaqueKey) -> dict:
     """
     Given an XBlock, course, library, etc., get the collections for its index doc.
 
@@ -340,11 +340,21 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
     # Gather the collections associated with this object
     collections = None
     try:
-        component = lib_api.get_component_from_usage_key(object_id)
-        collections = authoring_api.get_entity_collections(
-            component.learning_package_id,
-            component.key,
-        )
+        if isinstance(object_id, UsageKey):
+            component = lib_api.get_component_from_usage_key(object_id)
+            collections = authoring_api.get_entity_collections(
+                component.learning_package_id,
+                component.key,
+            )
+        elif isinstance(object_id, LibraryContainerLocator):
+            container = lib_api.get_container_from_key(object_id)
+            collections = authoring_api.get_entity_collections(
+                container.publishable_entity.learning_package_id,
+                container.key,
+            )
+        else:
+            return result
+
     except ObjectDoesNotExist:
         log.warning(f"No component found for {object_id}")
 
@@ -438,13 +448,13 @@ def searchable_doc_tags(key: OpaqueKey) -> dict:
     return doc
 
 
-def searchable_doc_collections(usage_key: UsageKey) -> dict:
+def searchable_doc_collections(opaque_key: OpaqueKey) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the collections data for the given content object.
     """
-    doc = searchable_doc_for_key(usage_key)
-    doc.update(_collections_for_content_object(usage_key))
+    doc = searchable_doc_for_key(opaque_key)
+    doc.update(_collections_for_content_object(opaque_key))
 
     return doc
 
