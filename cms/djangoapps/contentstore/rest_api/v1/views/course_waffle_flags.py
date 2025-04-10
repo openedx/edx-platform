@@ -62,7 +62,7 @@ class CourseWaffleFlagsView(APIView):
             "use_new_certificates_page": true,
             "use_new_textbooks_page": true,
             "use_new_group_configurations_page": true
-            "use_markdown_editor": true,
+            "react_markdown_editor": true,
         }
         ```
         """
