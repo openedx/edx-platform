@@ -7,6 +7,7 @@ from unittest import mock
 from unittest.mock import patch
 
 from lxml import etree
+from openedx_learning.api.authoring_models import LearningPackage
 
 from cms.djangoapps.import_from_modulestore import api
 from cms.djangoapps.import_from_modulestore.helpers import ImportClient
@@ -51,7 +52,7 @@ class TestImportClient(ModuleStoreTestCase):
         with self.captureOnCommitCallbacks(execute=True):
             self.import_event = api.create_import(
                 source_key=self.course.id,
-                learning_package_id=self.library.learning_package.id,
+                learning_package_id=self.library.learning_package_id,
                 user_id=self.user.id,
             )
         self.parser = etree.XMLParser(strip_cdata=False)
@@ -69,7 +70,8 @@ class TestImportClient(ModuleStoreTestCase):
 
         import_client.import_from_staged_content()
 
-        self.assertEqual(self.library.learning_package.content_set.count(), len(expected_imported_xblocks))
+        learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
+        self.assertEqual(learning_package.content_set.count(), len(expected_imported_xblocks))
 
     @patch('cms.djangoapps.import_from_modulestore.helpers.ImportClient._process_import')
     def test_import_from_staged_content_block_not_found(self, mocked_process_import):
@@ -84,7 +86,8 @@ class TestImportClient(ModuleStoreTestCase):
 
         import_client.import_from_staged_content()
 
-        self.assertTrue(not self.library.learning_package.content_set.count())
+        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
+        self.assertTrue(not library_learning_package.content_set.count())
         mocked_process_import.assert_not_called()
 
     @ddt.data('chapter', 'sequential', 'vertical')
@@ -105,7 +108,8 @@ class TestImportClient(ModuleStoreTestCase):
             container_to_import.display_name
         )
 
-        self.assertEqual(self.library.learning_package.publishable_entities.count(), 1)
+        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
+        self.assertEqual(library_learning_package.publishable_entities.count(), 1)
 
     def test_create_container_with_xblock(self):
         block_usage_id_to_import = str(self.problem.location)
@@ -142,7 +146,8 @@ class TestImportClient(ModuleStoreTestCase):
         # pylint: disable=protected-access
         result = import_client._process_import(block_usage_id_to_import, block_to_import)
 
-        self.assertEqual(self.library.learning_package.content_set.count(), len(expected_imported_xblocks))
+        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
+        self.assertEqual(library_learning_package.content_set.count(), len(expected_imported_xblocks))
         self.assertEqual(len(result), len(expected_imported_xblocks))
         self.assertEqual(self.import_event.publishableentityimport_set.count(), len(expected_imported_xblocks))
 
@@ -164,7 +169,8 @@ class TestImportClient(ModuleStoreTestCase):
         # pylint: disable=protected-access
         result = import_client._process_import(block_usage_id_to_import, block_to_import)
 
-        self.assertEqual(self.library.learning_package.content_set.count(), len(expected_imported_xblocks))
+        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
+        self.assertEqual(library_learning_package.content_set.count(), len(expected_imported_xblocks))
         self.assertEqual(len(result), len(expected_imported_xblocks))
         self.assertEqual(self.import_event.publishableentityimport_set.count(), len(expected_imported_xblocks))
 
@@ -190,7 +196,7 @@ class TestImportClient(ModuleStoreTestCase):
         with self.captureOnCommitCallbacks(execute=True):
             new_import_event = api.create_import(
                 source_key=self.course.id,
-                learning_package_id=self.library.learning_package.id,
+                learning_package_id=self.library.learning_package_id,
                 user_id=self.user.id,
             )
         new_staged_content = new_import_event.get_staged_content_by_block_usage_id(block_usage_id_to_import)

@@ -2,6 +2,7 @@
 Tests for tasks in import_from_modulestore app.
 """
 from organizations.models import Organization
+from openedx_learning.api.authoring_models import LearningPackage
 from unittest.mock import patch
 
 from cms.djangoapps.import_from_modulestore.data import ImportStatus
@@ -90,11 +91,13 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
     """
 
     def _is_imported(self, library, xblock):
-        self.assertTrue(library.learning_package.content_set.filter(text__icontains=xblock.display_name).exists())
+        library_learning_package = LearningPackage.objects.get(id=library.learning_package_id)
+        self.assertTrue(library_learning_package.content_set.filter(text__icontains=xblock.display_name).exists())
 
     def test_import_course_staged_content_to_library_task(self):
         """ End-to-end test for import_course_staged_content_to_library_task. """
-        self.assertEqual(self.library.learning_package.content_set.count(), 0)
+        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
+        self.assertEqual(library_learning_package.content_set.count(), 0)
         expected_imported_xblocks = [self.problem, self.problem2, self.video, self.video2]
         save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
@@ -111,7 +114,9 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
 
         for xblock in expected_imported_xblocks:
             self._is_imported(self.library, xblock)
-        self.assertEqual(self.library.learning_package.content_set.count(), len(expected_imported_xblocks))
+
+        library_learning_package.refresh_from_db()
+        self.assertEqual(library_learning_package.content_set.count(), len(expected_imported_xblocks))
 
     @patch('cms.djangoapps.import_from_modulestore.tasks.ImportClient')
     def test_import_library_block_not_found(self, mock_import_client):
@@ -151,7 +156,9 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
 
         for xblock in expected_imported_xblocks:
             self._is_imported(self.library, xblock)
-        self.assertEqual(self.library.learning_package.content_set.count(), len(expected_imported_xblocks))
+
+        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
+        self.assertEqual(library_learning_package.content_set.count(), len(expected_imported_xblocks))
 
         self.import_event.refresh_from_db()
         self.assertEqual(self.import_event.status, ImportStatus.IMPORTED)

@@ -47,7 +47,7 @@ class TestCourseToLibraryImportViewsMixin(SharedModuleStoreTestCase):
         with self.captureOnCommitCallbacks(execute=True):
             self.import_event = api.create_import(
                 user_id=self.admin_user.pk,
-                learning_package_id=self.library.learning_package.id,
+                learning_package_id=self.library.learning_package_id,
                 source_key=self.course.id,
             )
 
