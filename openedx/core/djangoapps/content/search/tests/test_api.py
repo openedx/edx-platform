@@ -868,6 +868,17 @@ class TestSearchApi(ModuleStoreTestCase):
         ])
 
     @override_settings(MEILISEARCH_ENABLED=True)
+    def test_delete_index_container(self, mock_meilisearch):
+        """
+        Test delete a container index.
+        """
+        library_api.delete_container(self.unit.container_key)
+
+        mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
+            self.unit_dict["id"],
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
     def test_index_library_container_metadata(self, mock_meilisearch):
         """
         Test indexing a Library Container.

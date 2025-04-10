@@ -46,6 +46,7 @@ from .api import (
 )
 from .tasks import (
     delete_library_block_index_doc,
+    delete_library_container_index_doc,
     delete_xblock_index_doc,
     update_content_library_index_docs,
     update_library_collection_index_doc,
@@ -238,7 +239,6 @@ def content_object_associations_changed_handler(**kwargs) -> None:
 
 
 @receiver(LIBRARY_CONTAINER_CREATED)
-@receiver(LIBRARY_CONTAINER_DELETED)
 @receiver(LIBRARY_CONTAINER_UPDATED)
 @only_if_meilisearch_enabled
 def library_container_updated_handler(**kwargs) -> None:
@@ -263,3 +263,19 @@ def library_container_updated_handler(**kwargs) -> None:
             str(library_container.library_key),
             library_container.container_key,
         ])
+
+
+@receiver(LIBRARY_CONTAINER_DELETED)
+@only_if_meilisearch_enabled
+def library_container_deleted(**kwargs) -> None:
+    """
+    Delete the index for the content library container
+    """
+    library_container = kwargs.get("library_container", None)
+    if not library_container or not isinstance(library_container, LibraryContainerData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches results. This is only a single document update so is very fast.
+    delete_library_container_index_doc.apply(args=[str(library_container.container_key)])

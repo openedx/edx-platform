@@ -82,6 +82,8 @@ urlpatterns = [
             path('', containers.LibraryContainerView.as_view()),
             # update components under container
             path('children/', containers.LibraryContainerChildrenView.as_view()),
+            # Restore a soft-deleted container
+            path('restore/', containers.LibraryContainerRestore.as_view()),
             # Update collections for a given container
             # path('collections/', views.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),
             # path('publish/', views.LibraryContainerPublishView.as_view()),
