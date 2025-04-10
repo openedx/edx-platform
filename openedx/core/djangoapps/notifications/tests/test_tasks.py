@@ -196,19 +196,23 @@ class SendNotificationsTest(ModuleStoreTestCase):
         """
         Test send_notifications with grouping enabled.
         """
+        (
+            self.preference_v1.notification_preference_config['discussion']
+            ['notification_types']['new_discussion_post']['web']
+        ) = True
+        self.preference_v1.save()
         with patch('openedx.core.djangoapps.notifications.tasks.group_user_notifications') as user_notifications_mock:
             context = {
-                'post_title': 'Post title',
-                'author_name': 'author name',
-                'replier_name': 'replier name',
-                'group_by_id': 'group_by_id',
+                'post_title': 'Test Post',
+                'username': 'Test Author',
+                'group_by_id': 'group_by_id'
             }
             content_url = 'https://example.com/'
             send_notifications(
                 [self.user.id],
                 str(self.course_1.id),
                 'discussion',
-                'new_comment',
+                'new_discussion_post',
                 {**context},
                 content_url
             )
@@ -216,7 +220,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
                 [self.user.id],
                 str(self.course_1.id),
                 'discussion',
-                'new_comment',
+                'new_discussion_post',
                 {**context},
                 content_url
             )

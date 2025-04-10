@@ -63,27 +63,6 @@ class NotificationRegistry:
         return grouper_class()
 
 
-@NotificationRegistry.register('new_comment')
-class NewCommentGrouper(BaseNotificationGrouper):
-    """
-    Groups new comment notifications based on the replier name.
-    """
-
-    def group(self, new_notification, old_notification):
-        """
-        Groups new comment notifications based on the replier name.
-        """
-        context = old_notification.content_context.copy()
-        if not context.get('grouped'):
-            context['replier_name_list'] = [context['replier_name']]
-            context['grouped_count'] = 1
-        context['grouped'] = True
-        context['replier_name_list'].append(new_notification.content_context['replier_name'])
-        context['grouped_count'] += 1
-        context['email_content'] = new_notification.content_context.get('email_content', '')
-        return context
-
-
 @NotificationRegistry.register('new_discussion_post')
 class NewPostGrouper(BaseNotificationGrouper):
     """
