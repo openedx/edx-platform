@@ -4,10 +4,6 @@
 #
 #    make upgrade
 #
--e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 accessible-pygments==0.0.5
     # via
     #   -r requirements/edx/doc.txt
@@ -791,7 +787,6 @@ edx-proctoring==5.1.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   edx-proctoring-proctortrack
 edx-rbac==1.10.0
     # via
     #   -r requirements/edx/doc.txt
