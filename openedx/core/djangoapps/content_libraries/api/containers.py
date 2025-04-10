@@ -13,6 +13,7 @@ from opaque_keys.edx.locator import (
     LibraryContainerLocator,
     LibraryLocatorV2,
     UsageKeyV2,
+    LibraryUsageLocatorV2,
 )
 from openedx_events.content_authoring.data import LibraryContainerData
 from openedx_events.content_authoring.signals import (
@@ -26,14 +27,16 @@ from openedx_learning.api.authoring_models import Container
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
+from .exceptions import ContentLibraryContainerNotFound
 from .libraries import LibraryXBlockMetadata, PublishableItem
 
 
 # The public API is only the following symbols:
 __all__ = [
-    "ContentLibraryContainerNotFound",
+    # Models
     "ContainerMetadata",
     "ContainerType",
+    # API methods
     "get_container",
     "create_container",
     "get_container_children",
@@ -42,10 +45,8 @@ __all__ = [
     "update_container",
     "delete_container",
     "update_container_children",
+    "get_containers_contains_component",
 ]
-
-
-ContentLibraryContainerNotFound = Container.DoesNotExist
 
 
 class ContainerType(Enum):
@@ -316,3 +317,20 @@ def update_container_children(
     )
 
     return ContainerMetadata.from_container(library_key, new_version.container)
+
+
+def get_containers_contains_component(
+    usage_key: LibraryUsageLocatorV2
+) -> list[ContainerMetadata]:
+    """
+    Get containers that contains the component.
+    """
+    assert isinstance(usage_key, LibraryUsageLocatorV2)
+    component = get_component_from_usage_key(usage_key)
+    containers = authoring_api.get_containers_with_entity(
+        component.publishable_entity.pk,
+    )
+    return [
+        ContainerMetadata.from_container(usage_key.context_key, container)
+        for container in containers
+    ]

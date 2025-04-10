@@ -106,6 +106,21 @@ class NewPostGrouper(BaseNotificationGrouper):
         }
 
 
+@NotificationRegistry.register('ora_staff_notification')
+class OraStaffGrouper(BaseNotificationGrouper):
+    """
+    Grouper for new ora staff notifications.
+    """
+
+    def group(self, new_notification, old_notification):
+        """
+        Groups new ora staff notifications based on the xblock ID.
+        """
+        content_context = old_notification.content_context
+        content_context.setdefault("grouped", True)
+        return content_context
+
+
 def group_user_notifications(new_notification: Notification, old_notification: Notification):
     """
     Groups user notification based on notification type and group_id

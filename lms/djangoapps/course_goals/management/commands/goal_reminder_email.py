@@ -49,6 +49,9 @@ def send_ace_message(goal, session_id):
     Returns true if sent, false if it absorbed an exception and did not send
     """
     user = goal.user
+    if not user.has_usable_password():
+        log.info(f'Goal Reminder User is disabled {user.username} course {goal.course_key}')
+        return False
     try:
         course = CourseOverview.get_from_id(goal.course_key)
     except CourseOverview.DoesNotExist:

@@ -80,6 +80,9 @@ def send_digest_email_to_user(user, cadence_type, start_date, end_date, course_l
     if cadence_type not in [EmailCadence.DAILY, EmailCadence.WEEKLY]:
         raise ValueError('Invalid cadence_type')
     logger.info(f'<Email Cadence> Sending email to user {user.username} ==Temp Log==')
+    if not user.has_usable_password():
+        logger.info(f'<Email Cadence> User is disabled {user.username} ==Temp Log==')
+        return
     if not is_email_notification_flag_enabled(user):
         logger.info(f'<Email Cadence> Flag disabled for {user.username} ==Temp Log==')
         return

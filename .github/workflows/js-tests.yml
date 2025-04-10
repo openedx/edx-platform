@@ -26,6 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
       - name: Setup npm
         run: npm i -g npm@10.7.x
@@ -62,8 +63,6 @@ jobs:
       - name: Install Required Python Dependencies
         run: |
           make base-requirements
-
-      - uses: c-hive/gha-npm-cache@v1
 
       - name: Install npm
         run: npm ci  

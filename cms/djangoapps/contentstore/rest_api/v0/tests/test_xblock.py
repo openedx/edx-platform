@@ -55,13 +55,8 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
             }
         ),
     )
-    @patch(
-        f"cms.djangoapps.contentstore.rest_api.{VERSION}.views.xblock.toggles.use_studio_content_api",
-        return_value=True,
-    )
     def make_request(
         self,
-        mock_use_studio_content_api,
         mock_handle_xblock,
         run_assertions=None,
         course_id=None,
@@ -110,13 +105,6 @@ class XBlockViewGetTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
 
     def send_request(self, url, data):
         return self.client.get(url)
-
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_xblock_handler_called_with_correct_arguments(self):
         self.client.login(
@@ -167,13 +155,6 @@ class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     def send_request(self, url, data):
         return self.client.post(url, data=data, format="json")
 
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_xblock_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
@@ -217,13 +198,6 @@ class XBlockViewPutTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
 
     def send_request(self, url, data):
         return self.client.put(url, data=data, format="json")
-
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.put(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_xblock_handler_called_with_correct_arguments(self):
         self.client.login(
@@ -269,13 +243,6 @@ class XBlockViewPatchTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     def send_request(self, url, data):
         return self.client.patch(url, data=data, format="json")
 
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.patch(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_xblock_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
@@ -309,13 +276,6 @@ class XBlockViewDeleteTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase)
 
     def send_request(self, url, data):
         return self.client.delete(url)
-
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_xblock_handler_called_with_correct_arguments(self):
         self.client.login(
