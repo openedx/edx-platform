@@ -34,6 +34,7 @@ URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files 
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
 URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
 URL_LIB_CONTAINER_COMPONENTS = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
+URL_LIB_CONTAINER_RESTORE = URL_LIB_CONTAINER + 'restore/'  # Restore a deleted container
 
 URL_LIB_LTI_PREFIX = URL_PREFIX + 'lti/1.3/'
 URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
@@ -385,6 +386,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
     def _delete_container(self, container_key: str, expect_response=204):
         """ Delete a container (unit etc.) """
         return self._api('delete', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)
+
+    def _restore_container(self, container_key: str, expect_response=204):
+        """ Restore a deleted a container (unit etc.) """
+        return self._api('post', URL_LIB_CONTAINER_RESTORE.format(container_key=container_key), None, expect_response)
 
     def _get_container_components(self, container_key: str, expect_response=200):
         """ Get container components"""
