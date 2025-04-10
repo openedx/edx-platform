@@ -3,8 +3,6 @@ import model_utils.fields
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 
-from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
-
 
 class Migration(migrations.Migration):
 
@@ -18,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, verbose_name='created', editable=False)),
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
-                ('id', UnsignedBigIntAutoField(serialize=False, primary_key=True)),
+                ('id', models.BigAutoField(primary_key=True, serialize=False)),
                 ('user_id', models.IntegerField(db_index=True)),
                 ('course_id', CourseKeyField(max_length=255)),
                 ('course_edited_timestamp', models.DateTimeField(verbose_name='Last content edit timestamp')),
