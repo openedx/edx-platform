@@ -330,3 +330,53 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
             },
             update_receiver.call_args_list[0].kwargs,
         )
+
+    def test_restore_unit(self):
+        """
+        Test restore a deleted unit.
+        """
+        lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+        lib_key = LibraryLocatorV2.from_string(lib["id"])
+
+        # Create a unit:
+        create_date = datetime(2024, 9, 8, 7, 6, 5, tzinfo=timezone.utc)
+        with freeze_time(create_date):
+            container_data = self._create_container(lib["id"], "unit", slug="u1", display_name="Test Unit")
+
+        # Delete the unit
+        self._delete_container(container_data["container_key"])
+
+        create_receiver = mock.Mock()
+        LIBRARY_CONTAINER_CREATED.connect(create_receiver)
+
+        # Restore container
+        self._restore_container(container_data["container_key"])
+        new_container_data = self._get_container(container_data["container_key"])
+        expected_data = {
+            "container_key": "lct:CL-TEST:containers:unit:u1",
+            "container_type": "unit",
+            "display_name": "Test Unit",
+            "last_published": None,
+            "published_by": "",
+            "last_draft_created": "2024-09-08T07:06:05Z",
+            "last_draft_created_by": 'Bob',
+            'has_unpublished_changes': True,
+            'created': '2024-09-08T07:06:05Z',
+            'modified': '2024-09-08T07:06:05Z',
+            'collections': [],
+        }
+
+        self.assertDictContainsEntries(new_container_data, expected_data)
+
+        assert create_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_CREATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    lib_key,
+                    container_key="lct:CL-TEST:containers:unit:u1",
+                ),
+            },
+            create_receiver.call_args_list[0].kwargs,
+        )

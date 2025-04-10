@@ -8,8 +8,7 @@ from hashlib import blake2b
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
-from opaque_keys import OpaqueKey
-from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from opaque_keys.edx.keys import LearningContextKey, UsageKey, OpaqueKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
