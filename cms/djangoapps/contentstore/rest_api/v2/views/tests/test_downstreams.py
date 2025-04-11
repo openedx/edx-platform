@@ -3,14 +3,17 @@ Unit tests for /api/contentstore/v2/downstreams/* JSON APIs.
 """
 import json
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from django.conf import settings
+from django.urls import reverse
 from freezegun import freeze_time
 from organizations.models import Organization
 
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from opaque_keys.edx.keys import UsageKey
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -171,7 +174,6 @@ class SharedErrorTestCases(_BaseDownstreamViewTestMixin):
         assert response.status_code == 404
         assert "not found" in response.data["developer_message"]
 
-
 class GetDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
     """
     Test that `GET /api/v2/contentstore/downstreams/...` inspects a downstream's link to an upstream.
@@ -327,6 +329,56 @@ class _DownstreamSyncViewTestMixin(SharedErrorTestCases):
         response = self.call_api(self.regular_video_key)
         assert response.status_code == 400
         assert "is not linked" in response.data["developer_message"][0]
+
+
+class CreateDownstreamViewTest(CourseTestCase, SharedErrorTestCases, SharedModuleStoreTestCase):
+    """
+    Tests create new downstream blocks
+    """
+    def call_api(self, library_content_key, category):
+        data = {
+            "parent_locator": str(self.course.location),
+            "display_name": "Test block",
+            "library_content_key": library_content_key,
+            "category": category,
+        }
+        return self.client.post(
+            reverse("xblock_handler"),
+            data=json.dumps(data),
+            content_type="application/json",
+        )
+
+    def test_200(self):
+        response = self.call_api(self.html_lib_id, "html")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["upstreamRef"] == self.html_lib_id
+
+        usage_key = UsageKey.from_string(data["locator"])
+        item = modulestore().get_item(usage_key)
+        assert item.upstream == self.html_lib_id
+
+    @patch("cms.djangoapps.contentstore.helpers._insert_static_files_into_downstream_xblock")
+    @patch("cms.djangoapps.contentstore.helpers.content_staging_api.stage_xblock_temporarily")
+    @patch("cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers.sync_from_upstream")
+    def test_200_video(self, mock_sync, mock_stage, mock_insert):
+        mock_lib_block = MagicMock()
+        mock_lib_block.runtime.get_block_assets.return_value = ['mocked_asset']
+        mock_sync.return_value = mock_lib_block
+        mock_stage.return_value = MagicMock()
+        mock_insert.return_value = StaticFileNotices()
+
+        response = self.call_api(self.video_lib_id, "video")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["upstreamRef"] == self.video_lib_id
+
+        usage_key = UsageKey.from_string(data["locator"])
+        item = modulestore().get_item(usage_key)
+        assert item.upstream == self.video_lib_id
+        assert item.edx_video_id != None
 
 
 class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStoreTestCase):
