@@ -169,6 +169,9 @@ function($, _, Backbone, gettext, BasePage,
                     case 'addXBlock':
                         this.createComponent(this, xblockElement, data);
                         break;
+                    case 'scrollToXBlock':
+                        document.getElementById(data.payload.locator)?.scrollIntoView({behavior: "smooth"});
+                        break;
                     default:
                         console.warn('Unhandled message type:', data.type);
                     }
