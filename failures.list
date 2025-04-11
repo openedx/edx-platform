@@ -1,0 +1,105 @@
+cms/djangoapps/contentstore/rest_api/v1/views/tests/test_course_index.py
+CourseIndexViewTest::test_course_index_response - AssertionError: {'cou[11463 chars]l', 'is_custom_relative_dates_active': True, '[775 chars]420'} != {'cou[11463 chars]l', 'discussions_settings': {'enable_in_contex[886 chars]True}
+CourseIndexViewTest::test_course_index_response_with_show_locators - AssertionError: {'cou[11463 chars]l', 'is_custom_relative_dates_active': False, [1019 chars]430'} != {'cou[11463 chars]l', 'discussions_settings': {'enable_in_contex[1147 chars]alse}
+CourseIndexViewTest::test_number_of_calls_to_db - AssertionError: 33 queries executed, 32 expected
+
+cms/djangoapps/contentstore/rest_api/v1/views/tests/test_course_waffle_flags.py
+CourseWaffleFlagsViewTest::test_get_course_waffle_flags_with_course_id - AssertionError: {'use_new_custom_pages': True, 'use_new_schedule_de[512 chars]alse} != {'use_new_home_page': True, 'use_new_custom_pages':[511 chars]True}
+CourseWaffleFlagsViewTest::test_get_course_waffle_flags_without_course_id - AssertionError: {'use_new_custom_pages': False, 'use_new_schedule_d[528 chars]alse} != {'use_new_home_page': True, 'use_new_custom_pages':[513 chars]alse}
+
+cms/djangoapps/contentstore/tests/test_course_listing.py
+TestCourseListing::test_empty_course_listing - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+
+cms/djangoapps/contentstore/tests/test_course_settings.py
+CourseAdvanceSettingViewTest::test_disable_advanced_settings_feature_1_False - AssertionError: 302 != 200
+CourseAdvanceSettingViewTest::test_disable_advanced_settings_feature_2_True - AssertionError: 302 != 200
+CourseAdvanceSettingViewTest::test_discussion_fields_available_1__False__False__True_ - AssertionError: False != True
+CourseAdvanceSettingViewTest::test_discussion_fields_available_3__True__True__True_ - AssertionError: False != True
+CourseAdvanceSettingViewTest::test_discussion_fields_available_4__False__True__True_ - AssertionError: False != True
+CourseAdvanceSettingViewTest::test_mobile_field_available - json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+CourseDetailsViewTest
+test_editable_short_description_fetch - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+CourseDetailsViewTest::test_marketing_site_fetch - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+CourseDetailsViewTest::test_pre_requisite_course_list_present - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+CourseDetailsViewTest::test_regular_site_fetch - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+CourseDetailsViewTest::test_upgrade_deadline_3__True__True_ - AssertionError: False != True
+CourseDetailsViewTest::test_visibility_of_entrance_exam_section_2__True__False__True_ - AssertionError: True != False
+CourseDetailsViewTest::test_visibility_of_entrance_exam_section_4__True__True__True_ - AssertionError: True != False
+
+cms/djangoapps/contentstore/tests/test_course_settings.py
+CourseEnrollmentEndFieldTest::test_course_details_with_disabled_setting_global_staff - AssertionError: 302 != 200
+CourseEnrollmentEndFieldTest::test_course_details_with_disabled_setting_non_global_staff - AssertionError: 302 != 200
+CourseEnrollmentEndFieldTest::test_course_details_with_enabled_setting_global_staff - AssertionError: 302 != 200
+CourseEnrollmentEndFieldTest::test_course_details_with_enabled_setting_non_global_staff - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/tests/test_i18n.py
+InternationalizationTest::test_course_explicit_english - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+InternationalizationTest::test_course_plain_english - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+
+cms/djangoapps/contentstore/tests/test_permissions.py
+TestCourseAccess::test_get_all_users - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+
+cms/djangoapps/contentstore/tests/tests.py
+AuthTestCase::test_inactive_session_timeout - AssertionError: 302 != 200
+AuthTestCase::test_private_pages_auth - AssertionError: 302 != 200
+CourseKeyVerificationTestCase::test_course_key_decorator_1___edX_test_course_key_Test_Course___200_ - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_assets.py
+BasicAssetsTestCase::test_basic - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_block.py
+TestComponentTemplates::test_advanced_problems - AssertionError: unexpectedly None
+TestComponentTemplates::test_basic_components_support_levels - AssertionError: Lists differ: [{'boilerplate_name': None, 'category': 'd[105 chars]ed'}] != []
+TestComponentTemplates::test_xblock_masquerading_as_problem - AssertionError: unexpectedly None
+
+cms/djangoapps/contentstore/views/tests/test_certificates.py
+CertificatesListHandlerTestCase::test_audit_course_mode_is_skipped - AssertionError: 302 != 200
+CertificatesListHandlerTestCase::test_audit_only_disables_cert - AssertionError: 302 != 200
+CertificatesListHandlerTestCase::test_certificate_info_in_response - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+CertificatesListHandlerTestCase::test_certificate_info_not_in_response - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+CertificatesListHandlerTestCase::test_non_audit_enables_cert_1___audit____verified__ - AssertionError: 302 != 200
+CertificatesListHandlerTestCase::test_non_audit_enables_cert_2___verified__ - AssertionError: 302 != 200
+CertificatesListHandlerTestCase::test_non_audit_enables_cert_3___audit____verified____credit__ - AssertionError: 302 != 200
+CertificatesListHandlerTestCase::test_non_audit_enables_cert_4___verified____credit__ - AssertionError: 302 != 200
+CertificatesListHandlerTestCase::test_non_audit_enables_cert_5___professional__ - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_container_page.py
+ContainerPageTestCase::test_container_on_container_html - AssertionError: 302 != 200
+ContainerPageTestCase::test_container_page_with_valid_and_invalid_usage_key_string - AssertionError: 302 != 200
+ContainerEmbedPageTestCase::test_container_on_container_html - AssertionError: 302 != 200
+ContainerEmbedPageTestCase::test_container_page_with_valid_and_invalid_usage_key_string - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_course_index.py
+TestCourseOutline::test_number_of_calls_to_db - AssertionError: 38 queries executed, 29 expected
+
+cms/djangoapps/contentstore/views/tests/test_course_updates.py
+CourseUpdateTest::test_course_update - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+
+cms/djangoapps/contentstore/views/tests/test_credit_eligibility.py
+CreditEligibilityTest::test_course_details_with_disabled_setting - AssertionError: 302 != 200
+CreditEligibilityTest::test_course_details_with_enabled_setting - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_group_configurations.py
+GroupConfigurationsListHandlerTestCase::test_view_index_ok - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_header_menu.py
+TestHeaderMenu::test_header_menu_with_exam_settings_enabled - AssertionError: 302 != 200
+TestHeaderMenu::test_header_menu_with_web_certs_enabled - AssertionError: 302 != 200
+TestHeaderMenu::test_header_menu_without_exam_settings_enabled - AssertionError: 302 != 200
+TestHeaderMenu::test_header_menu_without_web_certs_enabled - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_import_export.py
+ExportTestCase::test_export_html - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_tabs.py
+TabsPageTests::test_view_index - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+
+cms/djangoapps/contentstore/views/tests/test_textbooks.py
+TextbookIndexTestCase::test_view_index - AssertionError: 302 != 200
+
+cms/djangoapps/contentstore/views/tests/test_user.py
+UsersTestCase::test_index - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
+
+cms/djangoapps/contentstore/views/tests/test_user.py
+UsersTestCase::test_index_member - AssertionError: 302 != 200 : Couldn't retrieve content: Response code was 302 (expected 200)
