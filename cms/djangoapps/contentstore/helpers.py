@@ -394,6 +394,12 @@ def import_static_assets_for_library_sync(downstream_xblock: XBlock, lib_block: 
     store = modulestore()
     try:
         with store.bulk_operations(downstream_xblock.context_key):
+            if downstream_xblock.usage_key.block_type == 'video' and not downstream_xblock.edx_video_id:
+                # If the `downstream_xblock` is a new created block, we need to create
+                # a new `edx_video_id` to import the transcripts.
+                downstream_xblock.edx_video_id = create_external_video(display_name='external video')
+                store.update_item(downstream_xblock, request.user.id)
+
             # Now handle static files that need to go into Files & Uploads.
             # If the required files already exist, nothing will happen besides updating the olx.
             notices = _insert_static_files_into_downstream_xblock(downstream_xblock, staged_content.id, request)
