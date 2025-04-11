@@ -34,6 +34,7 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         "use_new_certificates_page",
         "use_new_textbooks_page",
         "use_new_group_configurations_page",
+        "use_react_markdown_editor"
     ]
 
     other_expected_waffle_flags = ["enable_course_optimizer"]
@@ -71,7 +72,11 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         """
         for flag in flags:
             WaffleFlagCourseOverrideModel.objects.create(
-                waffle_flag=f"contentstore.new_studio_mfe.{flag}",
+                waffle_flag=(
+                    f"contentstore.new_studio_mfe.{flag}"
+                    if flag != "use_react_markdown_editor"
+                    else "contentstore.use_react_markdown_editor"
+                ),
                 course_id=self.course.id,
                 enabled=enabled,
             )
