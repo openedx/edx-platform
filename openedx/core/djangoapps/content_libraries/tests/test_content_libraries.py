@@ -1084,7 +1084,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             event_receiver.call_args.kwargs
         )
 
-    def test_library_paste_clipboard(self):
+    def test_library_paste_xblock(self):
         """
         Check the a new block is created in the library after pasting from clipboard.
         The content of the new block should match the content of the block in the clipboard.

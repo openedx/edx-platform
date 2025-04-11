@@ -3,21 +3,24 @@ Content libraries API methods related to XBlocks/Components.
 
 These methods don't enforce permissions (only the REST APIs do).
 """
+from __future__ import annotations
 import logging
 import mimetypes
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+from uuid import uuid4
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import validate_unicode_slug
 from django.db import transaction
 from django.db.models import QuerySet
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from lxml import etree
-from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
     LibraryBlockData,
@@ -53,12 +56,21 @@ from .exceptions import (
     InvalidNameError,
     LibraryBlockAlreadyExists,
 )
+from .containers import (
+    create_container,
+    update_container_children,
+    ContainerMetadata,
+    ContainerType,
+)
 from .libraries import (
     library_collection_locator,
     library_component_usage_key,
     require_permission_for_library_key,
     PublishableItem,
 )
+
+if TYPE_CHECKING:
+    from openedx.core.djangoapps.content_staging.api import StagedContentFileData
 
 log = logging.getLogger(__name__)
 
@@ -364,29 +376,27 @@ def create_library_block(
     return get_library_block(usage_key)
 
 
-def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user, block_id) -> XBlock:
+def _import_staged_block(
+    block_type: str,
+    olx_str: str,
+    library_key: LibraryLocatorV2,
+    source_context_key: LearningContextKey,
+    user,
+    block_id: str,
+    staged_content_id: int,
+    staged_content_files: list[StagedContentFileData],
+    now: datetime,
+) -> LibraryXBlockMetadata:
     """
     Create a new library block and populate it with staged content from clipboard
 
     Returns the newly created library block
     """
     from openedx.core.djangoapps.content_staging import api as content_staging_api
-    if not content_staging_api:
-        raise RuntimeError("The required content_staging app is not installed")
-
-    user_clipboard = content_staging_api.get_user_clipboard(user)
-    if not user_clipboard:
-        return None
-
-    staged_content_id = user_clipboard.content.id
-    olx_str = content_staging_api.get_staged_content_olx(staged_content_id)
-    if olx_str is None:
-        return None  # Shouldn't happen since we checked that the clipboard exists - mostly here for type checker
-    staged_content_files = content_staging_api.get_staged_content_static_files(staged_content_id)
 
     content_library, usage_key = validate_can_add_block_to_library(
         library_key,
-        user_clipboard.content.block_type,
+        block_type,
         block_id
     )
 
@@ -395,10 +405,8 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
     # without one at the moment. TODO: fix this at the model level.
     learning_package: LearningPackage = content_library.learning_package  # type: ignore
 
-    now = datetime.now(tz=timezone.utc)
-
     # Create component for block then populate it with clipboard data
-    with transaction.atomic():
+    with transaction.atomic(savepoint=False):
         # First create the Component, but do not initialize it to anything (i.e.
         # no ComponentVersion).
         component_type = authoring_api.get_or_create_component_type(
@@ -451,7 +459,7 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
             # Learning Core components can store other kinds of files if they
             # wish (though none currently do).
             source_assumes_global_assets = not isinstance(
-                user_clipboard.source_context_key, LibraryLocatorV2
+                source_context_key, LibraryLocatorV2
             )
             if source_assumes_global_assets:
                 filename = f"static/{filename}"
@@ -485,6 +493,122 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
 
     # Now return the metadata about the new block
     return get_library_block(usage_key)
+
+
+def _import_staged_block_as_container(
+    olx_str: str,
+    library_key: LibraryLocatorV2,
+    source_context_key: LearningContextKey,
+    user,
+    block_id: str,
+    staged_content_id: int,
+    staged_content_files: list[StagedContentFileData],
+    now: datetime,
+) -> ContainerMetadata:
+    """
+    Convert the given XBlock (e.g. "vertical") to a Container (e.g. Unit) and
+    import it into the library, along with all its child XBlocks.
+    """
+    olx_node = etree.fromstring(olx_str)
+    if olx_node.tag != "vertical":
+        raise ValueError("This method is only designed to work with <vertical> XBlocks (units).")
+    # The olx_str looks like this:
+    # <vertical><block1>...[XML]...</block1><block2>...[XML]...</block2>...</vertical>
+    # Ideally we could split it up and preserve the strings, but that is difficult to do correctly, so we'll split
+    # it up using the XML nodes. This will unfortunately remove any custom comments or formatting in the XML, but that's
+    # OK since Studio-edited blocks won't have that anyways (hand-edited and library blocks can and do).
+
+    title = olx_node.attrib.get("display_name")
+    if not title:
+        # Not sure if we need this, but find a localized default title if none was set:
+        from cms.djangoapps.contentstore import helpers as studio_helpers
+        title = studio_helpers.xblock_type_display_name(olx_node.tag)
+
+    # Start an atomic section so the whole paste succeeds or fails together:
+    with transaction.atomic():
+        container = create_container(
+            library_key=library_key,
+            container_type=ContainerType.Unit,
+            slug=block_id,  # TODO: we should preserve the slug from the clipboard, plus a random suffix, not
+                            # expect the frontend to generate the slug. Right now it just passes in a UUID4
+            title=title,
+            user_id=user.id,
+        )
+        new_child_keys: list[UsageKeyV2] = []
+        for child_node in olx_node:
+            if child_node.attrib.get('url_name'):
+                child_block_id = child_node.attrib['url_name'] + '-' + uuid4().hex[-4:]
+            else:
+                child_block_id = uuid4().hex[-12:]
+            try:
+                child_metadata = _import_staged_block(
+                    block_type=child_node.tag,
+                    olx_str=etree.tostring(child_node, encoding='unicode'),
+                    library_key=library_key,
+                    source_context_key=source_context_key,
+                    user=user,
+                    block_id=child_block_id,
+                    staged_content_id=staged_content_id,
+                    staged_content_files=staged_content_files,
+                    now=now,
+                )
+                new_child_keys.append(child_metadata.usage_key)
+            except IncompatibleTypesError:
+                continue  # Skip blocks that won't work in libraries
+        update_container_children(container.container_key, new_child_keys, user_id=user.id)
+        
+
+
+def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user, block_id: str) -> PublishableItem:
+    """
+    Create a new library item from the staged content from clipboard.
+    Can create containers (e.g. units) or XBlocks.
+
+    Returns the newly created item metadata
+    """
+    from openedx.core.djangoapps.content_staging import api as content_staging_api
+    if not content_staging_api:
+        raise RuntimeError("The required content_staging app is not installed")
+
+    user_clipboard = content_staging_api.get_user_clipboard(user)
+    if not user_clipboard:
+        raise ValidationError("The user's clipboard is empty")
+
+    staged_content_id = user_clipboard.content.id
+    source_context_key: LearningContextKey = user_clipboard.source_context_key
+
+    staged_content_files = content_staging_api.get_staged_content_static_files(staged_content_id)
+
+    olx_str = content_staging_api.get_staged_content_olx(staged_content_id)
+    if olx_str is None:
+        raise RuntimeError("olx_str missing")  # Shouldn't happen - mostly here for type checker
+
+    now = datetime.now(tz=timezone.utc)
+
+    if user_clipboard.content.block_type == "vertical":
+        # This is a Unit. To import it into a library, we have to create it as a container.
+        return _import_staged_block_as_container(
+            olx_str,
+            library_key,
+            source_context_key,
+            user,
+            block_id,
+            staged_content_id,
+            staged_content_files,
+            now,
+        )
+    else:
+        return _import_staged_block(
+            user_clipboard.content.block_type,
+            olx_str,
+            library_key,
+            source_context_key,
+            user,
+            block_id,
+            staged_content_id,
+            staged_content_files,
+            now,
+        )
 
 
 def get_or_create_olx_media_type(block_type: str) -> MediaType:

@@ -506,9 +506,7 @@ class LibraryPasteClipboardView(GenericAPIView):
                 library_key, request.user, **serializer.validated_data
             )
         except api.IncompatibleTypesError as err:
-            raise ValidationError(  # lint-amnesty, pylint: disable=raise-missing-from
-                detail={'block_type': str(err)},
-            )
+            raise ValidationError(detail={'block_type': str(err)}) from err
 
         return Response(LibraryXBlockMetadataSerializer(result).data)
 
