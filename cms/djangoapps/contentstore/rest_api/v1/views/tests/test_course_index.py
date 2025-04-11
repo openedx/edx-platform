@@ -74,7 +74,9 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             },
             "language_code": "en",
             "lms_link": get_lms_link_for_item(self.course.location),
-            "mfe_proctored_exam_settings_url": "",
+            "mfe_proctored_exam_settings_url": (
+                "http://course-authoring-mfe/course/course-v1:org.0+course_0+Run_0/pages-and-resources/proctoring/settings"
+            ),
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
@@ -121,7 +123,9 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             },
             "language_code": "en",
             "lms_link": get_lms_link_for_item(self.course.location),
-            "mfe_proctored_exam_settings_url": "",
+            "mfe_proctored_exam_settings_url": (
+                "http://course-authoring-mfe/course/course-v1:org.10+course_10+Run_10/pages-and-resources/proctoring/settings"
+            ),
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
