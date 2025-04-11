@@ -446,7 +446,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             opaque_keys=[
                 UsageKey.from_string(self.lib1_problem_block["id"]),
                 UsageKey.from_string(self.lib1_html_block["id"]),
-                LibraryContainerLocator.from_string(self.unit1["container_key"]),
+                LibraryContainerLocator.from_string(self.unit1["id"]),
             ],
         )
         assert len(self.col1.entities.all()) == 3
@@ -475,7 +475,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             opaque_keys=[
                 UsageKey.from_string(self.lib1_problem_block["id"]),
                 UsageKey.from_string(self.lib1_html_block["id"]),
-                LibraryContainerLocator.from_string(self.unit1["container_key"]),
+                LibraryContainerLocator.from_string(self.unit1["id"]),
             ],
         )
 
@@ -507,7 +507,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectChangedData(
-                    object_id=self.unit1["container_key"],
+                    object_id=self.unit1["id"],
                     changes=["collections"],
                 ),
             },
@@ -535,7 +535,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 opaque_keys=[
                     UsageKey.from_string(self.lib1_problem_block["id"]),
                     UsageKey.from_string(self.lib1_html_block["id"]),
-                    LibraryContainerLocator.from_string(self.unit1["container_key"]),
+                    LibraryContainerLocator.from_string(self.unit1["id"]),
                 ],
             )
             assert self.lib1_problem_block["id"] in str(exc.exception)
@@ -634,14 +634,14 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
             opaque_keys=[
                 UsageKey.from_string(self.lib1_problem_block["id"]),
                 UsageKey.from_string(self.lib1_html_block["id"]),
-                LibraryContainerLocator.from_string(self.unit1["container_key"]),
+                LibraryContainerLocator.from_string(self.unit1["id"]),
             ],
         )
 
         event_receiver = mock.Mock()
         LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
 
-        api.delete_container(LibraryContainerLocator.from_string(self.unit1["container_key"]))
+        api.delete_container(LibraryContainerLocator.from_string(self.unit1["id"]))
 
         assert event_receiver.call_count == 1
         self.assertDictContainsSubset(

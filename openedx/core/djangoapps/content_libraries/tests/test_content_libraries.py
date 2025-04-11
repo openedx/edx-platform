@@ -4,7 +4,6 @@ Tests for Learning-Core-based Content Libraries
 from datetime import datetime, timezone
 from unittest import skip
 from unittest.mock import Mock, patch
-from uuid import uuid4
 
 import ddt
 from django.contrib.auth.models import Group
@@ -344,9 +343,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             "last_draft_created_by": "Bob",
         })
         block_id = block_data["id"]
-        # Confirm that the result contains a definition key, but don't check its value,
-        # which for the purposes of these tests is an implementation detail.
-        assert 'def_key' in block_data
 
         # now the library should contain one block and have unpublished changes:
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
@@ -1123,13 +1119,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             save_xblock_to_user_clipboard(block, author.id)
 
             # Paste the content of the clipboard into the library
-            pasted_block_id = str(uuid4())
-            paste_data = self._paste_clipboard_content_in_library(lib_id, pasted_block_id)
-            pasted_usage_key = LibraryUsageLocatorV2(
-                lib_key=library_key,
-                block_type="problem",
-                usage_id=pasted_block_id
-            )
+            paste_data = self._paste_clipboard_content_in_library(lib_id)
+            pasted_usage_key = LibraryUsageLocatorV2.from_string(paste_data["id"])
             self._get_library_block_asset(pasted_usage_key, "static/hello.txt")
 
             # Compare the two text files
@@ -1145,7 +1136,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 "last_draft_created": paste_data["last_draft_created"],
                 "created": paste_data["created"],
                 "modified": paste_data["modified"],
-                "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
+                "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_usage_key.block_id}",
             })
 
     @override_settings(LIBRARY_ENABLED_BLOCKS=['problem', 'video', 'html'])

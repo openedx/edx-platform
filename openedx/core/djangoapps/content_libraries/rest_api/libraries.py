@@ -110,7 +110,7 @@ from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
     LibraryXBlockMetadataSerializer,
     LibraryXBlockTypeSerializer,
     ContentLibraryAddPermissionByEmailSerializer,
-    LibraryPasteClipboardSerializer,
+    PublishableItemSerializer,
 )
 import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from openedx.core.lib.api.view_utils import view_auth_classes
@@ -485,12 +485,11 @@ class LibraryPasteClipboardView(GenericAPIView):
     """
     Paste content of clipboard into Library.
     """
-    serializer_class = LibraryXBlockMetadataSerializer
+    serializer_class = PublishableItemSerializer
 
     @convert_exceptions
     @swagger_auto_schema(
-        request_body=LibraryPasteClipboardSerializer,
-        responses={200: LibraryXBlockMetadataSerializer}
+        responses={200: PublishableItemSerializer}
     )
     def post(self, request, lib_key_str):
         """
@@ -498,17 +497,13 @@ class LibraryPasteClipboardView(GenericAPIView):
         """
         library_key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        serializer = LibraryPasteClipboardSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
         try:
-            result = api.import_staged_content_from_user_clipboard(
-                library_key, request.user, **serializer.validated_data
-            )
+            result = api.import_staged_content_from_user_clipboard(library_key, request.user)
         except api.IncompatibleTypesError as err:
             raise ValidationError(detail={'block_type': str(err)}) from err
 
-        return Response(LibraryXBlockMetadataSerializer(result).data)
+        return Response(PublishableItemSerializer(result).data)
 
 
 @method_decorator(non_atomic_requests, name="dispatch")

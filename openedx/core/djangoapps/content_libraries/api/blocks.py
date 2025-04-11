@@ -17,6 +17,7 @@ from django.core.validators import validate_unicode_slug
 from django.db import transaction
 from django.db.models import QuerySet
 from django.urls import reverse
+from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
@@ -382,7 +383,6 @@ def _import_staged_block(
     library_key: LibraryLocatorV2,
     source_context_key: LearningContextKey,
     user,
-    block_id: str,
     staged_content_id: int,
     staged_content_files: list[StagedContentFileData],
     now: datetime,
@@ -393,6 +393,16 @@ def _import_staged_block(
     Returns the newly created library block
     """
     from openedx.core.djangoapps.content_staging import api as content_staging_api
+
+    # Generate a block_id:
+    try:
+        olx_node = etree.fromstring(olx_str)
+        title = olx_node.attrib.get("display_name")
+        # Slugify the title and append some random numbers to make a unique slug
+        block_id = slugify(title, allow_unicode=True) + '-' + uuid4().hex[-6:]
+    except Exception:   # pylint: disable=broad-except
+        # Just generate a random title if we can't make a nice slug.
+        block_id = uuid4().hex[-12:]
 
     content_library, usage_key = validate_can_add_block_to_library(
         library_key,
@@ -500,7 +510,6 @@ def _import_staged_block_as_container(
     library_key: LibraryLocatorV2,
     source_context_key: LearningContextKey,
     user,
-    block_id: str,
     staged_content_id: int,
     staged_content_files: list[StagedContentFileData],
     now: datetime,
@@ -529,17 +538,12 @@ def _import_staged_block_as_container(
         container = create_container(
             library_key=library_key,
             container_type=ContainerType.Unit,
-            slug=block_id,  # TODO: we should preserve the slug from the clipboard, plus a random suffix, not
-                            # expect the frontend to generate the slug. Right now it just passes in a UUID4
+            slug=None,  # auto-generate slug from title
             title=title,
             user_id=user.id,
         )
         new_child_keys: list[UsageKeyV2] = []
         for child_node in olx_node:
-            if child_node.attrib.get('url_name'):
-                child_block_id = child_node.attrib['url_name'] + '-' + uuid4().hex[-4:]
-            else:
-                child_block_id = uuid4().hex[-12:]
             try:
                 child_metadata = _import_staged_block(
                     block_type=child_node.tag,
@@ -547,7 +551,6 @@ def _import_staged_block_as_container(
                     library_key=library_key,
                     source_context_key=source_context_key,
                     user=user,
-                    block_id=child_block_id,
                     staged_content_id=staged_content_id,
                     staged_content_files=staged_content_files,
                     now=now,
@@ -556,10 +559,10 @@ def _import_staged_block_as_container(
             except IncompatibleTypesError:
                 continue  # Skip blocks that won't work in libraries
         update_container_children(container.container_key, new_child_keys, user_id=user.id)
-        
+    return container
 
 
-def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user, block_id: str) -> PublishableItem:
+def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user) -> PublishableItem:
     """
     Create a new library item from the staged content from clipboard.
     Can create containers (e.g. units) or XBlocks.
@@ -592,7 +595,6 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
             library_key,
             source_context_key,
             user,
-            block_id,
             staged_content_id,
             staged_content_files,
             now,
@@ -604,7 +606,6 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
             library_key,
             source_context_key,
             user,
-            block_id,
             staged_content_id,
             staged_content_files,
             now,
