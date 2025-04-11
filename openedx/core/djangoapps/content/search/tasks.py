@@ -131,3 +131,16 @@ def update_library_container_index_doc(container_key_str: str) -> None:
     log.info("Updating content index documents for container %s in library%s", container_key, library_key)
 
     api.upsert_library_container_index_doc(container_key)
+
+
+@shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
+@set_code_owner_attribute
+def delete_library_container_index_doc(container_key_str: str) -> None:
+    """
+    Celery task to delete the content index document for a library block
+    """
+    container_key = LibraryContainerLocator.from_string(container_key_str)
+
+    log.info("Deleting content index document for library block with id: %s", container_key)
+
+    api.delete_index_doc(container_key)

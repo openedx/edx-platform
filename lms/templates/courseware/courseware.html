@@ -290,7 +290,6 @@ ${HTML(fragment.foot_html())}
     </section>
 
   </div>
-  ${HTML(course_sock_fragment.body_html())}
 </div>
 <div class="container-footer">
   % if settings.FEATURES.get("LICENSING", False):
@@ -317,36 +316,3 @@ ${HTML(fragment.foot_html())}
       % endif
     </nav>
 % endif
-
-<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
-
-  var fbeLink = $("#FBE_banner");
-  var welcomeLink = $("#welcome");
-  var accessDeniedUpsellLink = $("#accessDeniedUpsell");
-  var sockLink = $("#sock");
-
-  TrackECommerceEvents.trackUpsellClick(fbeLink, 'in_course_audit_access_expires', {
-      pageName: "in_course",
-      linkType: "link",
-      linkCategory: "FBE_banner"
-  });
-
-  TrackECommerceEvents.trackUpsellClick(welcomeLink, 'in_course_welcome', {
-      pageName: "in_course",
-      linkType: "link",
-      linkCategory: "welcome"
-  });
-
-  TrackECommerceEvents.trackUpsellClick(accessDeniedUpsellLink, 'in_course_upgrade', {
-    pageName: "in_course",
-    linkType: "link",
-    linkCategory: "(none)"
-  });
-
-  TrackECommerceEvents.trackUpsellClick(sockLink, 'in_course_sock', {
-      pageName: "in_course",
-      linkType: "button",
-      linkCategory: "green_upgrade"
-  });
-
-</%static:require_module_async>

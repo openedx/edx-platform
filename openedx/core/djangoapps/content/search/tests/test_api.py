@@ -237,7 +237,6 @@ class TestSearchApi(ModuleStoreTestCase):
             "modified": created_date.timestamp(),
             "access_id": lib_access.id,
             "breadcrumbs": [{"display_name": "Library"}],
-            # "tags" should be here but we haven't implemented them yet
             # "published" is not set since we haven't published it yet
         }
 
@@ -265,6 +264,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
         doc_unit = copy.deepcopy(self.unit_dict)
+        doc_unit["tags"] = {}
 
         api.rebuild_index()
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
@@ -295,6 +295,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
         doc_unit = copy.deepcopy(self.unit_dict)
+        doc_unit["tags"] = {}
 
         api.rebuild_index(incremental=True)
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 4
@@ -475,8 +476,7 @@ class TestSearchApi(ModuleStoreTestCase):
         """
         Test indexing an XBlock with tags.
         """
-
-        # Tag XBlock (these internally call `upsert_block_tags_index_docs`)
+        # Tag XBlock (these internally call `upsert_content_object_tags_index_doc`)
         tagging_api.tag_object(str(self.sequential.usage_key), self.taxonomyA, ["one", "two"])
         tagging_api.tag_object(str(self.sequential.usage_key), self.taxonomyB, ["three", "four"])
 
@@ -869,3 +869,54 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([
             doc_problem_without_collection,
         ])
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_delete_index_container(self, mock_meilisearch):
+        """
+        Test delete a container index.
+        """
+        library_api.delete_container(self.unit.container_key)
+
+        mock_meilisearch.return_value.index.return_value.delete_document.assert_called_once_with(
+            self.unit_dict["id"],
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_library_container_metadata(self, mock_meilisearch):
+        """
+        Test indexing a Library Container.
+        """
+        api.upsert_library_container_index_doc(self.unit.container_key)
+
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.unit_dict])
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_index_tags_in_containers(self, mock_meilisearch):
+        # Tag collection
+        tagging_api.tag_object(self.unit_key, self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(self.unit_key, self.taxonomyB, ["three", "four"])
+
+        # Build expected docs with tags at each stage
+        doc_unit_with_tags1 = {
+            "id": "lctorg1libunitunit-1-e4527f7c",
+            "tags": {
+                'taxonomy': ['A'],
+                'level0': ['A > one', 'A > two']
+            }
+        }
+        doc_unit_with_tags2 = {
+            "id": "lctorg1libunitunit-1-e4527f7c",
+            "tags": {
+                'taxonomy': ['A', 'B'],
+                'level0': ['A > one', 'A > two', 'B > four', 'B > three']
+            }
+        }
+
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_unit_with_tags1]),
+                call([doc_unit_with_tags2]),
+            ],
+            any_order=True,
+        )
