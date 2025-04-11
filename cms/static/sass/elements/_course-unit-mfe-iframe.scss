@@ -1,0 +1,96 @@
+%button-styles {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+%input-styles {
+  font-size: $base-font-size;
+  color: $text-color !important;
+  background-color: $white;
+  border: 1px solid $border-color !important;
+  border-radius: $input-border-radius !important;
+  padding: 10px 16px !important;
+  background-image: none;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+%modal-actions-button {
+  font-size: $base-font-size;
+  line-height: 20px;
+  padding: 10px 16px;
+  border-radius: $btn-border-radius;
+}
+
+%primary-button {
+  @extend %modal-actions-button;
+
+  background-color: $primary;
+  color: $white;
+  border: 1px solid $primary;
+  cursor: pointer;
+  background-image: none;
+  display: block;
+  box-shadow: none;
+  text-shadow: none;
+
+  &:hover {
+    background: darken($primary, 5%);
+    border-color: #2d494e;
+    box-shadow: none;
+    color: $white;
+  }
+
+  &:focus {
+    background: $primary;
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+%button-primary-outline {
+    @extend %modal-actions-button;
+
+    color: $primary;
+    border-color: $primary;
+    text-shadow: none;
+    font-weight: 400;
+    position: relative;
+
+    &:focus {
+        color: $primary;
+        background: transparent;
+
+        &:before {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border: 2px solid $primary;
+            border-radius: 10px;
+        }
+    }
+
+    &:hover {
+        color: darken($primary, 10%);
+        background-color: lighten($primary, 80%);
+        border-color: darken($primary, 15%);
+    }
+}
+
+%light-button {
+  @extend %modal-actions-button;
+
+  color: $black;
+  background-color: $light-background-color;
+  border-color: $light-background-color;
+  box-shadow: none;
+  border: 1px solid $transparent;
+  font-weight: 500;
+}
+
+%icon-position {
+  top: 11px;
+  left: 11px;
+  width: 20px;
+  height: 20px;
+}

@@ -36,7 +36,7 @@ class VisibilityTransformerTestCase(BlockParentsMapTestCase):
     ):
         for idx, _ in enumerate(self.parents_map):
             block = self.get_block(idx)
-            block.visible_to_staff_only = (idx in staff_only_blocks)
+            block.visible_to_staff_only = idx in staff_only_blocks
             update_block(block)
 
         self.assert_transform_results(

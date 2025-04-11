@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import logging
 import time
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 from typing import Callable, Generator
@@ -17,14 +17,21 @@ from django.core.paginator import Paginator
 from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchApiError, MeilisearchError
 from meilisearch.models.task import TaskInfo
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
+from opaque_keys.edx.keys import UsageKey, OpaqueKey
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryCollectionLocator
 from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
 from common.djangoapps.student.role_helpers import get_course_roles
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.search.models import get_access_ids_for_request
+from openedx.core.djangoapps.content.search.models import get_access_ids_for_request, IncrementalIndexCompleted
+from openedx.core.djangoapps.content.search.index_config import (
+    INDEX_DISTINCT_ATTRIBUTE,
+    INDEX_FILTERABLE_ATTRIBUTES,
+    INDEX_SEARCHABLE_ATTRIBUTES,
+    INDEX_SORTABLE_ATTRIBUTES,
+    INDEX_RANKING_RULES,
+)
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 
@@ -33,8 +40,9 @@ from .documents import (
     meili_id_from_opaque_key,
     searchable_doc_for_course_block,
     searchable_doc_for_collection,
+    searchable_doc_for_container,
     searchable_doc_for_library_block,
-    searchable_doc_for_usage_key,
+    searchable_doc_for_key,
     searchable_doc_collections,
     searchable_doc_tags,
     searchable_doc_tags_for_collection,
@@ -217,6 +225,42 @@ def _using_temp_index(status_cb: Callable[[str], None] | None = None) -> Generat
         _wait_for_meili_task(client.delete_index(temp_index_name))
 
 
+def _index_is_empty(index_name: str) -> bool:
+    """
+    Check if an index is empty
+
+    Args:
+        index_name (str): The name of the index to check
+    """
+    client = _get_meilisearch_client()
+    index = client.get_index(index_name)
+    return index.get_stats().number_of_documents == 0
+
+
+def _configure_index(index_name):
+    """
+    Configure the index. The following index settings are best changed on an empty index.
+    Changing them on a populated index will "re-index all documents in the index", which can take some time.
+
+    Args:
+        index_name (str): The name of the index to configure
+    """
+    client = _get_meilisearch_client()
+
+    # Mark usage_key as unique (it's not the primary key for the index, but nevertheless must be unique):
+    client.index(index_name).update_distinct_attribute(INDEX_DISTINCT_ATTRIBUTE)
+    # Mark which attributes can be used for filtering/faceted search:
+    client.index(index_name).update_filterable_attributes(INDEX_FILTERABLE_ATTRIBUTES)
+    # Mark which attributes are used for keyword search, in order of importance:
+    client.index(index_name).update_searchable_attributes(INDEX_SEARCHABLE_ATTRIBUTES)
+    # Mark which attributes can be used for sorting search results:
+    client.index(index_name).update_sortable_attributes(INDEX_SORTABLE_ATTRIBUTES)
+
+    # Update the search ranking rules to let the (optional) "sort" parameter take precedence over keyword relevance.
+    # cf https://www.meilisearch.com/docs/learn/core_concepts/relevancy
+    client.index(index_name).update_ranking_rules(INDEX_RANKING_RULES)
+
+
 def _recurse_children(block, fn, status_cb: Callable[[str], None] | None = None) -> None:
     """
     Recurse the children of an XBlock and call the given function for each
@@ -279,8 +323,75 @@ def is_meilisearch_enabled() -> bool:
     return False
 
 
-# pylint: disable=too-many-statements
-def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
+def reset_index(status_cb: Callable[[str], None] | None = None) -> None:
+    """
+    Reset the Meilisearch index, deleting all documents and reconfiguring it
+    """
+    if status_cb is None:
+        status_cb = log.info
+
+    status_cb("Creating new empty index...")
+    with _using_temp_index(status_cb) as temp_index_name:
+        _configure_index(temp_index_name)
+        status_cb("Index recreated!")
+    status_cb("Index reset complete.")
+
+
+def _is_index_configured(index_name: str) -> bool:
+    """
+    Check if an index is completely configured
+
+    Args:
+        index_name (str): The name of the index to check
+    """
+    client = _get_meilisearch_client()
+    index = client.get_index(index_name)
+    index_settings = index.get_settings()
+    for k, v in (
+        ("distinctAttribute", INDEX_DISTINCT_ATTRIBUTE),
+        ("filterableAttributes", INDEX_FILTERABLE_ATTRIBUTES),
+        ("searchableAttributes", INDEX_SEARCHABLE_ATTRIBUTES),
+        ("sortableAttributes", INDEX_SORTABLE_ATTRIBUTES),
+        ("rankingRules", INDEX_RANKING_RULES),
+    ):
+        setting = index_settings.get(k, [])
+        if isinstance(v, list):
+            v = set(v)
+            setting = set(setting)
+        if setting != v:
+            return False
+    return True
+
+
+def init_index(status_cb: Callable[[str], None] | None = None, warn_cb: Callable[[str], None] | None = None) -> None:
+    """
+    Initialize the Meilisearch index, creating it and configuring it if it doesn't exist
+    """
+    if status_cb is None:
+        status_cb = log.info
+    if warn_cb is None:
+        warn_cb = log.warning
+
+    if _index_exists(STUDIO_INDEX_NAME):
+        if _index_is_empty(STUDIO_INDEX_NAME):
+            warn_cb(
+                "The studio search index is empty. Please run ./manage.py cms reindex_studio"
+                " --experimental [--incremental]"
+            )
+            return
+        if not _is_index_configured(STUDIO_INDEX_NAME):
+            warn_cb(
+                "A rebuild of the index is required. Please run ./manage.py cms reindex_studio"
+                " --experimental [--incremental]"
+            )
+            return
+        status_cb("Index already exists and is configured.")
+        return
+
+    reset_index(status_cb)
+
+
+def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=False) -> None:  # lint-amnesty, pylint: disable=too-many-statements
     """
     Rebuild the Meilisearch index from scratch
     """
@@ -292,7 +403,14 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
 
     # Get the lists of libraries
     status_cb("Counting libraries...")
-    lib_keys = [lib.library_key for lib in lib_api.ContentLibrary.objects.select_related('org').only('org', 'slug')]
+    keys_indexed = []
+    if incremental:
+        keys_indexed = list(IncrementalIndexCompleted.objects.values_list("context_key", flat=True))
+    lib_keys = [
+        lib.library_key
+        for lib in lib_api.ContentLibrary.objects.select_related("org").only("org", "slug").order_by("-id")
+        if lib.library_key not in keys_indexed
+    ]
     num_libraries = len(lib_keys)
 
     # Get the list of courses
@@ -300,85 +418,25 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
     num_courses = CourseOverview.objects.count()
 
     # Some counters so we can track our progress as indexing progresses:
-    num_contexts = num_courses + num_libraries
-    num_contexts_done = 0  # How many courses/libraries we've indexed
+    num_libs_skipped = len(keys_indexed)
+    num_contexts = num_courses + num_libraries + num_libs_skipped
+    num_contexts_done = 0 + num_libs_skipped  # How many courses/libraries we've indexed
     num_blocks_done = 0  # How many individual components/XBlocks we've indexed
 
     status_cb(f"Found {num_courses} courses, {num_libraries} libraries.")
-    with _using_temp_index(status_cb) as temp_index_name:
+    with _using_temp_index(status_cb) if not incremental else nullcontext(STUDIO_INDEX_NAME) as index_name:
         ############## Configure the index ##############
 
-        # The following index settings are best changed on an empty index.
-        # Changing them on a populated index will "re-index all documents in the index, which can take some time"
+        # The index settings are best changed on an empty index.
+        # Changing them on a populated index will "re-index all documents in the index", which can take some time
         # and use more RAM. Instead, we configure an empty index then populate it one course/library at a time.
-
-        # Mark usage_key as unique (it's not the primary key for the index, but nevertheless must be unique):
-        client.index(temp_index_name).update_distinct_attribute(Fields.usage_key)
-        # Mark which attributes can be used for filtering/faceted search:
-        client.index(temp_index_name).update_filterable_attributes([
-            # Get specific block/collection using combination of block_id and context_key
-            Fields.block_id,
-            Fields.block_type,
-            Fields.context_key,
-            Fields.org,
-            Fields.tags,
-            Fields.tags + "." + Fields.tags_taxonomy,
-            Fields.tags + "." + Fields.tags_level0,
-            Fields.tags + "." + Fields.tags_level1,
-            Fields.tags + "." + Fields.tags_level2,
-            Fields.tags + "." + Fields.tags_level3,
-            Fields.collections,
-            Fields.collections + "." + Fields.collections_display_name,
-            Fields.collections + "." + Fields.collections_key,
-            Fields.type,
-            Fields.access_id,
-            Fields.last_published,
-            Fields.content + "." + Fields.problem_types,
-        ])
-        # Mark which attributes are used for keyword search, in order of importance:
-        client.index(temp_index_name).update_searchable_attributes([
-            # Keyword search does _not_ search the course name, course ID, breadcrumbs, block type, or other fields.
-            Fields.display_name,
-            Fields.block_id,
-            Fields.content,
-            Fields.description,
-            Fields.tags,
-            Fields.collections,
-            # If we don't list the following sub-fields _explicitly_, they're only sometimes searchable - that is, they
-            # are searchable only if at least one document in the index has a value. If we didn't list them here and,
-            # say, there were no tags.level3 tags in the index, the client would get an error if trying to search for
-            # these sub-fields: "Attribute `tags.level3` is not searchable."
-            Fields.tags + "." + Fields.tags_taxonomy,
-            Fields.tags + "." + Fields.tags_level0,
-            Fields.tags + "." + Fields.tags_level1,
-            Fields.tags + "." + Fields.tags_level2,
-            Fields.tags + "." + Fields.tags_level3,
-            Fields.collections + "." + Fields.collections_display_name,
-            Fields.collections + "." + Fields.collections_key,
-        ])
-        # Mark which attributes can be used for sorting search results:
-        client.index(temp_index_name).update_sortable_attributes([
-            Fields.display_name,
-            Fields.created,
-            Fields.modified,
-            Fields.last_published,
-        ])
-
-        # Update the search ranking rules to let the (optional) "sort" parameter take precedence over keyword relevance.
-        # cf https://www.meilisearch.com/docs/learn/core_concepts/relevancy
-        client.index(temp_index_name).update_ranking_rules([
-            "sort",
-            "words",
-            "typo",
-            "proximity",
-            "attribute",
-            "exactness",
-        ])
+        if not incremental:
+            _configure_index(index_name)
 
         ############## Libraries ##############
         status_cb("Indexing libraries...")
 
-        def index_library(lib_key: str) -> list:
+        def index_library(lib_key: LibraryLocatorV2) -> list:
             docs = []
             for component in lib_api.get_library_components(lib_key):
                 try:
@@ -393,7 +451,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             if docs:
                 try:
                     # Add all the docs in this library at once (usually faster than adding one at a time):
-                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                    _wait_for_meili_task(client.index(index_name).add_documents(docs))
                 except (TypeError, KeyError, MeilisearchError) as err:
                     status_cb(f"Error indexing library {lib_key}: {err}")
             return docs
@@ -413,9 +471,33 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
             if docs:
                 try:
                     # Add docs in batch of 100 at once (usually faster than adding one at a time):
-                    _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                    _wait_for_meili_task(client.index(index_name).add_documents(docs))
                 except (TypeError, KeyError, MeilisearchError) as err:
                     status_cb(f"Error indexing collection batch {p}: {err}")
+            return num_done
+
+        ############## Containers ##############
+        def index_container_batch(batch, num_done, library_key) -> int:
+            docs = []
+            for container in batch:
+                try:
+                    container_key = lib_api.library_container_locator(
+                        library_key,
+                        container,
+                    )
+                    doc = searchable_doc_for_container(container_key)
+                    doc.update(searchable_doc_tags(container_key))
+                    docs.append(doc)
+                except Exception as err:  # pylint: disable=broad-except
+                    status_cb(f"Error indexing container {container.key}: {err}")
+                num_done += 1
+
+            if docs:
+                try:
+                    # Add docs in batch of 100 at once (usually faster than adding one at a time):
+                    _wait_for_meili_task(client.index(index_name).add_documents(docs))
+                except (TypeError, KeyError, MeilisearchError) as err:
+                    status_cb(f"Error indexing container batch {p}: {err}")
             return num_done
 
         for lib_key in lib_keys:
@@ -425,10 +507,10 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
 
             # To reduce memory usage on large instances, split up the Collections into pages of 100 collections:
             library = lib_api.get_library(lib_key)
-            collections = authoring_api.get_collections(library.learning_package.id, enabled=True)
+            collections = authoring_api.get_collections(library.learning_package_id, enabled=True)
             num_collections = collections.count()
             num_collections_done = 0
-            status_cb(f"{num_collections_done + 1}/{num_collections}. Now indexing collections in library {lib_key}")
+            status_cb(f"{num_collections_done}/{num_collections}. Now indexing collections in library {lib_key}")
             paginator = Paginator(collections, 100)
             for p in paginator.page_range:
                 num_collections_done = index_collection_batch(
@@ -436,7 +518,25 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                     num_collections_done,
                     lib_key,
                 )
+            if incremental:
+                IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
             status_cb(f"{num_collections_done}/{num_collections} collections indexed for library {lib_key}")
+
+            # Similarly, batch process Containers (units, sections, etc) in pages of 100
+            containers = authoring_api.get_containers(library.learning_package_id)
+            num_containers = containers.count()
+            num_containers_done = 0
+            status_cb(f"{num_containers_done}/{num_containers}. Now indexing containers in library {lib_key}")
+            paginator = Paginator(containers, 100)
+            for p in paginator.page_range:
+                num_containers_done = index_container_batch(
+                    paginator.page(p).object_list,
+                    num_containers_done,
+                    lib_key,
+                )
+                status_cb(f"{num_containers_done}/{num_containers} containers indexed for library {lib_key}")
+            if incremental:
+                IncrementalIndexCompleted.objects.get_or_create(context_key=lib_key)
 
             num_contexts_done += 1
 
@@ -461,7 +561,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
 
             if docs:
                 # Add all the docs in this course at once (usually faster than adding one at a time):
-                _wait_for_meili_task(client.index(temp_index_name).add_documents(docs))
+                _wait_for_meili_task(client.index(index_name).add_documents(docs))
             return docs
 
         paginator = Paginator(CourseOverview.objects.only('id', 'display_name'), 1000)
@@ -470,10 +570,16 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None) -> None:
                 status_cb(
                     f"{num_contexts_done + 1}/{num_contexts}. Now indexing course {course.display_name} ({course.id})"
                 )
+                if course.id in keys_indexed:
+                    num_contexts_done += 1
+                    continue
                 course_docs = index_course(course)
+                if incremental:
+                    IncrementalIndexCompleted.objects.get_or_create(context_key=course.id)
                 num_contexts_done += 1
                 num_blocks_done += len(course_docs)
 
+    IncrementalIndexCompleted.objects.all().delete()
     status_cb(f"Done! {num_blocks_done} blocks indexed across {num_contexts_done} courses, collections and libraries.")
 
 
@@ -506,14 +612,14 @@ def upsert_xblock_index_doc(usage_key: UsageKey, recursive: bool = True) -> None
     _update_index_docs(docs)
 
 
-def delete_index_doc(usage_key: UsageKey) -> None:
+def delete_index_doc(key: OpaqueKey) -> None:
     """
     Deletes the document for the given XBlock from the search index
 
     Args:
-        usage_key (UsageKey): The usage key of the XBlock to be removed from the index
+        key (OpaqueKey): The opaque key of the XBlock/Container to be removed from the index
     """
-    doc = searchable_doc_for_usage_key(usage_key)
+    doc = searchable_doc_for_key(key)
     _delete_index_doc(doc[Fields.id])
 
 
@@ -646,7 +752,7 @@ def update_library_components_collections(
     Because there may be a lot of components, we send these updates to Meilisearch in batches.
     """
     library = lib_api.get_library(library_key)
-    components = authoring_api.get_collection_components(library.learning_package.id, collection_key)
+    components = authoring_api.get_collection_components(library.learning_package_id, collection_key)
 
     paginator = Paginator(components, batch_size)
     for page in paginator.page_range:
@@ -667,6 +773,30 @@ def update_library_components_collections(
         _update_index_docs(docs)
 
 
+def upsert_library_container_index_doc(container_key: LibraryContainerLocator) -> None:
+    """
+    Creates, updates, or deletes the document for the given Library Container in the search index.
+
+    TODO: add support for indexing a container's components, like upsert_library_collection_index_doc does.
+    """
+    doc = searchable_doc_for_container(container_key)
+
+    # Soft-deleted/disabled containers are removed from the index
+    # and their components updated.
+    if doc.get('_disabled'):
+
+        _delete_index_doc(doc[Fields.id])
+
+    # Hard-deleted containers are also deleted from the index
+    elif not doc.get(Fields.type):
+
+        _delete_index_doc(doc[Fields.id])
+
+    # Otherwise, upsert the container.
+    else:
+        _update_index_docs([doc])
+
+
 def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     """
     Creates or updates the documents for the given Content Library in the search index
@@ -680,12 +810,12 @@ def upsert_content_library_index_docs(library_key: LibraryLocatorV2) -> None:
     _update_index_docs(docs)
 
 
-def upsert_block_tags_index_docs(usage_key: UsageKey):
+def upsert_content_object_tags_index_doc(key: OpaqueKey):
     """
-    Updates the tags data in documents for the given Course/Library block
+    Updates the tags data in document for the given Course/Library item
     """
-    doc = {Fields.id: meili_id_from_opaque_key(usage_key)}
-    doc.update(searchable_doc_tags(usage_key))
+    doc = {Fields.id: meili_id_from_opaque_key(key)}
+    doc.update(searchable_doc_tags(key))
     _update_index_docs([doc])
 
 

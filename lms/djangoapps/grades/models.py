@@ -467,12 +467,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
             defaults=params,
         )
 
-        # TODO: Remove as part of EDUCATOR-4602.
-        if str(usage_key.course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
-            log.info('Created/updated grade ***{}*** for user ***{}*** in course ***{}***'
-                     'for subsection ***{}*** with default params ***{}***'
-                     .format(grade, user_id, usage_key.course_key, usage_key, params))
-
         grade.override = PersistentSubsectionGradeOverride.get_override(user_id, usage_key)
         if first_attempted is not None and grade.first_attempted is None:
             grade.first_attempted = first_attempted
@@ -722,6 +716,7 @@ class PersistentCourseGrade(TimeStampedModel):
         When called emits an event when a persistent grade is created or updated.
         """
         # .. event_implemented_name: PERSISTENT_GRADE_SUMMARY_CHANGED
+        # .. event_type: org.openedx.learning.course.persistent_grade_summary.changed.v1
         PERSISTENT_GRADE_SUMMARY_CHANGED.send_event(
             grade=PersistentCourseGradeData(
                 user_id=user_id,
@@ -822,11 +817,6 @@ class PersistentSubsectionGradeOverride(models.Model):
         grade_defaults['override_reason'] = override_data['comment'] if 'comment' in override_data else None
         grade_defaults['system'] = override_data['system'] if 'system' in override_data else None
 
-        # TODO: Remove as part of EDUCATOR-4602.
-        if str(subsection_grade_model.course_id) == 'course-v1:UQx+BUSLEAD5x+2T2019':
-            log.info('Creating override for user ***{}*** for PersistentSubsectionGrade'
-                     '***{}*** with override data ***{}*** and derived grade_defaults ***{}***.'
-                     .format(requesting_user, subsection_grade_model, override_data, grade_defaults))
         try:
             override = PersistentSubsectionGradeOverride.objects.get(grade=subsection_grade_model)
             for key, value in grade_defaults.items():
