@@ -13,7 +13,7 @@ from unittest.mock import Mock, NonCallableMock, patch
 import dateutil
 import ddt
 import pytest
-import pytz
+from zoneinfo import ZoneInfo
 from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -28,7 +28,6 @@ from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
-from pytz import UTC
 from testfixtures import LogCapture
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
@@ -372,14 +371,14 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             category='chapter',
             display_name="Chapter",
             publish_item=True,
-            start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
+            start=datetime.datetime(2018, 3, 10, tzinfo=ZoneInfo("UTC")),
         )
         cls.sequential = BlockFactory.create(
             parent=cls.chapter,
             category='sequential',
             display_name="Lesson",
             publish_item=True,
-            start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
+            start=datetime.datetime(2018, 3, 10, tzinfo=ZoneInfo("UTC")),
             metadata={'graded': True, 'format': 'Homework'},
         )
         cls.vertical = BlockFactory.create(
@@ -387,7 +386,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             category='vertical',
             display_name='Subsection',
             publish_item=True,
-            start=datetime.datetime(2018, 3, 10, tzinfo=UTC),
+            start=datetime.datetime(2018, 3, 10, tzinfo=ZoneInfo("UTC")),
         )
         cls.problem = BlockFactory.create(
             category="problem",
@@ -3631,7 +3630,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
         """
         schedule = "2099-05-02T14:00:00.000Z"
         self.full_test_message['schedule'] = schedule
-        expected_schedule = dateutil.parser.parse(schedule).replace(tzinfo=pytz.utc)
+        expected_schedule = dateutil.parser.parse(schedule).replace(tzinfo=ZoneInfo("UTC"))
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, self.full_test_message)
@@ -4088,7 +4087,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.course = CourseFactory.create()
-        cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
+        cls.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC"))
 
         with cls.store.bulk_operations(cls.course.id, emit_signals=False):
             cls.week1 = BlockFactory.create(due=cls.due)
@@ -4167,7 +4166,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
-        due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
+        due_date = datetime.datetime(2013, 12, 30, tzinfo=ZoneInfo("UTC"))
         response = self.client.post(url, {
             'student': self.user1.username,
             'url': str(self.week1.location),
@@ -4180,7 +4179,7 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_change_due_date_with_reason(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
-        due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
+        due_date = datetime.datetime(2013, 12, 30, tzinfo=ZoneInfo("UTC"))
         response = self.client.post(url, {
             'student': self.user1.username,
             'url': str(self.week1.location),
@@ -4238,12 +4237,12 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_reset_date_only_in_edx_when(self):
         # Start with a unit that only has a date in edx-when
         assert get_date_for_block(self.course, self.week3, self.user1) is None
-        original_due = datetime.datetime(2010, 4, 1, tzinfo=UTC)
+        original_due = datetime.datetime(2010, 4, 1, tzinfo=ZoneInfo("UTC"))
         set_date_for_block(self.course.id, self.week3.location, 'due', original_due)
         assert get_date_for_block(self.course, self.week3, self.user1) == original_due
 
         # set override, confirm it took
-        override = datetime.datetime(2010, 7, 1, tzinfo=UTC)
+        override = datetime.datetime(2010, 7, 1, tzinfo=ZoneInfo("UTC"))
         set_date_for_block(self.course.id, self.week3.location, 'due', override, user=self.user1)
         assert get_date_for_block(self.course, self.week3, self.user1) == override
 
@@ -4295,7 +4294,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
         super().setUp()
 
         self.course = CourseFactory.create()
-        self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
+        self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC"))
 
         with self.store.bulk_operations(self.course.id, emit_signals=False):
             self.week1 = BlockFactory.create(due=self.due)
@@ -4380,7 +4379,7 @@ class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestC
             'due_datetime': '12/30/2013 00:00'
         })
         assert response.status_code == 200, response.content
-        assert datetime.datetime(2013, 12, 30, 0, 0, tzinfo=UTC) ==\
+        assert datetime.datetime(2013, 12, 30, 0, 0, tzinfo=ZoneInfo("UTC")) ==\
                get_extended_due(self.course, self.week1, self.user1)
 
         self.week1.due = None

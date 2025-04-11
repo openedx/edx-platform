@@ -10,7 +10,7 @@ from urllib.parse import quote
 from uuid import UUID
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from dateutil import parser
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -862,7 +862,7 @@ class TestListTeamsAPI(EventTestMixin, TeamAPITestCase):
             dispatch_uid='teams.signals.course_team_post_save_callback'
         ):
             solar_team = self.test_team_name_id_map['Sólar team']
-            solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=pytz.utc)
+            solar_team.last_activity_at = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
             solar_team.save()
 
         data = {'order_by': field} if field else {}
@@ -1292,7 +1292,7 @@ class TestCreateTeamAPI(EventTestMixin, TeamAPITestCase):
         del team['membership']
 
         # verify that it's been set to a time today.
-        assert parser.parse(team['last_activity_at']).date() == datetime.utcnow().replace(tzinfo=pytz.utc).date()
+        assert parser.parse(team['last_activity_at']).date() == datetime.utcnow().replace(tzinfo=ZoneInfo("UTC")).date()
         del team['last_activity_at']
 
         # Verify that the creating user gets added to the team.
