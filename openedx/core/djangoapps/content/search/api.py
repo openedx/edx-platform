@@ -18,7 +18,11 @@ from meilisearch import Client as MeilisearchClient
 from meilisearch.errors import MeilisearchApiError, MeilisearchError
 from meilisearch.models.task import TaskInfo
 from opaque_keys.edx.keys import UsageKey, OpaqueKey
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryCollectionLocator
+from opaque_keys.edx.locator import (
+    LibraryCollectionLocator,
+    LibraryContainerLocator,
+    LibraryLocatorV2,
+)
 from openedx_learning.api import authoring as authoring_api
 from common.djangoapps.student.roles import GlobalStaff
 from rest_framework.request import Request
@@ -461,8 +465,9 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
             docs = []
             for collection in batch:
                 try:
-                    doc = searchable_doc_for_collection(library_key, collection.key, collection=collection)
-                    doc.update(searchable_doc_tags_for_collection(library_key, collection.key))
+                    collection_key = lib_api.library_collection_locator(library_key, collection.key)
+                    doc = searchable_doc_for_collection(collection_key, collection=collection)
+                    doc.update(searchable_doc_tags_for_collection(collection_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing collection {collection}: {err}")
@@ -702,13 +707,13 @@ def _get_document_from_index(document_id: str) -> dict:
     return document
 
 
-def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collection_key: str) -> None:
+def upsert_library_collection_index_doc(collection_key: LibraryCollectionLocator) -> None:
     """
     Creates, updates, or deletes the document for the given Library Collection in the search index.
 
     If the Collection is not found or disabled (i.e. soft-deleted), then delete it from the search index.
     """
-    doc = searchable_doc_for_collection(library_key, collection_key)
+    doc = searchable_doc_for_collection(collection_key)
     update_components = False
 
     # Soft-deleted/disabled collections are removed from the index
@@ -738,12 +743,11 @@ def upsert_library_collection_index_doc(library_key: LibraryLocatorV2, collectio
     if update_components:
         from .tasks import update_library_components_collections as update_task
 
-        update_task.delay(str(library_key), collection_key)
+        update_task.delay(str(collection_key))
 
 
 def update_library_components_collections(
-    library_key: LibraryLocatorV2,
-    collection_key: str,
+    collection_key: LibraryCollectionLocator,
     batch_size: int = 1000,
 ) -> None:
     """
@@ -751,8 +755,12 @@ def update_library_components_collections(
 
     Because there may be a lot of components, we send these updates to Meilisearch in batches.
     """
+    library_key = collection_key.library_key
     library = lib_api.get_library(library_key)
-    components = authoring_api.get_collection_components(library.learning_package_id, collection_key)
+    components = authoring_api.get_collection_components(
+        library.learning_package_id,
+        collection_key.collection_id,
+    )
 
     paginator = Paginator(components, batch_size)
     for page in paginator.page_range:
@@ -828,12 +836,12 @@ def upsert_block_collections_index_docs(usage_key: UsageKey):
     _update_index_docs([doc])
 
 
-def upsert_collection_tags_index_docs(collection_usage_key: LibraryCollectionLocator):
+def upsert_collection_tags_index_docs(collection_key: LibraryCollectionLocator):
     """
     Updates the tags data in documents for the given library collection
     """
 
-    doc = searchable_doc_tags_for_collection(collection_usage_key.library_key, collection_usage_key.collection_id)
+    doc = searchable_doc_tags_for_collection(collection_key)
     _update_index_docs([doc])
 
 
