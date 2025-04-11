@@ -12,11 +12,11 @@ Open edX Platform
 
 Purpose
 *******
-The `Open edX Platform <https://openedx.org>`_ is a service-oriented platform for authoring and
-delivering online learning at any scale.  The platform is written in
+The `Open edX Platform <https://openedx.org>`_ enables the authoring and
+delivery of online learning at any scale.  The platform is written in
 Python and JavaScript and makes extensive use of the Django
 framework. At the highest level, the platform is composed of a
-monolith, some independently deployable applications (IDAs), and
+modular monolith, some independently deployable applications (IDAs), and
 micro-frontends (MFEs) based on the ReactJS.
 
 This repository hosts the monolith at the center of the Open edX
@@ -70,6 +70,11 @@ complexity of Open edX configuration and deployment into their own hands.
 System Dependencies
 -------------------
 
+OS:
+* Ubuntu 22.04
+
+* Ubuntu 24.04
+
 Interperters/Tools:
 
 * Python 3.11
@@ -99,6 +104,17 @@ Language Packages:
 
   - ``pip install -r requirements/edx/base.txt`` (production)
   - ``pip install -r requirements/edx/dev.txt`` (development)
+
+  Some Python packages have system dependencies. For example, installing these packages on Debian or Ubuntu will require first running ``sudo apt install python3-dev default-libmysqlclient-dev build-essential pkg-config`` to satisfy the requirements of the ``mysqlclient`` Python package.
+
+Codejail Setup
+--------------
+
+As a part of the baremetal setup, you will need to configure your system to
+work properly with codejail.  See the `codejail installation steps`_ for more
+details.
+
+.. _codejail installation steps: https://github.com/openedx/codejail?tab=readme-ov-file#installation
 
 Build Steps
 -----------

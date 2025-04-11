@@ -367,7 +367,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert Error Message
         assert res_json['message'] ==\
-               'Please select one or more certificate statuses that require certificate regeneration.'
+               'Please select certificate statuses from the list only.'
 
         # Access the url passing 'certificate_statuses' that are not present in db
         url = reverse('start_certificate_regeneration', kwargs={'course_id': str(self.course.id)})
@@ -378,7 +378,8 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
-        assert res_json['message'] == 'Please select certificate statuses from the list only.'
+        assert (res_json['message'] ==
+                'Please select certificate statuses from the list only.')
 
 
 @override_settings(CERT_QUEUE='certificates')
@@ -488,9 +489,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         assert not res_json['success']
 
         # Assert Error Message
-        assert res_json['message'] ==\
-               'Student username/email field is required and can not be empty.' \
-               ' Kindly fill in username/email and then press "Add to Exception List" button.'
+        assert res_json['message'] == {'user': ['This field may not be blank.']}
 
     def test_certificate_exception_duplicate_user_error(self):
         """
@@ -596,6 +595,34 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
             self.url,
             data=json.dumps(self.certificate_exception_in_db),
             content_type='application/json',
+            REQUEST_METHOD='DELETE'
+        )
+        # Assert successful request processing
+        assert response.status_code == 204
+
+        # Verify that certificate exception does not exist
+        assert not certs_api.is_on_allowlist(self.user2, self.course.id)
+
+    def test_certificate_exception_removed_successfully_form_url(self):
+        """
+        In case of deletion front-end is sending content-type x-www-form-urlencoded.
+        Just to handle that some logic added in api and this test is for that part.
+        Test certificates exception removal api endpoint returns success status
+        when called with valid course key and certificate exception id
+        """
+        GeneratedCertificateFactory.create(
+            user=self.user2,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            grade='1.0'
+        )
+        # Verify that certificate exception exists
+        assert certs_api.is_on_allowlist(self.user2, self.course.id)
+
+        response = self.client.post(
+            self.url,
+            data=json.dumps(self.certificate_exception_in_db),
+            content_type='application/x-www-form-urlencoded',
             REQUEST_METHOD='DELETE'
         )
         # Assert successful request processing
@@ -1085,9 +1112,7 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         res_json = json.loads(response.content.decode('utf-8'))
 
         # Assert Error Message
-        assert res_json['message'] == \
-               'Student username/email field is required and can not be empty.' \
-               ' Kindly fill in username/email and then press "Invalidate Certificate" button.'
+        assert res_json['message'] == {'user': ['This field may not be blank.']}
 
     def test_invalid_user_name_error(self):
         """
@@ -1106,7 +1131,6 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         # Assert 400 status code in response
         assert response.status_code == 400
         res_json = json.loads(response.content.decode('utf-8'))
-
         # Assert Error Message
         assert res_json['message'] == f'{invalid_user} does not exist in the LMS. Please check your spelling and retry.'
 
@@ -1125,7 +1149,6 @@ class CertificateInvalidationViewTests(SharedModuleStoreTestCase):
         # Assert 400 status code in response
         assert response.status_code == 400
         res_json = json.loads(response.content.decode('utf-8'))
-
         # Assert Error Message
         assert res_json['message'] == f'The student {self.enrolled_user_2.username} does not have certificate for the course {self.course.number}. Kindly verify student username/email and the selected course are correct and try again.'  # pylint: disable=line-too-long
 

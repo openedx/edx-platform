@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node-version: [18, 20]
+        node-version: [20]
         python-version:
           - "3.11"
 
@@ -26,9 +26,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
       - name: Setup npm
-        run: npm i -g npm@10.5.x
+        run: npm i -g npm@10.7.x
 
       - name: Install Firefox 123.0
         run: |
@@ -63,14 +64,12 @@ jobs:
         run: |
           make base-requirements
 
-      - uses: c-hive/gha-npm-cache@v1
+      - name: Install npm
+        run: npm ci  
+
       - name: Run JS Tests
-        env:
-          TEST_SUITE: js-unit
-          SCRIPT_TO_RUN: ./scripts/generic-ci-tests.sh
         run: |
-          npm install -g jest
-          xvfb-run --auto-servernum ./scripts/all-tests.sh
+          npm run test
 
       - name: Save Job Artifacts
         uses: actions/upload-artifact@v4

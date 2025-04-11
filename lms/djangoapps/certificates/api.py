@@ -82,6 +82,7 @@ def _format_certificate_for_user(username, cert):
                 if cert.status == CertificateStatuses.downloadable
                 else None
             ),
+            "uuid": cert.verify_uuid,
         }
 
     return None
@@ -857,7 +858,14 @@ def available_date_for_certificate(course, certificate) -> datetime:
 
 def display_date_for_certificate(course, certificate):
     """
-    Returns the display date that a certificate should display.
+    Returns the date that should be displayed on a certificate when rendered.
+
+    If the certificate has a certificate date override associated with it, display the override date.
+
+    Otherwise, if the course has a display behavior of "END_WITH_DATE", display the associated certificate available
+    date. If the course has a display behavior of "END", we should display the end date of the course. Lastly, when the
+    display behavior is "EARLY_NO_INFO" or when the course run is self-paced, we display the modified date of the
+    certificate instance.
 
     Arguments:
         course (CourseOverview or course block): The course we're getting the date for
@@ -872,8 +880,17 @@ def display_date_for_certificate(course, certificate):
 
     if _course_uses_available_date(course) and course.certificate_available_date < datetime.now(UTC):
         return course.certificate_available_date
-
-    return certificate.modified_date
+    # It is possible for a self-paced course run to end up configured with a display behavior of "END" even though it
+    # shouldn't be a valid option. We must check if the course is instructor-paced here to ensure that we are selecting
+    # the correct date to display.
+    elif (
+        not course.self_paced
+        and course.certificates_display_behavior == CertificatesDisplayBehaviors.END
+        and course.end
+    ):
+        return course.end
+    else:
+        return certificate.modified_date
 
 
 def is_valid_pdf_certificate(cert_data):

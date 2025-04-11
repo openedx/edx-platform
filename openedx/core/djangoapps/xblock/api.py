@@ -17,7 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component
+from openedx_learning.api.authoring_models import Component, ComponentVersion
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
@@ -32,7 +32,13 @@ from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreFieldData,
     LearningCoreXBlockRuntime,
 )
-from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
+from .data import CheckPerm, LatestVersion
+from .rest_api.url_converters import VersionConverter
+from .utils import (
+    get_secure_token_for_xblock_handler,
+    get_xblock_id_for_anonymous_user,
+    get_auto_latest_version,
+)
 
 from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
 
@@ -42,16 +48,6 @@ from openedx.core.djangoapps.xblock.learning_context import LearningContext
 # Implementation:
 
 log = logging.getLogger(__name__)
-
-
-class CheckPerm(Enum):
-    """ Options for the default permission check done by load_block() """
-    # can view the published block and call handlers etc. but not necessarily view its OLX source nor field data
-    CAN_LEARN = 1
-    # read-only studio view: can see the block (draft or published), see its OLX, see its field data, etc.
-    CAN_READ_AS_AUTHOR = 2
-    # can view everything and make changes to the block
-    CAN_EDIT = 3
 
 
 def get_runtime(user: UserType):
@@ -73,7 +69,13 @@ def get_runtime(user: UserType):
     return runtime
 
 
-def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPerm.CAN_LEARN):
+def load_block(
+    usage_key: UsageKeyV2,
+    user: UserType,
+    *,
+    check_permission: CheckPerm | None = CheckPerm.CAN_LEARN,
+    version: int | LatestVersion = LatestVersion.AUTO,
+):
     """
     Load the specified XBlock for the given user.
 
@@ -112,10 +114,13 @@ def load_block(usage_key, user, *, check_permission: CheckPerm | None = CheckPer
     runtime = get_runtime(user=user)
 
     try:
-        return runtime.get_block(usage_key)
+        return runtime.get_block(usage_key, version=version)
     except NoSuchUsage as exc:
         # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The component '{usage_key}' does not exist.") from exc
+    except ComponentVersion.DoesNotExist as exc:
+        # Convert ComponentVersion.DoesNotExist to NotFound so we do the right thing (404 not 500) by default.
+        raise NotFound(f"The requested version of component '{usage_key}' does not exist.") from exc
 
 
 def get_block_metadata(block, includes=()):
@@ -208,13 +213,26 @@ def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
     )
 
 
-def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
+def get_block_olx(
+    usage_key: UsageKeyV2,
+    *,
+    version: int | LatestVersion = LatestVersion.AUTO
+) -> str:
     """
-    Get the OLX source of the draft version of the given Learning-Core-backed XBlock.
+    Get the OLX source of the of the given Learning-Core-backed XBlock and a version.
     """
-    # Inefficient but simple approach. Optimize later if needed.
     component = get_component_from_usage_key(usage_key)
-    component_version = component.versioning.draft
+    version = get_auto_latest_version(version)
+
+    if version == LatestVersion.DRAFT:
+        component_version = component.versioning.draft
+    elif version == LatestVersion.PUBLISHED:
+        component_version = component.versioning.published
+    else:
+        assert isinstance(version, int)
+        component_version = component.versioning.version_num(version)
+    if component_version is None:
+        raise NoSuchUsage(usage_key)
 
     # TODO: we should probably make a method on ComponentVersion that returns
     # a content based on the name. Accessing by componentversioncontent__key is
@@ -222,6 +240,11 @@ def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
     content = component_version.contents.get(componentversioncontent__key="block.xml")
 
     return content.text
+
+
+def get_block_draft_olx(usage_key: UsageKeyV2) -> str:
+    """ DEPRECATED. Use get_block_olx(). Can be removed post-Teak. """
+    return get_block_olx(usage_key, version=LatestVersion.DRAFT)
 
 
 def render_block_view(block, view_name, user):  # pylint: disable=unused-argument
@@ -248,7 +271,13 @@ def render_block_view(block, view_name, user):  # pylint: disable=unused-argumen
     return fragment
 
 
-def get_handler_url(usage_key, handler_name, user):
+def get_handler_url(
+    usage_key: UsageKeyV2,
+    handler_name: str,
+    user: UserType | None,
+    *,
+    version: int | LatestVersion = LatestVersion.AUTO,
+):
     """
     A method for getting the URL to any XBlock handler. The URL must be usable
     without any authentication (no cookie, no OAuth/JWT), and may expire. (So
@@ -265,14 +294,18 @@ def get_handler_url(usage_key, handler_name, user):
         usage_key       - Usage Key (Opaque Key object or string)
         handler_name    - Name of the handler or a dummy name like 'any_handler'
         user            - Django User (registered or anonymous)
+        version         - Run the handler against a specific version of the
+                          block (e.g. when viewing an old version of it in
+                          Studio). Some blocks use handlers to load their data
+                          so it's important the handler matches the student_view
+                          etc.
 
     This view does not check/care if the XBlock actually exists.
     """
-    usage_key_str = str(usage_key)
     site_root_url = get_xblock_app_config().get_site_root_url()
-    if not user:  # lint-amnesty, pylint: disable=no-else-raise
+    if not user:
         raise TypeError("Cannot get handler URLs without specifying a specific user ID.")
-    elif user.is_authenticated:
+    if user.is_authenticated:
         user_id = user.id
     elif user.is_anonymous:
         user_id = get_xblock_id_for_anonymous_user(user)
@@ -280,14 +313,18 @@ def get_handler_url(usage_key, handler_name, user):
         raise ValueError("Invalid user value")
     # Now generate a token-secured URL for this handler, specific to this user
     # and this XBlock:
-    secure_token = get_secure_token_for_xblock_handler(user_id, usage_key_str)
+    secure_token = get_secure_token_for_xblock_handler(user_id, str(usage_key))
     # Now generate the URL to that handler:
-    path = reverse('xblock_api:xblock_handler', kwargs={
-        'usage_key_str': usage_key_str,
+    kwargs = {
+        'usage_key': usage_key,
         'user_id': user_id,
         'secure_token': secure_token,
         'handler_name': handler_name,
-    })
+    }
+    if version != LatestVersion.AUTO:
+        kwargs["version"] = version
+    path = reverse('xblock_api:xblock_handler', kwargs=kwargs)
+
     # We must return an absolute URL. We can't just use
     # rest_framework.reverse.reverse to get the absolute URL because this method
     # can be called by the XBlock from python as well and in that case we don't

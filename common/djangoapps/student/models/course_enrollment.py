@@ -512,6 +512,7 @@ class CourseEnrollment(models.Model):
             )
 
             # .. event_implemented_name: COURSE_ENROLLMENT_CHANGED
+            # .. event_type: org.openedx.learning.course.enrollment.changed.v1
             COURSE_ENROLLMENT_CHANGED.send_event(
                 enrollment=CourseEnrollmentData(
                     user=UserData(
@@ -539,6 +540,7 @@ class CourseEnrollment(models.Model):
                 self.send_signal(EnrollStatusChange.unenroll)
 
                 # .. event_implemented_name: COURSE_UNENROLLMENT_COMPLETED
+                # .. event_type: org.openedx.learning.course.unenrollment.completed.v1
                 COURSE_UNENROLLMENT_COMPLETED.send_event(
                     enrollment=CourseEnrollmentData(
                         user=UserData(
@@ -717,6 +719,8 @@ class CourseEnrollment(models.Model):
         Also emits relevant events for analytics purposes.
         """
         try:
+            # .. filter_implemented_name: CourseEnrollmentStarted
+            # .. filter_type: org.openedx.learning.course.enrollment.started.v1
             user, course_key, mode = CourseEnrollmentStarted.run_filter(
                 user=user, course_key=course_key, mode=mode,
             )
@@ -775,6 +779,7 @@ class CourseEnrollment(models.Model):
         enrollment.send_signal(EnrollStatusChange.enroll)
 
         # .. event_implemented_name: COURSE_ENROLLMENT_CREATED
+        # .. event_type: org.openedx.learning.course.enrollment.created.v1
         COURSE_ENROLLMENT_CREATED.send_event(
             enrollment=CourseEnrollmentData(
                 user=UserData(
@@ -1750,7 +1755,7 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
 
 class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: disable=empty-docstring
     """
-
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],
@@ -1763,6 +1768,8 @@ class BulkUnenrollConfiguration(ConfigurationModel):  # lint-amnesty, pylint: di
 class BulkChangeEnrollmentConfiguration(ConfigurationModel):
     """
     config model for the bulk_change_enrollment_csv command
+
+    .. no_pii:
     """
     csv_file = models.FileField(
         validators=[FileExtensionValidator(allowed_extensions=['csv'])],

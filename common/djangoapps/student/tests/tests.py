@@ -47,6 +47,7 @@ from openedx.core.djangoapps.content.course_overviews.tests.factories import Cou
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
+from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
@@ -440,28 +441,19 @@ class DashboardTest(ModuleStoreTestCase, TestVerificationBase):
         assert response.status_code == 200
         self.assertContains(response, 'Add Certificate to LinkedIn')
 
-        # We can switch to this and the commented out assertContains once edx-platform reaches Python 3.8
-        # expected_url = (
-        #     'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-        #     'name={platform}+Honor+Code+Certificate+for+Omega&certUrl={cert_url}&'
-        #     'organizationId={company_identifier}'
-        # ).format(
-        #     platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
-        #     cert_url=quote(cert.download_url, safe=''),
-        #     company_identifier=linkedin_config.company_identifier,
-        # )
-
-        # self.assertContains(response, escape(expected_url))
-
-        # These can be removed (in favor of the above) once we are on Python 3.8. Fails in 3.5 because of dict ordering
-        self.assertContains(response, escape('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME'))
-        self.assertContains(response, escape('&name={platform}+Honor+Code+Certificate+for+Omega'.format(
-            platform=quote(settings.PLATFORM_NAME.encode('utf-8'))
-        )))
-        self.assertContains(response, escape('&certUrl={cert_url}'.format(cert_url=quote(cert.download_url, safe=''))))
-        self.assertContains(response, escape('&organizationId={company_identifier}'.format(
+        expected_url = (
+            'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+            'name={platform}+Honor+Code+Certificate+for+Omega&'
+            'certUrl={cert_url}&'
+            'organizationId={company_identifier}'
+        ).format(
+            platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+            cert_url=quote(cert.download_url, safe=''),
             company_identifier=linkedin_config.company_identifier
-        )))
+        )
+
+        # Single assertion for the expected LinkedIn URL
+        self.assertContains(response, escape(expected_url))
 
     @skip_unless_lms
     def test_dashboard_metadata_caching(self):
@@ -916,15 +908,15 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         )
         return response
 
-    @ddt.data(
-        (True, 'courseware'),
-        (False, None),
-    )
-    @ddt.unpack
-    def test_enrollment_url(self, waffle_flag_enabled, returned_view):
-        with override_waffle_switch(REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT, waffle_flag_enabled):
+    def test_enrollment_url_without_redirect(self):
+        with override_waffle_switch(REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT, False):
             response = self._enroll_through_view(self.course)
-        data = reverse(returned_view, args=[str(self.course.id)]) if returned_view else ''
+        assert response.content.decode('utf8') == ''
+
+    def test_enrollment_with_redirect(self):
+        with override_waffle_switch(REDIRECT_TO_COURSEWARE_AFTER_ENROLLMENT, True):
+            response = self._enroll_through_view(self.course)
+        data = make_learning_mfe_courseware_url(self.course.id)
         assert response.content.decode('utf8') == data
 
     def test_enroll_as_default(self):

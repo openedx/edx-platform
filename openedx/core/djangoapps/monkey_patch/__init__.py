@@ -6,9 +6,8 @@ Here be dragons (and simians!)
 * USE WITH CAUTION *
 No, but seriously, you probably never really want to make changes here.
 This module contains methods to monkey-patch [0] the edx-platform.
-Patches are to be applied as early as possible in the callstack
-(currently lms/startup.py and cms/startup.py). Consequently, changes
-made here will affect the entire platform.
+Patches are to be applied as early as possible in the callstack). Consequently,
+changes made here will affect the entire platform.
 
 That said, if you've decided you really need to monkey-patch the
 platform (and you've convinced enough people that this is best
@@ -25,8 +24,7 @@ solution), kindly follow these guidelines:
         - is_patched
         - patch
         - unpatch
-    - Add the following code where needed (typically cms/startup.py and
-      lms/startup.py):
+    - Add the following code where needed:
         ```
         from openedx.core.djangoapps.monkey_patch import your_module
         your_module.patch()
