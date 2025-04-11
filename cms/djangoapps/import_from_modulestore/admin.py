@@ -3,9 +3,6 @@ This module contains the admin configuration for the Import model.
 """
 from django.contrib import admin
 
-from opaque_keys.edx.keys import UsageKey
-from opaque_keys import InvalidKeyError
-
 from .models import Import, PublishableEntityImport, PublishableEntityMapping
 
 
