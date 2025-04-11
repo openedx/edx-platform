@@ -258,7 +258,7 @@ class ProblemResetSerializer(UniqueStudentIdentifierSerializer):
         help_text=_("unique student identifier.")
     )
 
-    
+
 class ModifyAccessSerializer(serializers.Serializer):
     """
     serializers for enroll or un-enroll users in beta testing program.
