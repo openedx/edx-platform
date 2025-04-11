@@ -174,6 +174,7 @@ class SharedErrorTestCases(_BaseDownstreamViewTestMixin):
         assert response.status_code == 404
         assert "not found" in response.data["developer_message"]
 
+
 class GetDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
     """
     Test that `GET /api/v2/contentstore/downstreams/...` inspects a downstream's link to an upstream.
@@ -331,11 +332,11 @@ class _DownstreamSyncViewTestMixin(SharedErrorTestCases):
         assert "is not linked" in response.data["developer_message"][0]
 
 
-class CreateDownstreamViewTest(CourseTestCase, SharedErrorTestCases, SharedModuleStoreTestCase):
+class CreateDownstreamViewTest(CourseTestCase, _BaseDownstreamViewTestMixin, SharedModuleStoreTestCase):
     """
     Tests create new downstream blocks
     """
-    def call_api(self, library_content_key, category):
+    def call_api_post(self, library_content_key, category):
         data = {
             "parent_locator": str(self.course.location),
             "display_name": "Test block",
@@ -349,7 +350,7 @@ class CreateDownstreamViewTest(CourseTestCase, SharedErrorTestCases, SharedModul
         )
 
     def test_200(self):
-        response = self.call_api(self.html_lib_id, "html")
+        response = self.call_api_post(self.html_lib_id, "html")
 
         assert response.status_code == 200
         data = response.json()
@@ -369,7 +370,7 @@ class CreateDownstreamViewTest(CourseTestCase, SharedErrorTestCases, SharedModul
         mock_stage.return_value = MagicMock()
         mock_insert.return_value = StaticFileNotices()
 
-        response = self.call_api(self.video_lib_id, "video")
+        response = self.call_api_post(self.video_lib_id, "video")
 
         assert response.status_code == 200
         data = response.json()
@@ -378,7 +379,7 @@ class CreateDownstreamViewTest(CourseTestCase, SharedErrorTestCases, SharedModul
         usage_key = UsageKey.from_string(data["locator"])
         item = modulestore().get_item(usage_key)
         assert item.upstream == self.video_lib_id
-        assert item.edx_video_id != None
+        assert item.edx_video_id is not None
 
 
 class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStoreTestCase):
