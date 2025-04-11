@@ -381,13 +381,20 @@ class XmlMixin:
                     )
 
         if aside_children:
-            asides_tags = [x.tag for x in aside_children]
-            asides = runtime.get_asides(xblock)
-            for asd in asides:
-                if asd.scope_ids.block_type in asides_tags:
-                    xblock.add_aside(asd)
+            cls.add_applicable_asides_to_block(xblock, runtime, aside_children)
 
         return xblock
+
+    @classmethod
+    def add_applicable_asides_to_block(cls, block, runtime, aside_children):
+        """
+        Add asides to the block. Moved this out of the parse_xml method to use it in the VideoBlock.parse_xml
+        """
+        asides_tags = [aside_child.tag for aside_child in aside_children]
+        asides = runtime.get_asides(block)
+        for aside in asides:
+            if aside.scope_ids.block_type in asides_tags:
+                block.add_aside(aside)
 
     @classmethod
     def parse_xml_new_runtime(cls, node, runtime, keys):
