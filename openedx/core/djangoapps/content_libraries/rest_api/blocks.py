@@ -141,7 +141,7 @@ class LibraryBlockView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.delete_library_block(key)
+        api.delete_library_block(key, user_id=request.user.id)
         return Response({})
 
 
@@ -347,7 +347,7 @@ class LibraryBlockRestore(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.restore_library_block(key)
+        api.restore_library_block(key, request.user.id)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
