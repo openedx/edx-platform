@@ -337,6 +337,10 @@ class CreateDownstreamViewTest(CourseTestCase, _BaseDownstreamViewTestMixin, Sha
     Tests create new downstream blocks
     """
     def call_api_post(self, library_content_key, category):
+        """
+        Call the api to create a downstream block using
+        `library_content_key` as upstream
+        """
         data = {
             "parent_locator": str(self.course.location),
             "display_name": "Test block",
