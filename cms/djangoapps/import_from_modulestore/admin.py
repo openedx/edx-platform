@@ -96,7 +96,7 @@ class ImportAdmin(admin.ModelAdmin):
         is_created = not getattr(obj, 'id', None)
         super().save_model(request, obj, form, change)
         if is_created:
-            save_legacy_content_to_staged_content_task.apply_async(kwargs={'import_uuid': obj.uuid})
+            save_legacy_content_to_staged_content_task.delay_on_commit(obj.uuid)
 
     def import_course_to_library_action(self, request, queryset):
         """
