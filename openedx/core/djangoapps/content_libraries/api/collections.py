@@ -32,8 +32,8 @@ __all__ = [
     "update_library_collection",
     "update_library_collection_components",
     "set_library_component_collections",
-    "get_library_collection_usage_key",
-    "get_library_collection_from_usage_key",
+    "library_collection_locator",
+    "get_library_collection_from_locator",
 ]
 
 
@@ -218,8 +218,10 @@ def set_library_component_collections(
     for collection in affected_collections:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
                 background=True,
             )
         )
@@ -227,7 +229,7 @@ def set_library_component_collections(
     return component
 
 
-def get_library_collection_usage_key(
+def library_collection_locator(
     library_key: LibraryLocatorV2,
     collection_key: str,
 ) -> LibraryCollectionLocator:
@@ -238,15 +240,14 @@ def get_library_collection_usage_key(
     return LibraryCollectionLocator(library_key, collection_key)
 
 
-def get_library_collection_from_usage_key(
-    collection_usage_key: LibraryCollectionLocator,
+def get_library_collection_from_locator(
+    collection_locator: LibraryCollectionLocator,
 ) -> Collection:
     """
     Return a Collection using the LibraryCollectionLocator
     """
-
-    library_key = collection_usage_key.library_key
-    collection_key = collection_usage_key.collection_id
+    library_key = collection_locator.library_key
+    collection_key = collection_locator.collection_id
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     assert content_library.learning_package_id is not None  # shouldn't happen but it's technically possible.
     try:

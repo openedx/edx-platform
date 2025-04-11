@@ -75,6 +75,7 @@ from openedx.core.types import User as UserType
 from .. import permissions
 from ..constants import ALL_RIGHTS_RESERVED
 from ..models import ContentLibrary, ContentLibraryPermission
+from .collections import library_collection_locator
 from .exceptions import (
     LibraryAlreadyExists,
     LibraryPermissionIntegrityError,
@@ -739,8 +740,10 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     for collection in authoring_api.get_collections(learning_package.id):
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
                 background=True,
             )
         )

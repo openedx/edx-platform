@@ -59,6 +59,7 @@ from .exceptions import (
     LibraryBlockAlreadyExists,
 )
 from .libraries import (
+    library_collection_locator,
     library_component_usage_key,
     require_permission_for_library_key,
     PublishableItem,
@@ -284,8 +285,7 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
-                library_key=usage_key.lib_key,
-                container_key=str(container.container_key),
+                container_key=container.container_key,
                 background=True,
             )
         )
@@ -527,8 +527,10 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     for collection in affected_collections:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
                 background=True,
             )
         )
@@ -540,8 +542,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
-                library_key=library_key,
-                container_key=str(container.container_key),
+                container_key=container.container_key,
                 background=True,
             )
         )
@@ -580,8 +581,10 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     for collection in affected_collections:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
                 background=True,
             )
         )
@@ -594,8 +597,7 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
-                library_key=library_key,
-                container_key=str(container.container_key),
+                container_key=container.container_key,
                 background=True,
             )
         )
