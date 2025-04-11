@@ -47,3 +47,4 @@ unidiff                   # Required by coverage_pytest_plugin
 pylint-pytest             # A Pylint plugin to suppress pytest-related false positives.
 pact-python               # Library for contract testing
 py                        # Needed for pytest configurations, was previously been fetched through tox
+-e git+https://github.com/aulasneo/openedx-events.git@XQU-44-add-signal-to-call-xqueue-callback#egg=openedx-events

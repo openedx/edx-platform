@@ -115,7 +115,7 @@ olxcleaner
 openedx-atlas                       # CLI tool to manage translations
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 openedx-django-require
-openedx-events                      # Open edX Events from Hooks Extension Framework (OEP-50)
+-e git+https://github.com/aulasneo/openedx-events.git@XQU-44-add-signal-to-call-xqueue-callback#egg=openedx-events                   # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 openedx-forum                       # Open edX forum v2 application
 openedx-learning                    # Open edX Learning core (experimental)
