@@ -211,12 +211,17 @@ class LibraryXBlockMetadata(PublishableItem):
     Class that represents the metadata about an XBlock in a content library.
     """
     usage_key: LibraryUsageLocatorV2
+    # TODO: move tags_count to LibraryItem as all objects under a library can be tagged.
+    tags_count: int = 0
 
     @classmethod
     def from_component(cls, library_key, component, associated_collections=None):
         """
         Construct a LibraryXBlockMetadata from a Component object.
         """
+        # Import content_tagging.api here to avoid circular imports
+        from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
+
         last_publish_log = component.versioning.last_publish_log
 
         published_by = None
@@ -227,12 +232,11 @@ class LibraryXBlockMetadata(PublishableItem):
         published = component.versioning.published
         last_draft_created = draft.created if draft else None
         last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
+        usage_key = library_component_usage_key(library_key, component)
+        tags = get_object_tag_counts(str(usage_key), count_implicit=True)
 
         return cls(
-            usage_key=library_component_usage_key(
-                library_key,
-                component,
-            ),
+            usage_key=usage_key,
             display_name=draft.title,
             created=component.created,
             modified=draft.created,
@@ -245,6 +249,7 @@ class LibraryXBlockMetadata(PublishableItem):
             has_unpublished_changes=component.versioning.has_unpublished_changes,
             collections=associated_collections or [],
             can_stand_alone=component.publishable_entity.can_stand_alone,
+            tags_count=tags.get(str(usage_key), 0),
         )
 
 
