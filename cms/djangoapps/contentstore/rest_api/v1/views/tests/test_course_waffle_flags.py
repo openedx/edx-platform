@@ -34,7 +34,7 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         "use_new_certificates_page",
         "use_new_textbooks_page",
         "use_new_group_configurations_page",
-        "react_markdown_editor"
+        "use_react_markdown_editor"
     ]
 
     other_expected_waffle_flags = ["enable_course_optimizer"]
@@ -74,8 +74,8 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
             WaffleFlagCourseOverrideModel.objects.create(
                 waffle_flag=(
                     f"contentstore.new_studio_mfe.{flag}"
-                    if flag != "react_markdown_editor"
-                    else "contentstore.react_markdown_editor"
+                    if flag != "use_react_markdown_editor"
+                    else "contentstore.use_react_markdown_editor"
                 ),
                 course_id=self.course.id,
                 enabled=enabled,
@@ -114,7 +114,6 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         expected_response["use_new_home_page"] = False
 
         response = self.client.get(course_url)
-        print(expected_response, response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(expected_response, response.data)
 
