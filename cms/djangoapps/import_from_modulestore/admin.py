@@ -8,6 +8,7 @@ from opaque_keys import InvalidKeyError
 
 from .models import Import, PublishableEntityImport, PublishableEntityMapping
 
+
 class ImportAdmin(admin.ModelAdmin):
     """
     Admin configuration for the Import model.
