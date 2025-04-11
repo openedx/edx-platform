@@ -199,7 +199,7 @@ def library_collection_entities_changed(sender, instance, action, pk_set, **kwar
 
     # When action=="post_clear", pk_set==None
     # Since the collection instance now has an empty entities set,
-    # we don't know which ones were removed, so we need to update associations for all library components.
+    # we don't know which ones were removed, so we need to update associations for all library components and containers.
     components = get_components(instance.learning_package_id)
     containers = get_containers(instance.learning_package_id)
     if pk_set:

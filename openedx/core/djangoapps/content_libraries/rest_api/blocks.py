@@ -24,7 +24,7 @@ from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
     LibraryXBlockMetadataSerializer,
     LibraryXBlockOlxSerializer,
     LibraryXBlockStaticFileSerializer,
-    LibraryXBlockStaticFilesSerializer
+    LibraryXBlockStaticFilesSerializer,
 )
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes

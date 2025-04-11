@@ -107,7 +107,7 @@ def update_library_collection_items(
     content_library: ContentLibrary | None = None,
 ) -> Collection:
     """
-    Associates the Collection with items (XBlocks, Units) for the given OpaqueKeys.
+    Associates the Collection with items (XBlocks, Containers) for the given OpaqueKeys.
 
     By default the items are added to the Collection.
     If remove=True, the items are removed from the Collection.
@@ -158,7 +158,6 @@ def update_library_collection_items(
             # This should never happen, but just in case.
             raise ValueError(f"Invalid opaque_key: {opaque_key}")
 
-    # Note: Component.key matches its PublishableEntity.key
     entities_qset = PublishableEntity.objects.filter(
         key__in=item_keys,
     )

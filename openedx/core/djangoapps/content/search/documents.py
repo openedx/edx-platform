@@ -356,7 +356,7 @@ def _collections_for_content_object(object_id: OpaqueKey) -> dict:
             return result
 
     except ObjectDoesNotExist:
-        log.warning(f"No component found for {object_id}")
+        log.warning(f"No library item found for {object_id}")
 
     if not collections:
         return result
