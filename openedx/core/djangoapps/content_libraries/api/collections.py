@@ -213,7 +213,6 @@ def set_library_item_collections(
     )
 
     affected_collections = authoring_api.set_collections(
-        content_library.learning_package_id,
         publishable_entity,
         collection_qs,
         created_by=created_by,
