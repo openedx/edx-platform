@@ -11,8 +11,9 @@ from uuid import uuid4
 from django.utils.text import slugify
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import LibraryCollectionData, LibraryContainerData
+from openedx_events.content_authoring.data import ContentObjectChangedData, LibraryCollectionData, LibraryContainerData
 from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_CREATED,
     LIBRARY_CONTAINER_DELETED,
@@ -277,7 +278,13 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     """
     Restore the specified library container.
     """
+    library_key = container_key.library_key
     container = get_container_from_key(container_key, isDeleted=True)
+
+    affected_collections = authoring_api.get_entity_collections(
+        container.publishable_entity.learning_package_id,
+        container.key,
+    )
 
     authoring_api.set_draft_version(container.pk, container.versioning.latest.pk)
 
@@ -286,6 +293,28 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
             container_key=str(container_key),
         )
     )
+
+    # Add tags and collections back to index
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+        content_object=ContentObjectChangedData(
+            object_id=str(container_key),
+            changes=["collections", "tags"],
+        ),
+    )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    #
+    # To restore the container on collections
+    for collection in affected_collections:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
+            )
+        )
 
 
 def get_container_children(
