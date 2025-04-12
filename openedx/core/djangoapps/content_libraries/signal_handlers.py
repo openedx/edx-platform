@@ -21,7 +21,7 @@ from openedx_learning.api.authoring_models import Collection, CollectionPublisha
 
 from lms.djangoapps.grades.api import signals as grades_signals
 
-from .api import library_collection_locator, library_component_usage_key
+from .api import library_collection_locator, library_component_usage_key, library_container_locator
 from .models import ContentLibrary, LtiGradedResource
 
 log = logging.getLogger(__name__)
@@ -205,7 +205,8 @@ def library_collection_entities_changed(sender, instance, action, pk_set, **kwar
 
     # When action=="post_clear", pk_set==None
     # Since the collection instance now has an empty entities set,
-    # we don't know which ones were removed, so we need to update associations for all library components and containers.
+    # we don't know which ones were removed, so we need to update associations for all library
+    # components and containers.
     components = get_components(instance.learning_package_id)
     containers = get_containers(instance.learning_package_id)
     if pk_set:
