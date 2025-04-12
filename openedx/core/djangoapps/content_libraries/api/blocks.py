@@ -59,6 +59,7 @@ from .exceptions import (
 )
 from .containers import (
     create_container,
+    get_container,
     update_container_children,
     ContainerMetadata,
     ContainerType,
@@ -559,6 +560,8 @@ def _import_staged_block_as_container(
             except IncompatibleTypesError:
                 continue  # Skip blocks that won't work in libraries
         update_container_children(container.container_key, new_child_keys, user_id=user.id)
+        # Re-fetch the container because the 'last_draft_created' will have changed when we added children
+        container = get_container(container.container_key)
     return container
 
 

@@ -12,7 +12,7 @@ from opaque_keys.edx.locator import LibraryContainerLocator
 from opaque_keys import InvalidKeyError
 
 from openedx_learning.api.authoring_models import Collection
-from openedx.core.djangoapps.content_libraries.api.containers import ContainerMetadata, ContainerType
+from openedx.core.djangoapps.content_libraries.api.containers import ContainerType
 from openedx.core.djangoapps.content_libraries.constants import (
     ALL_RIGHTS_RESERVED,
     LICENSE_OPTIONS,
