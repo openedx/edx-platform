@@ -353,7 +353,7 @@ def _collections_for_content_object(object_id: OpaqueKey) -> dict:
                 container.key,
             )
         else:
-            return result
+            log.warning(f"Unexpected key type for {object_id}")
 
     except ObjectDoesNotExist:
         log.warning(f"No library item found for {object_id}")
