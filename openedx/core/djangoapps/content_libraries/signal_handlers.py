@@ -21,7 +21,7 @@ from openedx_learning.api.authoring_models import Collection, CollectionPublisha
 
 from lms.djangoapps.grades.api import signals as grades_signals
 
-from .api import library_component_usage_key, library_container_locator
+from .api import library_collection_locator, library_component_usage_key
 from .models import ContentLibrary, LtiGradedResource
 
 log = logging.getLogger(__name__)
@@ -82,15 +82,19 @@ def library_collection_saved(sender, instance, created, **kwargs):
     if created:
         LIBRARY_COLLECTION_CREATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library.library_key,
-                collection_key=instance.key,
+                collection_key=library_collection_locator(
+                    library_key=library.library_key,
+                    collection_key=instance.key,
+                ),
             )
         )
     else:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library.library_key,
-                collection_key=instance.key,
+                collection_key=library_collection_locator(
+                    library_key=library.library_key,
+                    collection_key=instance.key,
+                ),
             )
         )
 
@@ -108,8 +112,10 @@ def library_collection_deleted(sender, instance, **kwargs):
 
     LIBRARY_COLLECTION_DELETED.send_event(
         library_collection=LibraryCollectionData(
-            library_key=library.library_key,
-            collection_key=instance.key,
+            collection_key=library_collection_locator(
+                library_key=library.library_key,
+                collection_key=instance.key,
+            ),
         )
     )
 

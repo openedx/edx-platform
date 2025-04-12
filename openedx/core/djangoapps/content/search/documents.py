@@ -9,7 +9,7 @@ from hashlib import blake2b
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 from opaque_keys.edx.keys import LearningContextKey, UsageKey, OpaqueKey
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
 from rest_framework.exceptions import NotFound
@@ -460,19 +460,14 @@ def searchable_doc_collections(opaque_key: OpaqueKey) -> dict:
 
 
 def searchable_doc_tags_for_collection(
-    library_key: LibraryLocatorV2,
-    collection_key: str,
+    collection_key: LibraryCollectionLocator
 ) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the tags data for the given library collection.
     """
-    collection_usage_key = lib_api.get_library_collection_usage_key(
-        library_key,
-        collection_key,
-    )
-    doc = searchable_doc_for_key(collection_usage_key)
-    doc.update(_tags_for_content_object(collection_usage_key))
+    doc = searchable_doc_for_key(collection_key)
+    doc.update(_tags_for_content_object(collection_key))
 
     return doc
 
@@ -494,8 +489,7 @@ def searchable_doc_for_course_block(block) -> dict:
 
 
 def searchable_doc_for_collection(
-    library_key: LibraryLocatorV2,
-    collection_key: str,
+    collection_key: LibraryCollectionLocator,
     *,
     # Optionally provide the collection if we've already fetched one
     collection: Collection | None = None,
@@ -508,21 +502,16 @@ def searchable_doc_for_collection(
     If no collection is found for the given library_key + collection_key, the returned document will contain only basic
     information derived from the collection usage key, and no Fields.type value will be included in the returned dict.
     """
-    collection_usage_key = lib_api.get_library_collection_usage_key(
-        library_key,
-        collection_key,
-    )
-
-    doc = searchable_doc_for_key(collection_usage_key)
+    doc = searchable_doc_for_key(collection_key)
 
     try:
-        collection = collection or lib_api.get_library_collection_from_usage_key(collection_usage_key)
+        collection = collection or lib_api.get_library_collection_from_locator(collection_key)
     except lib_api.ContentLibraryCollectionNotFound:
         # Collection not found, so we can only return the base doc
         pass
 
     if collection:
-        assert collection.key == collection_key
+        assert collection.key == collection_key.collection_id
 
         draft_num_children = authoring_api.filter_publishable_entities(
             collection.entities,
@@ -534,9 +523,9 @@ def searchable_doc_for_collection(
         ).count()
 
         doc.update({
-            Fields.context_key: str(library_key),
-            Fields.org: str(library_key.org),
-            Fields.usage_key: str(collection_usage_key),
+            Fields.context_key: str(collection_key.library_key),
+            Fields.org: str(collection_key.org),
+            Fields.usage_key: str(collection_key),
             Fields.block_id: collection.key,
             Fields.type: DocType.collection,
             Fields.display_name: collection.title,
@@ -547,7 +536,7 @@ def searchable_doc_for_collection(
             Fields.published: {
                 Fields.published_num_children: published_num_children,
             },
-            Fields.access_id: _meili_access_id_from_context_key(library_key),
+            Fields.access_id: _meili_access_id_from_context_key(collection_key.library_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })
 

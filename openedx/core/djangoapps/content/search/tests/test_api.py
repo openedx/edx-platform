@@ -8,6 +8,7 @@ import copy
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, Mock, call, patch
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryCollectionLocator
 
 import ddt
 import pytest
@@ -188,11 +189,13 @@ class TestSearchApi(ModuleStoreTestCase):
                 created_by=None,
                 description="my collection description"
             )
-            self.collection_usage_key = "lib-collection:org1:lib:MYCOL"
+            self.collection_key = LibraryCollectionLocator.from_string(
+                "lib-collection:org1:lib:MYCOL",
+            )
         self.collection_dict = {
             "id": "lib-collectionorg1libmycol-5b647617",
             "block_id": self.collection.key,
-            "usage_key": self.collection_usage_key,
+            "usage_key": str(self.collection_key),
             "type": "collection",
             "display_name": "my_collection",
             "description": "my collection description",
@@ -739,8 +742,8 @@ class TestSearchApi(ModuleStoreTestCase):
     @override_settings(MEILISEARCH_ENABLED=True)
     def test_index_tags_in_collections(self, mock_meilisearch):
         # Tag collection
-        tagging_api.tag_object(self.collection_usage_key, self.taxonomyA, ["one", "two"])
-        tagging_api.tag_object(self.collection_usage_key, self.taxonomyB, ["three", "four"])
+        tagging_api.tag_object(str(self.collection_key), self.taxonomyA, ["one", "two"])
+        tagging_api.tag_object(str(self.collection_key), self.taxonomyB, ["three", "four"])
 
         # Build expected docs with tags at each stage
         doc_collection_with_tags1 = {

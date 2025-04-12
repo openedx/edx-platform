@@ -5,6 +5,7 @@ from dataclasses import replace
 from datetime import datetime, timezone
 
 from freezegun import freeze_time
+from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from organizations.models import Organization
 
@@ -81,7 +82,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 created_by=None,
                 description="my toy collection description"
             )
-            cls.collection_usage_key = "lib-collection:edX:2012_Fall:TOY_COLLECTION"
+            cls.collection_key = LibraryCollectionLocator.from_string(
+                "lib-collection:edX:2012_Fall:TOY_COLLECTION",
+            )
             cls.library_block = library_api.create_library_block(
                 cls.library.key,
                 "html",
@@ -94,7 +97,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 title="A Unit in the Search Index",
                 user_id=None,
             )
-            cls.container_usage_key = "lct:edX:2012_Fall:unit:unit1"
+            cls.container_key = LibraryContainerLocator.from_string(
+                "lct:edX:2012_Fall:unit:unit1",
+            )
 
             # Add the problem block to the collection
             library_api.update_library_collection_items(
@@ -123,8 +128,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.tag_object(str(cls.html_block_key), cls.subject_tags, tags=["Chinese", "Jump Links"])
         tagging_api.tag_object(str(cls.html_block_key), cls.difficulty_tags, tags=["Normal"])
         tagging_api.tag_object(str(cls.library_block.usage_key), cls.difficulty_tags, tags=["Normal"])
-        tagging_api.tag_object(cls.collection_usage_key, cls.difficulty_tags, tags=["Normal"])
-        tagging_api.tag_object(cls.container_usage_key, cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.collection_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.container_key), cls.difficulty_tags, tags=["Normal"])
 
     @property
     def toy_course_access_id(self):
@@ -451,13 +456,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         assert doc["publish_status"] == "modified"
 
     def test_collection_with_library(self):
-        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
-        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+        doc = searchable_doc_for_collection(self.collection_key)
+        doc.update(searchable_doc_tags_for_collection(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
-            "usage_key": self.collection_usage_key,
+            "usage_key": str(self.collection_key),
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -480,13 +485,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
     def test_collection_with_published_library(self):
         library_api.publish_changes(self.library.key)
 
-        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
-        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+        doc = searchable_doc_for_collection(self.collection_key)
+        doc.update(searchable_doc_tags_for_collection(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
-            "usage_key": self.collection_usage_key,
+            "usage_key": str(self.collection_key),
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",

@@ -197,8 +197,7 @@ def create_container(
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
-            library_key=library_key,
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 
@@ -226,8 +225,7 @@ def update_container(
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
-            library_key=library_key,
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 
@@ -253,8 +251,7 @@ def delete_container(
 
     LIBRARY_CONTAINER_DELETED.send_event(
         library_container=LibraryContainerData(
-            library_key=container_key.library_key,
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 
@@ -282,7 +279,6 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
-            library_key=container_key.library_key,
             container_key=str(container_key),
         )
     )
@@ -348,8 +344,7 @@ def update_container_children(
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
-            library_key=library_key,
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 
