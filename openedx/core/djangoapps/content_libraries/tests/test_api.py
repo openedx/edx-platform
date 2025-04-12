@@ -649,8 +649,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 "signal": LIBRARY_COLLECTION_UPDATED,
                 "sender": None,
                 "library_collection": LibraryCollectionData(
-                    self.lib1.library_key,
-                    collection_key=self.col1.key,
+                    collection_key=api.library_collection_locator(
+                        self.lib1.library_key,
+                        collection_key=self.col1.key,
+                    ),
                     background=True,
                 ),
             },
