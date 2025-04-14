@@ -8,6 +8,16 @@
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+-e git+https://github.com/aulasneo/openedx-events.git@XQU-44-add-signal-to-call-xqueue-callback#egg=openedx-events
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   edx-enterprise
+    #   edx-event-bus-kafka
+    #   edx-event-bus-redis
+    #   edx-name-affirmation
+    #   event-tracking
+    #   ora2
 accessible-pygments==0.0.5
     # via
     #   -r requirements/edx/doc.txt
@@ -812,7 +822,7 @@ edx-sga==0.25.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions==3.9.0
+edx-submissions @ git+https://github.com/aulasneo/edx-submissions.git@XQU-44-add-signal-to-call-xqueue-callback
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1363,16 +1373,6 @@ openedx-django-wiki==2.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==9.20.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   edx-enterprise
-    #   edx-event-bus-kafka
-    #   edx-event-bus-redis
-    #   edx-name-affirmation
-    #   event-tracking
-    #   ora2
 openedx-filters==2.0.1
     # via
     #   -r requirements/edx/doc.txt
