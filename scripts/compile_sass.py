@@ -188,7 +188,7 @@ def main(
         Eventually, we may eschew libsass-python altogether by switching to SassC@3.3.2, a direct CLI for libsass@3.3.2.
         (ref: https://github.com/sass/sassc). This would be nice because it would allow us to remove Python from the
         Sass build pipeline entirely. However, it would mean explicitly compiling & installing both libsass and SassC
-        within the edx-platform Dockerfile, which has its own drawbacks.
+        within the edx-platform build environment, which has its own drawbacks.
         """
         # Constants from libsass-python
         SASS_STYLE_NESTED = 0
@@ -352,18 +352,6 @@ def main(
                     repo / "lms" / "static" / "sass",
                 ],
             )
-            compile_sass_dir(
-                "Compiling built-in XBlock Sass for default LMS",
-                repo / "xmodule" / "assets",
-                repo / "lms" / "static" / "css",
-                includes=[
-                    *common_includes,
-                    repo / "lms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass",
-                    repo / "cms" / "static" / "sass",
-                ],
-            )
         if not skip_cms:
             compile_sass_dir(
                 "Compiling default CMS Sass",
@@ -373,18 +361,6 @@ def main(
                     *common_includes,
                     repo / "lms" / "static" / "sass" / "partials",
                     repo / "cms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass",
-                ],
-            )
-            compile_sass_dir(
-                "Compiling built-in XBlock Sass for default CMS",
-                repo / "xmodule" / "assets",
-                repo / "cms" / "static" / "css",
-                includes=[
-                    *common_includes,
-                    repo / "lms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass",
                     repo / "cms" / "static" / "sass",
                 ],
             )
@@ -429,20 +405,6 @@ def main(
                 ],
                 tolerate_missing=True,
             )
-            compile_sass_dir(
-                "Compiling built-in XBlock Sass for themed LMS",
-                repo / "xmodule" / "assets",
-                theme / "lms" / "static" / "css",
-                includes=[
-                    *common_includes,
-                    theme / "lms" / "static" / "sass" / "partials",
-                    theme / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass",
-                    repo / "cms" / "static" / "sass",
-                ],
-            )
         if not skip_cms:
             compile_sass_dir(
                 "Compiling default CMS Sass with themed partials",
@@ -469,20 +431,6 @@ def main(
                     repo / "cms" / "static" / "sass",
                 ],
                 tolerate_missing=True,
-            )
-            compile_sass_dir(
-                "Compiling built-in XBlock Sass for themed CMS",
-                repo / "xmodule" / "assets",
-                theme / "cms" / "static" / "css",
-                includes=[
-                    *common_includes,
-                    theme / "lms" / "static" / "sass" / "partials",
-                    theme / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass" / "partials",
-                    repo / "cms" / "static" / "sass" / "partials",
-                    repo / "lms" / "static" / "sass",
-                    repo / "cms" / "static" / "sass",
-                ],
             )
         click.secho(f"Done compiling Sass for theme at {theme}!", fg="cyan", bold=True)
         click.echo()

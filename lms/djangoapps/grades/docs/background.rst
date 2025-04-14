@@ -79,13 +79,13 @@ Overall Course Grade
 
   - A learner's overall numerical grade in the course can range anywhere between 0% to 100%.
 
-  - Course teams set the `grade range <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/grading/grade_range.html>`_ and specify the Pass / Fail threshold (for example, a minimum of 50/100 is required to Pass).
+  - Course teams set the `grade range <https://docs.openedx.org/en/latest/educators/how-tos/grading/set_grade_range.html>`_ and specify the Pass / Fail threshold (for example, a minimum of 50/100 is required to Pass).
 
   - The Passing grade range can be further divided into letter grades, such as A, B, etc.
 
 Assignment Weights
 
-* Course teams set the `assignment types <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/grading/configure_assignment_type.html>`_ used in the course, along with their weights and the number of allowed drops (number of assignments with the lowest grades that can be discarded in the final grade computation).
+* Course teams set the `assignment types <https://docs.openedx.org/en/latest/educators/references/grading/gradebook_assignment_types.html>`_ used in the course, along with their weights and the number of allowed drops (number of assignments with the lowest grades that can be discarded in the final grade computation).
 
 Computation
 
@@ -118,9 +118,9 @@ Problem Scores
 
   - **automatically scored, synchronously** at the time of submission, such as for most Capa-based problems
 
-  - **automatically scored, asynchronously** via an `external grader service <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html>`_
+  - **automatically scored, asynchronously** via an `external grader service <https://docs.openedx.org/en/latest/educators/concepts/exercise_tools/about_external_graders.html>`_
 
-  - **manually scored**, such as for `Open Response Assessments <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html>`_, where the calculation requires human input from either
+  - **manually scored**, such as for `Open Response Assessments <https://docs.openedx.org/en/latest/educators/navigation/components_activities.html#open-response-assessments>`_, where the calculation requires human input from either
 
     - a single course staff (staff assessment)
 
@@ -153,19 +153,19 @@ As described above in the Grade Computation section, the grading policy is distr
 
   - A problem's external grader configuration
 
-  - A problem's individual grading policy - as currently supported by `ORA's assessment configuration <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/OpenResponseAssessments.html#how-scores-for-open-response-assessments-are-calculated>`_
+  - A problem's individual grading policy - as currently supported by `ORA's assessment configuration <https://docs.openedx.org/en/latest/educators/concepts/exercise_tools/about_OpenResponseAssessments.html#how-scores-for-open-response-assessments-are-calculated>`_
 
 
 Grade Overrides/Exceptions
 --------------------------
 
-Today, we support the following features to `adjust grades <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-koa.master/student_progress/course_grades.html#adjust-grades-for-one-or-all-learners>`_, but don't have a general feature to override a grade for any xBlock:
+Today, we support the following features to `adjust grades <https://docs.openedx.org/en/latest/educators/how-tos/data/manage_learner_grades.html#adjust-grades-for-one-or-all-learners>`_, but don't have a general feature to override a grade for any xBlock:
 
-* In `ORA Studio settings <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/open_response_assessments/Manage_ORA_Assignment.html#override-a-learner-s-assessment-grade>`_:
+* In `ORA Studio settings <https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/Manage_ORA_Assignment.html#override-a-learner-assessment-grade>`_:
 
   - override a learner's grade for an ORA2 block
 
-* In LMS Instructor Dashboard or `Staff Debug Info <http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/manage_live_course/staff_debug_info.html>`_:
+* In LMS Instructor Dashboard or `Staff Debug Info <https://docs.openedx.org/en/latest/educators/references/data/staff_debug_info.html>`_:
 
   - reset the number of attempts a learner has made for a problem back to 0
 
@@ -173,7 +173,7 @@ Today, we support the following features to `adjust grades <https://edx.readthed
 
   - delete a student state for a problem
 
-* In `Gradebook <https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/open-release-koa.master/student_progress/course_grades.html#adjust-grades-for-one-or-all-learners>`_:
+* In `Gradebook <https://docs.openedx.org/en/latest/educators/how-tos/data/manage_learner_grades.html#adjust-grades-for-one-or-all-learners>`_:
 
   - override a subsection grade for a learner
   - override subsection grades in bulk (master's track only)

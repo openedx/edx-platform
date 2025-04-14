@@ -6,6 +6,7 @@ from unittest.mock import Mock
 from django.test import TestCase
 from fs.memoryfs import MemoryFS
 from lxml import etree
+from webob import Request
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
@@ -115,3 +116,29 @@ class WordCloudBlockTest(TestCase):
                {'content_type': 'Word Cloud',
                 'content': {'display_name': 'Word Cloud Block',
                             'instructions': 'Enter some random words that comes to your mind'}}
+
+    def test_studio_submit_handler(self):
+        """
+        Test studio_submint handler
+        """
+        TEST_SUBMIT_DATA = {
+            'display_name': "New Word Cloud",
+            'instructions': "This is a Test",
+            'num_inputs': 5,
+            'num_top_words': 10,
+            'display_student_percents': 'False',
+        }
+        module_system = get_test_system()
+        block = WordCloudBlock(module_system, DictFieldData(self.raw_field_data), Mock())
+        body = json.dumps(TEST_SUBMIT_DATA)
+        request = Request.blank('/')
+        request.method = 'POST'
+        request.body = body.encode('utf-8')
+        res = block.handle('studio_submit', request)
+        assert json.loads(res.body.decode('utf8')) == {'result': 'success'}
+
+        assert block.display_name == TEST_SUBMIT_DATA['display_name']
+        assert block.instructions == TEST_SUBMIT_DATA['instructions']
+        assert block.num_inputs == TEST_SUBMIT_DATA['num_inputs']
+        assert block.num_top_words == TEST_SUBMIT_DATA['num_top_words']
+        assert block.display_student_percents == (TEST_SUBMIT_DATA['display_student_percents'] == "True")

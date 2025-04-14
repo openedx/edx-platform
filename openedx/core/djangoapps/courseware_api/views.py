@@ -19,6 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
@@ -54,7 +55,6 @@ from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
-from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
@@ -125,10 +125,6 @@ class CoursewareMeta:
             user=self.effective_user,
             course_key=self.course_key,
         )
-
-    @property
-    def can_show_upgrade_sock(self):
-        return DISPLAY_COURSE_SOCK_FLAG.is_enabled(self.course_key)
 
     @property
     def license(self):
@@ -594,30 +590,40 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             usage_key = UsageKey.from_string(usage_key_string)
         except InvalidKeyError as exc:
             raise NotFound(f"Invalid usage key: '{usage_key_string}'.") from exc
+
+        staff_access = has_access(request.user, 'staff', usage_key.course_key)
+        is_preview = request.GET.get('preview', '0') == '1'
         _, request.user = setup_masquerade(
             request,
             usage_key.course_key,
-            staff_access=has_access(request.user, 'staff', usage_key.course_key),
+            staff_access=staff_access,
             reset_masquerade_data=True,
         )
 
-        sequence, _ = get_block_by_usage_id(
-            self.request,
-            str(usage_key.course_key),
-            str(usage_key),
-            disable_staff_debug_info=True,
-            will_recheck_access=True)
+        branch_type = (
+            ModuleStoreEnum.Branch.draft_preferred
+        ) if is_preview and staff_access else (
+            ModuleStoreEnum.Branch.published_only
+        )
 
-        if not hasattr(sequence, 'get_metadata'):
-            # Looks like we were asked for metadata on something that is not a sequence (or section).
-            return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        with modulestore().branch_setting(branch_type, usage_key.course_key):
+            sequence, _ = get_block_by_usage_id(
+                self.request,
+                str(usage_key.course_key),
+                str(usage_key),
+                disable_staff_debug_info=True,
+                will_recheck_access=True)
 
-        view = STUDENT_VIEW
-        if request.user.is_anonymous:
-            view = PUBLIC_VIEW
+            if not hasattr(sequence, 'get_metadata'):
+                # Looks like we were asked for metadata on something that is not a sequence (or section).
+                return Response(status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)}
-        return Response(sequence.get_metadata(view=view, context=context))
+            view = STUDENT_VIEW
+            if request.user.is_anonymous:
+                view = PUBLIC_VIEW
+
+            context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)}
+            return Response(sequence.get_metadata(view=view, context=context))
 
 
 class Resume(DeveloperErrorViewMixin, APIView):

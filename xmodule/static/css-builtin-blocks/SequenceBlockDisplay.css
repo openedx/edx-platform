@@ -1,0 +1,359 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
+
+.xmodule_display.xmodule_SequenceBlock .block-link {
+    border-left: 1px solid var(--border-color, #e7e7e7);
+    display: block;
+}
+
+.xmodule_display.xmodule_SequenceBlock .block-link:hover,
+.xmodule_display.xmodule_SequenceBlock .block-link:focus {
+    background: none;
+}
+
+.xmodule_display.xmodule_SequenceBlock .topbar,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav {
+    border-bottom: 1px solid var(--border-color, #e7e7e7);
+}
+
+.xmodule_display.xmodule_SequenceBlock .topbar:after,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+@media print {
+
+    .xmodule_display.xmodule_SequenceBlock .topbar,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav {
+        display: none;
+    }
+}
+
+.xmodule_display.xmodule_SequenceBlock .topbar a.block-link,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav a.block-link {
+    border-left: 1px solid var(--border-color, #e7e7e7);
+    display: block;
+}
+
+.xmodule_display.xmodule_SequenceBlock .topbar a.block-link:hover,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav a.block-link:hover,
+.xmodule_display.xmodule_SequenceBlock .topbar a.block-link:focus,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav a.block-link:focus {
+    background: none;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button {
+    background-color: transparent;
+    background-image: none;
+    background-position: center 14px;
+    background-repeat: no-repeat;
+    border: none;
+    border-radius: 0;
+    background-clip: border-box;
+    box-shadow: none;
+    box-sizing: content-box;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav {
+    margin: 0 auto var(--baseline, 20px);
+    position: relative;
+    border-bottom: none;
+    z-index: 0;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+@media print {
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav {
+        display: none;
+    }
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav .sequence-list-wrapper {
+    position: relative;
+    height: 100%;
+    flex-grow: 1;
+}
+
+@media (max-width: 575.98px) {
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav .sequence-list-wrapper {
+        white-space: nowrap;
+        overflow-x: scroll;
+    }
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol {
+    display: flex;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li {
+    box-sizing: border-box;
+    min-width: 40px;
+    flex-grow: 1;
+    border-color: var(--border-color, #e7e7e7);
+    border-width: 1px;
+    border-top-style: solid;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li:not(:last-child) {
+    border-right-style: solid;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button {
+    width: 100%;
+    height: 49px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    display: block;
+    text-align: center;
+    border-color: var(--border-color, #e7e7e7);
+    border-width: 1px;
+    border-bottom-style: solid;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button .icon {
+    display: inline-block;
+    line-height: 100%;
+    font-size: 110%;
+    color: #5a5a5a;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button .fa-bookmark {
+    color: var(--link-color, #1b6d99);
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button.seq_video .icon::before {
+    content: "\f008";
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button.seq_other .icon::before {
+    content: "\f02d";
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button.seq_vertical .icon::before {
+    content: "\f00b";
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button.seq_problem .icon::before {
+    content: "\f044";
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button .sequence-tooltip {
+    text-align: left;
+    margin-top: 12px;
+    background: #333333;
+    color: var(--white, #fff);
+    font-family: var(--font-family-sans-serif);
+    line-height: lh();
+    right: 0;
+    padding: 6px;
+    position: absolute;
+    top: 48px;
+    text-shadow: 0 -1px 0 var(--black, #000);
+    white-space: pre;
+    pointer-events: none;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button .sequence-tooltip:empty {
+    background: none;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button .sequence-tooltip:empty::after {
+    display: none;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button .sequence-tooltip::after {
+    transform: rotate(45deg);
+    right: 18px;
+    background: #333333;
+    content: " ";
+    display: block;
+    height: 10px;
+    right: 18px;
+    position: absolute;
+    top: -5px;
+    width: 10px;
+}
+
+body.touch-based-device .xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button:hover p {
+    display: none;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button {
+    display: block;
+    top: 0;
+    min-width: 40px;
+    max-width: 40px;
+    height: 100%;
+    text-shadow: none;
+    background: none;
+    background-color: #fff;
+    border-color: var(--border-color, #e7e7e7);
+    box-shadow: none;
+    font-size: inherit;
+    font-weight: normal;
+    padding: 0;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+
+@media (min-width: 768px) {
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button {
+        min-width: 120px;
+        max-width: 200px;
+        text-overflow: ellipsis;
+    }
+
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button span:not(:last-child) {
+        padding-right: calc((var(--baseline, 20px) / 2));
+    }
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button .sequence-nav-button-label {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button .sequence-nav-button-label {
+        display: inline;
+    }
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button.button-previous {
+    order: -999;
+}
+
+@media (min-width: 768px) {
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button.button-previous {
+        left: 0;
+        -webkit-border-top-left-radius: 3px;
+        -moz-border-topleft-radius: 3px;
+        border-top-left-radius: 3px;
+        -webkit-border-top-right-radius: 0;
+        -moz-border-topright-radius: 0;
+        border-top-right-radius: 0;
+        -webkit-border-bottom-right-radius: 0;
+        -moz-border-bottomright-radius: 0;
+        border-bottom-right-radius: 0;
+        -webkit-border-bottom-left-radius: 3px;
+        -moz-border-bottomleft-radius: 3px;
+        border-bottom-left-radius: 3px;
+    }
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button.button-next {
+    order: 999;
+}
+
+@media (min-width: 768px) {
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button.button-next {
+        right: 0;
+        -webkit-border-top-left-radius: 0;
+        -moz-border-topleft-radius: 0;
+        border-top-left-radius: 0;
+        -webkit-border-top-right-radius: 3px;
+        -moz-border-topright-radius: 3px;
+        border-top-right-radius: 3px;
+        -webkit-border-bottom-right-radius: 3px;
+        -moz-border-bottomright-radius: 3px;
+        border-bottom-right-radius: 3px;
+        -webkit-border-bottom-left-radius: 0;
+        -moz-border-bottomleft-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button.disabled {
+    cursor: normal;
+}
+
+.xmodule_display.xmodule_SequenceBlock .seq_contents {
+    display: none;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-bottom {
+    position: relative;
+    height: 45px;
+    margin: lh(2) auto;
+    display: flex;
+    justify-content: center;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-bottom .sequence-nav-button {
+    position: relative;
+    min-width: 120px;
+    max-width: 200px;
+    text-overflow: ellipsis;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-bottom .sequence-nav-button:last-of-type {
+    border-left: none;
+}
+
+@media print {
+    .xmodule_display.xmodule_SequenceBlock .sequence-bottom {
+        display: none;
+    }
+}
+
+.xmodule_display.xmodule_SequenceBlock #seq_content:focus,
+.xmodule_display.xmodule_SequenceBlock #seq_content:active {
+    outline: none;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button.focused,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button:hover,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button:active,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button.active,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav button.focused,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav button:hover,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav button:active,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav button.active {
+    padding-top: 2px;
+    background-color: #0075b4;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button.focused .icon,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button:hover .icon,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button:active .icon,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button.active .icon,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav button.focused .icon,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav button:hover .icon,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav button:active .icon,
+.xmodule_display.xmodule_SequenceBlock .sequence-nav button.active .icon {
+    color: #fff;
+}
+
+@media (min-width: 576px) {
+
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button.focused,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button:hover,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button:active,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button.active,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav button.focused,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav button:hover,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav button:active,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav button.active {
+        border-bottom: 3px solid var(--link-color, #1b6d99);
+        background-color: #fff;
+    }
+
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button.focused .icon,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button:hover .icon,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button:active .icon,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav-button.active .icon,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav button.focused .icon,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav button:hover .icon,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav button:active .icon,
+    .xmodule_display.xmodule_SequenceBlock .sequence-nav button.active .icon {
+        color: #0a0a0a;
+    }
+}

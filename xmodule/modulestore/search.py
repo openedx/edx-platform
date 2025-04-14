@@ -12,7 +12,7 @@ from .exceptions import ItemNotFoundError, NoPathToItem
 LOGGER = getLogger(__name__)
 
 
-def path_to_location(modulestore, usage_key, request=None, full_path=False):
+def path_to_location(modulestore, usage_key, request=None, full_path=False, branch_type=None):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -82,46 +82,47 @@ def path_to_location(modulestore, usage_key, request=None, full_path=False):
             queue.append((parent, newpath))
 
     with modulestore.bulk_operations(usage_key.course_key):
-        if not modulestore.has_item(usage_key):
-            raise ItemNotFoundError(usage_key)
+        with modulestore.branch_setting(branch_type, usage_key.course_key):
+            if not modulestore.has_item(usage_key):
+                raise ItemNotFoundError(usage_key)
 
-        path = find_path_to_course()
-        if path is None:
-            raise NoPathToItem(usage_key)
+            path = find_path_to_course()
+            if path is None:
+                raise NoPathToItem(usage_key)
 
-        if full_path:
-            return path
+            if full_path:
+                return path
 
-        n = len(path)
-        course_id = path[0].course_key
-        # pull out the location names
-        chapter = path[1].block_id if n > 1 else None
-        section = path[2].block_id if n > 2 else None
-        vertical = path[3].block_id if n > 3 else None
-        # Figure out the position
-        position = None
+            n = len(path)
+            course_id = path[0].course_key
+            # pull out the location names
+            chapter = path[1].block_id if n > 1 else None
+            section = path[2].block_id if n > 2 else None
+            vertical = path[3].block_id if n > 3 else None
+            # Figure out the position
+            position = None
 
-        # This block of code will find the position of a block within a nested tree
-        # of blocks. If a problem is on tab 2 of a sequence that's on tab 3 of a
-        # sequence, the resulting position is 3_2. However, no positional blocks
-        # (e.g. sequential) currently deal with this form of representing nested
-        # positions. This needs to happen before jumping to a block nested in more
-        # than one positional block will work.
+            # This block of code will find the position of a block within a nested tree
+            # of blocks. If a problem is on tab 2 of a sequence that's on tab 3 of a
+            # sequence, the resulting position is 3_2. However, no positional blocks
+            # (e.g. sequential) currently deal with this form of representing nested
+            # positions. This needs to happen before jumping to a block nested in more
+            # than one positional block will work.
 
-        if n > 3:
-            position_list = []
-            for path_index in range(2, n - 1):
-                category = path[path_index].block_type
-                if category == 'sequential':
-                    section_desc = modulestore.get_item(path[path_index])
-                    # this calls get_children rather than just children b/c old mongo includes private children
-                    # in children but not in get_children
-                    child_locs = get_child_locations(section_desc, request, course_id)
-                    # positions are 1-indexed, and should be strings to be consistent with
-                    # url parsing.
-                    if path[path_index + 1] in child_locs:
-                        position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
-            position = "_".join(position_list)
+            if n > 3:
+                position_list = []
+                for path_index in range(2, n - 1):
+                    category = path[path_index].block_type
+                    if category == 'sequential':
+                        section_desc = modulestore.get_item(path[path_index])
+                        # this calls get_children rather than just children b/c old mongo includes private children
+                        # in children but not in get_children
+                        child_locs = get_child_locations(section_desc, request, course_id)
+                        # positions are 1-indexed, and should be strings to be consistent with
+                        # url parsing.
+                        if path[path_index + 1] in child_locs:
+                            position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
+                position = "_".join(position_list)
 
     return (course_id, chapter, section, vertical, position, path[-1])
 

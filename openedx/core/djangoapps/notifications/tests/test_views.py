@@ -1,12 +1,16 @@
 """
 Tests for the views in the notifications app.
 """
+import itertools
 import json
+from copy import deepcopy
 from datetime import datetime, timedelta
 from unittest import mock
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -27,19 +31,23 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_MODERATOR
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
+from openedx.core.djangoapps.notifications.email.utils import encrypt_object, encrypt_string
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
     get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
-from openedx.core.djangoapps.notifications.email.utils import encrypt_object, encrypt_string
+from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager
 from ..utils import get_notification_types_with_visibility_settings
+
+User = get_user_model()
 
 
 @ddt.ddt
@@ -111,6 +119,7 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+@ddt.ddt
 class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
     """
     Tests for the post_save signal for CourseEnrollment.
@@ -168,6 +177,68 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
 
         self.assertEqual(notification_preferences.count(), 1)
         self.assertEqual(notification_preferences[0].user, self.user)
+
+    def test_disabled_email_preference_is_generated_after_unsubscribe(self):
+        """
+        Test the post_save signal for CourseEnrollment for user with one-click unsubscribe.
+        """
+        UserPreference.objects.create(user_id=self.user.id, key=ONE_CLICK_EMAIL_UNSUB_KEY)
+        enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=enrollment_data
+        )
+
+        notification_preferences = CourseNotificationPreference.objects.all()
+
+        self.assertEqual(notification_preferences.count(), 1)
+        self.assertEqual(notification_preferences[0].user, self.user)
+
+        email_preferences = [
+            notification["email"]
+            for app in notification_preferences[0].notification_preference_config.values()
+            for notification in app["notification_types"].values()
+        ]
+
+        self.assertEqual(email_preferences, [False] * len(email_preferences))
+
+    @ddt.data(*itertools.product(('web', 'email'), (True, False)))
+    @ddt.unpack
+    def test_course_preference_creation_for_inactive_enrollments_on_unsub(
+        self,
+        channel,
+        value
+    ):
+        """
+        Test that unsubscribing through one click email does not create new course preferences for inactive enrollments
+        if not already exists.
+        """
+        self.course_enrollment.is_active = False
+        self.course_enrollment.save()
+        encrypted_username = encrypt_string(self.user.username)
+        encrypted_patch = encrypt_object({
+            'channel': channel,
+            'value': value
+        })
+        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
+
+        self.assertEqual(CourseNotificationPreference.objects.all().count(), 0)
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
@@ -271,9 +342,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'email_cadence': 'Daily',
                         },
                     },
-                    'non_editable': {
-                        'core': ['web']
-                    }
+                    'non_editable': {}
                 },
                 'updates': {
                     'enabled': True,
@@ -300,8 +369,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                     'enabled': True,
                     'core_notification_types': [],
                     'notification_types': {
-                        'ora_staff_notification': {
-                            'web': False,
+                        'ora_staff_notifications': {
+                            'web': True,
                             'email': False,
                             'push': False,
                             'email_cadence': 'Daily',
@@ -468,6 +537,24 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         for notification_app, app_prefs in default_prefs.items():
             for _, type_prefs in app_prefs.get('notification_types', {}).items():
                 assert 'info' not in type_prefs.keys()
+
+    @ddt.data(*itertools.product(('email', 'web'), (True, False)))
+    @ddt.unpack
+    def test_unsub_user_preferences_removal_on_email_enabled(self, channel, value):
+        """
+        Test one click unsub user preference should be removed on email enable for any app.
+        """
+        UserPreference.objects.create(user=self.user, key=ONE_CLICK_EMAIL_UNSUB_KEY)
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+        payload = {
+            'notification_app': 'discussion',
+            'notification_type': 'core',
+            'notification_channel': channel,
+            'value': value
+        }
+        self.client.patch(self.path, json.dumps(payload), content_type='application/json')
+        result = 0 if channel == 'email' and value else 1
+        self.assertEqual(UserPreference.objects.count(), result)
 
 
 @ddt.ddt
@@ -706,6 +793,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         Notification.objects.create(user=self.user, app_name='App Name 1', notification_type='Type B')
         Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
+        Notification.objects.create(user=self.user, app_name='App Name 4', notification_type='Type D', web=False)
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.unpack
@@ -904,6 +992,7 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
     """
     Tests if preference is updated when encrypted url is hit
     """
+
     def setUp(self):
         """
         Setup test case
@@ -936,7 +1025,6 @@ class UpdatePreferenceFromEncryptedDataView(ModuleStoreTestCase):
         for app_name, app_prefs in config.items():
             for type_prefs in app_prefs['notification_types'].values():
                 assert type_prefs['email'] is False
-                assert type_prefs['email_cadence'] == EmailCadence.NEVER
 
     def test_if_config_version_is_updated(self):
         """
@@ -970,3 +1058,328 @@ def remove_notifications_with_visibility_settings(expected_response):
                     notification_type
                 )
     return expected_response
+
+
+@ddt.ddt
+class UpdateAllNotificationPreferencesViewTests(APITestCase):
+    """
+    Tests for the UpdateAllNotificationPreferencesView.
+    """
+
+    def setUp(self):
+        # Create test user
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse('update-all-notification-preferences')
+
+        # Complex notification config structure
+        self.base_config = {
+            "grading": {
+                "enabled": True,
+                "non_editable": {},
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "ora_staff_notifications": {
+                        "web": False,
+                        "push": False,
+                        "email": False,
+                        "email_cadence": "Daily"
+                    }
+                },
+                "core_notification_types": []
+            },
+            "updates": {
+                "enabled": True,
+                "non_editable": {},
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "course_updates": {
+                        "web": True,
+                        "push": True,
+                        "email": False,
+                        "email_cadence": "Daily"
+                    }
+                },
+                "core_notification_types": []
+            },
+            "discussion": {
+                "enabled": True,
+                "non_editable": {
+                    "core": ["web"]
+                },
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "content_reported": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "new_question_post": {
+                        "web": True,
+                        "push": False,
+                        "email": False,
+                        "email_cadence": "Daily"
+                    },
+                    "new_discussion_post": {
+                        "web": True,
+                        "push": False,
+                        "email": False,
+                        "email_cadence": "Daily"
+                    }
+                },
+                "core_notification_types": [
+                    "new_comment_on_response",
+                    "new_comment",
+                    "new_response",
+                    "response_on_followed_post",
+                    "comment_on_followed_post",
+                    "response_endorsed_on_thread",
+                    "response_endorsed"
+                ]
+            }
+        }
+
+        # Create test notification preferences
+        self.preferences = []
+        for i in range(3):
+            pref = CourseNotificationPreference.objects.create(
+                user=self.user,
+                course_id=f'course-v1:TestX+Test{i}+2024',
+                notification_preference_config=deepcopy(self.base_config),
+                is_active=True
+            )
+            self.preferences.append(pref)
+
+        # Create an inactive preference
+        self.inactive_pref = CourseNotificationPreference.objects.create(
+            user=self.user,
+            course_id='course-v1:TestX+Inactive+2024',
+            notification_preference_config=deepcopy(self.base_config),
+            is_active=False
+        )
+
+    def test_update_discussion_notification(self):
+        """
+        Test updating discussion notification settings
+        """
+        data = {
+            'notification_app': 'discussion',
+            'notification_type': 'content_reported',
+            'notification_channel': 'push',
+            'value': False
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        self.assertEqual(response.data['data']['total_updated'], 3)
+
+        # Verify database updates
+        for pref in CourseNotificationPreference.objects.filter(is_active=True):
+            self.assertFalse(
+                pref.notification_preference_config['discussion']['notification_types']['content_reported']['push']
+            )
+
+    def test_update_non_editable_field(self):
+        """
+        Test attempting to update a non-editable field
+        """
+        data = {
+            'notification_app': 'discussion',
+            'notification_type': 'core',
+            'notification_channel': 'web',
+            'value': False
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        # Should fail because 'web' is non-editable for 'core' in discussion
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+
+        # Verify database remains unchanged
+        for pref in CourseNotificationPreference.objects.filter(is_active=True):
+            self.assertFalse(
+                pref.notification_preference_config['discussion']['notification_types']['core']['web']
+            )
+
+    def test_update_email_cadence(self):
+        """
+        Test updating email cadence setting
+        """
+        data = {
+            'notification_app': 'discussion',
+            'notification_type': 'content_reported',
+            'email_cadence': 'Weekly'
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+
+        # Verify database updates
+        for pref in CourseNotificationPreference.objects.filter(is_active=True):
+            notification_type = pref.notification_preference_config['discussion']['notification_types'][
+                'content_reported']
+            self.assertEqual(
+                notification_type['email_cadence'],
+                'Weekly'
+            )
+
+    @patch.dict('openedx.core.djangoapps.notifications.serializers.COURSE_NOTIFICATION_APPS', {
+        **COURSE_NOTIFICATION_APPS,
+        'grading': {
+            'enabled': False,
+            'core_info': 'Notifications for submission grading.',
+            'core_web': True,
+            'core_email': True,
+            'core_push': True,
+            'core_email_cadence': 'Daily',
+            'non_editable': []
+        }
+    })
+    def test_update_disabled_app(self):
+        """
+        Test updating notification for a disabled app
+        """
+        # Disable the grading app in all preferences
+        for pref in self.preferences:
+            config = pref.notification_preference_config
+            config['grading']['enabled'] = False
+            pref.notification_preference_config = config
+            pref.save()
+
+        data = {
+            'notification_app': 'grading',
+            'notification_type': 'core',
+            'notification_channel': 'email',
+            'value': False
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['status'], 'error')
+
+    def test_invalid_serializer_data(self):
+        """
+        Test handling of invalid input data
+        """
+        test_cases = [
+            {
+                'notification_app': 'invalid_app',
+                'notification_type': 'core',
+                'notification_channel': 'push',
+                'value': False
+            },
+            {
+                'notification_app': 'discussion',
+                'notification_type': 'invalid_type',
+                'notification_channel': 'push',
+                'value': False
+            },
+            {
+                'notification_app': 'discussion',
+                'notification_type': 'core',
+                'notification_channel': 'invalid_channel',
+                'value': False
+            },
+            {
+                'notification_app': 'discussion',
+                'notification_type': 'core',
+                'notification_channel': 'email_cadence',
+                'value': 'Invalid_Cadence'
+            }
+        ]
+
+        for test_case in test_cases:
+            response = self.client.post(self.url, test_case, format='json')
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @ddt.data(*itertools.product(('email', 'web'), (True, False)))
+    @ddt.unpack
+    def test_unsub_user_preferences_removal_on_account_email_enabled(self, channel, value):
+        """
+        Test one click unsub user preference should be removed on email enable for any app through account preferences
+        """
+        UserPreference.objects.create(user=self.user, key=ONE_CLICK_EMAIL_UNSUB_KEY)
+        payload = {
+            'notification_app': 'grading',
+            'notification_type': 'core',
+            'notification_channel': channel,
+            'value': value
+        }
+        self.client.post(self.url, payload, format='json')
+        result = 0 if channel == 'email' and value else 1
+        self.assertEqual(UserPreference.objects.count(), result)
+
+
+class GetAggregateNotificationPreferencesTest(APITestCase):
+    """
+    Tests for the GetAggregateNotificationPreferences API view.
+    """
+
+    def setUp(self):
+        # Set up a user and API client
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse('notification-preferences-aggregated')  # Adjust with the actual name
+
+    def test_no_active_notification_preferences(self):
+        """
+        Test case: No active notification preferences found for the user
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['status'], 'error')
+        self.assertEqual(response.data['message'], 'No active notification preferences found')
+
+    @patch('openedx.core.djangoapps.notifications.views.aggregate_notification_configs')
+    def test_with_active_notification_preferences(self, mock_aggregate):
+        """
+        Test case: Active notification preferences found for the user
+        """
+        # Mock aggregate_notification_configs for a controlled output
+        mock_aggregate.return_value = {'mocked': 'data'}
+
+        # Create active notification preferences for the user
+        CourseNotificationPreference.objects.create(
+            user=self.user,
+            is_active=True,
+            notification_preference_config={'example': 'config'}
+        )
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        self.assertEqual(response.data['message'], 'Notification preferences retrieved')
+        self.assertEqual(response.data['data'], {'mocked': 'data'})
+
+    def test_unauthenticated_user(self):
+        """
+        Test case: Request without authentication
+        """
+        # Test case: Request without authentication
+        self.client.logout()  # Remove authentication
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

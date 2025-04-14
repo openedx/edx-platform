@@ -68,7 +68,7 @@ def get_context(course, request, thread=None):
     moderator_user_ids = get_moderator_users_list(course.id)
     ta_user_ids = get_course_ta_users_list(course.id)
     requester = request.user
-    cc_requester = CommentClientUser.from_django_user(requester).retrieve()
+    cc_requester = CommentClientUser.from_django_user(requester).retrieve(course_id=course.id)
     cc_requester["course_id"] = course.id
     course_discussion_settings = CourseDiscussionSettings.get(course.id)
     is_global_staff = GlobalStaff().has_user(requester)
