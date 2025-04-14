@@ -5521,6 +5521,12 @@ EVENT_BUS_PRODUCER_CONFIG = {
             "enabled": Derived(_should_send_learning_badge_events),
         },
     },
+    "org.openedx.learning.external_grader.score.submitted.v1": {
+        "learning-external-grader-score-lifecycle": {
+            "event_key_field": "score.submission_id",
+            "enabled": Derived(_should_send_learning_badge_events)
+        },
+    },
 }
 
 BEAMER_PRODUCT_ID = ""

@@ -811,7 +811,7 @@ edx-sga==0.25.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions==3.10.1
+edx-submissions @ git+https://github.com/aulasneo/edx-submissions.git@XQU-44-add-signal-to-call-xqueue-callback
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1357,7 +1357,7 @@ openedx-django-wiki==3.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==10.2.0
+openedx-events==10.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

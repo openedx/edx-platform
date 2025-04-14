@@ -348,6 +348,14 @@ urlpatterns += [
         name='xqueue_callback',
     ),
 
+    re_path(
+        r'^courses/{}/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        xqueue_callback,
+        name='callback_submission',
+    ),
+
     # TODO: These views need to be updated before they work
     path('calculate', util_views.calculate),
 
@@ -1046,4 +1054,10 @@ urlpatterns += [
 
 urlpatterns += [
     path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
+]
+
+from submissions import urls as submissions_urls
+
+urlpatterns += [
+    path('xqueue/', include((submissions_urls, 'submissions'), namespace='submissions')),
 ]
