@@ -124,11 +124,15 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     openassessment_path = Path(openassessment.__path__[0])
     oa_manifest_path = openassessment_path / "xblock" / "static" / "dist" / "manifest.json"
 
-    oa_studio_css = ""
     if oa_manifest_path.exists():
         with open(oa_manifest_path, "r") as f:
             oa_manifest = json.load(f)
-            oa_studio_css = oa_manifest.get("openassessment-ltr.css", "")
+            new_oa_manifest = {
+                'oa_ltr_css': oa_manifest.get("openassessment-ltr.css", ""),
+                'oa_ltr_js': oa_manifest.get("openassessment-ltr.js", ""),
+                'oa_editor_textarea_js': oa_manifest.get("openassessment-editor-textarea.js", ""),
+                'oa_editor_tinymce_js': oa_manifest.get("openassessment-editor-tinymce.js", ""),
+            }
 
     context = {
         'fragment': fragment,
@@ -137,7 +141,7 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
         'cms_root_url': cms_root_url,
         'view_name': view_name,
         'is_development': settings.DEBUG,
-        'oa_studio_css': oa_studio_css,
+        'oa_manifest': new_oa_manifest,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
 

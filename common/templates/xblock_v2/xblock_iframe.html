@@ -42,32 +42,38 @@
     define = define || RequireJS.define;
     (function (require, define) {
         if ('{{ view_name | safe }}' === 'studio_view') {
-          // Call `require-config.js` of the CMS
-          var script = document.createElement('script');
-          script.type = 'text/javascript';
-          script.src = "{{ cms_root_url }}/static/studio/cms/js/require-config.js";
-          document.head.appendChild(script);
+            // Call `require-config.js` of the CMS
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = "{{ cms_root_url }}/static/studio/cms/js/require-config.js";
+            document.head.appendChild(script);
 
-          require.config({
-              baseUrl: "{{ cms_root_url }}/static/studio",
-              paths: {
-                  accessibility: 'js/src/accessibility_tools',
-                  draggabilly: 'js/vendor/draggabilly',
-                  hls: 'common/js/vendor/hls',
-                  moment: 'common/js/vendor/moment-with-locales',
-              },
-          });
+            require.config({
+                baseUrl: "{{ cms_root_url }}/static/studio",
+                paths: {
+                        accessibility: 'js/src/accessibility_tools',
+                        draggabilly: 'js/vendor/draggabilly',
+                        hls: 'common/js/vendor/hls',
+                        moment: 'common/js/vendor/moment-with-locales',
+                        'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
+                        'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce.min',
+                },
+            });
+            require([
+                "{{ lms_root_url }}/static/dist{{ oa_manifest.oa_editor_tinymce_js }}",
+                "{{ lms_root_url }}/static/dist{{ oa_manifest.oa_editor_textarea_js }}",
+            ]);
         } else {
-          require.config({
-              baseUrl: "{{ lms_root_url }}/static/",
-              paths: {
-                  accessibility: 'js/src/accessibility_tools',
-                  draggabilly: 'js/vendor/draggabilly',
-                  hls: 'common/js/vendor/hls',
-                  moment: 'common/js/vendor/moment-with-locales',
-                  HtmlUtils: 'edx-ui-toolkit/js/utils/html-utils',
-              },
-          });
+            require.config({
+                baseUrl: "{{ lms_root_url }}/static/",
+                paths: {
+                    accessibility: 'js/src/accessibility_tools',
+                    draggabilly: 'js/vendor/draggabilly',
+                    hls: 'common/js/vendor/hls',
+                    moment: 'common/js/vendor/moment-with-locales',
+                    HtmlUtils: 'edx-ui-toolkit/js/utils/html-utils',
+                },
+            });
         }
         define('gettext', [], function() { return window.gettext; });
         define('jquery', [], function() { return window.jQuery; });
@@ -109,7 +115,8 @@
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/vendor/hint.css">
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/studio-main-v1.css" />
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/course-unit-mfe-iframe-bundle.css" />
-  <link rel="stylesheet" href="{{ lms_root_url }}/static/dist/{{ oa_studio_css }}">
+  <link rel="stylesheet" href="{{ lms_root_url }}/static/dist{{ oa_manifest.oa_ltr_css }}">
+  <script type="text/javascript" src="{{ lms_root_url }}/static/dist{{ oa_manifest.oa_ltr_js }}"></script>
 
   <!-- Configure and load MathJax -->
   <script type="text/x-mathjax-config">
