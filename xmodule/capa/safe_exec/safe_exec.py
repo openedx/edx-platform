@@ -159,6 +159,8 @@ def safe_exec(
                 raise SafeExecException(emsg)
             return
 
+    cacheable = True  # unless we get an unexpected error
+
     # Create the complete code we'll run.
     code_prolog = CODE_PROLOG % random_seed
 
@@ -196,11 +198,17 @@ def safe_exec(
                     limit_overrides_context=limit_overrides_context,
                     slug=slug,
                 )
-        except SafeExecException as e:
+        except BaseException as e:
             # Saving SafeExecException e in exception to be used later.
             exception = e
             emsg = str(e)
+            if not isinstance(exception, SafeExecException):
+                # Something unexpected happened, so don't cache this evaluation.
+                # (We may decide to cache these in the future as well; this is just
+                # preserving existing behavior during a refactor of error handling.)
+                cacheable = False
         else:
+            exception = None
             emsg = None
 
         # Run the code in both the remote codejail service as well as the local codejail
@@ -235,10 +243,10 @@ def safe_exec(
 
     # Put the result back in the cache.  This is complicated by the fact that
     # the globals dict might not be entirely serializable.
-    if cache:
+    if cache and cacheable:
         cleaned_results = json_safe(globals_dict)
         cache.set(key, (emsg, cleaned_results))
 
     # If an exception happened, raise it now.
-    if emsg:
+    if exception:
         raise exception
