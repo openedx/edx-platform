@@ -6,17 +6,14 @@ Views for the maintenance app.
 import logging
 
 from django.core.validators import ValidationError
-from django.db import transaction
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic import View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.util.views import require_global_staff
@@ -30,16 +27,6 @@ log = logging.getLogger(__name__)
 
 # This dict maintains all the views that will be used Maintenance app.
 MAINTENANCE_VIEWS = {
-    'force_publish_course': {
-        'url': 'maintenance:force_publish_course',
-        'name': _('Force Publish Course'),
-        'slug': 'force_publish_course',
-        'description': _(
-            'Sometimes the draft and published branches of a course can get out of sync. Force publish course command '
-            'resets the published branch of a course to point to the draft branch, effectively force publishing the '
-            'course. This view dry runs the force publish command'
-        ),
-    },
     'announcement_index': {
         'url': 'maintenance:announcement_index',
         'name': _('Edit Announcements'),
@@ -129,104 +116,6 @@ class MaintenanceBaseView(View):
         course_usage_key = course_usage_key.for_branch(branch)
 
         return course_usage_key
-
-
-class ForcePublishCourseView(MaintenanceBaseView):
-    """
-    View for force publishing state of the course, used by the global staff.
-
-    This view uses `force_publish_course` method of modulestore which publishes the draft state of the course. After
-    the course has been forced published, both draft and publish draft point to same location.
-    """
-
-    def __init__(self):
-        super().__init__(MAINTENANCE_VIEWS['force_publish_course'])
-        self.context.update({
-            'current_versions': [],
-            'updated_versions': [],
-            'form_data': {
-                'course_id': '',
-                'is_dry_run': True
-            }
-        })
-
-    def get_course_branch_versions(self, versions):
-        """
-        Returns a dict containing unicoded values of draft and published draft versions.
-        """
-        return {
-            'draft-branch': str(versions['draft-branch']),
-            'published-branch': str(versions['published-branch'])
-        }
-
-    @transaction.atomic
-    @method_decorator(require_global_staff)
-    def post(self, request):
-        """
-        This method force publishes a course if dry-run argument is not selected. If dry-run is selected, this view
-        shows possible outcome if the `force_publish_course` modulestore method is executed.
-
-        Arguments:
-            course_id (string): a request parameter containing course id
-            is_dry_run (string): a request parameter containing dry run value.
-                                 It is obtained from checkbox so it has either values 'on' or ''.
-        """
-        course_id = request.POST.get('course-id')
-
-        self.context.update({
-            'form_data': {
-                'course_id': course_id
-            }
-        })
-
-        try:
-            course_usage_key = self.validate_course_key(course_id)
-        except InvalidKeyError:
-            self.context['error'] = True
-            self.context['msg'] = COURSE_KEY_ERROR_MESSAGES['invalid_course_key']
-        except ItemNotFoundError as exc:
-            self.context['error'] = True
-            self.context['msg'] = str(exc)
-        except ValidationError as exc:
-            self.context['error'] = True
-            self.context['msg'] = str(exc)
-
-        if self.context['error']:
-            return self.render_response()
-
-        source_store = modulestore()._get_modulestore_for_courselike(course_usage_key)  # pylint: disable=protected-access
-        if not hasattr(source_store, 'force_publish_course'):
-            self.context['msg'] = _('Force publishing course is not supported with old mongo courses.')
-            log.warning(
-                'Force publishing course is not supported with old mongo courses. \
-                %s attempted to force publish the course %s.',
-                request.user,
-                course_id,
-                exc_info=True
-            )
-            return self.render_response()
-
-        current_versions = self.get_course_branch_versions(get_course_versions(course_id))
-
-        # if publish and draft are NOT different
-        if current_versions['published-branch'] == current_versions['draft-branch']:
-            self.context['msg'] = _('Course is already in published state.')
-            log.warning(
-                'Course is already in published state. %s attempted to force publish the course %s.',
-                request.user,
-                course_id,
-                exc_info=True
-            )
-            return self.render_response()
-
-        self.context['current_versions'] = current_versions
-        log.info(
-            '%s dry ran force publish the course %s.',
-            request.user,
-            course_id,
-            exc_info=True
-        )
-        return self.render_response()
 
 
 class AnnouncementBaseView(View):

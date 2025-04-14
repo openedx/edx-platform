@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from path import Path as path
 from pytz import UTC
 from rest_framework import status
@@ -31,10 +32,13 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     TEST_DATA_SPLIT_MODULESTORE,
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase
+    SharedModuleStoreTestCase,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import (
+    BlockFactory,
+    CourseFactory,
+)
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 class LMSLinksTestCase(TestCase):
@@ -935,10 +939,13 @@ class UpdateCourseDetailsTests(ModuleStoreTestCase):
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
-class CourseUpdateNotificationTests(ModuleStoreTestCase):
+class CourseUpdateNotificationTests(OpenEdxEventsTestMixin, ModuleStoreTestCase):
     """
     Unit tests for the course_update notification.
     """
+    ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.learning.course.notification.requested.v1",
+    ]
 
     def setUp(self):
         """
@@ -960,4 +967,32 @@ class CourseUpdateNotificationTests(ModuleStoreTestCase):
         send_course_update_notification(self.course.id, content, self.user)
         assert Notification.objects.all().count() == 1
         notification = Notification.objects.first()
-        assert notification.content == "<p><strong><p>content</p></strong></p>"
+        assert notification.content == "<p><strong>content</strong></p>"
+
+    def test_if_content_is_plain_text(self):
+        """
+        Test that the course_update notification is sent.
+        """
+        user = UserFactory()
+        CourseEnrollment.enroll(user=user, course_key=self.course.id)
+        assert Notification.objects.all().count() == 0
+        content = "<p>content<p>Sub content</p><h1>heading</h1></p><img src='' />"
+        send_course_update_notification(self.course.id, content, self.user)
+        assert Notification.objects.all().count() == 1
+        notification = Notification.objects.first()
+        assert notification.content == "<p><strong>content Sub content heading</strong></p>"
+
+    def test_if_html_unescapes(self):
+        """
+        Tests if html unescapes when creating content of course update notification
+        """
+        user = UserFactory()
+        CourseEnrollment.enroll(user=user, course_key=self.course.id)
+        assert Notification.objects.all().count() == 0
+        content = "<p>&lt;p&gt; &amp;nbsp;&lt;/p&gt;<br />"\
+                  "&lt;p&gt;abcd&lt;/p&gt;<br />"\
+                  "&lt;p&gt;&amp;nbsp;&lt;/p&gt;<br /></p>"
+        send_course_update_notification(self.course.id, content, self.user)
+        assert Notification.objects.all().count() == 1
+        notification = Notification.objects.first()
+        assert notification.content == "<p><strong>abcd</strong></p>"

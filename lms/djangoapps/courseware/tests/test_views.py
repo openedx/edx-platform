@@ -133,38 +133,6 @@ class TestJumpTo(ModuleStoreTestCase):
     Check the jumpto link for a course.
     """
     @ddt.data(
-        (True, False),  # preview -> Legacy experience
-        (False, True),  # no preview -> MFE experience
-    )
-    @ddt.unpack
-    def test_jump_to_legacy_vs_mfe(self, preview_mode, expect_mfe):
-        """
-        Test that jump_to and jump_to_id correctly choose which courseware frontend to redirect to.
-
-        Can be removed when the MFE supports a preview mode.
-        """
-        course = CourseFactory.create()
-        chapter = BlockFactory.create(category='chapter', parent_location=course.location)
-        if expect_mfe:
-            expected_url = f'http://learning-mfe/course/{course.id}/{chapter.location}'
-        else:
-            expected_url = f'/courses/{course.id}/courseware/{chapter.url_name}/'
-
-        jumpto_url = f'/courses/{course.id}/jump_to/{chapter.location}'
-        with set_preview_mode(preview_mode):
-            response = self.client.get(jumpto_url)
-        assert response.status_code == 302
-        # Check the response URL, but chop off the querystring; we don't care here.
-        assert response.url.split('?')[0] == expected_url
-
-        jumpto_id_url = f'/courses/{course.id}/jump_to_id/{chapter.url_name}'
-        with set_preview_mode(preview_mode):
-            response = self.client.get(jumpto_id_url)
-        assert response.status_code == 302
-        # Check the response URL, but chop off the querystring; we don't care here.
-        assert response.url.split('?')[0] == expected_url
-
-    @ddt.data(
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
     )
@@ -174,32 +142,34 @@ class TestJumpTo(ModuleStoreTestCase):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
             location = course.id.make_usage_key(None, 'NoSuchPlace')
-        expected_redirect_url = (
-            f'/courses/{course.id}/courseware?' + urlencode({'activate_block_id': str(course.location)})
+
+        expected_redirect_url = f'http://learning-mfe/course/{course.id}'
+        jumpto_url = (
+            f'/courses/{course.id}/jump_to/{location}?preview=1'
         ) if preview_mode else (
-            f'http://learning-mfe/course/{course.id}'
+            f'/courses/{course.id}/jump_to/{location}'
         )
+
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
-        jumpto_url = f'/courses/{course.id}/jump_to/{location}'
-        with set_preview_mode(preview_mode):
+        with set_preview_mode(False):
             response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    @set_preview_mode(True)
-    def test_jump_to_legacy_from_sequence(self):
+    @set_preview_mode(False)
+    def test_jump_to_preview_from_sequence(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
             sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
-        activate_block_id = urlencode({'activate_block_id': str(sequence.location)})
+        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}?preview=1'
         expected_redirect_url = (
-            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/?{activate_block_id}'
+            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{sequence.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
 
     @set_preview_mode(False)
     def test_jump_to_mfe_from_sequence(self):
@@ -214,8 +184,8 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    @set_preview_mode(True)
-    def test_jump_to_legacy_from_block(self):
+    @set_preview_mode(False)
+    def test_jump_to_preview_from_block(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -225,21 +195,21 @@ class TestJumpTo(ModuleStoreTestCase):
             block1 = BlockFactory.create(category='html', parent_location=vertical1.location)
             block2 = BlockFactory.create(category='html', parent_location=vertical2.location)
 
-        activate_block_id = urlencode({'activate_block_id': str(block1.location)})
+        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}?preview=1'
         expected_redirect_url = (
-            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
+            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}/{vertical1.location}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
 
-        activate_block_id = urlencode({'activate_block_id': str(block2.location)})
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}?preview=1'
         expected_redirect_url = (
-            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/2?{activate_block_id}'
+            f'http://learning-mfe/preview/course/{course.id}/{sequence.location}/{vertical2.location}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
+        assert response.status_code == 302
+        assert response.url == expected_redirect_url
 
     @set_preview_mode(False)
     def test_jump_to_mfe_from_block(self):
@@ -300,8 +270,12 @@ class TestJumpTo(ModuleStoreTestCase):
     def test_jump_to_id_invalid_location(self, preview_mode, store_type):
         with self.store.default_store(store_type):
             course = CourseFactory.create()
-        jumpto_url = f'/courses/{course.id}/jump_to/NoSuchPlace'
-        with set_preview_mode(preview_mode):
+        jumpto_url = (
+            f'/courses/{course.id}/jump_to/NoSuchPlace?preview=1'
+        ) if preview_mode else (
+            f'/courses/{course.id}/jump_to/NoSuchPlace'
+        )
+        with set_preview_mode(False):
             response = self.client.get(jumpto_url)
         assert response.status_code == 404
 
@@ -367,7 +341,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.user_password)
         CourseEnrollment.enroll(self.user, course.id)
 
-        with self.assertNumQueries(177, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
+        with self.assertNumQueries(152, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
             with check_mongo_calls(3):
                 url = reverse(
                     'courseware_section',
@@ -1498,8 +1472,8 @@ class ProgressPageTests(ProgressPageBaseTests):
             self.assertContains(resp, "earned a certificate for this course.")
 
     @ddt.data(
-        (True, 53),
-        (False, 53),
+        (True, 54),
+        (False, 54),
     )
     @ddt.unpack
     def test_progress_queries_paced_courses(self, self_paced, query_count):
@@ -1514,13 +1488,13 @@ class ProgressPageTests(ProgressPageBaseTests):
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         self.setup_course()
         with self.assertNumQueries(
-            53, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+            54, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
         ), check_mongo_calls(2):
             self._get_progress_page()
 
         for _ in range(2):
             with self.assertNumQueries(
-                38, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
+                39, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST
             ), check_mongo_calls(2):
                 self._get_progress_page()
 
@@ -2959,9 +2933,9 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
-    @patch('lms.djangoapps.courseware.views.views.unpack_token_for')
+    @patch('lms.djangoapps.courseware.views.views.unpack_jwt')
     def test_render_descendant_of_exam_gated_by_access_token(self, exam_access_token,
-                                                             expected_response, _mock_token_unpack):
+                                                             expected_response, _mock_unpack_jwt):
         """
         Verify blocks inside an exam that requires token access are gated by
         a valid exam access JWT issued for that exam sequence.
@@ -2994,7 +2968,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         CourseOverview.load_from_module_store(self.course.id)
         self.setup_user(admin=False, enroll=True, login=True)
 
-        def _mock_token_unpack_fn(token, user_id):
+        def _mock_unpack_jwt_fn(token, user_id):
             if token == 'valid-jwt-for-exam-sequence':
                 return {'content_id': str(self.sequence.location)}
             elif token == 'valid-jwt-for-incorrect-sequence':
@@ -3002,7 +2976,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
             else:
                 raise Exception('invalid JWT')
 
-        _mock_token_unpack.side_effect = _mock_token_unpack_fn
+        _mock_unpack_jwt.side_effect = _mock_unpack_jwt_fn
 
         # Problem and Vertical response should be gated on access token
         for block in [self.problem_block, self.vertical_block]:
@@ -3359,7 +3333,7 @@ class PreviewTests(BaseViewsTestCase):
     def test_preview_no_redirect(self):
         __, __, preview_url = self._get_urls()
         with set_preview_mode(True):
-            # Previews will not redirect to the mfe
+            # Previews server from PREVIEW_LMS_BASE will not redirect to the mfe
             course_staff = UserFactory.create(is_staff=False)
             CourseStaffRole(self.course_key).add_users(course_staff)
             self.client.login(username=course_staff.username, password=TEST_PASSWORD)
@@ -3803,7 +3777,7 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
     def test_is_mfe_search_waffle_disabled(self):
         """
-        Courseware search is only available when the waffle flag is enabled.
+        Courseware search is only available when the waffle flag is enabled, if no inclusion date is provided.
         """
         user_admin = UserFactory(is_staff=True, is_superuser=True)
         CourseEnrollmentFactory.create(user=user_admin, course_id=self.course.id, mode=CourseMode.VERIFIED)
@@ -3813,6 +3787,27 @@ class TestCoursewareMFESearchAPI(SharedModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(body, {'enabled': False})
+
+    @patch.dict('django.conf.settings.FEATURES', {'COURSEWARE_SEARCH_INCLUSION_DATE': '2020'})
+    @override_waffle_flag(COURSEWARE_MICROFRONTEND_SEARCH_ENABLED, active=False)
+    @ddt.data(
+        (datetime(2013, 9, 18, 11, 30, 00), False),
+        (None, False),
+        (datetime(2024, 9, 18, 11, 30, 00), True),
+    )
+    @ddt.unpack
+    def test_inclusion_date_greater_than_course_start(self, start_date, expected_enabled):
+        course_with_start = CourseFactory.create(start=start_date)
+        api_url = reverse('courseware_search_enabled_view', kwargs={'course_id': str(course_with_start.id)})
+
+        user_staff = UserFactory(is_staff=True)
+
+        self.client.login(username=user_staff.username, password=TEST_PASSWORD)
+        response = self.client.get(api_url, content_type='application/json')
+        body = json.loads(response.content.decode('utf-8'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body, {'enabled': expected_enabled})
 
 
 class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):

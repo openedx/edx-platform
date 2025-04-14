@@ -1,8 +1,7 @@
 """HomePageCoursesViewV2 APIView for getting content available to the logged in user."""
+
 import edx_api_doc_tools as apidocs
 from collections import OrderedDict
-from django.conf import settings
-from django.http import HttpResponseNotFound
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -126,13 +125,7 @@ class HomePageCoursesViewV2(APIView):
             "in_process_course_actions": [],
         }
         ```
-
-        if the `ENABLE_HOME_PAGE_COURSE_API_V2` feature flag is not enabled, an HTTP 404 "Not Found" response
-        is returned.
         """
-        if not settings.FEATURES.get('ENABLE_HOME_PAGE_COURSE_API_V2', False):
-            return HttpResponseNotFound()
-
         courses, in_process_course_actions = get_course_context_v2(request)
         paginator = HomePageCoursesPaginator()
         courses_page = paginator.paginate_queryset(

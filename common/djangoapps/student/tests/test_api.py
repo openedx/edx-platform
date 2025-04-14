@@ -1,10 +1,16 @@
 """
 Test Student api.py
 """
+
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from common.djangoapps.student.api import is_user_enrolled_in_course, is_user_staff_or_instructor_in_course
+from common.djangoapps.student.api import (
+    is_user_enrolled_in_course,
+    is_user_staff_or_instructor_in_course,
+    get_course_enrollments,
+)
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import (
     CourseEnrollmentFactory,
     GlobalStaffFactory,
@@ -33,10 +39,7 @@ class TestStudentApi(SharedModuleStoreTestCase):
         """
         Verify the correct value is returned when a learner is actively enrolled in a course-run.
         """
-        CourseEnrollmentFactory.create(
-            user_id=self.user.id,
-            course_id=self.course.id
-        )
+        CourseEnrollmentFactory.create(user_id=self.user.id, course_id=self.course.id)
 
         result = is_user_enrolled_in_course(self.user, self.course_run_key)
         assert result
@@ -45,11 +48,7 @@ class TestStudentApi(SharedModuleStoreTestCase):
         """
         Verify the correct value is returned when a learner is not actively enrolled in a course-run.
         """
-        CourseEnrollmentFactory.create(
-            user_id=self.user.id,
-            course_id=self.course.id,
-            is_active=False
-        )
+        CourseEnrollmentFactory.create(user_id=self.user.id, course_id=self.course.id, is_active=False)
 
         result = is_user_enrolled_in_course(self.user, self.course_run_key)
         assert not result
@@ -79,3 +78,25 @@ class TestStudentApi(SharedModuleStoreTestCase):
         assert is_user_staff_or_instructor_in_course(instructor, self.course_run_key)
         assert not is_user_staff_or_instructor_in_course(self.user, self.course_run_key)
         assert not is_user_staff_or_instructor_in_course(instructor_different_course, self.course_run_key)
+
+    def test_get_course_enrollments(self):
+        """Verify all enrollments can be retrieved"""
+        course_2 = CourseFactory.create()
+        CourseEnrollmentFactory.create(user_id=self.user.id, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user_id=self.user.id, course_id=course_2.id)
+        expected = CourseEnrollment.objects.all()
+
+        result = get_course_enrollments(self.user)
+
+        self.assertQuerySetEqual(expected, result)
+
+    def test_get_filtered_course_enrollments(self):
+        """Verify a filtered subset of enrollments can be retrieved"""
+        course_2 = CourseFactory.create()
+        CourseEnrollmentFactory.create(user_id=self.user.id, course_id=self.course.id)
+        ce_2 = CourseEnrollmentFactory.create(user_id=self.user.id, course_id=course_2.id)
+        expected = CourseEnrollment.objects.filter(id=ce_2.id)
+
+        result = get_course_enrollments(self.user, True, course_ids=[course_2.id])
+
+        self.assertQuerySetEqual(expected, result)

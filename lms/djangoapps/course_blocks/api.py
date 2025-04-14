@@ -108,4 +108,5 @@ def get_course_blocks(
         transformers,
         starting_block_usage_key,
         collected_block_structure,
+        user,
     )

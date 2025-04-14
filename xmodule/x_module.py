@@ -1,5 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
+import importlib.resources as resources
 import logging
 import os
 import time
@@ -13,7 +14,6 @@ from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_isdir, resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
@@ -856,16 +856,16 @@ class ResourceTemplates:
     def get_template_dir(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
         if getattr(cls, 'template_dir_name', None):
             dirname = os.path.join('templates', cls.template_dir_name)  # lint-amnesty, pylint: disable=no-member
-            if not resource_isdir(__name__, dirname):
+            template_path = resources.files(__name__.rsplit('.', 1)[0]) / dirname
+
+            if not template_path.is_dir():
                 log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
                     cls_name=cls.__name__,
                 ))
-                return None
-            else:
-                return dirname
-        else:
-            return None
+                return
+            return dirname
+        return
 
     @classmethod
     def get_template_dirpaths(cls):
@@ -874,8 +874,11 @@ class ResourceTemplates:
         """
         template_dirpaths = []
         template_dirname = cls.get_template_dir()
-        if template_dirname and resource_isdir(__name__, template_dirname):
-            template_dirpaths.append(resource_filename(__name__, template_dirname))
+        if template_dirname:
+            template_path = resources.files(__name__.rsplit('.', 1)[0]) / template_dirname
+            if template_path.is_dir():
+                with resources.as_file(template_path) as template_real_path:
+                    template_dirpaths.append(str(template_real_path))
 
         custom_template_dir = cls.get_custom_template_dir()
         if custom_template_dir:

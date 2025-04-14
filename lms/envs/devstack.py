@@ -96,11 +96,12 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.cache.CachePanel',
     'debug_toolbar.panels.history.HistoryPanel',
+
     # ProfilingPanel has been intentionally removed for default devstack.py
-    # runtimes for performance reasons. If you wish to re-enable it in your
-    # local development environment, please create a new settings file
-    # that imports and extends devstack.py.
+    # runtimes for performance reasons.
+    # 'debug_toolbar.panels.profiling.ProfilingPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -134,9 +135,6 @@ PIPELINE['JS_COMPRESSOR'] = None
 REQUIRE_DEBUG = DEBUG
 
 PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
-
-# Load development webpack configuration
-WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ########################### VERIFIED CERTIFICATES #################################
 
@@ -384,6 +382,7 @@ EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 ############## Settings for Microfrontends  #########################
 LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
+PROFILE_MICROFRONTEND_URL = 'http://localhost:1995'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
@@ -553,6 +552,20 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:1996',  # frontend-app-learner-dashboard
 ]
 
+RETIREMENT_STATES = [
+    'PENDING',
+    'LOCKING_ACCOUNT',
+    'LOCKING_COMPLETE',
+    'RETIRING_ENROLLMENTS',
+    'ENROLLMENTS_COMPLETE',
+    'RETIRING_LMS_MISC',
+    'LMS_MISC_COMPLETE',
+    'RETIRING_LMS',
+    'LMS_COMPLETE',
+    'ERRORED',
+    'ABORTED',
+    'COMPLETE',
+]
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
