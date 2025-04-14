@@ -2,13 +2,15 @@
 Notification grouping utilities for notifications
 """
 import datetime
+from abc import ABC, abstractmethod
 from typing import Dict, Type, Union
 
 from pytz import utc
 
-from abc import ABC, abstractmethod
-
+from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.models import Notification
+
+from .exceptions import InvalidNotificationTypeError
 
 
 class BaseNotificationGrouper(ABC):
@@ -42,6 +44,10 @@ class NotificationRegistry:
             """
             Registers the grouper class for the given notification type.
             """
+            if notification_type not in COURSE_NOTIFICATION_TYPES:
+                raise InvalidNotificationTypeError(
+                    f"'{notification_type}' is not a valid notification type."
+                )
             cls._groupers[notification_type] = grouper_class
             return grouper_class
 
@@ -106,7 +112,7 @@ class NewPostGrouper(BaseNotificationGrouper):
         }
 
 
-@NotificationRegistry.register('ora_staff_notification')
+@NotificationRegistry.register('ora_staff_notifications')
 class OraStaffGrouper(BaseNotificationGrouper):
     """
     Grouper for new ora staff notifications.
