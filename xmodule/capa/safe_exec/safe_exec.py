@@ -227,18 +227,30 @@ def safe_exec(
                     "extra_files": extra_files,
                 }
                 with function_trace('safe_exec.remote_exec_darklaunch'):
-                    remote_emsg, _remote_exception = get_remote_exec(data)
+                    remote_emsg, _ = get_remote_exec(data)
+            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
+                # Swallow all exceptions and log it in monitoring so that dark launch doesn't cause issues during
+                # deploy.
+                remote_emsg = None
+                remote_exception = e
+            else:
+                remote_emsg = None
+                remote_exception = None
+
+            try:
                 log.info(
-                    f"Remote execution in darklaunch mode produces: {darklaunch_globals} or exception: {remote_emsg}"
+                    f"Remote execution in darklaunch mode produces globals={darklaunch_globals!r}, "
+                    f"emsg={remote_emsg!r}, exception={remote_exception!r}"
                 )
-                log.info(f"Local execution in darklaunch mode produces: {globals_dict} or exception: {emsg}")
+                local_exc_unexpected = None if isinstance(exception, SafeExecException) else exception
+                log.info(
+                    f"Local execution in darklaunch mode produces globals={globals_dict!r}, "
+                    f"emsg={emsg!r}, exception={local_exc_unexpected!r}")
                 set_custom_attribute('dark_launch_emsg_match', remote_emsg == emsg)
                 set_custom_attribute('remote_emsg_exists', remote_emsg is not None)
                 set_custom_attribute('local_emsg_exists', emsg is not None)
-            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
-                # Swallows all exceptions and logs it in monitoring so that dark launch doesn't cause issues during
-                # deploy.
-                log.exception("Error occurred while trying to remote exec in dark launch mode.")
+            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
+                log.exception("Error occurred while trying to report codejail darklauch data.")
                 record_exception()
 
     # Put the result back in the cache.  This is complicated by the fact that
