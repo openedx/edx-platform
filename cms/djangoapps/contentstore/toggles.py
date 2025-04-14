@@ -5,6 +5,7 @@ from edx_toggles.toggles import SettingDictToggle, WaffleFlag
 from openedx.core.djangoapps.content.search import api as search_api
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
+
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
@@ -160,37 +161,6 @@ def use_new_problem_editor():
     return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
 
 
-# .. toggle_name: new_core_editors.use_advanced_problem_editor
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new core problem xblock advanced editor as the default
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2024-07-25
-# .. toggle_target_removal_date: 2024-08-31
-# .. toggle_tickets: TNL-11694
-# .. toggle_warning:
-ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_advanced_problem_editor', __name__)
-
-
-# .. toggle_name: new_editors.add_game_block_button
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the creation of the new games block
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-07-26
-# .. toggle_target_removal_date: 2023-09-31
-# .. toggle_tickets: TNL-10924
-# .. toggle_warning:
-ENABLE_ADD_GAME_BLOCK_FLAG = WaffleFlag('new_editors.add_game_block_button', __name__)
-
-
-def use_add_game_block():
-    """
-    Returns a boolean if add game block button is enabled
-    """
-    return ENABLE_ADD_GAME_BLOCK_FLAG.is_enabled()
-
-
 # .. toggle_name: contentstore.individualize_anonymous_user_id
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -209,30 +179,6 @@ def individualize_anonymous_user_id(course_id):
     Returns a boolean if individualized anonymous_user_id is enabled on the course
     """
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
-
-
-# .. toggle_name: contentstore.enable_studio_content_api
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Enables the new (experimental and unsafe!) Studio Content REST API for course authors,
-# .. which provides CRUD capabilities for course content and xblock editing.
-# .. Use at your own peril - you can easily delete learner data when editing running courses.
-# .. This can be triggered by deleting blocks, editing subsections, problems, assignments, discussions,
-# .. creating new problems or graded sections, and by other things you do.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-05-26
-# .. toggle_tickets: TNL-10208
-ENABLE_STUDIO_CONTENT_API = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.enable_studio_content_api',
-    __name__,
-)
-
-
-def use_studio_content_api():
-    """
-    Returns a boolean if studio editing API is enabled
-    """
-    return ENABLE_STUDIO_CONTENT_API.is_enabled()
 
 
 # .. toggle_name: new_studio_mfe.use_new_home_page

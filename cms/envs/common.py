@@ -1317,16 +1317,6 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ##### custom vendor plugin variables #####
 
-# .. setting_name: JS_ENV_EXTRA_CONFIG
-# .. setting_default: {}
-# .. setting_description: JavaScript code can access this dictionary using `process.env.JS_ENV_EXTRA_CONFIG`
-#   One of the current use cases for this is enabling custom TinyMCE plugins
-#   (TINYMCE_ADDITIONAL_PLUGINS) and overriding the TinyMCE configuration (TINYMCE_CONFIG_OVERRIDES).
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the JS_ENV_EXTRA_CONFIG environment variable to an equivalent JSON
-#   string instead. For details, see: https://github.com/openedx/edx-platform/issues/31895
-JS_ENV_EXTRA_CONFIG = json.loads(os.environ.get('JS_ENV_EXTRA_CONFIG', '{}'))
-
 ############################### PIPELINE #######################################
 
 PIPELINE = {
@@ -1507,14 +1497,6 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
-
-# .. setting_name: WEBPACK_CONFIG_PATH
-# .. setting_default: "webpack.prod.config.js"
-# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
-#   see: https://github.com/openedx/edx-platform/issues/31895
-WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
 
 
 ############################ SERVICE_VARIANT ##################################
@@ -1879,6 +1861,7 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.components",
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
+    "openedx_learning.apps.authoring.units",
 ]
 
 
@@ -2778,16 +2761,16 @@ SHOW_ACCOUNT_ACTIVATION_CTA = False
 ################# Documentation links for course apps #################
 
 # pylint: disable=line-too-long
-CALCULATOR_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/calculator.html"
-DISCUSSIONS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_components/create_discussion.html"
-EDXNOTES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/notes.html"
-PROGRESS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html?highlight=progress#hiding-or-showing-the-wiki-or-progress-pages"
-TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features/teams/teams_setup.html"
-TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
-WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
-CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
-COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
-ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#configuring-course-level-open-response-assessment-settings"
+CALCULATOR_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/add_calculator.html"
+DISCUSSIONS_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_discussions.html"
+EDXNOTES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/enable_notes.html"
+PROGRESS_HELP_URL = "https://docs.openedx.org/en/latest/educators/references/data/progress_page.html"
+TEAMS_HELP_URL = "https://docs.openedx.org/en/latest/educators/navigation/advanced_features.html#use-teams-in-your-course"
+TEXTBOOKS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_textbooks.html"
+WIKI_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_wiki.html"
+CUSTOM_PAGES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_custom_page.html"
+COURSE_LIVE_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/add_course_live.html"
+ORA_SETTINGS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/Manage_ORA_Assignment.html"
 # pylint: enable=line-too-long
 
 # keys for  big blue button live provider
@@ -2812,7 +2795,7 @@ DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 
 # Learn More link in upgraded discussion notification alert
 # pylint: disable=line-too-long
-DISCUSSIONS_INCONTEXT_LEARNMORE_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_discussions/discussions.html"
+DISCUSSIONS_INCONTEXT_LEARNMORE_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_discussions.html"
 # pylint: enable=line-too-long
 
 #### django-simple-history##
@@ -2836,7 +2819,7 @@ def _should_send_learning_badge_events(settings):
 #    Each topic configuration dictionary contains
 #    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
 #       according to
-#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#       https://docs.openedx.org/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
 #    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
 #    Note: The topic names should not include environment prefix as it will be dynamically added based on
 #    EVENT_BUS_TOPIC_PREFIX setting.

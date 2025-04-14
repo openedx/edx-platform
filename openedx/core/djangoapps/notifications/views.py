@@ -332,7 +332,7 @@ class NotificationCountView(APIView):
         # Get the unseen notifications count for each app name.
         count_by_app_name = (
             Notification.objects
-            .filter(user_id=request.user, last_seen__isnull=True)
+            .filter(user_id=request.user, last_seen__isnull=True, web=True)
             .values('app_name')
             .annotate(count=Count('*'))
         )
@@ -537,6 +537,11 @@ class UpdateAllNotificationPreferencesView(APIView):
                             'course_id': str(preference.course_id),
                             'error': str(e)
                         })
+                if channel == 'email' and value:
+                    UserPreference.objects.filter(
+                        user_id=request.user,
+                        key=ONE_CLICK_EMAIL_UNSUB_KEY
+                    ).delete()
                 response_data = {
                     'status': 'success' if updated_courses else 'partial_success' if errors else 'error',
                     'message': 'Notification preferences update completed',

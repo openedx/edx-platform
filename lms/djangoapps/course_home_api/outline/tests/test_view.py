@@ -31,7 +31,6 @@ from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactor
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    DISPLAY_COURSE_SOCK_FLAG,
     ENABLE_COURSE_GOALS
 )
 from openedx.features.discounts.applicability import (
@@ -361,12 +360,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert (data['offer'] is not None) == show_enrolled
         assert (data['access_expiration'] is not None) == show_enrolled
         assert (data['resume_course']['url'] is not None) == show_enrolled
-
-    @ddt.data(True, False)
-    def test_can_show_upgrade_sock(self, sock_enabled):
-        with override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=sock_enabled):
-            response = self.client.get(self.url)
-            assert response.data['can_show_upgrade_sock'] == sock_enabled
 
     def test_verified_mode(self):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)

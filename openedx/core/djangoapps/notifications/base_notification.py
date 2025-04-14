@@ -191,18 +191,20 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
-    'ora_staff_notification': {
+    'ora_staff_notifications': {
         'notification_app': 'grading',
-        'name': 'ora_staff_notification',
+        'name': 'ora_staff_notifications',
         'is_core': False,
         'info': '',
-        'web': False,
+        'web': True,
         'email': False,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new open response submission awaiting for review for '
+        'content_template': _('<{p}>You have a new open response submission awaiting review for '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}>You have multiple submissions awaiting review for '
+                                      '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',
         },

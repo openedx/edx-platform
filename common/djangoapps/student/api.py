@@ -4,6 +4,7 @@ Python APIs exposed by the student app to other in-process apps.
 """
 
 
+from typing import TYPE_CHECKING
 import logging
 
 from django.contrib.auth import get_user_model
@@ -31,6 +32,10 @@ from common.djangoapps.student.roles import (
     REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES,
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import AnonymousUser, User  # pylint: disable=imported-auth-user
+    from django.db.models.query import QuerySet
 
 
 # This is done so that if these strings change within the app, we can keep exported constants the same
@@ -92,13 +97,7 @@ def create_manual_enrollment_audit(
     else:
         enrollment = None
 
-    _create_manual_enrollment_audit(
-        enrolled_by,
-        user_email,
-        transition_state,
-        reason,
-        enrollment
-    )
+    _create_manual_enrollment_audit(enrolled_by, user_email, transition_state, reason, enrollment)
 
 
 def get_access_role_by_role_name(role_name):
@@ -132,7 +131,31 @@ def is_user_staff_or_instructor_in_course(user, course_key):
         course_key = CourseKey.from_string(course_key)
 
     return (
-        GlobalStaff().has_user(user) or
-        CourseStaffRole(course_key).has_user(user) or
-        CourseInstructorRole(course_key).has_user(user)
+        GlobalStaff().has_user(user)
+        or CourseStaffRole(course_key).has_user(user)
+        or CourseInstructorRole(course_key).has_user(user)
     )
+
+
+def get_course_enrollments(
+    user: "AnonymousUser | User",
+    is_filtered: bool = False,
+    course_ids: list[str | None] | None = None,
+) -> "QuerySet[CourseEnrollment]":
+    """
+    Return enrollments for a user, potentially filtered by course_id.
+
+    Because an empty `course_ids` value is a meaningful filter, the easiest way to verify
+    that the list should be filtered intentionally is to specify `is_filtered`.
+
+    Arguments:
+
+    * is_filtered (bool): whether or not the list is filtered
+    * course_ids (list): a list of course IDs to filter by.
+    """
+    course_enrollments = CourseEnrollment.enrollments_for_user(user).select_related("course")
+
+    if is_filtered:
+        course_enrollments = course_enrollments.filter(course_id__in=course_ids)
+
+    return course_enrollments

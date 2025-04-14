@@ -184,8 +184,8 @@
 <!-- The default stylesheet will set the body min-height to 100% (a common strategy to allow for background
   images to fill the viewport), but this has the undesireable side-effect of causing an infinite loop via the onResize
   event listeners below, in certain situations.  Resetting it to the default "auto" skirts the problem.-->
-<body style="min-height: auto; background-color: white;" class="view-container">
-  <div class="wrapper xblock-iframe-content">
+<body style="background-color: white;" class="view-container">
+  <div id="content" class="wrapper xblock-iframe-content">
       <!-- fragment body -->
       {{ fragment.body_html | safe }}
       <!-- fragment foot -->
@@ -364,7 +364,7 @@
                                     error_message_div.html('Error: '+response.message);
                                     error_message_div.css('display', 'block');
                                 }
-                            });         
+                            });
                         });
                     });
                 }
@@ -443,21 +443,55 @@
         const rootNode = document.querySelector('.xblock, .xblock-v1'); // will always return the first matching element
         initializeXBlockAndChildren(rootNode, () => {
         });
+        (function() {
+            // If this view is rendered in an iframe within the authoring microfrontend app
+            // it will report the height of its contents to the parent window when the
+            // document loads, window resizes, or DOM mutates.
+            if (window !== window.parent) {
+                var lastHeight = window.parent[0].offsetHeight;
+                var lastWidth = window.parent[0].offsetWidth;
 
-        let lastHeight = -1;
-        function checkFrameHeight() {
-            const newHeight = document.documentElement.scrollHeight;
-            if (newHeight !== lastHeight) {
-                lastHeight = newHeight;
+                function dispatchResizeMessage(event) {
+                    // Note: event is actually an Array of MutationRecord objects when fired from the MutationObserver
+                    var newHeight = rootNode.scrollHeight;
+                    var newWidth = rootNode.offsetWidth;
+
+                    window.parent.postMessage(
+                        {
+                            type: 'plugin.resize',
+                            payload: {
+                                width: newWidth,
+                                height: newHeight,
+                            }
+                        }, document.referrer
+                    );
+
+                    lastHeight = newHeight;
+                    lastWidth = newWidth;
+
+                    // Within the authoring microfrontend the iframe resizes to match the
+                    // height of this document and it should never scroll. It does scroll
+                    // ocassionally when javascript is used to focus elements on the page
+                    // before the parent iframe has been resized to match the content
+                    // height. This window.scrollTo is an attempt to keep the content at the
+                    // top of the page.
+                    window.scrollTo(0, 0);
+                }
+
+                // Create an observer instance linked to the callback function
+                const observer = new MutationObserver(dispatchResizeMessage);
+
+                // Start observing the target node for configured mutations
+                observer.observe(rootNode, { attributes: true, childList: true, subtree: true });
+
+                const resizeObserver = new ResizeObserver(dispatchResizeMessage);
+                resizeObserver.observe(rootNode);
             }
-        }
-        // Check the size whenever the DOM changes:
-        new MutationObserver(checkFrameHeight).observe(document.body, { attributes: true, childList: true, subtree: true });
-        // And whenever the IFrame is resized
-        window.addEventListener('resize', checkFrameHeight);
+        }());
     }
 
     window.addEventListener('load', blockFrameJS);
+
   </script>
 </body>
 </html>

@@ -19,9 +19,10 @@ re-tried.  You can do this using the Django admin. In this example, a user
 retirement errored during forums retirement, so we manually reset their state
 from ``ERRORED`` to ``ENROLLMENTS_COMPLETE``.
 
-.. digraph:: retirement_states_example
+.. graphviz::
    :align: center
 
+    digraph G {
       //rankdir=LR;  // Rank Direction Left to Right
       ranksep = "0.3";
 
@@ -49,6 +50,7 @@ from ``ERRORED`` to ``ENROLLMENTS_COMPLETE``.
       }
 
       ERRORED -> ENROLLMENTS_COMPLETE[style="bold,dashed",color=black,label=" via django\nadmin"]
+    }
 
 Now, the user retirement driver scripts will automatically resume this user's
 retirement the next time they are executed.

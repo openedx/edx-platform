@@ -459,7 +459,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.12.0
+edx-enterprise==5.12.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -477,7 +477,7 @@ edx-milestones==0.6.0
     # via -r requirements/edx/kernel.in
 edx-name-affirmation==3.0.1
     # via -r requirements/edx/kernel.in
-edx-opaque-keys[django]==2.11.0
+edx-opaque-keys[django]==2.12.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-bulk-grades
@@ -804,7 +804,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.20.0
+openedx-events==10.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -818,9 +818,9 @@ openedx-filters==2.0.1
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   ora2
-openedx-forum==0.1.9
+openedx-forum==0.2.0
     # via -r requirements/edx/kernel.in
-openedx-learning==0.18.3
+openedx-learning==0.19.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
