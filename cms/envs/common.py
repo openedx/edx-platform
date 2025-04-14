@@ -61,7 +61,7 @@ from lms.envs.common import (
     PROFILE_IMAGE_HASH_SEED, PROFILE_IMAGE_MIN_BYTES, PROFILE_IMAGE_MAX_BYTES, PROFILE_IMAGE_SIZES_MAP,
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
-    COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL,
+    COURSE_MODE_DEFAULTS, DEFAULT_COURSE_ABOUT_IMAGE_URL, DEFAULT_CERTIFICATES_DISPLAY_BEHAVIOR,
 
     # User-uploaded content
     MEDIA_ROOT,
