@@ -26,6 +26,10 @@ class TestNotificationRegistry(unittest.TestCase):
     Tests for the NotificationRegistry class
     """
 
+    @patch.dict(
+        'openedx.core.djangoapps.notifications.base_notification.COURSE_NOTIFICATION_TYPES',
+        {'test_notification': 'Test Notification'}
+    )
     def test_register_and_get_grouper(self):
         """
         Test that the register and get_grouper methods work as expected
