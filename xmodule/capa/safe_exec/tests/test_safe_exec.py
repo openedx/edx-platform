@@ -1,6 +1,7 @@
 """Test safe_exec.py"""
 
 
+import copy
 import hashlib
 import os
 import os.path
@@ -216,10 +217,21 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         # Both will attempt to read and write the 'overwrite' key.
         globals_dict = {'overwrite': 'original'}
 
+        local_globals = None
+        remote_globals = None
+
         def local_exec(code, globals_dict, **kwargs):
+            # Preserve what local exec saw
+            nonlocal local_globals
+            local_globals = copy.deepcopy(globals_dict)
+
             globals_dict['overwrite'] = 'mock local'
 
         def remote_exec(data):
+            # Preserve what remote exec saw
+            nonlocal remote_globals
+            remote_globals = copy.deepcopy(data['globals_dict'])
+
             data['globals_dict']['overwrite'] = 'mock remote'
             return (None, None)
 
@@ -244,6 +256,11 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             expect_globals_contains={'overwrite': 'mock local'},
         )
         assert results['raised'] is None
+
+        # Both arms should have only seen the original globals object, untouched
+        # by the other arm.
+        assert local_globals == {'overwrite': 'original'}
+        assert remote_globals == {'overwrite': 'original'}
 
     def test_remote_runs_even_if_local_raises(self):
         """Test that remote exec runs even if local raises."""

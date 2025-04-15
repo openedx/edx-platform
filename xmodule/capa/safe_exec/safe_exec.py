@@ -180,6 +180,11 @@ def safe_exec(
 
     else:
 
+        # Create a copy so the originals are not modified as part of this call.
+        # This has to happen before local exec is run, since globals are modified
+        # as a side effect.
+        darklaunch_globals = copy.deepcopy(globals_dict)
+
         # Decide which code executor to use.
         if unsafely:
             exec_fn = codejail_not_safe_exec
@@ -215,8 +220,6 @@ def safe_exec(
         # when in darklaunch mode.
         if is_codejail_in_darklaunch():
             try:
-                # Create a copy so the originals are not modified as part of this call.
-                darklaunch_globals = copy.deepcopy(globals_dict)
                 data = {
                     "code": code_prolog + LAZY_IMPORTS + code,
                     "globals_dict": darklaunch_globals,
