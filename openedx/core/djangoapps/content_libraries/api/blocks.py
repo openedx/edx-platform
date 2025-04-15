@@ -378,6 +378,19 @@ def create_library_block(
     return get_library_block(usage_key)
 
 
+def _title_from_olx_node(olx_node) -> str:
+    """
+    Given an OLX XML node (etree node), find an appropriate title for that
+    XBlock.
+    """
+    title = olx_node.attrib.get("display_name")
+    if not title:
+        # Find a localized default title if none was set:
+        from cms.djangoapps.contentstore import helpers as studio_helpers
+        title = studio_helpers.xblock_type_display_name(olx_node.tag)
+    return title
+
+
 def _import_staged_block(
     block_type: str,
     olx_str: str,
@@ -398,11 +411,11 @@ def _import_staged_block(
     # Generate a block_id:
     try:
         olx_node = etree.fromstring(olx_str)
-        title = olx_node.attrib.get("display_name")
+        title = _title_from_olx_node(olx_node)
         # Slugify the title and append some random numbers to make a unique slug
         block_id = slugify(title, allow_unicode=True) + '-' + uuid4().hex[-6:]
     except Exception:   # pylint: disable=broad-except
-        # Just generate a random title if we can't make a nice slug.
+        # Just generate a random block_id if we can't make a nice slug.
         block_id = uuid4().hex[-12:]
 
     content_library, usage_key = validate_can_add_block_to_library(
@@ -528,11 +541,7 @@ def _import_staged_block_as_container(
     # it up using the XML nodes. This will unfortunately remove any custom comments or formatting in the XML, but that's
     # OK since Studio-edited blocks won't have that anyways (hand-edited and library blocks can and do).
 
-    title = olx_node.attrib.get("display_name")
-    if not title:
-        # Not sure if we need this, but find a localized default title if none was set:
-        from cms.djangoapps.contentstore import helpers as studio_helpers
-        title = studio_helpers.xblock_type_display_name(olx_node.tag)
+    title = _title_from_olx_node(olx_node)
 
     # Start an atomic section so the whole paste succeeds or fails together:
     with transaction.atomic():
