@@ -20,7 +20,7 @@ from edx_django_utils.plugins import get_plugins_view_context
 from edx_toggles.toggles import WaffleFlag
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import DashboardRenderStarted
-from pytz import UTC
+from zoneinfo import ZoneInfo
 
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import Optout
@@ -107,7 +107,7 @@ def _get_recently_enrolled_courses(course_enrollments):
         list[CourseEnrollment]: A list of recent course enrollments.
     """
     seconds = DashboardConfiguration.current().recent_enrollment_time_delta
-    time_delta = (datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds))
+    time_delta = (datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(seconds=seconds))
     return [
         enrollment for enrollment in course_enrollments
         # If the enrollment has no created date, we are explicitly excluding the course
@@ -269,7 +269,7 @@ def complete_course_mode_info(course_id, enrollment, modes=None):
         mode_info['verified_bulk_sku'] = modes['verified'].bulk_sku
         # if there is an expiration date, find out how long from now it is
         if modes['verified'].expiration_datetime:
-            today = datetime.datetime.now(UTC).date()
+            today = datetime.datetime.now(ZoneInfo("UTC")).date()
             mode_info['days_for_upsell'] = (modes['verified'].expiration_datetime.date() - today).days
             mode_info['expiration_datetime'] = modes['verified'].expiration_datetime.date()
 

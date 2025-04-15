@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from django.db.utils import IntegrityError
 from django.utils import timezone
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -66,7 +66,7 @@ class HasCourseWithProblemsMixin:
             seq2 = BlockFactory.create(parent=self.chapter, category='sequential')
             BlockFactory.create(parent=seq2, category='problem')
 
-        self.frozen_now_datetime = datetime.now().replace(tzinfo=pytz.UTC)
+        self.frozen_now_datetime = datetime.now().replace(tzinfo=ZoneInfo("UTC"))
         self.frozen_now_timestamp = to_timestamp(self.frozen_now_datetime)
 
         self.problem_weighted_score_changed_kwargs = OrderedDict([
@@ -296,7 +296,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     def test_retry_when_db_not_updated(self, score_db_table, mock_log, mock_retry):
         self.set_up_course()
         self.recalculate_subsection_grade_kwargs['score_db_table'] = score_db_table
-        modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)
+        modified_datetime = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC")) - timedelta(days=1)
         if score_db_table == ScoreDatabaseTableEnum.submissions:
             with patch('lms.djangoapps.grades.tasks.sub_api.get_score') as mock_sub_score:
                 mock_sub_score.return_value = {
@@ -383,7 +383,7 @@ class RecalculateSubsectionGradeTest(HasCourseWithProblemsMixin, ModuleStoreTest
     def _apply_recalculate_subsection_grade(
             self,
             mock_score=MagicMock(
-                modified=datetime.utcnow().replace(tzinfo=pytz.UTC) + timedelta(days=1),
+                modified=datetime.utcnow().replace(tzinfo=ZoneInfo("UTC")) + timedelta(days=1),
                 grade=1.0,
                 max_grade=2.0,
             )
@@ -637,7 +637,7 @@ class FreezeGradingAfterCourseEndTest(HasCourseWithProblemsMixin, ModuleStoreTes
             CourseEnrollment.enroll(user, self.course.id)
 
         with override_waffle_flag(self.freeze_grade_flag, active=freeze_flag_value):
-            modified_datetime = datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)  # lint-amnesty, pylint: disable=unused-variable
+            modified_datetime = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC")) - timedelta(days=1)  # lint-amnesty, pylint: disable=unused-variable
             with patch('lms.djangoapps.grades.tasks._has_db_updated_with_new_score') as mock_has_db_updated:
                 result = recalculate_subsection_grade_v3.apply_async(kwargs=self.recalculate_subsection_grade_kwargs)
                 self._assert_for_freeze_grade_flag(

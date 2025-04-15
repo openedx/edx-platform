@@ -16,7 +16,7 @@ from django.test import TestCase
 from edx_when.api import get_dates_for_course, set_dates_for_course
 from edx_when.field_data import DateLookupFieldData
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
@@ -91,7 +91,7 @@ class TestParseDatetime(unittest.TestCase):
     Test date parsing.
     """
     def test_parse_no_error(self):
-        assert tools.parse_datetime('5/12/2010 2:42') == datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
+        assert tools.parse_datetime('5/12/2010 2:42') == datetime.datetime(2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC"))
 
     def test_parse_error(self):
         with pytest.raises(tools.DashboardError):
@@ -149,7 +149,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         week2 = BlockFactory.create(parent=course)
         child = BlockFactory.create(parent=week1)
 
-        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
+        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC"))
         set_dates_for_course(course.id, [
             (week1.location, {'due': due}),
             (week2.location, {'due': due}),
@@ -212,7 +212,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         """
         super().setUp()
 
-        self.due = due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
+        self.due = due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC"))
         course = CourseFactory.create()
         week1 = BlockFactory.create(due=due, parent=course)
         week2 = BlockFactory.create(due=due, parent=course)
@@ -249,7 +249,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
 
     def test_set_due_date_extension(self):
         # First, extend the leaf assignment date
-        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=UTC)
+        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         tools.set_due_date_extension(self.course, self.assignment, self.user, extended_hw)
         self._clear_field_data_cache()
         assert self.week1.due == self.due
@@ -257,7 +257,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         assert self.assignment.due == extended_hw
 
         # Now, extend the whole section that the assignment was in. Both it and all under it should change
-        extended_week = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
+        extended_week = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         tools.set_due_date_extension(self.course, self.week1, self.user, extended_week)
         self._clear_field_data_cache()
         assert self.week1.due == extended_week
@@ -265,17 +265,17 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         assert self.assignment.due == extended_week
 
     def test_set_due_date_extension_invalid_date(self):
-        extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=UTC)
+        extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=ZoneInfo("UTC"))
         with pytest.raises(tools.DashboardError), self.allow_transaction_exception():
             tools.set_due_date_extension(self.course, self.week1, self.user, extended)
 
     def test_set_due_date_extension_no_date(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         with pytest.raises(tools.DashboardError), self.allow_transaction_exception():
             tools.set_due_date_extension(self.course, self.week3, self.user, extended)
 
     def test_reset_due_date_extension(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         tools.set_due_date_extension(self.course, self.week1, self.user, extended)
         tools.set_due_date_extension(self.course, self.week1, self.user, None)
         assert self.week1.due == self.due
@@ -286,7 +286,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         for a block given the user is not enrolled in the course.
         """
         user = UserFactory.create()
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         with pytest.raises(tools.DashboardError):
             tools.set_due_date_extension(self.course, self.week3, user, extended)
 
@@ -295,7 +295,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         """
         Tests that the course dates are reloaded once they are overridden.
         """
-        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=UTC)
+        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         tools.set_due_date_extension(self.course, self.assignment, self.user, extended_hw)
 
         assert mock_method.call_count == 3
@@ -308,7 +308,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         a unified experience across the platform.
         """
         self.course.course_version = 'test_version'
-        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=UTC)
+        extended_hw = datetime.datetime(2013, 10, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         tools.set_due_date_extension(self.course, self.assignment, self.user, extended_hw)
 
         assert mock_method.call_count == 3
@@ -328,7 +328,7 @@ class TestDataDumps(ModuleStoreTestCase):
         """
         super().setUp()
 
-        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=UTC)
+        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC"))
         course = CourseFactory.create()
         week1 = BlockFactory.create(due=due, parent=course)
         week2 = BlockFactory.create(due=due, parent=course)
@@ -352,7 +352,7 @@ class TestDataDumps(ModuleStoreTestCase):
         handlers.extract_dates(None, course.id)
 
     def test_dump_module_extensions(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         tools.set_due_date_extension(self.course, self.week1, self.user1,
                                      extended)
         tools.set_due_date_extension(self.course, self.week1, self.user2,
@@ -379,7 +379,7 @@ class TestDataDumps(ModuleStoreTestCase):
         )
 
     def test_dump_student_extensions(self):
-        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=UTC)
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=ZoneInfo("UTC"))
         tools.set_due_date_extension(self.course, self.week1, self.user1,
                                      extended)
         tools.set_due_date_extension(self.course, self.week2, self.user1,

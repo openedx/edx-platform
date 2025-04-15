@@ -15,7 +15,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views import View
 from opaque_keys.edx.keys import CourseKey
-from pytz import utc
+from zoneinfo import ZoneInfo
 from web_fragments.fragment import Fragment
 from xblock.runtime import KeyValueStore
 
@@ -387,7 +387,7 @@ def check_content_start_date_for_masquerade_user(course_key, user, request, cour
     Add a warning message if the masquerade user would not have access to this content
     due to the content start date being in the future.
     """
-    now = datetime.now(utc)
+    now = datetime.now(ZoneInfo("UTC"))
     most_future_date = course_start
     if chapter_start and section_start:
         most_future_date = max(course_start, chapter_start, section_start)

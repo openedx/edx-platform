@@ -7,7 +7,7 @@ from functools import wraps
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
 
@@ -362,7 +362,7 @@ def get_course_run_status(course_overview, certificate_info):
         else:
             return CourseRunProgressStatuses.UPCOMING
     elif course_overview.pacing == 'self':
-        thirty_days_ago = datetime.now(UTC) - timedelta(30)
+        thirty_days_ago = datetime.now(ZoneInfo("UTC")) - timedelta(30)
         certificate_completed = is_certificate_passing and (
             certificate_creation_date <= thirty_days_ago
         )
