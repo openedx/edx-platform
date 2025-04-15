@@ -167,6 +167,7 @@ def create_container(
     slug: str | None,
     title: str,
     user_id: int | None,
+    created: datetime | None = None,
 ) -> ContainerMetadata:
     """
     Create a container (e.g. a Unit) in the specified content library.
@@ -192,7 +193,7 @@ def create_container(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
-                created=datetime.now(),
+                created=created or datetime.now(),
                 created_by=user_id,
             )
         case _:

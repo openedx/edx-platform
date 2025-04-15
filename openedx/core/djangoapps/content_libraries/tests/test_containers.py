@@ -69,7 +69,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         with freeze_time(create_date):
             container_data = self._create_container(lib["id"], "unit", slug="u1", display_name="Test Unit")
         expected_data = {
-            "container_key": "lct:CL-TEST:containers:unit:u1",
+            "id": "lct:CL-TEST:containers:unit:u1",
             "container_type": "unit",
             "display_name": "Test Unit",
             "last_published": None,
@@ -99,7 +99,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         )
 
         # Fetch the unit:
-        unit_as_read = self._get_container(container_data["container_key"])
+        unit_as_read = self._get_container(container_data["id"])
         # make sure it contains the same data when we read it back:
         self.assertDictContainsEntries(unit_as_read, expected_data)
 
@@ -124,13 +124,13 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         )
 
         # Re-fetch the unit
-        unit_as_re_read = self._get_container(container_data["container_key"])
+        unit_as_re_read = self._get_container(container_data["id"])
         # make sure it contains the same data when we read it back:
         self.assertDictContainsEntries(unit_as_re_read, expected_data)
 
         # Delete the unit
-        self._delete_container(container_data["container_key"])
-        self._get_container(container_data["container_key"], expect_response=404)
+        self._delete_container(container_data["id"])
+        self._get_container(container_data["id"], expect_response=404)
         assert delete_receiver.call_count == 1
         self.assertDictContainsSubset(
             {
@@ -153,17 +153,17 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         random_user = UserFactory.create(username="Random", email="random@example.com")
         with self.as_user(random_user):
             self._create_container(lib["id"], "unit", slug="u3", display_name="Test Unit", expect_response=403)
-            self._get_container(container_data["container_key"], expect_response=403)
-            self._update_container(container_data["container_key"], display_name="Unit ABC", expect_response=403)
-            self._delete_container(container_data["container_key"], expect_response=403)
+            self._get_container(container_data["id"], expect_response=403)
+            self._update_container(container_data["id"], display_name="Unit ABC", expect_response=403)
+            self._delete_container(container_data["id"], expect_response=403)
 
         # Granting read-only permissions on the library should only allow retrieval, nothing else.
         self._add_user_by_email(lib["id"], random_user.email, access_level="read")
         with self.as_user(random_user):
             self._create_container(lib["id"], "unit", slug="u2", display_name="Test Unit", expect_response=403)
-            self._get_container(container_data["container_key"], expect_response=200)
-            self._update_container(container_data["container_key"], display_name="Unit ABC", expect_response=403)
-            self._delete_container(container_data["container_key"], expect_response=403)
+            self._get_container(container_data["id"], expect_response=200)
+            self._update_container(container_data["id"], display_name="Unit ABC", expect_response=403)
+            self._delete_container(container_data["id"], expect_response=403)
 
     def test_unit_gets_auto_slugs(self):
         """
@@ -176,9 +176,9 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         container1_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
         container2_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
         # Notice the container IDs below are slugified from the title: "alpha-bravo-NNNNN"
-        assert container1_data["container_key"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
-        assert container2_data["container_key"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
-        assert container1_data["container_key"] != container2_data["container_key"]
+        assert container1_data["id"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
+        assert container2_data["id"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
+        assert container1_data["id"] != container2_data["id"]
 
     def test_unit_add_children(self):
         """
@@ -194,10 +194,10 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         problem_block = self._add_block_to_library(lib["id"], "problem", "Problem1", can_stand_alone=False)
         html_block = self._add_block_to_library(lib["id"], "html", "Html1", can_stand_alone=False)
         self._add_container_components(
-            container_data["container_key"],
+            container_data["id"],
             children_ids=[problem_block["id"], html_block["id"]]
         )
-        data = self._get_container_components(container_data["container_key"])
+        data = self._get_container_components(container_data["id"])
         assert len(data) == 2
         assert data[0]['id'] == problem_block['id']
         assert not data[0]['can_stand_alone']
@@ -207,7 +207,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         html_block_2 = self._add_block_to_library(lib["id"], "html", "Html2")
         # Add two more components
         self._add_container_components(
-            container_data["container_key"],
+            container_data["id"],
             children_ids=[problem_block_2["id"], html_block_2["id"]]
         )
         self.assertDictContainsSubset(
@@ -216,13 +216,13 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "sender": None,
                 "library_container": LibraryContainerData(
                     container_key=LibraryContainerLocator.from_string(
-                        container_data["container_key"],
+                        container_data["id"],
                     ),
                 ),
             },
             update_receiver.call_args_list[0].kwargs,
         )
-        data = self._get_container_components(container_data["container_key"])
+        data = self._get_container_components(container_data["id"])
         # Verify total number of components to be 2 + 2 = 4
         assert len(data) == 4
         assert data[2]['id'] == problem_block_2['id']
@@ -246,17 +246,17 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         problem_block_2 = self._add_block_to_library(lib["id"], "problem", "Problem2", can_stand_alone=False)
         html_block_2 = self._add_block_to_library(lib["id"], "html", "Html2")
         self._add_container_components(
-            container_data["container_key"],
+            container_data["id"],
             children_ids=[problem_block["id"], html_block["id"], problem_block_2["id"], html_block_2["id"]]
         )
-        data = self._get_container_components(container_data["container_key"])
+        data = self._get_container_components(container_data["id"])
         assert len(data) == 4
         # Remove both problem blocks.
         self._remove_container_components(
-            container_data["container_key"],
+            container_data["id"],
             children_ids=[problem_block_2["id"], problem_block["id"]]
         )
-        data = self._get_container_components(container_data["container_key"])
+        data = self._get_container_components(container_data["id"])
         assert len(data) == 2
         assert data[0]['id'] == html_block['id']
         assert data[1]['id'] == html_block_2['id']
@@ -266,7 +266,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "sender": None,
                 "library_container": LibraryContainerData(
                     container_key=LibraryContainerLocator.from_string(
-                        container_data["container_key"],
+                        container_data["id"],
                     ),
                 ),
             },
@@ -289,10 +289,10 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         problem_block_2 = self._add_block_to_library(lib["id"], "problem", "Problem2", can_stand_alone=False)
         html_block_2 = self._add_block_to_library(lib["id"], "html", "Html2")
         self._add_container_components(
-            container_data["container_key"],
+            container_data["id"],
             children_ids=[problem_block["id"], html_block["id"], problem_block_2["id"], html_block_2["id"]]
         )
-        data = self._get_container_components(container_data["container_key"])
+        data = self._get_container_components(container_data["id"])
         assert len(data) == 4
         assert data[0]['id'] == problem_block['id']
         assert data[1]['id'] == html_block['id']
@@ -301,10 +301,10 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
 
         # Reorder the components
         self._patch_container_components(
-            container_data["container_key"],
+            container_data["id"],
             children_ids=[problem_block["id"], problem_block_2["id"], html_block["id"], html_block_2["id"]]
         )
-        data = self._get_container_components(container_data["container_key"])
+        data = self._get_container_components(container_data["id"])
         assert len(data) == 4
         assert data[0]['id'] == problem_block['id']
         assert data[1]['id'] == problem_block_2['id']
@@ -315,10 +315,10 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         new_problem_block = self._add_block_to_library(lib["id"], "problem", "New_Problem", can_stand_alone=False)
         new_html_block = self._add_block_to_library(lib["id"], "html", "New_Html", can_stand_alone=False)
         self._patch_container_components(
-            container_data["container_key"],
+            container_data["id"],
             children_ids=[new_problem_block["id"], new_html_block["id"]],
         )
-        data = self._get_container_components(container_data["container_key"])
+        data = self._get_container_components(container_data["id"])
         assert len(data) == 2
         assert data[0]['id'] == new_problem_block['id']
         assert data[1]['id'] == new_html_block['id']
@@ -328,7 +328,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "sender": None,
                 "library_container": LibraryContainerData(
                     container_key=LibraryContainerLocator.from_string(
-                        container_data["container_key"],
+                        container_data["id"],
                     ),
                 ),
             },
@@ -348,16 +348,16 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
             container_data = self._create_container(lib["id"], "unit", slug="u1", display_name="Test Unit")
 
         # Delete the unit
-        self._delete_container(container_data["container_key"])
+        self._delete_container(container_data["id"])
 
         create_receiver = mock.Mock()
         LIBRARY_CONTAINER_CREATED.connect(create_receiver)
 
         # Restore container
-        self._restore_container(container_data["container_key"])
-        new_container_data = self._get_container(container_data["container_key"])
+        self._restore_container(container_data["id"])
+        new_container_data = self._get_container(container_data["id"])
         expected_data = {
-            "container_key": "lct:CL-TEST:containers:unit:u1",
+            "id": "lct:CL-TEST:containers:unit:u1",
             "container_type": "unit",
             "display_name": "Test Unit",
             "last_published": None,
@@ -402,14 +402,14 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         )
 
         result = self._patch_container_collections(
-            container_data["container_key"],
+            container_data["id"],
             collection_keys=[col1.key],
         )
 
         assert result['count'] == 1
 
         # Fetch the unit
-        unit_as_read = self._get_container(container_data["container_key"])
+        unit_as_read = self._get_container(container_data["id"])
 
         # Verify the collections
         assert unit_as_read['collections'] == [{"title": col1.title, "key": col1.key}]
