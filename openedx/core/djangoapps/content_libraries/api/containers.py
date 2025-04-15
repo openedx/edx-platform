@@ -9,20 +9,19 @@ from enum import Enum
 from uuid import uuid4
 
 from django.utils.text import slugify
-from opaque_keys.edx.locator import (
-    LibraryContainerLocator,
-    LibraryLocatorV2,
-    UsageKeyV2,
-    LibraryUsageLocatorV2,
-)
-from openedx_events.content_authoring.data import LibraryContainerData
+from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_events.content_authoring.data import ContentObjectChangedData, LibraryCollectionData, LibraryContainerData
 from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_CREATED,
     LIBRARY_CONTAINER_DELETED,
     LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container
+from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
@@ -30,13 +29,13 @@ from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
 from .libraries import LibraryXBlockMetadata, PublishableItem
 
-
 # The public API is only the following symbols:
 __all__ = [
     # Models
     "ContainerMetadata",
     "ContainerType",
     # API methods
+    "get_container_from_key",
     "get_container",
     "create_container",
     "get_container_children",
@@ -122,7 +121,7 @@ def library_container_locator(
     )
 
 
-def _get_container(container_key: LibraryContainerLocator, isDeleted=False) -> Container:
+def get_container_from_key(container_key: LibraryContainerLocator, isDeleted=False) -> Container:
     """
     Internal method to fetch the Container object from its LibraryContainerLocator
 
@@ -141,12 +140,23 @@ def _get_container(container_key: LibraryContainerLocator, isDeleted=False) -> C
     raise ContentLibraryContainerNotFound
 
 
-def get_container(container_key: LibraryContainerLocator) -> ContainerMetadata:
+def get_container(container_key: LibraryContainerLocator, include_collections=False) -> ContainerMetadata:
     """
     Get a container (a Section, Subsection, or Unit).
     """
-    container = _get_container(container_key)
-    container_meta = ContainerMetadata.from_container(container_key.library_key, container)
+    container = get_container_from_key(container_key)
+    if include_collections:
+        associated_collections = authoring_api.get_entity_collections(
+            container.publishable_entity.learning_package_id,
+            container_key.container_id,
+        ).values('key', 'title')
+    else:
+        associated_collections = None
+    container_meta = ContainerMetadata.from_container(
+        container_key.library_key,
+        container,
+        associated_collections=associated_collections,
+    )
     assert container_meta.container_type.value == container_key.container_type
     return container_meta
 
@@ -205,7 +215,7 @@ def update_container(
     """
     Update a container (e.g. a Unit) title.
     """
-    container = _get_container(container_key)
+    container = get_container_from_key(container_key)
     library_key = container_key.library_key
 
     assert container.unit
@@ -233,8 +243,13 @@ def delete_container(
 
     No-op if container doesn't exist or has already been soft-deleted.
     """
-    container = _get_container(container_key)
+    library_key = container_key.library_key
+    container = get_container_from_key(container_key)
 
+    affected_collections = authoring_api.get_entity_collections(
+        container.publishable_entity.learning_package_id,
+        container.key,
+    )
     authoring_api.soft_delete_draft(container.pk)
 
     LIBRARY_CONTAINER_DELETED.send_event(
@@ -243,14 +258,33 @@ def delete_container(
         )
     )
 
-    # TODO: trigger a LIBRARY_COLLECTION_UPDATED for each collection the container was in
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    #
+    # To delete the container on collections
+    for collection in affected_collections:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
+                background=True,
+            )
+        )
 
 
 def restore_container(container_key: LibraryContainerLocator) -> None:
     """
     Restore the specified library container.
     """
-    container = _get_container(container_key, isDeleted=True)
+    library_key = container_key.library_key
+    container = get_container_from_key(container_key, isDeleted=True)
+
+    affected_collections = authoring_api.get_entity_collections(
+        container.publishable_entity.learning_package_id,
+        container.key,
+    )
 
     authoring_api.set_draft_version(container.pk, container.versioning.latest.pk)
 
@@ -260,6 +294,28 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
         )
     )
 
+    # Add tags and collections back to index
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+        content_object=ContentObjectChangedData(
+            object_id=str(container_key),
+            changes=["collections", "tags"],
+        ),
+    )
+
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
+    # collection indexing asynchronously.
+    #
+    # To restore the container on collections
+    for collection in affected_collections:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
+            )
+        )
+
 
 def get_container_children(
     container_key: LibraryContainerLocator,
@@ -268,7 +324,7 @@ def get_container_children(
     """
     Get the entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    container = _get_container(container_key)
+    container = get_container_from_key(container_key)
     if container_key.container_type == ContainerType.Unit.value:
         child_components = authoring_api.get_components_in_unit(container.unit, published=published)
         return [LibraryXBlockMetadata.from_component(
@@ -290,7 +346,7 @@ def get_container_children_count(
     """
     Get the count of entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    container = _get_container(container_key)
+    container = get_container_from_key(container_key)
     return authoring_api.get_container_children_count(container, published=published)
 
 
@@ -305,7 +361,7 @@ def update_container_children(
     """
     library_key = container_key.library_key
     container_type = container_key.container_type
-    container = _get_container(container_key)
+    container = get_container_from_key(container_key)
     match container_type:
         case ContainerType.Unit.value:
             components = [get_component_from_usage_key(key) for key in children_ids]  # type: ignore[arg-type]
