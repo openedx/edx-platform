@@ -306,11 +306,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Publish changes from a specified XBlock """
         return self._api('post', URL_LIB_BLOCK_PUBLISH.format(block_key=block_key), None, expect_response)
 
-    def _paste_clipboard_content_in_library(self, lib_key, block_id, expect_response=200):
+    def _paste_clipboard_content_in_library(self, lib_key, expect_response=200):
         """ Paste's the users clipboard content into Library """
         url = URL_LIB_PASTE_CLIPBOARD.format(lib_key=lib_key)
-        data = {"block_id": block_id}
-        return self._api('post', url, data, expect_response)
+        return self._api('post', url, {}, expect_response)
 
     def _render_block_view(self, block_key, view_name, version=None, expect_response=200):
         """
