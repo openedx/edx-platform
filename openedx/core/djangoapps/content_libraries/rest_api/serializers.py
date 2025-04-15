@@ -135,7 +135,7 @@ class CollectionMetadataSerializer(serializers.Serializer):
 
 class PublishableItemSerializer(serializers.Serializer):
     """
-    Serializer for LibraryXBlockMetadata
+    Serializer for any PublishableItem in a library (XBlock, Container, etc.)
     """
     id = serializers.SerializerMethodField()
     display_name = serializers.CharField()

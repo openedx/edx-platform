@@ -40,7 +40,6 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component, ComponentVersion, LearningPackage, MediaType
 from xblock.core import XBlock
 
-from openedx.core.djangoapps.content_libraries import api as lib_api
 from openedx.core.djangoapps.xblock.api import (
     get_component_from_usage_key,
     get_xblock_app_config,
@@ -60,6 +59,7 @@ from .exceptions import (
 from .containers import (
     create_container,
     get_container,
+    get_containers_contains_component,
     update_container_children,
     ContainerMetadata,
     ContainerType,
@@ -71,6 +71,9 @@ from .libraries import (
     PublishableItem,
 )
 
+# This content_libraries API is sometimes imported in the LMS (should we prevent that?), but the content_staging app
+# cannot be. For now we only need this one type import at module scope, so only import it during type checks.
+# To use the content_staging API or other CMS-only code, we import it within the functions below.
 if TYPE_CHECKING:
     from openedx.core.djangoapps.content_staging.api import StagedContentFileData
 
@@ -290,7 +293,7 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
 
     # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
     # container indexing asynchronously.
-    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_component(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
@@ -332,7 +335,9 @@ def validate_can_add_block_to_library(
     # Ensure the XBlock type is valid and installed:
     block_class = XBlock.load_class(block_type)  # Will raise an exception if invalid
     if block_class.has_children:
-        raise IncompatibleTypesError("XBlocks with children are not supported in content libraries")
+        raise IncompatibleTypesError(
+            'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries',
+        )
     # Make sure the new ID is not taken already:
     usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
         lib_key=library_key,
@@ -582,8 +587,6 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
     Returns the newly created item metadata
     """
     from openedx.core.djangoapps.content_staging import api as content_staging_api
-    if not content_staging_api:
-        raise RuntimeError("The required content_staging app is not installed")
 
     user_clipboard = content_staging_api.get_user_clipboard(user)
     if not user_clipboard:
@@ -643,7 +646,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     component = get_component_from_usage_key(usage_key)
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
-    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_component(usage_key)
 
     authoring_api.soft_delete_draft(component.pk)
 
@@ -727,7 +730,7 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     # container indexing asynchronously.
     #
     # To update the components count in containers
-    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_component(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
