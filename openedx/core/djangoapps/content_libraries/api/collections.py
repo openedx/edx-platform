@@ -154,6 +154,7 @@ def update_library_collection_components(
     # Note: Component.key matches its PublishableEntity.key
     entities_qset = PublishableEntity.objects.filter(
         key__in=component_keys,
+        learning_package_id=content_library.learning_package_id,
     )
 
     if remove:
