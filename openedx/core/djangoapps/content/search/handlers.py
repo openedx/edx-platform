@@ -40,9 +40,9 @@ from openedx.core.djangoapps.content.search.models import SearchAccess
 
 from .api import (
     only_if_meilisearch_enabled,
-    upsert_block_collections_index_docs,
     upsert_content_object_tags_index_doc,
     upsert_collection_tags_index_docs,
+    upsert_item_collections_index_docs,
 )
 from .tasks import (
     delete_library_block_index_doc,
@@ -211,15 +211,15 @@ def content_object_associations_changed_handler(**kwargs) -> None:
 
     try:
         # Check if valid course or library block
-        usage_key = UsageKey.from_string(str(content_object.object_id))
+        opaque_key = UsageKey.from_string(str(content_object.object_id))
     except InvalidKeyError:
         try:
             # Check if valid library collection
-            usage_key = LibraryCollectionLocator.from_string(str(content_object.object_id))
+            opaque_key = LibraryCollectionLocator.from_string(str(content_object.object_id))
         except InvalidKeyError:
             try:
                 # Check if valid library container
-                usage_key = LibraryContainerLocator.from_string(str(content_object.object_id))
+                opaque_key = LibraryContainerLocator.from_string(str(content_object.object_id))
             except InvalidKeyError:
                 # Invalid content object id
                 log.error("Received invalid content object id")
@@ -228,12 +228,12 @@ def content_object_associations_changed_handler(**kwargs) -> None:
     # This event's changes may contain both "tags" and "collections", but this will happen rarely, if ever.
     # So we allow a potential double "upsert" here.
     if not content_object.changes or "tags" in content_object.changes:
-        if isinstance(usage_key, LibraryCollectionLocator):
-            upsert_collection_tags_index_docs(usage_key)
+        if isinstance(opaque_key, LibraryCollectionLocator):
+            upsert_collection_tags_index_docs(opaque_key)
         else:
-            upsert_content_object_tags_index_doc(usage_key)
+            upsert_content_object_tags_index_doc(opaque_key)
     if not content_object.changes or "collections" in content_object.changes:
-        upsert_block_collections_index_docs(usage_key)
+        upsert_item_collections_index_docs(opaque_key)
 
 
 @receiver(LIBRARY_CONTAINER_CREATED)

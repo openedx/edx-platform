@@ -17,6 +17,7 @@ from openedx_events.content_authoring.signals import (
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.content_libraries import api
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
@@ -382,3 +383,33 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
             },
             create_receiver.call_args_list[0].kwargs,
         )
+
+    def test_container_collections(self):
+        # Create a library
+        lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+        lib_key = LibraryLocatorV2.from_string(lib["id"])
+
+        # Create a unit
+        container_data = self._create_container(lib["id"], "unit", display_name="Alpha Bravo", slug=None)
+
+        # Create a collection
+        col1 = api.create_library_collection(
+            lib_key,
+            "COL1",
+            title="Collection 1",
+            created_by=self.user.id,
+            description="Description for Collection 1",
+        )
+
+        result = self._patch_container_collections(
+            container_data["container_key"],
+            collection_keys=[col1.key],
+        )
+
+        assert result['count'] == 1
+
+        # Fetch the unit
+        unit_as_read = self._get_container(container_data["container_key"])
+
+        # Verify the collections
+        assert unit_as_read['collections'] == [{"title": col1.title, "key": col1.key}]

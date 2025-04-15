@@ -22,7 +22,7 @@ from .utils import convert_exceptions
 from .serializers import (
     ContentLibraryCollectionSerializer,
     ContentLibraryCollectionUpdateSerializer,
-    ContentLibraryComponentKeysSerializer,
+    ContentLibraryItemKeysSerializer,
 )
 from openedx.core.types.http import RestRequest
 
@@ -190,27 +190,27 @@ class LibraryCollectionsView(ModelViewSet):
         return Response(None, status=HTTP_204_NO_CONTENT)
 
     @convert_exceptions
-    @action(detail=True, methods=['delete', 'patch'], url_path='components', url_name='components-update')
-    def update_components(self, request: RestRequest, *args, **kwargs) -> Response:
+    @action(detail=True, methods=['delete', 'patch'], url_path='items', url_name='items-update')
+    def update_items(self, request: RestRequest, *args, **kwargs) -> Response:
         """
-        Adds (PATCH) or removes (DELETE) Components to/from a Collection.
+        Adds (PATCH) or removes (DELETE) items to/from a Collection.
 
-        Collection and Components must all be part of the given library/learning package.
+        Collection and items must all be part of the given library/learning package.
         """
         content_library = self.get_content_library()
         collection_key = kwargs["key"]
 
-        serializer = ContentLibraryComponentKeysSerializer(data=request.data)
+        serializer = ContentLibraryItemKeysSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        usage_keys = serializer.validated_data["usage_keys"]
-        api.update_library_collection_components(
+        opaque_keys = serializer.validated_data["usage_keys"]
+        api.update_library_collection_items(
             library_key=content_library.library_key,
             content_library=content_library,
             collection_key=collection_key,
-            usage_keys=usage_keys,
+            opaque_keys=opaque_keys,
             created_by=request.user.id,
             remove=(request.method == "DELETE"),
         )
 
-        return Response({'count': len(usage_keys)})
+        return Response({'count': len(opaque_keys)})
