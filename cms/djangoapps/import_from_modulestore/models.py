@@ -3,13 +3,14 @@ Models for the course to library import app.
 """
 
 import uuid as uuid_tools
-from typing import Self, Optional
+from typing import Optional
 
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from model_utils.models import TimeStampedModel
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.django.models import (
     LearningContextKeyField,
     UsageKeyField,
@@ -27,46 +28,28 @@ class Import(TimeStampedModel):
     library into a learning-core based learning package (today, that is always a content library).
     """
 
-    uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True, db_index=True)
-    status = models.CharField(max_length=100, choices=ImportStatus.choices, default=ImportStatus.PENDING)
+    uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
+    status = models.CharField(max_length=100, choices=ImportStatus.choices, default=ImportStatus.PENDING, db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     source_key = LearningContextKeyField(help_text=_('The modulestore course'), max_length=255, db_index=True)
     target = models.ForeignKey(LearningPackage, models.SET_NULL, null=True)
 
+    class Meta:
+        verbose_name = _('Import from modulestore')
+        verbose_name_plural = _('Imports from modulestore')
+
     def __str__(self):
         return f'{self.source_key} - {self.target}'
 
-    def ready(self) -> None:
+    def set_status(self, status: ImportStatus):
         """
-        Set import status to ready.
+        Set import status.
         """
-        self.status = ImportStatus.READY
+        self.status = status
         self.save()
-
-    def imported(self) -> None:
-        """
-        Set import status to imported and clean related staged content.
-        """
-        self.status = ImportStatus.IMPORTED
-        self.save()
-        self.clean_related_staged_content()
-
-    def cancel(self) -> None:
-        """
-        Cancel import action and delete related staged content.
-        """
-        self.status = ImportStatus.CANCELED
-        self.save()
-        self.clean_related_staged_content()
-
-    def error(self) -> None:
-        """
-        Set import status to error and clean related staged
-        """
-        self.status = ImportStatus.ERROR
-        self.save()
-        self.clean_related_staged_content()
+        if status in [ImportStatus.IMPORTED, ImportStatus.CANCELED]:
+            self.clean_related_staged_content()
 
     def clean_related_staged_content(self) -> None:
         """
@@ -75,32 +58,14 @@ class Import(TimeStampedModel):
         for staged_content_for_import in self.staged_content_for_import.all():
             staged_content_for_import.staged_content.delete()
 
-    class Meta:
-        verbose_name = _('Import from modulestore')
-        verbose_name_plural = _('Imports from modulestore')
-
-    @classmethod
-    def get_by_uuid(cls, import_uuid: str) -> Self | None:
+    def get_staged_content_by_block_usage_key(self, block_usage_key: str | UsageKey) -> Optional["StagedContent"]:
         """
-        Get an import task by its ID.
-        """
-        return cls.objects.filter(uuid=import_uuid).first()
-
-    @classmethod
-    def get_ready_by_uuid(cls, import_uuid: str) -> Self | None:
-        """
-        Get an import task by its UUID.
-        """
-        return cls.objects.filter(uuid=import_uuid, status=ImportStatus.READY).first()
-
-    def get_staged_content_by_block_usage_id(self, block_usage_id: str) -> Optional["StagedContent"]:
-        """
-        Get staged content by block usage ID.
+        Get staged content by block usage key.
         """
         staged_content_for_import = self.staged_content_for_import.filter(
-            staged_content__tags__icontains=block_usage_id
+            staged_content__tags__icontains=block_usage_key
         ).first()
-        return getattr(staged_content_for_import, 'staged_content', None)
+        return staged_content_for_import.staged_content if staged_content_for_import else None
 
 
 class PublishableEntityMapping(TimeStampedModel):
@@ -124,11 +89,11 @@ class PublishableEntityMapping(TimeStampedModel):
 
 class PublishableEntityImport(TimeStampedModel):
     """
-    Represents a container version that has been imported into a content library.
+    Represents a publishableentity version that has been imported into a learning package (e.g. content library)
     This is a many-to-many relationship between a container version and a course to library import.
     """
 
-    import_event = models.ForeignKey(Import, on_delete=models.SET_NULL, null=True, blank=True)
+    import_event = models.ForeignKey(Import, on_delete=models.CASCADE)
     result = models.ForeignKey(PublishableEntityMapping, on_delete=models.SET_NULL, null=True, blank=True)
     resulting_draft = models.OneToOneField(
         to='oel_publishing.PublishableEntityVersion',
