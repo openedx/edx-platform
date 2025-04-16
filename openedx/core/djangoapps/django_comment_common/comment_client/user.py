@@ -179,6 +179,7 @@ class User(models.Model):
                 params["count_flagged"] = str_to_bool(count_flagged)
             if not params.get("course_id"):
                 params["course_id"] = str(course_key)
+            params = _clean_forum_params(params)
             response = forum_api.get_user_threads(**params)
         else:
             response = utils.perform_request(
@@ -214,23 +215,19 @@ class User(models.Model):
         course_key = utils.get_course_key(course_id)
 
         if is_forum_v2_enabled(course_key):
-            group_ids = [retrieve_params['group_id']] if 'group_id' in retrieve_params else []
+            group_ids = [retrieve_params['group_id']] if 'group_id' in retrieve_params else None
             is_complete = retrieve_params['complete']
+            params = _clean_forum_params({
+                "user_id": self.attributes["id"],
+                "group_ids": group_ids,
+                "course_id": course_id,
+                "complete": is_complete
+            })
             try:
-                response = forum_api.get_user(
-                    self.attributes["id"],
-                    group_ids=group_ids,
-                    course_id=course_id,
-                    complete=is_complete
-                )
+                response = forum_api.get_user(**params)
             except ForumV2RequestError as e:
                 self.save({"course_id": course_id})
-                response = forum_api.get_user(
-                    self.attributes["id"],
-                    group_ids=group_ids,
-                    course_id=course_id,
-                    complete=is_complete
-                )
+                response = forum_api.get_user(**params)
         else:
             try:
                 response = utils.perform_request(
@@ -327,3 +324,20 @@ def _url_for_username_replacement(user_id):
     Returns cs_comments_servuce url endpoint to replace the username of a user
     """
     return f"{settings.PREFIX}/users/{user_id}/replace_username"
+
+
+def _clean_forum_params(params):
+    """Convert string booleans to actual booleans and remove None values from forum parameters."""
+    result = {}
+    for k, v in params.items():
+        if v is not None:
+            if isinstance(v, str):
+                if v.lower() == 'true':
+                    result[k] = True
+                elif v.lower() == 'false':
+                    result[k] = False
+                else:
+                    result[k] = v
+            else:
+                result[k] = v
+    return result
