@@ -2938,3 +2938,16 @@ LIBRARY_ENABLED_BLOCKS = [
     'survey',
     'word_cloud',
 ]
+
+# .. setting_name: DEFAULT_ADVANCED_MODULES
+# .. setting_default: ['google-calendar', 'google-document', 'lti_consumer', 'poll', 'split_test', 'survey', 'word_cloud']
+# .. setting_description: List of advanced modules that are enabled by default
+DEFAULT_ADVANCED_MODULES = [
+    'google-calendar',
+    'google-document',
+    'lti_consumer',
+    'poll',
+    'split_test',
+    'survey',
+    'word_cloud',
+]
