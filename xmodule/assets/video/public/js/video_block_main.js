@@ -1,5 +1,8 @@
 // Import required modules and dependencies
+import $ from 'jquery';
+import _ from 'underscore';
 import {VideoStorage} from './video_storage';
+import {VideoPoster} from './poster';
 // TODO: Uncomment the imports
 // import { initialize } from './initialize'; // Assuming this function is imported
 // import {
@@ -23,21 +26,24 @@ import {VideoStorage} from './video_storage';
 //     VideoPlaySkipControl,
 //     VideoSkipControl,
 //     VideoEventsBumperPlugin,
-//     VideoPoster,
 //     VideoSocialSharing,
 //     VideoAccessibleMenu,
 //     VideoBumper,
 // } from './video_modules'; // Assuming all necessary modules are grouped here
 
+// Stub gettext if the runtime doesn't provide it
+if (typeof window.gettext === 'undefined') {
+    window.gettext = function (text) {
+        return text;
+    };
+}
+
+
 'use strict';
 
 console.log('In video_block_main.js file');
 
-(function (require, $) {
-    // TODO: Following code needs to be reviewed, why we are not getting $
-    if (!$) {
-        $ = window.jQuery;
-    }
+(function () {
     var youtubeXhr = null;
     var oldVideo = window.Video;
 
@@ -121,26 +127,26 @@ console.log('In video_block_main.js file');
         // VideoSocialSharing(el);
 
         if (bumperMetadata) {
-            // VideoPoster(el, {
-            //     poster: el.data('poster'),
-            //     onClick: _.once(function () {
-            //         const mainVideoPlayer = player(state);
-            //
-            //         if (storage.getItem('isBumperShown')) {
-            //             mainVideoPlayer();
-            //         } else {
-            //             const bumperState = getBumperState(bumperMetadata);
-            //             const bumper = new VideoBumper(player(bumperState), bumperState);
-            //
-            //             state.bumperState = bumperState;
-            //
-            //             bumper.getPromise().then(() => {
-            //                 delete state.bumperState;
-            //                 mainVideoPlayer();
-            //             });
-            //         }
-            //     }),
-            // });
+            VideoPoster(el, {
+                poster: el.data('poster'),
+                onClick: _.once(function () {
+                    const mainVideoPlayer = player(state);
+
+                    if (storage.getItem('isBumperShown')) {
+                        mainVideoPlayer();
+                    } else {
+                        const bumperState = getBumperState(bumperMetadata);
+                        const bumper = new VideoBumper(player(bumperState), bumperState);
+
+                        state.bumperState = bumperState;
+
+                        bumper.getPromise().then(() => {
+                            delete state.bumperState;
+                            mainVideoPlayer();
+                        });
+                    }
+                }),
+            });
         } else {
             // TODO: Uncomment following initialize method calling
             // initialize(state, element);
