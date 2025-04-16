@@ -192,11 +192,18 @@ def get_container_from_key(container_key: LibraryContainerLocator, isDeleted=Fal
     raise ContentLibraryContainerNotFound
 
 
-def get_container(container_key: LibraryContainerLocator, include_collections=False) -> ContainerMetadata:
+def get_container(
+    container_key: LibraryContainerLocator,
+    *,
+    include_collections=False,
+    container: Container | None = None,
+) -> ContainerMetadata:
     """
     Get a container (a Section, Subsection, or Unit).
     """
-    container = get_container_from_key(container_key)
+    if not container:
+        container = get_container_from_key(container_key)
+    assert container.key == container_key.container_id
     if include_collections:
         associated_collections = authoring_api.get_entity_collections(
             container.publishable_entity.learning_package_id,
@@ -372,12 +379,16 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
 
 def get_container_children(
     container_key: LibraryContainerLocator,
+    *,
     published=False,
+    container: Container | None = None,
 ) -> list[LibraryXBlockMetadata | ContainerMetadata]:
     """
     Get the entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    container = get_container_from_key(container_key)
+    if not container:
+        container = get_container_from_key(container_key)
+    assert container.key == container_key.container_id
     if container_key.container_type == ContainerType.Unit.value:
         child_components = authoring_api.get_components_in_unit(container.unit, published=published)
         return [LibraryXBlockMetadata.from_component(
