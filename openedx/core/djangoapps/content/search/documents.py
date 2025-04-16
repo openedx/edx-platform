@@ -71,6 +71,7 @@ class Fields:
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
     # Text (html) blocks have an "html_content" key in here, capa has "capa_content" and "problem_types", and so on.
+    # Containers store their list of child usage keys here.
     content = "content"
 
     # Collections use this field to communicate how many entities/components they contain.
@@ -87,6 +88,7 @@ class Fields:
     published = "published"
     published_display_name = "display_name"
     published_description = "description"
+    published_content = "content"
     published_num_children = "num_children"
 
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
@@ -576,12 +578,21 @@ def searchable_doc_for_container(
     }
 
     try:
-        container = lib_api.get_container(container_key)
+        container_obj = lib_api.get_container_from_key(container_key)
+        container = lib_api.get_container(
+            container_key,
+            container=container_obj,
+        )
     except lib_api.ContentLibraryContainerNotFound:
         # Container not found, so we can only return the base doc
+        log.error(f"Container {container_key} not found")
         return doc
 
-    draft_num_children = lib_api.get_container_children_count(container_key, published=False)
+    draft_children = lib_api.get_container_children(
+        container_key,
+        published=False,
+        container=container_obj,
+    )
     publish_status = PublishStatus.published
     if container.last_published is None:
         publish_status = PublishStatus.never
@@ -592,7 +603,13 @@ def searchable_doc_for_container(
         Fields.display_name: container.display_name,
         Fields.created: container.created.timestamp(),
         Fields.modified: container.modified.timestamp(),
-        Fields.num_children: draft_num_children,
+        Fields.num_children: len(draft_children),
+        Fields.content: {
+            "child_usage_keys": [
+                str(child.usage_key)
+                for child in draft_children
+            ],
+        },
         Fields.publish_status: publish_status,
         Fields.last_published: container.last_published.timestamp() if container.last_published else None,
     })
@@ -601,10 +618,20 @@ def searchable_doc_for_container(
         doc[Fields.breadcrumbs] = [{"display_name": library.title}]
 
     if container.published_version_num is not None:
-        published_num_children = lib_api.get_container_children_count(container_key, published=True)
+        published_children = lib_api.get_container_children(
+            container_key,
+            published=True,
+            container=container_obj,
+        )
         doc[Fields.published] = {
-            Fields.published_num_children: published_num_children,
             Fields.published_display_name: container.published_display_name,
+            Fields.published_num_children: len(published_children),
+            Fields.published_content: {
+                "child_usage_keys": [
+                    str(child.usage_key)
+                    for child in published_children
+                ],
+            },
         }
 
     return doc

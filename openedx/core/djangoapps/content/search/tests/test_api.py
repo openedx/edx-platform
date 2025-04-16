@@ -230,6 +230,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Unit 1",
             # description is not set for containers
             "num_children": 0,
+            "content": {"child_usage_keys": []},
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
