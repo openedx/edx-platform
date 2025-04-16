@@ -639,7 +639,10 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
     )
 
 
-def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=True) -> None:
+def delete_library_block(
+    usage_key: LibraryUsageLocatorV2,
+    user_id: int | None = None,
+) -> None:
     """
     Delete the specified block from this library (soft delete).
     """
@@ -648,7 +651,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
     affected_containers = get_containers_contains_component(usage_key)
 
-    authoring_api.soft_delete_draft(component.pk)
+    authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
@@ -685,7 +688,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
         )
 
 
-def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
+def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None = None) -> None:
     """
     Restore the specified library block.
     """
@@ -694,7 +697,11 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
 
     # Set draft version back to the latest available component version id.
-    authoring_api.set_draft_version(component.pk, component.versioning.latest.pk)
+    authoring_api.set_draft_version(
+        component.pk,
+        component.versioning.latest.pk,
+        set_by=user_id,
+    )
 
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
