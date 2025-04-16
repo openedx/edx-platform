@@ -244,7 +244,9 @@ class ProblemResetSerializer(UniqueStudentIdentifierSerializer):
         }
     )
     score = serializers.CharField(
-        help_text="Score must be a valid number or decimal, e.g., 1.00"
+        help_text="Score must be a valid number or decimal, e.g., 1.00",
+        required=False,  # Make this field optional
+        allow_null=True,
     )
 
     all_students = serializers.BooleanField(
@@ -261,6 +263,13 @@ class ProblemResetSerializer(UniqueStudentIdentifierSerializer):
         allow_null=True,
         help_text=_("unique student identifier.")
     )
+
+    def __init__(self, *args, **kwargs):
+        # Get context to check if `score` should be required
+        score = kwargs.get('context', {}).get('score')
+        super().__init__(*args, **kwargs)
+        if score:
+            self.fields['score'].required = True
 
 
 class ModifyAccessSerializer(serializers.Serializer):

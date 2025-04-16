@@ -2075,7 +2075,6 @@ class RescoreProblem(DeveloperErrorViewMixin, APIView):
 
         all_students and unique_student_identifier cannot both be present.
         """
-
         course_id = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'staff', course_id)
 
@@ -2162,8 +2161,7 @@ class OverrideProblemScore(DeveloperErrorViewMixin, APIView):
         unique_student_identifier student username or email.
         """
         course_key = CourseKey.from_string(course_id)
-        serializer_data = self.serializer_class(data=request.data)
-
+        serializer_data = self.serializer_class(data=request.data, context={'score': True})
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
 
