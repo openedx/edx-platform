@@ -2,13 +2,15 @@
 Notification grouping utilities for notifications
 """
 import datetime
+from abc import ABC, abstractmethod
 from typing import Dict, Type, Union
 
 from pytz import utc
 
-from abc import ABC, abstractmethod
-
+from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.models import Notification
+
+from .exceptions import InvalidNotificationTypeError
 
 
 class BaseNotificationGrouper(ABC):
@@ -42,6 +44,10 @@ class NotificationRegistry:
             """
             Registers the grouper class for the given notification type.
             """
+            if notification_type not in COURSE_NOTIFICATION_TYPES:
+                raise InvalidNotificationTypeError(
+                    f"'{notification_type}' is not a valid notification type."
+                )
             cls._groupers[notification_type] = grouper_class
             return grouper_class
 
@@ -61,27 +67,6 @@ class NotificationRegistry:
         if not grouper_class:
             return None
         return grouper_class()
-
-
-@NotificationRegistry.register('new_comment')
-class NewCommentGrouper(BaseNotificationGrouper):
-    """
-    Groups new comment notifications based on the replier name.
-    """
-
-    def group(self, new_notification, old_notification):
-        """
-        Groups new comment notifications based on the replier name.
-        """
-        context = old_notification.content_context.copy()
-        if not context.get('grouped'):
-            context['replier_name_list'] = [context['replier_name']]
-            context['grouped_count'] = 1
-        context['grouped'] = True
-        context['replier_name_list'].append(new_notification.content_context['replier_name'])
-        context['grouped_count'] += 1
-        context['email_content'] = new_notification.content_context.get('email_content', '')
-        return context
 
 
 @NotificationRegistry.register('new_discussion_post')
@@ -106,7 +91,7 @@ class NewPostGrouper(BaseNotificationGrouper):
         }
 
 
-@NotificationRegistry.register('ora_staff_notification')
+@NotificationRegistry.register('ora_staff_notifications')
 class OraStaffGrouper(BaseNotificationGrouper):
     """
     Grouper for new ora staff notifications.

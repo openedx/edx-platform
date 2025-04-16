@@ -3,11 +3,9 @@ URL configuration for Studio's Content Libraries REST API
 """
 
 from django.urls import include, path, re_path, register_converter
-
 from rest_framework import routers
 
 from .rest_api import blocks, collections, containers, libraries, url_converters
-
 
 # Django application name.
 
@@ -82,8 +80,10 @@ urlpatterns = [
             path('', containers.LibraryContainerView.as_view()),
             # update components under container
             path('children/', containers.LibraryContainerChildrenView.as_view()),
+            # Restore a soft-deleted container
+            path('restore/', containers.LibraryContainerRestore.as_view()),
             # Update collections for a given container
-            # path('collections/', views.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),
+            path('collections/', containers.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),
             # path('publish/', views.LibraryContainerPublishView.as_view()),
         ])),
         re_path(r'^lti/1.3/', include([

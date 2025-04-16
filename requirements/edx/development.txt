@@ -812,7 +812,7 @@ edx-sga==0.25.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions==3.8.6
+edx-submissions==3.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1363,7 +1363,7 @@ openedx-django-wiki==2.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==9.20.0
+openedx-events==10.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1383,7 +1383,7 @@ openedx-forum==0.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-learning==0.19.2
+openedx-learning==0.22.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -1396,7 +1396,7 @@ optimizely-sdk==5.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==6.15.0
+ora2==6.15.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

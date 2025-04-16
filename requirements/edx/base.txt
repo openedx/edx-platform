@@ -512,7 +512,7 @@ edx-search==4.1.3
     #   openedx-forum
 edx-sga==0.25.3
     # via -r requirements/edx/bundled.in
-edx-submissions==3.8.6
+edx-submissions==3.9.0
     # via
     #   -r requirements/edx/kernel.in
     #   ora2
@@ -804,7 +804,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==9.20.0
+openedx-events==10.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -820,7 +820,7 @@ openedx-filters==2.0.1
     #   ora2
 openedx-forum==0.2.0
     # via -r requirements/edx/kernel.in
-openedx-learning==0.19.2
+openedx-learning==0.22.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -828,7 +828,7 @@ openedx-mongodbproxy==0.2.2
     # via -r requirements/edx/kernel.in
 optimizely-sdk==5.2.0
     # via -r requirements/edx/bundled.in
-ora2==6.15.0
+ora2==6.15.1
     # via -r requirements/edx/bundled.in
 packaging==24.2
     # via

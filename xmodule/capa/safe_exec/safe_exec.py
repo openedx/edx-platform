@@ -159,6 +159,8 @@ def safe_exec(
                 raise SafeExecException(emsg)
             return
 
+    cacheable = True  # unless we get an unexpected error
+
     # Create the complete code we'll run.
     code_prolog = CODE_PROLOG % random_seed
 
@@ -178,6 +180,11 @@ def safe_exec(
 
     else:
 
+        # Create a copy so the originals are not modified as part of this call.
+        # This has to happen before local exec is run, since globals are modified
+        # as a side effect.
+        darklaunch_globals = copy.deepcopy(globals_dict)
+
         # Decide which code executor to use.
         if unsafely:
             exec_fn = codejail_not_safe_exec
@@ -196,19 +203,23 @@ def safe_exec(
                     limit_overrides_context=limit_overrides_context,
                     slug=slug,
                 )
-        except SafeExecException as e:
+        except BaseException as e:
             # Saving SafeExecException e in exception to be used later.
             exception = e
             emsg = str(e)
+            if not isinstance(exception, SafeExecException):
+                # Something unexpected happened, so don't cache this evaluation.
+                # (We may decide to cache these in the future as well; this is just
+                # preserving existing behavior during a refactor of error handling.)
+                cacheable = False
         else:
+            exception = None
             emsg = None
 
         # Run the code in both the remote codejail service as well as the local codejail
         # when in darklaunch mode.
         if is_codejail_in_darklaunch():
             try:
-                # Create a copy so the originals are not modified as part of this call.
-                darklaunch_globals = copy.deepcopy(globals_dict)
                 data = {
                     "code": code_prolog + LAZY_IMPORTS + code,
                     "globals_dict": darklaunch_globals,
@@ -219,26 +230,38 @@ def safe_exec(
                     "extra_files": extra_files,
                 }
                 with function_trace('safe_exec.remote_exec_darklaunch'):
-                    remote_emsg, _remote_exception = get_remote_exec(data)
+                    remote_emsg, _ = get_remote_exec(data)
+            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
+                # Swallow all exceptions and log it in monitoring so that dark launch doesn't cause issues during
+                # deploy.
+                remote_emsg = None
+                remote_exception = e
+            else:
+                remote_emsg = None
+                remote_exception = None
+
+            try:
                 log.info(
-                    f"Remote execution in darklaunch mode produces: {darklaunch_globals} or exception: {remote_emsg}"
+                    f"Remote execution in darklaunch mode produces globals={darklaunch_globals!r}, "
+                    f"emsg={remote_emsg!r}, exception={remote_exception!r}"
                 )
-                log.info(f"Local execution in darklaunch mode produces: {globals_dict} or exception: {emsg}")
+                local_exc_unexpected = None if isinstance(exception, SafeExecException) else exception
+                log.info(
+                    f"Local execution in darklaunch mode produces globals={globals_dict!r}, "
+                    f"emsg={emsg!r}, exception={local_exc_unexpected!r}")
                 set_custom_attribute('dark_launch_emsg_match', remote_emsg == emsg)
                 set_custom_attribute('remote_emsg_exists', remote_emsg is not None)
                 set_custom_attribute('local_emsg_exists', emsg is not None)
-            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
-                # Swallows all exceptions and logs it in monitoring so that dark launch doesn't cause issues during
-                # deploy.
-                log.exception("Error occurred while trying to remote exec in dark launch mode.")
+            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
+                log.exception("Error occurred while trying to report codejail darklauch data.")
                 record_exception()
 
     # Put the result back in the cache.  This is complicated by the fact that
     # the globals dict might not be entirely serializable.
-    if cache:
+    if cache and cacheable:
         cleaned_results = json_safe(globals_dict)
         cache.set(key, (emsg, cleaned_results))
 
     # If an exception happened, raise it now.
-    if emsg:
+    if exception:
         raise exception

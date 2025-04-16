@@ -34,6 +34,8 @@ URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files 
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
 URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
 URL_LIB_CONTAINER_COMPONENTS = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
+URL_LIB_CONTAINER_RESTORE = URL_LIB_CONTAINER + 'restore/'  # Restore a deleted container
+URL_LIB_CONTAINER_COLLECTIONS = URL_LIB_CONTAINER + 'collections/'  # Handle associated collections
 
 URL_LIB_LTI_PREFIX = URL_PREFIX + 'lti/1.3/'
 URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
@@ -304,11 +306,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Publish changes from a specified XBlock """
         return self._api('post', URL_LIB_BLOCK_PUBLISH.format(block_key=block_key), None, expect_response)
 
-    def _paste_clipboard_content_in_library(self, lib_key, block_id, expect_response=200):
+    def _paste_clipboard_content_in_library(self, lib_key, expect_response=200):
         """ Paste's the users clipboard content into Library """
         url = URL_LIB_PASTE_CLIPBOARD.format(lib_key=lib_key)
-        data = {"block_id": block_id}
-        return self._api('post', url, data, expect_response)
+        return self._api('post', url, {}, expect_response)
 
     def _render_block_view(self, block_key, view_name, version=None, expect_response=200):
         """
@@ -386,6 +387,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Delete a container (unit etc.) """
         return self._api('delete', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)
 
+    def _restore_container(self, container_key: str, expect_response=204):
+        """ Restore a deleted a container (unit etc.) """
+        return self._api('post', URL_LIB_CONTAINER_RESTORE.format(container_key=container_key), None, expect_response)
+
     def _get_container_components(self, container_key: str, expect_response=200):
         """ Get container components"""
         return self._api(
@@ -434,5 +439,19 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             'patch',
             URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
             {'usage_keys': children_ids},
+            expect_response
+        )
+
+    def _patch_container_collections(
+        self,
+        container_key: str,
+        collection_keys: list[str],
+        expect_response=200,
+    ):
+        """ Update container collections"""
+        return self._api(
+            'patch',
+            URL_LIB_CONTAINER_COLLECTIONS.format(container_key=container_key),
+            {'collection_keys': collection_keys},
             expect_response
         )
