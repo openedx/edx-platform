@@ -15,8 +15,10 @@ import json
 import logging
 import os.path
 import uuid
+
 from datetime import timedelta
 from email.utils import formatdate
+
 
 import requests
 from config_models.models import ConfigurationModel
@@ -42,7 +44,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
     rsa_decrypt,
     rsa_encrypt
 )
-from openedx.core.djangoapps.signals.signals import LEARNER_NOW_VERIFIED
+from openedx.core.djangoapps.signals.signals import LEARNER_SSO_VERIFIED, PHOTO_VERIFICATION_APPROVED
 from openedx.core.storage import get_storage
 
 from .utils import auto_verify_for_testing_enabled, earliest_allowed_verification_date, submit_request_to_ss
@@ -249,12 +251,12 @@ class SSOVerification(IDVerificationAttempt):
         ))
 
         # Emit signal to find and generate eligible certificates
-        LEARNER_NOW_VERIFIED.send_robust(
-            sender=SSOVerification,
-            user=self.user
+        LEARNER_SSO_VERIFIED.send_robust(
+            sender=PhotoVerification,
+            user=self.user,
         )
 
-        message = 'LEARNER_NOW_VERIFIED signal fired for {user} from SSOVerification'
+        message = 'LEARNER_SSO_VERIFIED signal fired for {user} from SSOVerification'
         log.info(message.format(user=self.user.username))
 
 
@@ -451,13 +453,14 @@ class PhotoVerification(IDVerificationAttempt):
             days=settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         )
         self.save()
+
         # Emit signal to find and generate eligible certificates
-        LEARNER_NOW_VERIFIED.send_robust(
+        PHOTO_VERIFICATION_APPROVED.send_robust(
             sender=PhotoVerification,
-            user=self.user
+            user=self.user,
         )
 
-        message = 'LEARNER_NOW_VERIFIED signal fired for {user} from PhotoVerification'
+        message = 'PHOTO_VERIFICATION_APPROVED signal fired for {user} from PhotoVerification'
         log.info(message.format(user=self.user.username))
 
     @status_before_must_be("ready", "must_retry")
@@ -1174,8 +1177,10 @@ class VerificationDeadline(TimeStampedModel):
 
 class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-missing-unicode, useless-suppression
     """
-        SSPVerificationRetryConfig used to inject arguments
-        to retry_failed_photo_verifications management command
+    SSPVerificationRetryConfig used to inject arguments
+    to retry_failed_photo_verifications management command
+
+    .. no_pii:
     """
 
     class Meta:
@@ -1192,33 +1197,59 @@ class SSPVerificationRetryConfig(ConfigurationModel):  # pylint: disable=model-m
         return str(self.arguments)
 
 
-class VerificationAttempt(TimeStampedModel):
+class VerificationAttempt(StatusModel):
     """
     The model represents impelementation-agnostic information about identity verification (IDV) attempts.
 
     Plugins that implement forms of IDV can store information about IDV attempts in this model for use across
     the platform.
+
+    .. pii: Contains the name of the user
+    .. pii_types: name
+    .. pii_retirement: local_api
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=255)
 
-    STATUS_CHOICES = [
+    STATUS = Choices(
         VerificationAttemptStatus.CREATED,
         VerificationAttemptStatus.PENDING,
         VerificationAttemptStatus.APPROVED,
         VerificationAttemptStatus.DENIED,
-    ]
-    status = models.CharField(max_length=64, choices=[(status, status) for status in STATUS_CHOICES])
+    )
 
     expiration_datetime = models.DateTimeField(
         null=True,
         blank=True,
     )
 
-    @property
-    def updated_at(self):
-        """Backwards compatibility with existing IDVerification models"""
-        return self.modified
+    hide_status_from_user = models.BooleanField(
+        default=False,
+        null=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+    def should_display_status_to_user(self):
+        """When called, returns true or false based on the type of VerificationAttempt"""
+        return not self.hide_status_from_user
+
+    def active_at_datetime(self, deadline):
+        """Check whether the verification was active at a particular datetime.
+
+        Arguments:
+            deadline (datetime): The date at which the verification was active
+                (created before and expiration datetime is after today).
+
+        Returns:
+            bool
+
+        """
+        return (
+            self.created_at <= deadline and
+            (self.expiration_datetime is None or self.expiration_datetime > now())
+        )
 
     @classmethod
     def retire_user(cls, user_id):

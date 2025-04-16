@@ -1990,6 +1990,15 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         self.add_notenrolled(response, self.notenrolled_student.username)
         assert CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id)
 
+    def test_add_notenrolled_username_autoenroll_with_multiple_users(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
+        identifiers = (f"Lorem@ipsum.dolor, "
+                       f"sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed, "
+                       f"{self.notenrolled_student.username}"
+                       )
+        response = self.client.post(url, {'identifiers': identifiers, 'action': 'add', 'email_students': False, 'auto_enroll': True})  # lint-amnesty, pylint: disable=line-too-long
+        assert 6, len(json.loads(response.content.decode())['results'])
+
     @ddt.data('http', 'https')
     def test_add_notenrolled_with_email(self, protocol):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
@@ -3566,6 +3575,15 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         })
         assert response.status_code == 400
 
+    def test_skip_entrance_exam_student_with_invalid_student(self):
+        """ Test skip entrance exam api for non existing user. """
+        # create a re-score entrance exam task
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'unique_student_identifier': 'test',
+        })
+        assert response.status_code == 400
+
     def test_skip_entrance_exam_student(self):
         """ Test skip entrance exam api for student. """
         # create a re-score entrance exam task
@@ -4285,6 +4303,16 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         assert get_extended_due(self.course, self.week1, self.user1) == due_date
         # This operation regenerates the cache, so we can use cached results from edx-when.
         assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
+
+    def test_reset_due_date_with_reason(self):
+        url = reverse('reset_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': str(self.week1.location),
+            'reason': 'Testing reason.'  # this is optional field.
+        })
+        assert response.status_code == 200
+        assert 'Successfully reset due date for student' in response.content.decode('utf-8')
 
     def test_change_to_invalid_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})

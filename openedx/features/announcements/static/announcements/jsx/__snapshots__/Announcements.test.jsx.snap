@@ -13,7 +13,7 @@ exports[`Announcements component render test announcements 1`] = `
   <div
     className="announcement"
     dangerouslySetInnerHTML={
-      Object {
+      {
         "__html": "Test Announcement 1",
       }
     }
@@ -21,7 +21,7 @@ exports[`Announcements component render test announcements 1`] = `
   <div
     className="announcement"
     dangerouslySetInnerHTML={
-      Object {
+      {
         "__html": "Bold <b>Announcement 2</b>",
       }
     }
@@ -29,7 +29,7 @@ exports[`Announcements component render test announcements 1`] = `
   <div
     className="announcement"
     dangerouslySetInnerHTML={
-      Object {
+      {
         "__html": "Test Announcement 3",
       }
     }
@@ -37,7 +37,7 @@ exports[`Announcements component render test announcements 1`] = `
   <div
     className="announcement"
     dangerouslySetInnerHTML={
-      Object {
+      {
         "__html": "Test Announcement 4",
       }
     }
@@ -45,7 +45,7 @@ exports[`Announcements component render test announcements 1`] = `
   <div
     className="announcement"
     dangerouslySetInnerHTML={
-      Object {
+      {
         "__html": "Test Announcement 5",
       }
     }
@@ -53,7 +53,7 @@ exports[`Announcements component render test announcements 1`] = `
   <div
     className="announcement"
     dangerouslySetInnerHTML={
-      Object {
+      {
         "__html": "Test Announcement 6",
       }
     }

@@ -25,7 +25,14 @@ from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString, List
 from xblock.scorable import ScorableXBlockMixin, Score
+from xblocks_contrib.problem import ProblemBlock as _ExtractedProblemBlock
 
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ID,
+)
+from openedx.core.djangolib.markup import HTML, Text
 from xmodule.capa import responsetypes
 from xmodule.capa.capa_problem import LoncapaProblem, LoncapaSystem
 from xmodule.capa.inputtypes import Status
@@ -36,8 +43,8 @@ from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.util.sandboxing import SandboxService
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
     ResourceTemplates,
     XModuleMixin,
@@ -45,19 +52,11 @@ from xmodule.x_module import (
     shim_xmodule_js
 )
 from xmodule.xml_block import XmlMixin
-from common.djangoapps.xblock_django.constants import (
-    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
-    ATTR_KEY_USER_IS_STAFF,
-    ATTR_KEY_USER_ID,
-)
-from openedx.core.djangolib.markup import HTML, Text
 from .capa.xqueue_interface import XQueueService
-
 from .fields import Date, ListScoreField, ScoreField, Timedelta
 from .progress import Progress
 
 log = logging.getLogger("edx.courseware")
-
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.gettext_noop` because Django cannot be imported in this file
@@ -134,7 +133,7 @@ class Randomization(String):
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
 @XBlock.wants('call_to_action')
-class ProblemBlock(
+class _BuiltInProblemBlock(
     ScorableXBlockMixin,
     RawMixin,
     XmlMixin,
@@ -160,6 +159,8 @@ class ProblemBlock(
     system is inspired.
     """
     INDEX_CONTENT_TYPE = 'CAPA'
+
+    is_extracted = False
 
     resources_dir = None
 
@@ -339,6 +340,11 @@ class ProblemBlock(
                "or to report an issue, please contact moocsupport@mathworks.com"),
         scope=Scope.settings
     )
+    markdown_edited = Boolean(
+        help=_("Indicates if the problem was edited using the Markdown editor in the Authoring MFE."),
+        scope=Scope.settings,
+        default=False
+    )
 
     def bind_for_student(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
         super().bind_for_student(*args, **kwargs)
@@ -361,7 +367,7 @@ class ProblemBlock(
         else:
             html = self.get_html()
         fragment = Fragment(html)
-        add_sass_to_fragment(fragment, "ProblemBlockDisplay.scss")
+        add_css_to_fragment(fragment, "ProblemBlockDisplay.css")
         add_webpack_js_to_fragment(fragment, 'ProblemBlockDisplay')
         shim_xmodule_js(fragment, 'Problem')
         return fragment
@@ -393,7 +399,7 @@ class ProblemBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_sass_to_fragment(fragment, 'ProblemBlockEditor.scss')
+        add_css_to_fragment(fragment, 'ProblemBlockEditor.css')
         add_webpack_js_to_fragment(fragment, 'ProblemBlockEditor')
         shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
         return fragment
@@ -616,11 +622,15 @@ class ProblemBlock(
             "",
             capa_content
         )
+        # Strip out all other tags, leaving their content. But we want spaces between adjacent tags, so that
+        # <choice correct="true"><div>Option A</div></choice><choice correct="false"><div>Option B</div></choice>
+        # becomes "Option A Option B" not "Option AOption B" (these will appear in search results)
+        capa_content = re.sub(r"</(\w+)><([^>]+)>", r"</\1> <\2>", capa_content)
         capa_content = re.sub(
             r"(\s|&nbsp;|//)+",
             " ",
             nh3.clean(capa_content, tags=set())
-        )
+        ).strip()
 
         capa_body = {
             "capa_content": capa_content,
@@ -2505,3 +2515,10 @@ def randomization_bin(seed, problem_id):
     r_hash.update(str(problem_id).encode())
     # get the first few digits of the hash, convert to an int, then mod.
     return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
+
+
+ProblemBlock = (
+    _ExtractedProblemBlock if settings.USE_EXTRACTED_PROBLEM_BLOCK
+    else _BuiltInProblemBlock
+)
+ProblemBlock.__name__ = "ProblemBlock"

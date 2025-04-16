@@ -96,6 +96,7 @@ class LoncapaSystem(object):
     See :class:`DescriptorSystem` for documentation of other attributes.
 
     """
+
     def __init__(
         self,
         ajax_url,
@@ -130,6 +131,7 @@ class LoncapaProblem(object):
     """
     Main class for capa Problems.
     """
+
     def __init__(self, problem_text, id, capa_system, capa_block,  # pylint: disable=redefined-builtin
                  state=None, seed=None, minimal_init=False, extract_tree=True):
         """

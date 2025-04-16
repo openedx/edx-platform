@@ -55,7 +55,6 @@ release = ''
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.doctest',
     'sphinx.ext.graphviz',
@@ -68,7 +67,22 @@ extensions = [
     'sphinx_design',
     'code_annotations.contrib.sphinx.extensions.featuretoggles',
     'code_annotations.contrib.sphinx.extensions.settings',
+    # 'autoapi.extension',  # Temporarily disabled
+    'sphinx_reredirects',
 ]
+
+# Temporarily disabling autoapi_dirs and the AutoAPI extension due to performance issues.
+# This will unblock ReadTheDocs builds and will be revisited for optimization.
+# autoapi_type = 'python'
+# autoapi_dirs = ['../lms/djangoapps', '../openedx/core/djangoapps', "../openedx/features"]
+#
+# autoapi_ignore = [
+#     '*/migrations/*',
+#     '*/tests/*',
+#     '*.pyc',
+#     '__init__.py',
+#     '**/xblock_serializer/data.py',
+# ]
 
 # Rediraffe related settings.
 rediraffe_redirects = "redirects.txt"
@@ -83,11 +97,11 @@ try:
 except git.InvalidGitRepositoryError:
     edx_platform_version = "master"
 
-featuretoggles_source_path = edxplatform_source_path
+featuretoggles_source_path = str(edxplatform_source_path)
 featuretoggles_repo_url = edxplatform_repo_url
 featuretoggles_repo_version = edx_platform_version
 
-settings_source_path = edxplatform_source_path
+settings_source_path = str(edxplatform_source_path)
 settings_repo_url = edxplatform_repo_url
 settings_repo_version = edx_platform_version
 
@@ -98,7 +112,6 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
@@ -108,7 +121,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -170,7 +183,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -258,22 +271,24 @@ epub_title = project
 epub_exclude_files = ['search.html']
 
 
+# -- Read the Docs Specific Configuration
+# Define the canonical URL if you are using a custom domain on Read the Docs
+html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "")
+
+# Tell Jinja2 templates the build is running on Read the Docs
+if os.environ.get("READTHEDOCS", "") == "True":
+    if "html_context" not in globals():
+        html_context = {}
+    html_context["READTHEDOCS"] = True
+
 # -- Extension configuration -------------------------------------------------
 
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
-    'https://docs.python.org/2.7': None,
-    'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
+    'django': ('https://docs.djangoproject.com/en/4.2/', 'https://docs.djangoproject.com/en/4.2/_objects/'),
 }
-
-# Mock out these external modules during code import to avoid errors
-autodoc_mock_imports = [
-    'MySQLdb',
-    'django_mysql',
-    'pymongo',
-]
 
 # Start building a map of the directories relative to the repository root to
 # run sphinx-apidoc against and the directories under "docs" in which to store
@@ -287,6 +302,16 @@ modules = {
     # 'cms': 'references/docstrings/cms',
     # 'common': 'references/docstrings/common',
     # 'xmodule': 'references/docstrings/xmodule',
+}
+
+# Mapping permanently moved pages to appropriate new location outside of edx-platform
+# with by sphinx-reredirects extension redirects.
+# More information: https://documatt.com/sphinx-reredirects/usage.html
+
+redirects = {
+    'hooks/events': 'https://docs.openedx.org/projects/openedx-events/en/latest/',
+    'hooks/filters': 'https://docs.openedx.org/projects/openedx-filters/en/latest/',
+    'hooks/index': 'https://docs.openedx.org/en/latest/developers/concepts/hooks_extension_framework.html',
 }
 
 

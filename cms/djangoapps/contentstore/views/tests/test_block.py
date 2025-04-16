@@ -23,6 +23,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
 from pytz import UTC
+from bs4 import BeautifulSoup
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlockAside
@@ -265,9 +266,10 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            '"/container/{}" class="action-button">\\s*<span class="action-button-text">View</span>'.format(
-                re.escape(str(wrapper_usage_key))
-            ),
+            (
+                '"/container/{}" class="action-button xblock-view-action-button">'
+                '\\s*<span class="action-button-text">View</span>'
+            ).format(re.escape(str(wrapper_usage_key))),
         )
 
     @patch("cms.djangoapps.contentstore.xblock_storage_handlers.xblock_helpers.get_object_tag_counts")
@@ -312,12 +314,12 @@ class GetItemTest(ItemTest):
         resp = self.create_xblock(
             parent_usage_key=split_test_usage_key,
             category="html",
-            boilerplate="zooming_image.yaml",
+            boilerplate="latex_html.yaml",
         )
         self.assertEqual(resp.status_code, 200)
         html, __ = self._get_container_preview(split_test_usage_key)
         self.assertIn("Announcement", html)
-        self.assertIn("Zooming", html)
+        self.assertIn("LaTeX", html)
 
     def test_split_test_edited(self):
         """
@@ -558,9 +560,6 @@ class GetItemTest(ItemTest):
             else:
                 self.assertNotIn("ancestors", response)
                 xblock_info = get_block_info(xblock)
-                # TODO: remove after beta testing for the new problem editor parser
-                if xblock_info["category"] == "problem":
-                    xblock_info["metadata"]["default_to_advanced"] = False
                 self.assertEqual(xblock_info, response)
 
 
@@ -982,7 +981,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
 
     def test_duplicate_library_content_block(self):  # pylint: disable=too-many-statements
         """
-        Test the LibraryContentBlock's special duplication process.
+        Test the LegacyLibraryContentBlock's special duplication process.
         """
         store = modulestore()
 
@@ -3184,13 +3183,13 @@ class TestComponentTemplates(CourseTestCase):
         templates = get_component_templates(self.course)
         button_names = [template["display_name"] for template in templates]
         self.assertIn("Advanced", button_names)
-        self.assertEqual(len(templates[0]["templates"]), len(expected_xblocks))
+        self.assertEqual(len(templates[-1]["templates"]), len(expected_xblocks))
         template_display_names = [
-            template["display_name"] for template in templates[0]["templates"]
+            template["display_name"] for template in templates[-1]["templates"]
         ]
         self.assertEqual(template_display_names, expected_xblocks)
         template_support_levels = [
-            template["support_level"] for template in templates[0]["templates"]
+            template["support_level"] for template in templates[-1]["templates"]
         ]
         self.assertEqual(template_support_levels, expected_support_levels)
 
@@ -3674,14 +3673,15 @@ class TestSpecialExamXBlockInfo(ItemTest):
     @patch_does_backend_support_onboarding
     @patch_get_exam_by_content_id_success
     @ddt.data(
-        ("lti_external", False),
-        ("other_proctoring_backend", True),
+        ("lti_external", False, None),
+        ("other_proctoring_backend", True, "test_url"),
     )
     @ddt.unpack
-    def test_support_onboarding_is_correct_depending_on_lti_external(
+    def test_proctoring_values_correct_depending_on_lti_external(
         self,
         external_id,
-        expected_value,
+        expected_supports_onboarding_value,
+        expected_proctoring_link,
         mock_get_exam_by_content_id,
         mock_does_backend_support_onboarding,
         _mock_get_exam_configuration_dashboard_url,
@@ -3691,8 +3691,9 @@ class TestSpecialExamXBlockInfo(ItemTest):
             category="sequential",
             display_name="Test Lesson 1",
             user_id=self.user.id,
-            is_proctored_enabled=False,
-            is_time_limited=False,
+            is_proctored_enabled=True,
+            is_time_limited=True,
+            default_time_limit_minutes=100,
             is_onboarding_exam=False,
         )
 
@@ -3709,7 +3710,8 @@ class TestSpecialExamXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS,
             course=self.course,
         )
-        assert xblock_info["supports_onboarding"] is expected_value
+        assert xblock_info["supports_onboarding"] is expected_supports_onboarding_value
+        assert xblock_info["proctoring_exam_configuration_link"] == expected_proctoring_link
 
     @patch_get_exam_configuration_dashboard_url
     @patch_does_backend_support_onboarding
@@ -3772,6 +3774,42 @@ class TestSpecialExamXBlockInfo(ItemTest):
         )
         assert xblock_info["was_exam_ever_linked_with_external"] is False
         assert mock_get_exam_by_content_id.call_count == 1
+
+    @patch_get_exam_configuration_dashboard_url
+    @patch_does_backend_support_onboarding
+    @patch_get_exam_by_content_id_success
+    def test_special_exam_xblock_info_get_dashboard_error(
+        self,
+        mock_get_exam_by_content_id,
+        _mock_does_backend_support_onboarding,
+        mock_get_exam_configuration_dashboard_url,
+    ):
+        sequential = BlockFactory.create(
+            parent_location=self.chapter.location,
+            category="sequential",
+            display_name="Test Lesson 1",
+            user_id=self.user.id,
+            is_proctored_enabled=True,
+            is_time_limited=True,
+            default_time_limit_minutes=100,
+            is_onboarding_exam=False,
+        )
+        sequential = modulestore().get_item(sequential.location)
+        mock_get_exam_configuration_dashboard_url.side_effect = Exception("proctoring error")
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+
+        # no errors should be raised and proctoring_exam_configuration_link is None
+        assert xblock_info["is_proctored_exam"] is True
+        assert xblock_info["was_exam_ever_linked_with_external"] is True
+        assert xblock_info["is_time_limited"] is True
+        assert xblock_info["default_time_limit_minutes"] == 100
+        assert xblock_info["proctoring_exam_configuration_link"] is None
+        assert xblock_info["supports_onboarding"] is True
+        assert xblock_info["is_onboarding_exam"] is False
 
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
@@ -4498,3 +4536,61 @@ class TestUpdateFromSource(ModuleStoreTestCase):
             user_id=user.id,
         )
         self.check_updated(source_block, destination_block.location)
+
+
+class TestXblockEditView(CourseTestCase):
+    """
+    Test xblock_edit_view.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.chapter = self._create_block(self.course, "chapter", "Week 1")
+        self.sequential = self._create_block(self.chapter, "sequential", "Lesson 1")
+        self.vertical = self._create_block(self.sequential, "vertical", "Unit")
+        self.html = self._create_block(self.vertical, "html", "HTML")
+        self.child_container = self._create_block(
+            self.vertical, "split_test", "Split Test"
+        )
+        self.child_vertical = self._create_block(
+            self.child_container, "vertical", "Child Vertical"
+        )
+        self.video = self._create_block(self.child_vertical, "video", "My Video")
+        self.store = modulestore()
+
+        self.store.publish(self.vertical.location, self.user.id)
+
+    def _create_block(self, parent, category, display_name, **kwargs):
+        """
+        creates a block in the module store, without publishing it.
+        """
+        return BlockFactory.create(
+            parent=parent,
+            category=category,
+            display_name=display_name,
+            publish_item=False,
+            user_id=self.user.id,
+            **kwargs,
+        )
+
+    def test_xblock_edit_view(self):
+        url = reverse_usage_url("xblock_edit_handler", self.video.location)
+        resp = self.client.get_html(url)
+        self.assertEqual(resp.status_code, 200)
+
+        html_content = resp.content.decode(resp.charset)
+        self.assertIn("var decodedActionName = 'edit';", html_content)
+
+    def test_xblock_edit_view_contains_resources(self):
+        url = reverse_usage_url("xblock_edit_handler", self.video.location)
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+        html_content = resp.content.decode(resp.charset)
+        soup = BeautifulSoup(html_content, "html.parser")
+
+        resource_links = [link["href"] for link in soup.find_all("link", {"rel": "stylesheet"})]
+        script_sources = [script["src"] for script in soup.find_all("script") if script.get("src")]
+
+        self.assertGreater(len(resource_links), 0, f"No CSS resources found in HTML. Found: {resource_links}")
+        self.assertGreater(len(script_sources), 0, f"No JS resources found in HTML. Found: {script_sources}")

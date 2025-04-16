@@ -1,10 +1,12 @@
 """ Instructor apis serializers. """
+import re
 
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 from rest_framework import serializers
 
+from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.instructor.access import ROLES
 from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_ADMINISTRATOR,
@@ -17,6 +19,8 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_user,
     get_group_name
 )
+
+from .tools import get_student_from_identifier
 
 from .tools import get_student_from_identifier
 
@@ -43,22 +47,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'first_name', 'last_name']
 
 
-class AccessSerializer(serializers.Serializer):
+class UniqueStudentIdentifierSerializer(serializers.Serializer):
     """
-    Serializer for managing user access changes.
-    This serializer validates and processes the data required to modify
-    user access within a system.
+    Serializer for identifying unique_student.
     """
     unique_student_identifier = serializers.CharField(
         max_length=255,
         help_text="Email or username of user to change access"
-    )
-    rolename = serializers.CharField(
-        help_text="Role name to assign to the user"
-    )
-    action = serializers.ChoiceField(
-        choices=['allow', 'revoke'],
-        help_text="Action to perform on the user's access"
     )
 
     def validate_unique_student_identifier(self, value):
@@ -114,20 +109,6 @@ class ForumRoleNameSerializer(serializers.Serializer):  # pylint: disable=abstra
             users = []
 
         return [extract_user_info(user, self.context.get('course_discussion_settings')) for user in users]
-
-
-def extract_user_info(user, course_discussion_settings):
-    """ utility method to convert user into dict for JSON rendering. """
-    group_id = get_group_id_for_user(user, course_discussion_settings)
-    group_name = get_group_name(group_id, course_discussion_settings)
-
-    return {
-        'username': user.username,
-        'email': user.email,
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'group_name': group_name,
-    }
 
 
 class ListInstructorTaskInputSerializer(serializers.Serializer):  # pylint: disable=abstract-method
@@ -277,6 +258,155 @@ class BlockDueDateSerializer(serializers.Serializer):
     def validate_student(self, value):
         """
         Validate that the student corresponds to an existing user.
+        """
+        try:
+            user = get_student_from_identifier(value)
+        except User.DoesNotExist:
+            return None
+
+        return user
+
+    def __init__(self, *args, **kwargs):
+        # Get context to check if `due_datetime` should be optional
+        disable_due_datetime = kwargs.get('context', {}).get('disable_due_datetime', False)
+        super().__init__(*args, **kwargs)
+        if disable_due_datetime:
+            self.fields['due_datetime'].required = False
+
+
+class ProblemResetSerializer(UniqueStudentIdentifierSerializer):
+    """
+    serializer for resetting problem.
+    """
+    problem_to_reset = serializers.CharField(
+        help_text=_("The URL name of the problem to reset."),
+        error_messages={
+            'blank': _("Problem URL name cannot be blank."),
+        }
+    )
+    all_students = serializers.BooleanField(
+        default=False,
+        help_text=_("Whether to reset the problem for all students."),
+    )
+    only_if_higher = serializers.BooleanField(
+        default=False,
+    )
+
+    # Override the unique_student_identifier field to make it optional
+    unique_student_identifier = serializers.CharField(
+        required=False,  # Make this field optional
+        allow_null=True,
+        help_text=_("unique student identifier.")
+    )
+
+
+class ModifyAccessSerializer(serializers.Serializer):
+    """
+    serializers for enroll or un-enroll users in beta testing program.
+    """
+    identifiers = serializers.CharField(
+        help_text="A comma separated list of emails or usernames.",
+        required=True
+    )
+    action = serializers.ChoiceField(
+        choices=["add", "remove"],
+        help_text="Action to perform: add or remove.",
+        required=True
+    )
+
+    email_students = serializers.BooleanField(
+        default=False,
+        help_text="Boolean flag to indicate if students should be emailed."
+    )
+
+    auto_enroll = serializers.BooleanField(
+        default=False,
+        help_text="Boolean flag to indicate if the user should be auto-enrolled."
+    )
+
+    def validate_identifiers(self, value):
+        """
+        Validate the 'identifiers' field which is now a list of strings.
+        """
+        # Iterate over the list of identifiers and validate each one
+        validated_list = _split_input_list(value)
+        if not validated_list:
+            raise serializers.ValidationError("The identifiers list cannot be empty.")
+
+        return validated_list
+
+    def validate_email_students(self, value):
+        """
+        handle string values like 'true' or 'false'.
+        """
+        if isinstance(value, str):
+            return value.lower() == 'true'
+        return bool(value)
+
+    def validate_auto_enroll(self, value):
+        """
+        handle string values like 'true' or 'false'.
+        """
+        if isinstance(value, str):
+            return value.lower() == 'true'
+        return bool(value)
+
+
+def _split_input_list(str_list):
+    """
+    Separate out individual student email from the comma, or space separated string.
+
+    e.g.
+    in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
+    out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
+
+    `str_list` is a string coming from an input text area
+    returns a list of separated values
+    """
+    new_list = re.split(r'[,\s\n\r]+', str_list)
+    new_list = [s.strip() for s in new_list]
+    new_list = [s for s in new_list if s != '']
+
+    return new_list
+
+
+class CertificateStatusesSerializer(serializers.Serializer):
+    """
+    Serializer for validating and serializing certificate status inputs.
+
+    This serializer is used to ensure that the provided certificate statuses
+    conform to the predefined set of valid statuses defined in the
+    `CertificateStatuses` enumeration.
+    """
+    certificate_statuses = serializers.ListField(
+        child=serializers.ChoiceField(choices=[
+            CertificateStatuses.downloadable,
+            CertificateStatuses.error,
+            CertificateStatuses.notpassing,
+            CertificateStatuses.audit_passing,
+            CertificateStatuses.audit_notpassing,
+        ]),
+        allow_empty=False  # Set to True if you want to allow empty lists
+    )
+
+
+class CertificateSerializer(serializers.Serializer):
+    """
+    Serializer for multiple operations related with certificates.
+    resetting a students attempts counter or starts a task to reset all students
+    attempts counters
+    Also Add/Remove students to/from the certificate allowlist.
+    Also For resetting a students attempts counter or starts a task to reset all students
+    attempts counters.
+    """
+    user = serializers.CharField(
+        help_text="Email or username of student.", required=True
+    )
+    notes = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    def validate_user(self, value):
+        """
+        Validate that the user corresponds to an existing user.
         """
         try:
             user = get_student_from_identifier(value)

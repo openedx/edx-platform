@@ -148,11 +148,12 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
             "context_key": "lib:orgA:lib_a",
             "org": "orgA",
             "breadcrumbs": [{"display_name": "Library Org A"}],
-            "content": {"problem_types": [], "capa_content": " "},
+            "content": {"problem_types": [], "capa_content": ""},
             "access_id": lib_access.id,
             "last_published": None,
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
+            "publish_status": "never",
         }
 
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
@@ -176,6 +177,8 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
         with freeze_time(published_date):
             library_api.publish_changes(library.key)
         doc_problem["last_published"] = published_date.timestamp()
+        doc_problem["published"] = {"display_name": "Blank Problem"}
+        doc_problem["publish_status"] = "published"
         meilisearch_client.return_value.index.return_value.update_documents.assert_called_with([doc_problem])
 
         # Delete the Library Block
@@ -183,4 +186,14 @@ class TestUpdateIndexHandlers(ModuleStoreTestCase, LiveServerTestCase):
 
         meilisearch_client.return_value.index.return_value.delete_document.assert_called_with(
             "lborgalib_aproblemproblem1-ca3186e9"
+        )
+
+        # Restore the Library Block
+        library_api.restore_library_block(problem.usage_key)
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call([doc_problem])
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call(
+            [{'id': doc_problem['id'], 'collections': {'display_name': [], 'key': []}}]
+        )
+        meilisearch_client.return_value.index.return_value.update_documents.assert_any_call(
+            [{'id': doc_problem['id'], 'tags': {}}]
         )

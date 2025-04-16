@@ -29,6 +29,7 @@ from openedx.features.enterprise_support.tests.factories import (
 )
 from openedx.features.enterprise_support.utils import (
     ENTERPRISE_HEADER_LINKS,
+    _user_has_social_auth_record,
     clear_data_consent_share_cache,
     enterprise_fields_only,
     fetch_enterprise_customer_by_id,
@@ -269,10 +270,11 @@ class TestEnterpriseUtils(TestCase):
         mock_get_fields.assert_called_once_with(user)
         assert expected_context == context
 
+    @ddt.data(settings.ENTERPRISE_READONLY_ACCOUNT_FIELDS, ['username', 'email', 'country'])
     @mock.patch('openedx.features.enterprise_support.utils.get_current_request')
     @mock.patch('openedx.features.enterprise_support.api.enterprise_customer_for_request')
     def test_get_enterprise_readonly_account_fields_no_sync_learner_profile_data(
-            self, mock_customer_for_request, mock_get_current_request,
+            self, readonly_fields, mock_customer_for_request, mock_get_current_request,
     ):
         mock_get_current_request.return_value = mock.Mock(
             GET={'enterprise_customer': 'some-uuid'},
@@ -284,7 +286,8 @@ class TestEnterpriseUtils(TestCase):
         }
         user = mock.Mock()
 
-        actual_fields = get_enterprise_readonly_account_fields(user)
+        with override_settings(ENTERPRISE_READONLY_ACCOUNT_FIELDS=readonly_fields):
+            actual_fields = get_enterprise_readonly_account_fields(user)
         assert set() == actual_fields
         mock_customer_for_request.assert_called_once_with(mock_get_current_request.return_value)
         mock_get_current_request.assert_called_once_with()
@@ -536,6 +539,54 @@ class TestEnterpriseUtils(TestCase):
             redirect_url=redirect_url,
         )
         assert not mock_next_login_url.called
+
+    @mock.patch('openedx.features.enterprise_support.utils.UserSocialAuth')
+    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth')
+    def test_user_has_social_auth_record(self, mock_tpa, mock_user_social_auth):
+        user = mock.Mock()
+        enterprise_customer = {
+            'identity_providers': [
+                {'provider_id': 'mock-idp'},
+            ],
+        }
+        mock_idp = mock.MagicMock(backend_name='mock-backend')
+        mock_tpa.provider.Registry.get.return_value = mock_idp
+        mock_user_social_auth.objects.select_related.return_value.filter.return_value.exists.return_value = True
+
+        result = _user_has_social_auth_record(user, enterprise_customer)
+        assert result is True
+
+        mock_tpa.provider.Registry.get.assert_called_once_with(provider_id='mock-idp')
+        mock_user_social_auth.objects.select_related.assert_called_once_with('user')
+        mock_user_social_auth.objects.select_related.return_value.filter.assert_called_once_with(
+            provider__in=['mock-backend'], user=user
+        )
+
+    @mock.patch('openedx.features.enterprise_support.utils.UserSocialAuth')
+    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth')
+    def test_user_has_social_auth_record_no_providers(self, mock_tpa, mock_user_social_auth):
+        user = mock.Mock()
+        enterprise_customer = {
+            'identity_providers': [],
+        }
+
+        result = _user_has_social_auth_record(user, enterprise_customer)
+        assert result is False
+
+        assert not mock_tpa.provider.Registry.get.called
+        assert not mock_user_social_auth.objects.select_related.called
+
+    @mock.patch('openedx.features.enterprise_support.utils.UserSocialAuth')
+    @mock.patch('openedx.features.enterprise_support.utils.third_party_auth')
+    def test_user_has_social_auth_record_no_enterprise_customer(self, mock_tpa, mock_user_social_auth):
+        user = mock.Mock()
+        enterprise_customer = None
+
+        result = _user_has_social_auth_record(user, enterprise_customer)
+        assert result is False
+
+        assert not mock_tpa.provider.Registry.get.called
+        assert not mock_user_social_auth.objects.select_related.called
 
 
 @override_settings(FEATURES=FEATURES_WITH_ENTERPRISE_ENABLED)
