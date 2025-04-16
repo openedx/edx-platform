@@ -233,7 +233,6 @@ class BlockDueDateSerializer(serializers.Serializer):
             self.fields['due_datetime'].required = False
 
 
-
 class ProblemResetSerializer(UniqueStudentIdentifierSerializer):
     """
     serializer for resetting problem.
