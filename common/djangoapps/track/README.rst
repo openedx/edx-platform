@@ -12,4 +12,4 @@ Glossary
 
 More Documentation
 ==================
-`Events in the Tracking Logs <https://edx.readthedocs.io/projects/devdata/en/stable/internal_data_formats/tracking_logs.html>`_
+`Events in the Tracking Logs <https://docs.openedx.org/en/latest/developers/references/internal_data_formats/tracking_logs/index.html>`_

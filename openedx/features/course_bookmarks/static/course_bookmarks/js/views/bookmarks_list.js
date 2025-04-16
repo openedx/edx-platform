@@ -78,9 +78,7 @@
                         component_type: componentType,
                         component_usage_id: componentUsageId
                     }
-                ).always(function() {
-                    window.location.href = event.currentTarget.pathname;
-                });
+                );
             },
 
             /**

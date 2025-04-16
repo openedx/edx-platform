@@ -4,7 +4,6 @@ Enrollment operations for use by instructor APIs.
 Does not include any access control, be sure to check access before calling.
 """
 
-
 import json
 import logging
 from contextlib import ExitStack, contextmanager
@@ -60,6 +59,7 @@ log = logging.getLogger(__name__)
 
 class EmailEnrollmentState:
     """ Store the complete enrollment state of an email in a class """
+
     def __init__(self, course_id, email):
         # N.B. retired users are not a concern here because they should be
         # handled at a higher level (i.e. in enroll_email).  Besides, this
@@ -433,10 +433,10 @@ def _reset_module_attempts(studentmodule):
 
 
 def _fire_score_changed_for_block(
-        course_id,
-        student,
-        block,
-        module_state_key,
+    course_id,
+    student,
+    block,
+    module_state_key,
 ):
     """
     Fires a PROBLEM_RAW_SCORE_CHANGED event for the given module.
@@ -566,9 +566,10 @@ def send_mail_to_student(student, param_dict, language=None):
 
     # Extract an LMS user ID for the student, if possible.
     # ACE needs the user ID to be able to send email via Braze.
-    lms_user_id = 0
-    if 'user_id' in param_dict and param_dict['user_id'] is not None and param_dict['user_id'] > 0:
-        lms_user_id = param_dict['user_id']
+    try:
+        lms_user_id = User.objects.get(email=student).id
+    except User.DoesNotExist:
+        lms_user_id = 0
 
     # see if there is an activation email template definition available as configuration,
     # if so, then render that
@@ -590,7 +591,6 @@ def send_mail_to_student(student, param_dict, language=None):
         language=language,
         user_context=param_dict,
     )
-
     ace.send(message)
 
 

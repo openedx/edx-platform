@@ -2,13 +2,15 @@
 Notification grouping utilities for notifications
 """
 import datetime
+from abc import ABC, abstractmethod
 from typing import Dict, Type, Union
 
 from pytz import utc
 
-from abc import ABC, abstractmethod
-
+from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.models import Notification
+
+from .exceptions import InvalidNotificationTypeError
 
 
 class BaseNotificationGrouper(ABC):
@@ -42,6 +44,10 @@ class NotificationRegistry:
             """
             Registers the grouper class for the given notification type.
             """
+            if notification_type not in COURSE_NOTIFICATION_TYPES:
+                raise InvalidNotificationTypeError(
+                    f"'{notification_type}' is not a valid notification type."
+                )
             cls._groupers[notification_type] = grouper_class
             return grouper_class
 
@@ -63,24 +69,41 @@ class NotificationRegistry:
         return grouper_class()
 
 
-@NotificationRegistry.register('new_comment')
-class NewCommentGrouper(BaseNotificationGrouper):
+@NotificationRegistry.register('new_discussion_post')
+class NewPostGrouper(BaseNotificationGrouper):
     """
-    Groups new comment notifications based on the replier name.
+    Groups new post notifications based on the author name.
     """
 
     def group(self, new_notification, old_notification):
         """
-        Groups new comment notifications based on the replier name.
+        Groups new post notifications based on the author name.
         """
-        context = old_notification.content_context.copy()
-        if not context.get('grouped'):
-            context['replier_name_list'] = [context['replier_name']]
-            context['grouped_count'] = 1
-            context['grouped'] = True
-        context['replier_name_list'].append(new_notification.content_context['replier_name'])
-        context['grouped_count'] += 1
-        return context
+        if (
+            old_notification.content_context['username'] == new_notification.content_context['username']
+            and not old_notification.content_context.get('grouped', False)
+        ):
+            return {**new_notification.content_context}
+        return {
+            **old_notification.content_context,
+            "grouped": True,
+            "replier_name": new_notification.content_context["replier_name"]
+        }
+
+
+@NotificationRegistry.register('ora_staff_notifications')
+class OraStaffGrouper(BaseNotificationGrouper):
+    """
+    Grouper for new ora staff notifications.
+    """
+
+    def group(self, new_notification, old_notification):
+        """
+        Groups new ora staff notifications based on the xblock ID.
+        """
+        content_context = old_notification.content_context
+        content_context.setdefault("grouped", True)
+        return content_context
 
 
 def group_user_notifications(new_notification: Notification, old_notification: Notification):
@@ -92,9 +115,9 @@ def group_user_notifications(new_notification: Notification, old_notification: N
 
     if grouper_class:
         old_notification.content_context = grouper_class.group(new_notification, old_notification)
-        old_notification.content_context['grouped'] = True
         old_notification.web = old_notification.web or new_notification.web
         old_notification.email = old_notification.email or new_notification.email
+        old_notification.content_url = new_notification.content_url
         old_notification.last_read = None
         old_notification.last_seen = None
         old_notification.created = utc.localize(datetime.datetime.now())
@@ -109,7 +132,8 @@ def get_user_existing_notifications(user_ids, notification_type, group_by_id, co
         user__in=user_ids,
         notification_type=notification_type,
         group_by_id=group_by_id,
-        course_id=course_id
+        course_id=course_id,
+        last_seen__isnull=True,
     )
     notifications_mapping = {user_id: [] for user_id in user_ids}
     for notification in notifications:

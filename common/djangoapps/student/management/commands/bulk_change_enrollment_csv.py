@@ -81,7 +81,7 @@ class Command(BaseCommand):
                 self.change_enrollments(csv_file)
 
         else:
-            CommandError('No file is provided. File is required')
+            raise CommandError('No file is provided. File is required')
 
     def change_enrollments(self, csv_file):
         """ change the enrollments of the learners. """

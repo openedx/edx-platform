@@ -2,7 +2,9 @@
 CMS feature toggles.
 """
 from edx_toggles.toggles import SettingDictToggle, WaffleFlag
+from openedx.core.djangoapps.content.search import api as search_api
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+
 
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
@@ -159,37 +161,6 @@ def use_new_problem_editor():
     return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
 
 
-# .. toggle_name: new_core_editors.use_advanced_problem_editor
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new core problem xblock advanced editor as the default
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2024-07-25
-# .. toggle_target_removal_date: 2024-08-31
-# .. toggle_tickets: TNL-11694
-# .. toggle_warning:
-ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_advanced_problem_editor', __name__)
-
-
-# .. toggle_name: new_editors.add_game_block_button
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the creation of the new games block
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-07-26
-# .. toggle_target_removal_date: 2023-09-31
-# .. toggle_tickets: TNL-10924
-# .. toggle_warning:
-ENABLE_ADD_GAME_BLOCK_FLAG = WaffleFlag('new_editors.add_game_block_button', __name__)
-
-
-def use_add_game_block():
-    """
-    Returns a boolean if add game block button is enabled
-    """
-    return ENABLE_ADD_GAME_BLOCK_FLAG.is_enabled()
-
-
 # .. toggle_name: contentstore.individualize_anonymous_user_id
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -208,30 +179,6 @@ def individualize_anonymous_user_id(course_id):
     Returns a boolean if individualized anonymous_user_id is enabled on the course
     """
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
-
-
-# .. toggle_name: contentstore.enable_studio_content_api
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Enables the new (experimental and unsafe!) Studio Content REST API for course authors,
-# .. which provides CRUD capabilities for course content and xblock editing.
-# .. Use at your own peril - you can easily delete learner data when editing running courses.
-# .. This can be triggered by deleting blocks, editing subsections, problems, assignments, discussions,
-# .. creating new problems or graded sections, and by other things you do.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-05-26
-# .. toggle_tickets: TNL-10208
-ENABLE_STUDIO_CONTENT_API = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.enable_studio_content_api',
-    __name__,
-)
-
-
-def use_studio_content_api():
-    """
-    Returns a boolean if studio editing API is enabled
-    """
-    return ENABLE_STUDIO_CONTENT_API.is_enabled()
 
 
 # .. toggle_name: new_studio_mfe.use_new_home_page
@@ -272,6 +219,22 @@ def use_new_custom_pages(course_key):
     """
     return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled(course_key)
 
+# .. toggle_name: contentstore.use_react_markdown_editor
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the Markdown editor when creating or editing problems in the authoring MFE
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2025-4-11
+# .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4517232656/Re-enable+Markdown+editing+of+CAPA+problems+to+meet+various+use+cases
+ENABLE_REACT_MARKDOWN_EDITOR = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.use_react_markdown_editor', __name__)
+
+
+def use_react_markdown_editor(course_key):
+    """
+    Returns a boolean if new studio custom pages mfe is enabled
+    """
+    return ENABLE_REACT_MARKDOWN_EDITOR.is_enabled(course_key)
 
 # .. toggle_name: contentstore.new_studio_mfe.use_new_schedule_details_page
 # .. toggle_implementation: CourseWaffleFlag
@@ -593,3 +556,96 @@ def default_enable_flexible_peer_openassessments(course_key):
     level to opt in/out of rolling forward this feature.
     """
     return DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS.is_enabled(course_key)
+
+
+# .. toggle_name: FEATURES['ENABLE_CONTENT_LIBRARIES']
+# .. toggle_implementation: SettingDictToggle
+# .. toggle_default: True
+# .. toggle_description: Enables use of the legacy and v2 libraries waffle flags.
+#    Note that legacy content libraries are only supported in courses using split mongo.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2015-03-06
+# .. toggle_target_removal_date: 2025-04-09
+# .. toggle_warning: This flag is deprecated in Sumac, and will be removed in favor of the disable_legacy_libraries and
+#    disable_new_libraries waffle flags.
+ENABLE_CONTENT_LIBRARIES = SettingDictToggle(
+    "FEATURES", "ENABLE_CONTENT_LIBRARIES", default=True, module_name=__name__
+)
+
+# .. toggle_name: contentstore.new_studio_mfe.disable_legacy_libraries
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Hides legacy (v1) Libraries tab in Authoring MFE.
+#    This toggle interacts with ENABLE_CONTENT_LIBRARIES toggle: if this is disabled, then legacy libraries are also
+#    disabled.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-10-02
+# .. toggle_target_removal_date: 2025-04-09
+# .. toggle_tickets: https://github.com/openedx/frontend-app-authoring/issues/1334
+# .. toggle_warning: Legacy libraries are deprecated in Sumac, cf https://github.com/openedx/edx-platform/issues/32457
+DISABLE_LEGACY_LIBRARIES = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.disable_legacy_libraries',
+    __name__,
+    CONTENTSTORE_LOG_PREFIX,
+)
+
+
+def libraries_v1_enabled():
+    """
+    Returns a boolean if Libraries V2 is enabled in the new Studio Home.
+    """
+    return (
+        ENABLE_CONTENT_LIBRARIES.is_enabled() and
+        not DISABLE_LEGACY_LIBRARIES.is_enabled()
+    )
+
+
+# .. toggle_name: contentstore.new_studio_mfe.disable_new_libraries
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Hides new Libraries v2 tab in Authoring MFE.
+#    This toggle interacts with settings.MEILISEARCH_ENABLED and ENABLE_CONTENT_LIBRARIES toggle: if these flags are
+#    False, then v2 libraries are also disabled.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2024-10-02
+# .. toggle_target_removal_date: 2025-04-09
+# .. toggle_tickets: https://github.com/openedx/frontend-app-authoring/issues/1334
+# .. toggle_warning: Libraries v2 are in beta for Sumac, will be fully supported in Teak.
+DISABLE_NEW_LIBRARIES = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.disable_new_libraries',
+    __name__,
+    CONTENTSTORE_LOG_PREFIX,
+)
+
+
+def libraries_v2_enabled():
+    """
+    Returns a boolean if Libraries V2 is enabled in the new Studio Home.
+
+    Requires the ENABLE_CONTENT_LIBRARIES feature flag to be enabled, plus Meilisearch.
+    """
+    return (
+        ENABLE_CONTENT_LIBRARIES.is_enabled() and
+        search_api.is_meilisearch_enabled() and
+        not DISABLE_NEW_LIBRARIES.is_enabled()
+    )
+
+
+# .. toggle_name: contentstore.enable_course_optimizer
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the course optimizer tool in the authoring MFE.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-01-17
+# .. toggle_target_removal_date: 2025-05-30
+# .. toggle_tickets: TNL-11837
+ENABLE_COURSE_OPTIMIZER = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.enable_course_optimizer', __name__
+)
+
+
+def enable_course_optimizer(course_id):
+    """
+    Returns a boolean if course optimizer is enabled on the course
+    """
+    return ENABLE_COURSE_OPTIMIZER.is_enabled(course_id)

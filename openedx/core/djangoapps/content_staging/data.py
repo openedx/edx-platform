@@ -25,6 +25,10 @@ class StagedContentStatus(TextChoices):
 
 # Value of the "purpose" field on StagedContent objects used for clipboards.
 CLIPBOARD_PURPOSE = "clipboard"
+
+# Value of the "purpose" field on StagedContent objects used for library to course sync.
+LIBRARY_SYNC_PURPOSE = "library_sync"
+
 # There may be other valid values of "purpose" which aren't defined within this app.
 
 
@@ -43,6 +47,7 @@ class StagedContentData:
     block_type: str = field(validator=validators.instance_of(str))
     display_name: str = field(validator=validators.instance_of(str))
     tags: dict = field(validator=validators.optional(validators.instance_of(dict)))
+    version_num: int = field(validator=validators.instance_of(int))
 
 
 @frozen
