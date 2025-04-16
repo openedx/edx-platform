@@ -1,12 +1,13 @@
 """Test safe_exec.py"""
 
 
+import copy
 import hashlib
 import os
 import os.path
 import textwrap
 import unittest
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import pytest
 import random2 as random
@@ -132,62 +133,167 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
     """
     @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
     @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
-    def test_default_code_execution(self, local_exec, remote_exec):
+    def test_default_code_execution(self, mock_local_exec, mock_remote_exec):
 
         # Test default only runs local exec.
         g = {}
         safe_exec('a=1', g)
-        assert local_exec.called
-        assert not remote_exec.called
+        assert mock_local_exec.called
+        assert not mock_remote_exec.called
 
     @override_settings(ENABLE_CODEJAIL_REST_SERVICE=True)
     @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
     @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
-    def test_code_execution_only_codejail_service(self, local_exec, remote_exec):
+    def test_code_execution_only_codejail_service(self, mock_local_exec, mock_remote_exec):
         # Set return values to empty values to indicate no error.
-        remote_exec.return_value = (None, None)
+        mock_remote_exec.return_value = (None, None)
         # Test with only the service enabled.
         g = {}
         safe_exec('a=1', g)
-        assert not local_exec.called
-        assert remote_exec.called
+        assert not mock_local_exec.called
+        assert mock_remote_exec.called
 
     @override_settings(ENABLE_CODEJAIL_DARKLAUNCH=True)
     @patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec')
     @patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec')
-    def test_code_execution_darklaunch(self, local_exec, remote_exec):
-        # Set return values to empty values to indicate no error.
-        remote_exec.return_value = (None, None)
-        g = {}
+    def test_code_execution_darklaunch_misconfig(self, mock_local_exec, mock_remote_exec):
+        """Test that darklaunch doesn't run when remote service is generally enabled."""
+        mock_remote_exec.return_value = (None, None)
 
-        # Verify that incorrect config runs only remote and not both.
         with override_settings(ENABLE_CODEJAIL_REST_SERVICE=True):
-            safe_exec('a=1', g)
-            assert not local_exec.called
-            assert remote_exec.called
+            safe_exec('a=1', {})
 
-        local_exec.reset_mock()
-        remote_exec.reset_mock()
+        assert not mock_local_exec.called
+        assert mock_remote_exec.called
 
-        # Set up side effects to mimic the real behavior of modifying the globals_dict.
-        def local_side_effect(*args, **kwargs):
-            test_globals = args[1]
-            test_globals['test'] = 'local_test'
+    @override_settings(ENABLE_CODEJAIL_DARKLAUNCH=True)
+    def run_dark_launch(
+            self, globals_dict, local, remote,
+            expect_attr_calls, expect_log_info_calls, expect_globals_contains,
+    ):
+        """
+        Run a darklaunch scenario with mocked out local and remote execution.
 
-        def remote_side_effect(*args, **kwargs):
-            test_globals = args[0]['globals_dict']
-            test_globals['test'] = 'remote_test'
+        Asserts set_custom_attribute and log.info calls and (partial) contents
+        of globals dict.
 
-        local_exec.side_effect = local_side_effect
-        remote_exec.side_effect = remote_side_effect
+        Return value is a dictionary of:
+
+        - 'raised': Exception that safe_exec raised, or None.
+        """
 
         assert is_codejail_in_darklaunch()
-        safe_exec('a=1', g)
 
-        assert local_exec.called
-        assert remote_exec.called
-        # Verify that the local/default behavior currently wins out.
-        assert g['test'] == 'local_test'
+        with (
+                patch('xmodule.capa.safe_exec.safe_exec.codejail_safe_exec') as mock_local_exec,
+                patch('xmodule.capa.safe_exec.safe_exec.get_remote_exec') as mock_remote_exec,
+                patch('xmodule.capa.safe_exec.safe_exec.set_custom_attribute') as mock_set_custom_attribute,
+                patch('xmodule.capa.safe_exec.safe_exec.log.info') as mock_log_info,
+        ):
+            mock_local_exec.side_effect = local
+            mock_remote_exec.side_effect = remote
+
+            try:
+                safe_exec("<IGNORED BY MOCKS>", globals_dict)
+            except BaseException as e:
+                safe_exec_e = e
+            else:
+                safe_exec_e = None
+
+        # Always want both sides to be called
+        assert mock_local_exec.called
+        assert mock_remote_exec.called
+
+        mock_set_custom_attribute.assert_has_calls(expect_attr_calls, any_order=True)
+        mock_log_info.assert_has_calls(expect_log_info_calls, any_order=True)
+
+        for (k, v) in expect_globals_contains.items():
+            assert globals_dict[k] == v
+
+        return {'raised': safe_exec_e}
+
+    def test_separate_globals(self):
+        """Test that local and remote globals are isolated from each other's side effects."""
+        # Both will attempt to read and write the 'overwrite' key.
+        globals_dict = {'overwrite': 'original'}
+
+        local_globals = None
+        remote_globals = None
+
+        def local_exec(code, globals_dict, **kwargs):
+            # Preserve what local exec saw
+            nonlocal local_globals
+            local_globals = copy.deepcopy(globals_dict)
+
+            globals_dict['overwrite'] = 'mock local'
+
+        def remote_exec(data):
+            # Preserve what remote exec saw
+            nonlocal remote_globals
+            remote_globals = copy.deepcopy(data['globals_dict'])
+
+            data['globals_dict']['overwrite'] = 'mock remote'
+            return (None, None)
+
+        results = self.run_dark_launch(
+            globals_dict=globals_dict, local=local_exec, remote=remote_exec,
+            expect_attr_calls=[
+                call('local_emsg_exists', False),
+                call('remote_emsg_exists', False),
+                call('dark_launch_emsg_match', True),
+            ],
+            expect_log_info_calls=[
+                call(
+                    "Local execution in darklaunch mode produces globals={'overwrite': 'mock local'}, "
+                    "emsg=None, exception=None"
+                ),
+                call(
+                    "Remote execution in darklaunch mode produces globals={'overwrite': 'mock remote'}, "
+                    "emsg=None, exception=None"
+                ),
+            ],
+            # Should only see behavior of local exec
+            expect_globals_contains={'overwrite': 'mock local'},
+        )
+        assert results['raised'] is None
+
+        # Both arms should have only seen the original globals object, untouched
+        # by the other arm.
+        assert local_globals == {'overwrite': 'original'}
+        assert remote_globals == {'overwrite': 'original'}
+
+    def test_remote_runs_even_if_local_raises(self):
+        """Test that remote exec runs even if local raises."""
+        def local_exec(code, globals_dict, **kwargs):
+            # Raise something other than a SafeExecException.
+            raise BaseException("unexpected")
+
+        def remote_exec(data):
+            return (None, None)
+
+        results = self.run_dark_launch(
+            globals_dict={}, local=local_exec, remote=remote_exec,
+            expect_attr_calls=[
+                call('local_emsg_exists', True),
+                call('remote_emsg_exists', False),
+                call('dark_launch_emsg_match', False),
+            ],
+            expect_log_info_calls=[
+                call(
+                    "Remote execution in darklaunch mode produces globals={}, "
+                    "emsg=None, exception=None"
+                ),
+                call(
+                    "Local execution in darklaunch mode produces globals={}, "
+                    "emsg='unexpected', exception=BaseException('unexpected')"
+                ),
+            ],
+            expect_globals_contains={},
+        )
+
+        # Unexpected errors from local safe_exec propagate up.
+        assert isinstance(results['raised'], BaseException)
+        assert 'unexpected' in repr(results['raised'])
 
 
 class TestLimitConfiguration(unittest.TestCase):
