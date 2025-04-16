@@ -5,6 +5,8 @@ import _ from 'underscore';
 
 /**
  * VideoPoster function
+ *
+ * @constructor
  * @param {jQuery} element
  * @param {Object} options
  */

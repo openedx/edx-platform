@@ -3,6 +3,8 @@ import $ from 'jquery';
 import _ from 'underscore';
 import {VideoStorage} from './video_storage';
 import {VideoPoster} from './poster';
+import {VideoTranscriptDownloadHandler} from './video_accessible_menu';
+
 // TODO: Uncomment the imports
 // import { initialize } from './initialize'; // Assuming this function is imported
 // import {
@@ -27,7 +29,6 @@ import {VideoPoster} from './poster';
 //     VideoSkipControl,
 //     VideoEventsBumperPlugin,
 //     VideoSocialSharing,
-//     VideoAccessibleMenu,
 //     VideoBumper,
 // } from './video_modules'; // Assuming all necessary modules are grouped here
 
@@ -119,10 +120,10 @@ console.log('In video_block_main.js file');
             };
         };
 
-        // VideoAccessibleMenu(el, {
-        //     storage: storage,
-        //     saveStateUrl: state.metadata.saveStateUrl,
-        // });
+        VideoTranscriptDownloadHandler(el, {
+            storage: storage,
+            saveStateUrl: state.metadata.saveStateUrl,
+        });
 
         // VideoSocialSharing(el);
 
