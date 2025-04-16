@@ -184,7 +184,8 @@ class LibraryContainerChildrenView(GenericAPIView):
             request.user,
             permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
         )
-        child_entities = api.get_container_children(container_key, published)
+        child_entities = api.get_container_children(container_key, published=published)
+        # TODO -- this looks backwards?
         if container_key.container_type == api.ContainerType.Unit.value:
             data = serializers.LibraryXBlockMetadataSerializer(child_entities, many=True).data
         else:
