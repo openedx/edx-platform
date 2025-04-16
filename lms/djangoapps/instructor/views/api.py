@@ -2150,7 +2150,7 @@ class OverrideProblemScore(DeveloperErrorViewMixin, APIView):
 
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
     permission_name = permissions.OVERRIDE_GRADES
-    serializer_class = ProblemSerializer
+    serializer_class = ProblemResetSerializer
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(transaction.non_atomic_requests)
