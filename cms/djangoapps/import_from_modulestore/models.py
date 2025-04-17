@@ -58,7 +58,7 @@ class Import(TimeStampedModel):
         for staged_content_for_import in self.staged_content_for_import.all():
             staged_content_for_import.staged_content.delete()
 
-    def get_staged_content_by_block_usage_key(self, block_usage_key: str | UsageKey) -> Optional["StagedContent"]:
+    def _get_staged_content_by_block_usage_key(self, block_usage_key: str | UsageKey) -> Optional["StagedContent"]:
         """
         Get staged content by block usage key.
         """
@@ -126,6 +126,13 @@ class StagedContentForImport(TimeStampedModel):
         to='content_staging.StagedContent',
         on_delete=models.CASCADE,
         related_name='staged_content_for_import',
+    )
+    # Since StagedContent stores all the keys of the saved blocks, this field was added to optimize search.
+    source_usage_key = UsageKeyField(
+        max_length=255,
+        help_text=_(
+            'The original Usage key of the highest-level component that was saved in StagedContent.'
+        ),
     )
 
     class Meta:
