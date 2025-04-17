@@ -16,14 +16,14 @@ class ImportAdmin(admin.ModelAdmin):
         'created',
         'status',
         'source_key',
-        'target',
+        'target_change',
     )
     list_filter = (
         'status',
     )
     search_fields = (
         'source_key',
-        'target',
+        'target_change',
     )
 
     raw_id_fields = ('user',)

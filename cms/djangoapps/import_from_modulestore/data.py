@@ -7,17 +7,14 @@ from django.utils.translation import gettext_lazy as _
 
 class ImportStatus(TextChoices):
     """
-    The status of this course import.
+    The status of this modulestore-to-learning-core import.
     """
 
-    # PENDING: The import has been created, but the OLX and related data are not yet in the library.
-    # It is not ready to be read.
-    PENDING = 'pending', _('Pending')
-    # READY: The content is staged and ready to be read.
-    READY = 'ready', _('Ready')
-    # IMPORTED: The content has been imported into the library.
-    IMPORTED = 'imported', _('Imported')
-    # CANCELED: The import was canceled before it was imported.
+    NOT_STARTED = 'not_started', _('Waiting to stage content')
+    STAGING = 'staging', _('Staging content for import')
+    STAGING_FAILED = _('Failed to stage content')
+    STAGED = 'staged', _('Content is staged and ready for import')
+    IMPORTING = 'importing', _('Importing staged content')
+    IMPORTING_FAILED = 'importing_failed', _('Failed to import staged content')
+    IMPORTED = 'imported', _('Successfully imported content')
     CANCELED = 'canceled', _('Canceled')
-    # ERROR: The content could not be imported.
-    ERROR = 'error', _('Error')
