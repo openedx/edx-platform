@@ -23,6 +23,7 @@ from six.moves import range
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa.safe_exec import safe_exec, update_hash
 from xmodule.capa.safe_exec.remote_exec import is_codejail_in_darklaunch, is_codejail_rest_service_enabled
+from xmodule.capa.safe_exec.safe_exec import emsg_normalizers, normalize_error_message
 
 
 class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -212,6 +213,13 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
 
         return {'raised': safe_exec_e}
 
+    # These don't change between the tests
+    standard_codejail_attr_calls = [
+        call('codejail.slug', None),
+        call('codejail.limit_overrides_context', None),
+        call('codejail.extra_files_count', 0),
+    ]
+
     def test_separate_globals(self):
         """Test that local and remote globals are isolated from each other's side effects."""
         # Both will attempt to read and write the 'overwrite' key.
@@ -238,17 +246,21 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         results = self.run_dark_launch(
             globals_dict=globals_dict, local=local_exec, remote=remote_exec,
             expect_attr_calls=[
-                call('local_emsg_exists', False),
-                call('remote_emsg_exists', False),
-                call('dark_launch_emsg_match', True),
+                *self.standard_codejail_attr_calls,
+                call('codejail.darklaunch.status.local', 'ok'),
+                call('codejail.darklaunch.status.remote', 'ok'),
+                call('codejail.darklaunch.exception.local', None),
+                call('codejail.darklaunch.exception.remote', None),
+                call('codejail.darklaunch.globals_match', False),  # mismatch revealed here
+                call('codejail.darklaunch.emsg_match', True),
             ],
             expect_log_info_calls=[
                 call(
-                    "Local execution in darklaunch mode produces globals={'overwrite': 'mock local'}, "
+                    "Codejail darklaunch local results for slug=None: globals={'overwrite': 'mock local'}, "
                     "emsg=None, exception=None"
                 ),
                 call(
-                    "Remote execution in darklaunch mode produces globals={'overwrite': 'mock remote'}, "
+                    "Codejail darklaunch remote results for slug=None: globals={'overwrite': 'mock remote'}, "
                     "emsg=None, exception=None"
                 ),
             ],
@@ -274,18 +286,22 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         results = self.run_dark_launch(
             globals_dict={}, local=local_exec, remote=remote_exec,
             expect_attr_calls=[
-                call('local_emsg_exists', True),
-                call('remote_emsg_exists', False),
-                call('dark_launch_emsg_match', False),
+                *self.standard_codejail_attr_calls,
+                call('codejail.darklaunch.status.local', 'unexpected_error'),
+                call('codejail.darklaunch.status.remote', 'ok'),
+                call('codejail.darklaunch.exception.local', "BaseException('unexpected')"),
+                call('codejail.darklaunch.exception.remote', None),
+                call('codejail.darklaunch.globals_match', "N/A"),
+                call('codejail.darklaunch.emsg_match', "N/A"),
             ],
             expect_log_info_calls=[
                 call(
-                    "Remote execution in darklaunch mode produces globals={}, "
-                    "emsg=None, exception=None"
+                    "Codejail darklaunch local results for slug=None: globals={}, "
+                    "emsg='unexpected', exception=BaseException('unexpected')"
                 ),
                 call(
-                    "Local execution in darklaunch mode produces globals={}, "
-                    "emsg='unexpected', exception=BaseException('unexpected')"
+                    "Codejail darklaunch remote results for slug=None: globals={}, "
+                    "emsg=None, exception=None"
                 ),
             ],
             expect_globals_contains={},
@@ -294,6 +310,103 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         # Unexpected errors from local safe_exec propagate up.
         assert isinstance(results['raised'], BaseException)
         assert 'unexpected' in repr(results['raised'])
+
+    def test_emsg_mismatch(self):
+        """Test that local and remote error messages are compared."""
+        def local_exec(code, globals_dict, **kwargs):
+            raise SafeExecException("oops")
+
+        def remote_exec(data):
+            return ("OH NO", SafeExecException("OH NO"))
+
+        results = self.run_dark_launch(
+            globals_dict={}, local=local_exec, remote=remote_exec,
+            expect_attr_calls=[
+                *self.standard_codejail_attr_calls,
+                call('codejail.darklaunch.status.local', 'safe_error'),
+                call('codejail.darklaunch.status.remote', 'safe_error'),
+                call('codejail.darklaunch.exception.local', None),
+                call('codejail.darklaunch.exception.remote', None),
+                call('codejail.darklaunch.globals_match', True),
+                call('codejail.darklaunch.emsg_match', False),  # mismatch revealed here
+            ],
+            expect_log_info_calls=[
+                call(
+                    "Codejail darklaunch local results for slug=None: globals={}, "
+                    "emsg='oops', exception=None"
+                ),
+                call(
+                    "Codejail darklaunch remote results for slug=None: globals={}, "
+                    "emsg='OH NO', exception=None"
+                ),
+            ],
+            expect_globals_contains={},
+        )
+        assert isinstance(results['raised'], SafeExecException)
+        assert 'oops' in repr(results['raised'])
+
+    def test_ignore_sandbox_dir_mismatch(self):
+        """Mismatch due only to differences in sandbox directory should be ignored."""
+        def local_exec(code, globals_dict, **kwargs):
+            raise SafeExecException("stack trace involving /tmp/codejail-1234567/whatever.py")
+
+        def remote_exec(data):
+            emsg = "stack trace involving /tmp/codejail-abcdefgh/whatever.py"
+            return (emsg, SafeExecException(emsg))
+
+        results = self.run_dark_launch(
+            globals_dict={}, local=local_exec, remote=remote_exec,
+            expect_attr_calls=[
+                *self.standard_codejail_attr_calls,
+                call('codejail.darklaunch.status.local', 'safe_error'),
+                call('codejail.darklaunch.status.remote', 'safe_error'),
+                call('codejail.darklaunch.exception.local', None),
+                call('codejail.darklaunch.exception.remote', None),
+                call('codejail.darklaunch.globals_match', True),
+                call('codejail.darklaunch.emsg_match', True),  # even though not exact match
+            ],
+            expect_log_info_calls=[
+                call(
+                    "Codejail darklaunch local results for slug=None: globals={}, "
+                    "emsg='stack trace involving /tmp/codejail-1234567/whatever.py', exception=None"
+                ),
+                call(
+                    "Codejail darklaunch remote results for slug=None: globals={}, "
+                    "emsg='stack trace involving /tmp/codejail-abcdefgh/whatever.py', exception=None"
+                ),
+            ],
+            expect_globals_contains={},
+        )
+        assert isinstance(results['raised'], SafeExecException)
+        assert 'whatever.py' in repr(results['raised'])
+
+    @override_settings(CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS=[
+        {
+            'search': r'/tmp/codejail-[0-9a-zA-Z]+',
+            'replace': r'/tmp/codejail-<RAND>',
+        },
+        {
+            'search': r'[0-9]+',
+            'replace': r'<NUM>',
+        },
+    ])
+    def test_configurable_normalizers(self):
+        """We can override the normalizers, and they run in order."""
+        emsg_in = "Error in /tmp/codejail-1234abcd/whatever.py: something 12 34 other"
+        expect_out = "Error in /tmp/codejail-<RAND>/whatever.py: something <NUM> <NUM> other"
+        assert expect_out == normalize_error_message(emsg_in)
+
+    @override_settings(CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS=[
+        {
+            'search': r'broken [',
+            'replace': r'replace',
+        },
+    ])
+    @patch('xmodule.capa.safe_exec.safe_exec.record_exception')
+    def test_normalizers_validate(self, mock_record_exception):
+        """Normalizers are validated, and fall back to empty list on error."""
+        assert emsg_normalizers() == []  # pylint: disable=use-implicit-booleaness-not-comparison
+        mock_record_exception.assert_called_once()
 
 
 class TestLimitConfiguration(unittest.TestCase):
