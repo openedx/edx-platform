@@ -8,6 +8,7 @@ import {VideoSkipControl} from './skip_control';
 import {VideoPlayPlaceholder} from './play_placeholder';
 import {VideoPlaySkipControl} from './play_skip_control';
 import {VideoPlayPauseControl} from './play_pause_control';
+import {VideoSocialSharingHandler} from './video_social_sharing';
 
 
 // TODO: Uncomment the imports
@@ -29,7 +30,6 @@ import {VideoPlayPauseControl} from './play_pause_control';
 //     VideoTranscriptFeedback,
 //     VideoAutoAdvanceControl,
 //     VideoEventsBumperPlugin,
-//     VideoSocialSharing,
 //     VideoBumper,
 // } from './video_modules'; // Assuming all necessary modules are grouped here
 
@@ -125,7 +125,7 @@ console.log('In video_block_main.js file');
             saveStateUrl: state.metadata.saveStateUrl,
         });
 
-        // VideoSocialSharing(el);
+        VideoSocialSharingHandler(el);
 
         if (bumperMetadata) {
             VideoPoster(el, {
