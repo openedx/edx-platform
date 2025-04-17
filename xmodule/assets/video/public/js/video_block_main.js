@@ -5,13 +5,13 @@ import {VideoStorage} from './video_storage';
 import {VideoPoster} from './poster';
 import {VideoTranscriptDownloadHandler} from './video_accessible_menu';
 import {VideoSkipControl} from './skip_control';
+import {VideoPlayPlaceholder} from './play_placeholder';
 
 // TODO: Uncomment the imports
 // import { initialize } from './initialize'; // Assuming this function is imported
 // import {
 //     FocusGrabber,
 //     VideoControl,
-//     VideoPlayPlaceholder,
 //     VideoPlayPauseControl,
 //     VideoProgressSlider,
 //     VideoSpeedControl,
@@ -57,26 +57,25 @@ console.log('In video_block_main.js file');
         const bumperMetadata = el.data('bumper-metadata');
         const autoAdvanceEnabled = el.data('autoadvance-enabled') === 'True';
 
-        const mainVideoModules = []
-        // TODO: Uncomment the code
-        // const mainVideoModules = [
-        //     FocusGrabber,
-        //     VideoControl,
-        //     VideoPlayPlaceholder,
-        //     VideoPlayPauseControl,
-        //     VideoProgressSlider,
-        //     VideoSpeedControl,
-        //     VideoVolumeControl,
-        //     VideoQualityControl,
-        //     VideoFullScreen,
-        //     VideoCaption,
-        //     VideoCommands,
-        //     VideoContextMenu,
-        //     VideoSaveStatePlugin,
-        //     VideoEventsPlugin,
-        //     VideoCompletionHandler,
-        //     VideoTranscriptFeedback,
-        // ].concat(autoAdvanceEnabled ? [VideoAutoAdvanceControl] : []);
+        const mainVideoModules = [
+            //     FocusGrabber,
+            //     VideoControl,
+            VideoPlayPlaceholder,
+            //     VideoPlayPauseControl,
+            //     VideoProgressSlider,
+            //     VideoSpeedControl,
+            //     VideoVolumeControl,
+            //     VideoQualityControl,
+            //     VideoFullScreen,
+            //     VideoCaption,
+            //     VideoCommands,
+            //     VideoContextMenu,
+            //     VideoSaveStatePlugin,
+            //     VideoEventsPlugin,
+            //     VideoCompletionHandler,
+            //     VideoTranscriptFeedback,
+            // ].concat(autoAdvanceEnabled ? [VideoAutoAdvanceControl] : []);
+        ]
 
         const bumperVideoModules = [
             // VideoControl,
@@ -184,4 +183,3 @@ console.log('In video_block_main.js file');
     // oldVideo(null, true);
 
 }());
-
