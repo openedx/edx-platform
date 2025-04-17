@@ -6,13 +6,15 @@ import {VideoPoster} from './poster';
 import {VideoTranscriptDownloadHandler} from './video_accessible_menu';
 import {VideoSkipControl} from './skip_control';
 import {VideoPlayPlaceholder} from './play_placeholder';
+import {VideoPlaySkipControl} from './play_skip_control';
+import {VideoPlayPauseControl} from './play_pause_control';
+
 
 // TODO: Uncomment the imports
 // import { initialize } from './initialize'; // Assuming this function is imported
 // import {
 //     FocusGrabber,
 //     VideoControl,
-//     VideoPlayPauseControl,
 //     VideoProgressSlider,
 //     VideoSpeedControl,
 //     VideoVolumeControl,
@@ -26,7 +28,6 @@ import {VideoPlayPlaceholder} from './play_placeholder';
 //     VideoCompletionHandler,
 //     VideoTranscriptFeedback,
 //     VideoAutoAdvanceControl,
-//     VideoPlaySkipControl,
 //     VideoEventsBumperPlugin,
 //     VideoSocialSharing,
 //     VideoBumper,
@@ -61,7 +62,7 @@ console.log('In video_block_main.js file');
             //     FocusGrabber,
             //     VideoControl,
             VideoPlayPlaceholder,
-            //     VideoPlayPauseControl,
+            VideoPlayPauseControl,
             //     VideoProgressSlider,
             //     VideoSpeedControl,
             //     VideoVolumeControl,
@@ -79,7 +80,7 @@ console.log('In video_block_main.js file');
 
         const bumperVideoModules = [
             // VideoControl,
-            // VideoPlaySkipControl,
+            VideoPlaySkipControl,
             VideoSkipControl,
             // VideoVolumeControl,
             // VideoCaption,
