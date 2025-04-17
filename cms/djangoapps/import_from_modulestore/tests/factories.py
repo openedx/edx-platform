@@ -25,6 +25,6 @@ class ImportFactory(DjangoModelFactory):
     def source_key(self):
         return CourseKey.from_string(f'course-v1:edX+DemoX+{self.uuid}')
 
-    target = factory.SubFactory(factories.LearningPackageFactory)
+    target_change = factory.SubFactory(factories.LearningPackageFactory)
     uuid = factory.LazyFunction(lambda: str(uuid.uuid4()))
     user = factory.SubFactory(UserFactory)
