@@ -181,6 +181,7 @@ setup(
         ],
         'openedx.learning_context': [
             'lib = openedx.core.djangoapps.content_libraries.library_context:LibraryContextImpl',
+            'lct = openedx.core.djangoapps.content_libraries.library_context:LibraryContextContainerImpl',
         ],
         'openedx.dynamic_partition_generator': [
             'content_type_gating = openedx.features.content_type_gating.partitions:create_content_gating_partition',
