@@ -3,7 +3,7 @@ Helper methods for working with learning contexts
 """
 from edx_django_utils.plugins import PluginManager
 from opaque_keys import OpaqueKey
-from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
+from opaque_keys.edx.keys import LearningContextKey, LibraryItemKey, UsageKeyV2
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
@@ -33,8 +33,8 @@ def get_learning_context_impl(key):
     Raises PluginError if there is some misconfiguration causing the context
     implementation to not be installed.
     """
-    if isinstance(key, LearningContextKey):
-        context_type = key.CANONICAL_NAMESPACE  # e.g. 'lib'
+    if isinstance(key, LearningContextKey) or isinstance(key, LibraryItemKey):
+        context_type = key.CANONICAL_NAMESPACE  # e.g. 'lib' or 'lct'
     elif isinstance(key, UsageKeyV2):
         context_type = key.context_key.CANONICAL_NAMESPACE
     elif isinstance(key, OpaqueKey):

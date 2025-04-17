@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import CourseLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import CourseLocator, LibraryContainerLocator, LibraryLocatorV2
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -91,12 +91,18 @@ class ClipboardEndpoint(APIView):
         # Check if the content exists and the user has permission to read it.
         # Parse the usage key:
         try:
-            usage_key = UsageKey.from_string(request.data["usage_key"])
-        except (ValueError, InvalidKeyError):
-            raise ValidationError('Invalid usage key')  # lint-amnesty, pylint: disable=raise-missing-from
-        if usage_key.block_type in ('course', 'chapter', 'sequential'):
-            raise ValidationError('Requested XBlock tree is too large')
-        course_key = usage_key.context_key
+            opaque_key = UsageKey.from_string(request.data["usage_key"])
+            if opaque_key.block_type in ('course', 'chapter', 'sequential'):
+                raise ValidationError('Requested XBlock tree is too large')
+        except InvalidKeyError:
+            try:
+                # Check if valid library container
+                opaque_key = LibraryContainerLocator.from_string(request.data["usage_key"])
+                if opaque_key.container_type != 'unit':
+                    raise ValidationError('Requested XBlock tree is too large')
+            except (ValueError, InvalidKeyError):
+                raise ValidationError('Invalid usage key')  # lint-amnesty, pylint: disable=raise-missing-from
+        course_key = getattr(opaque_key, 'context_key', None) or getattr(opaque_key, 'library_key', None)
 
         # Load the block and copy it to the user's clipboard
         try:
@@ -106,7 +112,7 @@ class ClipboardEndpoint(APIView):
                     raise PermissionDenied(
                         "You must be a member of the course team in Studio to export OLX using this API."
                     )
-                block = modulestore().get_item(usage_key)
+                block = modulestore().get_item(opaque_key)
                 version_num = None
 
             elif isinstance(course_key, LibraryLocatorV2):
@@ -115,8 +121,12 @@ class ClipboardEndpoint(APIView):
                     request.user,
                     lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
                 )
-                block = xblock_api.load_block(usage_key, user=None)
-                version_num = lib_api.get_library_block(usage_key).draft_version_num
+                if isinstance(opaque_key, LibraryContainerLocator):
+                    # TODO: load unit block data to staging content, probably need to convert unit from library to xml
+                    raise NotImplementedError("Containers not supported yet")
+                else:
+                    block = xblock_api.load_block(opaque_key, user=None)
+                    version_num = lib_api.get_library_block(opaque_key).draft_version_num
 
             else:
                 raise ValidationError("Invalid usage_key for the content.")
