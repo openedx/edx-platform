@@ -17,7 +17,6 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import ContainerVersion
 
 from openedx.core.djangoapps.content_libraries import api
-from openedx.core.djangoapps.content_libraries.api.exceptions import IncompatibleTypesError
 from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.django import modulestore
 
@@ -187,13 +186,17 @@ class ImportClient:
         """
         Update components of a container.
         """
+        entity_rows = [
+            authoring_api.ContainerEntityRow(
+                entity_pk=cv.container.pk if isinstance(cv, ContainerVersion) else cv.component.pk,
+                version_pk=cv.pk,
+            )
+            for cv in component_versions
+        ]
         return authoring_api.create_next_container_version(
             container_pk=container_version.container.pk,
             title=container_version.title,
-            publishable_entities_pks=[
-                cv.container.pk if isinstance(cv, ContainerVersion) else cv.component.pk for cv in component_versions
-            ],
-            entity_version_pks=[cv.pk for cv in component_versions],
+            entity_rows=entity_rows,
             created=datetime.now(tz=timezone.utc),
             created_by=self.import_event.user_id,
             container_version_cls=container_version.__class__,
