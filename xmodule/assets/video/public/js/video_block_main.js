@@ -4,6 +4,7 @@ import _ from 'underscore';
 import {VideoStorage} from './video_storage';
 import {VideoPoster} from './poster';
 import {VideoTranscriptDownloadHandler} from './video_accessible_menu';
+import {VideoSkipControl} from './skip_control';
 
 // TODO: Uncomment the imports
 // import { initialize } from './initialize'; // Assuming this function is imported
@@ -26,7 +27,6 @@ import {VideoTranscriptDownloadHandler} from './video_accessible_menu';
 //     VideoTranscriptFeedback,
 //     VideoAutoAdvanceControl,
 //     VideoPlaySkipControl,
-//     VideoSkipControl,
 //     VideoEventsBumperPlugin,
 //     VideoSocialSharing,
 //     VideoBumper,
@@ -81,7 +81,7 @@ console.log('In video_block_main.js file');
         const bumperVideoModules = [
             // VideoControl,
             // VideoPlaySkipControl,
-            // VideoSkipControl,
+            VideoSkipControl,
             // VideoVolumeControl,
             // VideoCaption,
             // VideoCommands,
