@@ -53,17 +53,19 @@ def _save_xblock_to_staged_content(
 
     expired_ids = []
     with transaction.atomic():
-        # Mark all of the user's existing StagedContent rows as EXPIRED
-        to_expire = _StagedContent.objects.filter(
-            user_id=user_id,
-            purpose=purpose,
-        ).exclude(
-            status=StagedContentStatus.EXPIRED,
-        )
-        for sc in to_expire:
-            expired_ids.append(sc.id)
-            sc.status = StagedContentStatus.EXPIRED
-            sc.save()
+        if purpose == CLIPBOARD_PURPOSE:
+            # Mark all of the user's existing StagedContent rows as EXPIRED
+            to_expire = _StagedContent.objects.filter(
+                user_id=user_id,
+                purpose=purpose,
+            ).exclude(
+                status=StagedContentStatus.EXPIRED,
+            )
+            for sc in to_expire:
+                expired_ids.append(sc.id)
+                sc.status = StagedContentStatus.EXPIRED
+                sc.save()
+
         # Insert a new StagedContent row for this
         staged_content = _StagedContent.objects.create(
             user_id=user_id,
