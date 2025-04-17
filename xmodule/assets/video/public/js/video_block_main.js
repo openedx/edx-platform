@@ -9,12 +9,16 @@ import {VideoPlayPlaceholder} from './play_placeholder';
 import {VideoPlaySkipControl} from './play_skip_control';
 import {VideoPlayPauseControl} from './play_pause_control';
 import {VideoSocialSharingHandler} from './video_social_sharing';
+import {FocusGrabber} from './focus_grabber';
+import {VideoCommands} from "./commands";
+import {VideoEventsBumperPlugin} from "./events_bumper_plugin";
+import {VideoEventsPlugin} from "./events_plugin";
+import {VideoSaveStatePlugin} from "./save_state_plugin";
 
 
 // TODO: Uncomment the imports
 // import { initialize } from './initialize'; // Assuming this function is imported
 // import {
-//     FocusGrabber,
 //     VideoControl,
 //     VideoProgressSlider,
 //     VideoSpeedControl,
@@ -22,14 +26,10 @@ import {VideoSocialSharingHandler} from './video_social_sharing';
 //     VideoQualityControl,
 //     VideoFullScreen,
 //     VideoCaption,
-//     VideoCommands,
 //     VideoContextMenu,
-//     VideoSaveStatePlugin,
-//     VideoEventsPlugin,
 //     VideoCompletionHandler,
 //     VideoTranscriptFeedback,
 //     VideoAutoAdvanceControl,
-//     VideoEventsBumperPlugin,
 //     VideoBumper,
 // } from './video_modules'; // Assuming all necessary modules are grouped here
 
@@ -59,7 +59,7 @@ console.log('In video_block_main.js file');
         const autoAdvanceEnabled = el.data('autoadvance-enabled') === 'True';
 
         const mainVideoModules = [
-            //     FocusGrabber,
+            FocusGrabber,
             //     VideoControl,
             VideoPlayPlaceholder,
             VideoPlayPauseControl,
@@ -69,10 +69,10 @@ console.log('In video_block_main.js file');
             //     VideoQualityControl,
             //     VideoFullScreen,
             //     VideoCaption,
-            //     VideoCommands,
+            VideoCommands,
             //     VideoContextMenu,
-            //     VideoSaveStatePlugin,
-            //     VideoEventsPlugin,
+            VideoSaveStatePlugin,
+            VideoEventsPlugin,
             //     VideoCompletionHandler,
             //     VideoTranscriptFeedback,
             // ].concat(autoAdvanceEnabled ? [VideoAutoAdvanceControl] : []);
@@ -84,10 +84,10 @@ console.log('In video_block_main.js file');
             VideoSkipControl,
             // VideoVolumeControl,
             // VideoCaption,
-            // VideoCommands,
-            // VideoSaveStatePlugin,
+            VideoCommands,
+            VideoSaveStatePlugin,
             // VideoTranscriptFeedback,
-            // VideoEventsBumperPlugin,
+            VideoEventsBumperPlugin,
             // VideoCompletionHandler,
         ];
 
