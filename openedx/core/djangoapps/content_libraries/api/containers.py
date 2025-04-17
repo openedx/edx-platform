@@ -6,14 +6,21 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+import logging
 from uuid import uuid4
 
 from django.utils.text import slugify
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import ContentObjectChangedData, LibraryCollectionData, LibraryContainerData
+from openedx_events.content_authoring.data import (
+    ContentObjectChangedData,
+    LibraryBlockData,
+    LibraryCollectionData,
+    LibraryContainerData,
+)
 from openedx_events.content_authoring.signals import (
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_CREATED,
     LIBRARY_CONTAINER_DELETED,
@@ -27,7 +34,7 @@ from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
-from .libraries import LibraryXBlockMetadata, PublishableItem
+from .libraries import LibraryXBlockMetadata, PublishableItem, library_component_usage_key
 
 # The public API is only the following symbols:
 __all__ = [
@@ -46,7 +53,10 @@ __all__ = [
     "restore_container",
     "update_container_children",
     "get_containers_contains_component",
+    "publish_container_changes",
 ]
+
+log = logging.getLogger(__name__)
 
 
 class ContainerType(Enum):
@@ -400,3 +410,41 @@ def get_containers_contains_component(
         ContainerMetadata.from_container(usage_key.context_key, container)
         for container in containers
     ]
+
+
+def publish_container_changes(container_key: LibraryContainerLocator, user_id: int | None) -> None:
+    """
+    Publish all unpublished changes in a container and all its child
+    containers/blocks.
+    """
+    container = get_container_from_key(container_key)
+    library_key = container_key.library_key
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    learning_package = content_library.learning_package
+    assert learning_package
+    # The core publishing API is based on draft objects, so find the draft that corresponds to this container:
+    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__pk=container.pk)
+    # Publish the container, which will also auto-publish any unpublished child components:
+    publish_log = authoring_api.publish_from_drafts(
+        learning_package.id,
+        draft_qset=drafts_to_publish,
+        published_by=user_id,
+    )
+    # Update anything that needs to be updated (e.g. search index):
+    for record in publish_log.records.select_related("entity", "entity__container", "entity__component").all():
+        if hasattr(record.entity, "component"):
+            # This is a child component like an XBLock in a Unit that was published:
+            usage_key = library_component_usage_key(library_key, record.entity.component)
+            LIBRARY_BLOCK_UPDATED.send_event(
+                library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key)
+            )
+        elif hasattr(record.entity, "container"):
+            # This is a child container like a Unit, or is the same "container" we published above.
+            LIBRARY_CONTAINER_UPDATED.send_event(
+                library_container=LibraryContainerData(container_key=container_key)
+            )
+        else:
+            log.warning(
+                f"PublishableEntity {record.entity.pk} / {record.entity.key} was modified during publish operation "
+                "but is of unknown type."
+            )

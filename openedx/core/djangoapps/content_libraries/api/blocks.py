@@ -48,7 +48,6 @@ from openedx.core.djangoapps.xblock.api import (
 from openedx.core.types import User as UserType
 
 from ..models import ContentLibrary
-from ..permissions import CAN_EDIT_THIS_CONTENT_LIBRARY
 from .exceptions import (
     BlockLimitReachedError,
     ContentLibraryBlockNotFound,
@@ -67,7 +66,6 @@ from .containers import (
 from .libraries import (
     library_collection_locator,
     library_component_usage_key,
-    require_permission_for_library_key,
     PublishableItem,
 )
 
@@ -891,18 +889,14 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     """
     Publish all pending changes in a single component.
     """
-    content_library = require_permission_for_library_key(
-        usage_key.lib_key,
-        user,
-        CAN_EDIT_THIS_CONTENT_LIBRARY
-    )
-    learning_package = content_library.learning_package
-
-    assert learning_package
     component = get_component_from_usage_key(usage_key)
-    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(
-        entity__key=component.key
-    )
+    library_key = usage_key.context_key
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    learning_package = content_library.learning_package
+    assert learning_package
+    # The core publishing API is based on draft objects, so find the draft that corresponds to this component:
+    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__key=component.key)
+    # Publish the component and update anything that needs to be updated (e.g. search index):
     authoring_api.publish_from_drafts(learning_package.id, draft_qset=drafts_to_publish, published_by=user.id)
     LIBRARY_BLOCK_UPDATED.send_event(
         library_block=LibraryBlockData(
