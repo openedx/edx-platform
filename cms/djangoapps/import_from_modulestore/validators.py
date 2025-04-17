@@ -18,6 +18,7 @@ def validate_usage_keys_to_import(usage_keys: list[str | UsageKey]):
         if usage_key.block_type != 'chapter':
             raise ValueError(f'Importing from modulestore only supports chapters, not {usage_key.block_type}')
 
+
 def validate_composition_level(composition_level):
     if composition_level not in CompositionLevel.values():
         raise ValueError(f'Invalid composition level: {composition_level}')
