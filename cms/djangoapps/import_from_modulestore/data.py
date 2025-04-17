@@ -1,6 +1,8 @@
 """
 This module contains the data models for the import_from_modulestore app.
 """
+from enum import Enum
+
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
@@ -18,3 +20,26 @@ class ImportStatus(TextChoices):
     IMPORTING_FAILED = 'importing_failed', _('Failed to import staged content')
     IMPORTED = 'imported', _('Successfully imported content')
     CANCELED = 'canceled', _('Canceled')
+
+class CompositionLevel(Enum):
+    """
+    Enumeration of composition levels for course content.
+    Defines the different levels of composition for course content,
+    including chapters, sequentials, verticals, and xblocks.
+    It also categorizes these levels into complicated and flat
+    levels for easier processing.
+    """
+
+    CHAPTER = 'chapter'
+    SEQUENTIAL = 'sequential'
+    VERTICAL = 'vertical'
+    XBLOCK = 'xblock'
+    COMPLICATED_LEVELS = [CHAPTER, SEQUENTIAL, VERTICAL]
+    FLAT_LEVELS = [XBLOCK]
+
+    @classmethod
+    def values(cls):
+        """
+        Returns all levels of composition levels.
+        """
+        return [composition_level.value for composition_level in cls]

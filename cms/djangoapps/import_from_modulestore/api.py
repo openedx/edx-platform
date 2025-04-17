@@ -14,7 +14,7 @@ def create_import(source_key: LearningContextKey, user_id: int, learning_package
     """
     import_from_modulestore = _Import.objects.create(
         source_key=source_key,
-        target_id=learning_package_id,
+        target_change_id=learning_package_id,
         user_id=user_id,
     )
     save_legacy_content_to_staged_content_task.delay_on_commit(import_from_modulestore.uuid)

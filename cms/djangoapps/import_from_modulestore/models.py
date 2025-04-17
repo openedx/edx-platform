@@ -1,7 +1,7 @@
 """
 Models for the course to library import app.
 """
-
+from typing import Optional
 import uuid as uuid_tools
 
 from django.contrib.auth import get_user_model
@@ -61,6 +61,13 @@ class Import(TimeStampedModel):
         """
         for staged_content_for_import in self.staged_content_for_import.all():
             staged_content_for_import.staged_content.delete()
+
+    def get_staged_content_by_source_usage_key(self, source_key) -> Optional["StagedContent"]:
+        """
+        Get staged content by source usage key in related to import staged content.
+        """
+        staged_content_for_import = self.staged_content_for_import.filter(source_usage_key=source_key).first()
+        return staged_content_for_import.staged_content if staged_content_for_import else None
 
 
 class PublishableEntityMapping(TimeStampedModel):
