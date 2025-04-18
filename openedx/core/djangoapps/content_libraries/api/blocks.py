@@ -48,7 +48,6 @@ from openedx.core.djangoapps.xblock.api import (
 from openedx.core.types import User as UserType
 
 from ..models import ContentLibrary
-from ..permissions import CAN_EDIT_THIS_CONTENT_LIBRARY
 from .exceptions import (
     BlockLimitReachedError,
     ContentLibraryBlockNotFound,
@@ -67,7 +66,6 @@ from .containers import (
 from .libraries import (
     library_collection_locator,
     library_component_usage_key,
-    require_permission_for_library_key,
     PublishableItem,
 )
 
@@ -639,7 +637,10 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
     )
 
 
-def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=True) -> None:
+def delete_library_block(
+    usage_key: LibraryUsageLocatorV2,
+    user_id: int | None = None,
+) -> None:
     """
     Delete the specified block from this library (soft delete).
     """
@@ -648,7 +649,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
     affected_containers = get_containers_contains_component(usage_key)
 
-    authoring_api.soft_delete_draft(component.pk)
+    authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
@@ -685,7 +686,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
         )
 
 
-def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
+def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None = None) -> None:
     """
     Restore the specified library block.
     """
@@ -694,7 +695,11 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
 
     # Set draft version back to the latest available component version id.
-    authoring_api.set_draft_version(component.pk, component.versioning.latest.pk)
+    authoring_api.set_draft_version(
+        component.pk,
+        component.versioning.latest.pk,
+        set_by=user_id,
+    )
 
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
@@ -884,18 +889,14 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     """
     Publish all pending changes in a single component.
     """
-    content_library = require_permission_for_library_key(
-        usage_key.lib_key,
-        user,
-        CAN_EDIT_THIS_CONTENT_LIBRARY
-    )
-    learning_package = content_library.learning_package
-
-    assert learning_package
     component = get_component_from_usage_key(usage_key)
-    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(
-        entity__key=component.key
-    )
+    library_key = usage_key.context_key
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    learning_package = content_library.learning_package
+    assert learning_package
+    # The core publishing API is based on draft objects, so find the draft that corresponds to this component:
+    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__key=component.key)
+    # Publish the component and update anything that needs to be updated (e.g. search index):
     authoring_api.publish_from_drafts(learning_package.id, draft_qset=drafts_to_publish, published_by=user.id)
     LIBRARY_BLOCK_UPDATED.send_event(
         library_block=LibraryBlockData(
@@ -903,6 +904,17 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
             usage_key=usage_key,
         )
     )
+
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    affected_containers = get_containers_contains_component(usage_key)
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                container_key=container.container_key,
+                background=True,
+            )
+        )
 
 
 def _component_exists(usage_key: UsageKeyV2) -> bool:

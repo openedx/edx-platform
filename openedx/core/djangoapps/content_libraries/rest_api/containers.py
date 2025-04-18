@@ -328,3 +328,25 @@ class LibraryContainerCollectionsView(GenericAPIView):
         )
 
         return Response({'count': len(collection_keys)})
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryContainerPublishView(GenericAPIView):
+    """
+    View to publish a container, or revert to last published.
+    """
+    @convert_exceptions
+    def post(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
+        """
+        Publish the container and its children
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+        api.publish_container_changes(container_key, request.user.id)
+        # If we need to in the future, we could return a list of all the child containers/components that were
+        # auto-published as a result.
+        return Response({})
