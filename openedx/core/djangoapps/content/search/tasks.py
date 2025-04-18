@@ -121,6 +121,20 @@ def update_library_components_collections(collection_key_str: str) -> None:
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
 @set_code_owner_attribute
+def update_library_containers_collections(collection_key_str: str) -> None:
+    """
+    Celery task to update the "collections" field for containers in the given content library collection.
+    """
+    collection_key = LibraryCollectionLocator.from_string(collection_key_str)
+    library_key = collection_key.library_key
+
+    log.info("Updating document.collections for library %s collection %s containers", library_key, collection_key)
+
+    api.update_library_containers_collections(collection_key)
+
+
+@shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
+@set_code_owner_attribute
 def update_library_container_index_doc(container_key_str: str) -> None:
     """
     Celery task to update the content index document for a library container

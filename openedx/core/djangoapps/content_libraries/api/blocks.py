@@ -3,67 +3,77 @@ Content libraries API methods related to XBlocks/Components.
 
 These methods don't enforce permissions (only the REST APIs do).
 """
-from dataclasses import dataclass
-from datetime import datetime, timezone
+from __future__ import annotations
 import logging
 import mimetypes
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+from uuid import uuid4
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import validate_unicode_slug
-from django.db.models import QuerySet
 from django.db import transaction
-from django.utils.translation import gettext as _
+from django.db.models import QuerySet
 from django.urls import reverse
+from django.utils.text import slugify
+from django.utils.translation import gettext as _
 from lxml import etree
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
 from openedx_events.content_authoring.data import (
+    ContentObjectChangedData,
     LibraryBlockData,
     LibraryCollectionData,
-    LibraryContainerData,
-    ContentObjectChangedData,
+    LibraryContainerData
 )
 from openedx_events.content_authoring.signals import (
+    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
-    LIBRARY_CONTAINER_UPDATED,
-    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+    LIBRARY_CONTAINER_UPDATED
 )
-from xblock.core import XBlock
-
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import (
-    Component,
-    ComponentVersion,
-    LearningPackage,
-    MediaType,
-)
+from openedx_learning.api.authoring_models import Component, ComponentVersion, LearningPackage, MediaType
+from xblock.core import XBlock
 
 from openedx.core.djangoapps.xblock.api import (
     get_component_from_usage_key,
     get_xblock_app_config,
-    xblock_type_display_name,
+    xblock_type_display_name
 )
 from openedx.core.types import User as UserType
-from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from ..models import ContentLibrary
-from ..permissions import CAN_EDIT_THIS_CONTENT_LIBRARY
 from .exceptions import (
     BlockLimitReachedError,
     ContentLibraryBlockNotFound,
+    IncompatibleTypesError,
     InvalidNameError,
     LibraryBlockAlreadyExists,
+)
+from .containers import (
+    create_container,
+    get_container,
+    get_containers_contains_component,
+    update_container_children,
+    ContainerMetadata,
+    ContainerType,
 )
 from .libraries import (
     library_collection_locator,
     library_component_usage_key,
-    require_permission_for_library_key,
     PublishableItem,
 )
+
+# This content_libraries API is sometimes imported in the LMS (should we prevent that?), but the content_staging app
+# cannot be. For now we only need this one type import at module scope, so only import it during type checks.
+# To use the content_staging API or other CMS-only code, we import it within the functions below.
+if TYPE_CHECKING:
+    from openedx.core.djangoapps.content_staging.api import StagedContentFileData
 
 log = logging.getLogger(__name__)
 
@@ -281,7 +291,7 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
 
     # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
     # container indexing asynchronously.
-    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_component(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
@@ -321,7 +331,11 @@ def validate_can_add_block_to_library(
     # Make sure the proposed ID will be valid:
     validate_unicode_slug(block_id)
     # Ensure the XBlock type is valid and installed:
-    XBlock.load_class(block_type)  # Will raise an exception if invalid
+    block_class = XBlock.load_class(block_type)  # Will raise an exception if invalid
+    if block_class.has_children:
+        raise IncompatibleTypesError(
+            'The "{block_type}" XBlock (ID: "{block_id}") has children, so it not supported in content libraries',
+        )
     # Make sure the new ID is not taken already:
     usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
         lib_key=library_key,
@@ -367,29 +381,49 @@ def create_library_block(
     return get_library_block(usage_key)
 
 
-def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user, block_id) -> XBlock:
+def _title_from_olx_node(olx_node) -> str:
+    """
+    Given an OLX XML node (etree node), find an appropriate title for that
+    XBlock.
+    """
+    title = olx_node.attrib.get("display_name")
+    if not title:
+        # Find a localized default title if none was set:
+        from cms.djangoapps.contentstore import helpers as studio_helpers
+        title = studio_helpers.xblock_type_display_name(olx_node.tag)
+    return title
+
+
+def _import_staged_block(
+    block_type: str,
+    olx_str: str,
+    library_key: LibraryLocatorV2,
+    source_context_key: LearningContextKey,
+    user,
+    staged_content_id: int,
+    staged_content_files: list[StagedContentFileData],
+    now: datetime,
+) -> LibraryXBlockMetadata:
     """
     Create a new library block and populate it with staged content from clipboard
 
     Returns the newly created library block
     """
     from openedx.core.djangoapps.content_staging import api as content_staging_api
-    if not content_staging_api:
-        raise RuntimeError("The required content_staging app is not installed")
 
-    user_clipboard = content_staging_api.get_user_clipboard(user)
-    if not user_clipboard:
-        return None
-
-    staged_content_id = user_clipboard.content.id
-    olx_str = content_staging_api.get_staged_content_olx(staged_content_id)
-    if olx_str is None:
-        return None  # Shouldn't happen since we checked that the clipboard exists - mostly here for type checker
-    staged_content_files = content_staging_api.get_staged_content_static_files(staged_content_id)
+    # Generate a block_id:
+    try:
+        olx_node = etree.fromstring(olx_str)
+        title = _title_from_olx_node(olx_node)
+        # Slugify the title and append some random numbers to make a unique slug
+        block_id = slugify(title, allow_unicode=True) + '-' + uuid4().hex[-6:]
+    except Exception:   # pylint: disable=broad-except
+        # Just generate a random block_id if we can't make a nice slug.
+        block_id = uuid4().hex[-12:]
 
     content_library, usage_key = validate_can_add_block_to_library(
         library_key,
-        user_clipboard.content.block_type,
+        block_type,
         block_id
     )
 
@@ -398,10 +432,8 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
     # without one at the moment. TODO: fix this at the model level.
     learning_package: LearningPackage = content_library.learning_package  # type: ignore
 
-    now = datetime.now(tz=timezone.utc)
-
     # Create component for block then populate it with clipboard data
-    with transaction.atomic():
+    with transaction.atomic(savepoint=False):
         # First create the Component, but do not initialize it to anything (i.e.
         # no ComponentVersion).
         component_type = authoring_api.get_or_create_component_type(
@@ -454,7 +486,7 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
             # Learning Core components can store other kinds of files if they
             # wish (though none currently do).
             source_assumes_global_assets = not isinstance(
-                user_clipboard.source_context_key, LibraryLocatorV2
+                source_context_key, LibraryLocatorV2
             )
             if source_assumes_global_assets:
                 filename = f"static/{filename}"
@@ -490,6 +522,109 @@ def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, use
     return get_library_block(usage_key)
 
 
+def _import_staged_block_as_container(
+    olx_str: str,
+    library_key: LibraryLocatorV2,
+    source_context_key: LearningContextKey,
+    user,
+    staged_content_id: int,
+    staged_content_files: list[StagedContentFileData],
+    now: datetime,
+) -> ContainerMetadata:
+    """
+    Convert the given XBlock (e.g. "vertical") to a Container (e.g. Unit) and
+    import it into the library, along with all its child XBlocks.
+    """
+    olx_node = etree.fromstring(olx_str)
+    if olx_node.tag != "vertical":
+        raise ValueError("This method is only designed to work with <vertical> XBlocks (units).")
+    # The olx_str looks like this:
+    # <vertical><block1>...[XML]...</block1><block2>...[XML]...</block2>...</vertical>
+    # Ideally we could split it up and preserve the strings, but that is difficult to do correctly, so we'll split
+    # it up using the XML nodes. This will unfortunately remove any custom comments or formatting in the XML, but that's
+    # OK since Studio-edited blocks won't have that anyways (hand-edited and library blocks can and do).
+
+    title = _title_from_olx_node(olx_node)
+
+    # Start an atomic section so the whole paste succeeds or fails together:
+    with transaction.atomic():
+        container = create_container(
+            library_key=library_key,
+            container_type=ContainerType.Unit,
+            slug=None,  # auto-generate slug from title
+            title=title,
+            user_id=user.id,
+        )
+        new_child_keys: list[UsageKeyV2] = []
+        for child_node in olx_node:
+            try:
+                child_metadata = _import_staged_block(
+                    block_type=child_node.tag,
+                    olx_str=etree.tostring(child_node, encoding='unicode'),
+                    library_key=library_key,
+                    source_context_key=source_context_key,
+                    user=user,
+                    staged_content_id=staged_content_id,
+                    staged_content_files=staged_content_files,
+                    now=now,
+                )
+                new_child_keys.append(child_metadata.usage_key)
+            except IncompatibleTypesError:
+                continue  # Skip blocks that won't work in libraries
+        update_container_children(container.container_key, new_child_keys, user_id=user.id)
+        # Re-fetch the container because the 'last_draft_created' will have changed when we added children
+        container = get_container(container.container_key)
+    return container
+
+
+def import_staged_content_from_user_clipboard(library_key: LibraryLocatorV2, user) -> PublishableItem:
+    """
+    Create a new library item from the staged content from clipboard.
+    Can create containers (e.g. units) or XBlocks.
+
+    Returns the newly created item metadata
+    """
+    from openedx.core.djangoapps.content_staging import api as content_staging_api
+
+    user_clipboard = content_staging_api.get_user_clipboard(user)
+    if not user_clipboard:
+        raise ValidationError("The user's clipboard is empty")
+
+    staged_content_id = user_clipboard.content.id
+    source_context_key: LearningContextKey = user_clipboard.source_context_key
+
+    staged_content_files = content_staging_api.get_staged_content_static_files(staged_content_id)
+
+    olx_str = content_staging_api.get_staged_content_olx(staged_content_id)
+    if olx_str is None:
+        raise RuntimeError("olx_str missing")  # Shouldn't happen - mostly here for type checker
+
+    now = datetime.now(tz=timezone.utc)
+
+    if user_clipboard.content.block_type == "vertical":
+        # This is a Unit. To import it into a library, we have to create it as a container.
+        return _import_staged_block_as_container(
+            olx_str,
+            library_key,
+            source_context_key,
+            user,
+            staged_content_id,
+            staged_content_files,
+            now,
+        )
+    else:
+        return _import_staged_block(
+            user_clipboard.content.block_type,
+            olx_str,
+            library_key,
+            source_context_key,
+            user,
+            staged_content_id,
+            staged_content_files,
+            now,
+        )
+
+
 def get_or_create_olx_media_type(block_type: str) -> MediaType:
     """
     Get or create a MediaType for the block type.
@@ -502,16 +637,19 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
     )
 
 
-def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=True) -> None:
+def delete_library_block(
+    usage_key: LibraryUsageLocatorV2,
+    user_id: int | None = None,
+) -> None:
     """
     Delete the specified block from this library (soft delete).
     """
     component = get_component_from_usage_key(usage_key)
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
-    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_component(usage_key)
 
-    authoring_api.soft_delete_draft(component.pk)
+    authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
@@ -548,7 +686,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
         )
 
 
-def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
+def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None = None) -> None:
     """
     Restore the specified library block.
     """
@@ -557,7 +695,11 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
 
     # Set draft version back to the latest available component version id.
-    authoring_api.set_draft_version(component.pk, component.versioning.latest.pk)
+    authoring_api.set_draft_version(
+        component.pk,
+        component.versioning.latest.pk,
+        set_by=user_id,
+    )
 
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
@@ -593,7 +735,7 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     # container indexing asynchronously.
     #
     # To update the components count in containers
-    affected_containers = lib_api.get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_component(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
@@ -747,18 +889,14 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     """
     Publish all pending changes in a single component.
     """
-    content_library = require_permission_for_library_key(
-        usage_key.lib_key,
-        user,
-        CAN_EDIT_THIS_CONTENT_LIBRARY
-    )
-    learning_package = content_library.learning_package
-
-    assert learning_package
     component = get_component_from_usage_key(usage_key)
-    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(
-        entity__key=component.key
-    )
+    library_key = usage_key.context_key
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    learning_package = content_library.learning_package
+    assert learning_package
+    # The core publishing API is based on draft objects, so find the draft that corresponds to this component:
+    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__key=component.key)
+    # Publish the component and update anything that needs to be updated (e.g. search index):
     authoring_api.publish_from_drafts(learning_package.id, draft_qset=drafts_to_publish, published_by=user.id)
     LIBRARY_BLOCK_UPDATED.send_event(
         library_block=LibraryBlockData(
@@ -766,6 +904,17 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
             usage_key=usage_key,
         )
     )
+
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    affected_containers = get_containers_contains_component(usage_key)
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                container_key=container.container_key,
+                background=True,
+            )
+        )
 
 
 def _component_exists(usage_key: UsageKeyV2) -> bool:

@@ -736,7 +736,7 @@ edx-drf-extensions==10.5.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.12.3
+edx-enterprise==5.12.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -812,7 +812,7 @@ edx-sga==0.25.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions==3.8.6
+edx-submissions==3.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1383,7 +1383,7 @@ openedx-forum==0.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-learning==0.19.2
+openedx-learning==0.23.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
