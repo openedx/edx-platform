@@ -479,3 +479,15 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
             # we should expect only one email to be sent as the other learner is not eligible to receive the message
             # based on their last_login date
             self._test_run_with_task(send_bulk_course_email, 'emailed', 1, 1)
+
+    def test_email_is_not_sent_to_disabled_user(self):
+        """
+        Tests if disabled user are skipped when sending bulk email
+        """
+        user_1 = self.create_student(username="user1", email="user1@example.com")
+        user_1.set_unusable_password()
+        user_1.save()
+        self.create_student(username="user2", email="user2@example.com")
+        with patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            self._test_run_with_task(send_bulk_course_email, 'emailed', 3, 2, skipped=1)
