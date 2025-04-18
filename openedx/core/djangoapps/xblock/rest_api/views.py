@@ -2,6 +2,7 @@
 Views that implement a RESTful API for interacting with XBlocks.
 """
 import json
+from pathlib import Path
 
 from common.djangoapps.util.json_request import JsonResponse
 from corsheaders.signals import check_request_enabled
@@ -21,6 +22,7 @@ from rest_framework.views import APIView
 from xblock.django.request import DjangoWebobRequest, webob_to_django_response
 from xblock.exceptions import NoSuchUsage
 from xblock.fields import Scope
+import openassessment
 
 import openedx.core.djangoapps.site_configuration.helpers as configuration_helpers
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
@@ -119,6 +121,24 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     # }
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     cms_root_url = configuration_helpers.get_value('CMS_ROOT_URL', settings.CMS_ROOT_URL)
+    openassessment_path = Path(openassessment.__path__[0])
+    oa_manifest_path = openassessment_path / "xblock" / "static" / "dist" / "manifest.json"
+
+    new_oa_manifest = {}
+    if oa_manifest_path.exists():
+        with open(oa_manifest_path, "r") as f:
+            oa_manifest = json.load(f)
+            new_oa_manifest = {
+                # When we add the RTL style, it automatically applies that style (right-to-left reading) regardless
+                # of the language.
+                # We weren't sure of where to place that conditional code, so we just defaulted to the LTR style for
+                # now, until we are more clear on how to handle rtl/ltr conditionally.
+                'oa_ltr_css': oa_manifest.get("openassessment-ltr.css", ""),
+                'oa_ltr_js': oa_manifest.get("openassessment-ltr.js", ""),
+                'oa_editor_textarea_js': oa_manifest.get("openassessment-editor-textarea.js", ""),
+                'oa_editor_tinymce_js': oa_manifest.get("openassessment-editor-tinymce.js", ""),
+            }
+
     context = {
         'fragment': fragment,
         'handler_urls_json': json.dumps(handler_urls),
@@ -126,6 +146,7 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
         'cms_root_url': cms_root_url,
         'view_name': view_name,
         'is_development': settings.DEBUG,
+        'oa_manifest': new_oa_manifest,
     }
     response = render(request, 'xblock_v2/xblock_iframe.html', context, content_type='text/html')
 

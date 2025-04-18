@@ -1,3 +1,8 @@
+@import '_builtin-block-variables';
+@import 'bourbon/bourbon'; // lib - bourbon
+@import 'neat/neat'; // lib - Neat
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+@import 'build-v1'; // shared app style assets/rendering
 @import 'cms/theme/variables-v1';
 @import 'elements/course-unit-mfe-iframe';
 
@@ -5,6 +10,9 @@ html {
   body {
     min-width: 800px;
     background: transparent;
+    &.openassessment_full_height.view-container {
+        overflow-y: hidden;
+    }
   }
 }
 
@@ -478,6 +486,38 @@ body,
       }
     }
 
+    // openassessment xblock mods for mfe iframe
+    .openassessment_editor_buttons.xblock-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+      position: absolute;
+      bottom: 0;
+      z-index: 11;
+      right: 0;
+
+      .action-item {
+        @extend %t-action3;
+
+        display: inline-block;
+        margin-right: ($baseline*0.75);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+
+    #openassessment-editor .oa_editor_content_wrapper {
+      // make room for action buttons
+      bottom: 70px;
+      // make room for tabs above after shifting everything up due to action buttons
+      height: calc(100% - 112px);
+    }
+
+    #openassessment-editor #openassessment_editor_header {
+      padding: 10px;
+      padding-right: 50px; // make space for close button
+    }
+
     .xblock-v1-studio_view {
       height: 100%;
 
@@ -486,10 +526,6 @@ body,
         flex-direction: column;
         justify-content: space-between;
         height: 100%;
-
-        .list-input {
-          height: 90vh;
-        }
       }
 
       &.xmodule_DoneXBlock {
