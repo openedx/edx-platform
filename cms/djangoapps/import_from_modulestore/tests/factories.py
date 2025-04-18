@@ -10,7 +10,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
 from cms.djangoapps.import_from_modulestore.models import Import
-from openedx.core.djangoapps.content_libraries.tests import factories
 
 
 class ImportFactory(DjangoModelFactory):
