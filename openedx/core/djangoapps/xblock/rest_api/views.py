@@ -124,10 +124,14 @@ def embed_block_view(request, usage_key: UsageKeyV2, view_name: str):
     openassessment_path = Path(openassessment.__path__[0])
     oa_manifest_path = openassessment_path / "xblock" / "static" / "dist" / "manifest.json"
 
+    new_oa_manifest = {}
     if oa_manifest_path.exists():
         with open(oa_manifest_path, "r") as f:
             oa_manifest = json.load(f)
             new_oa_manifest = {
+                # When we add the RTL style, it automatically applies that style (right-to-left reading) regardless of the language.
+                # We weren't sure of where to place that conditional code, so we just defaulted to the LTR style for
+                # now, until we are more clear on how to handle rtl/ltr conditionally.
                 'oa_ltr_css': oa_manifest.get("openassessment-ltr.css", ""),
                 'oa_ltr_js': oa_manifest.get("openassessment-ltr.js", ""),
                 'oa_editor_textarea_js': oa_manifest.get("openassessment-editor-textarea.js", ""),
