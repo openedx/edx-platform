@@ -9,6 +9,7 @@ import {VideoPlayPlaceholder} from './play_placeholder';
 import {VideoPlaySkipControl} from './play_skip_control';
 import {VideoPlayPauseControl} from './play_pause_control';
 import {VideoSocialSharingHandler} from './video_social_sharing';
+import VideoCaption from "./video_caption";
 
 
 // TODO: Uncomment the imports
@@ -21,7 +22,6 @@ import {VideoSocialSharingHandler} from './video_social_sharing';
 //     VideoVolumeControl,
 //     VideoQualityControl,
 //     VideoFullScreen,
-//     VideoCaption,
 //     VideoCommands,
 //     VideoContextMenu,
 //     VideoSaveStatePlugin,
@@ -68,7 +68,7 @@ console.log('In video_block_main.js file');
             //     VideoVolumeControl,
             //     VideoQualityControl,
             //     VideoFullScreen,
-            //     VideoCaption,
+                VideoCaption,
             //     VideoCommands,
             //     VideoContextMenu,
             //     VideoSaveStatePlugin,
@@ -83,7 +83,7 @@ console.log('In video_block_main.js file');
             VideoPlaySkipControl,
             VideoSkipControl,
             // VideoVolumeControl,
-            // VideoCaption,
+            VideoCaption,
             // VideoCommands,
             // VideoSaveStatePlugin,
             // VideoTranscriptFeedback,
@@ -150,7 +150,7 @@ console.log('In video_block_main.js file');
             });
         } else {
             // TODO: Uncomment following initialize method calling
-            
+
             // initialize(state, element);
         }
 
