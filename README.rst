@@ -79,7 +79,7 @@ Interperters/Tools:
 
 * Python 3.11
 
-* Node 18
+* Node: See the ``.nvmrc`` file in this repository.
 
 Services:
 
