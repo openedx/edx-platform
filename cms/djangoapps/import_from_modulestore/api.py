@@ -2,7 +2,6 @@
 API for course to library import.
 """
 from opaque_keys.edx.keys import LearningContextKey
-from openedx_learning.api import authoring as authoring_api
 
 from .models import Import as _Import
 from .tasks import import_course_staged_content_to_library_task, save_legacy_content_to_staged_content_task

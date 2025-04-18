@@ -12,7 +12,7 @@ from django.db.utils import IntegrityError
 from lxml import etree
 
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import CourseLocator, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import CourseLocator
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component, Container, ContainerVersion, PublishableEntity
 
