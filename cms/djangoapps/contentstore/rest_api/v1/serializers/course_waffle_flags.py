@@ -28,6 +28,7 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
     use_new_textbooks_page = serializers.SerializerMethodField()
     use_new_group_configurations_page = serializers.SerializerMethodField()
     enable_course_optimizer = serializers.SerializerMethodField()
+    use_react_markdown_editor = serializers.SerializerMethodField()
 
     def get_course_key(self):
         """
@@ -152,3 +153,10 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
         """
         course_key = self.get_course_key()
         return toggles.enable_course_optimizer(course_key)
+
+    def get_use_react_markdown_editor(self, obj):
+        """
+        Method to get the use_react_markdown_editor waffle flag
+        """
+        course_key = self.get_course_key()
+        return toggles.use_react_markdown_editor(course_key)

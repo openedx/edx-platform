@@ -18,6 +18,7 @@ from rest_framework.status import HTTP_204_NO_CONTENT
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.types.http import RestRequest
 from . import serializers
 from .utils import convert_exceptions
 
@@ -80,7 +81,7 @@ class LibraryContainerView(GenericAPIView):
             request.user,
             permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
         )
-        container = api.get_container(container_key)
+        container = api.get_container(container_key, include_collections=True)
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)
 
     @convert_exceptions
@@ -293,3 +294,59 @@ class LibraryContainerRestore(GenericAPIView):
         )
         api.restore_container(container_key)
         return Response(None, status=HTTP_204_NO_CONTENT)
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryContainerCollectionsView(GenericAPIView):
+    """
+    View to set collections for a container.
+    """
+    @convert_exceptions
+    def patch(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
+        """
+        Sets Collections for a Component.
+
+        Collection and Components must all be part of the given library/learning package.
+        """
+        content_library = api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
+        container = api.get_container_from_key(container_key)
+        serializer = serializers.ContentLibraryItemCollectionsUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        collection_keys = serializer.validated_data['collection_keys']
+        api.set_library_item_collections(
+            library_key=container_key.library_key,
+            publishable_entity=container.publishable_entity,
+            collection_keys=collection_keys,
+            created_by=request.user.id,
+            content_library=content_library,
+        )
+
+        return Response({'count': len(collection_keys)})
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryContainerPublishView(GenericAPIView):
+    """
+    View to publish a container, or revert to last published.
+    """
+    @convert_exceptions
+    def post(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
+        """
+        Publish the container and its children
+        """
+        api.require_permission_for_library_key(
+            container_key.library_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
+        )
+        api.publish_container_changes(container_key, request.user.id)
+        # If we need to in the future, we could return a list of all the child containers/components that were
+        # auto-published as a result.
+        return Response({})
