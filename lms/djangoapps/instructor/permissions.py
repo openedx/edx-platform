@@ -4,9 +4,13 @@ Permissions for the instructor dashboard and associated actions
 from bridgekeeper import perms
 from bridgekeeper.rules import is_staff
 from opaque_keys.edx.keys import CourseKey
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 
+from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.rules import HasAccessRule, HasRolesRule
+from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.lib.courses import get_course_by_id
 
 ALLOW_STUDENT_TO_BYPASS_ENTRANCE_EXAM = 'instructor.allow_student_to_bypass_entrance_exam'
@@ -82,3 +86,32 @@ class InstructorPermission(BasePermission):
         course = get_course_by_id(CourseKey.from_string(view.kwargs.get('course_id')))
         permission = getattr(view, 'permission_name', None)
         return request.user.has_perm(permission, course)
+
+
+class ForumAdminRequiresInstructorAccess(BasePermission):
+    """
+    default roles require either (staff & forum admin) or (instructor)
+    User should be forum-admin and staff to access this endpoint.
+
+    But if request rolename is  FORUM_ROLE_ADMINISTRATOR, then user must also have
+    instructor-level access to proceed.
+    """
+    def has_permission(self, request, view):
+        rolename = request.data.get('rolename')
+        course_id = view.kwargs.get('course_id')
+        course = get_course_by_id(CourseKey.from_string(course_id))
+
+        has_instructor_access = has_access(request.user, 'instructor', course)
+        has_forum_admin = has_forum_access(
+            request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+        )
+
+        # default roles require either (staff & forum admin) or (instructor)
+        if not (has_forum_admin or has_instructor_access):
+            raise PermissionDenied("Operation requires staff & forum admin or instructor access")
+
+        # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
+        if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
+            raise PermissionDenied("Operation requires instructor access.")
+
+        return True
