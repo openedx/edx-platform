@@ -7,9 +7,10 @@ from unittest import mock
 import ddt
 from freezegun import freeze_time
 
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import LibraryContainerData
 from openedx_events.content_authoring.signals import (
+    LIBRARY_BLOCK_UPDATED,
     LIBRARY_CONTAINER_CREATED,
     LIBRARY_CONTAINER_DELETED,
     LIBRARY_CONTAINER_UPDATED,
@@ -43,6 +44,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         break any tests, but backwards-incompatible API changes will.
     """
     ENABLED_OPENEDX_EVENTS = [
+        LIBRARY_BLOCK_UPDATED.event_type,
         LIBRARY_CONTAINER_CREATED.event_type,
         LIBRARY_CONTAINER_DELETED.event_type,
         LIBRARY_CONTAINER_UPDATED.event_type,
@@ -413,3 +415,88 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
 
         # Verify the collections
         assert unit_as_read['collections'] == [{"title": col1.title, "key": col1.key}]
+
+    def test_publish_container(self):  # pylint: disable=too-many-statements
+        """
+        Test that we can publish the changes to a specific container
+        """
+        lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+
+        # Create two containers and add some components
+        container1 = self._create_container(lib["id"], "unit", display_name="Alpha Unit", slug=None)
+        container2 = self._create_container(lib["id"], "unit", display_name="Bravo Unit", slug=None)
+        problem_block = self._add_block_to_library(lib["id"], "problem", "Problem1", can_stand_alone=False)
+        html_block = self._add_block_to_library(lib["id"], "html", "Html1", can_stand_alone=False)
+        html_block2 = self._add_block_to_library(lib["id"], "html", "Html2", can_stand_alone=False)
+        self._add_container_components(container1["id"], children_ids=[problem_block["id"], html_block["id"]])
+        self._add_container_components(container2["id"], children_ids=[html_block["id"], html_block2["id"]])
+        # At first everything is unpublished:
+        c1_before = self._get_container(container1["id"])
+        assert c1_before["has_unpublished_changes"]
+        c1_components_before = self._get_container_components(container1["id"])
+        assert len(c1_components_before) == 2
+        assert c1_components_before[0]["id"] == problem_block["id"]
+        assert c1_components_before[0]["has_unpublished_changes"]
+        assert c1_components_before[0]["published_by"] is None
+        assert c1_components_before[1]["id"] == html_block["id"]
+        assert c1_components_before[1]["has_unpublished_changes"]
+        assert c1_components_before[1]["published_by"] is None
+        c2_before = self._get_container(container2["id"])
+        assert c2_before["has_unpublished_changes"]
+
+        # Set up event receivers after the initial mock data setup is complete:
+        updated_container_receiver = mock.Mock()
+        updated_block_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(updated_container_receiver)
+        LIBRARY_BLOCK_UPDATED.connect(updated_block_receiver)
+
+        # Now publish only Container 1
+        self._publish_container(container1["id"])
+
+        # Now it is published:
+        c1_after = self._get_container(container1["id"])
+        assert c1_after["has_unpublished_changes"] is False
+        c1_components_after = self._get_container_components(container1["id"])
+        assert len(c1_components_after) == 2
+        assert c1_components_after[0]["id"] == problem_block["id"]
+        assert c1_components_after[0]["has_unpublished_changes"] is False
+        assert c1_components_after[0]["published_by"] == self.user.username
+        assert c1_components_after[1]["id"] == html_block["id"]
+        assert c1_components_after[1]["has_unpublished_changes"] is False
+        assert c1_components_after[1]["published_by"] == self.user.username
+
+        # and container 2 is still unpublished, except for the shared HTML block that is also in container 1:
+        c2_after = self._get_container(container2["id"])
+        assert c2_after["has_unpublished_changes"]
+        c2_components_after = self._get_container_components(container2["id"])
+        assert len(c2_components_after) == 2
+        assert c2_components_after[0]["id"] == html_block["id"]
+        assert c2_components_after[0]["has_unpublished_changes"] is False  # published since it's also in container 1
+        assert c2_components_after[0]["published_by"] == self.user.username
+        assert c2_components_after[1]["id"] == html_block2["id"]
+        assert c2_components_after[1]["has_unpublished_changes"]  # unaffected
+        assert c2_components_after[1]["published_by"] is None
+
+        # Make sure that the right events were sent out.
+        # First, there should be one container updated event:
+        assert len(updated_container_receiver.call_args_list) == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "library_container": LibraryContainerData(
+                    container_key=LibraryContainerLocator.from_string(container1["id"]),
+                ),
+            },
+            updated_container_receiver.call_args_list[0].kwargs,
+        )
+
+        # Second, two XBlock updated events:
+        assert len(updated_block_receiver.call_args_list) == 2
+        updated_block_ids = set(
+            call.kwargs["library_block"].usage_key for call in updated_block_receiver.call_args_list
+        )
+        assert updated_block_ids == {
+            LibraryUsageLocatorV2.from_string(problem_block["id"]),
+            LibraryUsageLocatorV2.from_string(html_block["id"]),
+        }
+        assert all(call.kwargs["signal"] == LIBRARY_BLOCK_UPDATED for call in updated_block_receiver.call_args_list)
