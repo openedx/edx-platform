@@ -87,7 +87,7 @@ def import_course_staged_content_to_library_task(
     with authoring_api.bulk_draft_changes_for(learning_package_id=learning_package_id) as change_log:
         try:
             for usage_key_string in usage_keys_string:
-                if staged_content_item := import_event.get_staged_content_by_source_usage_key(usage_key_string):  # FIXME
+                if staged_content_item := import_event.get_staged_content_by_source_usage_key(usage_key_string):
                     import_client = ImportClient(
                         import_event,
                         usage_key_string,
@@ -99,7 +99,7 @@ def import_course_staged_content_to_library_task(
                     imported_publishable_versions.extend(import_client.import_from_staged_content())
         except Exception as exc:  # pylint: disable=broad-except
             import_event.set_status(ImportStatus.IMPORTING_FAILED)
-            raise exc from exc  # FIXME retest raise and describe change_log commitment on Exception
+            raise exc from exc  # TODO: retest raise and describe change_log commitment on Exception
 
     import_event.set_status(ImportStatus.IMPORTED)
     for imported_component_version in imported_publishable_versions:
