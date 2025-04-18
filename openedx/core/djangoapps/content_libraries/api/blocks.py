@@ -161,6 +161,7 @@ class LibraryXBlockStaticFile:
     # Size in bytes
     size: int
 
+
 @dataclass(frozen=True)
 class LibraryDeletedBlockData:
     """
@@ -661,7 +662,17 @@ def delete_library_block(
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
     affected_containers = get_containers_contains_component(usage_key)
 
-    authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
+    with transaction.atomic():
+        authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
+
+        # Remove block from affected containers
+        for container in affected_containers:
+            update_container_children(
+                container_key=container.container_key,
+                children_ids=cast(list[UsageKeyV2], [usage_key]),
+                user_id=user_id,
+                entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
+            )
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
@@ -685,16 +696,6 @@ def delete_library_block(
             )
         )
 
-    # TODO In transaction
-    for container in affected_containers:
-        # Remove block from affected container
-        update_container_children(
-            container_key=container.container_key,
-            children_ids=cast(list[UsageKeyV2], [usage_key]),
-            user_id=user_id,
-            entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
-        )
-
     return LibraryDeletedBlockData(
         affected_containers=affected_containers
     )
@@ -712,12 +713,24 @@ def restore_library_block(
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
 
-    # Set draft version back to the latest available component version id.
-    authoring_api.set_draft_version(
-        component.pk,
-        component.versioning.latest.pk,
-        set_by=user_id,
-    )
+    with transaction.atomic():
+        # Set draft version back to the latest available component version id.
+        authoring_api.set_draft_version(
+            component.pk,
+            component.versioning.latest.pk,
+            set_by=user_id,
+        )
+
+        # The list `affected_containers` is obtained from the `delete_library_block` API
+        if affected_containers:
+            # Add the block in containers where was before being deleted.
+            for container_key in affected_containers:
+                update_container_children(
+                    container_key,
+                    children_ids=cast(list[UsageKeyV2], [usage_key]),
+                    user_id=user_id,
+                    entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+                )
 
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
@@ -748,18 +761,6 @@ def restore_library_block(
                 background=True,
             )
         )
-
-    # TODO In transaction
-    # This list is obtained from the `delete_library_block` API
-    if affected_containers:
-        for container_key in affected_containers:
-            # Add the block in containers where was before being deleted.
-            update_container_children(
-                container_key,
-                children_ids=cast(list[UsageKeyV2], [usage_key]),
-                user_id=user_id,
-                entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
-            )
 
 
 def get_library_block_static_asset_files(usage_key: LibraryUsageLocatorV2) -> list[LibraryXBlockStaticFile]:
