@@ -905,6 +905,17 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
         )
     )
 
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
+    # container indexing asynchronously.
+    affected_containers = get_containers_contains_component(usage_key)
+    for container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                container_key=container.container_key,
+                background=True,
+            )
+        )
+
 
 def _component_exists(usage_key: UsageKeyV2) -> bool:
     """
