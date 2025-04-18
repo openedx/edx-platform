@@ -57,7 +57,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, Toy
 from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.services import RebindUserServiceError
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import STUDENT_VIEW, DescriptorSystem  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW, DescriptorSystem, XModuleMixin  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import (
     BetaTesterFactory,
@@ -1965,6 +1965,8 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
 
     @ddt.data(*PER_COURSE_ANONYMIZED_XBLOCKS)
     def test_per_course_anonymized_id(self, xblock_class):
+        if settings.USE_EXTRACTED_LTI_BLOCK and not hasattr(xblock_class, 'bind_for_student'):
+            xblock_class.bind_for_student = XModuleMixin.bind_for_student
         assert '0c706d119cad686d28067412b9178454' == \
                self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), xblock_class, False)
 
