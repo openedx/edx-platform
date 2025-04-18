@@ -19,7 +19,6 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
-from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 
 
 class StudentModuleHistoryExtended(BaseStudentModuleHistory):
@@ -35,7 +34,7 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
         get_latest_by = "created"
         index_together = ['student_module']
 
-    id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
+    id = models.BigAutoField(primary_key=True, serialize=False)  # pylint: disable=invalid-name
 
     student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.DO_NOTHING)
 

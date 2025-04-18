@@ -26,7 +26,6 @@ from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from simple_history.models import HistoricalRecords
 
-from lms.djangoapps.courseware.fields import UnsignedBigIntAutoField
 from lms.djangoapps.grades import events  # lint-amnesty, pylint: disable=unused-import
 from openedx.core.lib.cache_utils import get_cache
 from lms.djangoapps.grades.signals.signals import (
@@ -321,7 +320,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         ]
 
     # primary key will need to be large for this table
-    id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
+    id = models.BigAutoField(primary_key=True)  # pylint: disable=invalid-name
 
     user_id = models.IntegerField(blank=False)
     course_id = CourseKeyField(blank=False, max_length=255)
@@ -575,7 +574,7 @@ class PersistentCourseGrade(TimeStampedModel):
         ]
 
     # primary key will need to be large for this table
-    id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
+    id = models.BigAutoField(primary_key=True)  # pylint: disable=invalid-name
     user_id = models.IntegerField(blank=False, db_index=True)
     course_id = CourseKeyField(blank=False, max_length=255)
 
