@@ -32,6 +32,7 @@ class TestImportClient(ModuleStoreTestCase):
             title='Library Org 1',
             description='This is a library from Org 1',
         )
+        self.learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
         self.user = UserFactory()
         self.course = CourseFactory.create()
         self.chapter = BlockFactory.create(category='chapter', parent=self.course, display_name='Chapter')
@@ -50,11 +51,7 @@ class TestImportClient(ModuleStoreTestCase):
             data="""<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>""",
         )
         with self.captureOnCommitCallbacks(execute=True):
-            self.import_event = api.create_import(
-                source_key=self.course.id,
-                learning_package_id=self.library.learning_package_id,
-                user_id=self.user.id,
-            )
+            self.import_event = api.create_import(source_key=self.course.id, user_id=self.user.id)
         self.parser = etree.XMLParser(strip_cdata=False)
 
     def test_import_from_staged_content(self):
@@ -63,6 +60,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=str(self.chapter.location),
             composition_level='xblock',
             override=False
@@ -70,8 +68,7 @@ class TestImportClient(ModuleStoreTestCase):
 
         import_client.import_from_staged_content()
 
-        learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
-        self.assertEqual(learning_package.content_set.count(), len(expected_imported_xblocks))
+        self.assertEqual(self.learning_package.content_set.count(), len(expected_imported_xblocks))
 
     @patch('cms.djangoapps.import_from_modulestore.helpers.ImportClient._process_import')
     def test_import_from_staged_content_block_not_found(self, mocked_process_import):
@@ -79,6 +76,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import='block-v1:edX+Demo+2025+type@chapter+block@12345',
             composition_level='xblock',
             override=False
@@ -86,8 +84,7 @@ class TestImportClient(ModuleStoreTestCase):
 
         import_client.import_from_staged_content()
 
-        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
-        self.assertTrue(not library_learning_package.content_set.count())
+        self.assertTrue(not self.learning_package.content_set.count())
         mocked_process_import.assert_not_called()
 
     @ddt.data('chapter', 'sequential', 'vertical')
@@ -98,6 +95,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
             override=False
@@ -105,11 +103,11 @@ class TestImportClient(ModuleStoreTestCase):
         import_client.get_or_create_container(
             container_to_import.category,
             container_to_import.location.block_id,
-            container_to_import.display_name
+            container_to_import.display_name,
+            str(container_to_import.location)
         )
 
-        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
-        self.assertEqual(library_learning_package.publishable_entities.count(), 1)
+        self.assertEqual(self.learning_package.publishable_entities.count(), 1)
 
     def test_create_container_with_xblock(self):
         block_usage_key_to_import = str(self.problem.location)
@@ -117,6 +115,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
             override=False
@@ -125,7 +124,8 @@ class TestImportClient(ModuleStoreTestCase):
             import_client.get_or_create_container(
                 self.problem.category,
                 self.problem.location.block_id,
-                self.problem.display_name
+                self.problem.display_name,
+                str(self.problem.location),
             )
 
     @ddt.data('chapter', 'sequential', 'vertical')
@@ -139,17 +139,16 @@ class TestImportClient(ModuleStoreTestCase):
             import_event=self.import_event,
             staged_content=staged_content,
             block_usage_key_to_import=block_usage_key_to_import,
+            target_learning_package=self.learning_package,
             composition_level='xblock',
             override=False
         )
         block_to_import = etree.fromstring(staged_content.olx, parser=self.parser)
         # pylint: disable=protected-access
-        result = import_client._process_import(block_usage_key_to_import, block_to_import)
+        result = import_client.import_from_staged_content()
 
-        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
-        self.assertEqual(library_learning_package.content_set.count(), len(expected_imported_xblocks))
+        self.assertEqual(self.learning_package.content_set.count(), len(expected_imported_xblocks))
         self.assertEqual(len(result), len(expected_imported_xblocks))
-        self.assertEqual(self.import_event.publishableentityimport_set.count(), len(expected_imported_xblocks))
 
     @ddt.data('problem', 'video')
     def test_process_import_with_simple_blocks(self, block_type_to_import):
@@ -160,6 +159,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
             override=False
@@ -169,10 +169,8 @@ class TestImportClient(ModuleStoreTestCase):
         # pylint: disable=protected-access
         result = import_client._process_import(block_usage_key_to_import, block_to_import)
 
-        library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
-        self.assertEqual(library_learning_package.content_set.count(), len(expected_imported_xblocks))
+        self.assertEqual(self.learning_package.content_set.count(), len(expected_imported_xblocks))
         self.assertEqual(len(result), len(expected_imported_xblocks))
-        self.assertEqual(self.import_event.publishableentityimport_set.count(), len(expected_imported_xblocks))
 
     @ddt.data(True, False)
     def test_process_import_with_override(self, override):
@@ -183,6 +181,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
             override=False
@@ -194,15 +193,12 @@ class TestImportClient(ModuleStoreTestCase):
         self.assertEqual(len(result1), 1)
 
         with self.captureOnCommitCallbacks(execute=True):
-            new_import_event = api.create_import(
-                source_key=self.course.id,
-                learning_package_id=self.library.learning_package_id,
-                user_id=self.user.id,
-            )
+            new_import_event = api.create_import(source_key=self.course.id, user_id=self.user.id)
         new_staged_content = new_import_event.get_staged_content_by_source_usage_key(self.chapter.location)
         import_client = ImportClient(
             import_event=new_import_event,
             staged_content=new_staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
             override=override
@@ -221,7 +217,8 @@ class TestImportClient(ModuleStoreTestCase):
             # pylint: disable=protected-access
             result2 = import_client._process_import(block_usage_key_to_import, block_xml)
             self.assertEqual(len(result2), 1)
-            assert result2[0].title == 'ModifiedName'
+
+            assert result2[0].publishable_version.title == 'ModifiedName'
         else:
             # pylint: disable=protected-access
             result2 = import_client._process_import(block_usage_key_to_import, block_xml)
@@ -236,37 +233,47 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='vertical',
             override=False
         )
 
-        container_version = import_client.get_or_create_container(
+        container_version_with_mapping = import_client.get_or_create_container(
             'vertical',
             container_to_import.location.block_id,
-            container_to_import.display_name
+            container_to_import.display_name,
+            str(container_to_import.location),
         )
-        assert container_version is not None
-        assert container_version.title == container_to_import.display_name
+        assert container_version_with_mapping is not None
+        assert container_version_with_mapping.publishable_version.title == container_to_import.display_name
 
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='vertical',
             override=True
         )
-        overrided_container_version = import_client.get_or_create_container(
+        container_version_with_mapping = import_client.get_or_create_container(
             'vertical',
             container_to_import.location.block_id,
-            'New Display Name'
+            'New Display Name',
+            str(container_to_import.location),
         )
+        overrided_container_version = container_version_with_mapping.publishable_version
         assert overrided_container_version is not None
         assert overrided_container_version.title == 'New Display Name'
 
     @ddt.data('xblock', 'vertical')
     def test_composition_levels(self, composition_level):
-        expected_imported_blocks = [self.problem, self.video] if composition_level == 'xblock' else [self.vertical]
+        if composition_level == 'xblock':
+            expected_imported_blocks = [self.problem, self.video]
+        else:
+            # The vertical block is expected to be imported as a container
+            # with the same location as the original vertical block.
+            expected_imported_blocks = [self.vertical, self.problem, self.video]
 
         container_to_import = self.vertical
         block_usage_key_to_import = str(container_to_import.location)
@@ -275,6 +282,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level=composition_level,
             override=False
@@ -295,6 +303,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
             override=False
@@ -313,33 +322,13 @@ class TestImportClient(ModuleStoreTestCase):
             display_name='Problem With Image',
             data=modified_data,
         )
+        block_xml = etree.fromstring(modified_data, parser=self.parser)
 
-        with patch('cms.djangoapps.import_from_modulestore.helpers.authoring_api') as mock_authoring_api:
-            mock_component_type = mock.MagicMock()
-            mock_component_version = mock.MagicMock()
-            mock_media_type = mock.MagicMock()
-            mock_file_content = mock.MagicMock()
-
-            mock_authoring_api.get_or_create_component_type.return_value = mock_component_type
-            mock_authoring_api.get_components.return_value.filter.return_value.exists.return_value = False
-            mock_authoring_api.get_or_create_media_type.return_value = mock_media_type
-            mock_authoring_api.get_or_create_file_content.return_value = mock_file_content
-
-            with patch('cms.djangoapps.import_from_modulestore.helpers.api') as mock_api:
-                mock_api.validate_can_add_block_to_library.return_value = (None, None)
-                mock_api.set_library_block_olx.return_value = mock_component_version
-
-                with patch('cms.djangoapps.import_from_modulestore.helpers._create_publishable_entity_import'):
-                    block_xml = etree.fromstring(modified_data, parser=self.parser)
-
-                    # pylint: disable=protected-access
-                    import_client._create_block_in_library(block_xml, modified_block.location)
-
-                    mock_content_staging_api.get_staged_content_static_file_data.assert_called_once_with(
-                        staged_content.id, 'test.png'
-                    )
-                    mock_authoring_api.get_or_create_file_content.assert_called_once()
-                    mock_authoring_api.create_component_version_content.assert_called_once()
+        # pylint: disable=protected-access
+        import_client._create_block_in_library(block_xml, modified_block.location)
+        mock_content_staging_api.get_staged_content_static_file_data.assert_called_once_with(
+            staged_content.id, 'test.png'
+        )
 
     def test_update_container_components(self):
         container_to_import = self.vertical
@@ -349,6 +338,7 @@ class TestImportClient(ModuleStoreTestCase):
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
+            target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='container',
             override=False
