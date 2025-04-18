@@ -150,6 +150,7 @@ console.log('In video_block_main.js file');
             });
         } else {
             // TODO: Uncomment following initialize method calling
+            
             // initialize(state, element);
         }
 
