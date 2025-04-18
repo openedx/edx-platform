@@ -572,6 +572,7 @@ def searchable_doc_for_container(
         Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
         Fields.access_id: _meili_access_id_from_context_key(container_key.library_key),
         Fields.publish_status: PublishStatus.never,
+        Fields.last_published: None,
     }
 
     try:
@@ -593,6 +594,7 @@ def searchable_doc_for_container(
         Fields.modified: container.modified.timestamp(),
         Fields.num_children: draft_num_children,
         Fields.publish_status: publish_status,
+        Fields.last_published: container.last_published.timestamp() if container.last_published else None,
     })
     library = lib_api.get_library(container_key.library_key)
     if library:
@@ -601,8 +603,8 @@ def searchable_doc_for_container(
     if container.published_version_num is not None:
         published_num_children = lib_api.get_container_children_count(container_key, published=True)
         doc[Fields.published] = {
-            # Fields.published_display_name: container_published.title, TODO: set the published title
             Fields.published_num_children: published_num_children,
+            Fields.published_display_name: container.published_display_name,
         }
 
     return doc
