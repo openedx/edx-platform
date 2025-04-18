@@ -18,7 +18,7 @@ def cancel_incomplete_imports(sender, instance, created, **kwargs):
     if created:
         incomplete_user_imports_with_same_target = Import.objects.filter(
             user=instance.user,
-            target=instance.target,
+            target_change=instance.target_change,
             source_key=instance.source_key,
             staged_content_for_import__isnull=False
         ).exclude(uuid=instance.uuid)
