@@ -32,20 +32,18 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
         """
         course_id = "course-v1:edX+DemoX+Demo_Course"
         user = UserFactory()
-        create_import(course_id, user.id, self.library.learning_package_id)
+        create_import(course_id, user.id)
 
         import_event = Import.objects.get()
         assert import_event.source_key == CourseKey.from_string(course_id)
-        assert import_event.target == self.library.learning_package
         assert import_event.user_id == user.id
-        assert import_event.status == ImportStatus.PENDING
+        assert import_event.status == ImportStatus.NOT_STARTED
 
     def test_import_course_staged_content_to_library(self):
         """
         Test import_course_staged_content_to_library function with different override values.
         """
         import_event = ImportFactory(
-            target=self.library.learning_package,
             source_key=CourseKey.from_string("course-v1:edX+DemoX+Demo_Course"),
         )
         usage_ids = [
@@ -60,6 +58,7 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
             import_course_staged_content_to_library(
                 usage_ids,
                 import_event.uuid,
+                self.library.learning_package.id,
                 import_event.user.id,
                 "xblock",
                 override
@@ -69,6 +68,7 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
             kwargs={
                 "usage_keys_string": usage_ids,
                 "import_uuid": import_event.uuid,
+                "learning_package_id": self.library.learning_package.id,
                 "user_id": import_event.user.id,
                 "composition_level": "xblock",
                 "override": override,
@@ -80,7 +80,6 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
         Test import_course_staged_content_to_library function with not chapter usage keys.
         """
         import_event = ImportFactory(
-            target=self.library.learning_package,
             source_key=CourseKey.from_string("course-v1:edX+DemoX+Demo_Course"),
         )
         usage_ids = [
@@ -95,6 +94,7 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
                 import_course_staged_content_to_library(
                     usage_ids,
                     import_event.uuid,
+                    self.library.learning_package.id,
                     import_event.user.id,
                     "xblock",
                     False

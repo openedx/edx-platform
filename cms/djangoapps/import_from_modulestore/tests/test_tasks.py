@@ -49,10 +49,7 @@ class ImportCourseToLibraryMixin(ModuleStoreTestCase):
         self.video2 = BlockFactory.create(category='video', parent=self.vertical2, display_name='Video 2')
         self.problem2 = BlockFactory.create(category='problem', parent=self.vertical2, display_name='Problem 2')
 
-        self.import_event = ImportFactory(
-            source_key=self.course.id,
-            target=self.content_library.learning_package,
-        )
+        self.import_event = ImportFactory(source_key=self.course.id)
         self.user = self.import_event.user
 
 
@@ -70,7 +67,7 @@ class TestSaveCourseSectionsToStagedContentTask(ImportCourseToLibraryMixin):
 
         self.import_event.refresh_from_db()
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(course_chapters_to_import))
-        self.assertEqual(self.import_event.status, ImportStatus.READY)
+        self.assertEqual(self.import_event.status, ImportStatus.STAGED)
 
     def test_old_staged_content_deletion_before_save_new(self):
         """ Checking that repeated saving of the same content does not create duplicates. """
@@ -104,6 +101,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         import_course_staged_content_to_library_task(
             [str(self.chapter.location), str(self.chapter2.location)],
             self.import_event.uuid,
+            self.content_library.learning_package.id,
             self.user.id,
             'xblock',
             override=True
@@ -117,6 +115,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
 
         library_learning_package.refresh_from_db()
         self.assertEqual(library_learning_package.content_set.count(), len(expected_imported_xblocks))
+        self.assertEqual(self.import_event.publishableentityimport_set.count(), len(expected_imported_xblocks))
 
     @patch('cms.djangoapps.import_from_modulestore.tasks.ImportClient')
     def test_import_library_block_not_found(self, mock_import_client):
@@ -127,6 +126,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         import_course_staged_content_to_library_task(
             non_existent_usage_ids,
             str(self.import_event.uuid),
+            self.content_library.learning_package.id,
             self.user.id,
             'xblock',
             override=True,
@@ -144,11 +144,12 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
 
         self.import_event.refresh_from_db()
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(chapters_to_import))
-        self.assertEqual(self.import_event.status, ImportStatus.READY)
+        self.assertEqual(self.import_event.status, ImportStatus.STAGED)
 
         import_course_staged_content_to_library_task(
             [str(self.chapter.location)],
             str(self.import_event.uuid),
+            self.content_library.learning_package.id,
             self.user.id,
             'xblock',
             override=True,
@@ -163,3 +164,4 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         self.import_event.refresh_from_db()
         self.assertEqual(self.import_event.status, ImportStatus.IMPORTED)
         self.assertTrue(not self.import_event.staged_content_for_import.exists())
+        self.assertEqual(self.import_event.publishableentityimport_set.count(), len(expected_imported_xblocks))
