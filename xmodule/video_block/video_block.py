@@ -246,8 +246,8 @@ class _BuiltInVideoBlock(
         """
         fragment = Fragment(self.get_html(context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
-        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
-        shim_xmodule_js(fragment, 'Video')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockMain')
+        fragment.initialize_js('Video')
         return fragment
 
     def author_view(self, context):
