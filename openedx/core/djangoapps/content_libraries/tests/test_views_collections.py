@@ -18,7 +18,7 @@ URL_PREFIX = '/api/libraries/v2/{lib_key}/'
 URL_LIB_COLLECTIONS = URL_PREFIX + 'collections/'
 URL_LIB_COLLECTION = URL_LIB_COLLECTIONS + '{collection_key}/'
 URL_LIB_COLLECTION_RESTORE = URL_LIB_COLLECTIONS + '{collection_key}/restore/'
-URL_LIB_COLLECTION_COMPONENTS = URL_LIB_COLLECTION + 'components/'
+URL_LIB_COLLECTION_COMPONENTS = URL_LIB_COLLECTION + 'items/'
 
 
 @ddt.ddt

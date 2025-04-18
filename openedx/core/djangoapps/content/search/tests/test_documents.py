@@ -5,6 +5,7 @@ from dataclasses import replace
 from datetime import datetime, timezone
 
 from freezegun import freeze_time
+from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from organizations.models import Organization
 
@@ -81,18 +82,30 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 created_by=None,
                 description="my toy collection description"
             )
-            cls.collection_usage_key = "lib-collection:edX:2012_Fall:TOY_COLLECTION"
+            cls.collection_key = LibraryCollectionLocator.from_string(
+                "lib-collection:edX:2012_Fall:TOY_COLLECTION",
+            )
             cls.library_block = library_api.create_library_block(
                 cls.library.key,
                 "html",
                 "text2",
             )
+            cls.container = library_api.create_container(
+                cls.library.key,
+                container_type=library_api.ContainerType.Unit,
+                slug="unit1",
+                title="A Unit in the Search Index",
+                user_id=None,
+            )
+            cls.container_key = LibraryContainerLocator.from_string(
+                "lct:edX:2012_Fall:unit:unit1",
+            )
 
             # Add the problem block to the collection
-            library_api.update_library_collection_components(
+            library_api.update_library_collection_items(
                 cls.library.key,
                 collection_key="TOY_COLLECTION",
-                usage_keys=[
+                opaque_keys=[
                     cls.library_block.usage_key,
                 ]
             )
@@ -115,7 +128,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.tag_object(str(cls.html_block_key), cls.subject_tags, tags=["Chinese", "Jump Links"])
         tagging_api.tag_object(str(cls.html_block_key), cls.difficulty_tags, tags=["Normal"])
         tagging_api.tag_object(str(cls.library_block.usage_key), cls.difficulty_tags, tags=["Normal"])
-        tagging_api.tag_object(cls.collection_usage_key, cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.collection_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.container_key), cls.difficulty_tags, tags=["Normal"])
 
     @property
     def toy_course_access_id(self):
@@ -442,13 +456,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         assert doc["publish_status"] == "modified"
 
     def test_collection_with_library(self):
-        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
-        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+        doc = searchable_doc_for_collection(self.collection_key)
+        doc.update(searchable_doc_tags_for_collection(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
-            "usage_key": self.collection_usage_key,
+            "usage_key": str(self.collection_key),
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -471,13 +485,13 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
     def test_collection_with_published_library(self):
         library_api.publish_changes(self.library.key)
 
-        doc = searchable_doc_for_collection(self.library.key, self.collection.key)
-        doc.update(searchable_doc_tags_for_collection(self.library.key, self.collection.key))
+        doc = searchable_doc_for_collection(self.collection_key)
+        doc.update(searchable_doc_tags_for_collection(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
             "block_id": self.collection.key,
-            "usage_key": self.collection_usage_key,
+            "usage_key": str(self.collection_key),
             "type": "collection",
             "org": "edX",
             "display_name": "Toy Collection",
@@ -501,17 +515,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         """
         Test creating a search document for a draft-only container
         """
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
-            container_meta = library_api.create_container(
-                self.library.key,
-                container_type=library_api.ContainerType.Unit,
-                slug="unit1",
-                title="A Unit in the Search Index",
-                user_id=None,
-            )
-
-        doc = searchable_doc_for_container(container_meta.container_key)
+        doc = searchable_doc_for_container(self.container.container_key)
+        doc.update(searchable_doc_tags(self.container.container_key))
 
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",
@@ -529,7 +534,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
-            # "tags" should be here but we haven't implemented them yet
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"]
+            },
             # "published" is not set since we haven't published it yet
         }
 
@@ -537,23 +545,17 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         """
         Test creating a search document for a published container
         """
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
-            container_meta = library_api.create_container(
-                self.library.key,
-                container_type=library_api.ContainerType.Unit,
-                slug="unit1",
-                title="A Unit in the Search Index",
-                user_id=None,
-            )
+        with freeze_time(self.container.created):
+            # Create a container with a block in it
             library_api.update_container_children(
-                container_meta.container_key,
+                self.container.container_key,
                 [self.library_block.usage_key],
                 user_id=None,
             )
         library_api.publish_changes(self.library.key)
 
-        doc = searchable_doc_for_container(container_meta.container_key)
+        doc = searchable_doc_for_container(self.container.container_key)
+        doc.update(searchable_doc_tags(self.container.container_key))
 
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",
@@ -571,29 +573,22 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"]
+            },
             "published": {"num_children": 1},
-            # "tags" should be here but we haven't implemented them yet
-            # "published" is not set since we haven't published it yet
         }
 
     def test_published_container_with_changes(self):
         """
         Test creating a search document for a published container
         """
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
-            container_meta = library_api.create_container(
-                self.library.key,
-                container_type=library_api.ContainerType.Unit,
-                slug="unit1",
-                title="A Unit in the Search Index",
-                user_id=None,
-            )
-            library_api.update_container_children(
-                container_meta.container_key,
-                [self.library_block.usage_key],
-                user_id=None,
-            )
+        library_api.update_container_children(
+            self.container.container_key,
+            [self.library_block.usage_key],
+            user_id=None,
+        )
         library_api.publish_changes(self.library.key)
         block_2 = library_api.create_library_block(
             self.library.key,
@@ -602,15 +597,16 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         )
 
         # Add another component after publish
-        with freeze_time(created_date):
+        with freeze_time(self.container.created):
             library_api.update_container_children(
-                container_meta.container_key,
+                self.container.container_key,
                 [block_2.usage_key],
                 user_id=None,
                 entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
             )
 
-        doc = searchable_doc_for_container(container_meta.container_key)
+        doc = searchable_doc_for_container(self.container.container_key)
+        doc.update(searchable_doc_tags(self.container.container_key))
 
         assert doc == {
             "id": "lctedx2012_fallunitunit1-edd13a0c",
@@ -628,9 +624,11 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
+            "tags": {
+                "taxonomy": ["Difficulty"],
+                "level0": ["Difficulty > Normal"]
+            },
             "published": {"num_children": 1},
-            # "tags" should be here but we haven't implemented them yet
-            # "published" is not set since we haven't published it yet
         }
 
     def test_mathjax_plain_text_conversion_for_search(self):

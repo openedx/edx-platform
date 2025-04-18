@@ -591,8 +591,7 @@ class AggregatedNotificationPreferences(APIView):
         """
         API view for getting the aggregate notification preferences for the current user.
         """
-        notification_preferences = CourseNotificationPreference.objects.filter(user=request.user, is_active=True)
-
+        notification_preferences = CourseNotificationPreference.get_user_notification_preferences(request.user)
         if not notification_preferences.exists():
             return Response({
                 'status': 'error',

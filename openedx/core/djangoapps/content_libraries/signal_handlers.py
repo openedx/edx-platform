@@ -7,25 +7,21 @@ import logging
 from django.conf import settings
 from django.db.models.signals import m2m_changed, post_delete, post_save
 from django.dispatch import receiver
-
-from opaque_keys import InvalidKeyError
+from opaque_keys import InvalidKeyError, OpaqueKey
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import (
-    ContentObjectChangedData,
-    LibraryCollectionData,
-)
+from openedx_events.content_authoring.data import ContentObjectChangedData, LibraryCollectionData
 from openedx_events.content_authoring.signals import (
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
     LIBRARY_COLLECTION_CREATED,
     LIBRARY_COLLECTION_DELETED,
-    LIBRARY_COLLECTION_UPDATED,
+    LIBRARY_COLLECTION_UPDATED
 )
-from openedx_learning.api.authoring import get_component, get_components
-from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, Component, PublishableEntity
+from openedx_learning.api.authoring import get_components, get_containers
+from openedx_learning.api.authoring_models import Collection, CollectionPublishableEntity, PublishableEntity
 
 from lms.djangoapps.grades.api import signals as grades_signals
 
-from .api import library_component_usage_key
+from .api import library_collection_locator, library_component_usage_key, library_container_locator
 from .models import ContentLibrary, LtiGradedResource
 
 log = logging.getLogger(__name__)
@@ -86,15 +82,19 @@ def library_collection_saved(sender, instance, created, **kwargs):
     if created:
         LIBRARY_COLLECTION_CREATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library.library_key,
-                collection_key=instance.key,
+                collection_key=library_collection_locator(
+                    library_key=library.library_key,
+                    collection_key=instance.key,
+                ),
             )
         )
     else:
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library.library_key,
-                collection_key=instance.key,
+                collection_key=library_collection_locator(
+                    library_key=library.library_key,
+                    collection_key=instance.key,
+                ),
             )
         )
 
@@ -112,39 +112,53 @@ def library_collection_deleted(sender, instance, **kwargs):
 
     LIBRARY_COLLECTION_DELETED.send_event(
         library_collection=LibraryCollectionData(
-            library_key=library.library_key,
-            collection_key=instance.key,
+            collection_key=library_collection_locator(
+                library_key=library.library_key,
+                collection_key=instance.key,
+            ),
         )
     )
 
 
-def _library_collection_component_changed(
-    component: Component,
+def _library_collection_entity_changed(
+    publishable_entity: PublishableEntity,
     library_key: LibraryLocatorV2 | None = None,
 ) -> None:
     """
-    Sends a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for the component.
+    Sends a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for the entity.
     """
     if not library_key:
         try:
             library = ContentLibrary.objects.get(
-                learning_package_id=component.learning_package_id,
+                learning_package_id=publishable_entity.learning_package_id,
             )
         except ContentLibrary.DoesNotExist:
-            log.error("{component} is not associated with a content library.")
+            log.error("{publishable_entity} is not associated with a content library.")
             return
 
         library_key = library.library_key
 
     assert library_key
 
-    usage_key = library_component_usage_key(
-        library_key,
-        component,
-    )
+    opaque_key: OpaqueKey
+
+    if hasattr(publishable_entity, 'component'):
+        opaque_key = library_component_usage_key(
+            library_key,
+            publishable_entity.component,
+        )
+    elif hasattr(publishable_entity, 'container'):
+        opaque_key = library_container_locator(
+            library_key,
+            publishable_entity.container,
+        )
+    else:
+        log.error("Unknown publishable entity type: %s", publishable_entity)
+        return
+
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
-            object_id=str(usage_key),
+            object_id=str(opaque_key),
             changes=["collections"],
         ),
     )
@@ -156,9 +170,7 @@ def library_collection_entity_saved(sender, instance, created, **kwargs):
     Sends a CONTENT_OBJECT_ASSOCIATIONS_CHANGED event for components added to a collection.
     """
     if created:
-        # Component.pk matches its entity.pk
-        component = get_component(instance.entity_id)
-        _library_collection_component_changed(component)
+        _library_collection_entity_changed(instance.entity)
 
 
 @receiver(post_delete, sender=CollectionPublishableEntity, dispatch_uid="library_collection_entity_deleted")
@@ -168,9 +180,7 @@ def library_collection_entity_deleted(sender, instance, **kwargs):
     """
     # Only trigger component updates if CollectionPublishableEntity was cascade deleted due to deletion of a collection.
     if isinstance(kwargs.get('origin'), Collection):
-        # Component.pk matches its entity.pk
-        component = get_component(instance.entity_id)
-        _library_collection_component_changed(component)
+        _library_collection_entity_changed(instance.entity)
 
 
 @receiver(m2m_changed, sender=CollectionPublishableEntity, dispatch_uid="library_collection_entities_changed")
@@ -190,15 +200,18 @@ def library_collection_entities_changed(sender, instance, action, pk_set, **kwar
         return
 
     if isinstance(instance, PublishableEntity):
-        _library_collection_component_changed(instance.component, library.library_key)
+        _library_collection_entity_changed(instance, library.library_key)
         return
 
     # When action=="post_clear", pk_set==None
     # Since the collection instance now has an empty entities set,
-    # we don't know which ones were removed, so we need to update associations for all library components.
+    # we don't know which ones were removed, so we need to update associations for all library
+    # components and containers.
     components = get_components(instance.learning_package_id)
+    containers = get_containers(instance.learning_package_id)
     if pk_set:
         components = components.filter(pk__in=pk_set)
+        containers = containers.filter(pk__in=pk_set)
 
-    for component in components.all():
-        _library_collection_component_changed(component, library.library_key)
+    for entity in list(components.all()) + list(containers.all()):
+        _library_collection_entity_changed(entity.publishable_entity, library.library_key)

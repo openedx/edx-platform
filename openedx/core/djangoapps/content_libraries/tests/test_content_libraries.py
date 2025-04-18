@@ -4,7 +4,6 @@ Tests for Learning-Core-based Content Libraries
 from datetime import datetime, timezone
 from unittest import skip
 from unittest.mock import Mock, patch
-from uuid import uuid4
 
 import ddt
 from django.contrib.auth.models import Group
@@ -344,9 +343,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             "last_draft_created_by": "Bob",
         })
         block_id = block_data["id"]
-        # Confirm that the result contains a definition key, but don't check its value,
-        # which for the purposes of these tests is an implementation detail.
-        assert 'def_key' in block_data
 
         # now the library should contain one block and have unpublished changes:
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
@@ -509,7 +505,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         """
         lib = self._create_library(slug="list_blocks-slug", title="Library 1")
         block1 = self._add_block_to_library(lib["id"], "problem", "problem1")
-        self._add_block_to_library(lib["id"], "unit", "unit1")
+        self._add_block_to_library(lib["id"], "html", "html1")
 
         response = self._get_library_blocks(lib["id"])
         result = response['results']
@@ -792,7 +788,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 description="Testing XBlocks limits in a library"
             )
             lib_id = lib["id"]
-            self._add_block_to_library(lib_id, "unit", "unit1")
+            self._add_block_to_library(lib_id, "html", "html1")
             # Second block should throw error
             self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
 
@@ -981,14 +977,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         library_key = LibraryLocatorV2.from_string(lib_id)
 
-        block = self._add_block_to_library(lib_id, "unit", "u1")
+        block = self._add_block_to_library(lib_id, "html", "h1")
         block_id = block["id"]
         self._set_library_block_asset(block_id, "static/test.txt", b"data")
 
         usage_key = LibraryUsageLocatorV2(
             lib_key=library_key,
-            block_type="unit",
-            usage_id="u1"
+            block_type="html",
+            usage_id="h1"
         )
 
         event_receiver.assert_called_once()
@@ -1020,7 +1016,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         library_key = LibraryLocatorV2.from_string(lib_id)
 
-        block = self._add_block_to_library(lib_id, "unit", "u1")
+        block = self._add_block_to_library(lib_id, "html", "h321")
         block_id = block["id"]
         self._set_library_block_asset(block_id, "static/test.txt", b"data")
 
@@ -1028,8 +1024,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
 
         usage_key = LibraryUsageLocatorV2(
             lib_key=library_key,
-            block_type="unit",
-            usage_id="u1"
+            block_type="html",
+            usage_id="h321"
         )
 
         event_receiver.assert_called()
@@ -1084,7 +1080,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             event_receiver.call_args.kwargs
         )
 
-    def test_library_paste_clipboard(self):
+    def test_library_paste_xblock(self):
         """
         Check the a new block is created in the library after pasting from clipboard.
         The content of the new block should match the content of the block in the clipboard.
@@ -1123,13 +1119,8 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             save_xblock_to_user_clipboard(block, author.id)
 
             # Paste the content of the clipboard into the library
-            pasted_block_id = str(uuid4())
-            paste_data = self._paste_clipboard_content_in_library(lib_id, pasted_block_id)
-            pasted_usage_key = LibraryUsageLocatorV2(
-                lib_key=library_key,
-                block_type="problem",
-                usage_id=pasted_block_id
-            )
+            paste_data = self._paste_clipboard_content_in_library(lib_id)
+            pasted_usage_key = LibraryUsageLocatorV2.from_string(paste_data["id"])
             self._get_library_block_asset(pasted_usage_key, "static/hello.txt")
 
             # Compare the two text files
@@ -1145,7 +1136,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
                 "last_draft_created": paste_data["last_draft_created"],
                 "created": paste_data["created"],
                 "modified": paste_data["modified"],
-                "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_block_id}",
+                "id": f"lb:CL-TEST:test_lib_paste_clipboard:problem:{pasted_usage_key.block_id}",
             })
 
     @override_settings(LIBRARY_ENABLED_BLOCKS=['problem', 'video', 'html'])

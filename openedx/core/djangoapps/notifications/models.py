@@ -25,7 +25,7 @@ NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 12
+COURSE_NOTIFICATION_CONFIG_VERSION = 13
 
 
 def get_course_notification_preference_config():
@@ -170,6 +170,35 @@ class CourseNotificationPreference(TimeStampedModel):
                 # pylint: disable-next=broad-except
             except Exception as e:
                 log.error(f'Unable to update notification preference to new config. {e}')
+        return preferences
+
+    @staticmethod
+    def get_user_notification_preferences(user):
+        """
+        Checks if all user preferences have updated versions and returns the user preferences.
+        Updates any preferences that need to be updated to the latest config version.
+        """
+        preferences = CourseNotificationPreference.objects.filter(user=user, is_active=True)
+        email_opt_out = UserPreference.objects.filter(user_id=user.id, key=ONE_CLICK_EMAIL_UNSUB_KEY).exists()
+        current_config_version = get_course_notification_preference_config_version()
+        preferences_to_update = []
+
+        try:
+            for preference in preferences:
+                if preference.config_version != current_config_version:
+                    current_prefs = preference.notification_preference_config
+                    new_prefs = NotificationPreferenceSyncManager.update_preferences(current_prefs, email_opt_out)
+                    preference.config_version = current_config_version
+                    preference.notification_preference_config = new_prefs
+                    preferences_to_update.append(preference)
+            if preferences_to_update:
+                CourseNotificationPreference.objects.bulk_update(
+                    preferences_to_update,
+                    ['config_version', 'notification_preference_config']
+                )
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            log.error(f'Unable to update notification preference to new config: {str(e)}')
+
         return preferences
 
     @staticmethod
