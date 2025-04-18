@@ -14,14 +14,14 @@ from lxml import etree
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator, LibraryUsageLocatorV2
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import ContainerVersion
+from openedx_learning.api.authoring_models import Component, Container, ContainerVersion, PublishableEntity
 
 from openedx.core.djangoapps.content_libraries import api
 from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.django import modulestore
 
-from .data import CompositionLevel
-from .models import Import, PublishableEntityMapping, PublishableEntityImport
+from .data import CompositionLevel, PublishableVersionWithMapping
+from .models import Import, PublishableEntityMapping
 
 
 log = logging.getLogger(__name__)
@@ -53,22 +53,24 @@ class ImportClient:
         self,
         import_event: Import,
         block_usage_key_to_import: str,
+        target_learning_package: 'LearningPackage',
         staged_content: 'StagedContent',
         composition_level: str,
         override: bool = False,
     ):
         self.import_event = import_event
         self.block_usage_key_to_import = block_usage_key_to_import
+        self.learning_package = target_learning_package
         self.staged_content = staged_content
         self.composition_level = composition_level
         self.override = override
 
         self.user_id = import_event.user_id
-        self.content_library = import_event.target.contentlibrary
+        self.content_library = target_learning_package.contentlibrary
         self.library_key = self.content_library.library_key
         self.parser = etree.XMLParser(strip_cdata=False)
 
-    def import_from_staged_content(self):
+    def import_from_staged_content(self) -> list[PublishableVersionWithMapping]:
         """
         Import staged content into a library.
         """
@@ -76,11 +78,11 @@ class ImportClient:
         usage_key = UsageKey.from_string(self.block_usage_key_to_import)
         block_to_import = get_block_to_import(node, usage_key)
         if block_to_import is None:
-            return
+            return []
 
-        self._process_import(self.block_usage_key_to_import, block_to_import)
+        return self._process_import(self.block_usage_key_to_import, block_to_import)
 
-    def _process_import(self, usage_id, block_to_import):
+    def _process_import(self, usage_key_string, block_to_import) -> list[PublishableVersionWithMapping]:
         """
         Process import of a block from staged content into a library.
 
@@ -88,7 +90,7 @@ class ImportClient:
         composition level. It handles both simple and complicated blocks, creating
         the necessary container hierarchy.
         """
-        usage_key = UsageKey.from_string(usage_id)
+        usage_key = UsageKey.from_string(usage_key_string)
         result = []
 
         if block_to_import.tag not in CompositionLevel.COMPLICATED_LEVELS.value:
@@ -100,36 +102,40 @@ class ImportClient:
             )
             if not child_usage_key_string:
                 continue
+
             result.extend(self._import_child_block(child, child_usage_key_string))
 
         if self.composition_level in CompositionLevel.FLAT_LEVELS.value:
-            return [component for component in result if not isinstance(component, ContainerVersion)]
+            return [
+                publishable_version_with_mapping for publishable_version_with_mapping in result
+                if not isinstance(publishable_version_with_mapping.publishable_version, ContainerVersion)
+            ]
         return result
 
-    def _import_simple_block(self, block_to_import, usage_key) -> list:
+    def _import_simple_block(self, block_to_import, usage_key) -> list[PublishableVersionWithMapping]:
         """
         Import a simple block into the library.
 
         Creates a block in the library from the staged content block.
         It returns a list containing the created component version.
         """
-        component_version = self._create_block_in_library(block_to_import, usage_key)
-        return [component_version] if component_version else []
+        publishable_version_with_mapping = self._create_block_in_library(block_to_import, usage_key)
+        return [publishable_version_with_mapping] if publishable_version_with_mapping else []
 
-    def _import_child_block(self, child, child_usage_id):
+    def _import_child_block(self, child, child_usage_key_string):
         """
         Import a child block into the library.
 
         Determines whether the child block is simple or complicated and
         delegates the import process to the appropriate helper method.
         """
-        child_usage_key = UsageKey.from_string(child_usage_id)
+        child_usage_key = UsageKey.from_string(child_usage_key_string)
         if child.tag in CompositionLevel.COMPLICATED_LEVELS.value:
-            return self._import_complicated_child(child, child_usage_id)
+            return self._import_complicated_child(child, child_usage_key_string)
         else:
             return self._import_simple_block(child, child_usage_key)
 
-    def _import_complicated_child(self, child, child_usage_id):
+    def _import_complicated_child(self, child, child_usage_key_string):
         """
         Import a complicated child block into the library.
 
@@ -137,19 +143,43 @@ class ImportClient:
         containers and updating components.
         Returns a list containing the created container version.
         """
-        if self.composition_level in CompositionLevel.FLAT_LEVELS.value:
-            return self._process_import(child_usage_id, child)
+        if not self._should_create_container(child.tag):
+            return self._process_import(child_usage_key_string, child)
 
-        container_version = self.get_or_create_container(
+        container_version_with_mapping = self.get_or_create_container(
             child.tag,
             child.get('url_name'),
-            child.get('display_name', child.tag)
+            child.get('display_name', child.tag),
+            child_usage_key_string,
         )
-        child_component_versions = self._process_import(child_usage_id, child)
-        self._update_container_components(container_version, child_component_versions)
-        return [container_version]
+        child_component_versions_with_mapping = self._process_import(child_usage_key_string, child)
+        child_component_versions = [
+            child_component_version.publishable_version for child_component_version
+            in child_component_versions_with_mapping
+        ]
+        self._update_container_components(container_version_with_mapping.publishable_version, child_component_versions)
+        return [container_version_with_mapping] + child_component_versions_with_mapping
 
-    def get_or_create_container(self, container_type, key, display_name):
+    def _should_create_container(self, container_type: str) -> bool:
+        """
+        Determine if a new container should be created.
+
+        Container type should be at a lower level than the current composition level.
+        """
+        composition_hierarchy = CompositionLevel.COMPLICATED_LEVELS.value
+        return (
+            container_type in composition_hierarchy and
+            self.composition_level in composition_hierarchy and
+            composition_hierarchy.index(container_type) >= composition_hierarchy.index(self.composition_level)
+        )
+
+    def get_or_create_container(
+        self,
+        container_type: str,
+        key: str,
+        display_name: str,
+        block_usage_key_string: str
+    ) -> PublishableVersionWithMapping:
         """
         Create a container of the specified type.
 
@@ -161,7 +191,11 @@ class ImportClient:
         if not all((container_creator_func, container_override_func)):
             raise ValueError(f"Unknown container type: {container_type}")
 
-        container_version = self.content_library.learning_package.publishable_entities.filter(key=key).first()
+        try:
+            container_version = self.content_library.learning_package.publishable_entities.get(key=key)
+        except PublishableEntity.DoesNotExist:
+            container_version = None
+
         if container_version and self.override:
             container_version = container_override_func(
                 container_version.container,
@@ -172,7 +206,7 @@ class ImportClient:
             )
         elif not container_version:
             _, container_version = container_creator_func(
-                self.import_event.target_id,
+                self.learning_package.id,
                 key=key or secrets.token_hex(16),
                 title=display_name or f"New {container_type}",
                 components=[],
@@ -180,7 +214,12 @@ class ImportClient:
                 created_by=self.import_event.user_id,
             )
 
-        return container_version
+        publishable_entity_mapping, _ = get_or_create_publishable_entity_mapping(
+            block_usage_key_string,
+            container_version.container
+        )
+
+        return PublishableVersionWithMapping(container_version, publishable_entity_mapping)
 
     def _update_container_components(self, container_version, component_versions):
         """
@@ -202,7 +241,7 @@ class ImportClient:
             container_version_cls=container_version.__class__,
         )
 
-    def _create_block_in_library(self, block_to_import, usage_key):
+    def _create_block_in_library(self, block_to_import, usage_key) -> PublishableVersionWithMapping | None:
         """
         Create a block in a library from a staged content block.
         """
@@ -212,7 +251,7 @@ class ImportClient:
         with transaction.atomic():
             component_type = authoring_api.get_or_create_component_type("xblock.v1", usage_key.block_type)
             does_component_exist = authoring_api.get_components(
-                self.import_event.target_id
+                self.learning_package.id
             ).filter(local_key=usage_key.block_id).exists()
 
             if does_component_exist:
@@ -233,7 +272,7 @@ class ImportClient:
                     return
 
                 authoring_api.create_component(
-                    self.import_event.target_id,
+                    self.learning_package.id,
                     component_type=component_type,
                     local_key=usage_key.block_id,
                     created=now,
@@ -248,24 +287,24 @@ class ImportClient:
                 block_to_import,
                 now,
             )
-            _create_publishable_entity_import(self.import_event, usage_key, component_version)
-
-            return component_version
+            publishable_entity_mapping, _ = get_or_create_publishable_entity_mapping(
+                usage_key,
+                component_version.component
+            )
+            return PublishableVersionWithMapping(component_version, publishable_entity_mapping)
 
     def _handle_component_override(self, usage_key, new_content):
         """
         Create new ComponentVersion for overridden component.
         """
         component_version = None
-        component = self.import_event.target.component_set.filter(local_key=usage_key.block_id).first()
+        try:
+            component = authoring_api.get_components(self.learning_package.id).get(local_key=usage_key.block_id)
+        except Component.DoesNotExist:
+            return component_version
+        library_usage_key = api.library_component_usage_key(self.library_key, component)
 
-        if component:
-            library_usage_key = LibraryUsageLocatorV2(  # type: ignore[abstract]
-                lib_key=self.library_key,
-                block_type=component.component_type.name,
-                usage_id=component.local_key,
-            )
-            component_version = api.set_library_block_olx(library_usage_key, new_content)
+        component_version = api.set_library_block_olx(library_usage_key, new_content)
 
         return component_version
 
@@ -313,7 +352,7 @@ class ImportClient:
 
             media_type = authoring_api.get_or_create_media_type(media_type_str)
             content = authoring_api.get_or_create_file_content(
-                self.import_event.target_id,
+                self.learning_package.id,
                 media_type.id,
                 data=file_data,
                 created=created_at,
@@ -325,29 +364,18 @@ class ImportClient:
                 pass  # Content already exists
 
 
-def _create_publishable_entity_import(import_event, usage_key, component_version) -> PublishableEntityImport:
-    """
-    Creates relations between the imported component and source usage key and import event.
-    """
-    publishable_entity_mapping, _ = _get_or_create_publishable_entity_mapping(
-        usage_key,
-        component_version.component
-    )
-    return PublishableEntityImport.objects.create(
-        import_event=import_event,
-        result=publishable_entity_mapping,
-        resulting_draft=component_version.publishable_entity_version,
-    )
-
-
-def _get_or_create_publishable_entity_mapping(usage_key, component) -> tuple[PublishableEntityMapping, bool]:
+def get_or_create_publishable_entity_mapping(usage_key, component) -> tuple[PublishableEntityMapping, bool]:
     """
     Creates a mapping between the source usage key and the target publishable entity.
     """
+    if isinstance(component, Container):
+        target_package = component.publishable_entity.learning_package
+    else:
+        target_package = component.learning_package
     return PublishableEntityMapping.objects.get_or_create(
         source_usage_key=usage_key,
         target_entity=component.publishable_entity,
-        target_package=component.learning_package
+        target_package=target_package,
     )
 
 

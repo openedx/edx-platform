@@ -1,6 +1,7 @@
 """
 This module contains the data models for the import_from_modulestore app.
 """
+from collections import namedtuple
 from enum import Enum
 
 from django.db.models import TextChoices
@@ -20,6 +21,7 @@ class ImportStatus(TextChoices):
     IMPORTING_FAILED = 'importing_failed', _('Failed to import staged content')
     IMPORTED = 'imported', _('Successfully imported content')
     CANCELED = 'canceled', _('Canceled')
+
 
 class CompositionLevel(Enum):
     """
@@ -43,3 +45,6 @@ class CompositionLevel(Enum):
         Returns all levels of composition levels.
         """
         return [composition_level.value for composition_level in cls]
+
+
+PublishableVersionWithMapping = namedtuple('PublishableVersionWithMapping', ['publishable_version', 'mapping'])
