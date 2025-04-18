@@ -233,7 +233,15 @@ class LibraryBlockPublishView(APIView):
 
     @convert_exceptions
     def post(self, request, usage_key_str):
+        """
+        Publish the draft changes made to this component.
+        """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
+        api.require_permission_for_library_key(
+            key.lib_key,
+            request.user,
+            permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
+        )
         api.publish_component_changes(key, request.user)
         return Response({})
 
