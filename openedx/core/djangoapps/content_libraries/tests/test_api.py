@@ -885,7 +885,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
         assert html_block_containers[0].container_key == self.unit1.container_key
         assert html_block_containers[1].container_key == self.unit2.container_key
 
-    def _validate_calls_of_html_block(self, event_mock):
+    def _validate_calls_of_html_block(self, event_mock, background):
         """
         Validate that the `event_mock` has been called twice
         using the `LIBRARY_CONTAINER_UPDATED` signal.
@@ -897,7 +897,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "sender": None,
                 "library_container": LibraryContainerData(
                     container_key=self.unit1.container_key,
-                    background=True,
+                    background=background,
                 )
             },
             event_mock.call_args_list[0].kwargs,
@@ -908,7 +908,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "sender": None,
                 "library_container": LibraryContainerData(
                     container_key=self.unit2.container_key,
-                    background=True,
+                    background=background,
                 )
             },
             event_mock.call_args_list[1].kwargs,
@@ -919,16 +919,22 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
         LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
 
         api.delete_library_block(self.html_block_usage_key)
-        self._validate_calls_of_html_block(container_update_event_receiver)
+        self._validate_calls_of_html_block(container_update_event_receiver, False)
 
     def test_call_container_update_signal_when_restore_component(self):
         api.delete_library_block(self.html_block_usage_key)
 
         container_update_event_receiver = mock.Mock()
         LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
-        api.restore_library_block(self.html_block_usage_key)
+        api.restore_library_block(
+            self.html_block_usage_key,
+            affected_containers=[
+                self.unit1.container_key,
+                self.unit2.container_key,
+            ]
+        )
 
-        self._validate_calls_of_html_block(container_update_event_receiver)
+        self._validate_calls_of_html_block(container_update_event_receiver, False)
 
     def test_call_container_update_signal_when_update_olx(self):
         block_olx = "<html><b>Hello world!</b></html>"
@@ -936,7 +942,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
         LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
 
         self._set_library_block_olx(self.html_block_usage_key, block_olx)
-        self._validate_calls_of_html_block(container_update_event_receiver)
+        self._validate_calls_of_html_block(container_update_event_receiver, True)
 
     def test_call_container_update_signal_when_update_component(self):
         block_olx = "<html><b>Hello world!</b></html>"
@@ -944,4 +950,4 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
         LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
 
         self._set_library_block_fields(self.html_block_usage_key, {"data": block_olx, "metadata": {}})
-        self._validate_calls_of_html_block(container_update_event_receiver)
+        self._validate_calls_of_html_block(container_update_event_receiver, True)

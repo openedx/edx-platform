@@ -8,7 +8,11 @@ from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import (
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryContainerLocator,
+)
 from openedx_learning.api import authoring as authoring_api
 from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
@@ -18,20 +22,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from openedx.core.djangoapps.content_libraries import api, permissions
-from openedx.core.djangoapps.content_libraries.rest_api.serializers import (
-    ContentLibraryItemCollectionsUpdateSerializer,
-    LibraryXBlockCreationSerializer,
-    LibraryXBlockMetadataSerializer,
-    LibraryXBlockOlxSerializer,
-    LibraryXBlockStaticFileSerializer,
-    LibraryXBlockStaticFilesSerializer,
-)
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.types.http import RestRequest
 
 from .libraries import LibraryApiPaginationDocs
 from .utils import convert_exceptions
+from . import serializers
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
@@ -40,7 +37,7 @@ class LibraryBlocksView(GenericAPIView):
     """
     Views to work with XBlocks in a specific content library.
     """
-    serializer_class = LibraryXBlockMetadataSerializer
+    serializer_class = serializers.LibraryXBlockMetadataSerializer
 
     @apidocs.schema(
         parameters=[
@@ -74,13 +71,13 @@ class LibraryBlocksView(GenericAPIView):
             api.LibraryXBlockMetadata.from_component(key, component)
             for component in self.paginate_queryset(components)
         ]
-        serializer = LibraryXBlockMetadataSerializer(paginated_xblock_metadata, many=True)
+        serializer = serializers.LibraryXBlockMetadataSerializer(paginated_xblock_metadata, many=True)
         return self.get_paginated_response(serializer.data)
 
     @convert_exceptions
     @swagger_auto_schema(
-        request_body=LibraryXBlockCreationSerializer,
-        responses={200: LibraryXBlockMetadataSerializer}
+        request_body=serializers.LibraryXBlockCreationSerializer,
+        responses={200: serializers.LibraryXBlockMetadataSerializer}
     )
     def post(self, request, lib_key_str):
         """
@@ -88,7 +85,7 @@ class LibraryBlocksView(GenericAPIView):
         """
         library_key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(library_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        serializer = LibraryXBlockCreationSerializer(data=request.data)
+        serializer = serializers.LibraryXBlockCreationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         # Create a new regular top-level block:
@@ -99,7 +96,7 @@ class LibraryBlocksView(GenericAPIView):
                 detail={'block_type': str(err)},
             )
 
-        return Response(LibraryXBlockMetadataSerializer(result).data)
+        return Response(serializers.LibraryXBlockMetadataSerializer(result).data)
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
@@ -123,7 +120,7 @@ class LibraryBlockView(APIView):
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         result = api.get_library_block(key, include_collections=True)
 
-        return Response(LibraryXBlockMetadataSerializer(result).data)
+        return Response(serializers.LibraryXBlockMetadataSerializer(result).data)
 
     @convert_exceptions
     def delete(self, request, usage_key_str):  # pylint: disable=unused-argument
@@ -140,8 +137,8 @@ class LibraryBlockView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.delete_library_block(key, user_id=request.user.id)
-        return Response({})
+        result = api.delete_library_block(key, user_id=request.user.id)
+        return Response(serializers.LibraryXblockDeleteSerializer(result).data)
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
@@ -158,7 +155,7 @@ class LibraryBlockAssetListView(APIView):
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         files = api.get_library_block_static_asset_files(key)
-        return Response(LibraryXBlockStaticFilesSerializer({"files": files}).data)
+        return Response(serializers.LibraryXBlockStaticFilesSerializer({"files": files}).data)
 
 
 @method_decorator(non_atomic_requests, name="dispatch")
@@ -179,7 +176,7 @@ class LibraryBlockAssetView(APIView):
         files = api.get_library_block_static_asset_files(key)
         for f in files:
             if f.path == file_path:
-                return Response(LibraryXBlockStaticFileSerializer(f).data)
+                return Response(serializers.LibraryXBlockStaticFileSerializer(f).data)
         raise NotFound
 
     @convert_exceptions
@@ -206,7 +203,7 @@ class LibraryBlockAssetView(APIView):
             result = api.add_library_block_static_asset_file(usage_key, file_path, file_content, request.user)
         except ValueError:
             raise ValidationError("Invalid file path")  # lint-amnesty, pylint: disable=raise-missing-from
-        return Response(LibraryXBlockStaticFileSerializer(result).data)
+        return Response(serializers.LibraryXBlockStaticFileSerializer(result).data)
 
     @convert_exceptions
     def delete(self, request, usage_key_str, file_path):
@@ -266,7 +263,7 @@ class LibraryBlockCollectionsView(APIView):
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
         component = api.get_component_from_usage_key(key)
-        serializer = ContentLibraryItemCollectionsUpdateSerializer(data=request.data)
+        serializer = serializers.ContentLibraryItemCollectionsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         collection_keys = serializer.validated_data['collection_keys']
@@ -320,7 +317,7 @@ class LibraryBlockOlxView(APIView):
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
         xml_str = xblock_api.get_block_draft_olx(key)
-        return Response(LibraryXBlockOlxSerializer({"olx": xml_str}).data)
+        return Response(serializers.LibraryXBlockOlxSerializer({"olx": xml_str}).data)
 
     @convert_exceptions
     def post(self, request, usage_key_str):
@@ -332,14 +329,14 @@ class LibraryBlockOlxView(APIView):
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        serializer = LibraryXBlockOlxSerializer(data=request.data)
+        serializer = serializers.LibraryXBlockOlxSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_olx_str = serializer.validated_data["olx"]
         try:
             version_num = api.set_library_block_olx(key, new_olx_str).version_num
         except ValueError as err:
             raise ValidationError(detail=str(err))  # lint-amnesty, pylint: disable=raise-missing-from
-        return Response(LibraryXBlockOlxSerializer({"olx": new_olx_str, "version_num": version_num}).data)
+        return Response(serializers.LibraryXBlockOlxSerializer({"olx": new_olx_str, "version_num": version_num}).data)
 
 
 @view_auth_classes()
@@ -348,13 +345,26 @@ class LibraryBlockRestore(APIView):
     View to restore soft-deleted library xblocks.
     """
     @convert_exceptions
+    @swagger_auto_schema(
+        request_body=serializers.LibraryXblockRestoreRequestSerializer,
+    )
     def post(self, request, usage_key_str) -> Response:
         """
         Restores a soft-deleted library block that belongs to a Content Library
         """
         key = LibraryUsageLocatorV2.from_string(usage_key_str)
         api.require_permission_for_library_key(key.lib_key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.restore_library_block(key, request.user.id)
+        serializer = serializers.LibraryXblockRestoreRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        affected_containers_keys = [
+            LibraryContainerLocator.from_string(key)
+            for key in serializer.validated_data["affected_containers"]
+        ]
+        api.restore_library_block(
+            key,
+            request.user.id,
+            affected_containers_keys,
+        )
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 

@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 from uuid import uuid4
+from typing import cast
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -20,7 +21,11 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from lxml import etree
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import (
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryContainerLocator,
+)
 from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
@@ -155,6 +160,14 @@ class LibraryXBlockStaticFile:
     url: str
     # Size in bytes
     size: int
+
+
+@dataclass(frozen=True)
+class LibraryDeletedBlockData:
+    """
+    Class that represents the data returned by the delete library block API.
+    """
+    affected_containers: list[ContainerMetadata]
 
 
 def get_library_components(
@@ -640,7 +653,7 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
 def delete_library_block(
     usage_key: LibraryUsageLocatorV2,
     user_id: int | None = None,
-) -> None:
+) -> LibraryDeletedBlockData:
     """
     Delete the specified block from this library (soft delete).
     """
@@ -649,7 +662,17 @@ def delete_library_block(
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
     affected_containers = get_containers_contains_component(usage_key)
 
-    authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
+    with transaction.atomic():
+        authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
+
+        # Remove block from affected containers
+        for container in affected_containers:
+            update_container_children(
+                container_key=container.container_key,
+                children_ids=cast(list[UsageKeyV2], [usage_key]),
+                user_id=user_id,
+                entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
+            )
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
@@ -673,20 +696,16 @@ def delete_library_block(
             )
         )
 
-    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
-    # container indexing asynchronously.
-    #
-    # To update the components count in containers
-    for container in affected_containers:
-        LIBRARY_CONTAINER_UPDATED.send_event(
-            library_container=LibraryContainerData(
-                container_key=container.container_key,
-                background=True,
-            )
-        )
+    return LibraryDeletedBlockData(
+        affected_containers=affected_containers
+    )
 
 
-def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None = None) -> None:
+def restore_library_block(
+    usage_key: LibraryUsageLocatorV2,
+    user_id: int | None = None,
+    affected_containers: list[LibraryContainerLocator] | None = None,
+) -> None:
     """
     Restore the specified library block.
     """
@@ -694,12 +713,24 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
 
-    # Set draft version back to the latest available component version id.
-    authoring_api.set_draft_version(
-        component.pk,
-        component.versioning.latest.pk,
-        set_by=user_id,
-    )
+    with transaction.atomic():
+        # Set draft version back to the latest available component version id.
+        authoring_api.set_draft_version(
+            component.pk,
+            component.versioning.latest.pk,
+            set_by=user_id,
+        )
+
+        # The list `affected_containers` is obtained from the `delete_library_block` API
+        if affected_containers:
+            # Add the block in containers where was before being deleted.
+            for container_key in affected_containers:
+                update_container_children(
+                    container_key,
+                    children_ids=cast(list[UsageKeyV2], [usage_key]),
+                    user_id=user_id,
+                    entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+                )
 
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
@@ -727,19 +758,6 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
                     library_key=library_key,
                     collection_key=collection.key,
                 ),
-                background=True,
-            )
-        )
-
-    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
-    # container indexing asynchronously.
-    #
-    # To update the components count in containers
-    affected_containers = get_containers_contains_component(usage_key)
-    for container in affected_containers:
-        LIBRARY_CONTAINER_UPDATED.send_event(
-            library_container=LibraryContainerData(
-                container_key=container.container_key,
                 background=True,
             )
         )
