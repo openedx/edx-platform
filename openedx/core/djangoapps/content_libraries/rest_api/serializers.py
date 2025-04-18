@@ -386,3 +386,21 @@ class ContentLibraryItemCollectionsUpdateSerializer(serializers.Serializer):
     """
 
     collection_keys = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+
+
+class LibraryXblockDeleteSerializer(serializers.Serializer):
+    """
+    Serializer for delete a Xblock in a content library
+    """
+    affected_containers = serializers.ListField(
+        child=LibraryContainerMetadataSerializer(),
+        allow_empty=True,
+        read_only=True,
+    )
+
+
+class LibraryXblockRestoreRequestSerializer(serializers.Serializer):
+    """
+    Serializer fo the request for the restore Xblock view
+    """
+    affected_containers = serializers.ListField(child=serializers.CharField(), allow_empty=True)

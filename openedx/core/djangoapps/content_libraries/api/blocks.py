@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 from uuid import uuid4
+from typing import cast
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -20,7 +21,11 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from lxml import etree
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import (
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryContainerLocator,
+)
 from opaque_keys.edx.keys import LearningContextKey, UsageKeyV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
@@ -155,6 +160,13 @@ class LibraryXBlockStaticFile:
     url: str
     # Size in bytes
     size: int
+
+@dataclass(frozen=True)
+class LibraryDeletedBlockData:
+    """
+    Class that represents the data returned by the delete library block API.
+    """
+    affected_containers: list[ContainerMetadata]
 
 
 def get_library_components(
@@ -640,7 +652,7 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
 def delete_library_block(
     usage_key: LibraryUsageLocatorV2,
     user_id: int | None = None,
-) -> None:
+) -> LibraryDeletedBlockData:
     """
     Delete the specified block from this library (soft delete).
     """
@@ -673,20 +685,26 @@ def delete_library_block(
             )
         )
 
-    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
-    # container indexing asynchronously.
-    #
-    # To update the components count in containers
+    # TODO In transaction
     for container in affected_containers:
-        LIBRARY_CONTAINER_UPDATED.send_event(
-            library_container=LibraryContainerData(
-                container_key=container.container_key,
-                background=True,
-            )
+        # Remove block from affected container
+        update_container_children(
+            container_key=container.container_key,
+            children_ids=cast(list[UsageKeyV2], [usage_key]),
+            user_id=user_id,
+            entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
         )
 
+    return LibraryDeletedBlockData(
+        affected_containers=affected_containers
+    )
 
-def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None = None) -> None:
+
+def restore_library_block(
+    usage_key: LibraryUsageLocatorV2,
+    user_id: int | None = None,
+    affected_containers: list[LibraryContainerLocator] | None = None,
+) -> None:
     """
     Restore the specified library block.
     """
@@ -731,18 +749,17 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
             )
         )
 
-    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
-    # container indexing asynchronously.
-    #
-    # To update the components count in containers
-    affected_containers = get_containers_contains_component(usage_key)
-    for container in affected_containers:
-        LIBRARY_CONTAINER_UPDATED.send_event(
-            library_container=LibraryContainerData(
-                container_key=container.container_key,
-                background=True,
+    # TODO In transaction
+    # This list is obtained from the `delete_library_block` API
+    if affected_containers:
+        for container_key in affected_containers:
+            # Add the block in containers where was before being deleted.
+            update_container_children(
+                container_key,
+                children_ids=cast(list[UsageKeyV2], [usage_key]),
+                user_id=user_id,
+                entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
             )
-        )
 
 
 def get_library_block_static_asset_files(usage_key: LibraryUsageLocatorV2) -> list[LibraryXBlockStaticFile]:
