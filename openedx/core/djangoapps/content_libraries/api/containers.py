@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from uuid import uuid4
+from lxml import etree
 
 from django.utils.text import slugify
 from opaque_keys.edx.keys import UsageKeyV2
@@ -20,7 +21,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Container
+from openedx_learning.api.authoring_models import Container, Unit
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
@@ -46,6 +47,7 @@ __all__ = [
     "restore_container",
     "update_container_children",
     "get_containers_contains_component",
+    "library_container_xml",
 ]
 
 
@@ -321,7 +323,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
 def get_container_children(
     container_key: LibraryContainerLocator,
     published=False,
-) -> list[authoring_api.ContainerEntityListEntry]:
+) -> list[LibraryXBlockMetadata | ContainerMetadata]:
     """
     Get the entities contained in the given container (e.g. the components/xblocks in a unit)
     """
@@ -400,3 +402,10 @@ def get_containers_contains_component(
         ContainerMetadata.from_container(usage_key.context_key, container)
         for container in containers
     ]
+
+
+def library_container_xml(container: ContainerMetadata):
+    """Converts given unit to xml without including children components"""
+    xml_object = etree.Element(container.container_type.value)
+    xml_object.set("display_name", container.display_name)
+    return xml_object

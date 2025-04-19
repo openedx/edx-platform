@@ -167,36 +167,8 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
     (eventually) asset storage.
     """
 
-    def get_block(self, usage_key, for_parent=None, *, version: int | LatestVersion = LatestVersion.AUTO):
-        """
-        Fetch an XBlock from Learning Core data models.
-
-        This method will find the OLX for the content in Learning Core, parse it
-        into an XBlock (with mixins) instance, and properly initialize our
-        internal LearningCoreFieldData instance with the field values from the
-        parsed OLX.
-        """
-        # We can do this more efficiently in a single query later, but for now
-        # just get it the easy way.
-        component = self._get_component_from_usage_key(usage_key)
-
-        version = get_auto_latest_version(version)
-        if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
-            raise ValidationError("This runtime only allows accessing the published version of components")
-        if version == LatestVersion.DRAFT:
-            component_version = component.versioning.draft
-        elif version == LatestVersion.PUBLISHED:
-            component_version = component.versioning.published
-        else:
-            assert isinstance(version, int)
-            component_version = component.versioning.version_num(version)
-        if component_version is None:
-            raise NoSuchUsage(usage_key)
-
-        content = component_version.contents.get(
-            componentversioncontent__key="block.xml"
-        )
-        xml_node = etree.fromstring(content.text)
+    def _initialize_block(self, content, usage_key, version: int | LatestVersion):
+        xml_node = etree.fromstring(content)
         block_type = usage_key.block_type
         keys = ScopeIds(self.user_id, block_type, None, usage_key)
 
@@ -230,6 +202,49 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         self.authored_data_store.mark_unchanged(block)
 
         return block
+
+    def get_block(self, usage_key, for_parent=None, *, version: int | LatestVersion = LatestVersion.AUTO):
+        """
+        Fetch an XBlock from Learning Core data models.
+
+        This method will find the OLX for the content in Learning Core, parse it
+        into an XBlock (with mixins) instance, and properly initialize our
+        internal LearningCoreFieldData instance with the field values from the
+        parsed OLX.
+        """
+        # We can do this more efficiently in a single query later, but for now
+        # just get it the easy way.
+        component = self._get_component_from_usage_key(usage_key)
+
+        version = get_auto_latest_version(version)
+        if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
+            raise ValidationError("This runtime only allows accessing the published version of components")
+        if version == LatestVersion.DRAFT:
+            component_version = component.versioning.draft
+        elif version == LatestVersion.PUBLISHED:
+            component_version = component.versioning.published
+        else:
+            assert isinstance(version, int)
+            component_version = component.versioning.version_num(version)
+        if component_version is None:
+            raise NoSuchUsage(usage_key)
+
+        content = component_version.contents.get(
+            componentversioncontent__key="block.xml"
+        )
+        return self._initialize_block(content.text, usage_key, version)
+
+    def get_container_block(self, container_key, *, version: int | LatestVersion = LatestVersion.AUTO):
+        """
+        Fetch container from learning core data models.
+
+        This method create a very basic olx for container and parse it into an XBlock instance.
+        """
+        from openedx.core.djangoapps.content_libraries.api.containers import get_container, library_container_xml
+        container = get_container(container_key)
+        content = library_container_xml(container)
+        xml = etree.tostring(content)
+        return self._initialize_block(xml.decode(), container_key, version)
 
     def get_block_assets(self, block, fetch_asset_data):
         """
