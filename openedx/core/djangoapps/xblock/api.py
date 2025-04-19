@@ -19,12 +19,13 @@ from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component, ComponentVersion
 from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchUsage, NoSuchViewError
 from xblock.plugin import PluginMissingError
 
+from openedx.core.djangoapps.content_libraries.api.exceptions import ContentLibraryContainerNotFound
 from openedx.core.types import User as UserType
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
@@ -70,7 +71,7 @@ def get_runtime(user: UserType):
 
 
 def load_block(
-    usage_key: UsageKeyV2,
+    usage_key: UsageKeyV2 | LibraryContainerLocator,
     user: UserType,
     *,
     check_permission: CheckPerm | None = CheckPerm.CAN_LEARN,
@@ -114,11 +115,14 @@ def load_block(
     runtime = get_runtime(user=user)
 
     try:
-        return runtime.get_block(usage_key, version=version)
+        if isinstance(usage_key, UsageKeyV2):
+            return runtime.get_block(usage_key, version=version)
+        else:
+            return runtime.get_container_block(usage_key, version=version)
     except NoSuchUsage as exc:
         # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The component '{usage_key}' does not exist.") from exc
-    except ComponentVersion.DoesNotExist as exc:
+    except (ComponentVersion.DoesNotExist, ContentLibraryContainerNotFound) as exc:
         # Convert ComponentVersion.DoesNotExist to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The requested version of component '{usage_key}' does not exist.") from exc
 

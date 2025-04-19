@@ -11,6 +11,7 @@ exposed through this module's public Python interface.
 """
 from __future__ import annotations
 
+from functools import lru_cache
 import logging
 import typing as t
 from dataclasses import dataclass, asdict
@@ -19,12 +20,13 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import NotFound
-from opaque_keys import InvalidKeyError
+from opaque_keys import InvalidKeyError, OpaqueKey
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from xblock.exceptions import XBlockNotFoundError
 from xblock.fields import Scope, String, Integer
 from xblock.core import XBlockMixin, XBlock
+
 
 if t.TYPE_CHECKING:
     from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
@@ -146,37 +148,23 @@ class UpstreamLink:
         If link exists, is supported, and is followable, returns UpstreamLink.
         Otherwise, raises an UpstreamLinkException.
         """
-        if not downstream.upstream:
-            raise NoUpstream()
-        if not isinstance(downstream.usage_key.context_key, CourseKey):
-            raise BadDownstream(_("Cannot update content because it does not belong to a course."))
-        if downstream.has_children:
-            raise BadDownstream(_("Updating content with children is not yet supported."))
-        try:
-            upstream_key = LibraryUsageLocatorV2.from_string(downstream.upstream)
-        except InvalidKeyError as exc:
-            raise BadUpstream(_("Reference to linked library item is malformed")) from exc
-        downstream_type = downstream.usage_key.block_type
-        if upstream_key.block_type != downstream_type:
-            # Note: Currently, we strictly enforce that the downstream and upstream block_types must exactly match.
-            #       It could be reasonable to relax this requirement in the future if there's product need for it.
-            #       For example, there's no reason that a StaticTabBlock couldn't take updates from an HtmlBlock.
-            raise BadUpstream(
-                _("Content type mismatch: {downstream_type} cannot be linked to {upstream_type}.").format(
-                    downstream_type=downstream_type, upstream_type=upstream_key.block_type
-                )
-            ) from TypeError(
-                f"downstream block '{downstream.usage_key}' is linked to "
-                f"upstream block of different type '{upstream_key}'"
-            )
+        upstream_key = get_upstream_key(downstream)
         # We import this here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
         from openedx.core.djangoapps.content_libraries.api import (
-            get_library_block  # pylint: disable=wrong-import-order
+            ContentLibraryContainerNotFound,  # pylint: disable=wrong-import-order
+            get_container,  # pylint: disable=wrong-import-order
+            get_library_block,  # pylint: disable=wrong-import-order
         )
-        try:
-            lib_meta = get_library_block(upstream_key)
-        except XBlockNotFoundError as exc:
-            raise BadUpstream(_("Linked library item was not found in the system")) from exc
+        if isinstance(upstream_key, LibraryUsageLocatorV2):
+            try:
+                lib_meta = get_library_block(upstream_key)
+            except XBlockNotFoundError as exc:
+                raise BadUpstream(_("Linked library item was not found in the system")) from exc
+        else:
+            try:
+                lib_meta = get_container(upstream_key)
+            except ContentLibraryContainerNotFound as exc:
+                raise BadUpstream(_("Linked library item was not found in the system")) from exc
         return cls(
             upstream_ref=downstream.upstream,
             version_synced=downstream.upstream_version,
@@ -215,6 +203,55 @@ def fetch_customizable_fields(*, downstream: XBlock, user: User, upstream: XBloc
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
 
 
+@lru_cache
+def get_upstream_key(downstream: XBlock) -> LibraryUsageLocatorV2 | LibraryContainerLocator:
+    """
+    Convert upstream key to proper type for given downstream block.
+
+    Args:
+        downstream: XBlock
+
+    Returns:
+        Parsed upstream key
+
+    Raises:
+        NoUpstream:
+        BadDownstream:
+        BadUpstream:
+    """
+    if not downstream.upstream:
+        raise NoUpstream()
+    if not isinstance(downstream.usage_key.context_key, CourseKey):
+        raise BadDownstream(_("Cannot update content because it does not belong to a course."))
+    if downstream.has_children:
+        try:
+            upstream_key = LibraryContainerLocator.from_string(downstream.upstream)
+            upstream_type = upstream_key.container_type
+        except InvalidKeyError as exc:
+            raise BadUpstream(_("Reference to linked library item is malformed")) from exc
+    else:
+        try:
+            upstream_key = LibraryUsageLocatorV2.from_string(downstream.upstream)
+            upstream_type = upstream_key.block_type
+        except InvalidKeyError as exc:
+            raise BadUpstream(_("Reference to linked library item is malformed")) from exc
+    downstream_type = downstream.usage_key.block_type
+    upstream_type = "vertical" if upstream_type == "unit" else upstream_type
+    if upstream_type != downstream_type:
+        # Note: Currently, we strictly enforce that the downstream and upstream block_types must exactly match.
+        #       It could be reasonable to relax this requirement in the future if there's product need for it.
+        #       For example, there's no reason that a StaticTabBlock couldn't take updates from an HtmlBlock.
+        raise BadUpstream(
+            _("Content type mismatch: {downstream_type} cannot be linked to {upstream_type}.").format(
+                downstream_type=downstream_type, upstream_type=upstream_type
+            )
+        ) from TypeError(
+            f"downstream block '{downstream.usage_key}' is linked to "
+            f"upstream block of different type '{upstream_key}'"
+        )
+    return upstream_key
+
+
 def _load_upstream_link_and_block(downstream: XBlock, user: User) -> tuple[UpstreamLink, XBlock]:
     """
     Load the upstream metadata and content for a downstream block.
@@ -225,11 +262,12 @@ def _load_upstream_link_and_block(downstream: XBlock, user: User) -> tuple[Upstr
     If `downstream` lacks a valid+supported upstream link, this raises an UpstreamLinkException.
     """
     link = UpstreamLink.get_for_block(downstream)  # can raise UpstreamLinkException
+    upstream_key = get_upstream_key(downstream)
     # We import load_block here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
     from openedx.core.djangoapps.xblock.api import load_block, CheckPerm, LatestVersion  # pylint: disable=wrong-import-order
     try:
         lib_block: XBlock = load_block(
-            LibraryUsageLocatorV2.from_string(downstream.upstream),
+            upstream_key,
             user,
             check_permission=CheckPerm.CAN_READ_AS_AUTHOR,
             version=LatestVersion.PUBLISHED,

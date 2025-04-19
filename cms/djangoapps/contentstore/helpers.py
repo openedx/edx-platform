@@ -790,3 +790,26 @@ def _get_usage_key_from_node(node, parent_id: str) -> UsageKey | None:
         )
 
     return usage_key
+
+
+def concat_static_file_notices(notices: list[StaticFileNotices]) -> StaticFileNotices:
+    """Combines multiple static file notices into a single object
+
+    Args:
+        notices: list of StaticFileNotices
+
+    Returns:
+        Single StaticFileNotices
+    """
+    new_files = []
+    conflicting_files = []
+    error_files = []
+    for notice in notices:
+        new_files.append(notice.new_files)
+        conflicting_files.append(notice.conflicting_files)
+        error_files.append(notice.error_files)
+    return StaticFileNotices(
+        new_files=new_files,
+        conflicting_files=conflicting_files,
+        error_files=error_files,
+    )
