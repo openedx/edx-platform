@@ -805,9 +805,9 @@ def concat_static_file_notices(notices: list[StaticFileNotices]) -> StaticFileNo
     conflicting_files = []
     error_files = []
     for notice in notices:
-        new_files.append(notice.new_files)
-        conflicting_files.append(notice.conflicting_files)
-        error_files.append(notice.error_files)
+        new_files.extend(notice.new_files)
+        conflicting_files.extend(notice.conflicting_files)
+        error_files.extend(notice.error_files)
     return StaticFileNotices(
         new_files=new_files,
         conflicting_files=conflicting_files,
