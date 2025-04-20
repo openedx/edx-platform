@@ -12,6 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.transaction import atomic
 from django.urls import reverse
 
+from opaque_keys.edx.keys import UsageKeyV2
 from openedx_learning.api import authoring as authoring_api
 
 from lxml import etree
@@ -167,9 +168,8 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
     (eventually) asset storage.
     """
 
-    def _initialize_block(self, content, usage_key, version: int | LatestVersion):
+    def _initialize_block(self, content, usage_key, block_type, version: int | LatestVersion):
         xml_node = etree.fromstring(content)
-        block_type = usage_key.block_type
         keys = ScopeIds(self.user_id, block_type, None, usage_key)
 
         if xml_node.get("url_name", None):
@@ -232,7 +232,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         content = component_version.contents.get(
             componentversioncontent__key="block.xml"
         )
-        return self._initialize_block(content.text, usage_key, version)
+        return self._initialize_block(content.text, usage_key, usage_key.block_type, version)
 
     def get_container_block(self, container_key, *, version: int | LatestVersion = LatestVersion.AUTO):
         """
@@ -244,7 +244,8 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         container = get_container(container_key)
         content = library_container_xml(container)
         xml = etree.tostring(content)
-        return self._initialize_block(xml.decode(), container_key, version)
+        block_type = "vertical" if container_key.container_type == "unit" else container_key.container_type
+        return self._initialize_block(xml.decode(), container_key, block_type, version)
 
     def get_block_assets(self, block, fetch_asset_data):
         """
@@ -261,6 +262,9 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         lookups one by one is going to get slow. At some point we're going to
         want something to look up a bunch of blocks at once.
         """
+        if not isinstance(block.usage_key, UsageKeyV2):
+            # TODO: handle assets for containers if required.
+            return []
         component_version = self._get_component_version_from_block(block)
 
         # cvc = the ComponentVersionContent through-table

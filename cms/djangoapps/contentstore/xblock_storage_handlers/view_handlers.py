@@ -533,14 +533,14 @@ def sync_library_content(created_block, request):
         notices = [static_file_notices]
         for child in get_container_children(upstream_key, published=True):
             child_block = create_xblock(
-                parent_locator=created_block.location,
+                parent_locator=str(created_block.location),
                 user=request.user,
                 category=child.usage_key.block_type,
                 display_name=child.display_name,
             )
-            child_block.upstream = child.usage_key
+            child_block.upstream = str(child.usage_key)
             sync_library_content(child_block, request)
-            notices.append(sync_library_content(child, request))
+            notices.append(sync_library_content(child_block, request))
         static_file_notices = concat_static_file_notices(notices)
     return static_file_notices
 
