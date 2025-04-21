@@ -458,7 +458,6 @@ def cancel_incomplete_old_imports(import_event: Import) -> None:
     """
     incomplete_user_imports_with_same_target = Import.objects.filter(
         user=import_event.user,
-        target_change=import_event.target_change,
         source_key=import_event.source_key,
         staged_content_for_import__isnull=False
     ).exclude(uuid=import_event.uuid)
