@@ -4,9 +4,10 @@ import _ from 'underscore';
 import {VideoStorage} from './video_storage';
 import {VideoPoster} from './poster';
 import {VideoTranscriptDownloadHandler} from './video_accessible_menu';
+import {Initialize} from './initialize';
 
 // TODO: Uncomment the imports
-// import { initialize } from './initialize'; // Assuming this function is imported
+//  import { initialize } from './initialize'; // Assuming this function is imported
 // import {
 //     FocusGrabber,
 //     VideoControl,
@@ -116,7 +117,7 @@ console.log('In video_block_main.js file');
             return () => {
                 _.extend(innerState.metadata, {autoplay: true, focusFirstControl: true});
                 // TODO: Uncomment following initialize method calling
-                // initialize(innerState, element);
+                Initialize(innerState, element);
             };
         };
 
@@ -150,7 +151,7 @@ console.log('In video_block_main.js file');
             });
         } else {
             // TODO: Uncomment following initialize method calling
-            // initialize(state, element);
+            Initialize(state, element);
         }
 
         if (!youtubeXhr) {

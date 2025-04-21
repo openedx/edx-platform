@@ -1,54 +1,54 @@
-export class Iterator {
-    /**
-     * @param {Array} list - Array to be iterated.
-     */
-    constructor(list) {
-        this.list = Array.isArray(list) ? list : [];
-        this.index = 0;
-        this.size = this.list.length;
-        this.lastIndex = this.size - 1;
-    }
+'use strict';
 
+/**
+ * Provides a convenient way to work with iterable data.
+ * @constructor
+ * @param {Array} list Array to be iterated.
+ */
+function Iterator(list) {
+    this.list = list;
+    this.index = 0;
+    this.size = this.list.length;
+    this.lastIndex = this.list.length - 1;
+}
+
+Iterator.prototype = {
     /**
-     * Checks if the provided index is valid.
+     * Checks validity of the provided index for the iterator.
      * @param {number} index
      * @return {boolean}
-     * @protected
      */
     _isValid(index) {
-        return typeof index === 'number' &&
-            Number.isInteger(index) &&
-            index >= 0 &&
-            index < this.size;
-    }
+        return _.isNumber(index) && index < this.size && index >= 0;
+    },
 
     /**
-     * Returns the next element and updates the current position.
-     * @param {number} [index]
+     * Returns the next element.
+     * @param {number} [index] Updates current position.
      * @return {any}
      */
-    next(index = this.index) {
+    next(index) {
         if (!this._isValid(index)) {
             index = this.index;
         }
 
         this.index = (index >= this.lastIndex) ? 0 : index + 1;
         return this.list[this.index];
-    }
+    },
 
     /**
-     * Returns the previous element and updates the current position.
-     * @param {number} [index]
+     * Returns the previous element.
+     * @param {number} [index] Updates current position.
      * @return {any}
      */
-    prev(index = this.index) {
+    prev(index) {
         if (!this._isValid(index)) {
             index = this.index;
         }
 
         this.index = (index < 1) ? this.lastIndex : index - 1;
         return this.list[this.index];
-    }
+    },
 
     /**
      * Returns the last element in the list.
@@ -56,7 +56,7 @@ export class Iterator {
      */
     last() {
         return this.list[this.lastIndex];
-    }
+    },
 
     /**
      * Returns the first element in the list.
@@ -64,13 +64,15 @@ export class Iterator {
      */
     first() {
         return this.list[0];
-    }
+    },
 
     /**
-     * Checks if the iterator is at the end.
+     * Returns `true` if the current position is the last for the iterator.
      * @return {boolean}
      */
     isEnd() {
         return this.index === this.lastIndex;
     }
-}
+};
+
+export { Iterator };

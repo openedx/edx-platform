@@ -1,68 +1,69 @@
-function isObject(val) {
-    return typeof val === 'object' && val !== null;
-}
+'use strict';
 
-function isFunction(val) {
-    return typeof val === 'function';
+/**
+ * Creates a new object with the specified prototype object and properties.
+ * @param {Object} o The object which should be the prototype of the newly-created object.
+ * @private
+ * @throws {TypeError, Error}
+ * @return {Object}
+ */
+const inherit = Object.create || (function () {
+    const F = function () { };
+
+    return function (o) {
+        if (arguments.length > 1) {
+            throw Error('Second argument not supported');
+        }
+        if (_.isNull(o) || _.isUndefined(o)) {
+            throw Error('Cannot set a null [[Prototype]]');
+        }
+        if (!_.isObject(o)) {
+            throw TypeError('Argument must be an object');
+        }
+
+        F.prototype = o;
+        return new F();
+    };
+}());
+
+/**
+ * Component constructor function.
+ * Calls `initialize()` if defined.
+ * @returns {any}
+ */
+function Component() {
+    if ($.isFunction(this.initialize)) {
+        return this.initialize.apply(this, arguments);
+    }
 }
 
 /**
- * Polyfill-style safe object inheritance.
- * Equivalent to `Object.create()` but more robust for legacy use cases.
- * @param {Object} o
- * @returns {Object}
+ * Adds an `extend` method to the Component constructor.
+ * Creates a subclass that inherits from Component.
+ * @param {Object} protoProps - Prototype methods and properties.
+ * @param {Object} staticProps - Static methods and properties.
+ * @returns {Function} Child constructor.
  */
-function inherit(o) {
-    if (arguments.length > 1) {
-        throw new Error('Second argument not supported');
-    }
-    if (o === null || o === undefined) {
-        throw new Error('Cannot set a null [[Prototype]]');
-    }
-    if (!isObject(o)) {
-        throw new TypeError('Argument must be an object');
-    }
+Component.extend = function (protoProps, staticProps) {
+    const Parent = this;
 
-    return Object.create(o);
-}
-
-/**
- * Base Component class with extend() support
- */
-export class Component {
-    constructor(...args) {
-        if (isFunction(this.initialize)) {
-            return this.initialize(...args);
+    const Child = function () {
+        if ($.isFunction(this.initialize)) {
+            return this.initialize.apply(this, arguments);
         }
+    };
+
+    Child.prototype = inherit(Parent.prototype);
+    Child.constructor = Parent;
+    Child.__super__ = Parent.prototype;
+
+    if (protoProps) {
+        $.extend(Child.prototype, protoProps);
     }
 
-    /**
-     * Creates a subclass of the current Component.
-     * @param {Object} protoProps - Prototype methods
-     * @param {Object} staticProps - Static methods
-     * @returns {Function} Subclass
-     */
-    static extend(protoProps = {}, staticProps = {}) {
-        const Parent = this;
+    $.extend(Child, Parent, staticProps);
 
-        class Child extends Parent {
-            constructor(...args) {
-                super(...args);
-                if (isFunction(this.initialize)) {
-                    return this.initialize(...args);
-                }
-            }
-        }
+    return Child;
+};
 
-        // Extend prototype with instance methods
-        Object.assign(Child.prototype, protoProps);
-
-        // Extend constructor with static methods
-        Object.assign(Child, Parent, staticProps);
-
-        // Reference to parent’s prototype (optional, for legacy support)
-        Child.__super__ = Parent.prototype;
-
-        return Child;
-    }
-}
+export { Component };
