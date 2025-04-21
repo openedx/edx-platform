@@ -22,7 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import NotFound
 from opaque_keys import InvalidKeyError, OpaqueKey
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryContainerUsageLocator, LibraryUsageLocatorV2
 from xblock.exceptions import XBlockNotFoundError
 from xblock.fields import Scope, String, Integer
 from xblock.core import XBlockMixin, XBlock
@@ -152,19 +152,12 @@ class UpstreamLink:
         # We import this here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
         from openedx.core.djangoapps.content_libraries.api import (
             ContentLibraryContainerNotFound,  # pylint: disable=wrong-import-order
-            get_container,  # pylint: disable=wrong-import-order
-            get_library_block,  # pylint: disable=wrong-import-order
+            get_library_content_metadata,  # pylint: disable=wrong-import-order
         )
-        if isinstance(upstream_key, LibraryUsageLocatorV2):
-            try:
-                lib_meta = get_library_block(upstream_key)
-            except XBlockNotFoundError as exc:
-                raise BadUpstream(_("Linked library item was not found in the system")) from exc
-        else:
-            try:
-                lib_meta = get_container(upstream_key)
-            except ContentLibraryContainerNotFound as exc:
-                raise BadUpstream(_("Linked library item was not found in the system")) from exc
+        try:
+            lib_meta = get_library_content_metadata(upstream_key)
+        except (XBlockNotFoundError, ContentLibraryContainerNotFound) as exc:
+            raise BadUpstream(_("Linked library item was not found in the system")) from exc
         return cls(
             upstream_ref=downstream.upstream,
             version_synced=downstream.upstream_version,
@@ -204,7 +197,7 @@ def fetch_customizable_fields(*, downstream: XBlock, user: User, upstream: XBloc
 
 
 @lru_cache
-def get_upstream_key(downstream: XBlock) -> LibraryUsageLocatorV2 | LibraryContainerLocator:
+def get_upstream_key(downstream: XBlock) -> LibraryUsageLocatorV2 | LibraryContainerUsageLocator:
     """
     Convert upstream key to proper type for given downstream block.
 
@@ -225,18 +218,16 @@ def get_upstream_key(downstream: XBlock) -> LibraryUsageLocatorV2 | LibraryConta
         raise BadDownstream(_("Cannot update content because it does not belong to a course."))
     if downstream.has_children:
         try:
-            upstream_key = LibraryContainerLocator.from_string(downstream.upstream)
-            upstream_type = upstream_key.container_type
+            upstream_key = LibraryContainerLocator.from_string(downstream.upstream).lib_usage_key
         except InvalidKeyError as exc:
             raise BadUpstream(_("Reference to linked library item is malformed")) from exc
     else:
         try:
             upstream_key = LibraryUsageLocatorV2.from_string(downstream.upstream)
-            upstream_type = upstream_key.block_type
         except InvalidKeyError as exc:
             raise BadUpstream(_("Reference to linked library item is malformed")) from exc
     downstream_type = downstream.usage_key.block_type
-    upstream_type = "vertical" if upstream_type == "unit" else upstream_type
+    upstream_type = "vertical" if upstream_key.block_type == "unit" else upstream_key.block_type
     if upstream_type != downstream_type:
         # Note: Currently, we strictly enforce that the downstream and upstream block_types must exactly match.
         #       It could be reasonable to relax this requirement in the future if there's product need for it.

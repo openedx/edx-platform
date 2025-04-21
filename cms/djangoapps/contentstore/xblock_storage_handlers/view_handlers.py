@@ -28,7 +28,7 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryContainerUsageLocator, LibraryUsageLocator
 from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
@@ -526,14 +526,16 @@ def create_item(request):
 
 def sync_library_content(created_block, request):
     upstream_key = get_upstream_key(created_block)
+    created_block.upstream = str(upstream_key)
     lib_block = sync_from_upstream(downstream=created_block, user=request.user)
     static_file_notices = import_static_assets_for_library_sync(created_block, lib_block, request)
     store = modulestore()
     store.update_item(created_block, request.user.id)
-    if isinstance(upstream_key, LibraryContainerLocator):
+    if isinstance(upstream_key, LibraryContainerUsageLocator):
+        container_key = LibraryContainerLocator.from_usage_key(upstream_key)
         with store.bulk_operations(created_block.location.course_key):
             notices = [static_file_notices]
-            for child in get_container_children(upstream_key, published=True):
+            for child in get_container_children(container_key, published=True):
                 child_block = create_xblock(
                     parent_locator=str(created_block.location),
                     user=request.user,
