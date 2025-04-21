@@ -5,6 +5,7 @@ Serializers for the Course to Library Import API.
 from rest_framework import serializers
 
 from cms.djangoapps.import_from_modulestore.validators import validate_composition_level
+from cms.djangoapps.import_from_modulestore.models import Import
 
 
 class ImportBlocksSerializer(serializers.Serializer):
@@ -16,6 +17,7 @@ class ImportBlocksSerializer(serializers.Serializer):
         child=serializers.CharField(),
         required=True,
     )
+    target_library = serializers.CharField(required=True)
     import_uuid = serializers.CharField(required=True)
     composition_level = serializers.CharField(
         required=True,
@@ -24,12 +26,26 @@ class ImportBlocksSerializer(serializers.Serializer):
     override = serializers.BooleanField(default=False, required=False)
 
 
-class CourseToLibraryImportSerializer(serializers.Serializer):
+class ImportSerializer(serializers.ModelSerializer):
     """
     Serializer for the course to library import creation API.
     """
 
     course_ids = serializers.ListField()
-    status = serializers.CharField(allow_blank=True, required=False)
-    library_key = serializers.CharField(allow_blank=True, required=False)
-    uuid = serializers.CharField(allow_blank=True, required=False)
+    course_id = serializers.CharField(source='source_key', required=False)
+
+    class Meta:
+        model = Import
+        fields = [
+            'uuid',
+            'course_id',
+            'course_ids',
+            'status',
+        ]
+
+    def to_representation(self, instance):
+        return {
+            'uuid': str(instance.uuid),
+            'course_id': str(instance.source_key),
+            'status': instance.get_status_display(),
+        }

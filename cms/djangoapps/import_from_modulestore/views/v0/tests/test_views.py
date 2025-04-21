@@ -46,11 +46,7 @@ class TestCourseToLibraryImportViewsMixin(SharedModuleStoreTestCase):
         self.problem = BlockFactory.create(category='problem', parent=self.vertical)
 
         with self.captureOnCommitCallbacks(execute=True):
-            self.import_event = api.create_import(
-                user_id=self.admin_user.pk,
-                learning_package_id=self.library.learning_package_id,
-                source_key=self.course.id,
-            )
+            self.import_event = api.create_import(user_id=self.admin_user.pk, source_key=self.course.id)
 
 
 class ImportBlocksViewTest(TestCourseToLibraryImportViewsMixin):
@@ -65,6 +61,7 @@ class ImportBlocksViewTest(TestCourseToLibraryImportViewsMixin):
         self.valid_data = {
             'usage_ids': [str(self.chapter.location)],
             'import_uuid': self.import_event.uuid,
+            'target_library': self.library_id,
             'composition_level': 'xblock',
             'override': False,
         }
@@ -111,6 +108,7 @@ class ImportBlocksViewTest(TestCourseToLibraryImportViewsMixin):
         mock_import.assert_called_once_with(
             usage_ids=self.valid_data['usage_ids'],
             import_uuid=str(self.valid_data['import_uuid']),
+            target_learning_package_id=self.library.learning_package_id,
             user_id=self.admin_user.pk,
             composition_level=self.valid_data['composition_level'],
             override=self.valid_data['override'],
@@ -125,7 +123,7 @@ class TestCreateCourseToLibraryImportView(TestCourseToLibraryImportViewsMixin):
     def setUp(self):
         super().setUp()
 
-        self.url = reverse('import_from_modulestore:v0:create_import', args=[self.library_id])
+        self.url = reverse('import_from_modulestore:v0:create_import')
         self.valid_data = {
             'course_ids': ['course-v1:org+course+run', 'course-v1:org2+course2+run2'],
         }
@@ -160,34 +158,18 @@ class TestCreateCourseToLibraryImportView(TestCourseToLibraryImportViewsMixin):
         Test successful import returns a success response.
         """
         self.client.force_authenticate(user=self.admin_user)
-        expected_response = {
-            'result': []
-        }
+        expected_response = []
 
         response = self.client.post(self.url, self.valid_data, format='json')
 
         for course_id in self.valid_data['course_ids']:
-            expected_response['result'].append({
+            expected_response.append({
                 'uuid': str(Import.objects.get(source_key=CourseKey.from_string(course_id)).uuid),
                 'course_id': course_id,
-                'status': 'Pending',
-                'library_key': str(self.library_id),
+                'status': ImportStatus.NOT_STARTED.label,
             })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data, expected_response)
-
-    def test_non_existent_library(self):
-        """
-        Test that a non-existent library returns a 404 response.
-        """
-        self.client.force_authenticate(user=self.admin_user)
-
-        response = self.client.post(
-            reverse('import_from_modulestore:v0:create_import', args=['lib:org:lib2']),
-            self.valid_data,
-            format='json'
-        )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class GetCourseStructureToLibraryImportView(TestCourseToLibraryImportViewsMixin):
@@ -231,7 +213,7 @@ class GetCourseStructureToLibraryImportView(TestCourseToLibraryImportViewsMixin)
 
         response = self.client.get(reverse(
             'import_from_modulestore:v0:get_import',
-            kwargs={'course_to_lib_uuid': '593e93d7-ed64-4147-bb5c-4cfcb1cf80b1'})
+            kwargs={'import_uuid': '593e93d7-ed64-4147-bb5c-4cfcb1cf80b1'})
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 

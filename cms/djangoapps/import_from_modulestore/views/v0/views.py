@@ -19,15 +19,49 @@ from rest_framework.views import APIView
 from cms.djangoapps.import_from_modulestore import api
 from cms.djangoapps.import_from_modulestore.models import Import
 from cms.djangoapps.import_from_modulestore.permissions import IsImportAuthor
-from cms.djangoapps.import_from_modulestore.views.v0.serializers import CourseToLibraryImportSerializer
+from cms.djangoapps.import_from_modulestore.views.v0.serializers import ImportBlocksSerializer, ImportSerializer
 from openedx.core.djangoapps.content_libraries.api import ContentLibrary
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
-from .serializers import ImportBlocksSerializer
 
 
 class ImportBlocksView(APIView):
     """
     Import blocks from a course to a library.
+
+    **Example Request**
+        POST /api/import_from_modulestore/v0/import_blocks/
+
+    **Example request data**
+        ```
+        {
+            "usage_ids": ["block-v1:org+course+run+type@problem+block@12345"],
+            "target_library": "lib:org:test",
+            "import_uuid": "78df3b2c-4e5a-4d6b-8c7e-1f2a3b4c5d6e",
+            "composition_level": "xblock",
+            "override": false
+        }
+        ```
+
+    **POST Parameters**
+        - usage_ids (list): A list of usage IDs of the blocks to be imported.
+        - target_library (str): The library to which the blocks will be imported.
+        - import_uuid (str): The UUID of the import task.
+        - composition_level (str): The composition level of the blocks to be imported.
+        - override (bool): Whether to override existing blocks in the library.
+
+    **Responses**
+        - 200: Import blocks from a course to a library task successfully started.
+        - 400: Invalid request data.
+        - 401: Unauthorized.
+        - 403: Forbidden, request user is not the author of the received import.
+        - 404: Import not found.
+
+    **Example Response**:
+        ```
+        {
+            "status": "success"
+        }
+        ```
     """
 
     serializer_class = ImportBlocksSerializer
@@ -42,54 +76,70 @@ class ImportBlocksView(APIView):
     def post(self, request, *args, **kwargs):
         """
         Import blocks from a course to a library.
-        API endpoint: POST /api/import_from_modulestore/v0/import_blocks/
-        Request:
-        {
-            "usage_ids": ["block-v1:org+course+run+type@problem+block@12345"],
-            "import_uuid": "78df3b2c-4e5a-4d6b-8c7e-1f2a3b4c5d6e",
-            "composition_level": "xblock",
-            "override": false
-        }
-        Response:
-        {
-            "status": "success"
-        }
         """
-        data = self.serializer_class(data=request.data)
-        data.is_valid(raise_exception=True)
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        library_key = LibraryLocatorV2.from_string(serializer.validated_data['target_library'])
+        try:
+            content_library = ContentLibrary.objects.get_by_key(library_key)
+        except ContentLibrary.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         api.import_course_staged_content_to_library(
-            usage_ids=data.validated_data['usage_ids'],
-            import_uuid=data.validated_data['import_uuid'],
+            usage_ids=serializer.validated_data['usage_ids'],
+            import_uuid=serializer.validated_data['import_uuid'],
+            target_learning_package_id=content_library.learning_package_id,
             user_id=request.user.pk,
-            composition_level=data.validated_data['composition_level'],
-            override=data.validated_data['override'],
+            composition_level=serializer.validated_data['composition_level'],
+            override=serializer.validated_data['override'],
         )
         return Response({'status': 'success'})
 
 
 class CreateCourseToLibraryImportView(CreateAPIView):
     """
-    **Use Case**
-        Allows to create course to library import.
+    Create course to library import.
+
     **Example Request**
-        POST /api/import_from_modulestore/v0/create_import/<content_library_id>/
-        **POST Parameters**
-            * course_ids (list) - A list of course IDs whose content will be saved
-            in Staged Content for further import.
-    **POST Response Values**
-        If the request is successful, an HTTP 201 "Created" response
-        is returned with the newly created Import details.
-        The HTTP 201 response has the following values.
+        POST /api/import_from_modulestore/v0/create_import/
+
+    **Example request data**
+        ```
         {
-          "course_ids": ["course-v1:edX+DemoX+Demo_Course", "course-v1:edX+DemoX+Demo_Course2"],
-          "status": "pending",
-          "library_key": "lib:edX:1",
-          "uuid": "89b71d29-2135-4cf2-991d-e4e13b5a959a"
+            "course_ids": ["course-v1:edX+DemoX+Demo_Course", "course-v1:edX+M12+2025"],
         }
+        ```
+
+    **POST Parameters**
+        - course_ids (list): A list of course IDs for which imports will be created
+            and content will be saved to the Staged Content.
+
+    **Responses**
+        - 200: Imports created successfully and saving content to Staged Content started.
+        - 400: Invalid request data.
+        - 401: Unauthorized.
+        - 403: Forbidden.
+        - 404: ContentLibrary not found.
+
+    **Example Response**:
+        ```
+        [
+            {
+              "course_id": "course-v1:edX+DemoX+Demo_Course",
+              "status": "staging",
+              "uuid": "89b71d29-2135-4cf2-991d-e4e13b5a959a"
+            },
+            {
+              "course_id": "course-v1:edX+M12+2025",
+              "status": "not_started",
+              "uuid": "0782921a-4b56-4972-aa3a-edd1c99de85f"
+            },
+        ]
+        ```
     """
 
-    serializer_class = CourseToLibraryImportSerializer
+    serializer_class = ImportSerializer
 
     permission_classes = (IsAdminUser,)
     authentication_classes = (
@@ -98,45 +148,36 @@ class CreateCourseToLibraryImportView(CreateAPIView):
         SessionAuthenticationAllowInactiveUser,
     )
 
-    def get_serializer_context(self) -> dict:
-        """
-        Add library_id to the serializer context.
-        """
-        context = super().get_serializer_context()
-        context['content_library_id'] = self.kwargs['content_library_id']
-        return context
-
     def post(self, request, *args, **kwargs):
         """
         Create course to library import.
         """
-        library_key = LibraryLocatorV2.from_string(self.kwargs['content_library_id'])
-
-        try:
-            content_library = ContentLibrary.objects.get_by_key(library_key)
-        except ContentLibrary.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        result = []
-        for course_id in serializer.validated_data['course_ids']:
-            import_event = api.create_import(course_id, request.user.pk, content_library.learning_package.id)
-            result.append({
-                'uuid': str(import_event.uuid),
-                'course_id': str(import_event.source_key),
-                'status': import_event.get_status_display(),
-                'library_key': str(import_event.target.contentlibrary.library_key)
-            })
-        return Response({'result': result}, status=status.HTTP_201_CREATED)
+        result = (
+            api.create_import(course_id, request.user.pk)
+            for course_id in serializer.validated_data['course_ids']
+        )
+
+        serializer = self.get_serializer(result, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class GetCourseStructureToLibraryImportView(RetrieveAPIView):
     """
-    **Use Case**
-        Get the course structure saved when creating the import.
+    Get the course structure saved when creating the import.
+
     **Example Request**
-        GET /api/import_from_modulestore/v0/get_import/{course-to-library-uuid}/
+        GET /api/import_from_modulestore/v0/get_import/{import_uuid}/
+
+    **Responses**
+        - 200: Course structure retrieved successfully.
+        - 400: Invalid request data.
+        - 401: Unauthorized.
+        - 403: Forbidden.
+        - 404: Import not found.
+
     **GET Response Values**
         The query returns a list of hierarchical structures of
         courses that are related to the import in the format:
@@ -202,7 +243,7 @@ class GetCourseStructureToLibraryImportView(RetrieveAPIView):
 
     queryset = Import.objects.all()
     lookup_field = 'uuid'
-    lookup_url_kwarg = 'course_to_lib_uuid'
+    lookup_url_kwarg = 'import_uuid'
 
     permission_classes = (IsAdminUser,)
     authentication_classes = (
@@ -215,7 +256,7 @@ class GetCourseStructureToLibraryImportView(RetrieveAPIView):
         """
         Get the course structure saved when creating the import.
         """
-        import_event = get_object_or_404(Import, uuid=self.kwargs['course_to_lib_uuid'])
+        import_event = get_object_or_404(Import, uuid=self.kwargs['import_uuid'])
         staged_content = [
             staged_content_for_import.staged_content
             for staged_content_for_import in import_event.staged_content_for_import.all()
