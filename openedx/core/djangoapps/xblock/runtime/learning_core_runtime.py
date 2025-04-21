@@ -242,9 +242,9 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         """
         from openedx.core.djangoapps.content_libraries.api.containers import get_container, library_container_xml
         container = get_container(container_key)
-        content = library_container_xml(container)
-        xml = etree.tostring(content)
         block_type = "vertical" if container_key.container_type == "unit" else container_key.container_type
+        content = library_container_xml(container, block_type)
+        xml = etree.tostring(content)
         return self._initialize_block(xml.decode(), container_key, block_type, version)
 
     def get_block_assets(self, block, fetch_asset_data):

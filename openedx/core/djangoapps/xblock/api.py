@@ -97,14 +97,13 @@ def load_block(
     # Now, check if the block exists in this context and if the user has
     # permission to render this XBlock view:
     if check_permission and user is not None:
+        has_perm = False
         if check_permission == CheckPerm.CAN_EDIT:
             has_perm = context_impl.can_edit_block(user, usage_key)
         elif check_permission == CheckPerm.CAN_READ_AS_AUTHOR:
             has_perm = context_impl.can_view_block_for_editing(user, usage_key)
         elif check_permission == CheckPerm.CAN_LEARN:
             has_perm = context_impl.can_view_block(user, usage_key)
-        else:
-            has_perm = False
         if not has_perm:
             raise PermissionDenied(f"You don't have permission to access the component '{usage_key}'.")
 
@@ -117,8 +116,10 @@ def load_block(
     try:
         if isinstance(usage_key, UsageKeyV2):
             return runtime.get_block(usage_key, version=version)
-        else:
+        elif isinstance(usage_key, LibraryContainerLocator):
             return runtime.get_container_block(usage_key, version=version)
+        else:
+            raise NotFound(f"The component '{usage_key}' does not exist.")
     except NoSuchUsage as exc:
         # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The component '{usage_key}' does not exist.") from exc

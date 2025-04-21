@@ -493,8 +493,8 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
             )
 
 
-def library_container_xml(container: ContainerMetadata):
+def library_container_xml(container: ContainerMetadata, block_type: str | None = None):
     """Converts given unit to xml without including children components"""
-    xml_object = etree.Element(container.container_type.value)
+    xml_object = etree.Element(block_type or container.container_type.value)
     xml_object.set("display_name", container.display_name)
     return xml_object
