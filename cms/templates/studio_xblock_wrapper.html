@@ -211,7 +211,7 @@ upstream_info = UpstreamLink.try_get_for_block(xblock)
                                 <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
                             </li>
                         % endif
-                    % elif not show_inline:
+                    % elif not show_inline and not parent_has_upstream:
                         <li class="action-item action-edit action-edit-view-only">
                             <a href="#" class="edit-button action-button">
                                 <span class="action-button-text">${_("Details")}</span>
