@@ -524,7 +524,7 @@ def create_item(request):
     return _create_block(request)
 
 
-def sync_library_content(created_block, request, store):
+def sync_library_content(created_block: XBlock, request, store):
     upstream_key = check_and_parse_upstream_key(created_block.upstream, created_block.usage_key)
     if isinstance(upstream_key, LibraryUsageLocatorV2):
         lib_block = sync_from_upstream(downstream=created_block, user=request.user)
