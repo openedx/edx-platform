@@ -3417,7 +3417,7 @@ CREATE_FINANCIAL_ASSISTANCE_APPLICATION_URL = '/core/api/financial_assistance_ap
 # .. toggle_target_removal_date: None
 # .. toggle_warnings: None
 # .. toggle_tickets: None
-ENABLE_MFE_CONFIG_API = False
+ENABLE_MFE_CONFIG_API = True
 
 # .. setting_name: MFE_CONFIG
 # .. setting_implementation: DjangoSetting
@@ -3605,6 +3605,7 @@ EVENT_BUS_PRODUCER_CONFIG = {
     },
 }
 
+<<<<<<< HEAD
 #### Survey Report ####
 # .. toggle_name: SURVEY_REPORT_ENABLE
 # .. toggle_implementation: DjangoSetting
@@ -3678,3 +3679,28 @@ SSL_AUTH_EMAIL_DOMAIN = "MIT.EDU"
 SSL_AUTH_DN_FORMAT_STRING = (
     "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
 )
+=======
+# IES SAML integration.
+# .. setting_name: SAML_IES_ENTITIES_IDS
+# .. setting_default: []
+# .. setting_example_value: ['https://my-idp-integration-uri-id']
+# .. setting_description: This configuration allows us to define the IDs of the IES entities, to perform certain actions to the SAML IES request only.
+#    adding a new step to SOCIAL_AUTH_PIPELINE (edx-platform/common/djangoapps/third_party_auth/settings.py)
+#    is not a feasible option, since we can't override the SOCIAL_AUTH_PIPELINE from the Django or other plugin configuration,
+#    so we decided to handle it this way and add the necessary logic, directly in the edx-platform code
+#    edx-platform/common/djangoapps/third_party_auth/pipeline.py
+#    We will define the requried values using our Tutor plugin.
+#    Entity ID docs:
+#    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/tpa/tpa_integrate_open/tpa_SAML_IdP.html#add-and-enable-a-saml-identity-provider
+SAML_IES_ENTITIES_IDS = []
+
+
+OPEN_EDX_FILTERS_CONFIG = {
+    "org.openedx.learning.course.enrollment.email-notification-extra-params.v1": {
+        "fail_silently": False,
+        "pipeline": [
+            "pearson_course_operation.pipeline.GetEnrollEmailNotificationExtraParameters",
+        ],
+    },
+}
+>>>>>>> 80a02f4248 (feat: create an openedx-filter to provide enroll emails with extra parameters)
