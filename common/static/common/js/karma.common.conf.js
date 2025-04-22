@@ -285,7 +285,6 @@ function getBaseConfig(config, useRequireJs) {
             'karma-chrome-launcher',
             'karma-firefox-launcher',
             'karma-spec-reporter',
-            'karma-selenium-webdriver-launcher',
             'karma-webpack',
             'karma-sourcemap-loader',
             customPlugin
