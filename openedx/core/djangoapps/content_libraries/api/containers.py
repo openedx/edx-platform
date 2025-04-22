@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 import logging
+import typing as t
 from uuid import uuid4
 
 from django.utils.text import slugify
@@ -60,7 +61,47 @@ log = logging.getLogger(__name__)
 
 
 class ContainerType(Enum):
+    """
+    The container types supported by content_libraries, and logic to map them to OLX.
+    """
     Unit = "unit"
+    Subsection = "subsection"
+    Section = "section"
+
+    @property
+    def olx_tag(self) -> str:
+        """
+        Canonical XML tag to use when representing this container as OLX.
+
+        For example, Units are encoded as <vertical>...</vertical>.
+
+        These tag names are historical. We keep them around for the backwards compatibility of OLX
+        and for easier interaction with legacy modulestore-powered structural XBlocks
+        (e.g., copy-paste of Units between courses and V2 libraries).
+        """
+        match self:
+            case self.Unit:
+                return "vertical"
+            case self.Subsection:
+                return "sequential"
+            case self.Section:
+                return "chapter"
+        raise TypeError(f"unexpected ContainerType: {self!r}")
+
+    @classmethod
+    def from_source_olx_tag(cls, olx_tag: str) -> t.Self:
+        """
+        Get the ContainerType that this OLX tag maps to.
+        """
+        if olx_tag == "unit":
+            # There is an alternative implementation to VerticalBlock called UnitBlock whose
+            # OLX tag is <unit>. When converting from OLX, we want to handle both <vertical>
+            # and <unit> as Unit containers, although the canonical serialization is still <vertical>.
+            return cls.Unit
+        try:
+            return next(ct for ct in cls if olx_tag == ct.olx_tag)
+        except StopIteration:
+            raise ValueError(f"no container_type for XML tag: <{olx_tag}>") from None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -83,7 +124,6 @@ class ContainerMetadata(PublishableItem):
             container=container,
         )
         container_type = ContainerType(container_key.container_type)
-
         published_by = ""
         if last_publish_log and last_publish_log.published_by:
             published_by = last_publish_log.published_by.username
@@ -209,7 +249,7 @@ def create_container(
                 created_by=user_id,
             )
         case _:
-            raise ValueError(f"Invalid container type: {container_type}")
+            raise NotImplementedError(f"Library support for {container_type} is in progress")
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
