@@ -289,14 +289,13 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
         )
     )
 
-    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
-    # container indexing asynchronously.
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal
+    # synchronously to avoid a race condition with query invalidation
     affected_containers = get_containers_contains_component(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 container_key=container.container_key,
-                background=True,
             )
         )
 
@@ -658,8 +657,8 @@ def delete_library_block(
         )
     )
 
-    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
-    # collection indexing asynchronously.
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal
+    # synchronously to avoid a race condition with query invalidation
     #
     # To delete the component on collections
     for collection in affected_collections:
@@ -669,19 +668,17 @@ def delete_library_block(
                     library_key=library_key,
                     collection_key=collection.key,
                 ),
-                background=True,
             )
         )
 
-    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
-    # container indexing asynchronously.
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal
+    # synchronously to avoid a race condition with query invalidation
     #
     # To update the components count in containers
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 container_key=container.container_key,
-                background=True,
             )
         )
 
@@ -716,8 +713,8 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
         ),
     )
 
-    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
-    # collection indexing asynchronously.
+    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal
+    # synchronously to avoid a race condition with query invalidation
     #
     # To restore the component in the collections
     for collection in affected_collections:
@@ -727,12 +724,11 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
                     library_key=library_key,
                     collection_key=collection.key,
                 ),
-                background=True,
             )
         )
 
-    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
-    # container indexing asynchronously.
+    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal
+    # synchronously to avoid a race condition with query invalidation
     #
     # To update the components count in containers
     affected_containers = get_containers_contains_component(usage_key)
@@ -740,7 +736,6 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 container_key=container.container_key,
-                background=True,
             )
         )
 

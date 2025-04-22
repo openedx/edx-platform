@@ -621,7 +621,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                         self.lib1.library_key,
                         collection_key=self.col1.key,
                     ),
-                    background=True,
+                    background=False,
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -684,7 +684,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                         self.lib1.library_key,
                         collection_key=self.col1.key,
                     ),
-                    background=True,
+                    background=False,
                 ),
             },
             event_receiver.call_args_list[0].kwargs,
@@ -897,7 +897,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "sender": None,
                 "library_container": LibraryContainerData(
                     container_key=self.unit1.container_key,
-                    background=True,
+                    background=False,
                 )
             },
             event_mock.call_args_list[0].kwargs,
@@ -908,7 +908,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "sender": None,
                 "library_container": LibraryContainerData(
                     container_key=self.unit2.container_key,
-                    background=True,
+                    background=False,
                 )
             },
             event_mock.call_args_list[1].kwargs,
