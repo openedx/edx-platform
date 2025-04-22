@@ -20,5 +20,5 @@ def validate_usage_keys_to_import(usage_keys: list[str | UsageKey]):
 
 
 def validate_composition_level(composition_level):
-    if composition_level not in CompositionLevel.values():
+    if composition_level not in CompositionLevel.supported_levels():
         raise ValueError(f'Invalid composition level: {composition_level}')
