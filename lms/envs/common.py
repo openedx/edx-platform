@@ -3361,6 +3361,8 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
     "openedx_learning.apps.authoring.units",
+    "openedx_learning.apps.authoring.subsections",
+    "openedx_learning.apps.authoring.sections",
 ]
 
 
