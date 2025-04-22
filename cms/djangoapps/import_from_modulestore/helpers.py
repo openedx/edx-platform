@@ -38,14 +38,18 @@ class ImportClient:
     """
 
     CONTAINER_CREATORS_MAP = {
-        'chapter': authoring_api.create_unit_and_version,  # TODO: replace with create_module_and_version
-        'sequential': authoring_api.create_unit_and_version,  # TODO: replace with create_section_and_version
+        # Sequential- and Chapter-level composition to be added in the future as part of
+        # https://github.com/openedx/frontend-app-authoring/issues/1602
+        # 'chapter': authoring_api.create_unit_and_version,  # TODO: replace with create_module_and_version
+        # 'sequential': authoring_api.create_unit_and_version,  # TODO: replace with create_section_and_version
         'vertical': authoring_api.create_unit_and_version,
     }
 
     CONTAINER_OVERRIDERS_MAP = {
-        'chapter': authoring_api.create_next_unit_version,  # TODO: replace with create_next_module_version
-        'sequential': authoring_api.create_next_unit_version,  # TODO: replace with create_next_section_version
+        # Sequential- and Chapter-level composition to be added in the future as part of
+        # https://github.com/openedx/frontend-app-authoring/issues/1602
+        # 'chapter': authoring_api.create_next_unit_version,  # TODO: replace with create_next_module_version
+        # 'sequential': authoring_api.create_next_unit_version,  # TODO: replace with create_next_section_version
         'vertical': authoring_api.create_next_unit_version,
     }
 
@@ -93,7 +97,7 @@ class ImportClient:
         usage_key = UsageKey.from_string(usage_key_string)
         result = []
 
-        if block_to_import.tag not in CompositionLevel.COMPLICATED_LEVELS.value:
+        if block_to_import.tag not in CompositionLevel.COMPLEX_LEVELS.value:
             return self._import_simple_block(block_to_import, usage_key)
 
         for child in block_to_import.getchildren():
@@ -105,7 +109,7 @@ class ImportClient:
 
             result.extend(self._import_child_block(child, child_usage_key_string))
 
-        if self.composition_level in CompositionLevel.FLAT_LEVELS.value:
+        if self.composition_level == CompositionLevel.XBLOCK.value:
             return [
                 publishable_version_with_mapping for publishable_version_with_mapping in result
                 if not isinstance(publishable_version_with_mapping.publishable_version, ContainerVersion)
@@ -130,7 +134,7 @@ class ImportClient:
         delegates the import process to the appropriate helper method.
         """
         child_usage_key = UsageKey.from_string(child_usage_key_string)
-        if child.tag in CompositionLevel.COMPLICATED_LEVELS.value:
+        if child.tag in CompositionLevel.COMPLEX_LEVELS.value:
             return self._import_complicated_child(child, child_usage_key_string)
         else:
             return self._import_simple_block(child, child_usage_key)
@@ -166,11 +170,11 @@ class ImportClient:
 
         Container type should be at a lower level than the current composition level.
         """
-        composition_hierarchy = CompositionLevel.COMPLICATED_LEVELS.value
+        composition_hierarchy = CompositionLevel.COMPLEX_LEVELS.value
         return (
             container_type in composition_hierarchy and
             self.composition_level in composition_hierarchy and
-            composition_hierarchy.index(container_type) >= composition_hierarchy.index(self.composition_level)
+            composition_hierarchy.index(container_type) <= composition_hierarchy.index(self.composition_level)
         )
 
     def get_or_create_container(

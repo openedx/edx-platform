@@ -36,8 +36,11 @@ class CompositionLevel(Enum):
     SEQUENTIAL = 'sequential'
     VERTICAL = 'vertical'
     XBLOCK = 'xblock'
-    COMPLICATED_LEVELS = [CHAPTER, SEQUENTIAL, VERTICAL]
-    FLAT_LEVELS = [XBLOCK]
+    COMPLEX_LEVELS = [
+        VERTICAL,
+        SEQUENTIAL,
+        CHAPTER,
+    ]
 
     @classmethod
     def values(cls):
