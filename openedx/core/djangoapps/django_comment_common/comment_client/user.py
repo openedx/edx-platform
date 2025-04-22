@@ -50,8 +50,8 @@ class User(models.Model):
                 metric_tags=self._metric_tags + [f'target.type:{source.type}'],
             )
 
-    def follow(self, source):
-        course_key = utils.get_course_key(self.attributes.get("course_id"))
+    def follow(self, source, course_id=None):
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             forum_api.create_subscription(
                 user_id=self.id,
@@ -68,8 +68,8 @@ class User(models.Model):
                 metric_tags=self._metric_tags + [f'target.type:{source.type}'],
             )
 
-    def unfollow(self, source):
-        course_key = utils.get_course_key(self.attributes.get("course_id"))
+    def unfollow(self, source, course_id=None):
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             forum_api.delete_subscription(
                 user_id=self.id,
@@ -86,14 +86,14 @@ class User(models.Model):
                 metric_tags=self._metric_tags + [f'target.type:{source.type}'],
             )
 
-    def vote(self, voteable, value):
+    def vote(self, voteable, value, course_id=None):
         if voteable.type == 'thread':
             url = _url_for_vote_thread(voteable.id)
         elif voteable.type == 'comment':
             url = _url_for_vote_comment(voteable.id)
         else:
             raise utils.CommentClientRequestError("Can only vote / unvote for threads or comments")
-        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             if voteable.type == 'thread':
                 response = forum_api.update_thread_votes(
@@ -120,14 +120,14 @@ class User(models.Model):
             )
         voteable._update_from_response(response)
 
-    def unvote(self, voteable):
+    def unvote(self, voteable, course_id=None):
         if voteable.type == 'thread':
             url = _url_for_vote_thread(voteable.id)
         elif voteable.type == 'comment':
             url = _url_for_vote_comment(voteable.id)
         else:
             raise utils.CommentClientRequestError("Can only vote / unvote for threads or comments")
-        course_key = utils.get_course_key(self.attributes.get("course_id"))
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             if voteable.type == 'thread':
                 response = forum_api.delete_thread_vote(
