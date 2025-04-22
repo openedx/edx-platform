@@ -5,7 +5,6 @@ import {VideoStorage} from './video_storage';
 import {VideoPoster} from './poster';
 import {VideoTranscriptDownloadHandler} from './video_accessible_menu';
 import {Initialize} from './initialize';
-import {VideoBumper} from './video_bumper';
 
 // TODO: Uncomment the imports
 //  import { initialize } from './initialize'; // Assuming this function is imported
