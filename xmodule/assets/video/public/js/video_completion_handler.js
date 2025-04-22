@@ -1,11 +1,10 @@
-// VideoCompletionHandler.js
-
 /**
  * Handles video completion logic.
  * @param {Object} state - The shared video state object.
  * @returns {Promise<void>}
  */
-function VideoCompletionHandler(state) {
+
+const VideoCompletionHandler = (state) => {
     const handler = new CompletionHandler(state);
     state.completionHandler = handler;
     return Promise.resolve();
