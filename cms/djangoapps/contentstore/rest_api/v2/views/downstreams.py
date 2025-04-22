@@ -103,11 +103,11 @@ from cms.djangoapps.contentstore.rest_api.v2.serializers import (
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
     BadUpstream,
+    ComponentUpstreamSyncManager,
     NoUpstream,
     UpstreamLink,
     UpstreamLinkException,
     decline_sync,
-    fetch_customizable_fields,
     sever_upstream_link,
     sync_from_upstream,
 )
@@ -257,7 +257,8 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
                 # Even if we're not syncing (i.e., updating the downstream's values with the upstream's), we still need
                 # to fetch the upstream's customizable values and store them as hidden fields on the downstream. This
                 # ensures that downstream authors can restore defaults based on the upstream.
-                fetch_customizable_fields(downstream=downstream, user=request.user)
+                manager = ComponentUpstreamSyncManager(downstream=downstream, user=request.user)
+                manager.update_customizable_fields(only_fetch=True)
         except BadDownstream as exc:
             logger.exception(
                 "'%s' is an invalid downstream; refusing to set its upstream to '%s'",

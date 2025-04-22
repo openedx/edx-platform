@@ -31,7 +31,7 @@ from edxval.api import (
 )
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fetch_customizable_fields
+from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, ComponentUpstreamSyncManager
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
@@ -456,7 +456,8 @@ def _fetch_and_set_upstream_link(
         # later wants to restore it, it will restore to the value that the field had when the block was pasted. Of
         # course, if the author later syncs updates from a *future* published upstream version, then that will fetch
         # new values from the published upstream content.
-        fetch_customizable_fields(upstream=temp_xblock, downstream=temp_xblock, user=user)
+        manager = ComponentUpstreamSyncManager(downstream=temp_xblock, user=user, upstream=temp_xblock)
+        manager.update_customizable_fields(only_fetch=True)
 
 
 def _import_xml_node_to_parent(

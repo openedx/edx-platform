@@ -382,13 +382,13 @@ def get_container_children(
     if container_key.container_type == ContainerType.Unit.value:
         child_components = authoring_api.get_components_in_unit(container.unit, published=published)
         return [LibraryXBlockMetadata.from_component(
-            container_key.library_key,
+            container_key.lib_key,
             entry.component
         ) for entry in child_components]
     else:
         child_entities = authoring_api.get_entities_in_container(container, published=published)
         return [ContainerMetadata.from_container(
-            container_key.library_key,
+            container_key.lib_key,
             entry.entity
         ) for entry in child_entities]
 

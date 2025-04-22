@@ -19,7 +19,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
-from openedx.core.djangoapps.content_libraries.api.containers import get_container_children
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from edx_proctoring.api import (
     does_backend_support_onboarding,
@@ -28,7 +27,7 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocator
+from opaque_keys.edx.locator import LibraryUsageLocator, LibraryUsageLocatorV2
 from pytz import UTC
 from xblock.core import XBlock
 from xblock.fields import Scope
@@ -36,7 +35,8 @@ from xblock.fields import Scope
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
-from cms.lib.xblock.upstream_sync import BadUpstream, get_upstream_key, sync_from_upstream
+from cms.lib.xblock.upstream_sync import BadUpstream, check_and_parse_upstream_key, sync_from_upstream
+from cms.lib.xblock.container_upstream_sync import sync_from_upstream_container
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,
@@ -524,26 +524,23 @@ def create_item(request):
     return _create_block(request)
 
 
-def sync_library_content(created_block, request):
-    upstream_key = get_upstream_key(created_block)
-    lib_block = sync_from_upstream(downstream=created_block, user=request.user)
-    static_file_notices = import_static_assets_for_library_sync(created_block, lib_block, request)
-    store = modulestore()
-    store.update_item(created_block, request.user.id)
-    if isinstance(upstream_key, LibraryContainerLocator):
-        with store.bulk_operations(created_block.location.course_key):
-            notices = [static_file_notices]
-            for child in get_container_children(upstream_key, published=True):
-                child_block = create_xblock(
-                    parent_locator=str(created_block.location),
-                    user=request.user,
-                    category=child.usage_key.block_type,
-                    display_name=child.display_name,
-                )
-                child_block.upstream = str(child.usage_key)
-                sync_library_content(child_block, request)
-                notices.append(sync_library_content(child_block, request))
-            static_file_notices = concat_static_file_notices(notices)
+def sync_library_content(created_block, request, store):
+    upstream_key = check_and_parse_upstream_key(created_block.upstream, created_block.usage_key)
+    if isinstance(upstream_key, LibraryUsageLocatorV2):
+        lib_block = sync_from_upstream(downstream=created_block, user=request.user)
+        static_file_notices = import_static_assets_for_library_sync(created_block, lib_block, request)
+        store.update_item(created_block, request.user.id)
+    else:
+        lib_block, children_blocks = sync_from_upstream_container(downstream=created_block, user=request.user)
+        notices = [import_static_assets_for_library_sync(created_block, lib_block, request)]
+        with store.bulk_operations(created_block.location.context_key):
+            children_blocks_usage_keys = []
+            for child_block in children_blocks:
+                notices.append(sync_library_content(child_block, request, store))
+                children_blocks_usage_keys.append(child_block.usage_key)
+            created_block.children = children_blocks_usage_keys
+            store.update_item(created_block, request.user.id)
+        static_file_notices = concat_static_file_notices(notices)
     return static_file_notices
 
 
@@ -618,7 +615,8 @@ def _create_block(request):
         # Set `created_block.upstream` and then sync this with the upstream (library) version.
         created_block.upstream = upstream_ref
         try:
-            static_file_notices = sync_library_content(created_block, request)
+            store = modulestore()
+            static_file_notices = sync_library_content(created_block, request, store)
         except BadUpstream as exc:
             _delete_item(created_block.location, request.user)
             log.exception(

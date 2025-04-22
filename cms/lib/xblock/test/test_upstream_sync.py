@@ -9,8 +9,9 @@ from organizations.api import ensure_organization
 from organizations.models import Organization
 
 from cms.lib.xblock.upstream_sync import (
+    ComponentUpstreamSyncManager,
     UpstreamLink,
-    sync_from_upstream, decline_sync, fetch_customizable_fields, sever_upstream_link,
+    sync_from_upstream, decline_sync, sever_upstream_link,
     NoUpstream, BadUpstream, BadDownstream,
 )
 from common.djangoapps.student.tests.factories import UserFactory
@@ -415,7 +416,8 @@ class UpstreamTestCase(ModuleStoreTestCase):
 
         # fetch!
         upstream = xblock.load_block(self.upstream_key, self.user)
-        fetch_customizable_fields(upstream=upstream, downstream=downstream, user=self.user)
+        manager = ComponentUpstreamSyncManager(downstream=downstream, user=self.user, upstream=upstream)
+        manager.update_customizable_fields(only_fetch=True)
 
         # Ensure: fetching doesn't affect the upstream link (or lack thereof).
         assert not downstream.upstream
