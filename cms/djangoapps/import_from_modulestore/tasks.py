@@ -60,7 +60,7 @@ def save_legacy_content_to_staged_content_task(import_uuid: str) -> None:
 
 @shared_task
 @set_code_owner_attribute
-def import_course_staged_content_to_library_task(
+def import_staged_content_to_library_task(
     usage_keys_string: list[str],
     import_uuid: str,
     learning_package_id: int,

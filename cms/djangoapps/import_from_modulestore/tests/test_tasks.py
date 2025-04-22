@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from cms.djangoapps.import_from_modulestore.data import ImportStatus
 from cms.djangoapps.import_from_modulestore.tasks import (
-    import_course_staged_content_to_library_task,
+    import_staged_content_to_library_task,
     save_legacy_content_to_staged_content_task,
 )
 from openedx.core.djangoapps.content_libraries import api as content_libraries_api
@@ -84,21 +84,21 @@ class TestSaveCourseSectionsToStagedContentTask(ImportCourseToLibraryMixin):
 
 class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
     """
-    Test cases for import_course_staged_content_to_library_task.
+    Test cases for import_staged_content_to_library_task.
     """
 
     def _is_imported(self, library, xblock):
         library_learning_package = LearningPackage.objects.get(id=library.learning_package_id)
         self.assertTrue(library_learning_package.content_set.filter(text__icontains=xblock.display_name).exists())
 
-    def test_import_course_staged_content_to_library_task(self):
-        """ End-to-end test for import_course_staged_content_to_library_task. """
+    def test_import_staged_content_to_library_task(self):
+        """ End-to-end test for import_staged_content_to_library_task. """
         library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
         self.assertEqual(library_learning_package.content_set.count(), 0)
         expected_imported_xblocks = [self.problem, self.problem2, self.video, self.video2]
         save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
-        import_course_staged_content_to_library_task(
+        import_staged_content_to_library_task(
             [str(self.chapter.location), str(self.chapter2.location)],
             self.import_event.uuid,
             self.content_library.learning_package.id,
@@ -123,7 +123,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         non_existent_usage_ids = ['block-v1:edX+Demo+2023+type@vertical+block@12345']
         save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
-        import_course_staged_content_to_library_task(
+        import_staged_content_to_library_task(
             non_existent_usage_ids,
             str(self.import_event.uuid),
             self.content_library.learning_package.id,
@@ -146,7 +146,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(chapters_to_import))
         self.assertEqual(self.import_event.status, ImportStatus.STAGED)
 
-        import_course_staged_content_to_library_task(
+        import_staged_content_to_library_task(
             [str(self.chapter.location)],
             str(self.import_event.uuid),
             self.content_library.learning_package.id,

@@ -7,7 +7,7 @@ import pytest
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
-from cms.djangoapps.import_from_modulestore.api import create_import, import_course_staged_content_to_library
+from cms.djangoapps.import_from_modulestore.api import import_staged_content_to_library, stage_content_for_import
 from cms.djangoapps.import_from_modulestore.data import ImportStatus
 from cms.djangoapps.import_from_modulestore.models import Import
 from openedx.core.djangoapps.content_libraries.tests import factories
@@ -26,22 +26,22 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
 
         self.library = factories.ContentLibraryFactory()
 
-    def test_create_import(self):
+    def test_stage_content_for_import(self):
         """
-        Test create_import function.
+        Test stage_content_for_import function.
         """
         course_id = "course-v1:edX+DemoX+Demo_Course"
         user = UserFactory()
-        create_import(course_id, user.id)
+        stage_content_for_import(course_id, user.id)
 
         import_event = Import.objects.get()
         assert import_event.source_key == CourseKey.from_string(course_id)
         assert import_event.user_id == user.id
         assert import_event.status == ImportStatus.NOT_STARTED
 
-    def test_import_course_staged_content_to_library(self):
+    def test_import_staged_content_to_library(self):
         """
-        Test import_course_staged_content_to_library function with different override values.
+        Test import_staged_content_to_library function with different override values.
         """
         import_event = ImportFactory(
             source_key=CourseKey.from_string("course-v1:edX+DemoX+Demo_Course"),
@@ -53,9 +53,9 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
         override = False
 
         with patch(
-            "cms.djangoapps.import_from_modulestore.api.import_course_staged_content_to_library_task"
-        ) as import_course_staged_content_to_library_task_mock:
-            import_course_staged_content_to_library(
+            "cms.djangoapps.import_from_modulestore.api.import_staged_content_to_library_task"
+        ) as import_staged_content_to_library_task_mock:
+            import_staged_content_to_library(
                 usage_ids,
                 import_event.uuid,
                 self.library.learning_package.id,
@@ -64,7 +64,7 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
                 override
             )
 
-        import_course_staged_content_to_library_task_mock.apply_async.assert_called_once_with(
+        import_staged_content_to_library_task_mock.apply_async.assert_called_once_with(
             kwargs={
                 "usage_keys_string": usage_ids,
                 "import_uuid": import_event.uuid,
@@ -75,9 +75,9 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
             },
         )
 
-    def test_import_course_staged_content_to_library_invalid_usage_key(self):
+    def test_import_staged_content_to_library_invalid_usage_key(self):
         """
-        Test import_course_staged_content_to_library function with not chapter usage keys.
+        Test import_staged_content_to_library function with not chapter usage keys.
         """
         import_event = ImportFactory(
             source_key=CourseKey.from_string("course-v1:edX+DemoX+Demo_Course"),
@@ -88,10 +88,10 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
         ]
 
         with patch(
-            "cms.djangoapps.import_from_modulestore.api.import_course_staged_content_to_library_task"
-        ) as import_course_staged_content_to_library_task_mock:
+            "cms.djangoapps.import_from_modulestore.api.import_staged_content_to_library_task"
+        ) as import_staged_content_to_library_task_mock:
             with self.assertRaises(ValueError):
-                import_course_staged_content_to_library(
+                import_staged_content_to_library(
                     usage_ids,
                     import_event.uuid,
                     self.library.learning_package.id,
@@ -99,4 +99,4 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
                     "xblock",
                     False
                 )
-        import_course_staged_content_to_library_task_mock.apply_async.assert_not_called()
+        import_staged_content_to_library_task_mock.apply_async.assert_not_called()

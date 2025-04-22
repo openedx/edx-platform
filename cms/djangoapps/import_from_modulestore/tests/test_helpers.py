@@ -51,7 +51,7 @@ class TestImportClient(ModuleStoreTestCase):
             data="""<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>""",
         )
         with self.captureOnCommitCallbacks(execute=True):
-            self.import_event = api.create_import(source_key=self.course.id, user_id=self.user.id)
+            self.import_event = api.stage_content_for_import(source_key=self.course.id, user_id=self.user.id)
         self.parser = etree.XMLParser(strip_cdata=False)
 
     def test_import_from_staged_content(self):
@@ -193,7 +193,7 @@ class TestImportClient(ModuleStoreTestCase):
         self.assertEqual(len(result1), 1)
 
         with self.captureOnCommitCallbacks(execute=True):
-            new_import_event = api.create_import(source_key=self.course.id, user_id=self.user.id)
+            new_import_event = api.stage_content_for_import(source_key=self.course.id, user_id=self.user.id)
         new_staged_content = new_import_event.get_staged_content_by_source_usage_key(self.chapter.location)
         import_client = ImportClient(
             import_event=new_import_event,

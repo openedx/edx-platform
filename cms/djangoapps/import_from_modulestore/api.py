@@ -5,11 +5,11 @@ from opaque_keys.edx.keys import LearningContextKey
 
 from .helpers import cancel_incomplete_old_imports
 from .models import Import as _Import
-from .tasks import import_course_staged_content_to_library_task, save_legacy_content_to_staged_content_task
+from .tasks import import_staged_content_to_library_task, save_legacy_content_to_staged_content_task
 from .validators import validate_usage_keys_to_import
 
 
-def create_import(source_key: LearningContextKey, user_id: int) -> _Import:
+def stage_content_for_import(source_key: LearningContextKey, user_id: int) -> _Import:
     """
     Create a new import event to import a course to a library and save course to staged content.
     """
@@ -19,7 +19,7 @@ def create_import(source_key: LearningContextKey, user_id: int) -> _Import:
     return import_from_modulestore
 
 
-def import_course_staged_content_to_library(
+def import_staged_content_to_library(
     usage_ids: list[str],
     import_uuid: str,
     target_learning_package_id: int,
@@ -31,7 +31,7 @@ def import_course_staged_content_to_library(
     Import staged content to a library from staged content.
     """
     validate_usage_keys_to_import(usage_ids)
-    import_course_staged_content_to_library_task.apply_async(
+    import_staged_content_to_library_task.apply_async(
         kwargs={
             'usage_keys_string': usage_ids,
             'import_uuid': import_uuid,
