@@ -87,7 +87,13 @@ class TestImportClient(ModuleStoreTestCase):
         self.assertTrue(not self.learning_package.content_set.count())
         mocked_process_import.assert_not_called()
 
-    @ddt.data('chapter', 'sequential', 'vertical')
+    @ddt.data(
+        # TODO: Chapter and sequential will be uncommented in the future
+        # after adding it to the Learning Core.
+        # 'chapter',
+        # 'sequential',
+        'vertical'
+    )
     def test_create_container(self, block_lvl):
         container_to_import = getattr(self, block_lvl)
         block_usage_key_to_import = str(container_to_import.location)
