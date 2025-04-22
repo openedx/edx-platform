@@ -336,3 +336,13 @@ COURSE_LIVE_GLOBAL_CREDENTIALS["BIG_BLUE_BUTTON"] = {
 OPENEDX_LEARNING = {
     "MEDIA": {"BACKEND": "django.core.files.storage.InMemoryStorage", "OPTIONS": {"location": MEDIA_ROOT + "_private"}}
 }
+
+DEFAULT_ADVANCED_MODULES = [
+    'google-calendar',
+    'google-document',
+    'lti_consumer',
+    'poll',
+    'split_test',
+    'survey',
+    'word_cloud',
+]

@@ -2969,9 +2969,8 @@ class TestComponentTemplates(CourseTestCase):
 
         # Check for default advanced modules
         advanced_templates = self.get_templates_of_type("advanced")
-        self.assertEqual(len(advanced_templates), len(settings.DEFAULT_ADVANCED_MODULES))
-        advanced_module_titles = [t['display_name'] for t in advanced_templates]
-        self.assertEqual(advanced_module_titles, self.default_advanced_modules_titles)
+        advanced_module_keys = [t['category'] for t in advanced_templates]
+        self.assertCountEqual(advanced_module_keys, settings.DEFAULT_ADVANCED_MODULES)
 
         # Now fully disable video through XBlockConfiguration
         XBlockConfiguration.objects.create(name="video", enabled=False)
