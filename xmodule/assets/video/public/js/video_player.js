@@ -909,4 +909,4 @@ function VideoPlayer(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
         this.videoPlayer.player.setVolume(volume);
     }
 };
-export {VideoPlayer}
+export { VideoPlayer }
