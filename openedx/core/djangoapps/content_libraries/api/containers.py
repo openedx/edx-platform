@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 import logging
-import typing as t
 from uuid import uuid4
 
 from django.utils.text import slugify
@@ -89,7 +88,7 @@ class ContainerType(Enum):
         raise TypeError(f"unexpected ContainerType: {self!r}")
 
     @classmethod
-    def from_source_olx_tag(cls, olx_tag: str) -> t.Self:
+    def from_source_olx_tag(cls, olx_tag: str) -> 'ContainerType':
         """
         Get the ContainerType that this OLX tag maps to.
         """
