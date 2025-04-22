@@ -2910,6 +2910,7 @@ LIBRARY_ENABLED_BLOCKS = [
     'video',
     'html',
     'drag-and-drop-v2',
+    'openassessment',
     'conditional',
     'done',
     'freetextresponse',
