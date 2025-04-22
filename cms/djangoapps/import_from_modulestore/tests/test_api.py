@@ -5,12 +5,13 @@ from unittest.mock import patch
 
 import pytest
 from opaque_keys.edx.keys import CourseKey
+from organizations.models import Organization
 
 from common.djangoapps.student.tests.factories import UserFactory
 from cms.djangoapps.import_from_modulestore.api import import_staged_content_to_library, stage_content_for_import
 from cms.djangoapps.import_from_modulestore.data import ImportStatus
 from cms.djangoapps.import_from_modulestore.models import Import
-from openedx.core.djangoapps.content_libraries.tests import factories
+from openedx.core.djangoapps.content_libraries import api as content_libraries_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from .factories import ImportFactory
 
@@ -24,7 +25,13 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
 
-        self.library = factories.ContentLibraryFactory()
+        _library_metadata = content_libraries_api.create_library(
+            org=Organization.objects.create(name='Organization 1', short_name='org1'),
+            slug='lib_1',
+            title='Library Org 1',
+            description='This is a library from Org 1',
+        )
+        self.library = content_libraries_api.ContentLibrary.objects.get_by_key(_library_metadata.key)
 
     def test_stage_content_for_import(self):
         """
