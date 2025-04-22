@@ -9,6 +9,7 @@ from tempfile import mkdtemp
 from unittest import skip
 
 import ddt
+from django.conf import settings
 from django.test import TestCase  # lint-amnesty, pylint: disable=reimported
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -135,7 +136,7 @@ class CountMongoCallsCourseTraversal(TestCase):
     # maybe not. What parameters should one use for get_course() in order to minimize the number of
     # mongo calls? The tests below both ensure that code changes don't increase the number of mongo calls
     # during traversal -and- demonstrate how to minimize the number of calls.
-    @ddt.data(
+    test_cases = [
         # These two lines show the way this traversal *should* be done
         # (if you'll eventually access all the fields and load all the definitions anyway).
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, True, 2),
@@ -145,8 +146,16 @@ class CountMongoCallsCourseTraversal(TestCase):
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, False, False, 2),
         (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, False, 2),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 0, False, False, 2),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 2),
-    )
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, True, False, 2)
+    ]
+
+    if settings.USE_EXTRACTED_LTI_BLOCK:
+        test_case = (MIXED_SPLIT_MODULESTORE_BUILDER, None, True, True, 36)
+        test_cases[1] = test_case
+        test_cases[2] = test_case
+        test_cases[3] = test_case
+
+    @ddt.data(*test_cases)
     @ddt.unpack
     def test_number_mongo_calls(self, store_builder, depth, lazy, access_all_block_fields, num_mongo_calls):
         request_cache = MemoryCache()
