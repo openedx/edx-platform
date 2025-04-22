@@ -9,10 +9,10 @@ import * as gettext from 'gettext';
  * @param {object} state The object containing the state of the video player.
  * @return {Promise<void>}
  */
-class AutoAdvanceControl {
+class VideoAutoAdvanceControl {
     constructor(state) {
-        if (!(this instanceof AutoAdvanceControl)) {
-            return new AutoAdvanceControl(state);
+        if (!(this instanceof VideoAutoAdvanceControl)) {
+            return new VideoAutoAdvanceControl(state);
         }
 
         _.bindAll(this, 'onClick', 'destroy', 'autoPlay', 'autoAdvance');
@@ -145,4 +145,4 @@ class AutoAdvanceControl {
     }
 }
 
-export { AutoAdvanceControl };
+export { VideoAutoAdvanceControl };
