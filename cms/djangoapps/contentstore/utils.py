@@ -24,6 +24,7 @@ from eventtracking import tracker
 from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
 from opaque_keys.edx.locator import LibraryLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
@@ -2378,19 +2379,22 @@ def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, c
     """
     if not xblock.upstream:
         return None
-    upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
     try:
-        lib_component = get_component_from_usage_key(upstream_usage_key)
-    except ObjectDoesNotExist:
-        log.error(f"Library component not found for {upstream_usage_key}")
-        lib_component = None
-    ComponentLink.update_or_create(
-        lib_component,
-        upstream_usage_key=upstream_usage_key,
-        upstream_context_key=str(upstream_usage_key.context_key),
-        downstream_context_key=course_key,
-        downstream_usage_key=xblock.usage_key,
-        version_synced=xblock.upstream_version,
-        version_declined=xblock.upstream_version_declined,
-        created=created,
-    )
+        upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
+        try:
+            lib_component = get_component_from_usage_key(upstream_usage_key)
+        except ObjectDoesNotExist:
+            log.error(f"Library component not found for {upstream_usage_key}")
+            lib_component = None
+        ComponentLink.update_or_create(
+            lib_component,
+            upstream_usage_key=upstream_usage_key,
+            upstream_context_key=str(upstream_usage_key.context_key),
+            downstream_context_key=course_key,
+            downstream_usage_key=xblock.usage_key,
+            version_synced=xblock.upstream_version,
+            version_declined=xblock.upstream_version_declined,
+            created=created,
+        )
+    except InvalidKeyError:
+        pass
