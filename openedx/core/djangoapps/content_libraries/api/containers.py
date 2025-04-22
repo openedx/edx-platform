@@ -194,7 +194,7 @@ def create_container(
         slug = slugify(title, allow_unicode=True) + '-' + uuid4().hex[-6:]
     # Make sure the slug is valid by first creating a key for the new container:
     container_key = LibraryContainerLocator(
-        library_key=library_key,
+        library_key,
         container_type=container_type.value,
         container_id=slug,
     )
