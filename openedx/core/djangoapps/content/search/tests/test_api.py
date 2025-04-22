@@ -235,6 +235,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "org": "org1",
             "created": created_date.timestamp(),
             "modified": created_date.timestamp(),
+            "last_published": None,
             "access_id": lib_access.id,
             "breadcrumbs": [{"display_name": "Library"}],
             # "published" is not set since we haven't published it yet
