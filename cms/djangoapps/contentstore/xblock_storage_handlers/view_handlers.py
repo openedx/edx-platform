@@ -524,10 +524,13 @@ def create_item(request):
     return _create_block(request)
 
 
-def sync_library_content(created_block: XBlock, request, store):
+def sync_library_content(created_block: XBlock, request, store, remove_upstream_link: bool = False):
     upstream_key = check_and_parse_upstream_key(created_block.upstream, created_block.usage_key)
     if isinstance(upstream_key, LibraryUsageLocatorV2):
         lib_block = sync_from_upstream(downstream=created_block, user=request.user)
+        if remove_upstream_link:
+            # Removing upstream link from child components
+            created_block.upstream = None
         static_file_notices = import_static_assets_for_library_sync(created_block, lib_block, request)
         store.update_item(created_block, request.user.id)
     else:
@@ -536,7 +539,7 @@ def sync_library_content(created_block: XBlock, request, store):
         with store.bulk_operations(created_block.location.context_key):
             children_blocks_usage_keys = []
             for child_block in children_blocks:
-                notices.append(sync_library_content(child_block, request, store))
+                notices.append(sync_library_content(child_block, request, store, remove_upstream_link=True))
                 children_blocks_usage_keys.append(child_block.usage_key)
             created_block.children = children_blocks_usage_keys
             store.update_item(created_block, request.user.id)
