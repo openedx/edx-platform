@@ -71,7 +71,7 @@ def get_runtime(user: UserType):
 
 
 def load_block(
-    usage_key: UsageKeyV2,
+    usage_key: UsageKeyV2 | LibraryContainerLocator,
     user: UserType,
     *,
     check_permission: CheckPerm | None = CheckPerm.CAN_LEARN,
@@ -114,7 +114,12 @@ def load_block(
     runtime = get_runtime(user=user)
 
     try:
-        return runtime.get_block(usage_key, version=version)
+        if isinstance(usage_key, UsageKeyV2):
+            return runtime.get_block(usage_key, version=version)
+        elif isinstance(usage_key, LibraryContainerLocator):
+            return runtime.get_container_block(usage_key, version=version)
+        else:
+            raise NotFound(f"The component '{usage_key}' does not exist.")
     except NoSuchUsage as exc:
         # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The component '{usage_key}' does not exist.") from exc

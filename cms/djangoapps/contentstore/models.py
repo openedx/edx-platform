@@ -14,7 +14,7 @@ from django.db.models.lookups import GreaterThan
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_learning.api.authoring_models import Component, Container, PublishableEntity
+from openedx_learning.api.authoring_models import Component, PublishableEntity
 from openedx_learning.lib.fields import (
     immutable_uuid_field,
     key_field,
@@ -144,7 +144,7 @@ class PublishableEntityLink(models.Model):
     @classmethod
     def update_or_create(
         cls,
-        upstream_block: Component | Container | None,
+        upstream_block: Component | None,
         /,
         upstream_usage_key: UsageKey,
         upstream_context_key: str,

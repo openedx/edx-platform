@@ -28,7 +28,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import PublishableEntityVersion
+from openedx_learning.api.authoring_models import Container, Unit
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
@@ -493,8 +493,8 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
             )
 
 
-def library_container_xml(container: PublishableEntityVersion, block_type: str):
+def library_container_xml(container: ContainerMetadata, block_type: str | None = None):
     """Converts given unit to xml without including children components"""
-    xml_object = etree.Element(block_type)
-    xml_object.set("display_name", container.title)
+    xml_object = etree.Element(block_type or container.container_type.value)
+    xml_object.set("display_name", container.display_name)
     return xml_object

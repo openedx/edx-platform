@@ -13,7 +13,6 @@ from django.db.transaction import atomic
 from django.urls import reverse
 
 from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerUsageLocator
 from openedx_learning.api import authoring as authoring_api
 
 from lxml import etree
@@ -230,17 +229,23 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         if component_version is None:
             raise NoSuchUsage(usage_key)
 
-        if isinstance(usage_key, LibraryContainerUsageLocator):
-            from openedx.core.djangoapps.content_libraries.api.containers import library_container_xml
-            block_type = "vertical" if usage_key.block_type == "unit" else usage_key.block_type
-            content = library_container_xml(component_version, block_type)
-            content = etree.tostring(content)
-        else:
-            content = component_version.contents.get(
-                componentversioncontent__key="block.xml"
-            )
-            content = content.text
-        return self._initialize_block(content, usage_key, usage_key.block_type, version)
+        content = component_version.contents.get(
+            componentversioncontent__key="block.xml"
+        )
+        return self._initialize_block(content.text, usage_key, usage_key.block_type, version)
+
+    def get_container_block(self, container_key, *, version: int | LatestVersion = LatestVersion.AUTO):
+        """
+        Fetch container from learning core data models.
+
+        This method create a very basic olx for container and parse it into an XBlock instance.
+        """
+        from openedx.core.djangoapps.content_libraries.api.containers import get_container, library_container_xml
+        container = get_container(container_key)
+        block_type = "vertical" if container_key.container_type == "unit" else container_key.container_type
+        content = library_container_xml(container, block_type)
+        xml = etree.tostring(content)
+        return self._initialize_block(xml.decode(), container_key, block_type, version)
 
     def get_block_assets(self, block, fetch_asset_data):
         """
@@ -257,7 +262,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         lookups one by one is going to get slow. At some point we're going to
         want something to look up a bunch of blocks at once.
         """
-        if isinstance(block.usage_key, LibraryContainerUsageLocator):
+        if not isinstance(block.usage_key, UsageKeyV2):
             # TODO: handle assets for containers if required.
             return []
         component_version = self._get_component_version_from_block(block)
@@ -336,7 +341,6 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
     def _get_component_from_usage_key(self, usage_key):
         """
-        Gets library block or container based on given usage_key.
         Note that Components aren't ever really truly deleted, so this will
         return a Component if this usage key has ever been used, even if it was
         later deleted.
@@ -344,9 +348,14 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         TODO: This is the third place where we're implementing this. Figure out
         where the definitive place should be and have everything else call that.
         """
-        from openedx.core.djangoapps.content_libraries.api import get_library_content
+        learning_package = authoring_api.get_learning_package_by_key(str(usage_key.lib_key))
         try:
-            component = get_library_content(usage_key)
+            component = authoring_api.get_component_by_key(
+                learning_package.id,
+                namespace='xblock.v1',
+                type_name=usage_key.block_type,
+                local_key=usage_key.block_id,
+            )
         except ObjectDoesNotExist as exc:
             raise NoSuchUsage(usage_key) from exc
 
