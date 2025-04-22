@@ -183,9 +183,8 @@ def cross_domain_config(func):
     })
     settings_decorator = override_settings(
         CORS_ORIGIN_WHITELIST=['https://ecommerce.edx.org'],
-        CSRF_COOKIE_NAME="prod-edx-csrftoken",
-        CROSS_DOMAIN_CSRF_COOKIE_NAME="prod-edx-csrftoken",
-        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=".edx.org"
+        CSRF_TRUSTED_ORIGINS=['https://ecommerce.edx.org'],
+        CSRF_COOKIE_NAME="csrftoken",
     )
     is_secure_decorator = patch.object(WSGIRequest, 'is_secure', return_value=True)
 

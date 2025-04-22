@@ -7,6 +7,9 @@ from unittest import mock
 import django
 from django.http import HttpResponse
 from django.test import TestCase
+from edx_rest_framework_extensions.auth.session.authentication import (
+    SessionAuthenticationAllowInactiveUser
+)  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..decorators import ensure_csrf_cookie_cross_domain
 
@@ -23,11 +26,21 @@ class TestEnsureCsrfCookieCrossDomain(TestCase):
         request = mock.Mock()
         request.META = {}
         request.COOKIES = {}
+        request.successful_authenticator = SessionAuthenticationAllowInactiveUser()
         wrapped_view = ensure_csrf_cookie_cross_domain(fake_view)
         response = wrapped_view(request)
         response_meta = json.loads(response.content.decode('utf-8'))
-        assert response_meta['CROSS_DOMAIN_CSRF_COOKIE_USED'] is True
+        assert 'CSRF_COOKIE' in response_meta
         if django.VERSION < (4, 0):
             assert response_meta['CSRF_COOKIE_USED'] is True
         else:
             assert response_meta['CSRF_COOKIE_NEEDS_UPDATE'] is True
+
+    def test_ensure_csrf_cookie_cross_domain_with_no_session(self):
+        request = mock.Mock()
+        request.META = {}
+        request.COOKIES = {}
+        wrapped_view = ensure_csrf_cookie_cross_domain(fake_view)
+        response = wrapped_view(request)
+        response_meta = json.loads(response.content.decode('utf-8'))
+        assert 'CSRF_COOKIE' not in response_meta
