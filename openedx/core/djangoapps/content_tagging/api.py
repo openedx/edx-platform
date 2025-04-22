@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import UsageKey
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Exists, OuterRef, Q, QuerySet
 from django.utils.timezone import now
-from opaque_keys.edx.keys import CourseKey, LibraryCollectionKey
+from opaque_keys.edx.keys import CourseKey, LibraryItemKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from openedx_tagging.core.tagging.models.utils import TAGS_CSV_SEPARATOR
@@ -230,7 +230,7 @@ def generate_csv_rows(object_id, buffer) -> Iterator[str]:
     """
     content_key = get_content_key_from_string(object_id)
 
-    if isinstance(content_key, (UsageKey, LibraryCollectionKey)):
+    if isinstance(content_key, (UsageKey, LibraryItemKey)):
         raise ValueError("The object_id must be a CourseKey or a LibraryLocatorV2.")
 
     all_object_tags, taxonomies = get_all_object_tags(content_key)

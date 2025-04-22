@@ -1,13 +1,16 @@
 """
 Tests for course optimizer
 """
+from unittest import mock
 from unittest.mock import Mock
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.core.course_optimizer_provider import (
     _update_node_tree_and_dictionary,
-    _create_dto_recursive
+    _create_dto_recursive,
+    sort_course_sections
 )
+from cms.djangoapps.contentstore.tasks import LinkState
 
 
 class TestLinkCheckProvider(CourseTestCase):
@@ -61,7 +64,7 @@ class TestLinkCheckProvider(CourseTestCase):
             }
         }
         result_tree, result_dictionary = _update_node_tree_and_dictionary(
-            self.mock_block, 'example_link', True, {}, {}
+            self.mock_block, 'example_link', LinkState.LOCKED, {}, {}
         )
 
         self.assertEqual(expected_tree, result_tree)
@@ -92,7 +95,7 @@ class TestLinkCheckProvider(CourseTestCase):
             }
         }
         result_tree, result_dictionary = _update_node_tree_and_dictionary(
-            self.mock_block, 'example_link', True, {}, {}
+            self.mock_block, 'example_link', LinkState.LOCKED, {}, {}
         )
 
         self.assertEqual(expected_dictionary, result_dictionary)
@@ -118,7 +121,8 @@ class TestLinkCheckProvider(CourseTestCase):
                     'displayName': 'Block Name',
                     'url': '/block/1',
                     'brokenLinks': ['broken_link_1', 'broken_link_2'],
-                    'lockedLinks': ['locked_link']
+                    'lockedLinks': ['locked_link'],
+                    'externalForbiddenLinks': ['forbidden_link_1'],
                 }
             ]
         }
@@ -143,7 +147,8 @@ class TestLinkCheckProvider(CourseTestCase):
                 'display_name': 'Block Name',
                 'url': '/block/1',
                 'broken_links': ['broken_link_1', 'broken_link_2'],
-                'locked_links': ['locked_link']
+                'locked_links': ['locked_link'],
+                'external_forbidden_links': ['forbidden_link_1'],
             }
         }
         expected = _create_dto_recursive(mock_node_tree, mock_dictionary)
@@ -174,7 +179,8 @@ class TestLinkCheckProvider(CourseTestCase):
                                             'displayName': 'Block Name',
                                             'url': '/block/1',
                                             'brokenLinks': ['broken_link_1', 'broken_link_2'],
-                                            'lockedLinks': ['locked_link']
+                                            'lockedLinks': ['locked_link'],
+                                            'externalForbiddenLinks': ['forbidden_link_1'],
                                         }
                                     ]
                                 }
@@ -211,9 +217,81 @@ class TestLinkCheckProvider(CourseTestCase):
                 'display_name': 'Block Name',
                 'url': '/block/1',
                 'broken_links': ['broken_link_1', 'broken_link_2'],
-                'locked_links': ['locked_link']
+                'locked_links': ['locked_link'],
+                'external_forbidden_links': ['forbidden_link_1'],
             }
         }
         expected = _create_dto_recursive(mock_node_tree, mock_dictionary)
 
         self.assertEqual(expected_result, expected)
+
+    @mock.patch('cms.djangoapps.contentstore.core.course_optimizer_provider.modulestore', autospec=True)
+    def test_returns_unchanged_data_if_no_course_blocks(self, mock_modulestore):
+        """Test that the function returns unchanged data if no course blocks exist."""
+        mock_modulestore_instance = Mock()
+        mock_modulestore.return_value = mock_modulestore_instance
+        mock_modulestore_instance.get_items.return_value = []
+
+        data = {}
+        result = sort_course_sections("course-v1:Test+Course", data)
+        assert result == data  # Should return the original data
+
+    @mock.patch('cms.djangoapps.contentstore.core.course_optimizer_provider.modulestore', autospec=True)
+    def test_returns_unchanged_data_if_linkcheckoutput_missing(self, mock_modulestore):
+        """Test that the function returns unchanged data if 'LinkCheckOutput' is missing."""
+
+        mock_modulestore_instance = Mock()
+        mock_modulestore.return_value = mock_modulestore_instance
+
+        data = {'LinkCheckStatus': 'Uninitiated'}  # No 'LinkCheckOutput'
+        mock_modulestore_instance.get_items.return_value = data
+
+        result = sort_course_sections("course-v1:Test+Course", data)
+        assert result == data
+
+    @mock.patch('cms.djangoapps.contentstore.core.course_optimizer_provider.modulestore', autospec=True)
+    def test_returns_unchanged_data_if_sections_missing(self, mock_modulestore):
+        """Test that the function returns unchanged data if 'sections' is missing."""
+
+        mock_modulestore_instance = Mock()
+        mock_modulestore.return_value = mock_modulestore_instance
+
+        data = {'LinkCheckStatus': 'Success', 'LinkCheckOutput': {}}  # No 'LinkCheckOutput'
+        mock_modulestore_instance.get_items.return_value = data
+
+        result = sort_course_sections("course-v1:Test+Course", data)
+        assert result == data
+
+    @mock.patch('cms.djangoapps.contentstore.core.course_optimizer_provider.modulestore', autospec=True)
+    def test_sorts_sections_correctly(self, mock_modulestore):
+        """Test that the function correctly sorts sections based on published course structure."""
+
+        mock_course_block = Mock()
+        mock_course_block.get_children.return_value = [
+            Mock(location=Mock(block_id="section2")),
+            Mock(location=Mock(block_id="section3")),
+            Mock(location=Mock(block_id="section1")),
+        ]
+
+        mock_modulestore_instance = Mock()
+        mock_modulestore.return_value = mock_modulestore_instance
+        mock_modulestore_instance.get_items.return_value = [mock_course_block]
+
+        data = {
+            "LinkCheckOutput": {
+                "sections": [
+                    {"id": "section1", "name": "Intro"},
+                    {"id": "section2", "name": "Advanced"},
+                    {"id": "section3", "name": "Bonus"},  # Not in course structure
+                ]
+            }
+        }
+
+        result = sort_course_sections("course-v1:Test+Course", data)
+        expected_sections = [
+            {"id": "section2", "name": "Advanced"},
+            {"id": "section3", "name": "Bonus"},
+            {"id": "section1", "name": "Intro"},
+        ]
+
+        assert result["LinkCheckOutput"]["sections"] == expected_sections

@@ -14,17 +14,16 @@ from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffl
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
-from openedx.core.djangoapps.notifications.base_notification import (
-    COURSE_NOTIFICATION_APPS,
-    COURSE_NOTIFICATION_TYPES,
-)
+from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.events import notification_preference_unsubscribe_event
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     get_course_notification_preference_config_version
 )
+from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
@@ -385,7 +384,7 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
             pref = pref.get_user_course_preference(pref.user_id, pref.course_id)
         return pref
 
-    course_ids = CourseEnrollment.objects.filter(user=user).values_list('course_id', flat=True)
+    course_ids = CourseEnrollment.objects.filter(user=user, is_active=True).values_list('course_id', flat=True)
     CourseNotificationPreference.objects.bulk_create(
         [
             CourseNotificationPreference(user=user, course_id=course_id)
@@ -421,6 +420,8 @@ def update_user_preferences_from_patch(encrypted_username, encrypted_patch):
                                 is_preference_updated = True
         preference.save()
         notification_preference_unsubscribe_event(user, is_preference_updated)
+    if app_value is None and type_value is None and channel_value == 'email' and not pref_value:
+        UserPreference.objects.get_or_create(user_id=user.id, key=ONE_CLICK_EMAIL_UNSUB_KEY)
 
 
 def is_notification_type_channel_editable(app_name, notification_type, channel):

@@ -9,9 +9,13 @@ from unittest.mock import DEFAULT, Mock, patch
 
 import ddt
 from django.conf import settings
+from django.test import TestCase
+from edx_ace.recipient import Recipient
 
+from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.schedules.message_types import InstructorLedCourseUpdate
 from openedx.core.djangoapps.schedules.resolvers import DEFAULT_NUM_BINS
-from openedx.core.djangoapps.schedules.tasks import BinnedScheduleMessageBaseTask
+from openedx.core.djangoapps.schedules.tasks import BinnedScheduleMessageBaseTask, _schedule_send
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -73,3 +77,44 @@ class TestBinnedScheduleMessageBaseTask(CacheIsolationTestCase):  # lint-amnesty
             self.schedule_config.enqueue_recurring_nudge = enabled
             self.schedule_config.save()
             assert self.basetask.is_enqueue_enabled(self.site) == enabled
+
+
+@ddt.ddt
+@skip_unless_lms
+class TestScheduleSendForDisabledUser(TestCase):
+    """
+    Tests email send for disabled users
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.site = SiteFactory.create()
+        ScheduleConfigFactory.create(
+            site=self.site,
+            enqueue_recurring_nudge=True, deliver_recurring_nudge=True,
+            enqueue_upgrade_reminder=True, deliver_upgrade_reminder=True,
+            enqueue_course_update=True, deliver_course_update=True,
+        )
+
+    @ddt.data(True, False)
+    @patch('openedx.core.djangoapps.schedules.tasks.ace.send')
+    def test_email_not_sent_to_disable_users(self, user_enabled, mock_send):
+        """
+        Tests email not send for disabled users
+        """
+        if user_enabled:
+            self.user.set_password("12345678")
+        else:
+            self.user.set_unusable_password()
+        self.user.save()
+        msg = InstructorLedCourseUpdate().personalize(
+            Recipient(
+                self.user.id,
+                self.user.email,
+            ),
+            "en",
+            {},
+        )
+        _schedule_send(str(msg), self.site.id, "deliver_course_update", "Course Update")
+        assert mock_send.called is user_enabled

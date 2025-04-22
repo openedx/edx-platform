@@ -66,9 +66,6 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
-# Load development webpack donfiguration
-WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
-
 ############################ PYFS XBLOCKS SERVICE #############################
 # Set configuration for Django pyfilesystem
 

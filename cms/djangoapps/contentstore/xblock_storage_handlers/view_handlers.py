@@ -33,7 +33,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
-from cms.djangoapps.contentstore.toggles import ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from cms.lib.xblock.upstream_sync import BadUpstream, sync_from_upstream
@@ -187,11 +186,6 @@ def handle_xblock(request, usage_key_string=None):
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = get_block_info(get_xblock(usage_key, request.user))
-                    # TODO: remove after beta testing for the new problem editor parser
-                    if response["category"] == "problem":
-                        response["metadata"]["default_to_advanced"] = (
-                            ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG.is_enabled()
-                        )
                     if "customReadToken" in fields:
                         parent_children = _get_block_parent_children(get_xblock(usage_key, request.user))
                         response.update(parent_children)
@@ -611,6 +605,7 @@ def _create_block(request):
         modulestore().update_item(created_block, request.user.id)
         response["upstreamRef"] = upstream_ref
         response["static_file_notices"] = asdict(static_file_notices)
+        response["parent_locator"] = parent_locator
 
     return JsonResponse(response)
 

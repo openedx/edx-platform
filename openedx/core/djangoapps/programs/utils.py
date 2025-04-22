@@ -9,7 +9,6 @@ from urllib.parse import urljoin, urlparse, urlunparse
 
 from dateutil.parser import parse
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.urls import reverse
@@ -27,7 +26,7 @@ from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.commerce.utils import EcommerceService, get_program_price_info
 from openedx.core.djangoapps.catalog.api import get_programs_by_type
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import (
@@ -35,7 +34,6 @@ from openedx.core.djangoapps.catalog.utils import (
     get_pathways,
     get_programs,
 )
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
 from openedx.core.djangoapps.enrollments.api import get_enrollments
@@ -213,7 +211,7 @@ class ProgramProgressMeter:
         return inverted_programs
 
     @cached_property
-    def engaged_programs(self):
+    def engaged_programs(self) -> list[dict | None]:
         """Derive a list of programs in which the given user is engaged.
 
         Returns:
@@ -273,7 +271,7 @@ class ProgramProgressMeter:
         # An upgrade deadline of None means the course is always upgradeable.
         return any(not deadline or deadline and parse(deadline) > now for deadline in upgrade_deadlines)
 
-    def progress(self, programs=None, count_only=True):
+    def progress(self, programs: list[dict | None] | None = None, count_only: bool = True) -> list[dict | None]:
         """Gauge a user's progress towards program completion.
 
         Keyword Arguments:
@@ -703,6 +701,7 @@ class ProgramDataExtender:
         is_learner_eligible_for_one_click_purchase = self.data["is_program_eligible_for_one_click_purchase"]
         bundle_uuid = self.data.get("uuid")
         skus = []
+        course_keys = []
         bundle_variant = "full"
 
         if is_learner_eligible_for_one_click_purchase:  # lint-amnesty, pylint: disable=too-many-nested-blocks
@@ -721,6 +720,7 @@ class ProgramDataExtender:
                     # we are assuming that, for any given course, there is at most one paid entitlement available.
                     if entitlement["mode"] in applicable_seat_types:
                         skus.append(entitlement["sku"])
+                        course_keys.append(course.get("key"))
                         entitlement_product = True
                         break
                 if not entitlement_product:
@@ -730,6 +730,7 @@ class ProgramDataExtender:
                         for seat in published_course_runs[0]["seats"]:
                             if seat["type"] in applicable_seat_types and seat["sku"]:
                                 skus.append(seat["sku"])
+                                course_keys.append(course.get("key"))
                                 break
                     else:
                         # If a course in the program has more than 1 published course run
@@ -739,31 +740,23 @@ class ProgramDataExtender:
 
         if skus:
             try:
-                api_user = self.user
-                is_anonymous = False
-                if not self.user.is_authenticated:
-                    user = get_user_model()
-                    service_user = user.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-                    api_user = service_user
-                    is_anonymous = True
-
-                api_client = get_ecommerce_api_client(api_user)
-                api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/calculate/")
+                is_anonymous = not self.user.is_authenticated
 
                 # The user specific program price is slow to calculate, so use switch to force the
                 # anonymous price for all users. See LEARNER-5555 for more details.
                 if is_anonymous or ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.is_enabled():
                     # The bundle uuid is necessary to see the program's discounted price
                     if bundle_uuid:
-                        params = dict(sku=skus, is_anonymous=True, bundle=bundle_uuid)
+                        params = dict(sku=skus, is_anonymous=True, bundle=bundle_uuid, course_key=course_keys)
                     else:
-                        params = dict(sku=skus, is_anonymous=True)
+                        params = dict(sku=skus, is_anonymous=True, course_key=course_keys)
                 else:
                     if bundle_uuid:
-                        params = dict(sku=skus, username=self.user.username, bundle=bundle_uuid)
+                        params = dict(sku=skus, username=self.user.username, bundle=bundle_uuid, course_key=course_keys)
                     else:
-                        params = dict(sku=skus, username=self.user.username)
-                response = api_client.get(api_url, params=params)
+                        params = dict(sku=skus, username=self.user.username, course_key=course_keys)
+
+                response = get_program_price_info(self.user, params)
                 response.raise_for_status()
                 discount_data = response.json()
                 program_discounted_price = discount_data["total_incl_tax"]
