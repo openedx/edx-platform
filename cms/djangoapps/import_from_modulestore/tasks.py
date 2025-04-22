@@ -11,7 +11,7 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import LearningPackage
 from openedx.core.djangoapps.content_staging import api as content_staging_api
 
-from .constants import IMPORT_FROM_MODULESTORE_PURPOSE
+from .constants import IMPORT_FROM_MODULESTORE_STAGING_PURPOSE
 from .data import ImportStatus
 from .helpers import get_items_to_import, ImportClient
 from .models import Import, PublishableEntityImport, StagedContentForImport
@@ -41,7 +41,7 @@ def save_legacy_content_to_staged_content_task(import_uuid: str) -> None:
                 staged_content = content_staging_api.stage_xblock_temporarily(
                     item,
                     import_event.user.id,
-                    purpose=IMPORT_FROM_MODULESTORE_PURPOSE,
+                    purpose=IMPORT_FROM_MODULESTORE_STAGING_PURPOSE,
                 )
                 StagedContentForImport.objects.create(
                     staged_content=staged_content,
