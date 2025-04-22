@@ -3,6 +3,7 @@ API for course to library import.
 """
 from opaque_keys.edx.keys import LearningContextKey
 
+from .helpers import cancel_incomplete_old_imports
 from .models import Import as _Import
 from .tasks import import_course_staged_content_to_library_task, save_legacy_content_to_staged_content_task
 from .validators import validate_usage_keys_to_import
@@ -12,10 +13,8 @@ def create_import(source_key: LearningContextKey, user_id: int) -> _Import:
     """
     Create a new import event to import a course to a library and save course to staged content.
     """
-    import_from_modulestore = _Import.objects.create(
-        source_key=source_key,
-        user_id=user_id,
-    )
+    import_from_modulestore = _Import.objects.create(source_key=source_key, user_id=user_id)
+    cancel_incomplete_old_imports(import_from_modulestore)
     save_legacy_content_to_staged_content_task.delay_on_commit(import_from_modulestore.uuid)
     return import_from_modulestore
 

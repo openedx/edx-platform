@@ -20,7 +20,7 @@ from openedx.core.djangoapps.content_libraries import api
 from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.django import modulestore
 
-from .data import CompositionLevel, PublishableVersionWithMapping
+from .data import CompositionLevel, ImportStatus, PublishableVersionWithMapping
 from .models import Import, PublishableEntityMapping
 
 
@@ -414,3 +414,19 @@ def get_items_to_import(import_event):
         )
 
     return items_to_import
+
+
+def cancel_incomplete_old_imports(instance):
+    """
+    Cancel any incomplete imports that have the same target as the current import.
+
+    When a new import is created, we want to cancel any other incomplete user imports that have the same target.
+    """
+    incomplete_user_imports_with_same_target = Import.objects.filter(
+        user=instance.user,
+        target_change=instance.target_change,
+        source_key=instance.source_key,
+        staged_content_for_import__isnull=False
+    ).exclude(uuid=instance.uuid)
+    for incomplete_import in incomplete_user_imports_with_same_target:
+        incomplete_import.set_status(ImportStatus.CANCELED)
