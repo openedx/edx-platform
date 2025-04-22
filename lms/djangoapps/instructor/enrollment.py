@@ -140,7 +140,8 @@ def enroll_email(
     `auto_enroll` determines what is put in CourseEnrollmentAllowed.auto_enroll
         if auto_enroll is set, then when the email registers, they will be
         enrolled in the course automatically.
-    `message_students` determines if student should be notified of action by email or push message.
+    `message_students` determines if student(only if he has a registered user) 
+        should be notified of action by email or push message.
     `message_params` parameters used while parsing message templates (a `dict`).
     `language` is the language used to render the email.
 
@@ -192,7 +193,7 @@ def enroll_email(
             message_params['email_address'] = student_email
             if previous_state.user:
                 message_params['user_id'] = previous_state.user.id
-            send_mail_to_student(student_email, message_params, language=language)
+                send_mail_to_student(student_email, message_params, language=language)
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
