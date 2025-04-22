@@ -2742,7 +2742,7 @@ def export_ora2_summary(request, course_id):
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
-class ExportOra2SubmissionFilesView(APIView):
+class ExportOra2SubmissionFilesView(DeveloperErrorViewMixin, APIView):
     """
     Pushes a Celery task which will download and compress all submission
     files (texts, attachments) into a zip archive.
@@ -2751,6 +2751,7 @@ class ExportOra2SubmissionFilesView(APIView):
     permission_name = permissions.CAN_RESEARCH
 
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
         Initiates a task to export all ORA2 submission files for a course.
