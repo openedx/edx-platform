@@ -70,6 +70,7 @@ class ContainerMetadata(PublishableItem):
     """
     container_key: LibraryContainerLocator
     container_type: ContainerType
+    published_display_name: str | None
 
     @classmethod
     def from_container(cls, library_key, container: Container, associated_collections=None):
@@ -103,6 +104,7 @@ class ContainerMetadata(PublishableItem):
             modified=draft.created,
             draft_version_num=draft.version_num,
             published_version_num=published.version_num if published else None,
+            published_display_name=published.title if published else None,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
             published_by=published_by,
             last_draft_created=last_draft_created,
@@ -192,7 +194,7 @@ def create_container(
         slug = slugify(title, allow_unicode=True) + '-' + uuid4().hex[-6:]
     # Make sure the slug is valid by first creating a key for the new container:
     container_key = LibraryContainerLocator(
-        library_key=library_key,
+        library_key,
         container_type=container_type.value,
         container_id=slug,
     )
