@@ -2201,62 +2201,82 @@ def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.RESCORE_EXAMS)
-@common_exceptions_400
-def rescore_entrance_exam(request, course_id):
+class RescoreEntranceExamSerializer(serializers.Serializer):
+    """Serializer for entrance exam rescoring"""
+    unique_student_identifier = serializers.CharField(required=False, allow_null=True)
+    all_students = serializers.BooleanField(required=False)
+    only_if_higher = serializers.BooleanField(required=False, allow_null=True)
+
+
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class RescoreEntranceExamView(DeveloperErrorViewMixin, APIView):
     """
-    Starts a background process a students attempts counter for entrance exam.
+    Starts a background process for a student's attempts counter for entrance exam.
     Optionally deletes student state for a problem. Limited to instructor access.
 
-    Takes either of the following query parameters
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
+    Takes either of the following parameters:
+        - unique_student_identifier: an email or username
+        - all_students: a boolean
 
     all_students and unique_student_identifier cannot both be present.
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.RESCORE_EXAMS
+    serializer_class = RescoreEntranceExamSerializer
 
-    student_identifier = request.POST.get('unique_student_identifier', None)
-    only_if_higher = request.POST.get('only_if_higher', None)
-    student = None
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Initiates a Celery task to rescore the entrance exam for a student or all students.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
 
-    all_students = _get_boolean_param(request, 'all_students')
-
-    if not course.entrance_exam_id:
-        return HttpResponseBadRequest(
-            _("Course has no entrance exam section.")
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_with_access(
+            request.user, 'staff', course_id, depth=None
         )
 
-    if all_students and student:
-        return HttpResponseBadRequest(
-            _("Cannot rescore with all_students and unique_student_identifier.")
+        if not course.entrance_exam_id:
+            return Response(
+                {"error": _("Course has no entrance exam section.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        student_identifier = data.get('unique_student_identifier')
+        only_if_higher = data.get('only_if_higher')
+        all_students = data.get('all_students', False)
+        student = None
+
+        if student_identifier:
+            student = get_student_from_identifier(student_identifier)
+
+        if all_students and student:
+            return Response(
+                {"error": _("Cannot rescore with all_students and unique_student_identifier.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
+        except InvalidKeyError:
+            return Response(
+                {"error": _("Course has no valid entrance exam section.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        response_payload = {
+            'student': student_identifier if student else _("All Students"),
+            'task': TASK_SUBMISSION_OK
+        }
+
+        task_api.submit_rescore_entrance_exam_for_student(
+            request, entrance_exam_key, student, only_if_higher,
         )
 
-    try:
-        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
-    except InvalidKeyError:
-        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
-
-    response_payload = {}
-    if student:
-        response_payload['student'] = student_identifier
-    else:
-        response_payload['student'] = _("All Students")
-
-    task_api.submit_rescore_entrance_exam_for_student(
-        request, entrance_exam_key, student, only_if_higher,
-    )
-    response_payload['task'] = TASK_SUBMISSION_OK
-    return JsonResponse(response_payload)
+        return Response(response_payload)
 
 
 @require_POST
