@@ -173,7 +173,7 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
             create_or_update_xblock_upstream_link_patch.start()
             self.addCleanup(create_or_update_xblock_upstream_link_patch.stop)
             publishableEntityLinkPatch = patch(
-                'cms.djangoapps.contentstore.signals.handlers.PublishableEntityLink'
+                'cms.djangoapps.contentstore.signals.handlers.ComponentLink'
             )
             publishableEntityLinkPatch.start()
             self.addCleanup(publishableEntityLinkPatch.stop)

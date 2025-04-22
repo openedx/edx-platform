@@ -17,7 +17,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
-from ..models import LearningContextLinksStatus, LearningContextLinksStatusChoices, PublishableEntityLink
+from ..models import LearningContextLinksStatus, LearningContextLinksStatusChoices, ComponentLink
 
 
 class BaseUpstreamLinksHelpers(TestCase):
@@ -66,7 +66,7 @@ class BaseUpstreamLinksHelpers(TestCase):
         """
         Compares links for given course with passed expected list of dicts.
         """
-        links = list(PublishableEntityLink.objects.filter(downstream_context_key=course_key).values(
+        links = list(ComponentLink.objects.filter(downstream_context_key=course_key).values(
             'upstream_block',
             'upstream_usage_key',
             'upstream_context_key',
@@ -132,7 +132,7 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         """
         # Pre-checks
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_1)).exists()
-        assert not PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_1).exists()
+        assert not ComponentLink.objects.filter(downstream_context_key=self.course_key_1).exists()
         # Run command
         self.call_command('--course', str(self.course_key_1))
         # Post verfication
@@ -147,9 +147,9 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         """
         # Pre-checks
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_2)).exists()
-        assert not PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_2).exists()
+        assert not ComponentLink.objects.filter(downstream_context_key=self.course_key_2).exists()
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_3)).exists()
-        assert not PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_3).exists()
+        assert not ComponentLink.objects.filter(downstream_context_key=self.course_key_3).exists()
 
         # Run command
         self.call_command('--course', str(self.course_key_2), '--course', str(self.course_key_3))
@@ -170,7 +170,7 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         """
         # Delete all links and status just to make sure --all option works
         LearningContextLinksStatus.objects.all().delete()
-        PublishableEntityLink.objects.all().delete()
+        ComponentLink.objects.all().delete()
         # Pre-checks
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_1)).exists()
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_2)).exists()
@@ -257,9 +257,9 @@ class TestUpstreamLinksEvents(ModuleStoreTestCase, OpenEdxEventsTestMixin, BaseU
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_1)).exists()
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_2)).exists()
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_3)).exists()
-        assert PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_1).count() == 3
-        assert PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_2).count() == 3
-        assert PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_3).count() == 3
+        assert ComponentLink.objects.filter(downstream_context_key=self.course_key_1).count() == 3
+        assert ComponentLink.objects.filter(downstream_context_key=self.course_key_2).count() == 3
+        assert ComponentLink.objects.filter(downstream_context_key=self.course_key_3).count() == 3
         self._compare_links(self.course_key_1, self.expected_links_1)
         self._compare_links(self.course_key_2, self.expected_links_2)
         self._compare_links(self.course_key_3, self.expected_links_3)
@@ -269,6 +269,6 @@ class TestUpstreamLinksEvents(ModuleStoreTestCase, OpenEdxEventsTestMixin, BaseU
         Test whether links are deleted on deletion of xblock.
         """
         usage_key = self.expected_links_1[0]["downstream_usage_key"]
-        assert PublishableEntityLink.objects.filter(downstream_usage_key=usage_key).exists()
+        assert ComponentLink.objects.filter(downstream_usage_key=usage_key).exists()
         self.store.delete_item(usage_key, self.user.id)
-        assert not PublishableEntityLink.objects.filter(downstream_usage_key=usage_key).exists()
+        assert not ComponentLink.objects.filter(downstream_usage_key=usage_key).exists()

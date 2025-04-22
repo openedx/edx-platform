@@ -4,10 +4,10 @@ Serializers for upstream -> downstream entity links.
 
 from rest_framework import serializers
 
-from cms.djangoapps.contentstore.models import PublishableEntityLink
+from cms.djangoapps.contentstore.models import ComponentLink
 
 
-class PublishableEntityLinksSerializer(serializers.ModelSerializer):
+class ComponentLinksSerializer(serializers.ModelSerializer):
     """
     Serializer for publishable entity links.
     """
@@ -16,11 +16,11 @@ class PublishableEntityLinksSerializer(serializers.ModelSerializer):
     ready_to_sync = serializers.BooleanField()
 
     class Meta:
-        model = PublishableEntityLink
+        model = ComponentLink
         exclude = ['upstream_block', 'uuid']
 
 
-class PublishableEntityLinksSummarySerializer(serializers.Serializer):
+class ComponentLinksSummarySerializer(serializers.Serializer):
     """
     Serializer for summary for publishable entity links
     """

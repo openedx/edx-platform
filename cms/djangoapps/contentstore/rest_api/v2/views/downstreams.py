@@ -48,7 +48,7 @@ https://github.com/openedx/edx-platform/issues/35653):
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
       GET: List downstream blocks that can be synced, filterable by course or sync-readiness.
-        200: A paginated list of applicable & accessible downstream blocks. Entries are PublishableEntityLinks.
+        200: A paginated list of applicable & accessible downstream blocks. Entries are ComponentLinks.
 
   /api/contentstore/v2/downstreams/<course_key>/summary
       GET: List summary of links by course key
@@ -95,10 +95,10 @@ from rest_framework.views import APIView
 from xblock.core import XBlock
 
 from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
-from cms.djangoapps.contentstore.models import PublishableEntityLink
+from cms.djangoapps.contentstore.models import ComponentLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
-    PublishableEntityLinksSerializer,
-    PublishableEntityLinksSummarySerializer,
+    ComponentLinksSerializer,
+    ComponentLinksSummarySerializer,
 )
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
@@ -183,9 +183,9 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
                 link_filter["upstream_usage_key"] = UsageKey.from_string(upstream_usage_key)
             except InvalidKeyError as exc:
                 raise ValidationError(detail=f"Malformed usage key: {upstream_usage_key}") from exc
-        links = PublishableEntityLink.filter_links(**link_filter)
+        links = ComponentLink.filter_links(**link_filter)
         paginated_links = paginator.paginate_queryset(links, self.request, view=self)
-        serializer = PublishableEntityLinksSerializer(paginated_links, many=True)
+        serializer = ComponentLinksSerializer(paginated_links, many=True)
         return paginator.get_paginated_response(serializer.data, self.request)
 
 
@@ -217,8 +217,8 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        links = PublishableEntityLink.summarize_by_downstream_context(downstream_context_key=course_key)
-        serializer = PublishableEntityLinksSummarySerializer(links, many=True)
+        links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
+        serializer = ComponentLinksSummarySerializer(links, many=True)
         return Response(serializer.data)
 
 

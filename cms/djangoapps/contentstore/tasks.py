@@ -84,7 +84,7 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctori
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 
-from .models import LearningContextLinksStatus, LearningContextLinksStatusChoices, PublishableEntityLink
+from .models import LearningContextLinksStatus, LearningContextLinksStatusChoices, ComponentLink
 from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
@@ -1475,7 +1475,7 @@ def create_or_update_upstream_links(
         updated=created,
     )
     if replace:
-        PublishableEntityLink.objects.filter(downstream_context_key=course_key).delete()
+        ComponentLink.objects.filter(downstream_context_key=course_key).delete()
     try:
         xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
     except ItemNotFoundError:
@@ -1501,7 +1501,7 @@ def handle_unlink_upstream_block(upstream_usage_key_string: str) -> None:
         LOGGER.exception(f'Invalid upstream usage_key: {upstream_usage_key_string}')
         return
 
-    for link in PublishableEntityLink.objects.filter(
+    for link in ComponentLink.objects.filter(
         upstream_usage_key=upstream_usage_key,
     ):
         make_copied_tags_editable(str(link.downstream_usage_key))

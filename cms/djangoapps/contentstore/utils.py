@@ -113,7 +113,7 @@ from xmodule.partitions.partitions_service import (
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 
-from .models import PublishableEntityLink
+from .models import ComponentLink
 
 IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
 log = logging.getLogger(__name__)
@@ -2384,7 +2384,7 @@ def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, c
     except ObjectDoesNotExist:
         log.error(f"Library component not found for {upstream_usage_key}")
         lib_component = None
-    PublishableEntityLink.update_or_create(
+    ComponentLink.update_or_create(
         lib_component,
         upstream_usage_key=upstream_usage_key,
         upstream_context_key=str(upstream_usage_key.context_key),

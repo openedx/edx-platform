@@ -14,7 +14,7 @@ from django.db.models.lookups import GreaterThan
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_learning.api.authoring_models import Component, PublishableEntity
+from openedx_learning.api.authoring_models import Component
 from openedx_learning.lib.fields import (
     immutable_uuid_field,
     key_field,
@@ -80,14 +80,14 @@ class CleanStaleCertificateAvailabilityDatesConfig(ConfigurationModel):
     )
 
 
-class PublishableEntityLink(models.Model):
+class ComponentLink(models.Model):
     """
     This represents link between any two publishable entities or link between publishable entity and a course
     xblock. It helps in tracking relationship between xblocks imported from libraries and used in different courses.
     """
     uuid = immutable_uuid_field()
     upstream_block = models.ForeignKey(
-        PublishableEntity,
+        Component,
         on_delete=models.SET_NULL,
         related_name="links",
         null=True,
@@ -124,10 +124,10 @@ class PublishableEntityLink(models.Model):
         Returns upstream block version number if available.
         """
         version_num = None
-        if hasattr(self.upstream_block, 'published'):
-            if hasattr(self.upstream_block.published, 'version'):
-                if hasattr(self.upstream_block.published.version, 'version_num'):
-                    version_num = self.upstream_block.published.version.version_num
+        if hasattr(self.upstream_block.publishable_entity, 'published'):
+            if hasattr(self.upstream_block.publishable_entity.published, 'version'):
+                if hasattr(self.upstream_block.publishable_entity.published.version, 'version_num'):
+                    version_num = self.upstream_block.publishable_entity.published.version.version_num
         return version_num
 
     @property
@@ -135,11 +135,11 @@ class PublishableEntityLink(models.Model):
         """
         Returns upstream context title.
         """
-        return self.upstream_block.learning_package.title
+        return self.upstream_block.publishable_entity.learning_package.title
 
     class Meta:
-        verbose_name = _("Publishable Entity Link")
-        verbose_name_plural = _("Publishable Entity Links")
+        verbose_name = _("Component Link")
+        verbose_name_plural = _("Component Links")
 
     @classmethod
     def update_or_create(
@@ -153,7 +153,7 @@ class PublishableEntityLink(models.Model):
         version_synced: int,
         version_declined: int | None = None,
         created: datetime | None = None,
-    ) -> "PublishableEntityLink":
+    ) -> "ComponentLink":
         """
         Update or create entity link. This will only update `updated` field if something has changed.
         """
@@ -170,7 +170,7 @@ class PublishableEntityLink(models.Model):
         if upstream_block:
             new_values.update(
                 {
-                    'upstream_block': upstream_block.publishable_entity,
+                    'upstream_block': upstream_block,
                 }
             )
         try:
@@ -201,21 +201,21 @@ class PublishableEntityLink(models.Model):
     def filter_links(
         cls,
         **link_filter,
-    ) -> QuerySet["PublishableEntityLink"]:
+    ) -> QuerySet["ComponentLink"]:
         """
         Get all links along with sync flag, upstream context title and version, with optional filtering.
         """
         ready_to_sync = link_filter.pop('ready_to_sync', None)
         result = cls.objects.filter(**link_filter).select_related(
-            "upstream_block__published__version",
-            "upstream_block__learning_package"
+            "upstream_block__publishable_entity__published__version",
+            "upstream_block__publishable_entity__learning_package"
         ).annotate(
             ready_to_sync=(
                 GreaterThan(
-                    Coalesce("upstream_block__published__version__version_num", 0),
+                    Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
                     Coalesce("version_synced", 0)
                 ) & GreaterThan(
-                    Coalesce("upstream_block__published__version__version_num", 0),
+                    Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
                     Coalesce("version_declined", 0)
                 )
             )
@@ -225,7 +225,7 @@ class PublishableEntityLink(models.Model):
         return result
 
     @classmethod
-    def get_by_upstream_usage_key(cls, upstream_usage_key: UsageKey) -> QuerySet["PublishableEntityLink"]:
+    def get_by_upstream_usage_key(cls, upstream_usage_key: UsageKey) -> QuerySet["ComponentLink"]:
         """
         Get all downstream context keys for given upstream usage key
         """
@@ -255,7 +255,7 @@ class PublishableEntityLink(models.Model):
         """
         result = cls.filter_links(downstream_context_key=downstream_context_key).values(
             "upstream_context_key",
-            upstream_context_title=F("upstream_block__learning_package__title"),
+            upstream_context_title=F("upstream_block__publishable_entity__learning_package__title"),
         ).annotate(
             ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
             total_count=Count('id')
@@ -275,7 +275,7 @@ class LearningContextLinksStatusChoices(models.TextChoices):
 
 class LearningContextLinksStatus(models.Model):
     """
-    This table stores current processing status of upstream-downstream links in PublishableEntityLink table for a
+    This table stores current processing status of upstream-downstream links in ComponentLink table for a
     course or a learning context.
     """
     context_key = CourseKeyField(

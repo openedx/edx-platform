@@ -14,7 +14,7 @@ from cms.djangoapps.contentstore.models import (
     BackfillCourseTabsConfig,
     CleanStaleCertificateAvailabilityDatesConfig,
     LearningContextLinksStatus,
-    PublishableEntityLink,
+    ComponentLink,
     VideoUploadConfig
 )
 from cms.djangoapps.contentstore.outlines_regenerate import CourseOutlineRegenerate
@@ -88,10 +88,10 @@ class CleanStaleCertificateAvailabilityDatesConfigAdmin(ConfigurationModelAdmin)
     pass
 
 
-@admin.register(PublishableEntityLink)
-class PublishableEntityLinkAdmin(admin.ModelAdmin):
+@admin.register(ComponentLink)
+class ComponentLinkAdmin(admin.ModelAdmin):
     """
-    PublishableEntityLink admin.
+    ComponentLink admin.
     """
     fields = (
         "uuid",
