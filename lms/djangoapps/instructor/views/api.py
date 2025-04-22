@@ -2781,26 +2781,29 @@ def calculate_grades_csv(request, course_id):
     return JsonResponse({"status": success_status})
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def problem_grade_report(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ProblemGradeReportView(DeveloperErrorViewMixin, APIView):
     """
-    Request a CSV showing students' grades for all problems in the
-    course.
+    Request a CSV showing students' grades for all problems in the course.
 
     AlreadyRunningError is raised if the course's grades are already being
     updated.
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('problem grade')
-    task_api.submit_problem_grade_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Initiates a Celery task to calculate problem grade report.
+        """
+        course_key = CourseKey.from_string(course_id)
+        report_type = _('problem grade')
+        task_api.submit_problem_grade_report(request, course_key)
+        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+        return Response({"status": success_status})
 
 
 @require_POST
