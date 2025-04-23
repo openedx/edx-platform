@@ -96,7 +96,7 @@ class ImportClient:
         usage_key = UsageKey.from_string(usage_key_string)
         result = []
 
-        if block_to_import.tag not in CompositionLevel.COMPLEX_LEVELS.value:
+        if block_to_import.tag not in CompositionLevel.OLX_COMPLEX_LEVELS.value:
             return self._import_simple_block(block_to_import, usage_key)
 
         for child in block_to_import.getchildren():
@@ -108,7 +108,7 @@ class ImportClient:
 
             result.extend(self._import_child_block(child, child_usage_key_string))
 
-        if self.composition_level == CompositionLevel.XBLOCK.value:
+        if self.composition_level == CompositionLevel.COMPONENT.value:
             return [
                 publishable_version_with_mapping for publishable_version_with_mapping in result
                 if not isinstance(publishable_version_with_mapping.publishable_version, ContainerVersion)
@@ -133,7 +133,7 @@ class ImportClient:
         delegates the import process to the appropriate helper method.
         """
         child_usage_key = UsageKey.from_string(child_usage_key_string)
-        if child.tag in CompositionLevel.COMPLEX_LEVELS.value:
+        if child.tag in CompositionLevel.OLX_COMPLEX_LEVELS.value:
             return self._import_complicated_child(child, child_usage_key_string)
         else:
             return self._import_simple_block(child, child_usage_key)
@@ -169,7 +169,7 @@ class ImportClient:
 
         Container type should be at a lower level than the current composition level.
         """
-        composition_hierarchy = CompositionLevel.COMPLEX_LEVELS.value
+        composition_hierarchy = CompositionLevel.OLX_COMPLEX_LEVELS.value
         return (
             container_type in composition_hierarchy and
             self.composition_level in composition_hierarchy and
@@ -389,10 +389,7 @@ def import_from_staged_content(
     return import_client.import_from_staged_content()
 
 
-def get_or_create_publishable_entity_mapping(
-        usage_key: UsageKey,
-        component: 'Component' | 'Container'
-) -> tuple[PublishableEntityMapping, bool]:
+def get_or_create_publishable_entity_mapping(usage_key, component) -> tuple[PublishableEntityMapping, bool]:
     """
     Creates a mapping between the source usage key and the target publishable entity.
     """
@@ -418,7 +415,7 @@ def get_node_for_usage_key(node: etree._Element, usage_key: UsageKey) -> etree._
     """
     Get the node in an XML tree which matches to the usage key.
     """
-    if node.get('url_name') == usage_key.block_id:
+    if node.tag == usage_key.block_type and node.get('url_name') == usage_key.block_id:
         return node
 
     for child in node.getchildren():

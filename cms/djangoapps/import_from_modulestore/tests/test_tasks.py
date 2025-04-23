@@ -104,7 +104,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
             self.import_event.uuid,
             self.content_library.learning_package.id,
             self.user.id,
-            'xblock',
+            'component',
             override=True
         )
 
@@ -130,7 +130,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
                     str(self.import_event.uuid),
                     self.content_library.learning_package.id,
                     self.user.id,
-                    'xblock',
+                    'component',
                     override=True,
                 )
                 mock_import_from_staged_content.assert_not_called()
@@ -153,7 +153,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
             str(self.import_event.uuid),
             self.content_library.learning_package.id,
             self.user.id,
-            'xblock',
+            'component',
             override=True,
         )
 

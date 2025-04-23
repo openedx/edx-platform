@@ -3,6 +3,7 @@ This module contains the data models for the import_from_modulestore app.
 """
 from collections import namedtuple
 from enum import Enum
+from openedx.core.djangoapps.content_libraries import api as content_libraries_api
 
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
@@ -32,14 +33,14 @@ class CompositionLevel(Enum):
     levels for easier processing.
     """
 
-    CHAPTER = 'chapter'
-    SEQUENTIAL = 'sequential'
-    VERTICAL = 'vertical'
-    XBLOCK = 'xblock'
-    COMPLEX_LEVELS = [
-        VERTICAL,
-        SEQUENTIAL,
-        CHAPTER,
+    CHAPTER = content_libraries_api.ContainerType.Section
+    SEQUENTIAL = content_libraries_api.ContainerType.Subsection
+    VERTICAL = content_libraries_api.ContainerType.Unit
+    COMPONENT = 'component'
+    OLX_COMPLEX_LEVELS = [
+        VERTICAL.olx_tag,
+        SEQUENTIAL.olx_tag,
+        CHAPTER.olx_tag,
     ]
 
     @classmethod
