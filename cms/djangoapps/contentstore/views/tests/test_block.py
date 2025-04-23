@@ -75,7 +75,7 @@ from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 
-from ..component import component_handler, get_component_templates
+from ..component import component_handler, DEFAULT_ADVANCED_MODULES, get_component_templates
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     ALWAYS,
     VisibilityState,
@@ -2970,7 +2970,7 @@ class TestComponentTemplates(CourseTestCase):
         # Check for default advanced modules
         advanced_templates = self.get_templates_of_type("advanced")
         advanced_module_keys = [t['category'] for t in advanced_templates]
-        self.assertCountEqual(advanced_module_keys, settings.DEFAULT_ADVANCED_MODULES)
+        self.assertCountEqual(advanced_module_keys, DEFAULT_ADVANCED_MODULES)
 
         # Now fully disable video through XBlockConfiguration
         XBlockConfiguration.objects.create(name="video", enabled=False)
@@ -3019,7 +3019,7 @@ class TestComponentTemplates(CourseTestCase):
         Test the handling of advanced component templates.
         """
         self.course.advanced_modules.append("done")
-        EXPECTED_ADVANCED_MODULES_LENGTH = len(settings.DEFAULT_ADVANCED_MODULES) + 1
+        EXPECTED_ADVANCED_MODULES_LENGTH = len(DEFAULT_ADVANCED_MODULES) + 1
         self.templates = get_component_templates(self.course)
         advanced_templates = self.get_templates_of_type("advanced")
         self.assertEqual(len(advanced_templates), EXPECTED_ADVANCED_MODULES_LENGTH)

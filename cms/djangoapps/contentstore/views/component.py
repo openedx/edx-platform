@@ -82,6 +82,16 @@ CONTAINER_TEMPLATES = [
     "edit-title-button", "edit-upstream-alert",
 ]
 
+DEFAULT_ADVANCED_MODULES = [
+    'google-calendar',
+    'google-document',
+    'lti_consumer',
+    'poll',
+    'split_test',
+    'survey',
+    'word_cloud',
+]
+
 
 def _advanced_component_types(show_unsupported):
     """
@@ -445,7 +455,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # These modules should be specified as a list of strings, where the strings
     # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
     # enabled for the course.
-    course_advanced_keys = list(dict.fromkeys(courselike.advanced_modules + settings.DEFAULT_ADVANCED_MODULES))
+    course_advanced_keys = list(dict.fromkeys(courselike.advanced_modules + DEFAULT_ADVANCED_MODULES))
     advanced_component_templates = {
         "type": "advanced",
         "templates": [],
