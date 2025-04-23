@@ -17,8 +17,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
 
 from .tools import get_student_from_identifier
 
-from .tools import get_student_from_identifier
-
 
 class RoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
@@ -203,7 +201,7 @@ class UpdateForumRoleMembershipSerializer(AccessSerializer):
         help_text="Rolename assign to given user."
     )
 
- 
+
 class SendEmailSerializer(serializers.Serializer):
     """
     Serializer for sending an email with optional scheduling.
