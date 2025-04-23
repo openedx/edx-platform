@@ -7,8 +7,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from opaque_keys import OpaqueKey
-from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from opaque_keys import InvalidKeyError
 
 from openedx_learning.api.authoring_models import Collection
@@ -319,22 +318,22 @@ class ContentLibraryCollectionUpdateSerializer(serializers.Serializer):
 
 class UsageKeyV2Serializer(serializers.BaseSerializer):
     """
-    Serializes a UsageKeyV2.
+    Serializes a library Component (XBlock) key.
     """
-    def to_representation(self, value: UsageKeyV2) -> str:
+    def to_representation(self, value: LibraryUsageLocatorV2) -> str:
         """
-        Returns the UsageKeyV2 value as a string.
+        Returns the LibraryUsageLocatorV2 value as a string.
         """
         return str(value)
 
-    def to_internal_value(self, value: str) -> UsageKeyV2:
+    def to_internal_value(self, value: str) -> LibraryUsageLocatorV2:
         """
-        Returns a UsageKeyV2 from the string value.
+        Returns a LibraryUsageLocatorV2 from the string value.
 
-        Raises ValidationError if invalid UsageKeyV2.
+        Raises ValidationError if invalid LibraryUsageLocatorV2.
         """
         try:
-            return UsageKeyV2.from_string(value)
+            return LibraryUsageLocatorV2.from_string(value)
         except InvalidKeyError as err:
             raise ValidationError from err
 
@@ -359,12 +358,12 @@ class OpaqueKeySerializer(serializers.BaseSerializer):
 
     def to_internal_value(self, value: str) -> OpaqueKey:
         """
-        Returns a UsageKeyV2 or a LibraryContainerLocator from the string value.
+        Returns a LibraryUsageLocatorV2 or a LibraryContainerLocator from the string value.
 
         Raises ValidationError if invalid UsageKeyV2 or LibraryContainerLocator.
         """
         try:
-            return UsageKeyV2.from_string(value)
+            return LibraryUsageLocatorV2.from_string(value)
         except InvalidKeyError:
             try:
                 return LibraryContainerLocator.from_string(value)
