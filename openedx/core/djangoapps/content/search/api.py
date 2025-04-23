@@ -760,7 +760,7 @@ def update_library_components_collections(
 
     Because there may be a lot of components, we send these updates to Meilisearch in batches.
     """
-    library_key = collection_key.library_key
+    library_key = collection_key.lib_key
     library = lib_api.get_library(library_key)
     components = authoring_api.get_collection_components(
         library.learning_package_id,
@@ -795,7 +795,7 @@ def update_library_containers_collections(
 
     Because there may be a lot of containers, we send these updates to Meilisearch in batches.
     """
-    library_key = collection_key.library_key
+    library_key = collection_key.lib_key
     library = lib_api.get_library(library_key)
     containers = authoring_api.get_collection_containers(
         library.learning_package_id,
