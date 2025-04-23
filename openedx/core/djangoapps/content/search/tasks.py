@@ -98,7 +98,7 @@ def update_library_collection_index_doc(collection_key_str: str) -> None:
     Celery task to update the content index document for a library collection
     """
     collection_key = LibraryCollectionLocator.from_string(collection_key_str)
-    library_key = collection_key.library_key
+    library_key = collection_key.lib_key
 
     log.info("Updating content index documents for collection %s in library%s", collection_key, library_key)
 
@@ -112,7 +112,7 @@ def update_library_components_collections(collection_key_str: str) -> None:
     Celery task to update the "collections" field for components in the given content library collection.
     """
     collection_key = LibraryCollectionLocator.from_string(collection_key_str)
-    library_key = collection_key.library_key
+    library_key = collection_key.lib_key
 
     log.info("Updating document.collections for library %s collection %s components", library_key, collection_key)
 
@@ -126,7 +126,7 @@ def update_library_containers_collections(collection_key_str: str) -> None:
     Celery task to update the "collections" field for containers in the given content library collection.
     """
     collection_key = LibraryCollectionLocator.from_string(collection_key_str)
-    library_key = collection_key.library_key
+    library_key = collection_key.lib_key
 
     log.info("Updating document.collections for library %s collection %s containers", library_key, collection_key)
 

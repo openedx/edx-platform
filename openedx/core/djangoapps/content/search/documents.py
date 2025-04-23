@@ -523,7 +523,7 @@ def searchable_doc_for_collection(
         ).count()
 
         doc.update({
-            Fields.context_key: str(collection_key.library_key),
+            Fields.context_key: str(collection_key.context_key),
             Fields.org: str(collection_key.org),
             Fields.usage_key: str(collection_key),
             Fields.block_id: collection.key,
@@ -536,7 +536,7 @@ def searchable_doc_for_collection(
             Fields.published: {
                 Fields.published_num_children: published_num_children,
             },
-            Fields.access_id: _meili_access_id_from_context_key(collection_key.library_key),
+            Fields.access_id: _meili_access_id_from_context_key(collection_key.context_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })
 

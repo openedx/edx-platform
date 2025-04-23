@@ -5,7 +5,8 @@ from __future__ import annotations
 
 from edx_django_utils.cache import RequestCache
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import LearningContextKey, CollectionKey, ContainerKey, UsageKey
+from opaque_keys.edx.keys import CourseKey, CollectionKey, ContainerKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
 
@@ -17,14 +18,14 @@ def get_content_key_from_string(key_str: str) -> ContentKey:
     """
     Get content key from string
     """
-    for key_type in (LearningContextKey, UsageKey, ContainerKey, CollectionKey):
+    for key_type in (LibraryLocatorV2, CourseKey, UsageKey, ContainerKey, CollectionKey):
         try:
             return key_type.from_string(key_str)
         except InvalidKeyError:
             continue
     raise ValueError(
         "For tagging, object_id must be one of the following "
-        "key types: LearningContextKey, UsageKey, ContainerKey, CollectionKey. "
+        "key types: LibraryLocatorV2, CourseKey, UsageKey, ContainerKey, CollectionKey. "
         f"got: {key_str}"
     )
 
@@ -34,13 +35,14 @@ def get_context_key_from_key(content_key: ContentKey) -> ContextKey:
     Returns the context key from a given content key.
     """
     # If the content key is a CourseKey or a LibraryLocatorV2, return it
-    if isinstance(content_key, LearningContextKey):
+    if isinstance(content_key, (LibraryLocatorV2, CourseKey)):
         return content_key
     else:
+        assert isinstance(content_key.context_key, (CourseKey, LibraryLocatorV2))  # for type checker
         return content_key.context_key
 
 
-def get_context_key_from_key_string(key_str: str) -> LearningContextKey:
+def get_context_key_from_key_string(key_str: str) -> ContextKey:
     """
     Get context key from an key string
     """
@@ -48,7 +50,7 @@ def get_context_key_from_key_string(key_str: str) -> LearningContextKey:
     return get_context_key_from_key(content_key)
 
 
-def check_taxonomy_context_key_org(taxonomy: Taxonomy, context_key: LearningContextKey) -> bool:
+def check_taxonomy_context_key_org(taxonomy: Taxonomy, context_key: ContextKey) -> bool:
     """
     Returns True if the given taxonomy can tag a object with the given context_key.
     """
