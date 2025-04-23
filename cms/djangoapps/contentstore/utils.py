@@ -2375,6 +2375,9 @@ def get_xblock_render_error(request, xblock):
 
 
 def _create_or_update_component_link(course_key: CourseKey, created: datetime | None, xblock):
+    """
+    Create or update upstream->downstream link for components in database for given xblock.
+    """
     upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
     try:
         lib_component = get_component_from_usage_key(upstream_usage_key)
@@ -2394,6 +2397,9 @@ def _create_or_update_component_link(course_key: CourseKey, created: datetime | 
 
 
 def _create_or_update_container_link(course_key: CourseKey, created: datetime | None, xblock):
+    """
+    Create or update upstream->downstream link for containers in database for given xblock.
+    """
     upstream_container_key = LibraryContainerLocator.from_string(xblock.upstream)
     try:
         lib_component = get_container_from_key(upstream_container_key)

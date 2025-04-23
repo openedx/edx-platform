@@ -60,6 +60,9 @@ class BaseUpstreamLinksHelpers(TestCase):
         )
 
     def _create_unit_and_expected_container_link(self, course_key: str | CourseKey, num_blocks: int = 3):
+        """
+        Create unit xblock with random upstream key and version number.
+        """
         data = []
         for i in range(num_blocks):
             upstream, block = self._create_unit(i + 1)

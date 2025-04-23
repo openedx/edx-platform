@@ -525,6 +525,10 @@ def create_item(request):
 
 
 def sync_library_content(created_block: XBlock, request, store, remove_upstream_link: bool = False):
+    """
+    Handle syncing library content for given xblock depending on its upstream type.
+    It can sync unit containers and lower level xblocks.
+    """
     upstream_key = check_and_parse_upstream_key(created_block.upstream, created_block.usage_key)
     if isinstance(upstream_key, LibraryUsageLocatorV2):
         lib_block = sync_from_upstream(downstream=created_block, user=request.user)

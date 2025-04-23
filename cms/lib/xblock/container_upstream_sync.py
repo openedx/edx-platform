@@ -1,3 +1,14 @@
+"""
+Synchronize content and settings from upstream containers to their downstream usages.
+
+* The upstream is a Container from a Learning Core-backed Content Library.
+* The downstream is a block of matching type in a SplitModuleStore-backed Course.
+* They are both on the same Open edX instance.
+
+HOWEVER, those assumptions may loosen in the future. So, we consider these to be INTERNAL ASSUMPIONS that should not be
+exposed through this module's public Python interface.
+"""
+
 import logging
 import typing as t
 from dataclasses import asdict, dataclass
@@ -120,6 +131,9 @@ def _get_library_container_url(container_key: LibraryContainerLocator):
 
 
 class ContainerUpstreamSyncManager(BaseUpstreamSyncManager):
+    """
+    Manages sync process of downstream containers like unit with upstream containers.
+    """
     def __init__(self, downstream: XBlock, user: User, upstream: XBlock | None = None) -> None:
         super().__init__(downstream, user, upstream)
         if not isinstance(self.upstream_key, LibraryContainerLocator):
@@ -152,7 +166,8 @@ class ContainerUpstreamSyncManager(BaseUpstreamSyncManager):
 
         If `downstream` lacks a valid+supported upstream link, this raises an UpstreamLinkException.
         """
-        # We import load_block here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
+        # We import load_block here b/c UpstreamSyncMixin is used by cms/envs,
+        # which loads before the djangoapps are ready.
         from openedx.core.djangoapps.xblock.api import (  # pylint: disable=wrong-import-order
             CheckPerm,
             LatestVersion,
@@ -170,6 +185,9 @@ class ContainerUpstreamSyncManager(BaseUpstreamSyncManager):
         return lib_block
 
     def sync_new_children_blocks(self):
+        """
+        Creates children xblocks in course based on library container children.
+        """
         for child in get_container_children(self.upstream_key, published=True):
             child_block = create_xblock(
                 parent_locator=str(self.downstream.location),

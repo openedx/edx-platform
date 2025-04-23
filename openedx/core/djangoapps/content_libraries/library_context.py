@@ -42,7 +42,11 @@ class LibraryContextImpl(LearningContext):
         self._assert_key_instance(usage_key)
         return self._check_perm(user, usage_key.lib_key, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
 
-    def can_view_block_for_editing(self, user: UserType, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator) -> bool:
+    def can_view_block_for_editing(
+        self,
+        user: UserType,
+        usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
+    ) -> bool:
         """
         Assuming a block with the specified ID (usage_key) exists, does the
         specified user have permission to view its fields and OLX details (but
@@ -65,7 +69,7 @@ class LibraryContextImpl(LearningContext):
         return self._check_perm(user, usage_key.lib_key, permissions.CAN_LEARN_FROM_THIS_CONTENT_LIBRARY)
 
     def _assert_key_instance(self, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator):
-        assert isinstance(usage_key, LibraryUsageLocatorV2) or isinstance(usage_key, LibraryContainerLocator)
+        assert isinstance(usage_key, (LibraryUsageLocatorV2, LibraryContainerLocator))
 
     def _check_perm(self, user: UserType, lib_key: LibraryLocatorV2, perm) -> bool:
         """ Helper method to check a permission for the various can_ methods"""

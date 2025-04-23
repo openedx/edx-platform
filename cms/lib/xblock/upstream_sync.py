@@ -11,6 +11,7 @@ exposed through this module's public Python interface.
 """
 from __future__ import annotations
 
+from abc import ABC
 import logging
 import typing as t
 from dataclasses import asdict, dataclass
@@ -186,7 +187,10 @@ class UpstreamLink(BaseUpstreamLink):
         )
 
 
-class BaseUpstreamSyncManager:
+class BaseUpstreamSyncManager(ABC):
+    """
+    Base manager class for managing upstream link sync process.
+    """
     def __init__(
         self,
         downstream: XBlock,
@@ -293,6 +297,9 @@ class BaseUpstreamSyncManager:
 
 
 class ComponentUpstreamSyncManager(BaseUpstreamSyncManager):
+    """
+    Manages sync process of downstream component with upstream components.
+    """
     def __init__(self, downstream: XBlock, user: User, upstream: XBlock | None = None) -> None:
         super().__init__(downstream, user, upstream)
         if not upstream:
@@ -324,7 +331,8 @@ class ComponentUpstreamSyncManager(BaseUpstreamSyncManager):
 
         If `downstream` lacks a valid+supported upstream link, this raises an UpstreamLinkException.
         """
-        # We import load_block here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
+        # We import load_block here b/c UpstreamSyncMixin is used by cms/envs,
+        # which loads before the djangoapps are ready.
         from openedx.core.djangoapps.xblock.api import (
             CheckPerm,
             LatestVersion,
