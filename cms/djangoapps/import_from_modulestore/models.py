@@ -1,22 +1,29 @@
 """
 Models for the course to library import app.
 """
+from typing import Optional
 import uuid as uuid_tools
 
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from user_tasks.models import UserTaskStatus
 
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import (
     LearningContextKeyField,
     UsageKeyField,
 )
-from openedx_learning.api.authoring_models import LearningPackage, PublishableEntity
+from openedx_learning.api.authoring_models import LearningPackage, PublishableEntity, DraftChangeLog
 
-from .data import ImportStatus
+from openedx.core.djangoapps.content_libraries.api.containers import ContainerType
 
-User = get_user_model()
+COMPOSITION_LEVEL_COMPONENT = "component"
+
+COMPOSITION_LEVEL_CHOICES = [
+    (COMPOSITION_LEVEL_COMPONENT, "Component"),
+    *[(ct.value, ct.name) for ct in ContainerType],
+]
 
 
 class Import(TimeStampedModel):
@@ -24,19 +31,24 @@ class Import(TimeStampedModel):
     Represents the action of a user importing a modulestore-based course or legacy
     library into a learning-core based learning package (today, that is always a content library).
     """
-
-    uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
-    status = models.CharField(
-        max_length=100,
-        choices=ImportStatus.choices,
-        default=ImportStatus.NOT_STARTED,
-        db_index=True
+    user_task_status = models.OneToOneField(
+        to=UserTaskStatus, related_name="import_event",
+        null=True, on_delete=models.SET_NULL,
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # Note: For now, this will always be a course key. In the future, it may be a legacy library key.
-    source_key = LearningContextKeyField(help_text=_('The modulestore course'), max_length=255, db_index=True)
-    target_change = models.ForeignKey(to='oel_publishing.DraftChangeLog', on_delete=models.SET_NULL, null=True)
+    source_key = LearningContextKeyField(help_text=_('Source course key'), max_length=255, db_index=True)
+    target_key = LearningContextKeyField(
+        help_text=_('Target library key'),
+        max_length=255, db_index=True, null=True, blank=True
+    )
+    composition_level = models.CharField(
+        choices=COMPOSITION_LEVEL_CHOICES,
+        max_length=64,
+        default=COMPOSITION_LEVEL_COMPONENT,
+    )
+    override = models.BooleanField(default=False)
+    target_change = models.ForeignKey(to=DraftChangeLog, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name = _('Import from modulestore')
@@ -44,15 +56,6 @@ class Import(TimeStampedModel):
 
     def __str__(self):
         return f'{self.source_key} → {self.target_change}'
-
-    def set_status(self, status: ImportStatus):
-        """
-        Set import status.
-        """
-        self.status = status
-        self.save()
-        if status in [ImportStatus.IMPORTED, ImportStatus.CANCELED]:
-            self.clean_related_staged_content()
 
     def clean_related_staged_content(self) -> None:
         """

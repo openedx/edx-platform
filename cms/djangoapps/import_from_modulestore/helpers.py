@@ -1,13 +1,14 @@
 """
 Helper functions for importing course content into a library.
 """
+from __future__ import annotations
+
 from datetime import datetime, timezone
-from functools import partial
 import logging
 import mimetypes
 import os
 import secrets
-from typing import TYPE_CHECKING
+import typing as t
 
 from django.db import transaction
 from django.db.utils import IntegrityError
@@ -19,17 +20,12 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component, Container, ContainerVersion, PublishableEntity
 
 from openedx.core.djangoapps.content_libraries import api
+from openedx.core.djangoapps.content_libraries.api import ContainerType
 from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.django import modulestore
 
-from .data import CompositionLevel, ImportStatus, PublishableVersionWithMapping
+from .data import PublishableVersionWithMapping
 from .models import Import, PublishableEntityMapping
-
-if TYPE_CHECKING:
-    from openedx_learning.apps.authoring_models import LearningPackage
-    from xblock.core import XBlock
-
-    from openedx.core.djangoapps.content_staging.api import _StagedContent as StagedContent
 
 
 log = logging.getLogger(__name__)
@@ -45,18 +41,20 @@ class ImportClient:
     specified composition level.
     """
 
-    # The create functions have different kwarg names for the child list,
-    # so we need to use partial to set the child list to empty.
-    CONTAINER_CREATORS_MAP: dict[str, partial] = {
-        api.ContainerType.Section.olx_tag: partial(authoring_api.create_section_and_version, subsections=[]),
-        api.ContainerType.Subsection.olx_tag: partial(authoring_api.create_subsection_and_version, units=[]),
-        api.ContainerType.Unit.olx_tag: partial(authoring_api.create_unit_and_version, components=[]),
+    CONTAINER_CREATORS_MAP: dict[ContainerType, t.Callable] = {
+        # Sequential- and Chapter-level composition to be added in the future as part of
+        # https://github.com/openedx/frontend-app-authoring/issues/1602
+        # 'chapter': authoring_api.create_unit_and_version,  # TODO: replace with create_module_and_version
+        # 'sequential': authoring_api.create_unit_and_version,  # TODO: replace with create_section_and_version
+        ContainerType.Unit: authoring_api.create_unit_and_version,
     }
 
-    CONTAINER_OVERRIDERS_MAP: dict[str, partial] = {
-        api.ContainerType.Section.olx_tag: partial(authoring_api.create_next_section_version, subsections=[]),
-        api.ContainerType.Subsection.olx_tag: partial(authoring_api.create_next_subsection_version, units=[]),
-        api.ContainerType.Unit.olx_tag: partial(authoring_api.create_next_unit_version, components=[]),
+    CONTAINER_OVERRIDERS_MAP: dict[ContainerType, t.Callable] = {
+        # Sequential- and Chapter-level composition to be added in the future as part of
+        # https://github.com/openedx/frontend-app-authoring/issues/1602
+        # 'chapter': authoring_api.create_next_unit_version,  # TODO: replace with create_next_module_version
+        # 'sequential': authoring_api.create_next_unit_version,  # TODO: replace with create_next_section_version
+        ContainerType.Unit: authoring_api.create_next_unit_version,
     }
 
     def __init__(
@@ -65,7 +63,7 @@ class ImportClient:
         block_usage_key_to_import: str,
         target_learning_package: 'LearningPackage',
         staged_content: 'StagedContent',
-        composition_level: str,
+        composition_level: ContainerType | None,
         override: bool = False,
     ):
         self.import_event = import_event
@@ -86,7 +84,7 @@ class ImportClient:
         """
         node = etree.fromstring(self.staged_content.olx, parser=parser)
         usage_key = UsageKey.from_string(self.block_usage_key_to_import)
-        block_to_import = get_node_for_usage_key(node, usage_key)
+        block_to_import = get_block_to_import(node, usage_key)
         if block_to_import is None:
             return []
 
@@ -103,7 +101,7 @@ class ImportClient:
         usage_key = UsageKey.from_string(usage_key_string)
         result = []
 
-        if block_to_import.tag not in CompositionLevel.OLX_COMPLEX_LEVELS.value:
+        if block_to_import.tag not in CompositionLevel.COMPLEX_LEVELS.value:
             return self._import_simple_block(block_to_import, usage_key)
 
         for child in block_to_import.getchildren():
@@ -115,7 +113,7 @@ class ImportClient:
 
             result.extend(self._import_child_block(child, child_usage_key_string))
 
-        if self.composition_level == CompositionLevel.COMPONENT.value:
+        if not self.composition_level:
             return [
                 publishable_version_with_mapping for publishable_version_with_mapping in result
                 if not isinstance(publishable_version_with_mapping.publishable_version, ContainerVersion)
@@ -140,7 +138,7 @@ class ImportClient:
         delegates the import process to the appropriate helper method.
         """
         child_usage_key = UsageKey.from_string(child_usage_key_string)
-        if child.tag in CompositionLevel.OLX_COMPLEX_LEVELS.value:
+        if child.tag in CompositionLevel.COMPLEX_LEVELS.value:
             return self._import_complicated_child(child, child_usage_key_string)
         else:
             return self._import_simple_block(child, child_usage_key)
@@ -170,18 +168,15 @@ class ImportClient:
         self._update_container_components(container_version_with_mapping.publishable_version, child_component_versions)
         return [container_version_with_mapping] + child_component_versions_with_mapping
 
-    def _should_create_container(self, container_type: str) -> bool:
+    def _should_create_container(self, olx_tag: str) -> bool:
         """
         Determine if a new container should be created.
 
         Container type should be at a lower level than the current composition level.
         """
-        composition_hierarchy = CompositionLevel.OLX_COMPLEX_LEVELS.value
-        return (
-            container_type in composition_hierarchy and
-            self.composition_level in composition_hierarchy and
-            composition_hierarchy.index(container_type) <= composition_hierarchy.index(self.composition_level)
-        )
+        if self.composition_level and (container_type := ContainerType.from_source_olx_tag(olx_tag)):
+            return self.composition_level >= container_type
+        return None
 
     def get_or_create_container(
         self,
@@ -196,11 +191,10 @@ class ImportClient:
         Creates a container (e.g., chapter, sequential, vertical) in the
         content library.
         """
-        try:
-            container_creator_func = self.CONTAINER_CREATORS_MAP[container_type]
-            container_override_func = self.CONTAINER_OVERRIDERS_MAP[container_type]
-        except KeyError as exc:
-            raise ValueError(f"Unknown container type: {container_type}") from exc
+        container_creator_func = self.CONTAINER_CREATORS_MAP.get(container_type)
+        container_override_func = self.CONTAINER_OVERRIDERS_MAP.get(container_type)
+        if not all((container_creator_func, container_override_func)):
+            raise ValueError(f"Unknown container type: {container_type}")
 
         try:
             container_version = self.content_library.learning_package.publishable_entities.get(key=key)
@@ -211,6 +205,7 @@ class ImportClient:
             container_version = container_override_func(
                 container_version.container,
                 title=display_name or f"New {container_type}",
+                components=[],
                 created=datetime.now(tz=timezone.utc),
                 created_by=self.import_event.user_id,
             )
@@ -219,6 +214,7 @@ class ImportClient:
                 self.learning_package.id,
                 key=key or secrets.token_hex(16),
                 title=display_name or f"New {container_type}",
+                components=[],
                 created=datetime.now(tz=timezone.utc),
                 created_by=self.import_event.user_id,
             )
@@ -266,7 +262,7 @@ class ImportClient:
             if does_component_exist:
                 if not self.override:
                     log.info(f"Component {usage_key.block_id} already exists in library {self.library_key}, skipping.")
-                    return None
+                    return
                 else:
                     component_version = self._handle_component_override(usage_key, etree.tostring(block_to_import))
             else:
@@ -278,7 +274,7 @@ class ImportClient:
                     )
                 except api.IncompatibleTypesError as e:
                     log.error(f"Error validating block {usage_key} for library {self.library_key}: {e}")
-                    return None
+                    return
 
                 authoring_api.create_component(
                     self.learning_package.id,
@@ -373,30 +369,6 @@ class ImportClient:
                 pass  # Content already exists
 
 
-def import_from_staged_content(
-    import_event: Import,
-    usage_key_string: str,
-    target_learning_package: 'LearningPackage',
-    staged_content: 'StagedContent',
-    composition_level: str,
-    override: bool = False,
-) -> list[PublishableVersionWithMapping]:
-    """
-    Import staged content to a library from staged content.
-
-    Returns a list of PublishableVersionWithMappings created during the import.
-    """
-    import_client = ImportClient(
-        import_event,
-        usage_key_string,
-        target_learning_package,
-        staged_content,
-        composition_level,
-        override,
-    )
-    return import_client.import_from_staged_content()
-
-
 def get_or_create_publishable_entity_mapping(usage_key, component) -> tuple[PublishableEntityMapping, bool]:
     """
     Creates a mapping between the source usage key and the target publishable entity.
@@ -412,33 +384,32 @@ def get_or_create_publishable_entity_mapping(usage_key, component) -> tuple[Publ
     )
 
 
-def get_usage_key_string_from_staged_content(staged_content: 'StagedContent', block_id: str) -> str | None:
+def get_usage_key_string_from_staged_content(staged_content, block_id):
     """
     Get the usage ID from a staged content by block ID.
     """
-    if staged_content.tags is None:
-        return None
     return next((block_usage_id for block_usage_id in staged_content.tags if block_usage_id.endswith(block_id)), None)
 
 
-def get_node_for_usage_key(node: etree._Element, usage_key: UsageKey) -> etree._Element:
+def get_block_to_import(node, usage_key):
     """
-    Get the node in an XML tree which matches to the usage key.
+    Get the block to import from a node.
     """
-    if node.tag == usage_key.block_type and node.get('url_name') == usage_key.block_id:
+
+    if node.get('url_name') == usage_key.block_id:
         return node
 
     for child in node.getchildren():
-        found = get_node_for_usage_key(child, usage_key)
+        found = get_block_to_import(child, usage_key)
         if found is not None:
             return found
 
 
-def get_items_to_import(import_event: Import) -> list['XBlock']:
+def get_items_to_import(import_event):
     """
     Collect items to import from a course.
     """
-    items_to_import: list['XBlock'] = []
+    items_to_import = []
     if isinstance(import_event.source_key, CourseLocator):
         items_to_import.extend(
             modulestore().get_items(import_event.source_key, qualifiers={"category": "chapter"}) or []
@@ -450,17 +421,17 @@ def get_items_to_import(import_event: Import) -> list['XBlock']:
     return items_to_import
 
 
-def cancel_incomplete_old_imports(import_event: Import) -> None:
+def cancel_incomplete_old_imports(instance):
     """
     Cancel any incomplete imports that have the same target as the current import.
 
     When a new import is created, we want to cancel any other incomplete user imports that have the same target.
     """
     incomplete_user_imports_with_same_target = Import.objects.filter(
-        user=import_event.user,
-        target_change=import_event.target_change,
-        source_key=import_event.source_key,
+        user=instance.user,
+        target_change=instance.target_change,
+        source_key=instance.source_key,
         staged_content_for_import__isnull=False
-    ).exclude(uuid=import_event.uuid)
+    ).exclude(uuid=instance.uuid)
     for incomplete_import in incomplete_user_imports_with_same_target:
         incomplete_import.set_status(ImportStatus.CANCELED)

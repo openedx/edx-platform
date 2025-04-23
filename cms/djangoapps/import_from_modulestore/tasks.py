@@ -6,93 +6,86 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocatorV2
+from user_tasks.tasks import UserTask
 
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import LearningPackage
 from openedx.core.djangoapps.content_staging import api as content_staging_api
+from openedx.core.djangoapps.content_libraries.api import ContainerType
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .constants import IMPORT_FROM_MODULESTORE_STAGING_PURPOSE
-from .data import ImportStatus
-from .helpers import get_items_to_import, import_from_staged_content
-from .models import Import, PublishableEntityImport, StagedContentForImport
-from .validators import validate_composition_level
+from .helpers import get_items_to_import, ImportClient
+from .models import (
+    Import, PublishableEntityImport, StagedContentForImport,
+    COMPOSITION_LEVEL_COMPONENT,
+)
 
 log = get_task_logger(__name__)
 
 
-@shared_task
-@set_code_owner_attribute
-def save_legacy_content_to_staged_content_task(import_uuid: str) -> None:
-    """
-    Save courses to staged content task by sections/chapters.
-    """
-    import_event = Import.objects.get(uuid=import_uuid)
-
-    import_event.clean_related_staged_content()
-    import_event.set_status(ImportStatus.STAGING)
-    try:
-        with transaction.atomic():
-            items_to_import = get_items_to_import(import_event)
-            for item in items_to_import:
-                staged_content = content_staging_api.stage_xblock_temporarily(
-                    item,
-                    import_event.user.id,
-                    purpose=IMPORT_FROM_MODULESTORE_STAGING_PURPOSE,
-                )
-                StagedContentForImport.objects.create(
-                    staged_content=staged_content,
-                    import_event=import_event,
-                    source_usage_key=item.location
-                )
-
-            if items_to_import:
-                import_event.set_status(ImportStatus.STAGED)
-            else:
-                import_event.set_status(ImportStatus.STAGING_FAILED)
-    except Exception as exc:  # pylint: disable=broad-except
-        import_event.set_status(ImportStatus.STAGING_FAILED)
-        raise exc
+class ImportTask(UserTask):
+    pass
 
 
-@shared_task
-@set_code_owner_attribute
-def import_staged_content_to_library_task(
-    usage_key_strings: list[str],
-    import_uuid: str,
-    learning_package_id: int,
+@shared_task(base=ImportTask, bind=True)
+def import_legacy_content(
+    self: ImportTask,
     user_id: int,
-    composition_level: str,
+    *,
+    source_key: str,
+    target_key: str,
     override: bool,
+    composition_level: str,
 ) -> None:
-    """
-    Import staged content to a library task.
-    """
-    validate_composition_level(composition_level)
-
-    import_event = Import.objects.get(uuid=import_uuid, status=ImportStatus.STAGED, user_id=user_id)
-    target_learning_package = LearningPackage.objects.get(id=learning_package_id)
-
-    imported_publishable_versions = []
+    import_event = Import.objects.create(
+        user_task_status=self.status,
+        source_key=CourseKey.from_string(source_key),
+        target_key=LibraryLocatorV2.from_string(target_key),
+        override=override,
+        composition_level=composition_level,
+    )
+    import_event.set_state(f"Preparing to stage content")
+    import_event.clean_related_staged_content()
+    target_package = authoring_api.get_learning_package_by_key(target_key)
+    items_to_import: list['XBlock'] = get_items_to_import(import_event)
+    if not items_to_import:
+        import_event.fail("Nothing to stage for import")
+        return
+    for item in items_to_import:
+        import_event.set_state(f"Staging content: {item.usage_key}")
+        staged_content = content_staging_api.stage_xblock_temporarily(
+            item,
+            import_event.user.id,
+            purpose=IMPORT_FROM_MODULESTORE_STAGING_PURPOSE,
+        )
+        StagedContentForImport.objects.create(
+            staged_content=staged_content,
+            import_event=import_event,
+            source_usage_key=item.location
+        )
+    import_event.set_state(f"Content is staged, preparing to import")
     with authoring_api.bulk_draft_changes_for(learning_package_id=learning_package_id) as change_log:
-        try:
-            for usage_key_string in usage_key_strings:
-                staged_content_for_import = import_event.staged_content_for_import.get(
-                    source_usage_key=usage_key_string
-                )
-                publishable_versions = import_from_staged_content(
-                    import_event,
-                    usage_key_string,
-                    target_learning_package,
-                    staged_content_for_import.staged_content,
-                    composition_level,
-                    override,
-                )
-                imported_publishable_versions.extend(publishable_versions)
-        except:  # pylint: disable=bare-except
-            import_event.set_status(ImportStatus.IMPORTING_FAILED)
-            raise
-
-    import_event.set_status(ImportStatus.IMPORTED)
+        for staged_content_item in import_event.staged_content_for_import:
+            source_key = staged_content_item.source_usage_key
+            import_event.set_state(f"Importing staged content: {source_key}")
+            import_client = ImportClient(
+                import_event=import_event,
+                usage_key_string=source_key,
+                target_learning_package=target_package,
+                staged_content=staged_content_item.staged_content,
+                composition_level=(
+                    None
+                    if composition_level == COMPOSITION_LEVEL_COMPONENT
+                    else ContainerType(composition_level)
+                ),
+                override=override,
+            )
+            imported_publishable_versions.extend(import_client.import_from_staged_content())
+    import_event.set_state(f"Finalizing import")
     for imported_component_version in imported_publishable_versions:
         PublishableEntityImport.objects.create(
             import_event=import_event,
