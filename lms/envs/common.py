@@ -3042,6 +3042,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
 
+    'dal',
+    'dal_select2',
+
     # Tweaked version of django.contrib.staticfiles
     'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
 
