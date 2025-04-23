@@ -124,8 +124,8 @@ class ContainerUpstreamSyncManager(BaseUpstreamSyncManager):
         super().__init__(downstream, user, upstream)
         if not isinstance(self.upstream_key, LibraryContainerLocator):
             raise BadUpstream('Invalid upstream key')
-        self.link = ContainerUpstreamLink.get_for_container(downstream)
         if not upstream:
+            self.link = ContainerUpstreamLink.get_for_container(downstream)
             self.upstream = self._load_upstream_link_and_container_block()
         self.syncable_field_names: set[str] = self._get_synchronizable_fields()
         self.new_children_blocks: list[XBlock] = []

@@ -195,7 +195,9 @@ class BaseUpstreamSyncManager:
     ) -> None:
         self.downstream = downstream
         self.user = user
-        self.upstream_key = check_and_parse_upstream_key(downstream.upstream, downstream.usage_key)
+        if not upstream:
+            # Only parse upstream_key if upstream block is not passed else don't care about downstream.upstream
+            self.upstream_key = check_and_parse_upstream_key(downstream.upstream, downstream.usage_key)
         self.link: BaseUpstreamLink
         self.upstream = upstream
         self.syncable_field_names: set[str]
@@ -293,8 +295,10 @@ class BaseUpstreamSyncManager:
 class ComponentUpstreamSyncManager(BaseUpstreamSyncManager):
     def __init__(self, downstream: XBlock, user: User, upstream: XBlock | None = None) -> None:
         super().__init__(downstream, user, upstream)
-        self.link = UpstreamLink.get_for_block(downstream)
         if not upstream:
+            # Only parse upstream_key if upstream block is not passed else don't care about
+            # downstream.upstream and upstream link
+            self.link = UpstreamLink.get_for_block(downstream)
             self.upstream = self._load_upstream_link_and_block()
         self.syncable_field_names: set[str] = self._get_synchronizable_fields()
 

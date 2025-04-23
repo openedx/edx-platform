@@ -2,24 +2,28 @@
 Test CMS's upstream->downstream syncing system
 """
 import datetime
-import ddt
-from pytz import utc
 
+import ddt
 from organizations.api import ensure_organization
 from organizations.models import Organization
+from pytz import utc
 
 from cms.lib.xblock.upstream_sync import (
+    BadDownstream,
+    BadUpstream,
     ComponentUpstreamSyncManager,
+    NoUpstream,
     UpstreamLink,
-    sync_from_upstream, decline_sync, sever_upstream_link,
-    NoUpstream, BadUpstream, BadDownstream,
+    decline_sync,
+    sever_upstream_link,
+    sync_from_upstream,
 )
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as libs
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 
 @ddt.ddt
@@ -399,7 +403,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
     #       assert downstream.upstream_display_name == downstream.display_name == "Title V5"
 
     @ddt.data(None, "Title From Some Other Upstream Version")
-    def test_fetch_customizable_fields(self, initial_upstream_display_name):
+    def test_update_customizable_fields(self, initial_upstream_display_name):
         """
         Can we fetch a block's upstream field values without syncing it?
 
@@ -410,7 +414,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         downstream.display_name = "Some Title"
         downstream.data = "<html><data>Some content</data></html>"
 
-        # Note that we're not linked to any upstream. fetch_customizable_fields shouldn't care.
+        # Note that we're not linked to any upstream. ComponentUpstreamSyncManager shouldn't care if upstream is passed.
         assert not downstream.upstream
         assert not downstream.upstream_version
 
