@@ -48,15 +48,15 @@ class ImportClient:
     # The create functions have different kwarg names for the child list,
     # so we need to use partial to set the child list to empty.
     CONTAINER_CREATORS_MAP: dict[str, partial] = {
-        'chapter': partial(authoring_api.create_section_and_version, subsections=[]),
-        'sequential': partial(authoring_api.create_subsection_and_version, units=[]),
-        'vertical': partial(authoring_api.create_unit_and_version, components=[]),
+        api.ContainerType.Section.olx_tag: partial(authoring_api.create_section_and_version, subsections=[]),
+        api.ContainerType.Subsection.olx_tag: partial(authoring_api.create_subsection_and_version, units=[]),
+        api.ContainerType.Unit.olx_tag: partial(authoring_api.create_unit_and_version, components=[]),
     }
 
     CONTAINER_OVERRIDERS_MAP: dict[str, partial] = {
-        'chapter': partial(authoring_api.create_next_section_version, subsections=[]),
-        'sequential': partial(authoring_api.create_next_subsection_version, units=[]),
-        'vertical': partial(authoring_api.create_next_unit_version, components=[]),
+        api.ContainerType.Section.olx_tag: partial(authoring_api.create_next_section_version, subsections=[]),
+        api.ContainerType.Subsection.olx_tag: partial(authoring_api.create_next_subsection_version, units=[]),
+        api.ContainerType.Unit.olx_tag: partial(authoring_api.create_next_unit_version, components=[]),
     }
 
     def __init__(
