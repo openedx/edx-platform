@@ -199,8 +199,8 @@ class ImportClient:
         try:
             container_creator_func = self.CONTAINER_CREATORS_MAP[container_type]
             container_override_func = self.CONTAINER_OVERRIDERS_MAP[container_type]
-        except KeyError:
-            raise ValueError(f"Unknown container type: {container_type}")
+        except KeyError as exc:
+            raise ValueError(f"Unknown container type: {container_type}") from exc
 
         try:
             container_version = self.content_library.learning_package.publishable_entities.get(key=key)
