@@ -7,6 +7,7 @@ import logging
 import mimetypes
 import os
 import secrets
+from typing import TYPE_CHECKING
 
 from django.db import transaction
 from django.db.utils import IntegrityError
@@ -24,6 +25,12 @@ from xmodule.modulestore.django import modulestore
 from .data import CompositionLevel, ImportStatus, PublishableVersionWithMapping
 from .models import Import, PublishableEntityMapping
 
+if TYPE_CHECKING:
+    from openedx_learning.apps.authoring_models import LearningPackage
+    from xblock.core import XBlock
+
+    from openedx.core.djangoapps.content_staging.models import StagedContent
+
 
 log = logging.getLogger(__name__)
 parser = etree.XMLParser(strip_cdata=False)
@@ -40,13 +47,13 @@ class ImportClient:
 
     # The create functions have different kwarg names for the child list,
     # so we need to use partial to set the child list to empty.
-    CONTAINER_CREATORS_MAP = {
+    CONTAINER_CREATORS_MAP: dict[str, partial] = {
         'chapter': partial(authoring_api.create_section_and_version, subsections=[]),
         'sequential': partial(authoring_api.create_subsection_and_version, units=[]),
         'vertical': partial(authoring_api.create_unit_and_version, components=[]),
     }
 
-    CONTAINER_OVERRIDERS_MAP = {
+    CONTAINER_OVERRIDERS_MAP: dict[str, partial] = {
         'chapter': partial(authoring_api.create_next_section_version, subsections=[]),
         'sequential': partial(authoring_api.create_next_subsection_version, units=[]),
         'vertical': partial(authoring_api.create_next_unit_version, components=[]),
@@ -189,9 +196,10 @@ class ImportClient:
         Creates a container (e.g., chapter, sequential, vertical) in the
         content library.
         """
-        container_creator_func = self.CONTAINER_CREATORS_MAP.get(container_type)
-        container_override_func = self.CONTAINER_OVERRIDERS_MAP.get(container_type)
-        if not all((container_creator_func, container_override_func)):
+        try:
+            container_creator_func = self.CONTAINER_CREATORS_MAP[container_type]
+            container_override_func = self.CONTAINER_OVERRIDERS_MAP[container_type]
+        except KeyError:
             raise ValueError(f"Unknown container type: {container_type}")
 
         try:
@@ -258,7 +266,7 @@ class ImportClient:
             if does_component_exist:
                 if not self.override:
                     log.info(f"Component {usage_key.block_id} already exists in library {self.library_key}, skipping.")
-                    return
+                    return None
                 else:
                     component_version = self._handle_component_override(usage_key, etree.tostring(block_to_import))
             else:
@@ -270,7 +278,7 @@ class ImportClient:
                     )
                 except api.IncompatibleTypesError as e:
                     log.error(f"Error validating block {usage_key} for library {self.library_key}: {e}")
-                    return
+                    return None
 
                 authoring_api.create_component(
                     self.learning_package.id,
@@ -408,6 +416,8 @@ def get_usage_key_string_from_staged_content(staged_content: 'StagedContent', bl
     """
     Get the usage ID from a staged content by block ID.
     """
+    if staged_content.tags is None:
+        return None
     return next((block_usage_id for block_usage_id in staged_content.tags if block_usage_id.endswith(block_id)), None)
 
 
@@ -428,7 +438,7 @@ def get_items_to_import(import_event: Import) -> list['XBlock']:
     """
     Collect items to import from a course.
     """
-    items_to_import = []
+    items_to_import: list['XBlock'] = []
     if isinstance(import_event.source_key, CourseLocator):
         items_to_import.extend(
             modulestore().get_items(import_event.source_key, qualifiers={"category": "chapter"}) or []

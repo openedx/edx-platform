@@ -1,12 +1,14 @@
 """
 Validators for the import_from_modulestore app.
 """
+from typing import Sequence
+
 from opaque_keys.edx.keys import UsageKey
 
 from .data import CompositionLevel
 
 
-def validate_usage_keys_to_import(usage_keys: list[str | UsageKey]):
+def validate_usage_keys_to_import(usage_keys: Sequence[str | UsageKey]):
     """
     Validate the usage keys to import.
 
