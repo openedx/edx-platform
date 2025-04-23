@@ -36,7 +36,7 @@ from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from cms.lib.xblock.upstream_sync import BadUpstream, check_and_parse_upstream_key, sync_from_upstream
-from cms.lib.xblock.container_upstream_sync import sync_from_upstream_container
+from cms.lib.xblock.upstream_sync_container import sync_from_upstream_container
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,

@@ -338,6 +338,8 @@ class ComponentUpstreamSyncManager(BaseUpstreamSyncManager):
             LatestVersion,
             load_block,
         )
+        if not isinstance(self.upstream_key, LibraryUsageLocatorV2):
+            raise BadUpstream(_("Invalid upstream_key"))
         try:
             lib_block: XBlock = load_block(
                 self.upstream_key,
