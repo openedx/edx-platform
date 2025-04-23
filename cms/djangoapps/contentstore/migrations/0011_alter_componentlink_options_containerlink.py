@@ -43,7 +43,10 @@ class Migration(migrations.Migration):
                 (
                     'upstream_container_key',
                     opaque_keys.edx.django.models.LibraryItemField(
-                        help_text='Upstream block usage key, this value cannot be null and useful to track upstream library blocks that do not exist yet',
+                        help_text=(
+                            'Upstream block usage key, this value cannot be null and useful to track upstream'
+                            'library blocks that do not exist yet'
+                        ),
                         max_length=255,
                     ),
                 ),

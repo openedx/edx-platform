@@ -4,7 +4,6 @@ Models for contentstore
 
 
 from datetime import datetime, timezone
-from pyexpat import model
 
 from config_models.models import ConfigurationModel
 from django.db import models

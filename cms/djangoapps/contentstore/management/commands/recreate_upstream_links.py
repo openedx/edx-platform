@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Recreate links for course(s) in ComponentLink table.
+    Recreate upstream links for course(s) in ComponentLink and ContainerLink tables.
 
     Examples:
         # Recreate upstream links for two courses.

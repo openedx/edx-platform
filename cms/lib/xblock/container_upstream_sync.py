@@ -199,4 +199,3 @@ def sync_from_upstream_container(downstream: XBlock, user: User) -> tuple[XBlock
     manager.sync()
     downstream.upstream_version = manager.link.version_available
     return manager.upstream, manager.new_children_blocks
-

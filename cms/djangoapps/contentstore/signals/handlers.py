@@ -286,8 +286,6 @@ def delete_upstream_downstream_link_handler(**kwargs):
     ).delete()
 
 
-
-
 @receiver(COURSE_IMPORT_COMPLETED)
 def handle_new_course_import(**kwargs):
     """
