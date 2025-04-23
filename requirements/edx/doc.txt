@@ -141,7 +141,6 @@ certifi==2025.1.31
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
-    #   py2neo
     #   requests
     #   snowflake-connector-python
 cffi==1.17.1
@@ -775,10 +774,6 @@ inflection==0.5.1
     #   -r requirements/edx/base.txt
     #   drf-spectacular
     #   drf-yasg
-interchange==2021.0.4
-    # via
-    #   -r requirements/edx/base.txt
-    #   py2neo
 ipaddress==1.0.23
     # via -r requirements/edx/base.txt
 isodate==0.7.2
@@ -904,7 +899,6 @@ monotonic==1.6
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-    #   py2neo
 more-itertools==10.6.0
     # via
     #   -r requirements/edx/base.txt
@@ -1007,14 +1001,9 @@ packaging==24.2
     #   -r requirements/edx/base.txt
     #   drf-yasg
     #   gunicorn
-    #   py2neo
     #   pydata-sphinx-theme
     #   snowflake-connector-python
     #   sphinx
-pansi==2024.11.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   py2neo
 paramiko==3.5.1
     # via
     #   -r requirements/edx/base.txt
@@ -1049,7 +1038,6 @@ pillow==11.1.0
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-    #   pansi
 platformdirs==4.3.7
     # via
     #   -r requirements/edx/base.txt
@@ -1084,10 +1072,6 @@ psutil==7.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
-py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
 pyasn1==0.6.1
     # via
     #   -r requirements/edx/base.txt
@@ -1122,9 +1106,7 @@ pydata-sphinx-theme==0.15.4
     # via sphinx-book-theme
 pygments==2.19.1
     # via
-    #   -r requirements/edx/base.txt
     #   accessible-pygments
-    #   py2neo
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
@@ -1230,7 +1212,6 @@ pytz==2025.1
     #   edx-tincan-py35
     #   event-tracking
     #   fs
-    #   interchange
     #   olxcleaner
     #   ora2
     #   snowflake-connector-python
@@ -1358,8 +1339,6 @@ six==1.17.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   interchange
-    #   py2neo
     #   pyjwkest
     #   python-dateutil
     #   sphinxcontrib-httpdomain
@@ -1520,7 +1499,6 @@ urllib3==2.2.3
     #   -r requirements/edx/base.txt
     #   botocore
     #   elasticsearch
-    #   py2neo
     #   requests
 user-util==1.1.0
     # via -r requirements/edx/base.txt

@@ -144,7 +144,6 @@ certifi==2025.1.31
     #   elasticsearch
     #   httpcore
     #   httpx
-    #   py2neo
     #   requests
     #   snowflake-connector-python
 cffi==1.17.1
@@ -826,10 +825,6 @@ inflection==0.5.1
     #   drf-yasg
 iniconfig==2.1.0
     # via pytest
-interchange==2021.0.4
-    # via
-    #   -r requirements/edx/base.txt
-    #   py2neo
 ipaddress==1.0.23
     # via -r requirements/edx/base.txt
 isodate==0.7.2
@@ -962,7 +957,6 @@ monotonic==1.6
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-    #   py2neo
 more-itertools==10.6.0
     # via
     #   -r requirements/edx/base.txt
@@ -1065,17 +1059,12 @@ packaging==24.2
     #   -r requirements/edx/base.txt
     #   drf-yasg
     #   gunicorn
-    #   py2neo
     #   pyproject-api
     #   pytest
     #   snowflake-connector-python
     #   tox
 pact-python==2.0.1
     # via -r requirements/edx/testing.in
-pansi==2024.11.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   py2neo
 paramiko==3.5.1
     # via
     #   -r requirements/edx/base.txt
@@ -1108,7 +1097,6 @@ pillow==11.1.0
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-    #   pansi
 platformdirs==4.3.7
     # via
     #   -r requirements/edx/base.txt
@@ -1157,10 +1145,6 @@ psutil==7.0.0
     #   pytest-xdist
 py==1.11.0
     # via -r requirements/edx/testing.in
-py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
 pyasn1==0.6.1
     # via
     #   -r requirements/edx/base.txt
@@ -1198,10 +1182,8 @@ pydantic-core==2.27.2
     #   pydantic
 pygments==2.19.1
     # via
-    #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
     #   diff-cover
-    #   py2neo
 pyjwkest==1.4.2
     # via
     #   -r requirements/edx/base.txt
@@ -1353,7 +1335,6 @@ pytz==2025.1
     #   edx-tincan-py35
     #   event-tracking
     #   fs
-    #   interchange
     #   olxcleaner
     #   ora2
     #   snowflake-connector-python
@@ -1482,9 +1463,7 @@ six==1.17.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   interchange
     #   pact-python
-    #   py2neo
     #   pyjwkest
     #   python-dateutil
 slumber==0.7.1
@@ -1618,7 +1597,6 @@ urllib3==2.2.3
     #   botocore
     #   elasticsearch
     #   pact-python
-    #   py2neo
     #   requests
 user-util==1.1.0
     # via -r requirements/edx/base.txt
