@@ -167,6 +167,9 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
     """
 
     def _initialize_block(self, content, usage_key, block_type, version: int | LatestVersion):
+        """
+        Creates new xblock from given content, usage_key and block_type
+        """
         xml_node = etree.fromstring(content)
         keys = ScopeIds(self.user_id, block_type, None, usage_key)
 

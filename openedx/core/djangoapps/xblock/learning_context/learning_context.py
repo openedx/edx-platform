@@ -40,7 +40,11 @@ class LearningContext:
         """
         return False
 
-    def can_view_block_for_editing(self, user: UserType, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator) -> bool:
+    def can_view_block_for_editing(
+        self,
+        user: UserType,
+        usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
+    ) -> bool:
         """
         Assuming a block with the specified ID (usage_key) exists, does the
         specified user have permission to view its fields and OLX details (but

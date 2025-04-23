@@ -11,7 +11,7 @@ from freezegun import freeze_time
 from organizations.models import Organization
 
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
-from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
+from cms.lib.xblock.upstream_sync import BadUpstream, ComponentUpstreamSyncManager, UpstreamLink
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from opaque_keys.edx.keys import UsageKey
 from common.djangoapps.student.tests.factories import UserFactory
@@ -235,7 +235,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
             content_type="application/json",
         )
 
-    @patch.object(downstreams_views, "fetch_customizable_fields")
+    @patch.object(ComponentUpstreamSyncManager, "update_customizable_fields")
     @patch.object(downstreams_views, "sync_from_upstream")
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     def test_200_with_sync(self, mock_sync, mock_fetch):
@@ -250,7 +250,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert mock_fetch.call_count == 0
         assert video_after.upstream == self.video_lib_id
 
-    @patch.object(downstreams_views, "fetch_customizable_fields")
+    @patch.object(ComponentUpstreamSyncManager, "update_customizable_fields")
     @patch.object(downstreams_views, "sync_from_upstream")
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     def test_200_no_sync(self, mock_sync, mock_fetch):
@@ -265,7 +265,11 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert mock_fetch.call_count == 1
         assert video_after.upstream == self.video_lib_id
 
-    @patch.object(downstreams_views, "fetch_customizable_fields", side_effect=BadUpstream(MOCK_UPSTREAM_ERROR))
+    @patch.object(
+        ComponentUpstreamSyncManager,
+        "update_customizable_fields",
+        side_effect=BadUpstream(MOCK_UPSTREAM_ERROR)
+    )
     def test_400(self, sync: str):
         """
         Do we raise a 400 if the provided upstream reference is malformed or not accessible?

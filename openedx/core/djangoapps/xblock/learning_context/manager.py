@@ -35,7 +35,7 @@ def get_learning_context_impl(key):
     """
     if isinstance(key, LearningContextKey):
         context_type = key.CANONICAL_NAMESPACE  # e.g. 'lib'
-    elif isinstance(key, UsageKeyV2) or isinstance(key, LibraryItemKey):
+    elif isinstance(key, (UsageKeyV2, LibraryItemKey)):
         context_type = key.context_key.CANONICAL_NAMESPACE
     elif isinstance(key, OpaqueKey):
         # Maybe this is an older modulestore key etc.
