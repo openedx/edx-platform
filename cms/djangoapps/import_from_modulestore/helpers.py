@@ -2,6 +2,7 @@
 Helper functions for importing course content into a library.
 """
 from datetime import datetime, timezone
+from functools import partial
 import logging
 import mimetypes
 import os
@@ -37,20 +38,18 @@ class ImportClient:
     specified composition level.
     """
 
+    # The create functions have different kwarg names for the child list,
+    # so we need to use partial to set the child list to empty.
     CONTAINER_CREATORS_MAP = {
-        # Sequential- and Chapter-level composition to be added in the future as part of
-        # https://github.com/openedx/frontend-app-authoring/issues/1602
-        # 'chapter': authoring_api.create_unit_and_version,  # TODO: replace with create_module_and_version
-        # 'sequential': authoring_api.create_unit_and_version,  # TODO: replace with create_section_and_version
-        'vertical': authoring_api.create_unit_and_version,
+        'chapter': partial(authoring_api.create_section_and_version, subsections=[]),
+        'sequential': partial(authoring_api.create_subsection_and_version, units=[]),
+        'vertical': partial(authoring_api.create_unit_and_version, components=[]),
     }
 
     CONTAINER_OVERRIDERS_MAP = {
-        # Sequential- and Chapter-level composition to be added in the future as part of
-        # https://github.com/openedx/frontend-app-authoring/issues/1602
-        # 'chapter': authoring_api.create_next_unit_version,  # TODO: replace with create_next_module_version
-        # 'sequential': authoring_api.create_next_unit_version,  # TODO: replace with create_next_section_version
-        'vertical': authoring_api.create_next_unit_version,
+        'chapter': partial(authoring_api.create_next_section_version, subsections=[]),
+        'sequential': partial(authoring_api.create_next_subsection_version, units=[]),
+        'vertical': partial(authoring_api.create_next_unit_version, components=[]),
     }
 
     def __init__(
@@ -204,7 +203,6 @@ class ImportClient:
             container_version = container_override_func(
                 container_version.container,
                 title=display_name or f"New {container_type}",
-                components=[],
                 created=datetime.now(tz=timezone.utc),
                 created_by=self.import_event.user_id,
             )
@@ -213,7 +211,6 @@ class ImportClient:
                 self.learning_package.id,
                 key=key or secrets.token_hex(16),
                 title=display_name or f"New {container_type}",
-                components=[],
                 created=datetime.now(tz=timezone.utc),
                 created_by=self.import_event.user_id,
             )

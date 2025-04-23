@@ -49,19 +49,5 @@ class CompositionLevel(Enum):
         """
         return [composition_level.value for composition_level in cls]
 
-    @classmethod
-    def supported_levels(cls):
-        """
-        Returns all supported levels of composition levels.
-
-        # TEMPORARY: This is a temporary solution to support the
-        # import from modulestore to learning core for the
-        # vertical and xblock levels.
-        # This should be removed after Sections and Subsections are
-        # implemented in the openedx-learning repo.
-        # https://github.com/openedx/frontend-app-authoring/issues/1602
-        """
-        return [cls.VERTICAL.value, cls.XBLOCK.value]
-
 
 PublishableVersionWithMapping = namedtuple('PublishableVersionWithMapping', ['publishable_version', 'mapping'])
