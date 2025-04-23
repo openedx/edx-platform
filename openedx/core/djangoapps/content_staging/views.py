@@ -81,6 +81,12 @@ class ClipboardEndpoint(APIView):
     def post(self, request):
         """
         Put some piece of content into the user's clipboard.
+
+        FIXME: This API needs to be deprecated and replaced by dedicated APIs
+        within each learning context (POST /course/foo/bar/copy, POST
+        /library/foo/bar/copy, etc.) We don't want to encode course- and
+        library-specific logic in content staging, and it shouldn't import
+        course or library modules.
         """
         # Check if the content exists and the user has permission to read it.
         # Parse the usage key:
@@ -101,6 +107,7 @@ class ClipboardEndpoint(APIView):
                         "You must be a member of the course team in Studio to export OLX using this API."
                     )
                 block = modulestore().get_item(usage_key)
+                version_num = None
 
             elif isinstance(course_key, LibraryLocatorV2):
                 lib_api.require_permission_for_library_key(
@@ -109,6 +116,7 @@ class ClipboardEndpoint(APIView):
                     lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY
                 )
                 block = xblock_api.load_block(usage_key, user=None)
+                version_num = lib_api.get_library_block(usage_key).draft_version_num
 
             else:
                 raise ValidationError("Invalid usage_key for the content.")
@@ -116,7 +124,7 @@ class ClipboardEndpoint(APIView):
         except ItemNotFoundError as exc:
             raise NotFound("The requested usage key does not exist.") from exc
 
-        clipboard = api.save_xblock_to_user_clipboard(block=block, user_id=request.user.id)
+        clipboard = api.save_xblock_to_user_clipboard(block=block, version_num=version_num, user_id=request.user.id)
 
         # Return the current clipboard exactly as if GET was called:
         serializer = UserClipboardSerializer(clipboard, context={"request": request})

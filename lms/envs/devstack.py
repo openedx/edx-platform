@@ -96,11 +96,12 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.cache.CachePanel',
     'debug_toolbar.panels.history.HistoryPanel',
+
     # ProfilingPanel has been intentionally removed for default devstack.py
-    # runtimes for performance reasons. If you wish to re-enable it in your
-    # local development environment, please create a new settings file
-    # that imports and extends devstack.py.
+    # runtimes for performance reasons.
+    # 'debug_toolbar.panels.profiling.ProfilingPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -134,9 +135,6 @@ PIPELINE['JS_COMPRESSOR'] = None
 REQUIRE_DEBUG = DEBUG
 
 PIPELINE['SASS_ARGUMENTS'] = '--debug-info'
-
-# Load development webpack configuration
-WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ########################### VERIFIED CERTIFICATES #################################
 
@@ -384,6 +382,7 @@ EDXNOTES_CLIENT_NAME = 'edx_notes_api-backend-service'
 ############## Settings for Microfrontends  #########################
 LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
+PROFILE_MICROFRONTEND_URL = 'http://localhost:1995'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
@@ -522,15 +521,9 @@ course_access_role_removed_event_setting = EVENT_BUS_PRODUCER_CONFIG[
 ]
 course_access_role_removed_event_setting['learning-course-access-role-lifecycle']['enabled'] = True
 
-######################## Subscriptions API SETTINGS ########################
-SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
-SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
-
-SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
-SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
-SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
-SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
-SUBSCRIPTIONS_TRIAL_LENGTH = 7
+lc_enrollment_revoked_setting = \
+    EVENT_BUS_PRODUCER_CONFIG['org.openedx.enterprise.learner_credit_course_enrollment.revoked.v1']
+lc_enrollment_revoked_setting['learner-credit-course-enrollment-lifecycle']['enabled'] = True
 
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
@@ -552,12 +545,27 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:1992',  # frontend-app-ora
     'http://localhost:2002',  # frontend-app-discussions
     'http://localhost:1991',  # frontend-app-admin-portal
+    'http://localhost:8734',  # frontend-app-learner-portal-enterprise
     'http://localhost:1999',  # frontend-app-authn
     'http://localhost:18450',  # frontend-app-support-tools
     'http://localhost:1994',  # frontend-app-gradebook
     'http://localhost:1996',  # frontend-app-learner-dashboard
 ]
 
+RETIREMENT_STATES = [
+    'PENDING',
+    'LOCKING_ACCOUNT',
+    'LOCKING_COMPLETE',
+    'RETIRING_ENROLLMENTS',
+    'ENROLLMENTS_COMPLETE',
+    'RETIRING_LMS_MISC',
+    'LMS_MISC_COMPLETE',
+    'RETIRING_LMS',
+    'LMS_COMPLETE',
+    'ERRORED',
+    'ABORTED',
+    'COMPLETE',
+]
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

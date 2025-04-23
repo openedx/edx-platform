@@ -4,6 +4,7 @@ courseware.
 """
 
 import logging
+import pickle
 from collections import defaultdict, namedtuple
 from datetime import datetime
 
@@ -16,7 +17,7 @@ from django.core.cache import cache
 from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from edx_django_utils.monitoring import function_trace
+from edx_django_utils.monitoring import function_trace, set_custom_attribute
 from fs.errors import ResourceNotFound
 from opaque_keys.edx.keys import UsageKey
 from path import Path as path
@@ -94,7 +95,16 @@ def get_course(course_id, depth=0):
     return course
 
 
-def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
+def get_course_with_access(
+    user,
+    action,
+    course_key,
+    depth=0,
+    check_if_enrolled=False,
+    check_survey_complete=True,
+    check_if_authenticated=False,
+    allow_not_started_courses=False,
+):
     """
     Given a course_key, look up the corresponding course block,
     check that the user has the access to perform the specified action
@@ -113,7 +123,15 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
       be plugged in as additional callback checks for different actions.
     """
     course = get_course_by_id(course_key, depth)
-    check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
+    check_course_access_with_redirect(
+        course,
+        user,
+        action,
+        check_if_enrolled,
+        check_survey_complete,
+        check_if_authenticated,
+        allow_not_started_courses=allow_not_started_courses
+    )
     return course
 
 
@@ -202,7 +220,15 @@ def check_course_access(
     return non_staff_access_response
 
 
-def check_course_access_with_redirect(course, user, action, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
+def check_course_access_with_redirect(
+    course,
+    user,
+    action,
+    check_if_enrolled=False,
+    check_survey_complete=True,
+    check_if_authenticated=False,
+    allow_not_started_courses=False
+):
     """
     Check that the user has the access to perform the specified action
     on the course (CourseBlock|CourseOverview).
@@ -216,6 +242,9 @@ def check_course_access_with_redirect(course, user, action, check_if_enrolled=Fa
     access_response = check_course_access(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
 
     if not access_response:
+        # StartDateError should be ignored
+        if isinstance(access_response, StartDateError) and allow_not_started_courses:
+            return
         # Redirect if StartDateError
         if isinstance(access_response, StartDateError):
             start_date = strftime_localized(course.start, 'SHORT_DATE')
@@ -792,7 +821,17 @@ def get_assignments_grades(user, course_id, cache_timeout):
         collected_block_structure = cache.get(cache_key)
         if not collected_block_structure:
             collected_block_structure = get_block_structure_manager(course_id).get_collected()
-            cache.set(cache_key, collected_block_structure, cache_timeout)
+
+            total_bytes_in_one_mb = 1024 * 1024
+            data_size_in_bytes = len(pickle.dumps(collected_block_structure))
+            if data_size_in_bytes < total_bytes_in_one_mb * 2:
+                cache.set(cache_key, collected_block_structure, cache_timeout)
+            else:
+                data_size_in_mbs = round(data_size_in_bytes / total_bytes_in_one_mb, 2)
+                # .. custom_attribute_name: collected_block_structure_size_in_mbs
+                # .. custom_attribute_description: contains the data chunk size in MBs. The size on which
+                #   the memcached client failed to store value in cache.
+                set_custom_attribute('collected_block_structure_size_in_mbs', data_size_in_mbs)
 
         course_grade = CourseGradeFactory().read(user, collected_block_structure=collected_block_structure)
 

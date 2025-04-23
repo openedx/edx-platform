@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 Tests for the clipboard functionality
 """
@@ -159,7 +160,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
             <html url_name="toyhtml" display_name="Text"><![CDATA[
             <a href='/static/handouts/sample_handout.txt'>Sample</a>
             ]]></html>
-        """).lstrip()
+        """).replace("\n", "") + "\n"  # No newlines, expect one trailing newline.
 
         # Now if we GET the clipboard again, the GET response should exactly equal the last POST response:
         assert client.get(CLIPBOARD_ENDPOINT).json() == response_data

@@ -5,10 +5,11 @@ from django.conf import settings
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from organizations import api as org_api
 from openedx.core.lib.api.view_utils import view_auth_classes
 
 from ....utils import get_home_context, get_course_context, get_library_context
-from ..serializers import CourseHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
+from ..serializers import StudioHomeSerializer, CourseHomeTabSerializer, LibraryTabSerializer
 
 
 @view_auth_classes(is_authenticated=True)
@@ -24,7 +25,7 @@ class HomePageView(APIView):
                 description="Query param to filter by course org",
             )],
         responses={
-            200: CourseHomeSerializer,
+            200: StudioHomeSerializer,
             401: "The requester is not authenticated.",
         },
     )
@@ -51,19 +52,22 @@ class HomePageView(APIView):
             "allow_to_create_new_org": true,
             "allow_unicode_course_id": false,
             "allowed_organizations": [],
+            "allowed_organizations_for_libraries": [],
             "archived_courses": [],
+            "can_access_advanced_settings": true,
             "can_create_organizations": true,
             "course_creator_status": "granted",
             "courses": [],
             "in_process_course_actions": [],
             "libraries": [],
             "libraries_enabled": true,
+            "libraries_v1_enabled": true,
+            "libraries_v2_enabled": true,
             "library_authoring_mfe_url": "//localhost:3001/course/course-v1:edX+P315+2T2023",
-            "optimization_enabled": true,
-            "redirect_to_library_authoring_mfe": false,
             "request_course_creator_url": "/request_course_creator",
             "rerun_creator_status": true,
             "show_new_library_button": true,
+            "show_new_library_v2_button": true,
             "split_studio_home": false,
             "studio_name": "Studio",
             "studio_short_name": "Studio",
@@ -77,7 +81,12 @@ class HomePageView(APIView):
 
         home_context = get_home_context(request, True)
         home_context.update({
-            'allow_to_create_new_org': settings.FEATURES.get('ENABLE_CREATOR_GROUP', True) and request.user.is_staff,
+            # 'allow_to_create_new_org' is actually about auto-creating organizations
+            # (e.g. when creating a course or library), so we add an additional test.
+            'allow_to_create_new_org': (
+                home_context['can_create_organizations'] and
+                org_api.is_autocreate_enabled()
+            ),
             'studio_name': settings.STUDIO_NAME,
             'studio_short_name': settings.STUDIO_SHORT_NAME,
             'studio_request_email': settings.FEATURES.get('STUDIO_REQUEST_EMAIL', ''),
@@ -85,7 +94,7 @@ class HomePageView(APIView):
             'platform_name': settings.PLATFORM_NAME,
             'user_is_active': request.user.is_active,
         })
-        serializer = CourseHomeSerializer(home_context)
+        serializer = StudioHomeSerializer(home_context)
         return Response(serializer.data)
 
 

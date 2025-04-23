@@ -59,46 +59,46 @@ import datetime
 import hashlib
 import logging
 import textwrap
-from xml.sax.saxutils import escape
 from unittest import mock
 from urllib import parse
+from xml.sax.saxutils import escape
 
 import nh3
 import oauthlib.oauth1
 from django.conf import settings
 from lxml import etree
 from oauthlib.oauth1.rfc5849 import signature
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from webob import Response
 from web_fragments.fragment import Fragment
+from webob import Response
 from xblock.core import List, Scope, String, XBlock
 from xblock.fields import Boolean, Float
-from xmodule.mako_block import MakoTemplateBlockBase
-
-from openedx.core.djangolib.markup import HTML, Text
-from xmodule.editing_block import EditingMixin
+from xblocks_contrib.lti import LTIBlock as _ExtractedLTIBlock
 
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_USER_ROLE,
 )
+from openedx.core.djangolib.markup import HTML, Text
+from xmodule.editing_block import EditingMixin
 from xmodule.lti_2_util import LTI20BlockMixin, LTIError
+from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.raw_block import EmptyDataRawMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
-from xmodule.xml_block import XmlMixin
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
     XModuleToXBlockMixin,
 )
-
+from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
 
 DOCS_ANCHOR_TAG_OPEN = (
     "<a rel='noopener' target='_blank' "
-    "href='https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html'>"
+    "href='https://docs.openedx.org/en/latest/educators/navigation/components_activities.html#lti-component'>"
 )
 BREAK_TAG = '<br />'
 
@@ -274,7 +274,7 @@ class LTIFields:
 @XBlock.needs("mako")
 @XBlock.needs("user")
 @XBlock.needs("rebind_user")
-class LTIBlock(
+class _BuiltInLTIBlock(
     LTIFields,
     LTI20BlockMixin,
     EmptyDataRawMixin,
@@ -366,6 +366,7 @@ class LTIBlock(
 
         Otherwise error message from LTI provider is generated.
     """
+    is_extracted = False
     resources_dir = None
     uses_xmodule_styles_setup = True
 
@@ -524,7 +525,7 @@ class LTIBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.runtime.service(self, 'mako').render_lms_template('lti.html', self.get_context()))
-        add_sass_to_fragment(fragment, 'LTIBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'LTIBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'LTIBlockDisplay')
         shim_xmodule_js(fragment, 'LTI')
         return fragment
@@ -609,8 +610,12 @@ class LTIBlock(
     def get_course(self):
         """
         Return course by course id.
+
+        Returns None if the current block is not part of a course (i.e part of a library).
         """
-        return self.runtime.modulestore.get_course(self.course_id)
+        if isinstance(self.course_id, CourseKey):
+            return self.runtime.modulestore.get_course(self.course_id)
+        return None
 
     @property
     def context_id(self):
@@ -960,7 +965,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         Obtains client_key and client_secret credentials from current course.
         """
         course = self.get_course()
-        for lti_passport in course.lti_passports:
+        lti_passports = course.lti_passports if course else []
+        for lti_passport in lti_passports:
             try:
                 lti_id, key, secret = [i.strip() for i in lti_passport.split(':')]
             except ValueError:
@@ -984,3 +990,10 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         else:
             close_date = due_date
         return close_date is not None and datetime.datetime.now(UTC) > close_date
+
+
+LTIBlock = (
+    _ExtractedLTIBlock if settings.USE_EXTRACTED_LTI_BLOCK
+    else _BuiltInLTIBlock
+)
+LTIBlock.__name__ = "LTIBlock"

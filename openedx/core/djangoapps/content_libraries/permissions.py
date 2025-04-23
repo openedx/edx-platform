@@ -2,7 +2,8 @@
 Permissions for Content Libraries (v2, Learning-Core-based)
 """
 from bridgekeeper import perms, rules
-from bridgekeeper.rules import Attribute, ManyRelation, Relation, in_current_groups
+from bridgekeeper.rules import Attribute, ManyRelation, Relation, blanket_rule, in_current_groups
+from django.conf import settings
 
 from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 
@@ -41,6 +42,18 @@ has_explicit_admin_permission_for_library = (
 )
 
 
+# Are we in Studio? (Is there a better or more contextual way to define this, e.g. get from learning context?)
+@blanket_rule
+def is_studio_request(_):
+    return settings.SERVICE_VARIANT == "cms"
+
+
+@blanket_rule
+def is_course_creator(user):
+    from cms.djangoapps.course_creators.views import get_course_creator_status
+
+    return get_course_creator_status(user) == 'granted'
+
 ########################### Permissions ###########################
 
 # Is the user allowed to view XBlocks from the specified content library
@@ -51,15 +64,20 @@ CAN_LEARN_FROM_THIS_CONTENT_LIBRARY = 'content_libraries.learn_from_library'
 perms[CAN_LEARN_FROM_THIS_CONTENT_LIBRARY] = (
     # Global staff can learn from any library:
     is_global_staff |
-    # Regular users can learn if the library allows public learning:
+    # Regular and even anonymous users can learn if the library allows public learning:
     Attribute('allow_public_learning', True) |
     # Users/groups who are explicitly granted permission can learn from the library:
-    (is_user_active & has_explicit_read_permission_for_library)
+    (is_user_active & has_explicit_read_permission_for_library) |
+    # Or, in Studio (but not the LMS) any users can access libraries with "public read" permissions:
+    (is_studio_request & is_user_active & Attribute('allow_public_read', True))
 )
 
 # Is the user allowed to create content libraries?
 CAN_CREATE_CONTENT_LIBRARY = 'content_libraries.create_library'
-perms[CAN_CREATE_CONTENT_LIBRARY] = is_user_active
+if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+    perms[CAN_CREATE_CONTENT_LIBRARY] = is_global_staff | (is_user_active & is_course_creator)
+else:
+    perms[CAN_CREATE_CONTENT_LIBRARY] = is_global_staff
 
 # Is the user allowed to view the specified content library in Studio,
 # including to view the raw OLX and asset files?
@@ -67,8 +85,8 @@ CAN_VIEW_THIS_CONTENT_LIBRARY = 'content_libraries.view_library'
 perms[CAN_VIEW_THIS_CONTENT_LIBRARY] = is_user_active & (
     # Global staff can access any library
     is_global_staff |
-    # Some libraries allow anyone to view them in Studio:
-    Attribute('allow_public_read', True) |
+    # Libraries with "public read" permissions can be accessed only by course creators
+    (Attribute('allow_public_read', True) & is_course_creator) |
     # Otherwise the user must be part of the library's team
     has_explicit_read_permission_for_library
 )

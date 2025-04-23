@@ -1,13 +1,24 @@
 """Capa's specialized use of codejail.safe_exec."""
+import copy
 import hashlib
+import logging
+import re
+from functools import lru_cache
+from typing import assert_type
 
 from codejail.safe_exec import SafeExecException, json_safe
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import safe_exec as codejail_safe_exec
-from edx_django_utils.monitoring import function_trace
+from django.conf import settings
+from django.dispatch import receiver
+from django.test.signals import setting_changed
+from edx_django_utils.monitoring import function_trace, record_exception, set_custom_attribute
 
 from . import lazymod
-from .remote_exec import is_codejail_rest_service_enabled, get_remote_exec
+from .remote_exec import get_remote_exec, is_codejail_in_darklaunch, is_codejail_rest_service_enabled
+
+log = logging.getLogger(__name__)
+
 
 # Establish the Python environment for Capa.
 # Capa assumes float-friendly division always.
@@ -16,7 +27,23 @@ CODE_PROLOG = """\
 from __future__ import absolute_import, division
 
 import os
-os.environ["OPENBLAS_NUM_THREADS"] = "1"    # See TNL-6456
+
+# openblas is a math library used by numpy. It will try to allocate multiple
+# threads by default, but this may exceed resource limits and cause a segfault.
+# Limiting to 1 thread will prevent this in all configurations.
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+
+# Any code that uses the tempfile module to create temporary files should use
+# the ./tmp directory that codejail creates in each sandbox, rather than trying
+# to use a global temp dir (which should be blocked by AppArmor anyhow).
+# This is needed for matplotlib among other things.
+#
+# matplotlib will complain on stderr about the non-standard temp dir if we
+# don't explicitly tell it "no really, use this". This pollutes the output
+# when codejail returns an error message (which includes stderr). So we also
+# set MPLCONFIGDIR as a special case.
+os.environ["TMPDIR"] = os.getcwd() + "/tmp"
+os.environ["MPLCONFIGDIR"] = os.environ["TMPDIR"]
 
 import random2 as random_module
 import sys
@@ -89,7 +116,7 @@ def safe_exec(
     limit_overrides_context=None,
     slug=None,
     unsafely=False,
-):
+):  # pylint: disable=too-many-statements
     """
     Execute python code safely.
 
@@ -138,6 +165,8 @@ def safe_exec(
                 raise SafeExecException(emsg)
             return
 
+    cacheable = True  # unless we get an unexpected error
+
     # Create the complete code we'll run.
     code_prolog = CODE_PROLOG % random_seed
 
@@ -152,9 +181,16 @@ def safe_exec(
             "extra_files": extra_files,
         }
 
-        emsg, exception = get_remote_exec(data)
+        with function_trace('safe_exec.remote_exec'):
+            emsg, exception = get_remote_exec(data)
 
     else:
+
+        # Create a copy so the originals are not modified as part of this call.
+        # This has to happen before local exec is run, since globals are modified
+        # as a side effect.
+        darklaunch_globals = copy.deepcopy(globals_dict)
+
         # Decide which code executor to use.
         if unsafely:
             exec_fn = codejail_not_safe_exec
@@ -163,27 +199,215 @@ def safe_exec(
 
         # Run the code!  Results are side effects in globals_dict.
         try:
-            exec_fn(
-                code_prolog + LAZY_IMPORTS + code,
-                globals_dict,
-                python_path=python_path,
-                extra_files=extra_files,
-                limit_overrides_context=limit_overrides_context,
-                slug=slug,
-            )
-        except SafeExecException as e:
+            trace_name = 'safe_exec.local_exec_darklaunch' if is_codejail_in_darklaunch() else 'safe_exec.local_exec'
+            with function_trace(trace_name):
+                exec_fn(
+                    code_prolog + LAZY_IMPORTS + code,
+                    globals_dict,
+                    python_path=python_path,
+                    extra_files=extra_files,
+                    limit_overrides_context=limit_overrides_context,
+                    slug=slug,
+                )
+        except BaseException as e:
             # Saving SafeExecException e in exception to be used later.
             exception = e
             emsg = str(e)
+            if not isinstance(exception, SafeExecException):
+                # Something unexpected happened, so don't cache this evaluation.
+                # (We may decide to cache these in the future as well; this is just
+                # preserving existing behavior during a refactor of error handling.)
+                cacheable = False
         else:
+            exception = None
             emsg = None
+
+        # Run the code in both the remote codejail service as well as the local codejail
+        # when in darklaunch mode.
+        if is_codejail_in_darklaunch():
+            # Start adding attributes only once we're in a darklaunch
+            # comparison, even though these particular ones aren't specific to
+            # darklaunch. There can be multiple codejail calls per trace, and
+            # these attrs will overwrite previous values in the same trace. When
+            # that happens, we need to ensure we overwrite *all* of them,
+            # otherwise we could end up with inconsistent combinations of values.
+
+            # .. custom_attribute_name: codejail.slug
+            # .. custom_attribute_description: Value of the slug parameter. This
+            #   might be a problem ID, if present.
+            set_custom_attribute('codejail.slug', slug)
+            # .. custom_attribute_name: codejail.limit_overrides_context
+            # .. custom_attribute_description: Value of the limit_overrides_context
+            #   parameter to this code execution. Generally this will be the
+            #   course name, if present at all.
+            set_custom_attribute('codejail.limit_overrides_context', limit_overrides_context)
+            # .. custom_attribute_name: codejail.extra_files_count
+            # .. custom_attribute_description: Number of extra_files included
+            #   in request. This should be 0 or 1, the latter indicating a
+            #   python_lib.zip was present.
+            set_custom_attribute('codejail.extra_files_count', len(extra_files) if extra_files else 0)
+
+            try:
+                data = {
+                    "code": code_prolog + LAZY_IMPORTS + code,
+                    "globals_dict": darklaunch_globals,
+                    "python_path": python_path,
+                    "limit_overrides_context": limit_overrides_context,
+                    "slug": slug,
+                    "unsafely": unsafely,
+                    "extra_files": extra_files,
+                }
+                with function_trace('safe_exec.remote_exec_darklaunch'):
+                    # Ignore the returned exception, because it's just a
+                    # SafeExecException wrapped around emsg (if present).
+                    remote_emsg, _ = get_remote_exec(data)
+                    remote_exception = None
+            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
+                # Swallow all exceptions and log it in monitoring so that dark launch doesn't cause issues during
+                # deploy.
+                remote_emsg = None
+                remote_exception = e
+
+            try:
+                local_exc_unexpected = None if isinstance(exception, SafeExecException) else exception
+
+                report_darklaunch_results(
+                    slug=slug,
+                    globals_local=globals_dict, emsg_local=emsg, unexpected_exc_local=local_exc_unexpected,
+                    globals_remote=darklaunch_globals, emsg_remote=remote_emsg, unexpected_exc_remote=remote_exception,
+                )
+            except BaseException as e:  # pragma: no cover  # pylint: disable=broad-except
+                log.exception("Error occurred while trying to report codejail darklaunch data.")
+                record_exception()
 
     # Put the result back in the cache.  This is complicated by the fact that
     # the globals dict might not be entirely serializable.
-    if cache:
+    if cache and cacheable:
         cleaned_results = json_safe(globals_dict)
         cache.set(key, (emsg, cleaned_results))
 
     # If an exception happened, raise it now.
-    if emsg:
+    if exception:
         raise exception
+
+
+@lru_cache(maxsize=1)
+def emsg_normalizers():
+    """
+    Load emsg normalization settings.
+
+    The output is like the setting value, except the 'search' patterns have
+    been compiled.
+    """
+    default = [
+        {
+            'search': r'/tmp/codejail-[0-9a-zA-Z]+',
+            'replace': r'/tmp/codejail-<SANDBOX_DIR_NAME>',
+        },
+    ]
+    try:
+        # .. setting_name: CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS
+        # .. setting_default: (see description)
+        # .. setting_description: A list of patterns to search and replace in codejail error
+        #   messages during comparison in codejail-service darklaunch. Each entry is a dict
+        #   of 'search' (a regular expression string) and 'replace' (the replacement string).
+        #   The default value suppresses differences matching '/tmp/codejail-[0-9a-zA-Z]+',
+        #   the directory structure codejail uses for its random-named sandboxes. Deployers
+        #   may also need to add a search/replace pair for the location of the sandbox
+        #   virtualenv, or any other paths that show up in stack traces.
+        # .. setting_warning: Note that `replace' is a pattern, allowing for
+        #   backreferences. Any backslashes in the replacement pattern that are not
+        #   intended as backreferences should be escaped as `\\`.
+        setting = getattr(settings, 'CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS', default)
+
+        compiled = []
+        for pair in setting:
+            compiled.append({
+                'search': re.compile(assert_type(pair['search'], str)),
+                'replace': assert_type(pair['replace'], str),
+            })
+        return compiled
+    except BaseException as e:
+        record_exception()
+        return []
+
+
+def normalize_error_message(emsg):
+    """
+    Remove any uninteresting sources of discrepancy from an emsg.
+    """
+    if emsg is None:
+        return None
+
+    for replacer in emsg_normalizers():
+        emsg = re.sub(replacer['search'], replacer['replace'], emsg, count=0)
+
+    return emsg
+
+
+def report_darklaunch_results(
+        *, slug,
+        globals_local, emsg_local, unexpected_exc_local,
+        globals_remote, emsg_remote, unexpected_exc_remote,
+):
+    """Send telemetry for results of darklaunch."""
+    can_compare_output = True
+
+    def report_arm(arm, globals_dict, emsg, unexpected_exception):
+        nonlocal can_compare_output
+        if unexpected_exception:
+            # .. custom_attribute_name: codejail.darklaunch.status.{local,remote}
+            # .. custom_attribute_description: Outcome of this arm of the
+            #   darklaunch comparison. Values can be 'ok' (normal execution),
+            #   'safe_error' (submitted code raised an exception), or
+            #   'unexpected_error' (uncaught error in submitting or evaluating code).
+            set_custom_attribute(f'codejail.darklaunch.status.{arm}', 'unexpected_error')
+            # .. custom_attribute_name: codejail.darklaunch.exception.{local,remote}
+            # .. custom_attribute_description: When the status attribute indicates
+            #   an unexpected error, this is a string representation of the error,
+            #   otherwise None.
+            set_custom_attribute(f'codejail.darklaunch.exception.{arm}', repr(unexpected_exception))
+            can_compare_output = False
+        else:
+            set_custom_attribute(f'codejail.darklaunch.status.{arm}', 'ok' if emsg is None else 'safe_error')
+            set_custom_attribute(f'codejail.darklaunch.exception.{arm}', None)
+
+        # Logs include full globals and emsg
+        log.info(
+            f"Codejail darklaunch {arm} results for slug={slug}: globals={globals_dict!r}, "
+            f"emsg={emsg!r}, exception={unexpected_exception!r}"
+        )
+
+    report_arm('local', globals_local, emsg_local, unexpected_exc_local)
+    report_arm('remote', globals_remote, emsg_remote, unexpected_exc_remote)
+
+    # If the arms can't be compared (unexpected errors), stop early -- the rest
+    # is about output comparison.
+    if not can_compare_output:
+        set_custom_attribute('codejail.darklaunch.globals_match', 'N/A')
+        set_custom_attribute('codejail.darklaunch.emsg_match', 'N/A')
+        return
+
+    globals_match = globals_local == globals_remote
+    emsg_match = normalize_error_message(emsg_local) == normalize_error_message(emsg_remote)
+
+    # .. custom_attribute_name: codejail.darklaunch.globals_match
+    # .. custom_attribute_description: True if local and remote globals_dict
+    #   values match, False otherwise. 'N/A' when either arm raised an
+    #   uncaught error.
+    set_custom_attribute('codejail.darklaunch.globals_match', globals_match)
+    # .. custom_attribute_name: codejail.darklaunch.emsg_match
+    # .. custom_attribute_description: True if the local and remote emsg values
+    #   (errors returned from sandbox) match, False otherwise. Differences due
+    #   to known irrelevant factors are suppressed in this comparison, such as
+    #   the randomized directory names used for sandboxes. 'N/A' when either
+    #   arm raised an uncaught error.
+    set_custom_attribute('codejail.darklaunch.emsg_match', emsg_match)
+
+
+@receiver(setting_changed)
+def reset_caches(sender, **kwargs):
+    """
+    Reset cached settings during unit tests.
+    """
+    emsg_normalizers.cache_clear()

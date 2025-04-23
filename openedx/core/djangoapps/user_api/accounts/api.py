@@ -3,17 +3,17 @@
 Programmatic integration point for User API Accounts sub-application
 """
 
-
 import datetime
 import re
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import ValidationError, validate_email
-from django.utils.translation import override as override_language
 from django.utils.translation import gettext as _
+from django.utils.translation import override as override_language
 from eventtracking import tracker
 from pytz import UTC
+
 from common.djangoapps.student import views as student_views
 from common.djangoapps.student.models import (
     AccountRecovery,
@@ -26,7 +26,7 @@ from common.djangoapps.util.model_utils import emit_settings_changed_event
 from common.djangoapps.util.password_policy_validators import validate_password
 from lms.djangoapps.certificates.api import get_certificates_for_user
 from lms.djangoapps.certificates.data import CertificateStatuses
-
+from openedx.core.djangoapps.embargo.models import GlobalRestrictedCountry
 from openedx.core.djangoapps.enrollments.api import get_verified_enrollments
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.errors import (
@@ -40,6 +40,7 @@ from openedx.core.djangoapps.user_authn.views.registration_form import validate_
 from openedx.core.lib.api.view_utils import add_serializer_errors
 from openedx.features.enterprise_support.utils import get_enterprise_readonly_account_fields
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
+
 from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer, UserReadOnlySerializer, _visible_fields
 
 name_affirmation_installed = is_name_affirmation_installed()
@@ -152,6 +153,15 @@ def update_account_settings(requesting_user, update, username=None):
 
     _validate_email_change(user, update, field_errors)
     _validate_secondary_email(user, update, field_errors)
+    if (
+        settings.FEATURES.get('EMBARGO', False) and
+        GlobalRestrictedCountry.is_country_restricted(update.get('country', ''))
+    ):
+        field_errors['country'] = {
+            'developer_message': 'Country is disabled for registration',
+            'user_message': 'This country cannot be selected for user registration'
+        }
+
     old_name = _validate_name_change(user_profile, update, field_errors)
     old_language_proficiencies = _get_old_language_proficiencies_if_updating(user_profile, update)
 

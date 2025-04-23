@@ -11,6 +11,10 @@ from uuid import uuid4
 import crum
 from django.conf import settings
 
+from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
+
+from .data import AuthoredDataMode, LatestVersion
+
 
 def get_secure_token_for_xblock_handler(user_id, block_key_str, time_idx=0):
     """
@@ -167,3 +171,18 @@ def get_xblock_id_for_anonymous_user(user):
         return current_request.session["xblock_id_for_anonymous_user"]
     else:
         raise RuntimeError("Cannot get a user ID for an anonymous user outside of an HTTP request context.")
+
+
+def get_auto_latest_version(version: int | LatestVersion) -> int | LatestVersion:
+    """
+    Gets the actual LatestVersion if is `LatestVersion.AUTO`;
+    otherwise, returns the same value.
+    """
+    if version == LatestVersion.AUTO:
+        authored_data_mode = get_xblock_app_config().get_runtime_params()["authored_data_mode"]
+        version = (
+            LatestVersion.DRAFT
+            if authored_data_mode == AuthoredDataMode.DEFAULT_DRAFT
+            else LatestVersion.PUBLISHED
+        )
+    return version

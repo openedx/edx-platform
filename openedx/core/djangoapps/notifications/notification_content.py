@@ -1,35 +1,38 @@
 """
 Helper functions for overriding notification content for given notification type.
 """
+from typing import Dict
 
 
-def get_notification_type_content_function(notification_type):
+def get_notification_type_context_function(notification_type) -> callable:
     """
-        Returns the content function for the given notification if it exists.
+    Returns:
+         callable : The function that returns the context for the given notification type.
     """
     try:
-        return globals()[f"get_{notification_type}_notification_content"]
+        return globals()[f"get_{notification_type}_notification_context"]
     except KeyError:
-        return None
+        return lambda context: context
 
 
-def get_notification_content_with_author_pronoun(notification_type, context):
+def get_notification_context_with_author_pronoun(context: Dict) -> Dict:
     """
-        Helper function to get notification content with author's pronoun.
+    Returns the context for the given notification type with the author pronoun.
+
     """
     html_tags_context = {
         'strong': 'strong',
         'p': 'p',
     }
-    notification_type_content_template = notification_type.get('content_template', None)
+    context.update(html_tags_context)
     if 'author_pronoun' in context:
         context['author_name'] = context['author_pronoun']
-    if notification_type_content_template:
-        return notification_type_content_template.format(**context, **html_tags_context)
-    return ''
+    return context
 
 
 # Returns notification content for the new_comment notification.
-get_new_comment_notification_content = get_notification_content_with_author_pronoun
+get_new_comment_notification_context = get_notification_context_with_author_pronoun
+
+
 # Returns notification content for the comment_on_followed_post notification.
-get_comment_on_followed_post_notification_content = get_notification_content_with_author_pronoun
+get_comment_on_followed_post_notification_context = get_notification_context_with_author_pronoun

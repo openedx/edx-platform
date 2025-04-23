@@ -8,7 +8,7 @@ import pytest
 from django.http.response import Http404
 from itertools import product
 from pytz import utc
-from waffle import get_waffle_flag_model   # pylint: disable=invalid-django-waffle-import
+from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.notifications.base_notification import (
@@ -16,7 +16,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
     COURSE_NOTIFICATION_TYPES,
 )
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.email.utils import (
     add_additional_attributes_to_notifications,
@@ -33,6 +33,7 @@ from openedx.core.djangoapps.notifications.email.utils import (
     is_email_notification_flag_enabled,
     update_user_preferences_from_patch,
 )
+from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -43,6 +44,7 @@ class TestUtilFunctions(ModuleStoreTestCase):
     """
     Test utils functions
     """
+
     def setUp(self):
         """
         Setup
@@ -103,6 +105,7 @@ class TestContextFunctions(ModuleStoreTestCase):
     """
     Test template context functions in utils.py
     """
+
     def setUp(self):
         """
         Setup
@@ -149,8 +152,18 @@ class TestContextFunctions(ModuleStoreTestCase):
             {'title': 'Updates', 'count': 1},
         ]
         expected_email_content = [
-            {'title': 'Discussion', 'help_text': '', 'help_text_url': '', 'notifications': [discussion_notification]},
-            {'title': 'Updates', 'help_text': '', 'help_text_url': '', 'notifications': [update_notification]}
+            {
+                'title': 'Discussion', 'help_text': '', 'help_text_url': '',
+                'notifications': [discussion_notification],
+                'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
+                'url': 'http://learner-home-mfe/?showNotifications=true&app=discussion'
+            },
+            {
+                'title': 'Updates', 'help_text': '', 'help_text_url': '',
+                'notifications': [update_notification],
+                'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
+                'url': 'http://learner-home-mfe/?showNotifications=true&app=updates'
+            }
         ]
         assert context['start_date'] == expected_start_date
         assert context['end_date'] == 'Sunday, Mar 24'
@@ -163,6 +176,7 @@ class TestWaffleFlag(ModuleStoreTestCase):
     """
     Test user level email notifications waffle flag
     """
+
     def setUp(self):
         """
         Setup
@@ -215,6 +229,7 @@ class TestEncryption(ModuleStoreTestCase):
     """
     Tests all encryption methods
     """
+
     def test_string_encryption(self):
         """
         Tests if decrypted string is equal original string
@@ -241,6 +256,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
     """
     Tests if preferences are update according to patch data
     """
+
     def setUp(self):
         """
         Setup test cases
@@ -320,9 +336,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
                         if channel == param_channel:
                             assert type_prefs[channel] == new_value
                             if channel == 'email':
-                                cadence_value = EmailCadence.NEVER
-                                if new_value:
-                                    cadence_value = self.get_default_cadence_value(app_name, noti_type)
+                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
                                 assert type_prefs['email_cadence'] == cadence_value
                         else:
                             default_app_json = self.default_json[app_name]
@@ -381,9 +395,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
                         if app_name == param_app_name:
                             assert type_prefs[channel] == new_value
                             if channel == 'email':
-                                cadence_value = EmailCadence.NEVER
-                                if new_value:
-                                    cadence_value = self.get_default_cadence_value(app_name, noti_type)
+                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
                                 assert type_prefs['email_cadence'] == cadence_value
                         else:
                             default_app_json = self.default_json[app_name]
@@ -415,9 +427,7 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
                         if noti_type == param_notification_type:
                             assert type_prefs[channel] == new_value
                             if channel == 'email':
-                                cadence_value = EmailCadence.NEVER
-                                if new_value:
-                                    cadence_value = self.get_default_cadence_value(app_name, noti_type)
+                                cadence_value = self.get_default_cadence_value(app_name, noti_type)
                                 assert type_prefs['email_cadence'] == cadence_value
                         else:
                             default_app_json = self.default_json[app_name]
@@ -433,3 +443,17 @@ class TestUpdatePreferenceFromPatch(ModuleStoreTestCase):
         enc_patch = encrypt_object({"value": True})
         with pytest.raises(Http404):
             update_user_preferences_from_patch(enc_username, enc_patch)
+
+    def test_user_preference_created_on_email_unsubscribe(self):
+        """
+        Test that the user's email unsubscribe preference is correctly created after unsubscribing digest email.
+        """
+        encrypted_username = encrypt_string(self.user.username)
+        encrypted_patch = encrypt_object({
+            'channel': 'email',
+            'value': False
+        })
+        update_user_preferences_from_patch(encrypted_username, encrypted_patch)
+        self.assertTrue(
+            UserPreference.objects.filter(user=self.user, key=ONE_CLICK_EMAIL_UNSUB_KEY).exists()
+        )

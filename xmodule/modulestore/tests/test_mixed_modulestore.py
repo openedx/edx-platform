@@ -164,6 +164,19 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         self.course_locations = {}
 
         self.user_id = ModuleStoreEnum.UserID.test
+        # mock and ignore publishable link entity related tasks to avoid unnecessary
+        # errors as it is tested separately
+        if settings.ROOT_URLCONF == 'cms.urls':
+            create_or_update_xblock_upstream_link_patch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.handle_create_or_update_xblock_upstream_link'
+            )
+            create_or_update_xblock_upstream_link_patch.start()
+            self.addCleanup(create_or_update_xblock_upstream_link_patch.stop)
+            publishableEntityLinkPatch = patch(
+                'cms.djangoapps.contentstore.signals.handlers.PublishableEntityLink'
+            )
+            publishableEntityLinkPatch.start()
+            self.addCleanup(publishableEntityLinkPatch.stop)
 
     def _check_connection(self):
         """
@@ -1752,7 +1765,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             for location, expected in should_work:
                 # each iteration has different find count, pop this iter's find count
                 with check_mongo_calls(num_finds.pop(0), num_sends), self.assertNumQueries(num_mysql.pop(0)):
-                    path = path_to_location(self.store, location)
+                    path = path_to_location(self.store, location, branch_type=ModuleStoreEnum.Branch.published_only)
                     assert path == expected
 
         not_found = (

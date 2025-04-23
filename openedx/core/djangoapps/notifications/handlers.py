@@ -21,8 +21,11 @@ from openedx.core.djangoapps.notifications.audience_filters import (
     ForumRoleAudienceFilter,
     TeamAudienceFilter
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.base_notification import NotificationAppManager
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_ORA_GRADE_NOTIFICATION
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 log = logging.getLogger(__name__)
 
@@ -44,9 +47,16 @@ def course_enrollment_post_save(signal, sender, enrollment, metadata, **kwargs):
     if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.course_key):
         try:
             with transaction.atomic():
+                email_opt_out = UserPreference.objects.filter(
+                    user_id=enrollment.user.id,
+                    key=ONE_CLICK_EMAIL_UNSUB_KEY
+                ).exists()
                 CourseNotificationPreference.objects.create(
                     user_id=enrollment.user.id,
-                    course_id=enrollment.course.course_key
+                    course_id=enrollment.course.course_key,
+                    notification_preference_config=NotificationAppManager().get_notification_app_preferences(
+                        email_opt_out
+                    )
                 )
         except IntegrityError:
             log.info(f'CourseNotificationPreference already exists for user {enrollment.user.id} '
@@ -72,6 +82,12 @@ def generate_user_notifications(signal, sender, notification_data, metadata, **k
     """
     Watches for USER_NOTIFICATION_REQUESTED signal and calls send_web_notifications task
     """
+    if (
+        notification_data.notification_type == 'ora_grade_assigned'
+        and not ENABLE_ORA_GRADE_NOTIFICATION.is_enabled(notification_data.course_key)
+    ):
+        return
+
     from openedx.core.djangoapps.notifications.tasks import send_notifications
     notification_data = notification_data.__dict__
     notification_data['course_key'] = str(notification_data['course_key'])

@@ -1,7 +1,6 @@
 /* globals gettext */
 
 import Backbone from 'backbone';
-import picturefill from 'picturefill';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
@@ -30,10 +29,6 @@ class ProgramCardView extends Backbone.View {
                 uuid: this.model.get('uuid'),
             });
         }
-        this.isSubscribed = (
-            context.isUserB2CSubscriptionsEnabled &&
-            this.model.get('subscriptionIndex') > -1
-        ) ?? false;
         this.render();
     }
 
@@ -45,22 +40,10 @@ class ProgramCardView extends Backbone.View {
             this.getProgramProgress(),
             {
                 orgList: orgList.join(' '),
-                isSubscribed: this.isSubscribed,
             },
         );
 
         HtmlUtils.setHtml(this.$el, this.tpl(data));
-        this.postRender();
-    }
-
-    postRender() {
-        if (navigator.userAgent.indexOf('MSIE') !== -1
-        || navigator.appVersion.indexOf('Trident/') > 0) {
-            /* Microsoft Internet Explorer detected in. */
-            window.setTimeout(() => {
-                this.reLoadBannerImage();
-            }, 100);
-        }
     }
 
     // Calculate counts for progress and percentages for styling
@@ -86,26 +69,6 @@ class ProgramCardView extends Backbone.View {
     static getWidth(val, total) {
         const int = (val / total) * 100;
         return `${int}%`;
-    }
-
-    // Defer loading the rest of the page to limit FOUC
-    reLoadBannerImage() {
-        const $img = this.$('.program_card .banner-image');
-        const imgSrcAttr = $img ? $img.attr('src') : {};
-
-        if (!imgSrcAttr || imgSrcAttr.length < 0) {
-            try {
-                ProgramCardView.reEvaluatePicture();
-            } catch (err) {
-                // Swallow the error here
-            }
-        }
-    }
-
-    static reEvaluatePicture() {
-        picturefill({
-            reevaluate: true,
-        });
     }
 }
 

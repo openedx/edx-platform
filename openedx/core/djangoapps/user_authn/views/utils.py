@@ -3,6 +3,8 @@ User Auth Views Utils
 """
 import logging
 import re
+from typing import Dict
+
 from django.conf import settings
 from django.contrib import messages
 from django.utils.translation import gettext as _
@@ -12,6 +14,7 @@ from text_unidecode import unidecode
 from common.djangoapps import third_party_auth
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.models import clean_username
+from openedx.core.djangoapps.embargo.models import GlobalRestrictedCountry
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 import random
@@ -177,3 +180,21 @@ def get_auto_generated_username(data):
     # We generate the username regardless of whether the name is empty or invalid. We do this
     # because the name validations occur later, ensuring that users cannot create an account without a valid name.
     return f"{username_prefix}_{username_suffix}" if username_prefix else username_suffix
+
+
+def remove_disabled_country_from_list(countries: Dict) -> Dict:
+    """
+    Remove disabled countries from the list of countries.
+
+    Args:
+    - countries (dict): List of countries.
+
+    Returns:
+    - dict: Dict of countries with disabled countries removed.
+    """
+    if not settings.FEATURES.get("EMBARGO", False):
+        return countries
+
+    for country_code in GlobalRestrictedCountry.get_countries():
+        del countries[country_code]
+    return countries

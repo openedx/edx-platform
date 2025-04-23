@@ -7,10 +7,9 @@ from .email_notifications import EmailCadence
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
 from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-from .notification_content import get_notification_type_content_function
+from .notification_content import get_notification_type_context_function
 
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
-
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
@@ -64,6 +63,8 @@ COURSE_NOTIFICATION_TYPES = {
         'push': False,
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{username}</{strong}> posted <{strong}>{post_title}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> and others started new discussions'
+                                      '</{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'username': 'Post author name',
@@ -181,32 +182,53 @@ COURSE_NOTIFICATION_TYPES = {
         'push': True,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new course update: '
-                              '<{strong}>{course_update_content}</{strong}></{p}>'),
+        'content_template': _('<{p}><{strong}>{course_update_content}</{strong}></{p}>'),
         'content_context': {
             'course_update_content': 'Course update',
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
     },
-    'ora_staff_notification': {
+    'ora_staff_notifications': {
         'notification_app': 'grading',
-        'name': 'ora_staff_notification',
+        'name': 'ora_staff_notifications',
         'is_core': False,
         'info': '',
-        'web': False,
+        'web': True,
         'email': False,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
-        'content_template': _('<{p}>You have a new open response submission awaiting for review for '
+        'content_template': _('<{p}>You have a new open response submission awaiting review for '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
+        'grouped_content_template': _('<{p}>You have multiple submissions awaiting review for '
+                                      '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
             'ora_name': 'Name of ORA in course',
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
         'visible_to': [CourseStaffRole.ROLE, CourseInstructorRole.ROLE]
+    },
+    'ora_grade_assigned': {
+        'notification_app': 'grading',
+        'name': 'ora_grade_assigned',
+        'is_core': False,
+        'info': '',
+        'web': True,
+        'email': True,
+        'push': False,
+        'email_cadence': EmailCadence.DAILY,
+        'non_editable': [],
+        'content_template': _('<{p}>You have received {points_earned} out of {points_possible} on your assessment: '
+                              '<{strong}>{ora_name}</{strong}></{p}>'),
+        'content_context': {
+            'ora_name': 'Name of ORA in course',
+            'points_earned': 'Points earned',
+            'points_possible': 'Points possible',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
     },
 }
 
@@ -219,7 +241,7 @@ COURSE_NOTIFICATION_APPS = {
         'core_email': True,
         'core_push': True,
         'core_email_cadence': EmailCadence.DAILY,
-        'non_editable': ['web']
+        'non_editable': []
     },
     'updates': {
         'enabled': True,
@@ -308,7 +330,7 @@ class NotificationPreferenceSyncManager:
         return denormalized_preferences
 
     @staticmethod
-    def update_preferences(preferences):
+    def update_preferences(preferences, email_opt_out=False):
         """
         Creates a new preference version from old preferences.
         New preference is created instead of updating old preference
@@ -325,7 +347,7 @@ class NotificationPreferenceSyncManager:
             5) Denormalize new preference
         """
         old_preferences = NotificationPreferenceSyncManager.normalize_preferences(preferences)
-        default_prefs = NotificationAppManager().get_notification_app_preferences()
+        default_prefs = NotificationAppManager().get_notification_app_preferences(email_opt_out)
         new_prefs = NotificationPreferenceSyncManager.normalize_preferences(default_prefs)
 
         for app in new_prefs.get('apps'):
@@ -387,7 +409,7 @@ class NotificationTypeManager:
         return non_editable_notification_channels
 
     @staticmethod
-    def get_non_core_notification_type_preferences(non_core_notification_types):
+    def get_non_core_notification_type_preferences(non_core_notification_types, email_opt_out=False):
         """
         Returns non-core notification type preferences for the given notification types.
         """
@@ -395,13 +417,13 @@ class NotificationTypeManager:
         for notification_type in non_core_notification_types:
             non_core_notification_type_preferences[notification_type.get('name')] = {
                 'web': notification_type.get('web', False),
-                'email': notification_type.get('email', False),
+                'email': False if email_opt_out else notification_type.get('email', False),
                 'push': notification_type.get('push', False),
                 'email_cadence': notification_type.get('email_cadence', 'Daily'),
             }
         return non_core_notification_type_preferences
 
-    def get_notification_app_preference(self, notification_app):
+    def get_notification_app_preference(self, notification_app, email_opt_out=False):
         """
         Returns notification app preferences for the given notification app.
         """
@@ -409,7 +431,7 @@ class NotificationTypeManager:
             notification_app,
         )
         non_core_notification_types_preferences = self.get_non_core_notification_type_preferences(
-            non_core_notification_types,
+            non_core_notification_types, email_opt_out
         )
         non_editable_notification_channels = self.get_non_editable_notification_channels(non_core_notification_types)
         core_notification_types_name = [notification_type.get('name') for notification_type in core_notification_types]
@@ -421,13 +443,13 @@ class NotificationAppManager:
     Notification app manager
     """
 
-    def add_core_notification_preference(self, notification_app_attrs, notification_types):
+    def add_core_notification_preference(self, notification_app_attrs, notification_types, email_opt_out=False):
         """
         Adds core notification preference for the given notification app.
         """
         notification_types['core'] = {
             'web': notification_app_attrs.get('core_web', False),
-            'email': notification_app_attrs.get('core_email', False),
+            'email': False if email_opt_out else notification_app_attrs.get('core_email', False),
             'push': notification_app_attrs.get('core_push', False),
             'email_cadence': notification_app_attrs.get('core_email_cadence', 'Daily'),
         }
@@ -439,7 +461,7 @@ class NotificationAppManager:
         if notification_app_attrs.get('non_editable', None):
             non_editable_channels['core'] = notification_app_attrs.get('non_editable')
 
-    def get_notification_app_preferences(self):
+    def get_notification_app_preferences(self, email_opt_out=False):
         """
         Returns notification app preferences for the given name.
         """
@@ -447,8 +469,11 @@ class NotificationAppManager:
         for notification_app_key, notification_app_attrs in COURSE_NOTIFICATION_APPS.items():
             notification_app_preferences = {}
             notification_types, core_notifications, \
-                non_editable_channels = NotificationTypeManager().get_notification_app_preference(notification_app_key)
-            self.add_core_notification_preference(notification_app_attrs, notification_types)
+                non_editable_channels = NotificationTypeManager().get_notification_app_preference(
+                    notification_app_key,
+                    email_opt_out
+                )
+            self.add_core_notification_preference(notification_app_attrs, notification_types, email_opt_out)
             self.add_core_notification_non_editable(notification_app_attrs, non_editable_channels)
 
             notification_app_preferences['enabled'] = notification_app_attrs.get('enabled', False)
@@ -462,21 +487,46 @@ class NotificationAppManager:
 def get_notification_content(notification_type, context):
     """
     Returns notification content for the given notification type with provided context.
+
+    Args:
+    notification_type (str): The type of notification (e.g., 'course_update').
+    context (dict): The context data to be used in the notification template.
+
+    Returns:
+    str: Rendered notification content based on the template and context.
     """
-    html_tags_context = {
+    context.update({
         'strong': 'strong',
         'p': 'p',
-    }
-    content_function = get_notification_type_content_function(notification_type)
+    })
+
+    # Retrieve the function associated with the notification type.
+    context_function = get_notification_type_context_function(notification_type)
+
+    # Fix a specific case where 'course_update' needs to be renamed to 'course_updates'.
     if notification_type == 'course_update':
         notification_type = 'course_updates'
+
+    # Retrieve the notification type object from NotificationTypeManager.
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
+
     if notification_type:
-        if content_function:
-            return content_function(notification_type, context)
-        notification_type_content_template = notification_type.get('content_template', None)
-        if notification_type_content_template:
-            return notification_type_content_template.format(**context, **html_tags_context)
+        # Check if the notification is grouped.
+        is_grouped = context.get('grouped', False)
+
+        # Determine the correct template key based on whether it's grouped or not.
+        template_key = "grouped_content_template" if is_grouped else "content_template"
+
+        # Get the corresponding template from the notification type.
+        template = notification_type.get(template_key, None)
+
+        # Apply the context function to transform or modify the context.
+        context = context_function(context)
+
+        if template:
+            # Handle grouped templates differently by modifying the context using a different function.
+            return template.format(**context)
+
     return ''
 
 

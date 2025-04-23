@@ -13,7 +13,8 @@ from urllib.parse import parse_qs, urlparse
 import ddt
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryCollectionLocator, LibraryContainerLocator
 from openedx_tagging.core.tagging.models import Tag, Taxonomy
 from openedx_tagging.core.tagging.models.system_defined import SystemDefinedTaxonomy
 from openedx_tagging.core.tagging.rest_api.v1.serializers import TaxonomySerializer
@@ -34,7 +35,6 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries.api import AccessLevel, create_library, set_library_user_permissions
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.content_tagging.models import TaxonomyOrg
-from openedx.core.djangoapps.content_tagging.utils import rules_cache
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 from ....tests.test_objecttag_export_helpers import TaggedCourseMixin
@@ -110,6 +110,12 @@ class TestTaxonomyObjectsMixin:
             description="This is a library from Org A",
         )
         self.libraryA = str(self.content_libraryA.key)
+
+    def _setUp_collection(self):
+        self.collection_key = str(LibraryCollectionLocator(self.content_libraryA.key, 'test-collection'))
+
+    def _setUp_container(self):
+        self.container_key = str(LibraryContainerLocator(self.content_libraryA.key, 'unit', 'unit1'))
 
     def _setUp_users(self):
         """
@@ -284,9 +290,11 @@ class TestTaxonomyObjectsMixin:
         self._setUp_library()
         self._setUp_users()
         self._setUp_taxonomies()
+        self._setUp_collection()
+        self._setUp_container()
 
-        # Clear the rules cache in between test runs to keep query counts consistent.
-        rules_cache.clear()
+        # Clear all request caches in between test runs to keep query counts consistent.
+        RequestCache.clear_all_namespaces()
 
 
 @skip_unless_cms
@@ -506,12 +514,12 @@ class TestTaxonomyListCreateViewSet(TestTaxonomyObjectsMixin, APITestCase):
 
     @ddt.data(
         ('staff', 11),
-        ("content_creatorA", 16),
-        ("library_staffA", 16),
-        ("library_userA", 16),
-        ("instructorA", 16),
-        ("course_instructorA", 16),
-        ("course_staffA", 16),
+        ("content_creatorA", 17),
+        ("library_staffA", 17),
+        ("library_userA", 17),
+        ("instructorA", 17),
+        ("course_instructorA", 17),
+        ("course_staffA", 17),
     )
     @ddt.unpack
     def test_list_taxonomy_query_count(self, user_attr: str, expected_queries: int):
@@ -1654,6 +1662,131 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @ddt.data(
+        # staffA and staff are staff in collection and can tag using enabled taxonomies
+        ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", [], status.HTTP_200_OK),
+        ("staff", "tA1", [], status.HTTP_200_OK),
+        ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("staff", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        ("staff", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_tag_collection(self, user_attr, taxonomy_attr, tag_values, expected_status):
+        """
+        Tests that only staff and org level users can tag collections
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        response = self._call_put_request(self.collection_key, taxonomy.pk, tag_values)
+
+        assert response.status_code == expected_status
+        if status.is_success(expected_status):
+            tags_by_taxonomy = response.data[str(self.collection_key)]["taxonomies"]
+            if tag_values:
+                response_taxonomy = tags_by_taxonomy[0]
+                assert response_taxonomy["name"] == taxonomy.name
+                response_tags = response_taxonomy["tags"]
+                assert [t["value"] for t in response_tags] == tag_values
+            else:
+                assert tags_by_taxonomy == []  # No tags are set from any taxonomy
+
+            # Check that re-fetching the tags returns what we set
+            url = OBJECT_TAG_UPDATE_URL.format(object_id=self.collection_key)
+            new_response = self.client.get(url, format="json")
+            assert status.is_success(new_response.status_code)
+            assert new_response.data == response.data
+
+    @ddt.data(
+        # staffA and staff are staff in collection and can tag using enabled taxonomies
+        ("user", "tA1", ["Tag 1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("staff", "tA1", ["Tag 1"], status.HTTP_200_OK),
+        ("user", "tA1", [], status.HTTP_403_FORBIDDEN),
+        ("staffA", "tA1", [], status.HTTP_200_OK),
+        ("staff", "tA1", [], status.HTTP_200_OK),
+        ("user", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("staff", "multiple_taxonomy", ["Tag 1", "Tag 2"], status.HTTP_200_OK),
+        ("user", "open_taxonomy", ["tag1"], status.HTTP_403_FORBIDDEN),
+        ("staffA", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+        ("staff", "open_taxonomy", ["tag1"], status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_tag_container(self, user_attr, taxonomy_attr, tag_values, expected_status):
+        """
+        Tests that only staff and org level users can tag containers
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        response = self._call_put_request(self.container_key, taxonomy.pk, tag_values)
+
+        assert response.status_code == expected_status
+        if status.is_success(expected_status):
+            tags_by_taxonomy = response.data[str(self.container_key)]["taxonomies"]
+            if tag_values:
+                response_taxonomy = tags_by_taxonomy[0]
+                assert response_taxonomy["name"] == taxonomy.name
+                response_tags = response_taxonomy["tags"]
+                assert [t["value"] for t in response_tags] == tag_values
+            else:
+                assert tags_by_taxonomy == []  # No tags are set from any taxonomy
+
+            # Check that re-fetching the tags returns what we set
+            url = OBJECT_TAG_UPDATE_URL.format(object_id=self.container_key)
+            new_response = self.client.get(url, format="json")
+            assert status.is_success(new_response.status_code)
+            assert new_response.data == response.data
+
+    @ddt.data(
+        "staffA",
+        "staff",
+    )
+    def test_tag_collection_disabled_taxonomy(self, user_attr):
+        """
+        Nobody can use disabled taxonomies to tag objects
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        disabled_taxonomy = self.tA2
+        assert disabled_taxonomy.enabled is False
+
+        response = self._call_put_request(self.collection_key, disabled_taxonomy.pk, ["Tag 1"])
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    @ddt.data(
+        ("staffA", "tA1"),
+        ("staff", "tA1"),
+        ("staffA", "multiple_taxonomy"),
+        ("staff", "multiple_taxonomy"),
+    )
+    @ddt.unpack
+    def test_tag_collection_invalid(self, user_attr, taxonomy_attr):
+        """
+        Tests that nobody can add invalid tags to a collection using a closed taxonomy
+        """
+        user = getattr(self, user_attr)
+        self.client.force_authenticate(user=user)
+
+        taxonomy = getattr(self, taxonomy_attr)
+
+        response = self._call_put_request(self.collection_key, taxonomy.pk, ["invalid"])
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @ddt.data(
         ("superuser", status.HTTP_200_OK),
         ("staff", status.HTTP_403_FORBIDDEN),
         ("staffA", status.HTTP_403_FORBIDDEN),
@@ -1765,16 +1898,45 @@ class TestObjectTagViewSet(TestObjectTagMixin, APITestCase):
         assert status.is_success(response3.status_code)
         assert response3.data[str(self.courseA)]["taxonomies"] == expected_tags
 
+    def test_get_copied_tags(self):
+        self.client.force_authenticate(user=self.staffB)
+
+        object_id_1 = str(self.courseA)
+        object_id_2 = str(self.courseB)
+        tagging_api.tag_object(object_id=object_id_1, taxonomy=self.t1, tags=["android"])
+        tagging_api.tag_object(object_id=object_id_2, taxonomy=self.t1, tags=["anvil"])
+        tagging_api.copy_tags_as_read_only(object_id_1, object_id_2)
+
+        expected_tags = [{
+            'name': self.t1.name,
+            'taxonomy_id': self.t1.pk,
+            'can_tag_object': True,
+            'export_id': self.t1.export_id,
+            'tags': [
+                {'value': 'android', 'lineage': ['ALPHABET', 'android'], 'can_delete_objecttag': False},
+                {'value': 'anvil', 'lineage': ['ALPHABET', 'anvil'], 'can_delete_objecttag': True}
+            ]
+        }]
+
+        get_url = OBJECT_TAGS_URL.format(object_id=self.courseB)
+        response = self.client.get(get_url, format="json")
+        assert status.is_success(response.status_code)
+        assert response.data[str(object_id_2)]["taxonomies"] == expected_tags
+
     @ddt.data(
         ('staff', 'courseA', 8),
         ('staff', 'libraryA', 8),
-        ("content_creatorA", 'courseA', 11, False),
-        ("content_creatorA", 'libraryA', 11, False),
-        ("library_staffA", 'libraryA', 11, False),  # Library users can only view objecttags, not change them?
-        ("library_userA", 'libraryA', 11, False),
-        ("instructorA", 'courseA', 11),
-        ("course_instructorA", 'courseA', 11),
-        ("course_staffA", 'courseA', 11),
+        ('staff', 'collection_key', 8),
+        ("content_creatorA", 'courseA', 12, False),
+        ("content_creatorA", 'libraryA', 12, False),
+        ("content_creatorA", 'collection_key', 12, False),
+        ("library_staffA", 'libraryA', 12, False),  # Library users can only view objecttags, not change them?
+        ("library_staffA", 'collection_key', 12, False),
+        ("library_userA", 'libraryA', 12, False),
+        ("library_userA", 'collection_key', 12, False),
+        ("instructorA", 'courseA', 12),
+        ("course_instructorA", 'courseA', 12),
+        ("course_staffA", 'courseA', 12),
     )
     @ddt.unpack
     def test_object_tags_query_count(

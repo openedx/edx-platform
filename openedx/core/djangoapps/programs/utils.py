@@ -5,17 +5,14 @@ import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
-from urllib.parse import urlencode, urljoin, urlparse, urlunparse
+from urllib.parse import urljoin, urlparse, urlunparse
 
-import requests
 from dateutil.parser import parse
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.urls import reverse
 from django.utils.functional import cached_property
-from edx_rest_api_client.auth import SuppliedJwtAuth
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from requests.exceptions import RequestException
@@ -29,7 +26,7 @@ from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.commerce.utils import EcommerceService
+from lms.djangoapps.commerce.utils import EcommerceService, get_program_price_info
 from openedx.core.djangoapps.catalog.api import get_programs_by_type
 from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import (
@@ -37,12 +34,10 @@ from openedx.core.djangoapps.catalog.utils import (
     get_pathways,
     get_programs,
 )
-from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
 from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
-from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.modulestore.django import modulestore
@@ -64,15 +59,6 @@ def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
     return program_data, course_data
 
 
-def get_buy_subscription_url(program_uuid, skus):
-    """
-    Returns the URL to the Subscription Purchase page for the given program UUID and course Skus.
-    """
-    formatted_skus = urlencode({"sku": skus}, doseq=True)
-    url = f"{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}{program_uuid}/?{formatted_skus}"
-    return url
-
-
 def get_program_urls(program_data):
     """Returns important urls of program."""
     from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
@@ -92,10 +78,6 @@ def get_program_urls(program_data):
         "commerce_api_url": reverse("commerce_api:v0:baskets:create"),
         "buy_button_url": ecommerce_service.get_checkout_page_url(*skus),
         "program_record_url": program_record_url,
-        "buy_subscription_url": get_buy_subscription_url(program_uuid, skus),
-        "manage_subscription_url": settings.SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL,
-        "orders_and_subscriptions_url": settings.ORDER_HISTORY_MICROFRONTEND_URL,
-        "subscriptions_learner_help_center_url": settings.SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL,
     }
     return urls
 
@@ -127,15 +109,6 @@ def get_program_marketing_url(programs_config, mobile_only=False):
         marketing_url = urljoin(settings.MKTG_URLS.get("ROOT"), programs_config.marketing_path).rstrip("/")
 
     return marketing_url
-
-
-def get_program_subscriptions_marketing_url():
-    """Build a URL used to link to subscription eligible programs on the marketing site."""
-    marketing_urls = settings.MKTG_URLS
-    return urljoin(
-        marketing_urls.get("ROOT"),
-        marketing_urls.get("PROGRAM_SUBSCRIPTIONS"),
-    )
 
 
 def attach_program_detail_url(programs, mobile_only=False):
@@ -238,7 +211,7 @@ class ProgramProgressMeter:
         return inverted_programs
 
     @cached_property
-    def engaged_programs(self):
+    def engaged_programs(self) -> list[dict | None]:
         """Derive a list of programs in which the given user is engaged.
 
         Returns:
@@ -298,7 +271,7 @@ class ProgramProgressMeter:
         # An upgrade deadline of None means the course is always upgradeable.
         return any(not deadline or deadline and parse(deadline) > now for deadline in upgrade_deadlines)
 
-    def progress(self, programs=None, count_only=True):
+    def progress(self, programs: list[dict | None] | None = None, count_only: bool = True) -> list[dict | None]:
         """Gauge a user's progress towards program completion.
 
         Keyword Arguments:
@@ -656,7 +629,9 @@ class ProgramDataExtender:
             ecommerce = EcommerceService()
             sku = getattr(required_mode, "sku", None)
             if ecommerce.is_enabled(self.user) and sku:
-                run_mode["upgrade_url"] = ecommerce.get_checkout_page_url(required_mode.sku)
+                run_mode["upgrade_url"] = ecommerce.get_checkout_page_url(
+                    required_mode.sku, course_run_keys=[self.course_run_key]
+                )
             else:
                 run_mode["upgrade_url"] = None
         else:
@@ -726,6 +701,7 @@ class ProgramDataExtender:
         is_learner_eligible_for_one_click_purchase = self.data["is_program_eligible_for_one_click_purchase"]
         bundle_uuid = self.data.get("uuid")
         skus = []
+        course_keys = []
         bundle_variant = "full"
 
         if is_learner_eligible_for_one_click_purchase:  # lint-amnesty, pylint: disable=too-many-nested-blocks
@@ -744,6 +720,7 @@ class ProgramDataExtender:
                     # we are assuming that, for any given course, there is at most one paid entitlement available.
                     if entitlement["mode"] in applicable_seat_types:
                         skus.append(entitlement["sku"])
+                        course_keys.append(course.get("key"))
                         entitlement_product = True
                         break
                 if not entitlement_product:
@@ -753,6 +730,7 @@ class ProgramDataExtender:
                         for seat in published_course_runs[0]["seats"]:
                             if seat["type"] in applicable_seat_types and seat["sku"]:
                                 skus.append(seat["sku"])
+                                course_keys.append(course.get("key"))
                                 break
                     else:
                         # If a course in the program has more than 1 published course run
@@ -762,31 +740,23 @@ class ProgramDataExtender:
 
         if skus:
             try:
-                api_user = self.user
-                is_anonymous = False
-                if not self.user.is_authenticated:
-                    user = get_user_model()
-                    service_user = user.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
-                    api_user = service_user
-                    is_anonymous = True
-
-                api_client = get_ecommerce_api_client(api_user)
-                api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/calculate/")
+                is_anonymous = not self.user.is_authenticated
 
                 # The user specific program price is slow to calculate, so use switch to force the
                 # anonymous price for all users. See LEARNER-5555 for more details.
                 if is_anonymous or ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER.is_enabled():
                     # The bundle uuid is necessary to see the program's discounted price
                     if bundle_uuid:
-                        params = dict(sku=skus, is_anonymous=True, bundle=bundle_uuid)
+                        params = dict(sku=skus, is_anonymous=True, bundle=bundle_uuid, course_key=course_keys)
                     else:
-                        params = dict(sku=skus, is_anonymous=True)
+                        params = dict(sku=skus, is_anonymous=True, course_key=course_keys)
                 else:
                     if bundle_uuid:
-                        params = dict(sku=skus, username=self.user.username, bundle=bundle_uuid)
+                        params = dict(sku=skus, username=self.user.username, bundle=bundle_uuid, course_key=course_keys)
                     else:
-                        params = dict(sku=skus, username=self.user.username)
-                response = api_client.get(api_url, params=params)
+                        params = dict(sku=skus, username=self.user.username, course_key=course_keys)
+
+                response = get_program_price_info(self.user, params)
                 response.raise_for_status()
                 discount_data = response.json()
                 program_discounted_price = discount_data["total_incl_tax"]
@@ -1042,51 +1012,3 @@ def is_user_enrolled_in_program_type(
         elif course_run_id in course_runs:
             return True
     return False
-
-
-def get_subscription_api_client(user):
-    """
-    Returns an API client which can be used to make Subscriptions API requests.
-    """
-    scopes = ["user_id", "email", "profile"]
-    jwt = create_jwt_for_user(user, scopes=scopes)
-    client = requests.Session()
-    client.auth = SuppliedJwtAuth(jwt)
-
-    return client
-
-
-def get_programs_subscription_data(user, program_uuid=None):
-    """
-    Returns the subscription data for a user's program if uuid is specified
-    else return data for user's all subscriptions.
-    """
-    client = get_subscription_api_client(user)
-    api_path = f"{settings.SUBSCRIPTIONS_API_PATH}"
-    subscription_data = []
-
-    log.info(
-        f"B2C_SUBSCRIPTIONS: Requesting Program subscription data for user: {user}"
-        + (f" for program_uuid: {program_uuid}" if program_uuid is not None else "")
-    )
-
-    try:
-        if program_uuid:
-            response = client.get(api_path, params={"resource_id": program_uuid, "most_active_and_recent": "true"})
-            response.raise_for_status()
-            subscription_data = response.json().get("results", [])
-        else:
-            next_page = 1
-            while next_page:
-                response = client.get(api_path, params=dict(page=next_page))
-                response.raise_for_status()
-                subscription_data.extend(response.json().get("results", []))
-                next_page = response.json().get("next")
-    except Exception as exc:  # pylint: disable=broad-except
-        log.exception(
-            f"B2C_SUBSCRIPTIONS: Failed to retrieve Program Subscription Data for user: {user} with error: {exc}"
-            + f" for program_uuid: {str(program_uuid)}"
-            if program_uuid is not None
-            else ""
-        )
-    return subscription_data

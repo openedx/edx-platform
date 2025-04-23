@@ -1,9 +1,5 @@
 # This does not cover all the code in edx-platform but it's a good start.
 
-# Ensure that the team responsible for upgrades sees any PRs that would
-# add GitHub-hosted dependencies to that platform.
-requirements/edx/github.in                                          @openedx/2u-arbi-bom
-
 # Core
 common/djangoapps/student/
 common/djangoapps/student/models/__init__.py                        @openedx/2u-tnl
@@ -15,12 +11,15 @@ lms/djangoapps/grades/
 lms/djangoapps/instructor/
 lms/djangoapps/instructor_task/
 lms/djangoapps/mobile_api/
+openedx/core/djangoapps/commerce/                                   @openedx/2u-infinity
 openedx/core/djangoapps/credentials                                 @openedx/2U-aperture
 openedx/core/djangoapps/credit                                      @openedx/2U-aperture
+openedx/core/djangoapps/enrollments/                                @openedx/2U-aperture
 openedx/core/djangoapps/heartbeat/
 openedx/core/djangoapps/oauth_dispatch
 openedx/core/djangoapps/user_api/                                   @openedx/2U-aperture
-openedx/core/djangoapps/user_authn/                                 @openedx/2U-vanguards                                 
+openedx/core/djangoapps/user_authn/                                 @openedx/2U-infinity
+openedx/core/djangoapps/verified_track_content/                     @openedx/2u-infinity
 openedx/features/course_experience/
 xmodule/
 
@@ -35,15 +34,18 @@ common/djangoapps/track/
 lms/djangoapps/certificates/                                        @openedx/2U-aperture
 
 # Discovery
-common/djangoapps/course_modes/
+common/djangoapps/course_modes/                                     @openedx/2U-aperture
 common/djangoapps/enrollment/
-lms/djangoapps/commerce/
-lms/djangoapps/experiments/
-lms/djangoapps/learner_dashboard/                                    @openedx/2U-aperture
-lms/djangoapps/learner_home/                                         @openedx/2U-aperture
-openedx/features/content_type_gating/
+common/djangoapps/entitlements/                                     @openedx/2U-aperture
+lms/djangoapps/branding/                                            @openedx/2U-aperture
+lms/djangoapps/commerce/                                            @openedx/2u-infinity
+lms/djangoapps/experiments/                                         @openedx/2u-infinity
+lms/djangoapps/gating/                                              @openedx/2u-infinity
+lms/djangoapps/learner_dashboard/                                   @openedx/2U-aperture
+lms/djangoapps/learner_home/                                        @openedx/2U-aperture
+openedx/features/content_type_gating/                               @openedx/2u-infinity
 openedx/features/course_duration_limits/
-openedx/features/discounts/
+openedx/features/discounts/                                         @openedx/2u-infinity
 
 # Ping Axim On-call if someone uses the QuickStart
 # https://docs.openedx.org/en/latest/developers/quickstarts/first_openedx_pr.html
@@ -52,3 +54,10 @@ lms/templates/dashboard.html                                         @openedx/ax
 # Ensure minimal.yml stays minimal, this could be a team in the future
 # but it's just me for now, others can sign up if they care as well.
 lms/envs/minimal.yml                                                 @feanil
+
+# Ensure that un-necessary changes don't happen to the settings files as we're cleaning them up.
+lms/envs/production.py                                               @feanil @kdmccormick
+cms/envs/production.py                                               @feanil @kdmccormick
+
+# Ensure that this file is only used when strictly necessary
+requirements/edx/github.in                                           @feanil @kdmccormick

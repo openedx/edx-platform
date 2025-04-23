@@ -3,9 +3,8 @@ Objects and utilities used to construct registration forms.
 """
 
 import copy
-from importlib import import_module
-from eventtracking import tracker
 import re
+from importlib import import_module
 
 from django import forms
 from django.conf import settings
@@ -16,25 +15,25 @@ from django.forms import widgets
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django_countries import countries
+from eventtracking import tracker
 
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import marketing_link
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from openedx.core.djangoapps.user_api import accounts
-from openedx.core.djangoapps.user_api.helpers import FormDescription
-from openedx.core.djangoapps.user_authn.utils import check_pwned_password, is_registration_api_v1 as is_api_v1
-from openedx.core.djangolib.markup import HTML, Text
-from openedx.features.enterprise_support.api import enterprise_customer_for_request
-from common.djangoapps.student.models import (
-    CourseEnrollmentAllowed,
-    UserProfile,
-    email_exists_or_retired,
-)
+from common.djangoapps.student.models import CourseEnrollmentAllowed, UserProfile, email_exists_or_retired
 from common.djangoapps.util.password_policy_validators import (
     password_validators_instruction_texts,
     password_validators_restrictions,
-    validate_password,
+    validate_password
 )
+from openedx.core.djangoapps.embargo.models import GlobalRestrictedCountry
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api import accounts
+from openedx.core.djangoapps.user_api.helpers import FormDescription
+from openedx.core.djangoapps.user_authn.utils import check_pwned_password
+from openedx.core.djangoapps.user_authn.utils import is_registration_api_v1 as is_api_v1
+from openedx.core.djangoapps.user_authn.views.utils import remove_disabled_country_from_list
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.features.enterprise_support.api import enterprise_customer_for_request
 
 
 class TrueCheckbox(widgets.CheckboxInput):
@@ -147,6 +146,7 @@ class AccountCreationForm(forms.Form):
 
     _EMAIL_INVALID_MSG = _("A properly formatted e-mail is required")
     _NAME_TOO_SHORT_MSG = _("Your legal name must be a minimum of one character long")
+    _NAME_TOO_LONG_MSG = _("Your legal name is too long. It must not exceed %(max_length)s characters")
 
     # TODO: Resolve repetition
 
@@ -166,9 +166,11 @@ class AccountCreationForm(forms.Form):
 
     name = forms.CharField(
         min_length=accounts.NAME_MIN_LENGTH,
+        max_length=accounts.NAME_MAX_LENGTH,
         error_messages={
             "required": _NAME_TOO_SHORT_MSG,
             "min_length": _NAME_TOO_SHORT_MSG,
+            "max_length": _NAME_TOO_LONG_MSG % {"max_length": accounts.NAME_MAX_LENGTH},
         },
         validators=[validate_name]
     )
@@ -296,6 +298,18 @@ class AccountCreationForm(forms.Form):
             for key, value in self.cleaned_data.items()
             if key in self.extended_profile_fields and value is not None
         }
+
+    def clean_country(self):
+        """
+        Check if the user's country is in the embargoed countries list.
+        """
+        country = self.cleaned_data.get("country")
+        if (
+            settings.FEATURES.get('EMBARGO', False) and
+            country in GlobalRestrictedCountry.get_countries()
+        ):
+            raise ValidationError(_("Registration from this country is not allowed due to restrictions."))
+        return self.cleaned_data.get("country")
 
 
 def get_registration_extension_form(*args, **kwargs):
@@ -686,7 +700,7 @@ class RegistrationFormFactory:
         """
         opt_in_label = _(
             'I agree that {platform_name} may send me marketing messages.').format(
-                platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         )
 
         form_desc.add_field(
@@ -968,13 +982,12 @@ class RegistrationFormFactory:
                 'country',
                 default=default_country.upper()
             )
-
         form_desc.add_field(
             "country",
             label=country_label,
             instructions=country_instructions,
             field_type="select",
-            options=list(countries),
+            options=list(remove_disabled_country_from_list(dict(countries)).items()),
             include_default_option=True,
             required=required,
             error_messages={

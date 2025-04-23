@@ -1213,6 +1213,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Expect that the number of attempts is NOT incremented
         assert block.attempts == 1
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the submit_problem API.
@@ -1263,6 +1264,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         for fpath, fileobj in kwargs['files'].items():
             assert fpath == fileobj.name
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files_as_xblock(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the XBlock API.
@@ -2629,12 +2631,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         else:
 
             # Since there's a small chance (expected) we might get the
-            # same seed again, give it 10 chances
+            # same seed again, give it 60 chances
             # to generate a different seed
-            success = _retry_and_check(10, lambda: _reset_and_get_seed(block) != seed)
+            success = _retry_and_check(60, lambda: _reset_and_get_seed(block) != seed)
 
             assert block.seed is not None
-            msg = 'Could not get a new seed from reset after 10 tries'
+            msg = 'Could not get a new seed from reset after 60 tries'
             assert success, msg
 
     @ddt.data(
@@ -3290,7 +3292,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': ' Label Some comment Apple Banana Chocolate Donut '}}
+                'content': {'display_name': name, 'capa_content': 'Label Some comment Apple Banana Chocolate Donut'}}
 
     def test_response_types_multiple_tags(self):
         xml = textwrap.dedent("""
@@ -3328,7 +3330,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
                 'problem_types': {"optionresponse", "multiplechoiceresponse"},
                 'content': {
                     'display_name': name,
-                    'capa_content': " Label Some comment Donut Buggy '1','2' "
+                    'capa_content': "Label Some comment Donut Buggy '1','2'"
                 },
             }
         )
@@ -3369,7 +3371,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': [],
-                'content': {'display_name': name, 'capa_content': ' '}}
+                'content': {'display_name': name, 'capa_content': ''}}
 
     def test_indexing_checkboxes(self):
         name = "Checkboxes"
@@ -3390,7 +3392,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['choiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_dropdown(self):
         name = "Dropdown"
@@ -3405,7 +3407,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['optionresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_multiple_choice(self):
         name = "Multiple Choice"
@@ -3424,7 +3426,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_numerical_input(self):
         name = "Numerical Input"
@@ -3446,7 +3448,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['numericalresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_text_input(self):
         name = "Text Input"
@@ -3465,7 +3467,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['stringresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_non_latin_problem(self):
         sample_text_input_problem_xml = textwrap.dedent("""
@@ -3476,7 +3478,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         name = "Non latin Input"
         block = self._create_block(sample_text_input_problem_xml, name=name)
-        capa_content = " Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL "
+        capa_content = "Δοκιμή με μεταβλητές με Ελληνικούς χαρακτήρες μέσα σε python: $FX1_VAL"
 
         block_dict = block.index_dictionary()
         assert block_dict['content']['capa_content'] == smart_str(capa_content)
@@ -3503,7 +3505,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['choiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_dropdown_with_hints_and_feedback(self):
         name = "Dropdown with Hints and Feedback"
@@ -3523,7 +3525,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['optionresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_multiple_choice_with_hints_and_feedback(self):
         name = "Multiple Choice with Hints and Feedback"
@@ -3543,7 +3545,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['multiplechoiceresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_numerical_input_with_hints_and_feedback(self):
         name = "Numerical Input with Hints and Feedback"
@@ -3561,7 +3563,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['numericalresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_text_input_with_hints_and_feedback(self):
         name = "Text Input with Hints and Feedback"
@@ -3579,7 +3581,7 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': ['stringresponse'],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ').strip()}}
 
     def test_indexing_problem_with_html_tags(self):
         sample_problem_xml = textwrap.dedent("""
@@ -3598,14 +3600,33 @@ class ProblemBlockXMLTest(unittest.TestCase):  # lint-amnesty, pylint: disable=m
         """)
         name = "Mixed business"
         block = self._create_block(sample_problem_xml, name=name)
-        capa_content = textwrap.dedent("""
-            This has HTML comment in it.
-            HTML end.
-        """)
+        capa_content = "This has HTML comment in it. HTML end."
         assert block.index_dictionary() ==\
                {'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
                 'problem_types': [],
-                'content': {'display_name': name, 'capa_content': capa_content.replace('\n', ' ')}}
+                'content': {'display_name': name, 'capa_content': capa_content}}
+
+    def test_indexing_problem_with_no_whitespace_between_tags(self):
+        """
+        The new (MFE) visual editor for capa problems renders the OLX without spaces between the tags.
+        We want to make sure the index description is still readable and has whitespace.
+        """
+        sample_problem_xml = (
+            "<problem display_name=\"No spaces\">"
+            "<choiceresponse><div>Question text here.</div><checkboxgroup>"
+            "<choice correct=\"true\"><div>Option A</div></choice>"
+            "<choice correct=\"false\"><div>Option B</div></choice>"
+            "</checkboxgroup></choiceresponse>"
+            "</problem>"
+        )
+        name = "No spaces"
+        block = self._create_block(sample_problem_xml, name=name)
+        capa_content = "Question text here. Option A Option B"
+        assert block.index_dictionary() == {
+            'content_type': ProblemBlock.INDEX_CONTENT_TYPE,
+            'problem_types': ['choiceresponse'],
+            'content': {'display_name': name, 'capa_content': capa_content},
+        }
 
     def test_invalid_xml_handling(self):
         """
@@ -3881,6 +3902,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                                         'group_label': '',
                                         'variant': block.seed}}
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_file_inputs(self, mock_xqueue_post):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]

@@ -4,6 +4,7 @@
 from datetime import date
 import json
 from unittest.mock import MagicMock, patch
+from urllib.parse import urljoin
 from django.conf import settings
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
@@ -57,8 +58,8 @@ class CookieTests(TestCase):
     def _get_expected_header_urls(self):
         expected_header_urls = {
             'logout': reverse('logout'),
-            'account_settings': reverse('account_settings'),
-            'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
+            'account_settings': settings.ACCOUNT_MICROFRONTEND_URL,
+            'learner_profile': urljoin(settings.PROFILE_MICROFRONTEND_URL, f'/u/{self.user.username}'),
         }
         block_url = retrieve_last_sitewide_block_completed(self.user)
         if block_url:
@@ -73,9 +74,6 @@ class CookieTests(TestCase):
             key: val.value
             for key, val in response.cookies.items()
         }
-
-    def _set_use_jwt_cookie_header(self, request):
-        request.META['HTTP_USE_JWT_COOKIE'] = 'true'
 
     def _assert_recreate_jwt_from_cookies(self, response, can_recreate):
         """
@@ -133,7 +131,6 @@ class CookieTests(TestCase):
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_set_logged_in_jwt_cookies(self):
         setup_login_oauth_client()
-        self._set_use_jwt_cookie_header(self.request)
         response = cookies_api.set_logged_in_cookies(self.request, HttpResponse(), self.user)
         self._assert_cookies_present(response, cookies_api.ALL_LOGGED_IN_COOKIE_NAMES)
         self._assert_consistent_expires(response, num_of_unique_expires=2)
@@ -153,7 +150,6 @@ class CookieTests(TestCase):
     @patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     def test_refresh_jwt_cookies(self):
         setup_login_oauth_client()
-        self._set_use_jwt_cookie_header(self.request)
         response = cookies_api.get_response_with_refreshed_jwt_cookies(self.request, self.user)
         data = json.loads(response.content.decode('utf8').replace("'", '"'))
         assert data['success'] is True

@@ -63,9 +63,13 @@ class StagedContent(models.Model):
     # A _suggested_ URL name to use for this content. Since this suggestion may already be in use, it's fine to generate
     # a new url_name instead.
     suggested_url_name = models.CharField(max_length=1024)
+    # If applicable, an int >=1 indicating the version of copied content. If not applicable, zero (default).
+    version_num = models.PositiveIntegerField(default=0)
 
     # Tags applied to the original source block(s) will be copied to the new block(s) on paste.
-    tags = models.JSONField(null=True, help_text=_("Content tags applied to these blocks"))
+    tags: models.JSONField[dict | None, dict | None] = models.JSONField(
+        null=True, help_text=_("Content tags applied to these blocks")
+    )
 
     @property
     def olx_filename(self) -> str:
@@ -127,7 +131,6 @@ class UserClipboard(models.Model):
 
     def clean(self):
         """ Check that this model is being used correctly. """
-        # These could probably be replaced with constraints in Django 4.1+
         if self.user.id != self.content.user.id:
             raise ValidationError("User ID mismatch.")
         if self.content.purpose != CLIPBOARD_PURPOSE:

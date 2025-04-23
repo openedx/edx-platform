@@ -730,8 +730,8 @@ class CcxDetailTest(CcxRestApiTest):
             course_id=ccx_course_key,
             student_email=self.coach.email,
             auto_enroll=True,
-            email_students=False,
-            email_params=email_params,
+            message_students=False,
+            message_params=email_params,
         )
         return ccx
 

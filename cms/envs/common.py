@@ -122,18 +122,29 @@ from lms.envs.common import (
     # Password Validator Settings
     AUTH_PASSWORD_VALIDATORS
 )
+from lms.envs.common import (
+    USE_EXTRACTED_WORD_CLOUD_BLOCK,
+    USE_EXTRACTED_ANNOTATABLE_BLOCK,
+    USE_EXTRACTED_POLL_QUESTION_BLOCK,
+    USE_EXTRACTED_LTI_BLOCK,
+    USE_EXTRACTED_HTML_BLOCK,
+    USE_EXTRACTED_DISCUSSION_BLOCK,
+    USE_EXTRACTED_PROBLEM_BLOCK,
+    USE_EXTRACTED_VIDEO_BLOCK,
+)
 from path import Path as path
 from django.urls import reverse_lazy
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
+from cms.lib.xblock.upstream_sync import UpstreamSyncMixin
 from xmodule.modulestore.edit_info import EditInfoMixin
 from openedx.core.djangoapps.theming.helpers_dirs import (
     get_themes_unchecked,
     get_theme_base_dirs_from_settings
 )
 from openedx.core.lib.license import LicenseMixin
-from openedx.core.lib.derived import derived, derived_collection_entry
+from openedx.core.lib.derived import Derived
 from openedx.core.release import doc_version
 
 # pylint: enable=useless-suppression
@@ -434,18 +445,6 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/DEPR-58
     'DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO': True,
 
-    # .. toggle_name: FEATURES['ENABLE_LIBRARY_AUTHORING_MICROFRONTEND']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Set to True to enable the Library Authoring MFE
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2020-06-20
-    # .. toggle_target_removal_date: 2020-12-31
-    # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4106944527/Libraries+Relaunch+Proposal+For+Product+Review
-    # .. toggle_warning: Also set settings.LIBRARY_AUTHORING_MICROFRONTEND_URL and see
-    #   REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND for rollout.
-    'ENABLE_LIBRARY_AUTHORING_MICROFRONTEND': False,
-
     # .. toggle_name: FEATURES['DISABLE_COURSE_CREATION']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -467,17 +466,6 @@ FEATURES = {
     # .. toggle_creation_date: 2021-03-05
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/26106
     'ENABLE_HELP_LINK': True,
-
-    # .. toggle_name: FEATURES['ENABLE_V2_CERT_DISPLAY_SETTINGS']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Whether to use the reimagined certificates_display_behavior and certificate_available_date
-    # .. settings. Will eventually become the default.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2021-07-26
-    # .. toggle_target_removal_date: 2021-10-01
-    # .. toggle_tickets: 'https://openedx.atlassian.net/browse/MICROBA-1405'
-    'ENABLE_V2_CERT_DISPLAY_SETTINGS': False,
 
     # .. toggle_name: FEATURES['ENABLE_INTEGRITY_SIGNATURE']
     # .. toggle_implementation: DjangoSetting
@@ -559,16 +547,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33952
     'ENABLE_HIDE_FROM_TOC_UI': False,
 
-    # .. toggle_name: FEATURES['ENABLE_HOME_PAGE_COURSE_API_V2']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: True
-    # .. toggle_description: Enables the new home page course v2 API, which is a new version of the home page course
-    #   API with pagination, filter and ordering capabilities.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2024-03-14
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/34173
-    'ENABLE_HOME_PAGE_COURSE_API_V2': True,
-
     # .. toggle_name: FEATURES['ENABLE_GRADING_METHOD_IN_PROBLEMS']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -578,9 +556,6 @@ FEATURES = {
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/33911
     'ENABLE_GRADING_METHOD_IN_PROBLEMS': False,
 
-    # See annotations in lms/envs/common.py for details.
-    'ENABLE_BLAKE2B_HASHING': False,
-
     # .. toggle_name: FEATURES['BADGES_ENABLED']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -588,6 +563,14 @@ FEATURES = {
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2024-04-10
     'BADGES_ENABLED': False,
+
+    # .. toggle_name: FEATURES['IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Set to False to disable in-context discussion for units by default.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2024-09-02
+    'IN_CONTEXT_DISCUSSION_ENABLED_DEFAULT': True,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -612,7 +595,6 @@ IDA_LOGOUT_URI_LIST = []
 COURSE_AUTHORING_MICROFRONTEND_URL = None
 DISCUSSIONS_MICROFRONTEND_URL = None
 DISCUSSIONS_MFE_FEEDBACK_URL = None
-LIBRARY_AUTHORING_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -687,6 +669,7 @@ CMS_ROOT = REPO_ROOT / "cms"
 LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
+XMODULE_ROOT = REPO_ROOT / "xmodule"
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
@@ -747,7 +730,7 @@ TEMPLATES = [
         # Don't look for template source files inside installed applications.
         'APP_DIRS': False,
         # Instead, look for template source files in these dirs.
-        'DIRS': _make_mako_template_dirs,
+        'DIRS': Derived(_make_mako_template_dirs),
         # Options specific to this backend.
         'OPTIONS': {
             'loaders': (
@@ -766,7 +749,7 @@ TEMPLATES = [
         'NAME': 'mako',
         'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
         'APP_DIRS': False,
-        'DIRS': _make_mako_template_dirs,
+        'DIRS': Derived(_make_mako_template_dirs),
         'OPTIONS': {
             'context_processors': CONTEXT_PROCESSORS,
             'debug': False,
@@ -785,8 +768,6 @@ TEMPLATES = [
         }
     },
 ]
-derived_collection_entry('TEMPLATES', 0, 'DIRS')
-derived_collection_entry('TEMPLATES', 1, 'DIRS')
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
 #################################### AWS #######################################
@@ -832,8 +813,7 @@ FRONTEND_LOGIN_URL = LOGIN_URL
 # Warning: Must have trailing slash to activate correct logout view
 # (auth_backends, not LMS user_authn)
 FRONTEND_LOGOUT_URL = '/logout/'
-FRONTEND_REGISTER_URL = lambda settings: settings.LMS_ROOT_URL + '/register'
-derived('FRONTEND_REGISTER_URL')
+FRONTEND_REGISTER_URL = Derived(lambda settings: settings.LMS_ROOT_URL + '/register')
 
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
 ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
@@ -850,6 +830,7 @@ LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
 
 # Public domain name of Studio (should be resolvable from the end-user's browser)
 CMS_BASE = 'localhost:18010'
+CMS_ROOT_URL = "https://localhost:18010"
 
 LOG_DIR = '/edx/var/log/edx'
 
@@ -949,7 +930,6 @@ MIDDLEWARE = [
     'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
 
     'common.djangoapps.student.middleware.UserStandingMiddleware',
-    'openedx.core.djangoapps.contentserver.middleware.StaticContentServerMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'common.djangoapps.track.middleware.TrackMiddleware',
@@ -1020,6 +1000,7 @@ XBLOCK_MIXINS = (
     XModuleMixin,
     EditInfoMixin,
     AuthoringMixin,
+    UpstreamSyncMixin,
 )
 
 # .. setting_name: XBLOCK_EXTRA_MIXINS
@@ -1293,6 +1274,10 @@ STATIC_ROOT = os.environ.get('STATIC_ROOT_CMS', ENV_ROOT / 'staticfiles' / 'stud
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    # Temporarily adding the following static path as we are migrating the built-in blocks' Sass to vanilla CSS.
+    # Once all of the built-in blocks are extracted from edx-platform, we can remove this static path.
+    # Relevant ticket: https://github.com/openedx/edx-platform/issues/35300
+    XMODULE_ROOT / "static",
 ]
 
 # Locale/Internationalization
@@ -1318,8 +1303,7 @@ USE_L10N = True
 STATICI18N_FILENAME_FUNCTION = 'statici18n.utils.legacy_filename'
 STATICI18N_ROOT = PROJECT_ROOT / "static"
 
-LOCALE_PATHS = _make_locale_paths
-derived('LOCALE_PATHS')
+LOCALE_PATHS = Derived(_make_locale_paths)
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -1332,16 +1316,6 @@ COURSE_METADATA_EXPORT_STORAGE = 'django.core.files.storage.FileSystemStorage'
 EMBARGO_SITE_REDIRECT_URL = None
 
 ##### custom vendor plugin variables #####
-
-# .. setting_name: JS_ENV_EXTRA_CONFIG
-# .. setting_default: {}
-# .. setting_description: JavaScript code can access this dictionary using `process.env.JS_ENV_EXTRA_CONFIG`
-#   One of the current use cases for this is enabling custom TinyMCE plugins
-#   (TINYMCE_ADDITIONAL_PLUGINS) and overriding the TinyMCE configuration (TINYMCE_CONFIG_OVERRIDES).
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the JS_ENV_EXTRA_CONFIG environment variable to an equivalent JSON
-#   string instead. For details, see: https://github.com/openedx/edx-platform/issues/31895
-JS_ENV_EXTRA_CONFIG = json.loads(os.environ.get('JS_ENV_EXTRA_CONFIG', '{}'))
 
 ############################### PIPELINE #######################################
 
@@ -1430,6 +1404,12 @@ PIPELINE['STYLESHEETS'] = {
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
+    'course-unit-mfe-iframe-bundle': {
+        'source_filenames': [
+            'css/course-unit-mfe-iframe-bundle.css',
+        ],
+        'output_filename': 'css/course-unit-mfe-iframe-bundle.css',
+    },
 }
 
 base_vendor_js = [
@@ -1449,9 +1429,8 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/string-utils.js',
     'edx-ui-toolkit/js/utils/html-utils.js',
 
-    # Load Bootstrap and supporting libraries
-    'common/js/vendor/popper.js',
-    'common/js/vendor/bootstrap.js',
+    # Here we were loading Bootstrap and supporting libraries, but it no longer seems to be needed for any Studio UI.
+    # 'common/js/vendor/bootstrap.bundle.js',
 
     # Finally load RequireJS
     'common/js/vendor/require.js'
@@ -1518,14 +1497,6 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
-
-# .. setting_name: WEBPACK_CONFIG_PATH
-# .. setting_default: "webpack.prod.config.js"
-# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
-#   see: https://github.com/openedx/edx-platform/issues/31895
-WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
 
 
 ############################ SERVICE_VARIANT ##################################
@@ -1666,6 +1637,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'openedx.core.djangoapps.cors_csrf',
 
+    # Provides the 'django_markup' template library so we can use 'interpolate_html' in django templates
+    'xss_utils',
+
     # History tables
     'simple_history',
 
@@ -1693,6 +1667,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
     'cms.djangoapps.export_course_metadata.apps.ExportCourseMetadataConfig',
+    'cms.djangoapps.import_from_modulestore.apps.ImportFromModulestoreConfig',
 
     # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
@@ -1839,6 +1814,9 @@ INSTALLED_APPS = [
     # Search
     'openedx.core.djangoapps.content.search',
 
+    # For Programs API
+    'lms.djangoapps.program_enrollments',
+
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
@@ -1884,6 +1862,9 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.components",
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
+    "openedx_learning.apps.authoring.units",
+    "openedx_learning.apps.authoring.subsections",
+    "openedx_learning.apps.authoring.sections",
 ]
 
 
@@ -2083,10 +2064,9 @@ RETIRED_EMAIL_PREFIX = 'retired__user_'
 # See annotations in lms/envs/common.py for details.
 RETIRED_EMAIL_DOMAIN = 'retired.invalid'
 # See annotations in lms/envs/common.py for details.
-RETIRED_USERNAME_FMT = lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}'
+RETIRED_USERNAME_FMT = Derived(lambda settings: settings.RETIRED_USERNAME_PREFIX + '{}')
 # See annotations in lms/envs/common.py for details.
-RETIRED_EMAIL_FMT = lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN
-derived('RETIRED_USERNAME_FMT', 'RETIRED_EMAIL_FMT')
+RETIRED_EMAIL_FMT = Derived(lambda settings: settings.RETIRED_EMAIL_PREFIX + '{}@' + settings.RETIRED_EMAIL_DOMAIN)
 # See annotations in lms/envs/common.py for details.
 RETIRED_USER_SALTS = ['abc', '123']
 # See annotations in lms/envs/common.py for details.
@@ -2363,13 +2343,12 @@ EDX_DRF_EXTENSIONS = {
 ############## Settings for Studio Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "cms" / "envs" / "help_tokens.ini"
-HELP_TOKENS_LANGUAGE_CODE = lambda settings: settings.LANGUAGE_CODE
-HELP_TOKENS_VERSION = lambda settings: doc_version()
+HELP_TOKENS_LANGUAGE_CODE = Derived(lambda settings: settings.LANGUAGE_CODE)
+HELP_TOKENS_VERSION = Derived(lambda settings: doc_version())
 HELP_TOKENS_BOOKS = {
     'learner': 'https://edx.readthedocs.io/projects/open-edx-learner-guide',
     'course_author': 'https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course',
 }
-derived('HELP_TOKENS_LANGUAGE_CODE', 'HELP_TOKENS_VERSION')
 
 # Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
@@ -2517,6 +2496,8 @@ ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
+# time between scheduled runs, in seconds
+NOTIFY_CREDENTIALS_FREQUENCY = 14400
 
 ANALYTICS_DASHBOARD_URL = 'http://localhost:18110/courses'
 ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
@@ -2584,6 +2565,7 @@ VIDEO_TRANSCRIPTS_SETTINGS = dict(
 )
 
 VIDEO_TRANSCRIPTS_MAX_AGE = 31536000
+TRANSCRIPT_LANG_CACHE_TIMEOUT = 60 * 60 * 24
 
 
 ##### shoppingcart Payment #####
@@ -2736,7 +2718,7 @@ PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
 ######################## Setting for content libraries ########################
-MAX_BLOCKS_PER_CONTENT_LIBRARY = 1000
+MAX_BLOCKS_PER_CONTENT_LIBRARY = 100_000
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
@@ -2782,16 +2764,17 @@ SHOW_ACCOUNT_ACTIVATION_CTA = False
 ################# Documentation links for course apps #################
 
 # pylint: disable=line-too-long
-CALCULATOR_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/calculator.html"
-DISCUSSIONS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_components/create_discussion.html"
-EDXNOTES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/notes.html"
-PROGRESS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html?highlight=progress#hiding-or-showing-the-wiki-or-progress-pages"
-TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features/teams/teams_setup.html"
-TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
-WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
-CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
-COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
-ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#configuring-course-level-open-response-assessment-settings"
+CALCULATOR_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/add_calculator.html"
+DISCUSSIONS_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_discussions.html"
+EDXNOTES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/enable_notes.html"
+PROGRESS_HELP_URL = "https://docs.openedx.org/en/latest/educators/references/data/progress_page.html"
+TEAMS_HELP_URL = "https://docs.openedx.org/en/latest/educators/navigation/advanced_features.html#use-teams-in-your-course"
+TEXTBOOKS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_textbooks.html"
+WIKI_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_wiki.html"
+CUSTOM_PAGES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_custom_page.html"
+COURSE_LIVE_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/add_course_live.html"
+ORA_SETTINGS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/Manage_ORA_Assignment.html"
+# pylint: enable=line-too-long
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
@@ -2808,15 +2791,15 @@ INACTIVE_USER_URL = f'http://{CMS_BASE}'
 # String length for the configurable part of the auto-generated username
 AUTO_GENERATED_USERNAME_RANDOM_STRING_LENGTH = 4
 
-######################## BRAZE API SETTINGS ########################
+######################## Discussion Forum settings ########################
 
-EDX_BRAZE_API_KEY = None
-EDX_BRAZE_API_SERVER = None
-
-BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
-
+# Feedback link in upgraded discussion notification alert
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
-DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+# Learn More link in upgraded discussion notification alert
+# pylint: disable=line-too-long
+DISCUSSIONS_INCONTEXT_LEARNMORE_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_discussions.html"
+# pylint: enable=line-too-long
 
 #### django-simple-history##
 # disable indexing on date field its coming django-simple-history.
@@ -2839,7 +2822,7 @@ def _should_send_learning_badge_events(settings):
 #    Each topic configuration dictionary contains
 #    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
 #       according to
-#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#       https://docs.openedx.org/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
 #    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
 #    Note: The topic names should not include environment prefix as it will be dynamically added based on
 #    EVENT_BUS_TOPIC_PREFIX setting.
@@ -2862,15 +2845,15 @@ EVENT_BUS_PRODUCER_CONFIG = {
     },
     'org.openedx.content_authoring.xblock.published.v1': {
         'course-authoring-xblock-lifecycle':
-            {'event_key_field': 'xblock_info.usage_key', 'enabled': _should_send_xblock_events},
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': Derived(_should_send_xblock_events)},
     },
     'org.openedx.content_authoring.xblock.deleted.v1': {
         'course-authoring-xblock-lifecycle':
-            {'event_key_field': 'xblock_info.usage_key', 'enabled': _should_send_xblock_events},
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': Derived(_should_send_xblock_events)},
     },
     'org.openedx.content_authoring.xblock.duplicated.v1': {
         'course-authoring-xblock-lifecycle':
-            {'event_key_field': 'xblock_info.usage_key', 'enabled': _should_send_xblock_events},
+            {'event_key_field': 'xblock_info.usage_key', 'enabled': Derived(_should_send_xblock_events)},
     },
     # LMS events. These have to be copied over here because lms.common adds some derived entries as well,
     # and the derivation fails if the keys are missing. If we ever remove the import of lms.common, we can remove these.
@@ -2885,37 +2868,16 @@ EVENT_BUS_PRODUCER_CONFIG = {
     "org.openedx.learning.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.course_key",
-            "enabled": _should_send_learning_badge_events,
+            "enabled": Derived(_should_send_learning_badge_events),
         },
     },
     "org.openedx.learning.ccx.course.passing.status.updated.v1": {
         "learning-badges-lifecycle": {
             "event_key_field": "course_passing_status.course.ccx_course_key",
-            "enabled": _should_send_learning_badge_events,
+            "enabled": Derived(_should_send_learning_badge_events),
         },
     },
 }
-
-
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.published.v1',
-                         'course-authoring-xblock-lifecycle', 'enabled')
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.duplicated.v1',
-                         'course-authoring-xblock-lifecycle', 'enabled')
-derived_collection_entry('EVENT_BUS_PRODUCER_CONFIG', 'org.openedx.content_authoring.xblock.deleted.v1',
-                         'course-authoring-xblock-lifecycle', 'enabled')
-
-derived_collection_entry(
-    "EVENT_BUS_PRODUCER_CONFIG",
-    "org.openedx.learning.course.passing.status.updated.v1",
-    "learning-badges-lifecycle",
-    "enabled",
-)
-derived_collection_entry(
-    "EVENT_BUS_PRODUCER_CONFIG",
-    "org.openedx.learning.ccx.course.passing.status.updated.v1",
-    "learning-badges-lifecycle",
-    "enabled",
-)
 
 ################### Authoring API ######################
 
@@ -2938,3 +2900,27 @@ MEILISEARCH_PUBLIC_URL = "http://meilisearch.example.com"
 # See https://www.meilisearch.com/docs/learn/security/tenant_tokens
 MEILISEARCH_INDEX_PREFIX = ""
 MEILISEARCH_API_KEY = "devkey"
+
+# .. setting_name: LIBRARY_ENABLED_BLOCKS
+# .. setting_default: ['problem', 'video', 'html', 'drag-and-drop-v2']
+# .. setting_description: List of block types that are ready/enabled to be created/used
+# .. in libraries. Both basic blocks and advanced blocks can be included.
+# .. In the future, we will support individual configuration per library - see
+# .. openedx/core/djangoapps/content_libraries/api.py::get_allowed_block_types()
+LIBRARY_ENABLED_BLOCKS = [
+    'problem',
+    'video',
+    'html',
+    'drag-and-drop-v2',
+    'openassessment',
+    'conditional',
+    'done',
+    'freetextresponse',
+    'google-calendar',
+    'google-document',
+    'invideoquiz',
+    'pdf',
+    'poll',
+    'survey',
+    'word_cloud',
+]

@@ -274,7 +274,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
-        with self.assertNumQueries(30):
+        with self.assertNumQueries(26):
             sc = resolver.get_schedules()
             schedules = list(sc)
         apple_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg'
@@ -293,6 +293,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
             'contact_email': 'info@example.com',
             'contact_mailing_address': '123 Sesame Street',
             'course_ids': [str(self.course.id)],
+            'course_id': str(self.course.id),
             'course_name': self.course.display_name,
             'course_url': f'http://learning-mfe/course/{self.course.id}/home',
             'dashboard_url': '/dashboard',
