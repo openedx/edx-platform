@@ -10,8 +10,6 @@ from uuid import uuid4
 
 import crum
 from django.conf import settings
-from lxml import etree
-from opaque_keys.edx.locator import LibraryContainerLocator
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
@@ -188,14 +186,3 @@ def get_auto_latest_version(version: int | LatestVersion) -> int | LatestVersion
             else LatestVersion.PUBLISHED
         )
     return version
-
-
-def library_container_xml(
-    container_key: LibraryContainerLocator,
-    display_name: str | None = None,
-    block_type: str | None = None,
-):
-    """Converts given unit to xml without including children components"""
-    xml_object = etree.Element(block_type or container_key.container_type)
-    xml_object.set("display_name", display_name)
-    return xml_object

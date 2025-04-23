@@ -11,23 +11,24 @@ from urllib.parse import unquote
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.transaction import atomic
 from django.urls import reverse
-from lxml import etree
-from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator
+
 from openedx_learning.api import authoring as authoring_api
+
+from lxml import etree
+
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchUsage
-from xblock.field_data import FieldData
 from xblock.fields import Field, Scope, ScopeIds
+from xblock.field_data import FieldData
 
 from openedx.core.djangoapps.xblock.api import get_xblock_app_config
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from openedx.core.lib.xblock_serializer.data import StaticFile
-
 from ..data import AuthoredDataMode, LatestVersion
+from ..utils import get_auto_latest_version
 from ..learning_context.manager import get_learning_context_impl
-from ..utils import get_auto_latest_version, library_container_xml
 from .runtime import XBlockRuntime
+
 
 log = logging.getLogger(__name__)
 
@@ -166,11 +167,37 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
     (eventually) asset storage.
     """
 
-    def _initialize_block(self, content, usage_key, block_type, version: int | LatestVersion):
+    def get_block(self, usage_key, for_parent=None, *, version: int | LatestVersion = LatestVersion.AUTO):
         """
-        Creates new xblock from given content, usage_key and block_type
+        Fetch an XBlock from Learning Core data models.
+
+        This method will find the OLX for the content in Learning Core, parse it
+        into an XBlock (with mixins) instance, and properly initialize our
+        internal LearningCoreFieldData instance with the field values from the
+        parsed OLX.
         """
-        xml_node = etree.fromstring(content)
+        # We can do this more efficiently in a single query later, but for now
+        # just get it the easy way.
+        component = self._get_component_from_usage_key(usage_key)
+
+        version = get_auto_latest_version(version)
+        if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
+            raise ValidationError("This runtime only allows accessing the published version of components")
+        if version == LatestVersion.DRAFT:
+            component_version = component.versioning.draft
+        elif version == LatestVersion.PUBLISHED:
+            component_version = component.versioning.published
+        else:
+            assert isinstance(version, int)
+            component_version = component.versioning.version_num(version)
+        if component_version is None:
+            raise NoSuchUsage(usage_key)
+
+        content = component_version.contents.get(
+            componentversioncontent__key="block.xml"
+        )
+        xml_node = etree.fromstring(content.text)
+        block_type = usage_key.block_type
         keys = ScopeIds(self.user_id, block_type, None, usage_key)
 
         if xml_node.get("url_name", None):
@@ -204,53 +231,6 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         return block
 
-    def get_block(self, usage_key, for_parent=None, *, version: int | LatestVersion = LatestVersion.AUTO):
-        """
-        Fetch an XBlock from Learning Core data models.
-
-        This method will find the OLX for the content in Learning Core, parse it
-        into an XBlock (with mixins) instance, and properly initialize our
-        internal LearningCoreFieldData instance with the field values from the
-        parsed OLX.
-        """
-        # We can do this more efficiently in a single query later, but for now
-        # just get it the easy way.
-        component = self._get_component_from_usage_key(usage_key)
-
-        version = get_auto_latest_version(version)
-        if self.authored_data_mode == AuthoredDataMode.STRICTLY_PUBLISHED and version != LatestVersion.PUBLISHED:
-            raise ValidationError("This runtime only allows accessing the published version of components")
-        if version == LatestVersion.DRAFT:
-            component_version = component.versioning.draft
-        elif version == LatestVersion.PUBLISHED:
-            component_version = component.versioning.published
-        else:
-            assert isinstance(version, int)
-            component_version = component.versioning.version_num(version)
-        if component_version is None:
-            raise NoSuchUsage(usage_key)
-
-        content = component_version.contents.get(
-            componentversioncontent__key="block.xml"
-        )
-        return self._initialize_block(content.text, usage_key, usage_key.block_type, version)
-
-    def get_container_block(self, container_key, *, version: int | LatestVersion = LatestVersion.AUTO):
-        """
-        Fetch container from learning core data models.
-
-        This method create a very basic olx for container and parse it into an XBlock instance.
-        """
-        container = self._get_container_from_key(container_key)
-        block_type = "vertical" if container_key.container_type == "unit" else container_key.container_type
-        content = library_container_xml(
-            container_key,
-            display_name=container.versioning.draft.title if container.versioning.draft else None,
-            block_type=block_type
-        )
-        xml = etree.tostring(content)
-        return self._initialize_block(xml.decode(), container_key, block_type, version)
-
     def get_block_assets(self, block, fetch_asset_data):
         """
         Return a list of StaticFile entries.
@@ -266,9 +246,6 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         lookups one by one is going to get slow. At some point we're going to
         want something to look up a bunch of blocks at once.
         """
-        if not isinstance(block.usage_key, UsageKeyV2):
-            # TODO: handle assets for containers if required.
-            return []
         component_version = self._get_component_version_from_block(block)
 
         # cvc = the ComponentVersionContent through-table
@@ -342,22 +319,6 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         learning_context = get_learning_context_impl(usage_key)
         learning_context.send_block_updated_event(usage_key)
         learning_context.send_container_updated_events(usage_key)
-
-    def _get_container_from_key(self, container_key: LibraryContainerLocator):
-        """
-        TODO: This is the third place where we're implementing this. Figure out
-        where the definitive place should be and have everything else call that.
-        """
-        learning_package = authoring_api.get_learning_package_by_key(str(container_key.lib_key))
-        try:
-            component = authoring_api.get_container_by_key(
-                learning_package.id,
-                key=container_key.container_id,
-            )
-        except ObjectDoesNotExist as exc:
-            raise NoSuchUsage(container_key) from exc
-
-        return component
 
     def _get_component_from_usage_key(self, usage_key):
         """
