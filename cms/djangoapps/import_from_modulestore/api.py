@@ -33,7 +33,7 @@ def import_staged_content_to_library(
     validate_usage_keys_to_import(usage_ids)
     import_staged_content_to_library_task.apply_async(
         kwargs={
-            'usage_keys_string': usage_ids,
+            'usage_key_strings': usage_ids,
             'import_uuid': import_uuid,
             'learning_package_id': target_learning_package_id,
             'user_id': user_id,

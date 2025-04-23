@@ -13,7 +13,7 @@ from openedx.core.djangoapps.content_staging import api as content_staging_api
 
 from .constants import IMPORT_FROM_MODULESTORE_STAGING_PURPOSE
 from .data import ImportStatus
-from .helpers import get_items_to_import, ImportClient
+from .helpers import get_items_to_import, import_from_staged_content
 from .models import Import, PublishableEntityImport, StagedContentForImport
 from .validators import validate_composition_level
 
@@ -26,11 +26,7 @@ def save_legacy_content_to_staged_content_task(import_uuid: str) -> None:
     """
     Save courses to staged content task by sections/chapters.
     """
-    try:
-        import_event = Import.objects.get(uuid=import_uuid)
-    except Import.DoesNotExist:
-        log.info('Import event not found for UUID %s', import_uuid)
-        return
+    import_event = Import.objects.get(uuid=import_uuid)
 
     import_event.clean_related_staged_content()
     import_event.set_status(ImportStatus.STAGING)
@@ -61,7 +57,7 @@ def save_legacy_content_to_staged_content_task(import_uuid: str) -> None:
 @shared_task
 @set_code_owner_attribute
 def import_staged_content_to_library_task(
-    usage_keys_string: list[str],
+    usage_key_strings: list[str],
     import_uuid: str,
     learning_package_id: int,
     user_id: int,
@@ -72,34 +68,27 @@ def import_staged_content_to_library_task(
     Import staged content to a library task.
     """
     validate_composition_level(composition_level)
-    try:
-        import_event = Import.objects.get(uuid=import_uuid, status=ImportStatus.STAGED, user_id=user_id)
-    except Import.DoesNotExist:
-        log.info('Ready import from modulestore not found')
-        return
-    try:
-        target_learning_package = LearningPackage.objects.get(id=learning_package_id)
-    except Import.LearningPackage:
-        log.info('Target learning package not found')
-        return
+
+    import_event = Import.objects.get(uuid=import_uuid, status=ImportStatus.STAGED, user_id=user_id)
+    target_learning_package = LearningPackage.objects.get(id=learning_package_id)
 
     imported_publishable_versions = []
     with authoring_api.bulk_draft_changes_for(learning_package_id=learning_package_id) as change_log:
         try:
-            for usage_key_string in usage_keys_string:
-                if staged_content_item := import_event.get_staged_content_by_source_usage_key(usage_key_string):
-                    import_client = ImportClient(
-                        import_event,
-                        usage_key_string,
-                        target_learning_package,
-                        staged_content_item,
-                        composition_level,
-                        override,
-                    )
-                    imported_publishable_versions.extend(import_client.import_from_staged_content())
-        except Exception as exc:  # pylint: disable=broad-except
+            for usage_key_string in usage_key_strings:
+                staged_content_for_import = import_event.staged_content_for_import.get(source_usage_key=usage_key_string)
+                publishable_versions = import_from_staged_content(
+                    import_event,
+                    usage_key_string,
+                    target_learning_package,
+                    staged_content_for_import.staged_content,
+                    composition_level,
+                    override,
+                )
+                imported_publishable_versions.extend(publishable_versions)
+        except:  # pylint: disable=bare-except
             import_event.set_status(ImportStatus.IMPORTING_FAILED)
-            raise exc from exc  # TODO: retest raise and describe change_log commitment on Exception
+            raise
 
     import_event.set_status(ImportStatus.IMPORTED)
     for imported_component_version in imported_publishable_versions:

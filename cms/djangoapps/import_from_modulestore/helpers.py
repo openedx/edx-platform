@@ -368,6 +368,30 @@ class ImportClient:
                 pass  # Content already exists
 
 
+def import_from_staged_content(
+    import_event: Import,
+    usage_key_string: str,
+    target_learning_package: 'LearningPackage',
+    staged_content: 'StagedContent',
+    composition_level: str,
+    override: bool = False,
+) -> list[PublishableVersionWithMapping]:
+    """
+    Import staged content to a library from staged content.
+
+    Returns a list of PublishableVersionWithMappings created during the import.
+    """
+    import_client = ImportClient(
+        import_event,
+        usage_key_string,
+        target_learning_package,
+        staged_content,
+        composition_level,
+        override,
+    )
+    return import_client.import_from_staged_content()
+
+
 def get_or_create_publishable_entity_mapping(usage_key, component) -> tuple[PublishableEntityMapping, bool]:
     """
     Creates a mapping between the source usage key and the target publishable entity.
