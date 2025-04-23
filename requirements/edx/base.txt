@@ -349,7 +349,7 @@ django-storages==1.14.3
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edxval
-django-user-tasks==3.4.0
+django-user-tasks==3.3.0
     # via -r requirements/edx/kernel.in
 django-waffle==4.2.0
     # via
