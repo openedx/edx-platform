@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from openedx_learning.apps.authoring_models import LearningPackage
     from xblock.core import XBlock
 
-    from openedx.core.djangoapps.content_staging.models import StagedContent
+    from openedx.core.djangoapps.content_staging.api import _StagedContent as StagedContent
 
 
 log = logging.getLogger(__name__)
