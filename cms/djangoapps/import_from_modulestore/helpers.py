@@ -79,7 +79,7 @@ class ImportClient:
         """
         node = etree.fromstring(self.staged_content.olx, parser=parser)
         usage_key = UsageKey.from_string(self.block_usage_key_to_import)
-        block_to_import = get_block_to_import(node, usage_key)
+        block_to_import = get_node_for_usage_key(node, usage_key)
         if block_to_import is None:
             return []
 
@@ -389,7 +389,10 @@ def import_from_staged_content(
     return import_client.import_from_staged_content()
 
 
-def get_or_create_publishable_entity_mapping(usage_key, component) -> tuple[PublishableEntityMapping, bool]:
+def get_or_create_publishable_entity_mapping(
+        usage_key: UsageKey,
+        component: 'Component' | 'Container'
+) -> tuple[PublishableEntityMapping, bool]:
     """
     Creates a mapping between the source usage key and the target publishable entity.
     """
@@ -404,28 +407,27 @@ def get_or_create_publishable_entity_mapping(usage_key, component) -> tuple[Publ
     )
 
 
-def get_usage_key_string_from_staged_content(staged_content, block_id):
+def get_usage_key_string_from_staged_content(staged_content: 'StagedContent', block_id: str) -> str | None:
     """
     Get the usage ID from a staged content by block ID.
     """
     return next((block_usage_id for block_usage_id in staged_content.tags if block_usage_id.endswith(block_id)), None)
 
 
-def get_block_to_import(node, usage_key):
+def get_node_for_usage_key(node: etree._Element, usage_key: UsageKey) -> etree._Element:
     """
-    Get the block to import from a node.
+    Get the node in an XML tree which matches to the usage key.
     """
-
     if node.get('url_name') == usage_key.block_id:
         return node
 
     for child in node.getchildren():
-        found = get_block_to_import(child, usage_key)
+        found = get_node_for_usage_key(child, usage_key)
         if found is not None:
             return found
 
 
-def get_items_to_import(import_event):
+def get_items_to_import(import_event: Import) -> list['XBlock']:
     """
     Collect items to import from a course.
     """
@@ -441,17 +443,17 @@ def get_items_to_import(import_event):
     return items_to_import
 
 
-def cancel_incomplete_old_imports(instance):
+def cancel_incomplete_old_imports(import_event: Import) -> None:
     """
     Cancel any incomplete imports that have the same target as the current import.
 
     When a new import is created, we want to cancel any other incomplete user imports that have the same target.
     """
     incomplete_user_imports_with_same_target = Import.objects.filter(
-        user=instance.user,
-        target_change=instance.target_change,
-        source_key=instance.source_key,
+        user=import_event.user,
+        target_change=import_event.target_change,
+        source_key=import_event.source_key,
         staged_content_for_import__isnull=False
-    ).exclude(uuid=instance.uuid)
+    ).exclude(uuid=import_event.uuid)
     for incomplete_import in incomplete_user_imports_with_same_target:
         incomplete_import.set_status(ImportStatus.CANCELED)

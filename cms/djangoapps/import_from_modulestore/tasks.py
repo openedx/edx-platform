@@ -76,7 +76,9 @@ def import_staged_content_to_library_task(
     with authoring_api.bulk_draft_changes_for(learning_package_id=learning_package_id) as change_log:
         try:
             for usage_key_string in usage_key_strings:
-                staged_content_for_import = import_event.staged_content_for_import.get(source_usage_key=usage_key_string)
+                staged_content_for_import = import_event.staged_content_for_import.get(
+                    source_usage_key=usage_key_string
+                )
                 publishable_versions = import_from_staged_content(
                     import_event,
                     usage_key_string,
