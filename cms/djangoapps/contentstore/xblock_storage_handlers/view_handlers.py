@@ -538,9 +538,9 @@ def sync_library_content(downstream: XBlock, request, store, remove_upstream_lin
         static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
         store.update_item(downstream, request.user.id)
     else:
-        lib_block, children_blocks = sync_from_upstream_container(downstream=downstream, user=request.user)
-        notices = [import_static_assets_for_library_sync(downstream, lib_block, request)]
         with store.bulk_operations(downstream.location.context_key):
+            lib_block, children_blocks = sync_from_upstream_container(downstream=downstream, user=request.user)
+            notices = [import_static_assets_for_library_sync(downstream, lib_block, request)]
             children_blocks_usage_keys = []
             for child_block in children_blocks:
                 notices.append(sync_library_content(child_block, request, store, remove_upstream_link=True))
@@ -790,11 +790,11 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
 
 
 @login_required
-def delete_item(request, usage_key):
+def delete_item(user, usage_key):
     """
     Exposes internal helper method without breaking existing bindings/dependencies
     """
-    _delete_item(usage_key, request.user)
+    _delete_item(usage_key, user)
 
 
 def _delete_item(usage_key, user):

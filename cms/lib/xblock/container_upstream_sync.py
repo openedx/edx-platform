@@ -199,8 +199,25 @@ class ContainerUpstreamSyncManager(BaseUpstreamSyncManager):
             self.new_children_blocks.append(child_block)
         return self.new_children_blocks
 
+    def delete_extra_blocks(self):
+        """
+        Deletes extra child blocks under the container that are not present in new version of library container.
+        """
+        # TODO: Importing here to avoid circular imports, should be fixed later
+        from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import delete_item
+        current = self.downstream.children
+        latest = [str(child.usage_key) for child in get_container_children(self.upstream_key, published=True)]
+        for child in current:
+            # TODO: doesn't work for two reasons
+            # 1. child is not an XBlock but usage_key, so we need to load the child to get its upstream
+            # 2. Even if we get child, it won't have upstream set as we are not setting upstream for child components
+            #    See: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py:535
+            if child.upstream not in latest:
+                delete_item(self.user, child.usage_key)
+
     def sync(self) -> None:
         super().sync()
+        # self.delete_extra_blocks()
         self.sync_new_children_blocks()
 
 
