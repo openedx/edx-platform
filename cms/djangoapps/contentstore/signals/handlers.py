@@ -44,7 +44,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from ..models import ComponentLink
+from ..models import ComponentLink, ContainerLink
 from ..tasks import (
     create_or_update_upstream_links,
     handle_create_or_update_xblock_upstream_link,
@@ -281,6 +281,11 @@ def delete_upstream_downstream_link_handler(**kwargs):
     ComponentLink.objects.filter(
         downstream_usage_key=xblock_info.usage_key
     ).delete()
+    ContainerLink.objects.filter(
+        downstream_usage_key=xblock_info.usage_key
+    ).delete()
+
+
 
 
 @receiver(COURSE_IMPORT_COMPLETED)

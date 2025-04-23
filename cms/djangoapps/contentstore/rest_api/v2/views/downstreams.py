@@ -98,7 +98,7 @@ from cms.djangoapps.contentstore.helpers import import_static_assets_for_library
 from cms.djangoapps.contentstore.models import ComponentLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
     ComponentLinksSerializer,
-    ComponentLinksSummarySerializer,
+    PublishableEntityLinksSummarySerializer,
 )
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
@@ -218,7 +218,7 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
         links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
-        serializer = ComponentLinksSummarySerializer(links, many=True)
+        serializer = PublishableEntityLinksSummarySerializer(links, many=True)
         return Response(serializer.data)
 
 

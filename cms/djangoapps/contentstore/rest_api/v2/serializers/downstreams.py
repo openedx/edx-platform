@@ -20,7 +20,7 @@ class ComponentLinksSerializer(serializers.ModelSerializer):
         exclude = ['upstream_block', 'uuid']
 
 
-class ComponentLinksSummarySerializer(serializers.Serializer):
+class PublishableEntityLinksSummarySerializer(serializers.Serializer):
     """
     Serializer for summary for publishable entity links
     """

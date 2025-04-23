@@ -26,7 +26,7 @@ from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey, UsageKeyV2
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.learning.data import CourseNotificationData
@@ -87,6 +87,7 @@ from common.djangoapps.util.milestones_helpers import (
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
+from openedx.core.djangoapps.content_libraries.api.containers import get_container_from_key
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -114,7 +115,7 @@ from xmodule.partitions.partitions_service import (
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 
-from .models import ComponentLink
+from .models import ComponentLink, ContainerLink
 
 IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
 log = logging.getLogger(__name__)
@@ -2373,28 +2374,57 @@ def get_xblock_render_error(request, xblock):
     return ""
 
 
-def create_or_update_xblock_upstream_link(xblock, course_key: str | CourseKey, created: datetime | None = None) -> None:
+def _create_or_update_component_link(course_key: CourseKey, created: datetime | None, xblock):
+    upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
+    try:
+        lib_component = get_component_from_usage_key(upstream_usage_key)
+    except ObjectDoesNotExist:
+        log.error(f"Library component not found for {upstream_usage_key}")
+        lib_component = None
+    ComponentLink.update_or_create(
+        lib_component,
+        upstream_usage_key=upstream_usage_key,
+        upstream_context_key=str(upstream_usage_key.context_key),
+        downstream_context_key=course_key,
+        downstream_usage_key=xblock.usage_key,
+        version_synced=xblock.upstream_version,
+        version_declined=xblock.upstream_version_declined,
+        created=created,
+    )
+
+
+def _create_or_update_container_link(course_key: CourseKey, created: datetime | None, xblock):
+    upstream_container_key = LibraryContainerLocator.from_string(xblock.upstream)
+    try:
+        lib_component = get_container_from_key(upstream_container_key)
+    except ObjectDoesNotExist:
+        log.error(f"Library component not found for {upstream_container_key}")
+        lib_component = None
+    ContainerLink.update_or_create(
+        lib_component,
+        upstream_container_key=upstream_container_key,
+        upstream_context_key=str(upstream_container_key.context_key),
+        downstream_context_key=course_key,
+        downstream_usage_key=xblock.usage_key,
+        version_synced=xblock.upstream_version,
+        version_declined=xblock.upstream_version_declined,
+        created=created,
+    )
+
+
+def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created: datetime | None = None) -> None:
     """
     Create or update upstream->downstream link in database for given xblock.
     """
     if not xblock.upstream:
         return None
     try:
-        upstream_usage_key = UsageKeyV2.from_string(xblock.upstream)
-        try:
-            lib_component = get_component_from_usage_key(upstream_usage_key)
-        except ObjectDoesNotExist:
-            log.error(f"Library component not found for {upstream_usage_key}")
-            lib_component = None
-        ComponentLink.update_or_create(
-            lib_component,
-            upstream_usage_key=upstream_usage_key,
-            upstream_context_key=str(upstream_usage_key.context_key),
-            downstream_context_key=course_key,
-            downstream_usage_key=xblock.usage_key,
-            version_synced=xblock.upstream_version,
-            version_declined=xblock.upstream_version_declined,
-            created=created,
-        )
+        # Try to create component link
+        _create_or_update_component_link(course_key, created, xblock)
     except InvalidKeyError:
-        pass
+        # It is possible that the upstream is a container and UsageKeyV2 parse failed
+        # Create upstream container link
+        try:
+            _create_or_update_container_link(course_key, created, xblock)
+        except InvalidKeyError:
+            log.error(f"Invalid key: {xblock.upstream}")

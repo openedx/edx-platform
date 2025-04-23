@@ -13,15 +13,15 @@ from edx_django_utils.admin.mixins import ReadOnlyAdminMixin
 from cms.djangoapps.contentstore.models import (
     BackfillCourseTabsConfig,
     CleanStaleCertificateAvailabilityDatesConfig,
-    LearningContextLinksStatus,
     ComponentLink,
-    VideoUploadConfig
+    ContainerLink,
+    LearningContextLinksStatus,
+    VideoUploadConfig,
 )
 from cms.djangoapps.contentstore.outlines_regenerate import CourseOutlineRegenerate
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 
-from .tasks import update_outline_from_modulestore_task, update_all_outlines_from_modulestore_task
-
+from .tasks import update_all_outlines_from_modulestore_task, update_outline_from_modulestore_task
 
 log = logging.getLogger(__name__)
 
@@ -115,6 +115,45 @@ class ComponentLinkAdmin(admin.ModelAdmin):
     ]
     search_fields = [
         "upstream_usage_key",
+        "upstream_context_key",
+        "downstream_usage_key",
+        "downstream_context_key",
+    ]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(ContainerLink)
+class ContainerLinkAdmin(admin.ModelAdmin):
+    """
+    ContainerLink admin.
+    """
+    fields = (
+        "uuid",
+        "upstream_block",
+        "upstream_container_key",
+        "upstream_context_key",
+        "downstream_usage_key",
+        "downstream_context_key",
+        "version_synced",
+        "version_declined",
+        "created",
+        "updated",
+    )
+    readonly_fields = fields
+    list_display = [
+        "upstream_block",
+        "upstream_container_key",
+        "downstream_usage_key",
+        "version_synced",
+        "updated",
+    ]
+    search_fields = [
+        "upstream_container_key",
         "upstream_context_key",
         "downstream_usage_key",
         "downstream_context_key",
