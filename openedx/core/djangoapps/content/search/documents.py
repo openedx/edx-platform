@@ -8,7 +8,7 @@ from hashlib import blake2b
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
-from opaque_keys.edx.keys import LearningContextKey, UsageKey, OpaqueKey
+from opaque_keys.edx.keys import ContainerKey, LearningContextKey, UsageKey, OpaqueKey
 from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
@@ -523,7 +523,7 @@ def searchable_doc_for_collection(
         ).count()
 
         doc.update({
-            Fields.context_key: str(collection_key.library_key),
+            Fields.context_key: str(collection_key.context_key),
             Fields.org: str(collection_key.org),
             Fields.usage_key: str(collection_key),
             Fields.block_id: collection.key,
@@ -536,7 +536,7 @@ def searchable_doc_for_collection(
             Fields.published: {
                 Fields.published_num_children: published_num_children,
             },
-            Fields.access_id: _meili_access_id_from_context_key(collection_key.library_key),
+            Fields.access_id: _meili_access_id_from_context_key(collection_key.context_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })
 
@@ -549,7 +549,7 @@ def searchable_doc_for_collection(
 
 
 def searchable_doc_for_container(
-    container_key: LibraryContainerLocator,
+    container_key: ContainerKey,
 ) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
@@ -562,7 +562,7 @@ def searchable_doc_for_container(
     """
     doc = {
         Fields.id: meili_id_from_opaque_key(container_key),
-        Fields.context_key: str(container_key.library_key),
+        Fields.context_key: str(container_key.context_key),
         Fields.org: str(container_key.org),
         # In the future, this may be either course_container or library_container
         Fields.type: DocType.library_container,
@@ -570,7 +570,7 @@ def searchable_doc_for_container(
         Fields.block_type: container_key.container_type,
         Fields.usage_key: str(container_key),  # Field name isn't exact but this is the closest match
         Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
-        Fields.access_id: _meili_access_id_from_context_key(container_key.library_key),
+        Fields.access_id: _meili_access_id_from_context_key(container_key.context_key),
         Fields.publish_status: PublishStatus.never,
         Fields.last_published: None,
     }
@@ -596,7 +596,7 @@ def searchable_doc_for_container(
         Fields.publish_status: publish_status,
         Fields.last_published: container.last_published.timestamp() if container.last_published else None,
     })
-    library = lib_api.get_library(container_key.library_key)
+    library = lib_api.get_library(container_key.context_key)
     if library:
         doc[Fields.breadcrumbs] = [{"display_name": library.title}]
 
