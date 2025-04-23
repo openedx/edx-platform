@@ -198,7 +198,6 @@ certifi==2025.1.31
     #   elasticsearch
     #   httpcore
     #   httpx
-    #   py2neo
     #   requests
     #   snowflake-connector-python
 cffi==1.17.1
@@ -1086,11 +1085,6 @@ iniconfig==2.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   pytest
-interchange==2021.0.4
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   py2neo
 ipaddress==1.0.23
     # via
     #   -r requirements/edx/doc.txt
@@ -1264,7 +1258,6 @@ monotonic==1.6
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
-    #   py2neo
 more-itertools==10.6.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1410,7 +1403,6 @@ packaging==25.0
     #   build
     #   drf-yasg
     #   gunicorn
-    #   py2neo
     #   pydata-sphinx-theme
     #   pyproject-api
     #   pytest
@@ -1419,11 +1411,6 @@ packaging==25.0
     #   tox
 pact-python==2.0.1
     # via -r requirements/edx/testing.txt
-pansi==2024.11.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   py2neo
 paramiko==3.5.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1468,7 +1455,6 @@ pillow==11.2.1
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-    #   pansi
 pip-tools==7.4.1
     # via -r requirements/edx/../pip-tools.txt
 platformdirs==4.3.7
@@ -1525,11 +1511,6 @@ psutil==7.0.0
     #   pytest-xdist
 py==1.11.0
     # via -r requirements/edx/testing.txt
-py2neo @ https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 pyasn1==0.6.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1583,7 +1564,6 @@ pygments==2.19.1
     #   -r requirements/edx/testing.txt
     #   accessible-pygments
     #   diff-cover
-    #   py2neo
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
@@ -1774,7 +1754,6 @@ pytz==2025.2
     #   edx-tincan-py35
     #   event-tracking
     #   fs
-    #   interchange
     #   olxcleaner
     #   ora2
     #   snowflake-connector-python
@@ -1938,10 +1917,8 @@ six==1.17.0
     #   fs
     #   fs-s3fs
     #   html5lib
-    #   interchange
     #   libsass
     #   pact-python
-    #   py2neo
     #   pyjwkest
     #   python-dateutil
     #   sphinxcontrib-httpdomain
@@ -2184,7 +2161,6 @@ urllib3==2.2.3
     #   botocore
     #   elasticsearch
     #   pact-python
-    #   py2neo
     #   requests
     #   types-requests
 user-util==1.1.0
