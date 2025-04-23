@@ -4,14 +4,12 @@ Definition of "Library" as a learning context.
 import logging
 
 from django.core.exceptions import PermissionDenied
-from opaque_keys import OpaqueKey
-from rest_framework.exceptions import NotFound
-
+from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import LibraryBlockData, LibraryContainerData
 from openedx_events.content_authoring.signals import LIBRARY_BLOCK_UPDATED, LIBRARY_CONTAINER_UPDATED
-from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2, LibraryLocatorV2
 from openedx_learning.api import authoring as authoring_api
+from rest_framework.exceptions import NotFound
 
 from openedx.core.djangoapps.content_libraries import api, permissions
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
@@ -33,7 +31,7 @@ class LibraryContextImpl(LearningContext):
         super().__init__(**kwargs)
         self.use_draft = kwargs.get('use_draft', None)
 
-    def can_edit_block(self, user: UserType, usage_key: OpaqueKey) -> bool:
+    def can_edit_block(self, user: UserType, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator) -> bool:
         """
         Assuming a block with the specified ID (usage_key) exists, does the
         specified user have permission to edit it (make changes to the
@@ -44,7 +42,7 @@ class LibraryContextImpl(LearningContext):
         self._assert_key_instance(usage_key)
         return self._check_perm(user, usage_key.lib_key, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
 
-    def can_view_block_for_editing(self, user: UserType, usage_key: OpaqueKey) -> bool:
+    def can_view_block_for_editing(self, user: UserType, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator) -> bool:
         """
         Assuming a block with the specified ID (usage_key) exists, does the
         specified user have permission to view its fields and OLX details (but
@@ -55,7 +53,7 @@ class LibraryContextImpl(LearningContext):
         self._assert_key_instance(usage_key)
         return self._check_perm(user, usage_key.lib_key, permissions.CAN_VIEW_THIS_CONTENT_LIBRARY)
 
-    def can_view_block(self, user: UserType, usage_key: OpaqueKey) -> bool:
+    def can_view_block(self, user: UserType, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator) -> bool:
         """
         Does the specified usage key exist in its context, and if so, does the
         specified user have permission to view it and interact with it (call
@@ -66,7 +64,7 @@ class LibraryContextImpl(LearningContext):
         self._assert_key_instance(usage_key)
         return self._check_perm(user, usage_key.lib_key, permissions.CAN_LEARN_FROM_THIS_CONTENT_LIBRARY)
 
-    def _assert_key_instance(self, usage_key: OpaqueKey):
+    def _assert_key_instance(self, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator):
         assert isinstance(usage_key, LibraryUsageLocatorV2) or isinstance(usage_key, LibraryContainerLocator)
 
     def _check_perm(self, user: UserType, lib_key: LibraryLocatorV2, perm) -> bool:

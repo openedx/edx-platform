@@ -266,6 +266,8 @@ class BaseUpstreamSyncManager:
         """
         Update tags from `upstream` to `downstream`
         """
+        if not self.upstream:
+            return
         from openedx.core.djangoapps.content_tagging.api import copy_tags_as_read_only
         # For any block synced with an upstream, copy the tags as read_only
         # This keeps tags added locally.
@@ -370,6 +372,7 @@ def check_and_parse_upstream_key(
         BadDownstream:
         BadUpstream:
     """
+    upstream_key: LibraryContainerLocator | LibraryUsageLocatorV2
     if not upstream:
         raise NoUpstream()
     if not isinstance(downstream_usage_key.context_key, CourseKey):
