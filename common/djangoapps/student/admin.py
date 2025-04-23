@@ -2,6 +2,7 @@
 
 
 from functools import wraps
+from dal import autocomplete
 
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
@@ -16,7 +17,7 @@ from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm
 from django.db import models, router, transaction
 from django.http import HttpResponseRedirect
 from django.http.request import QueryDict
-from django.urls import reverse
+from django.urls import reverse, path
 from django.utils.translation import ngettext
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
@@ -45,6 +46,7 @@ from common.djangoapps.student.models import (
     UserProfile,
     UserTestGroup
 )
+from common.djangoapps.student.constants import LANGUAGE_CHOICES
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -309,9 +311,25 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
         return super().get_queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
+class LanguageAutocomplete(autocomplete.Select2ListView):
+    def get_list(self):
+        return [lang for lang in LANGUAGE_CHOICES if self.q.lower() in lang.lower()]
+
+class UserProfileInlineForm(forms.ModelForm):
+    language = forms.CharField(
+        required=False,
+        widget=autocomplete.ListSelect2(url='admin:language-autocomplete')
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
     model = UserProfile
+    form = UserProfileInlineForm
     can_delete = False
     verbose_name_plural = _('User profile')
 
@@ -358,6 +376,17 @@ class UserAdmin(BaseUserAdmin):
         if obj:
             return django_readonly + ('username',)
         return django_readonly
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'language-autocomplete/',
+                LanguageAutocomplete.as_view(),
+                name='language-autocomplete'
+            ),
+        ]
+        return custom_urls + urls
 
 
 @admin.register(UserAttribute)
