@@ -236,7 +236,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         )
 
     @patch.object(ComponentUpstreamSyncManager, "update_customizable_fields")
-    @patch.object(downstreams_views, "sync_from_upstream")
+    @patch.object(downstreams_views, "sync_library_content")
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     def test_200_with_sync(self, mock_sync, mock_fetch):
         """
@@ -251,7 +251,7 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert video_after.upstream == self.video_lib_id
 
     @patch.object(ComponentUpstreamSyncManager, "update_customizable_fields")
-    @patch.object(downstreams_views, "sync_from_upstream")
+    @patch.object(downstreams_views, "sync_library_content")
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     def test_200_no_sync(self, mock_sync, mock_fetch):
         """
@@ -398,10 +398,9 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
         return self.client.post(f"/api/contentstore/v2/downstreams/{usage_key_string}/sync")
 
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
-    @patch.object(downstreams_views, "sync_from_upstream")
-    @patch.object(downstreams_views, "import_static_assets_for_library_sync", return_value=StaticFileNotices())
+    @patch.object(downstreams_views, "sync_library_content", return_value=StaticFileNotices())
     @patch.object(downstreams_views, "clear_transcripts")
-    def test_200(self, mock_sync_from_upstream, mock_import_staged_content, mock_clear_transcripts):
+    def test_200(self, mock_sync_from_upstream, mock_clear_transcripts):
         """
         Does the happy path work?
         """
@@ -409,7 +408,6 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
         response = self.call_api(self.downstream_video_key)
         assert response.status_code == 200
         assert mock_sync_from_upstream.call_count == 1
-        assert mock_import_staged_content.call_count == 1
         assert mock_clear_transcripts.call_count == 1
 
 

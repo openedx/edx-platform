@@ -94,12 +94,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.core import XBlock
 
-from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
 from cms.djangoapps.contentstore.models import ComponentLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
     ComponentLinksSerializer,
     PublishableEntityLinksSummarySerializer,
 )
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import sync_library_content
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
     BadUpstream,
@@ -109,7 +109,6 @@ from cms.lib.xblock.upstream_sync import (
     UpstreamLinkException,
     decline_sync,
     sever_upstream_link,
-    sync_from_upstream,
 )
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import (
@@ -252,7 +251,11 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
             raise ValidationError({"sync": "must be 'true' or 'false'"})
         try:
             if sync_param == "true" or sync_param is True:
-                sync_from_upstream(downstream=downstream, user=request.user)
+                sync_library_content(
+                    downstream=downstream,
+                    request=request,
+                    store=modulestore()
+                )
             else:
                 # Even if we're not syncing (i.e., updating the downstream's values with the upstream's), we still need
                 # to fetch the upstream's customizable values and store them as hidden fields on the downstream. This
@@ -313,8 +316,11 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
             if downstream.usage_key.block_type == "video":
                 # Delete all transcripts so we can copy new ones from upstream
                 clear_transcripts(downstream)
-            upstream = sync_from_upstream(downstream, request.user)
-            static_file_notices = import_static_assets_for_library_sync(downstream, upstream, request)
+            static_file_notices = sync_library_content(
+                downstream=downstream,
+                request=request,
+                store=modulestore()
+            )
         except UpstreamLinkException as exc:
             logger.exception(
                 "Could not sync from upstream '%s' to downstream '%s'",
@@ -322,7 +328,6 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
                 usage_key_string,
             )
             raise ValidationError(detail=str(exc)) from exc
-        modulestore().update_item(downstream, request.user.id)
         # Note: We call `get_for_block` (rather than `try_get_for_block`) because if anything is wrong with the
         #       upstream at this point, then that is completely unexpected, so it's appropriate to let the 500 happen.
         response = UpstreamLink.get_for_block(downstream).to_json()
