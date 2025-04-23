@@ -56,7 +56,10 @@ class TestImportClient(ModuleStoreTestCase):
 
     def test_import_from_staged_content(self):
         expected_imported_xblocks = [self.video, self.problem]
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
+        staged_content = staged_content_for_import.staged_content
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
@@ -72,7 +75,10 @@ class TestImportClient(ModuleStoreTestCase):
 
     @patch('cms.djangoapps.import_from_modulestore.helpers.ImportClient._process_import')
     def test_import_from_staged_content_block_not_found(self, mocked_process_import):
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
+        staged_content = staged_content_for_import.staged_content
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
@@ -88,19 +94,19 @@ class TestImportClient(ModuleStoreTestCase):
         mocked_process_import.assert_not_called()
 
     @ddt.data(
-        # TODO: Chapter and sequential will be uncommented in the future
-        # after adding it to the Learning Core.
-        # 'chapter',
-        # 'sequential',
+        'chapter',
+        'sequential',
         'vertical'
     )
     def test_create_container(self, block_lvl):
         container_to_import = getattr(self, block_lvl)
         block_usage_key_to_import = str(container_to_import.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(block_usage_key_to_import)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
         import_client = ImportClient(
             import_event=self.import_event,
-            staged_content=staged_content,
+            staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
@@ -117,10 +123,12 @@ class TestImportClient(ModuleStoreTestCase):
 
     def test_create_container_with_xblock(self):
         block_usage_key_to_import = str(self.problem.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(block_usage_key_to_import)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
         import_client = ImportClient(
             import_event=self.import_event,
-            staged_content=staged_content,
+            staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
@@ -138,7 +146,10 @@ class TestImportClient(ModuleStoreTestCase):
     def test_process_import_with_complicated_blocks(self, block_lvl):
         container_to_import = getattr(self, block_lvl)
         block_usage_key_to_import = str(container_to_import.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
+        staged_content = staged_content_for_import.staged_content
         expected_imported_xblocks = [self.problem, self.video]
 
         import_client = ImportClient(
@@ -160,11 +171,13 @@ class TestImportClient(ModuleStoreTestCase):
     def test_process_import_with_simple_blocks(self, block_type_to_import):
         block_to_import = getattr(self, block_type_to_import)
         block_usage_key_to_import = str(block_to_import.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
         expected_imported_xblocks = [block_to_import]
         import_client = ImportClient(
             import_event=self.import_event,
-            staged_content=staged_content,
+            staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
@@ -182,11 +195,13 @@ class TestImportClient(ModuleStoreTestCase):
     def test_process_import_with_override(self, override):
         block_to_import = self.problem
         block_usage_key_to_import = str(block_to_import.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
 
         import_client = ImportClient(
             import_event=self.import_event,
-            staged_content=staged_content,
+            staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='xblock',
@@ -200,7 +215,11 @@ class TestImportClient(ModuleStoreTestCase):
 
         with self.captureOnCommitCallbacks(execute=True):
             new_import_event = api.stage_content_for_import(source_key=self.course.id, user_id=self.user.id)
-        new_staged_content = new_import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+
+        staged_content_for_import = new_import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
+        new_staged_content = staged_content_for_import.staged_content
         import_client = ImportClient(
             import_event=new_import_event,
             staged_content=new_staged_content,
@@ -234,7 +253,10 @@ class TestImportClient(ModuleStoreTestCase):
     def test_container_override(self, mock_authoring_api):
         container_to_import = self.vertical
         block_usage_key_to_import = str(container_to_import.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
+        staged_content = staged_content_for_import.staged_content
 
         import_client = ImportClient(
             import_event=self.import_event,
@@ -283,7 +305,10 @@ class TestImportClient(ModuleStoreTestCase):
 
         container_to_import = self.vertical
         block_usage_key_to_import = str(container_to_import.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
+        staged_content = staged_content_for_import.staged_content
 
         import_client = ImportClient(
             import_event=self.import_event,
@@ -304,7 +329,10 @@ class TestImportClient(ModuleStoreTestCase):
     def test_process_staged_content_files(self, mock_content_staging_api):
         block_to_import = self.problem
         block_usage_key_to_import = str(block_to_import.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
+        staged_content = staged_content_for_import.staged_content
 
         import_client = ImportClient(
             import_event=self.import_event,
@@ -339,11 +367,13 @@ class TestImportClient(ModuleStoreTestCase):
     def test_update_container_components(self):
         container_to_import = self.vertical
         block_usage_key_to_import = str(container_to_import.location)
-        staged_content = self.import_event.get_staged_content_by_source_usage_key(self.chapter.location)
+        staged_content_for_import = self.import_event.staged_content_for_import.get(
+            source_usage_key=self.chapter.location
+        )
 
         import_client = ImportClient(
             import_event=self.import_event,
-            staged_content=staged_content,
+            staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
             composition_level='container',

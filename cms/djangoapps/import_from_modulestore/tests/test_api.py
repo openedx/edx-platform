@@ -73,7 +73,7 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
 
         import_staged_content_to_library_task_mock.apply_async.assert_called_once_with(
             kwargs={
-                "usage_keys_string": usage_ids,
+                "usage_key_strings": usage_ids,
                 "import_uuid": import_event.uuid,
                 "learning_package_id": self.library.learning_package.id,
                 "user_id": import_event.user.id,
