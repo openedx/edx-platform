@@ -13,7 +13,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.xblock_storage_handlers.create_xblock import create_xblock
-from openedx.core.djangoapps.content_libraries.api.containers import get_container_children
+from openedx.core.djangoapps.content_libraries.api import get_container_children
 
 from .upstream_sync import (
     BadUpstream,

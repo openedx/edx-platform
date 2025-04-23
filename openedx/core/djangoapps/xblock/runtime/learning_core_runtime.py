@@ -11,25 +11,23 @@ from urllib.parse import unquote
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.transaction import atomic
 from django.urls import reverse
-
-from opaque_keys.edx.keys import UsageKeyV2
-from openedx_learning.api import authoring as authoring_api
-
 from lxml import etree
-
+from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.locator import LibraryContainerLocator
+from openedx_learning.api import authoring as authoring_api
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchUsage
-from xblock.fields import Field, Scope, ScopeIds
 from xblock.field_data import FieldData
+from xblock.fields import Field, Scope, ScopeIds
 
 from openedx.core.djangoapps.xblock.api import get_xblock_app_config
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from openedx.core.lib.xblock_serializer.data import StaticFile
-from ..data import AuthoredDataMode, LatestVersion
-from ..utils import get_auto_latest_version
-from ..learning_context.manager import get_learning_context_impl
-from .runtime import XBlockRuntime
 
+from ..data import AuthoredDataMode, LatestVersion
+from ..learning_context.manager import get_learning_context_impl
+from ..utils import get_auto_latest_version, library_container_xml
+from .runtime import XBlockRuntime
 
 log = logging.getLogger(__name__)
 
@@ -240,10 +238,13 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
         This method create a very basic olx for container and parse it into an XBlock instance.
         """
-        from openedx.core.djangoapps.content_libraries.api.containers import get_container, library_container_xml
-        container = get_container(container_key)
+        container = self._get_container_from_key(container_key)
         block_type = "vertical" if container_key.container_type == "unit" else container_key.container_type
-        content = library_container_xml(container, block_type)
+        content = library_container_xml(
+            container_key,
+            display_name=container.versioning.draft.title if container.versioning.draft else None,
+            block_type=block_type
+        )
         xml = etree.tostring(content)
         return self._initialize_block(xml.decode(), container_key, block_type, version)
 
@@ -338,6 +339,22 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         learning_context = get_learning_context_impl(usage_key)
         learning_context.send_block_updated_event(usage_key)
         learning_context.send_container_updated_events(usage_key)
+
+    def _get_container_from_key(self, container_key: LibraryContainerLocator):
+        """
+        TODO: This is the third place where we're implementing this. Figure out
+        where the definitive place should be and have everything else call that.
+        """
+        learning_package = authoring_api.get_learning_package_by_key(str(container_key.lib_key))
+        try:
+            component = authoring_api.get_container_by_key(
+                learning_package.id,
+                key=container_key.container_id,
+            )
+        except ObjectDoesNotExist as exc:
+            raise NoSuchUsage(container_key) from exc
+
+        return component
 
     def _get_component_from_usage_key(self, usage_key):
         """
