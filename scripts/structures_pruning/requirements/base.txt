@@ -12,18 +12,17 @@ click-log==0.4.0
     # via -r scripts/structures_pruning/requirements/base.in
 dnspython==2.7.0
     # via pymongo
-edx-opaque-keys==2.11.0
+edx-opaque-keys==2.13.0
     # via -r scripts/structures_pruning/requirements/base.in
 pbr==6.1.1
     # via stevedore
-pymongo==4.4.0
+pymongo==4.12.0
     # via
-    #   -c scripts/structures_pruning/requirements/../../../requirements/constraints.txt
     #   -r scripts/structures_pruning/requirements/base.in
     #   edx-opaque-keys
 stevedore==5.4.1
     # via edx-opaque-keys
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via edx-opaque-keys
 
 # The following packages are considered to be unsafe in a requirements file:

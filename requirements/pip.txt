@@ -12,5 +12,5 @@ pip==24.2
     # via
     #   -c requirements/common_constraints.txt
     #   -r requirements/pip.in
-setuptools==77.0.3
+setuptools==79.0.0
     # via -r requirements/pip.in

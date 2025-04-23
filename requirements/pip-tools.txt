@@ -8,7 +8,7 @@ build==1.2.2.post1
     # via pip-tools
 click==8.1.8
     # via pip-tools
-packaging==24.2
+packaging==25.0
     # via build
 pip-tools==7.4.1
     # via -r requirements/pip-tools.in

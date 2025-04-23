@@ -27,7 +27,7 @@ click==8.1.8
     # via
     #   click-option-group
     #   semgrep
-click-option-group==0.5.6
+click-option-group==0.5.7
     # via semgrep
 colorama==0.4.6
     # via semgrep
@@ -43,7 +43,7 @@ face==24.0.0
     # via glom
 glom==22.1.0
     # via semgrep
-googleapis-common-protos==1.69.2
+googleapis-common-protos==1.70.0
     # via opentelemetry-exporter-otlp-proto-http
 idna==3.10
     # via requests
@@ -51,7 +51,7 @@ importlib-metadata==7.1.0
     # via opentelemetry-api
 jsonschema==4.23.0
     # via semgrep
-jsonschema-specifications==2024.10.1
+jsonschema-specifications==2025.4.1
     # via jsonschema
 markdown-it-py==3.0.0
     # via rich
@@ -87,7 +87,7 @@ opentelemetry-semantic-conventions==0.46b0
     #   opentelemetry-sdk
 opentelemetry-util-http==0.46b0
     # via opentelemetry-instrumentation-requests
-packaging==24.2
+packaging==25.0
     # via semgrep
 peewee==3.17.9
     # via semgrep
@@ -107,7 +107,7 @@ requests==2.32.3
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.23.1
+rpds-py==0.24.0
     # via
     #   jsonschema
     #   referencing
@@ -115,11 +115,11 @@ ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.114.0
+semgrep==1.120.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
-typing-extensions==4.12.2
+typing-extensions==4.13.2
     # via
     #   opentelemetry-sdk
     #   referencing
