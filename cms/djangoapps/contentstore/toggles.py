@@ -373,7 +373,7 @@ def use_new_files_uploads_page(course_key):
 # .. toggle_name: contentstore.new_studio_mfe.use_new_video_uploads_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio files and uploads page mfe
+# .. toggle_description: This flag enables the use of the new studio video uploads page mfe
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2023-5-15
 # .. toggle_target_removal_date: 2023-8-31
