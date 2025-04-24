@@ -610,7 +610,7 @@ def _create_block(request):
     created_block = create_xblock(
         parent_locator=parent_locator,
         user=request.user,
-        category="vertical" if category == "unit" else category,
+        category=category,
         display_name=request.json.get("display_name"),
         boilerplate=request.json.get("boilerplate"),
     )
