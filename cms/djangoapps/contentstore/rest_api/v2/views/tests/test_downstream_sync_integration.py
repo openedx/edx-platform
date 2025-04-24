@@ -76,12 +76,12 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         return [str(k) for k in modulestore().get_item(UsageKey.from_string(usage_key), depth=0).children]
 
     def _create_block_from_upstream(
-            self,
-            block_category: str,
-            parent_usage_key: str,
-            upstream_key: str,
-            expect_response: int = 200,
-        ):
+        self,
+        block_category: str,
+        parent_usage_key: str,
+        upstream_key: str,
+        expect_response: int = 200,
+    ):
         """
         Call the CMS API for inserting an XBlock that's cloned from a library
         item. i.e. copy a *published* library block into a course, and create an
