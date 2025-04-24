@@ -3,6 +3,7 @@
 
 from functools import wraps
 from dal import autocomplete
+from django_countries import countries
 
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
@@ -315,15 +316,40 @@ class LanguageAutocomplete(autocomplete.Select2ListView):
     def get_list(self):
         return [lang for lang in LANGUAGE_CHOICES if self.q.lower() in lang.lower()]
 
+class CountryAutocomplete(autocomplete.Select2ListView):
+    def get_list(self):
+        return [
+            name for code, name in countries if self.q.lower() in name.lower()
+        ]
+
 class UserProfileInlineForm(forms.ModelForm):
     language = forms.CharField(
         required=False,
         widget=autocomplete.ListSelect2(url='admin:language-autocomplete')
     )
+    country = forms.CharField(
+        required=False,
+        widget=autocomplete.ListSelect2(url='admin:country-autocomplete')
+    )
 
     class Meta:
         model = UserProfile
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk:
+            if self.instance.country:
+                code = self.instance.country
+                name = countries.name(code) if code in countries else code
+                self.fields['country'].widget.choices = [(code, name)]
+                self.initial['country'] = code
+
+            if self.instance.language:
+                language = self.instance.language
+                self.fields['language'].initial = language
+                self.fields['language'].widget.choices = [(language, language)]
 
 
 class UserProfileInline(admin.StackedInline):
@@ -385,6 +411,7 @@ class UserAdmin(BaseUserAdmin):
                 LanguageAutocomplete.as_view(),
                 name='language-autocomplete'
             ),
+            path('country-autocomplete/', CountryAutocomplete.as_view(), name='country-autocomplete'),
         ]
         return custom_urls + urls
 
