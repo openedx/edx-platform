@@ -107,7 +107,7 @@ class EntityLinkBase(models.Model):
         abstract = True
 
     @property
-    def upstream_version(self) -> int | None:
+    def upstream_version_num(self) -> int | None:
         """
         Returns upstream block version number if available.
         """

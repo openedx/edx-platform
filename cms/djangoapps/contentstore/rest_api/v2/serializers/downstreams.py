@@ -12,7 +12,7 @@ class ComponentLinksSerializer(serializers.ModelSerializer):
     Serializer for publishable entity links.
     """
     upstream_context_title = serializers.CharField(read_only=True)
-    upstream_version = serializers.IntegerField(read_only=True)
+    upstream_version = serializers.IntegerField(read_only=True, source="upstream_version_num")
     ready_to_sync = serializers.BooleanField()
 
     class Meta:
