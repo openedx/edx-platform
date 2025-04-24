@@ -123,7 +123,7 @@ def _update_non_customizable_fields(*, upstream: lib_api.ContainerMetadata, down
     """
     For each field `downstream.blah` that isn't customizable: set it to `upstream.blah`.
     """
-    pass
+    # For now, there's nothing to do here - containers don't have any non-customizable fields.
 
 
 def _update_tags(*, upstream: XBlock, downstream: XBlock) -> None:

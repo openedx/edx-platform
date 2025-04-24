@@ -198,7 +198,9 @@ class UpstreamLink:
             # It could be reasonable to relax this requirement in the future if there's product need for it.
             # for example, there's no reason that a StaticTabBlock couldn't take updates from an HtmlBlock.
             raise BadUpstream(
-                _("Content type mismatch: {downstream_id} ({downstream_type}) cannot be linked to {upstream_id}.").format(
+                _(
+                    "Content type mismatch: {downstream_id} ({downstream_type}) cannot be linked to {upstream_id}."
+                ).format(
                     downstream_id=downstream.usage_key,
                     downstream_type=downstream_type,
                     upstream_id=str(upstream_key),
