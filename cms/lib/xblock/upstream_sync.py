@@ -111,11 +111,13 @@ class UpstreamLink:
         """
         Get an JSON-API-friendly representation of this upstream link.
         """
-        return {
+        data = {
             **asdict(self),
             "ready_to_sync": self.ready_to_sync,
             "upstream_link": self.upstream_link,
         }
+        del data["upstream_key"]  # As JSON (string), this would be redundant with upstream_ref
+        return data
 
     @classmethod
     def try_get_for_block(cls, downstream: XBlock) -> t.Self:
