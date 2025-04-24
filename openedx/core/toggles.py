@@ -12,6 +12,7 @@ from edx_toggles.toggles import SettingDictToggle
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2015-12-01
 # .. toggle_tickets: https://openedx.atlassian.net/browse/SOL-40
+# .. toggle_warning: This setting is deprecated. Use ENTRANCE_EXAMS_FLAG instead.
 ENTRANCE_EXAMS = SettingDictToggle(
     "FEATURES", "ENTRANCE_EXAMS", default=False, module_name=__name__
 )
