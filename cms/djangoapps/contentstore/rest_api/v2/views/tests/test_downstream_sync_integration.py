@@ -6,7 +6,9 @@ from typing import Any
 from xml.etree import ElementTree
 
 import ddt
+from opaque_keys.edx.keys import UsageKey
 
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
@@ -68,8 +70,10 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
     # def _get_course_block_fields(self, usage_key: str):
     #     return self._api('get', f'/xblock/{usage_key}', {}, expect_response=200)
 
-    # def _get_course_block_children(self, usage_key: str):
-    #     return self._api('get', f'/xblock/container/{usage_key}', {}, expect_response=200)
+    def _get_course_block_children(self, usage_key: str) -> list[str]:
+        """ Get the IDs of the child XBlocks of the given XBlock """
+        # TODO: is there really no REST API to get the children of an XBlock in Studio?
+        return [str(k) for k in modulestore().get_item(UsageKey.from_string(usage_key), depth=0).children]
 
     def _create_block_from_upstream(
             self,
@@ -218,6 +222,9 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         """
         # 1️⃣ Create a "vertical" block in the course based on a "unit" container:
         downstream_unit = self._create_block_from_upstream(
+            # The API consumer needs to specify "vertical" here, even though upstream is "unit".
+            # In the future we could create a nicer REST API endpoint for this that's not part of
+            # the messy '/xblock/' API and which auto-detects the types based on the upstream_key.
             block_category="vertical",
             parent_usage_key=str(self.course_subsection.usage_key),
             upstream_key=self.upstream_unit["id"],
@@ -271,3 +278,79 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 >multi select...</problem>
             </vertical>
         """)
+
+    # 2️⃣ Now, lets modify the upstream problem 1:
+
+        self._set_library_block_olx(
+            self.upstream_problem1["id"],
+            '<problem display_name="Problem 1 NEW name" markdown="updated">multiple choice v2...</problem>'
+        )
+        self._publish_container(self.upstream_unit["id"])
+
+        status = self._get_sync_status(downstream_unit["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
+            'version_available': 2,  # <--- not updated since we didn't directly modify the unit
+            'version_synced': 2,
+            'version_declined': None,
+            # FIXME: ready_to_sync should be true, since a child block needs syncing.
+            # This may need to be fixed post-Teak, as syncing the children directly is still possible.
+            'ready_to_sync': False,
+            'error_message': None,
+        })
+
+        # Check the upstream/downstream status of [one of] the children
+
+        downstream_problem1 = self._get_course_block_children(downstream_unit["locator"])[1]
+        assert "type@problem" in downstream_problem1
+        self.assertDictContainsEntries(self._get_sync_status(downstream_problem1), {
+            'upstream_ref': self.upstream_problem1["id"],
+            'version_available': 3,  # <--- updated since we modified the problem
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': True,  # <--- updated
+            'error_message': None,
+        })
+
+        # 3️⃣ Now, sync and check the resulting OLX of the downstream
+
+        self._sync_downstream(downstream_unit["locator"])
+
+        self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
+            <vertical
+                display_name="Unit 1 Title"
+                upstream_display_name="Unit 1 Title"
+                upstream="{self.upstream_unit['id']}"
+                upstream_version="2"
+            >
+                <html
+                    display_name="Text Content"
+                    upstream_display_name="Text Content"
+                    editor="visual"
+                    upstream="{self.upstream_html1['id']}"
+                    upstream_version="2"
+                >This is the HTML.</html>
+                <!-- 🟢 the problem below has been updated: -->
+                <problem
+                    display_name="Problem 1 NEW name"
+                    upstream_display_name="Problem 1 NEW name"
+                    markdown="updated"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem1['id']}"
+                    upstream_version="3"
+                >multiple choice v2...</problem>
+                <problem
+                    display_name="Problem 2 Display Name"
+                    upstream_display_name="Problem 2 Display Name"
+                    markdown="null"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem2['id']}"
+                    upstream_version="2"
+                >multi select...</problem>
+            </vertical>
+        """)
+
+    # TODO: tests where
+    # (1) a unit is synced to a course
+    # (2) an upstream [or downstream] block is deleted or added, and changes are published.
+    # (3) the unit is synced
