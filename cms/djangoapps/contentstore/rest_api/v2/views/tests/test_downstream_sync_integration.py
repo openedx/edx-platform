@@ -8,10 +8,10 @@ from xml.etree import ElementTree
 import ddt
 from opaque_keys.edx.keys import UsageKey
 
+from openedx.core.djangoapps.content_libraries.tests import ContentLibrariesRestApiTest
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
-from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 
 
 @ddt.ddt
