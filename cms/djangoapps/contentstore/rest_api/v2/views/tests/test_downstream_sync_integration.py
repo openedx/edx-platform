@@ -60,7 +60,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
 
     def _sync_downstream(self, usage_key: str):
         return self._api('post', f"/api/contentstore/v2/downstreams/{usage_key}/sync", {}, expect_response=200)
-    
+
     def _get_course_block_olx(self, usage_key: str):
         data = self._api('get', f'/api/olx-export/v1/xblock/{usage_key}/', {}, expect_response=200)
         return data["blocks"][data["root_block_id"]]["olx"]
@@ -82,7 +82,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             "parent_locator": parent_usage_key,
             "library_content_key": upstream_key,
         }, expect_response=expect_response)
-    
+
     def _update_course_block_fields(self, usage_key: str, fields: dict[str, Any] = None):
         """ Update fields of an XBlock """
         return self._api('patch', f"/xblock/{usage_key}", {
@@ -210,7 +210,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         """
         Test that we can sync a unit from the library into the course
         """
-        # Create a "vertical" block based on a "unit" container:
+        # 1️⃣ Create a "vertical" block in the course based on a "unit" container:
         downstream_unit = self._create_block_from_upstream(
             block_category="vertical",
             parent_usage_key=str(self.course_subsection.usage_key),
@@ -224,7 +224,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             'version_declined': None,
             'ready_to_sync': False,
             'error_message': None,
-            'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/units'
+            # 'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/units/...'
         })
         assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
         assert status["upstream_link"].endswith(f"/units/{self.upstream_unit['id']}")

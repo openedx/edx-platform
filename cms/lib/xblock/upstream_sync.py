@@ -99,13 +99,13 @@ class UpstreamLink:
         """
         Link to edit/view upstream block in library.
         """
-        if self.version_available is None or self.upstream_ref is None:
+        if self.version_available is None or self.upstream_key is None:
             return None
-        try:
-            usage_key = LibraryUsageLocatorV2.from_string(self.upstream_ref)
-        except InvalidKeyError:
-            return None
-        return _get_library_xblock_url(usage_key)
+        if isinstance(self.upstream_key, LibraryUsageLocatorV2):
+            return _get_library_xblock_url(self.upstream_key)
+        if isinstance(self.upstream_key, LibraryContainerLocator):
+            return _get_library_container_url(self.upstream_key)
+        return None
 
     def to_json(self) -> dict[str, t.Any]:
         """
@@ -266,6 +266,18 @@ def _get_library_xblock_url(usage_key: LibraryUsageLocatorV2):
     if mfe_base_url := settings.COURSE_AUTHORING_MICROFRONTEND_URL:  # type: ignore
         library_key = usage_key.lib_key
         library_url = f'{mfe_base_url}/library/{library_key}/components?usageKey={usage_key}'
+    return library_url
+
+
+def _get_library_container_url(container_key: LibraryContainerLocator):
+    """
+    Gets authoring url for given container_key.
+    """
+    library_url = None
+    if mfe_base_url := settings.COURSE_AUTHORING_MICROFRONTEND_URL:  # type: ignore
+        library_key = container_key.lib_key
+        if container_key.container_type == "unit":
+            library_url = f'{mfe_base_url}/library/{library_key}/units/{container_key}'
     return library_url
 
 
