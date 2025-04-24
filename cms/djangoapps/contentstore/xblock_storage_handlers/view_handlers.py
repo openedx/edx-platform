@@ -1316,10 +1316,7 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
         if is_xblock_unit and summary_configuration.is_enabled():
             xblock_info["summary_configuration_enabled"] = summary_configuration.is_summary_enabled(xblock_info['id'])
 
-        if xblock.upstream:
-            xblock_info["upstream"] = str(xblock.upstream)
-        else:
-            xblock_info["upstream"] = None
+        xblock_info["upstream"] = str(xblock.upstream) if xblock.upstream else None
 
     return xblock_info
 

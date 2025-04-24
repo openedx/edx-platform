@@ -300,14 +300,12 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)  # lint-amnesty, pylint: disable=line-too-long
         course = modulestore().get_course(xblock.location.course_key)
 
-        if root_xblock.upstream and str(root_xblock.upstream).startswith('lct:'):
+        if root_xblock and root_xblock.upstream and str(root_xblock.upstream).startswith('lct:'):
             can_edit = False
             can_add = False
-            parent_has_upstream = True
         else:
             can_edit = context.get('can_edit', True)
             can_add = context.get('can_add', True)
-            parent_has_upstream = False
 
         # Is this a course or a library?
         is_course = xblock.context_key.is_course
@@ -323,7 +321,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_root': is_root,
             'is_reorderable': is_reorderable,
             'can_edit': can_edit,
-            'can_edit_visibility': context.get('can_edit_visibility', is_course),
+            'can_edit_visibility': can_edit and context.get('can_edit_visibility', is_course),
             'course_authoring_url': settings.COURSE_AUTHORING_MICROFRONTEND_URL,
             'is_loading': context.get('is_loading', False),
             'is_selected': context.get('is_selected', False),
@@ -337,7 +335,6 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'language': getattr(course, 'language', None),
             'is_course': is_course,
             'tags_count': tags_count,
-            'parent_has_upstream': parent_has_upstream,
         }
 
         add_webpack_js_to_fragment(frag, "js/factories/xblock_validation")
