@@ -134,7 +134,7 @@ class ContainerLinkAdmin(admin.ModelAdmin):
     """
     fields = (
         "uuid",
-        "upstream_block",
+        "upstream_container",
         "upstream_container_key",
         "upstream_context_key",
         "downstream_usage_key",
@@ -146,7 +146,7 @@ class ContainerLinkAdmin(admin.ModelAdmin):
     )
     readonly_fields = fields
     list_display = [
-        "upstream_block",
+        "upstream_container",
         "upstream_container_key",
         "downstream_usage_key",
         "version_synced",

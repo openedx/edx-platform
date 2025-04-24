@@ -2,9 +2,8 @@
 A "Learning Context" is a course, a library, a program, or some other collection
 of content where learning happens.
 """
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
-
 from openedx.core.types import User as UserType
+from opaque_keys.edx.keys import UsageKeyV2
 
 
 class LearningContext:
@@ -26,7 +25,7 @@ class LearningContext:
         parameters without changing the API.
         """
 
-    def can_edit_block(self, user: UserType, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator) -> bool:  # pylint: disable=unused-argument
+    def can_edit_block(self, user: UserType, usage_key: UsageKeyV2) -> bool:  # pylint: disable=unused-argument
         """
         Assuming a block with the specified ID (usage_key) exists, does the
         specified user have permission to edit it (make changes to the
@@ -34,17 +33,13 @@ class LearningContext:
 
         user: a Django User object (may be an AnonymousUser)
 
-        usage_key: the UsageKeyV2 | LibraryItemKey  subclass used for this learning context
+        usage_key: the UsageKeyV2 subclass used for this learning context
 
         Must return a boolean.
         """
         return False
 
-    def can_view_block_for_editing(
-        self,
-        user: UserType,
-        usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
-    ) -> bool:
+    def can_view_block_for_editing(self, user: UserType, usage_key: UsageKeyV2) -> bool:
         """
         Assuming a block with the specified ID (usage_key) exists, does the
         specified user have permission to view its fields and OLX details (but
@@ -52,7 +47,7 @@ class LearningContext:
         """
         return self.can_edit_block(user, usage_key)
 
-    def can_view_block(self, user: UserType, usage_key: LibraryUsageLocatorV2 | LibraryContainerLocator) -> bool:  # pylint: disable=unused-argument
+    def can_view_block(self, user: UserType, usage_key: UsageKeyV2) -> bool:  # pylint: disable=unused-argument
         """
         Assuming a block with the specified ID (usage_key) exists, does the
         specified user have permission to view it and interact with it (call
@@ -61,7 +56,7 @@ class LearningContext:
 
         user: a Django User object (may be an AnonymousUser)
 
-        usage_key: the UsageKeyV2 | LibraryItemKey subclass used for this learning context
+        usage_key: the UsageKeyV2 subclass used for this learning context
 
         Must return a boolean.
         """
@@ -79,7 +74,7 @@ class LearningContext:
         """
         Send a "block updated" event for the block with the given usage_key in this context.
 
-        usage_key: the UsageKeyV2 | LibraryItemKey  subclass used for this learning context
+        usage_key: the UsageKeyV2 subclass used for this learning context
         """
 
     def send_container_updated_events(self, usage_key):

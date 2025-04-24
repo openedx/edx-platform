@@ -12,7 +12,7 @@ from django.db.models.fields import IntegerField, TextField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import GreaterThan
 from django.utils.translation import gettext_lazy as _
-from opaque_keys.edx.django.models import CourseKeyField, LibraryItemField, UsageKeyField
+from opaque_keys.edx.django.models import CourseKeyField, ContainerKeyField, UsageKeyField
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryContainerLocator
 from openedx_learning.api.authoring import get_published_version
@@ -198,6 +198,10 @@ class ComponentLink(EntityLinkBase):
         )
     )
 
+    class Meta:
+        verbose_name = _("Component Link")
+        verbose_name_plural = _("Component Links")
+
     def __str__(self):
         return f"ComponentLink<{self.upstream_usage_key}->{self.downstream_usage_key}>"
 
@@ -263,20 +267,25 @@ class ContainerLink(EntityLinkBase):
     This represents link between any two publishable entities or link between publishable entity and a course
     xblock. It helps in tracking relationship between xblocks imported from libraries and used in different courses.
     """
-    upstream_block = models.ForeignKey(
+    upstream_container = models.ForeignKey(
         Container,
         on_delete=models.SET_NULL,
         related_name="links",
         null=True,
         blank=True,
     )
-    upstream_container_key = LibraryItemField(
+    upstream_container_key = ContainerKeyField(
         max_length=255,
         help_text=_(
-            "Upstream block usage key, this value cannot be null"
-            " and useful to track upstream library blocks that do not exist yet"
+            "Upstream block key (e.g. lct:...), this value cannot be null "
+            "and is useful to track upstream library blocks that do not exist yet "
+            "or were deleted."
         )
     )
+
+    class Meta:
+        verbose_name = _("Container Link")
+        verbose_name_plural = _("Container Links")
 
     def __str__(self):
         return f"ContainerLink<{self.upstream_container_key}->{self.downstream_usage_key}>"
@@ -284,7 +293,7 @@ class ContainerLink(EntityLinkBase):
     @classmethod
     def update_or_create(
         cls,
-        upstream_block: Container | None,
+        upstream_container: Container | None,
         /,
         upstream_container_key: LibraryContainerLocator,
         upstream_context_key: str,
@@ -307,10 +316,10 @@ class ContainerLink(EntityLinkBase):
             'version_synced': version_synced,
             'version_declined': version_declined,
         }
-        if upstream_block:
+        if upstream_container:
             new_values.update(
                 {
-                    'upstream_block': upstream_block,
+                    'upstream_container': upstream_container,
                 }
             )
         try:

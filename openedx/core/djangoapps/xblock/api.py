@@ -8,36 +8,39 @@ Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
 # pylint: disable=unused-import
+from enum import Enum
+from datetime import datetime
 import logging
+import threading
 
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, ComponentVersion, Container
+from openedx_learning.api.authoring_models import Component, ComponentVersion
+from opaque_keys.edx.keys import UsageKeyV2
+from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchUsage, NoSuchViewError
 from xblock.plugin import PluginMissingError
 
+from openedx.core.types import User as UserType
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
-
-# Made available as part of this package's public API:
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.learning_core_runtime import (
     LearningCoreFieldData,
     LearningCoreXBlockRuntime,
 )
-from openedx.core.types import User as UserType
-
 from .data import CheckPerm, LatestVersion
+from .rest_api.url_converters import VersionConverter
 from .utils import (
-    get_auto_latest_version,
     get_secure_token_for_xblock_handler,
     get_xblock_id_for_anonymous_user,
+    get_auto_latest_version,
 )
+
+from .runtime.learning_core_runtime import LearningCoreXBlockRuntime
 
 # Made available as part of this package's public API:
 from openedx.core.djangoapps.xblock.learning_context import LearningContext
@@ -67,7 +70,7 @@ def get_runtime(user: UserType):
 
 
 def load_block(
-    usage_key: UsageKeyV2 | LibraryContainerLocator,
+    usage_key: UsageKeyV2,
     user: UserType,
     *,
     check_permission: CheckPerm | None = CheckPerm.CAN_LEARN,
@@ -93,13 +96,14 @@ def load_block(
     # Now, check if the block exists in this context and if the user has
     # permission to render this XBlock view:
     if check_permission and user is not None:
-        has_perm = False
         if check_permission == CheckPerm.CAN_EDIT:
             has_perm = context_impl.can_edit_block(user, usage_key)
         elif check_permission == CheckPerm.CAN_READ_AS_AUTHOR:
             has_perm = context_impl.can_view_block_for_editing(user, usage_key)
         elif check_permission == CheckPerm.CAN_LEARN:
             has_perm = context_impl.can_view_block(user, usage_key)
+        else:
+            has_perm = False
         if not has_perm:
             raise PermissionDenied(f"You don't have permission to access the component '{usage_key}'.")
 
@@ -110,16 +114,11 @@ def load_block(
     runtime = get_runtime(user=user)
 
     try:
-        if isinstance(usage_key, UsageKeyV2):
-            return runtime.get_block(usage_key, version=version)
-        elif isinstance(usage_key, LibraryContainerLocator):
-            return runtime.get_container_block(usage_key, version=version)
-        else:
-            raise NotFound(f"The component '{usage_key}' does not exist.")
+        return runtime.get_block(usage_key, version=version)
     except NoSuchUsage as exc:
         # Convert NoSuchUsage to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The component '{usage_key}' does not exist.") from exc
-    except (ComponentVersion.DoesNotExist, Container.DoesNotExist) as exc:
+    except ComponentVersion.DoesNotExist as exc:
         # Convert ComponentVersion.DoesNotExist to NotFound so we do the right thing (404 not 500) by default.
         raise NotFound(f"The requested version of component '{usage_key}' does not exist.") from exc
 

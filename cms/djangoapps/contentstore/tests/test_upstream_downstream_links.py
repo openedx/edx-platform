@@ -67,7 +67,7 @@ class BaseUpstreamLinksHelpers(TestCase):
         for i in range(num_blocks):
             upstream, block = self._create_unit(i + 1)
             data.append({
-                "upstream_block": None,
+                "upstream_container": None,
                 "downstream_context_key": course_key,
                 "downstream_usage_key": block.usage_key,
                 "upstream_container_key": upstream,
@@ -110,7 +110,7 @@ class BaseUpstreamLinksHelpers(TestCase):
         ))
         self.assertListEqual(links, expected_component_links)
         container_links = list(ContainerLink.objects.filter(downstream_context_key=course_key).values(
-            'upstream_block',
+            'upstream_container',
             'upstream_container_key',
             'upstream_context_key',
             'downstream_usage_key',

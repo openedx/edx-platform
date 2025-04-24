@@ -34,7 +34,8 @@ from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
-from .libraries import LibraryXBlockMetadata, PublishableItem, library_component_usage_key
+from .libraries import PublishableItem, library_component_usage_key
+from .block_metadata import LibraryXBlockMetadata
 
 # The public API is only the following symbols:
 __all__ = [
@@ -179,7 +180,7 @@ def get_container_from_key(container_key: LibraryContainerLocator, isDeleted=Fal
     Raises ContentLibraryContainerNotFound if no container found, or if the container has been soft deleted.
     """
     assert isinstance(container_key, LibraryContainerLocator)
-    content_library = ContentLibrary.objects.get_by_key(container_key.library_key)
+    content_library = ContentLibrary.objects.get_by_key(container_key.lib_key)
     learning_package = content_library.learning_package
     assert learning_package is not None
     container = authoring_api.get_container_by_key(
@@ -204,7 +205,7 @@ def get_container(container_key: LibraryContainerLocator, include_collections=Fa
     else:
         associated_collections = None
     container_meta = ContainerMetadata.from_container(
-        container_key.library_key,
+        container_key.lib_key,
         container,
         associated_collections=associated_collections,
     )
@@ -268,7 +269,7 @@ def update_container(
     Update a container (e.g. a Unit) title.
     """
     container = get_container_from_key(container_key)
-    library_key = container_key.library_key
+    library_key = container_key.lib_key
 
     assert container.unit
     unit_version = authoring_api.create_next_unit_version(
@@ -295,7 +296,7 @@ def delete_container(
 
     No-op if container doesn't exist or has already been soft-deleted.
     """
-    library_key = container_key.library_key
+    library_key = container_key.lib_key
     container = get_container_from_key(container_key)
 
     affected_collections = authoring_api.get_entity_collections(
@@ -330,7 +331,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     """
     Restore the specified library container.
     """
-    library_key = container_key.library_key
+    library_key = container_key.lib_key
     container = get_container_from_key(container_key, isDeleted=True)
 
     affected_collections = authoring_api.get_entity_collections(
@@ -411,7 +412,7 @@ def update_container_children(
     """
     Adds children components or containers to given container.
     """
-    library_key = container_key.library_key
+    library_key = container_key.lib_key
     container_type = container_key.container_type
     container = get_container_from_key(container_key)
     match container_type:
@@ -459,7 +460,7 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
     containers/blocks.
     """
     container = get_container_from_key(container_key)
-    library_key = container_key.library_key
+    library_key = container_key.lib_key
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     learning_package = content_library.learning_package
     assert learning_package
