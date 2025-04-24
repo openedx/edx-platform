@@ -370,7 +370,7 @@ def use_new_files_uploads_page(course_key):
     return not LEGACY_STUDIO_FILES_UPLOADS.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_files_uploads_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_video_uploads_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio files and uploads page mfe
