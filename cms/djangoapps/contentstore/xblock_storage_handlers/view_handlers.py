@@ -542,29 +542,17 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
     else:
         with store.bulk_operations(downstream.usage_key.context_key):
             upstream_children = sync_from_upstream_container(downstream=downstream, user=request.user)
-            store.update_item(downstream, request.user.id)
             downstream_children = downstream.get_children()
-            # For now in this BETA version of syncing, we do really dumb 1:1 child matching
-            # that will blow away any changes if the downstream container has had blocks added,
-            # re-ordered, or deleted.
-            # In the future, we need to do something more sophisticated.
-
-            # Delete any "extra" children in the downstream
-            while len(downstream_children) > len(upstream_children):
-                del downstream_children[-1]
+            downstream_children_keys = [child.upstream for child in downstream_children]
             # Sync the children:
             notices = []
+            # Store final children keys to update order of components in unit
+            children = []
             for i in range(len(upstream_children)):
                 upstream_child = upstream_children[i]
                 assert isinstance(upstream_child, LibraryXBlockMetadata)  # for now we only support units
-                downstream_child = downstream_children[i] if i < len(downstream_children) else None
-
-                if downstream_child and downstream_child.upstream != upstream_child.usage_key:
-                    # This downstream block was added, or re-ordered, or no longer aligns with an upstream block.
-                    store.delete_item(downstream_child.usage_key, user_id=request.user.id)
-                    downstream_child = None
-
-                if not downstream_child:
+                if upstream_child.usage_key not in downstream_children_keys:
+                    # This upstream_child is new, create it.
                     downstream_child = store.create_child(
                         parent_usage_key=downstream.usage_key,
                         position=i,
@@ -576,8 +564,19 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
                             "upstream": str(upstream_child.usage_key),
                         },
                     )
+                else:
+                    downstream_child_old_index = downstream_children_keys.index(upstream_child.usage_key)
+                    downstream_child = downstream_children[downstream_child_old_index]
+
                 result = sync_library_content(downstream=downstream_child, request=request, store=store)
+                children.append(downstream_child.usage_key)
                 notices.append(result)
+            for child in downstream_children:
+                if child.usage_key not in children:
+                    # This downstream block was added, or deleted from upstream block.
+                    store.delete_item(child.usage_key, user_id=request.user.id)
+            downstream.children = children
+            store.update_item(downstream, request.user.id)
         static_file_notices = concat_static_file_notices(notices)
     return static_file_notices
 

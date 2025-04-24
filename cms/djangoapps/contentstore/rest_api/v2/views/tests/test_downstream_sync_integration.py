@@ -350,7 +350,112 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             </vertical>
         """)
 
-    # TODO: tests where
-    # (1) a unit is synced to a course
-    # (2) an upstream [or downstream] block is deleted or added, and changes are published.
-    # (3) the unit is synced
+        #   Now, add and delete a component
+        self.upstream_problem3 = self._add_block_to_library(
+            self.library["id"],
+            "problem",
+            "prob3",
+            can_stand_alone=True
+        )
+        self._set_library_block_olx(
+            self.upstream_problem3["id"],
+            '<problem display_name="Problem 3 Display Name" max_attempts="22">single select...</problem>'
+        )
+        self._add_container_components(self.upstream_unit["id"], [self.upstream_problem3["id"]])
+        self._remove_container_components(self.upstream_unit["id"], [self.upstream_problem2["id"]])
+        self._commit_library_changes(self.library["id"])  # publish everything
+
+        status = self._get_sync_status(downstream_unit["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
+            'version_available': 4,  # <--- updated twice, delete and add component
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': True,
+            'error_message': None,
+        })
+
+        # 3️⃣ Now, sync and check the resulting OLX of the downstream
+
+        self._sync_downstream(downstream_unit["locator"])
+        self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
+            <vertical
+                display_name="Unit 1 Title"
+                upstream_display_name="Unit 1 Title"
+                upstream="{self.upstream_unit['id']}"
+                upstream_version="4"
+            >
+                <html
+                    display_name="Text Content"
+                    upstream_display_name="Text Content"
+                    editor="visual"
+                    upstream="{self.upstream_html1['id']}"
+                    upstream_version="2"
+                >This is the HTML.</html>
+                <problem
+                    display_name="Problem 1 NEW name"
+                    upstream_display_name="Problem 1 NEW name"
+                    markdown="updated"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem1['id']}"
+                    upstream_version="3"
+                >multiple choice v2...</problem>
+                <!-- 🟢 the problem 2 has been deleted: -->
+                <!-- 🟢 the problem 3 has been added: -->
+                <problem
+                    display_name="Problem 3 Display Name"
+                    upstream_display_name="Problem 3 Display Name"
+                    markdown="null"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem3['id']}"
+                    upstream_version="2"
+                >single select...</problem>
+            </vertical>
+        """)
+
+        #   Now, reorder components
+        self._patch_container_components(self.upstream_unit["id"], [
+            self.upstream_problem3["id"],
+            self.upstream_problem1["id"],
+            self.upstream_html1["id"],
+        ])
+        self._publish_container(self.upstream_unit["id"])
+
+        # 3️⃣ Now, sync and check the resulting OLX of the downstream
+
+        self._sync_downstream(downstream_unit["locator"])
+        self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
+            <vertical
+                display_name="Unit 1 Title"
+                upstream_display_name="Unit 1 Title"
+                upstream="{self.upstream_unit['id']}"
+                upstream_version="5"
+            >
+                <!-- 🟢 the problem 3 has been moved to top: -->
+                <problem
+                    display_name="Problem 3 Display Name"
+                    upstream_display_name="Problem 3 Display Name"
+                    markdown="null"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem3['id']}"
+                    upstream_version="2"
+                >single select...</problem>
+                <!-- 🟢 the problem 1 has been moved to middle: -->
+                <problem
+                    display_name="Problem 1 NEW name"
+                    upstream_display_name="Problem 1 NEW name"
+                    markdown="updated"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem1['id']}"
+                    upstream_version="3"
+                >multiple choice v2...</problem>
+                <!-- 🟢 the html 1 has been moved to end: -->
+                <html
+                    display_name="Text Content"
+                    upstream_display_name="Text Content"
+                    editor="visual"
+                    upstream="{self.upstream_html1['id']}"
+                    upstream_version="2"
+                >This is the HTML.</html>
+            </vertical>
+        """)
