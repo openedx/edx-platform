@@ -66,6 +66,7 @@ class LibraryXBlockMetadata(PublishableItem):
             has_unpublished_changes=component.versioning.has_unpublished_changes,
             collections=associated_collections or [],
             tags_count=tags.get(str(usage_key), 0),
+            can_stand_alone=component.publishable_entity.can_stand_alone,
         )
 
 
