@@ -161,6 +161,7 @@ class UpstreamLink:
             raise BadDownstream(_("Cannot update content because it does not belong to a course."))
         downstream_type = downstream.usage_key.block_type
 
+        upstream_key: LibraryUsageLocatorV2 | LibraryContainerLocator
         try:
             upstream_key = LibraryUsageLocatorV2.from_string(downstream.upstream)
         except InvalidKeyError:
