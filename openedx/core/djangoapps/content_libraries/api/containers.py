@@ -343,7 +343,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 

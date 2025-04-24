@@ -380,7 +380,7 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
                 "signal": LIBRARY_CONTAINER_CREATED,
                 "sender": None,
                 "library_container": LibraryContainerData(
-                    container_key="lct:CL-TEST:containers:unit:u1",
+                    container_key=LibraryContainerLocator.from_string("lct:CL-TEST:containers:unit:u1"),
                 ),
             },
             create_receiver.call_args_list[0].kwargs,
