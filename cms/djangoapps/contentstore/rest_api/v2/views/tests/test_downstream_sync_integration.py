@@ -65,6 +65,12 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         data = self._api('get', f'/api/olx-export/v1/xblock/{usage_key}/', {}, expect_response=200)
         return data["blocks"][data["root_block_id"]]["olx"]
 
+    # def _get_course_block_fields(self, usage_key: str):
+    #     return self._api('get', f'/xblock/{usage_key}', {}, expect_response=200)
+
+    # def _get_course_block_children(self, usage_key: str):
+    #     return self._api('get', f'/xblock/container/{usage_key}', {}, expect_response=200)
+
     def _create_block_from_upstream(
             self,
             block_category: str,
@@ -228,3 +234,40 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         })
         assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
         assert status["upstream_link"].endswith(f"/units/{self.upstream_unit['id']}")
+
+        # Check that the downstream container matches our expectations.
+        # Note that:
+        # (1) Every XBlock has an "upstream" field
+        # (2) some "downstream only" fields like weight and max_attempts are omitted.
+        self.assertXmlEqual(self._get_course_block_olx(downstream_unit["locator"]), f"""
+            <vertical
+                display_name="Unit 1 Title"
+                upstream_display_name="Unit 1 Title"
+                upstream="{self.upstream_unit['id']}"
+                upstream_version="2"
+            >
+                <html
+                    display_name="Text Content"
+                    upstream_display_name="Text Content"
+                    editor="visual"
+                    upstream="{self.upstream_html1['id']}"
+                    upstream_version="2"
+                >This is the HTML.</html>
+                <problem
+                    display_name="Problem 1 Display Name"
+                    upstream_display_name="Problem 1 Display Name"
+                    markdown="MD 1"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem1['id']}"
+                    upstream_version="2"
+                >multiple choice...</problem>
+                <problem
+                    display_name="Problem 2 Display Name"
+                    upstream_display_name="Problem 2 Display Name"
+                    markdown="null"
+                    {self.standard_capa_attributes}
+                    upstream="{self.upstream_problem2['id']}"
+                    upstream_version="2"
+                >multi select...</problem>
+            </vertical>
+        """)

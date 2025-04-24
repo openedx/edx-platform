@@ -542,6 +542,7 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
     else:
         with store.bulk_operations(downstream.usage_key.context_key):
             upstream_children = sync_from_upstream_container(downstream=downstream, user=request.user)
+            store.update_item(downstream, request.user.id)
             downstream_children = downstream.get_children()
             # For now in this BETA version of syncing, we do really dumb 1:1 child matching
             # that will blow away any changes if the downstream container has had blocks added,
@@ -577,7 +578,6 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
                     )
                 result = sync_library_content(downstream=downstream_child, request=request, store=store)
                 notices.append(result)
-            store.update_item(downstream, request.user.id)
         static_file_notices = concat_static_file_notices(notices)
     return static_file_notices
 
