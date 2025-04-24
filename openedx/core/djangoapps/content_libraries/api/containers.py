@@ -34,7 +34,8 @@ from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
-from .libraries import LibraryXBlockMetadata, PublishableItem, library_component_usage_key
+from .libraries import PublishableItem, library_component_usage_key
+from .block_metadata import LibraryXBlockMetadata
 
 # The public API is only the following symbols:
 __all__ = [
@@ -342,7 +343,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
-            container_key=str(container_key),
+            container_key=container_key,
         )
     )
 
@@ -372,7 +373,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
 def get_container_children(
     container_key: LibraryContainerLocator,
     published=False,
-) -> list[authoring_api.ContainerEntityListEntry]:
+) -> list[LibraryXBlockMetadata | ContainerMetadata]:
     """
     Get the entities contained in the given container (e.g. the components/xblocks in a unit)
     """
