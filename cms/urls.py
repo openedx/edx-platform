@@ -279,8 +279,9 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
                 certificates_list_handler, name='certificates_list_handler')
     ]
 
-# Maintenance Dashboard
-urlpatterns.append(path('maintenance/', include('cms.djangoapps.maintenance.urls', namespace='maintenance')))
+# Maintenance Dashboard (deprecated -- to be removed in Ulmo)
+if toggles.LEGACY_STUDIO_ANNOUNCEMENTS.is_enabled():
+    urlpatterns.append(path('maintenance/', include('cms.djangoapps.maintenance.urls', namespace='maintenance')))
 
 if settings.DEBUG:
     try:
