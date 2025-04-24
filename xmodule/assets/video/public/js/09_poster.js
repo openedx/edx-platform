@@ -1,70 +1,62 @@
-(function(define) {
-    'use strict';
+'use strict';
 
-    define('video/09_poster.js', [], function() {
-    /**
-     * Poster module.
-     * @exports video/09_poster.js
-     * @constructor
-     * @param {jquery Element} element
-     * @param {Object} options
-     */
-        var VideoPoster = function(element, options) {
-            if (!(this instanceof VideoPoster)) {
-                return new VideoPoster(element, options);
-            }
+import _ from 'underscore';
+import $ from 'jquery';
 
-            _.bindAll(this, 'onClick', 'destroy');
-            this.element = element;
-            this.container = element.find('.video-player');
-            this.options = options || {};
-            this.initialize();
-        };
+let VideoPoster = function(element, options) {
+    if (!(this instanceof VideoPoster)) {
+        return new VideoPoster(element, options);
+    }
 
-        VideoPoster.moduleName = 'Poster';
-        VideoPoster.prototype = {
-            template: _.template([
-                '<div class="video-pre-roll is-<%- type %> poster" ',
-                'style="background-image: url(<%- url %>)">',
-                '<button class="btn-play btn-pre-roll">',
-                '<img src="/static/images/play.png" alt="">',
-                '<span class="sr">', gettext('Play video'), '</span>',
-                '</button>',
-                '</div>'
-            ].join('')),
+    _.bindAll(this, 'onClick', 'destroy');
+    this.element = element;
+    this.container = element.find('.video-player');
+    this.options = options || {};
+    this.initialize();
+};
 
-            initialize: function() {
-                this.el = $(this.template({
-                    url: this.options.poster.url,
-                    type: this.options.poster.type
-                }));
-                this.element.addClass('is-pre-roll');
-                this.render();
-                this.bindHandlers();
-            },
+VideoPoster.moduleName = 'Poster';
+VideoPoster.prototype = {
+    template: _.template([
+        '<div class="video-pre-roll is-<%- type %> poster" ',
+        'style="background-image: url(<%- url %>)">',
+        '<button class="btn-play btn-pre-roll">',
+        '<img src="/static/images/play.png" alt="">',
+        '<span class="sr">', gettext('Play video'), '</span>',
+        '</button>',
+        '</div>'
+    ].join('')),
 
-            bindHandlers: function() {
-                this.el.on('click', this.onClick);
-                this.element.on('destroy', this.destroy);
-            },
+    initialize: function() {
+        this.el = $(this.template({
+            url: this.options.poster.url,
+            type: this.options.poster.type
+        }));
+        this.element.addClass('is-pre-roll');
+        this.render();
+        this.bindHandlers();
+    },
 
-            render: function() {
-                this.container.append(this.el);
-            },
+    bindHandlers: function() {
+        this.el.on('click', this.onClick);
+        this.element.on('destroy', this.destroy);
+    },
 
-            onClick: function() {
-                if (_.isFunction(this.options.onClick)) {
-                    this.options.onClick();
-                }
-                this.destroy();
-            },
+    render: function() {
+        this.container.append(this.el);
+    },
 
-            destroy: function() {
-                this.element.off('destroy', this.destroy).removeClass('is-pre-roll');
-                this.el.remove();
-            }
-        };
+    onClick: function() {
+        if (_.isFunction(this.options.onClick)) {
+            this.options.onClick();
+        }
+        this.destroy();
+    },
 
-        return VideoPoster;
-    });
-}(RequireJS.define));
+    destroy: function() {
+        this.element.off('destroy', this.destroy).removeClass('is-pre-roll');
+        this.el.remove();
+    }
+};
+
+export default VideoPoster;

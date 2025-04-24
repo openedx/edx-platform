@@ -79,10 +79,6 @@ module.exports = {
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/sequence/edit.js'
         ],
-        VideoBlockDisplay: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/video/10_main.js'
-        ],
         VideoBlockEditor: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/tabs/tabs-aggregator.js'
