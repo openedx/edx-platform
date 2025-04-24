@@ -23,12 +23,14 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.storage import FileSystemStorage
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
 from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.models import UserTaskStatus
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore import errors as import_error
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
@@ -746,6 +748,7 @@ class ExportTestCase(CourseTestCase):
         self.url = reverse_course_url('export_handler', self.course.id)
         self.status_url = reverse_course_url('export_status_handler', self.course.id)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_EXPORT, True)
     def test_export_html(self):
         """
         Get the HTML for the page.
