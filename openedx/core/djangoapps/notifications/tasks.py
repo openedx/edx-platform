@@ -7,7 +7,6 @@ from typing import List
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute
@@ -37,10 +36,10 @@ from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_course_notification_preference_config_version
 )
+from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_braze_push_channel
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
 
 
-User = get_user_model()
 logger = get_task_logger(__name__)
 
 
@@ -232,6 +231,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             generated_notification_audience, app_name, notification_type, course_key, content_url,
             generated_notification.content, sender_id=sender_id
         )
+        send_ace_msg_to_braze_push_channel(push_notification_audience, generated_notification, sender_id)
 
 def is_notification_valid(notification_type, context):
     """
