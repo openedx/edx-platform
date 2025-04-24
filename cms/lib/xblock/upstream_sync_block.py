@@ -138,9 +138,11 @@ def _update_non_customizable_fields(*, upstream: XBlock, downstream: XBlock) -> 
     """
     syncable_fields = _get_synchronizable_fields(upstream, downstream)
     customizable_fields = set(downstream.get_customizable_fields().keys())
-    isVideoBlock = downstream.usage_key.block_type == "video"
+    # TODO: resolve this so there's no special-case happening for video block.
+    # e.g. by some non_cloneable_fields property of the XBlock class?
+    is_video_block = downstream.usage_key.block_type == "video"
     for field_name in syncable_fields - customizable_fields:
-        if isVideoBlock and field_name == 'edx_video_id':
+        if is_video_block and field_name == 'edx_video_id':
             # Avoid overwriting edx_video_id between blocks
             continue
         new_upstream_value = getattr(upstream, field_name)
