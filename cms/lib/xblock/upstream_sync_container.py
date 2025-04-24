@@ -1,227 +1,28 @@
 """
-Synchronize content and settings from upstream containers to their downstream usages.
+Methods related to syncing a downstream XBlock with an upstream Container.
 
-* The upstream is a Container from a Learning Core-backed Content Library.
-* The downstream is a block of matching type in a SplitModuleStore-backed Course.
-* They are both on the same Open edX instance.
-
-HOWEVER, those assumptions may loosen in the future. So, we consider these to be INTERNAL ASSUMPIONS that should not be
-exposed through this module's public Python interface.
+See upstream_sync.py for general upstream sync code that applies even when the
+upstream is a container, not an XBlock.
 """
+from __future__ import annotations
 
-import logging
 import typing as t
-from dataclasses import asdict, dataclass
 
-from django.conf import settings
-from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
-from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryContainerLocator
-from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
-from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.xblock_storage_handlers.create_xblock import create_xblock
-from openedx.core.djangoapps.content_libraries.api import get_container_children
+from openedx.core.djangoapps.content_libraries import api as lib_api
+from .upstream_sync import UpstreamLink
 
-from .upstream_sync import (
-    BadUpstream,
-    BaseUpstreamLink,
-    BaseUpstreamSyncManager,
-    UpstreamLinkException,
-    check_and_parse_upstream_key,
-)
-
-logger = logging.getLogger(__name__)
+if t.TYPE_CHECKING:
+    from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
 
 
-@dataclass(frozen=True)
-class ContainerUpstreamLink(BaseUpstreamLink):
-    """
-    Metadata about some downstream content's relationship with its linked upstream content.
-    """
-
-    @property
-    def upstream_link(self) -> str | None:
-        """
-        Link to edit/view upstream block in library.
-        """
-        if self.version_available is None or self.upstream_ref is None:
-            return None
-        try:
-            container_key = LibraryContainerLocator.from_string(self.upstream_ref)
-        except InvalidKeyError:
-            return None
-        return _get_library_container_url(container_key)
-
-    def to_json(self) -> dict[str, t.Any]:
-        """
-        Get an JSON-API-friendly representation of this upstream link.
-        """
-        return {
-            **asdict(self),
-            "ready_to_sync": self.ready_to_sync,
-            "upstream_link": self.upstream_link,
-        }
-
-    @classmethod
-    def get_for_container(cls, downstream: XBlock) -> t.Self:
-        """
-        Get info on a container's relationship with its linked upstream content (without actually loading the content).
-
-        Currently, the only supported upstreams are LC-backed Library Components. This may change in the future (see
-        module docstring).
-
-        If link exists, is supported, and is followable, returns UpstreamLink.
-        Otherwise, raises an UpstreamLinkException.
-        """
-        upstream_key = check_and_parse_upstream_key(downstream.upstream, downstream.usage_key)
-        # We import this here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
-        from openedx.core.djangoapps.content_libraries.api import (
-            ContentLibraryContainerNotFound,  # pylint: disable=wrong-import-order
-            get_container,  # pylint: disable=wrong-import-order
-        )
-        if not isinstance(upstream_key, LibraryContainerLocator):
-            raise BadUpstream(_("Invalid upstream_key"))
-        try:
-            lib_meta = get_container(upstream_key)
-        except ContentLibraryContainerNotFound as exc:
-            raise BadUpstream(_("Linked library item was not found in the system")) from exc
-        return cls(
-            upstream_ref=downstream.upstream,
-            version_synced=downstream.upstream_version,
-            version_available=(lib_meta.published_version_num if lib_meta else None),
-            version_declined=downstream.upstream_version_declined,
-            error_message=None,
-        )
-
-    @classmethod
-    def try_get_for_container(cls, downstream: XBlock) -> t.Self:
-        """
-        Same as `get_for_container`, but upon failure, sets `.error_message` instead of raising an exception.
-        """
-        try:
-            return cls.get_for_container(downstream)
-        except UpstreamLinkException as exc:
-            logger.exception(
-                "Tried to inspect an unsupported, broken, or missing downstream->upstream link: '%s'->'%s'",
-                downstream.usage_key,
-                downstream.upstream,
-            )
-            return cls(
-                upstream_ref=downstream.upstream,
-                version_synced=downstream.upstream_version,
-                version_available=None,
-                version_declined=None,
-                error_message=str(exc),
-            )
-
-
-def _get_library_container_url(container_key: LibraryContainerLocator):
-    """
-    Gets authoring url for given library_key.
-    """
-    library_url = None
-    if mfe_base_url := settings.COURSE_AUTHORING_MICROFRONTEND_URL:  # type: ignore
-        library_key = container_key.context_key
-        library_url = f'{mfe_base_url}/library/{library_key}/units?container_key={container_key}'
-    return library_url
-
-
-class ContainerUpstreamSyncManager(BaseUpstreamSyncManager):
-    """
-    Manages sync process of downstream containers like unit with upstream containers.
-    """
-    def __init__(self, downstream: XBlock, user: User, upstream: XBlock | None = None) -> None:
-        super().__init__(downstream, user, upstream)
-        if not isinstance(self.upstream_key, LibraryContainerLocator):
-            raise BadUpstream('Invalid upstream key')
-        if not upstream:
-            self.link = ContainerUpstreamLink.get_for_container(downstream)
-            self.upstream = self._load_upstream_link_and_container_block()
-        self.syncable_field_names: set[str] = self._get_synchronizable_fields()
-        self.new_children_blocks: list[XBlock] = []
-
-    def _get_synchronizable_fields(self) -> set[str]:
-        """
-        The syncable fields are the ones which are content- or settings-scoped AND are defined on both (up,down)stream.
-        """
-        return set.intersection(*[
-            set(
-                field_name
-                for (field_name, field) in block.__class__.fields.items()
-                if field.scope in [Scope.settings, Scope.content]
-            )
-            for block in [self.upstream, self.downstream]
-        ])
-
-    def _load_upstream_link_and_container_block(self) -> XBlock:
-        """
-        Load the upstream metadata and content for a downstream block.
-
-        Assumes that the upstream content is an XBlock in an LC-backed content libraries. This assumption may need to be
-        relaxed in the future (see module docstring).
-
-        If `downstream` lacks a valid+supported upstream link, this raises an UpstreamLinkException.
-        """
-        # We import load_block here b/c UpstreamSyncMixin is used by cms/envs,
-        # which loads before the djangoapps are ready.
-        from openedx.core.djangoapps.xblock.api import (  # pylint: disable=wrong-import-order
-            CheckPerm,
-            LatestVersion,
-            load_block,
-        )
-        try:
-            lib_block: XBlock = load_block(
-                self.upstream_key,
-                self.user,
-                check_permission=CheckPerm.CAN_READ_AS_AUTHOR,
-                version=LatestVersion.PUBLISHED,
-            )
-        except (NotFound, PermissionDenied) as exc:
-            raise BadUpstream(_("Linked library item could not be loaded: {}").format(self.upstream_key)) from exc
-        return lib_block
-
-    def sync_new_children_blocks(self):
-        """
-        Creates children xblocks in course based on library container children.
-        """
-        for child in get_container_children(self.upstream_key, published=True):
-            child_block = create_xblock(
-                parent_locator=str(self.downstream.location),
-                user=self.user,
-                category=child.usage_key.block_type,
-                display_name=child.display_name,
-            )
-            child_block.upstream = str(child.usage_key)
-            self.new_children_blocks.append(child_block)
-        return self.new_children_blocks
-
-    def delete_extra_blocks(self):
-        """
-        Deletes extra child blocks under the container that are not present in new version of library container.
-        """
-        # TODO: Importing here to avoid circular imports, should be fixed later
-        from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import delete_item
-        current = self.downstream.children
-        latest = [str(child.usage_key) for child in get_container_children(self.upstream_key, published=True)]
-        for child in current:
-            # TODO: doesn't work for two reasons
-            # 1. child is not an XBlock but usage_key, so we need to load the child to get its upstream
-            # 2. Even if we get child, it won't have upstream set as we are not setting upstream for child components
-            #    See: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py:535
-            if child.upstream not in latest:
-                delete_item(self.user, child.usage_key)
-
-    def sync(self) -> None:
-        super().sync()
-        # self.delete_extra_blocks()
-        self.sync_new_children_blocks()
-
-
-def sync_from_upstream_container(downstream: XBlock, user: User) -> tuple[XBlock, list[XBlock]]:
+def sync_from_upstream_container(
+    downstream: XBlock,
+    user: User,
+) -> list[lib_api.LibraryXBlockMetadata | lib_api.ContainerMetadata]:
     """
     Update `downstream` with content+settings from the latest available version of its linked upstream content.
 
@@ -229,8 +30,110 @@ def sync_from_upstream_container(downstream: XBlock, user: User) -> tuple[XBlock
     Does not save `downstream` to the store. That is left up to the caller.
 
     If `downstream` lacks a valid+supported upstream link, this raises an UpstreamLinkException.
+
+    ⭐️ Does not directly sync static assets (containers don't have them) nor
+    children. Returns a list of the upstream children so the caller can do that.
+
+    Should children be handled in here? Maybe if sync_from_upstream_block
+    were updated to handle static assets and also save changes to modulestore.
     """
-    manager = ContainerUpstreamSyncManager(downstream, user)
-    manager.sync()
-    downstream.upstream_version = manager.link.version_available
-    return manager.upstream, manager.new_children_blocks
+    link = UpstreamLink.get_for_block(downstream)  # can raise UpstreamLinkException
+    if not isinstance(link.upstream_key, LibraryContainerLocator):
+        raise TypeError("sync_from_upstream_container() only supports Container upstreams, not containers")
+    lib_api.require_permission_for_library_key(  # TODO: should permissions be checked at this low level?
+        link.upstream_key.lib_key,
+        user,
+        permission=lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+    )
+    upstream_meta = lib_api.get_container(link.upstream_key, user)
+    upstream_children = lib_api.get_container_children(link.upstream_key, published=True)
+    _update_customizable_fields(upstream=upstream_meta, downstream=downstream, only_fetch=False)
+    _update_non_customizable_fields(upstream=upstream_meta, downstream=downstream)
+    _update_tags(upstream=upstream_meta, downstream=downstream)
+    downstream.upstream_version = link.version_available
+    return upstream_children
+
+
+def fetch_customizable_fields_from_container(*, downstream: XBlock, user: User) -> None:
+    """
+    Fetch upstream-defined value of customizable fields and save them on the downstream.
+
+    The container version only retrieves values from *published* containers.
+
+    Basically, this sets the value of "upstream_display_name" on the downstream block.
+    """
+    upstream = lib_api.get_container(LibraryContainerLocator.from_string(downstream.upstream), user)
+    _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
+
+
+def _update_customizable_fields(*, upstream: lib_api.ContainerMetadata, downstream: XBlock, only_fetch: bool) -> None:
+    """
+    For each customizable field:
+    * Save the upstream value to a hidden field on the downstream ("FETCH").
+    * If `not only_fetch`, and if the field *isn't* customized on the downstream, then:
+      * Update it the downstream field's value from the upstream field ("SYNC").
+
+    Concrete example: Imagine `lib_problem` is our upstream and `course_problem` is our downstream.
+
+     * Say that the customizable fields are [display_name, max_attempts].
+
+     * Set `course_problem.upstream_display_name = lib_problem.display_name` ("fetch").
+     * If `not only_fetch`, and `course_problem.display_name` wasn't customized, then:
+       * Set `course_problem.display_name = lib_problem.display_name` ("sync").
+    """
+    # For now, the only supported container "field" is display_name
+    syncable_field_names = ["display_name"]
+
+    for field_name, fetch_field_name in downstream.get_customizable_fields().items():
+
+        if field_name not in syncable_field_names:
+            continue
+
+        # Downstream-only fields don't have an upstream fetch field
+        if fetch_field_name is None:
+            continue
+
+        # FETCH the upstream's value and save it on the downstream (ie, `downstream.upstream_$FIELD`).
+        old_upstream_value = getattr(downstream, fetch_field_name)
+        new_upstream_value = getattr(upstream, f"published_{field_name}")
+        setattr(downstream, fetch_field_name, new_upstream_value)
+
+        if only_fetch:
+            continue
+
+        # Okay, now for the nuanced part...
+        # We need to update the downstream field *iff it has not been customized**.
+        # Determining whether a field has been customized will differ in Beta vs Future release.
+        # (See "PRESERVING DOWNSTREAM CUSTOMIZATIONS" comment below for details.)
+
+        ## FUTURE BEHAVIOR: field is "customized" iff we have noticed that the user edited it.
+        #  if field_name in downstream.downstream_customized:
+        #      continue
+
+        ## BETA BEHAVIOR: field is "customized" iff we have the prev upstream value, but field doesn't match it.
+        downstream_value = getattr(downstream, field_name)
+        if old_upstream_value and downstream_value != old_upstream_value:
+            continue  # Field has been customized. Don't touch it. Move on.
+
+        # Field isn't customized -- SYNC it!
+        setattr(downstream, field_name, new_upstream_value)
+
+
+def _update_non_customizable_fields(*, upstream: lib_api.ContainerMetadata, downstream: XBlock) -> None:
+    """
+    For each field `downstream.blah` that isn't customizable: set it to `upstream.blah`.
+    """
+    pass
+
+
+def _update_tags(*, upstream: XBlock, downstream: XBlock) -> None:
+    """
+    Update tags from `upstream` to `downstream`
+    """
+    from openedx.core.djangoapps.content_tagging.api import copy_tags_as_read_only
+    # For any block synced with an upstream, copy the tags as read_only
+    # This keeps tags added locally.
+    copy_tags_as_read_only(
+        str(upstream.location),
+        str(downstream.location),
+    )

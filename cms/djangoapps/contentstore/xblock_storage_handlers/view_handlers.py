@@ -33,9 +33,11 @@ from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
+from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
-from cms.lib.xblock.upstream_sync import BadUpstream, check_and_parse_upstream_key, sync_from_upstream
+from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
+from cms.lib.xblock.upstream_sync_block import sync_from_upstream_block
 from cms.lib.xblock.upstream_sync_container import sync_from_upstream_container
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
@@ -524,23 +526,24 @@ def create_item(request):
     return _create_block(request)
 
 
-def sync_library_content(downstream: XBlock, request, store, remove_upstream_link: bool = False):
+def sync_library_content(downstream: XBlock, request, store, remove_upstream_link: bool = False) -> StaticFileNotices:
     """
     Handle syncing library content for given xblock depending on its upstream type.
     It can sync unit containers and lower level xblocks.
     """
-    upstream_key = check_and_parse_upstream_key(downstream.upstream, downstream.usage_key)
+    link = UpstreamLink.get_for_block(downstream)
+    upstream_key = link.upstream_key
     if isinstance(upstream_key, LibraryUsageLocatorV2):
-        lib_block = sync_from_upstream(downstream=downstream, user=request.user)
+        lib_block = sync_from_upstream_block(downstream=downstream, user=request.user)
         if remove_upstream_link:
             # Removing upstream link from child components
             downstream.upstream = None
         static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
         store.update_item(downstream, request.user.id)
     else:
-        with store.bulk_operations(downstream.location.context_key):
-            lib_block, children_blocks = sync_from_upstream_container(downstream=downstream, user=request.user)
-            notices = [import_static_assets_for_library_sync(downstream, lib_block, request)]
+        with store.bulk_operations(downstream.usage_key.context_key):
+            children_blocks = sync_from_upstream_container(downstream=downstream, user=request.user)
+            notices = []
             children_blocks_usage_keys = []
             for child_block in children_blocks:
                 notices.append(sync_library_content(child_block, request, store, remove_upstream_link=True))
