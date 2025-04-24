@@ -6,7 +6,6 @@ These methods don't enforce permissions (only the REST APIs do).
 from __future__ import annotations
 import logging
 import mimetypes
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 from uuid import uuid4
@@ -66,7 +65,6 @@ from .containers import (
 )
 from .libraries import (
     library_collection_locator,
-    library_component_usage_key,
     PublishableItem,
 )
 
@@ -96,6 +94,7 @@ __all__ = [
     "delete_library_block_static_asset_file",
     "publish_component_changes",
 ]
+
 
 def get_library_components(
     library_key: LibraryLocatorV2,
