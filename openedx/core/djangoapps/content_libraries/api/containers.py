@@ -34,7 +34,8 @@ from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
-from .libraries import LibraryXBlockMetadata, PublishableItem, library_component_usage_key
+from .libraries import PublishableItem, library_component_usage_key
+from .block_metadata import LibraryXBlockMetadata
 
 # The public API is only the following symbols:
 __all__ = [
