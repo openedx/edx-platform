@@ -39,7 +39,7 @@ from .serializers import (
     UserNotificationPreferenceUpdateAllSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
-from .utils import get_is_new_notification_view_enabled, get_show_notifications_tray, aggregate_notification_configs, \
+from .utils import get_show_notifications_tray, aggregate_notification_configs, \
     filter_out_visible_preferences_by_course_ids
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
@@ -338,7 +338,6 @@ class NotificationCountView(APIView):
         )
         count_total = 0
         show_notifications_tray = get_show_notifications_tray(self.request.user)
-        is_new_notification_view_enabled = get_is_new_notification_view_enabled()
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS
@@ -355,7 +354,6 @@ class NotificationCountView(APIView):
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
             "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY,
-            "is_new_notification_view_enabled": is_new_notification_view_enabled
         })
 
 
