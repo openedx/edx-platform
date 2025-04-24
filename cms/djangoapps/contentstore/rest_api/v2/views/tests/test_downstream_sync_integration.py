@@ -6,11 +6,9 @@ from typing import Any
 from xml.etree import ElementTree
 
 import ddt
-from opaque_keys.edx.locator import LibraryContainerLocator
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 
 
@@ -43,6 +41,12 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             self.upstream_html1["id"],
             '<html display_name="Text Content">This is the HTML.</html>'
         )
+        self.upstream_unit = self._create_container(lib_id, "unit", slug="u1", display_name="Unit 1 Title")
+        self._add_container_components(self.upstream_unit["id"], [
+            self.upstream_html1["id"],
+            self.upstream_problem1["id"],
+            self.upstream_problem2["id"],
+        ])
         self._commit_library_changes(lib_id)  # publish everything
 
         # The destination course:
@@ -102,7 +106,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         tags="[]"
         use_latex_compiler="false"
     """
-    
+
     ####################################################################################################################
 
     def test_problem_sync(self):
@@ -201,3 +205,26 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 {self.standard_capa_attributes}
             >multiple choice v2...</problem>
         """)
+
+    def test_unit_sync(self):
+        """
+        Test that we can sync a unit from the library into the course
+        """
+        # Create a "vertical" block based on a "unit" container:
+        downstream_unit = self._create_block_from_upstream(
+            block_category="vertical",
+            parent_usage_key=str(self.course_subsection.usage_key),
+            upstream_key=self.upstream_unit["id"],
+        )
+        status = self._get_sync_status(downstream_unit["locator"])
+        self.assertDictContainsEntries(status, {
+            'upstream_ref': self.upstream_unit["id"],  # e.g. 'lct:CL-TEST:testlib:unit:u1'
+            'version_available': 2,
+            'version_synced': 2,
+            'version_declined': None,
+            'ready_to_sync': False,
+            'error_message': None,
+            'upstream_link': 'http://course-authoring-mfe/library/lib:CL-TEST:testlib/units'
+        })
+        assert status["upstream_link"].startswith("http://course-authoring-mfe/library/")
+        assert status["upstream_link"].endswith(f"/units/{self.upstream_unit['id']}")

@@ -10,6 +10,7 @@ Along with it, we moved the business logic of the other views in that file, sinc
 """
 import logging
 from datetime import datetime
+from uuid import uuid4
 
 from attrs import asdict
 from django.conf import settings
@@ -19,6 +20,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
+from openedx.core.djangoapps.content_libraries.api import LibraryXBlockMetadata
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from edx_proctoring.api import (
     does_backend_support_onboarding,
@@ -526,7 +528,7 @@ def create_item(request):
     return _create_block(request)
 
 
-def sync_library_content(downstream: XBlock, request, store, remove_upstream_link: bool = False) -> StaticFileNotices:
+def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotices:
     """
     Handle syncing library content for given xblock depending on its upstream type.
     It can sync unit containers and lower level xblocks.
@@ -535,20 +537,46 @@ def sync_library_content(downstream: XBlock, request, store, remove_upstream_lin
     upstream_key = link.upstream_key
     if isinstance(upstream_key, LibraryUsageLocatorV2):
         lib_block = sync_from_upstream_block(downstream=downstream, user=request.user)
-        if remove_upstream_link:
-            # Removing upstream link from child components
-            downstream.upstream = None
         static_file_notices = import_static_assets_for_library_sync(downstream, lib_block, request)
         store.update_item(downstream, request.user.id)
     else:
         with store.bulk_operations(downstream.usage_key.context_key):
-            children_blocks = sync_from_upstream_container(downstream=downstream, user=request.user)
+            upstream_children = sync_from_upstream_container(downstream=downstream, user=request.user)
+            downstream_children = downstream.get_children()
+            # For now in this BETA version of syncing, we do really dumb 1:1 child matching
+            # that will blow away any changes if the downstream container has had blocks added,
+            # re-ordered, or deleted.
+            # In the future, we need to do something more sophisticated.
+
+            # Delete any "extra" children in the downstream
+            while len(downstream_children) > len(upstream_children):
+                del downstream_children[-1]
+            # Sync the children:
             notices = []
-            children_blocks_usage_keys = []
-            for child_block in children_blocks:
-                notices.append(sync_library_content(child_block, request, store, remove_upstream_link=True))
-                children_blocks_usage_keys.append(child_block.usage_key)
-            downstream.children = children_blocks_usage_keys
+            for i in range(len(upstream_children)):
+                upstream_child = upstream_children[i]
+                assert isinstance(upstream_child, LibraryXBlockMetadata)  # for now we only support units
+                downstream_child = downstream_children[i] if i < len(downstream_children) else None
+
+                if downstream_child and downstream_child.upstream != upstream_child.usage_key:
+                    # This downstream block was added, or re-ordered, or no longer aligns with an upstream block.
+                    store.delete_item(downstream_child.usage_key, user_id=request.user.id)
+                    downstream_child = None
+
+                if not downstream_child:
+                    downstream_child = store.create_child(
+                        parent_usage_key=downstream.usage_key,
+                        position=i,
+                        user_id=request.user.id,
+                        block_type=upstream_child.usage_key.block_type,
+                        # TODO: Can we generate a unique but friendly block_id, perhaps using upstream block_id
+                        block_id=f"{upstream_child.usage_key.block_type}{uuid4().hex[:8]}",
+                        fields={
+                            "upstream": str(upstream_child.usage_key),
+                        },
+                    )
+                result = sync_library_content(downstream=downstream_child, request=request, store=store)
+                notices.append(result)
             store.update_item(downstream, request.user.id)
         static_file_notices = concat_static_file_notices(notices)
     return static_file_notices

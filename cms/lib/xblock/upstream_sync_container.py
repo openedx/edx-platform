@@ -126,7 +126,7 @@ def _update_non_customizable_fields(*, upstream: lib_api.ContainerMetadata, down
     # For now, there's nothing to do here - containers don't have any non-customizable fields.
 
 
-def _update_tags(*, upstream: XBlock, downstream: XBlock) -> None:
+def _update_tags(*, upstream: lib_api.ContainerMetadata, downstream: XBlock) -> None:
     """
     Update tags from `upstream` to `downstream`
     """
@@ -134,6 +134,6 @@ def _update_tags(*, upstream: XBlock, downstream: XBlock) -> None:
     # For any block synced with an upstream, copy the tags as read_only
     # This keeps tags added locally.
     copy_tags_as_read_only(
-        str(upstream.location),
-        str(downstream.location),
+        str(upstream.container_key),
+        str(downstream.usage_key),
     )
