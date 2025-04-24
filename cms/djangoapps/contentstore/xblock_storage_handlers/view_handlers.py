@@ -821,11 +821,11 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
 
 
 @login_required
-def delete_item(user, usage_key):
+def delete_item(request, usage_key):
     """
     Exposes internal helper method without breaking existing bindings/dependencies
     """
-    _delete_item(usage_key, user)
+    _delete_item(usage_key, request.user)
 
 
 def _delete_item(usage_key, user):
