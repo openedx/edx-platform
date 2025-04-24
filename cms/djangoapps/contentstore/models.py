@@ -181,7 +181,7 @@ class EntityLinkBase(models.Model):
 class ComponentLink(EntityLinkBase):
     """
     This represents link between any two publishable entities or link between publishable entity and a course
-    xblock. It helps in tracking relationship between xblocks imported from libraries and used in different courses.
+    XBlock. It helps in tracking relationship between XBlocks imported from libraries and used in different courses.
     """
     upstream_block = models.ForeignKey(
         Component,
