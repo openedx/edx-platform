@@ -649,3 +649,22 @@ def enable_course_optimizer(course_id):
     Returns a boolean if course optimizer is enabled on the course
     """
     return ENABLE_COURSE_OPTIMIZER.is_enabled(course_id)
+
+
+# .. toggle_name: legacy_studio.announcements
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Temporarily allow access to the deprecated Studio Maintenance Announcements page
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed, along with the legacy page.
+LEGACY_STUDIO_ANNOUNCEMENTS = WaffleFlag('legacy_studio.announcements', __name__)
+
+
+def use_legacy_announcements():
+    """
+    Returns whether the old Announcements page on the deprecated Maintenance dashboard should be available.
+    """
+    return LEGACY_STUDIO_ANNOUNCEMENTS.is_enabled()
