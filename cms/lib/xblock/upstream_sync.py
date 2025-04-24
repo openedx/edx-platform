@@ -136,9 +136,9 @@ class UpstreamLink:
                     downstream.upstream,
                 )
             return cls(
-                upstream_ref=downstream.upstream,
+                upstream_ref=getattr(downstream, "upstream", ""),
                 upstream_key=None,
-                version_synced=downstream.upstream_version,
+                version_synced=getattr(downstream, "upstream_version", None),
                 version_available=None,
                 version_declined=None,
                 error_message=str(exc),
@@ -160,6 +160,8 @@ class UpstreamLink:
         # We import this here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
         from openedx.core.djangoapps.content_libraries import api as lib_api
 
+        if not isinstance(downstream, UpstreamSyncMixin):
+            raise BadDownstream(_("Downstream is not an XBlock or is missing required UpstreamSyncMixin"))
         if not downstream.upstream:
             raise NoUpstream()
         if not isinstance(downstream.usage_key.context_key, CourseKey):
