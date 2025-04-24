@@ -351,17 +351,17 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
         """)
 
         #   Now, add and delete a component
-        self.upstream_problem3 = self._add_block_to_library(
+        upstream_problem3 = self._add_block_to_library(
             self.library["id"],
             "problem",
             "prob3",
             can_stand_alone=True
         )
         self._set_library_block_olx(
-            self.upstream_problem3["id"],
+            upstream_problem3["id"],
             '<problem display_name="Problem 3 Display Name" max_attempts="22">single select...</problem>'
         )
-        self._add_container_components(self.upstream_unit["id"], [self.upstream_problem3["id"]])
+        self._add_container_components(self.upstream_unit["id"], [upstream_problem3["id"]])
         self._remove_container_components(self.upstream_unit["id"], [self.upstream_problem2["id"]])
         self._commit_library_changes(self.library["id"])  # publish everything
 
@@ -407,7 +407,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     upstream_display_name="Problem 3 Display Name"
                     markdown="null"
                     {self.standard_capa_attributes}
-                    upstream="{self.upstream_problem3['id']}"
+                    upstream="{upstream_problem3['id']}"
                     upstream_version="2"
                 >single select...</problem>
             </vertical>
@@ -415,7 +415,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
 
         #   Now, reorder components
         self._patch_container_components(self.upstream_unit["id"], [
-            self.upstream_problem3["id"],
+            upstream_problem3["id"],
             self.upstream_problem1["id"],
             self.upstream_html1["id"],
         ])
@@ -437,7 +437,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                     upstream_display_name="Problem 3 Display Name"
                     markdown="null"
                     {self.standard_capa_attributes}
-                    upstream="{self.upstream_problem3['id']}"
+                    upstream="{upstream_problem3['id']}"
                     upstream_version="2"
                 >single select...</problem>
                 <!-- 🟢 the problem 1 has been moved to middle: -->
