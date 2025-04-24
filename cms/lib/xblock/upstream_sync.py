@@ -120,18 +120,21 @@ class UpstreamLink:
         return data
 
     @classmethod
-    def try_get_for_block(cls, downstream: XBlock) -> t.Self:
+    def try_get_for_block(cls, downstream: XBlock, log_error: bool = True) -> t.Self:
         """
         Same as `get_for_block`, but upon failure, sets `.error_message` instead of raising an exception.
         """
         try:
             return cls.get_for_block(downstream)
         except UpstreamLinkException as exc:
-            logger.exception(
-                "Tried to inspect an unsupported, broken, or missing downstream->upstream link: '%s'->'%s'",
-                downstream.usage_key,
-                downstream.upstream,
-            )
+            # Note: if we expect that an upstream may not be set at all (i.e. we're just inspecting a random
+            # unit that may be a regular course unit), we don't want to log this, so set log_error=False then.
+            if log_error:
+                logger.exception(
+                    "Tried to inspect an unsupported, broken, or missing downstream->upstream link: '%s'->'%s'",
+                    downstream.usage_key,
+                    downstream.upstream,
+                )
             return cls(
                 upstream_ref=downstream.upstream,
                 upstream_key=None,

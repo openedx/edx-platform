@@ -25,7 +25,7 @@ messages = xblock.validate().to_json()
 has_not_configured_message = messages.get('summary',{}).get('type', None) == 'not-configured'
 block_is_unit = is_unit(xblock)
 
-upstream_info = UpstreamLink.try_get_for_block(xblock)
+upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False)
 %>
 
 <%namespace name='static' file='static_content.html'/>
