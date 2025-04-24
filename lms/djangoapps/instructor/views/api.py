@@ -2259,26 +2259,31 @@ def rescore_entrance_exam(request, course_id):
     return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EMAIL)
-def list_background_email_tasks(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListBackgroundEmailTasks(DeveloperErrorViewMixin, APIView):
     """
     List background email tasks.
     """
-    course_id = CourseKey.from_string(course_id)
-    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
-    # Specifying for the history of a single task type
-    tasks = task_api.get_instructor_task_history(
-        course_id,
-        task_type=task_type
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EMAIL
 
-    response_payload = {
-        'tasks': list(map(extract_task_features, tasks)),
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        List background email tasks.
+        """
+        course_id = CourseKey.from_string(course_id)
+        task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
+        # Specifying for the history of a single task type
+        tasks = task_api.get_instructor_task_history(
+            course_id,
+            task_type=task_type
+        )
+
+        response_payload = {
+            'tasks': list(map(extract_task_features, tasks)),
+        }
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
