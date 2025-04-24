@@ -73,6 +73,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
     def _get_course_block_children(self, usage_key: str) -> list[str]:
         """ Get the IDs of the child XBlocks of the given XBlock """
         # TODO: is there really no REST API to get the children of an XBlock in Studio?
+        # Maybe this one: /api/contentstore/v1/container/vertical/{usage_key_string}/children
         return [str(k) for k in modulestore().get_item(UsageKey.from_string(usage_key), depth=0).children]
 
     def _create_block_from_upstream(
