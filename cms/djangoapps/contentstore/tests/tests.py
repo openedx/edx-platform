@@ -176,6 +176,7 @@ class AuthTestCase(ContentStoreTestCase):
         (True, 'assertContains'),
         (False, 'assertNotContains'))
     @unpack
+    @override_waffle_flag(toggles.LEGACY_STUDIO_LOGGED_OUT_HOME, True)
     def test_signin_and_signup_buttons_index_page(self, allow_account_creation, assertion_method_name):
         """
         Navigate to the home page and check the Sign Up button is hidden when ALLOW_PUBLIC_ACCOUNT_CREATION flag
