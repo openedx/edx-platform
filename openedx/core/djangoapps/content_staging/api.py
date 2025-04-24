@@ -53,17 +53,19 @@ def _save_xblock_to_staged_content(
 
     expired_ids = []
     with transaction.atomic():
-        # Mark all of the user's existing StagedContent rows as EXPIRED
-        to_expire = _StagedContent.objects.filter(
-            user_id=user_id,
-            purpose=purpose,
-        ).exclude(
-            status=StagedContentStatus.EXPIRED,
-        )
-        for sc in to_expire:
-            expired_ids.append(sc.id)
-            sc.status = StagedContentStatus.EXPIRED
-            sc.save()
+        if purpose == CLIPBOARD_PURPOSE:
+            # Mark all of the user's existing StagedContent rows as EXPIRED
+            to_expire = _StagedContent.objects.filter(
+                user_id=user_id,
+                purpose=purpose,
+            ).exclude(
+                status=StagedContentStatus.EXPIRED,
+            )
+            for sc in to_expire:
+                expired_ids.append(sc.id)
+                sc.status = StagedContentStatus.EXPIRED
+                sc.save()
+
         # Insert a new StagedContent row for this
         staged_content = _StagedContent.objects.create(
             user_id=user_id,
@@ -110,17 +112,17 @@ def _save_static_assets_to_staged_content(
         )
         # Compute the MD5 hash and get the content:
         content: bytes | None = f.data
-        md5_hash = ""  # Unknown
         if content:
-            md5_hash = hashlib.md5(content).hexdigest()
             # This asset came from the XBlock's filesystem, e.g. a video block's transcript file
             source_key = usage_key
         # Check if the asset file exists. It can be absent if an XBlock contains an invalid link.
         elif source_key and (sc := contentstore().find(source_key, throw_on_not_found=False)):
-            md5_hash = sc.content_digest
             content = sc.data
-        else:
+            # Note that sc.content_digest has an md5_hash but it's sometimes NULL so we just compute it ourselves.
+        if not content:
             continue  # Skip this file - we don't need a reference to a non-existent file.
+        # Compute the md5 hash
+        md5_hash = hashlib.md5(content).hexdigest()
 
         # Because we store clipboard files on S3, uploading really large files will be too slow. And it's wasted if
         # the copy-paste is just happening within a single course. So for files > 10MB, users must copy the files

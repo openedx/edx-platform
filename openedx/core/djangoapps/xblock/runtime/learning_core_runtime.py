@@ -311,6 +311,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                     "block.xml": content.id,
                 },
                 created=now,
+                created_by=self.user.id if self.user else None
             )
         self.authored_data_store.mark_unchanged(block)
 

@@ -102,10 +102,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             )
 
             # Add the problem block to the collection
-            library_api.update_library_collection_components(
+            library_api.update_library_collection_items(
                 cls.library.key,
                 collection_key="TOY_COLLECTION",
-                usage_keys=[
+                opaque_keys=[
                     cls.library_block.usage_key,
                 ]
             )
@@ -534,6 +534,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
+            "last_published": None,
             "tags": {
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Normal"]
@@ -552,7 +553,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 [self.library_block.usage_key],
                 user_id=None,
             )
-        library_api.publish_changes(self.library.key)
+            library_api.publish_changes(self.library.key)
 
         doc = searchable_doc_for_container(self.container.container_key)
         doc.update(searchable_doc_tags(self.container.container_key))
@@ -573,11 +574,15 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
+            "last_published": 1680674828.0,
             "tags": {
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Normal"]
             },
-            "published": {"num_children": 1},
+            "published": {
+                "num_children": 1,
+                "display_name": "A Unit in the Search Index",
+            },
         }
 
     def test_published_container_with_changes(self):
@@ -589,7 +594,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             [self.library_block.usage_key],
             user_id=None,
         )
-        library_api.publish_changes(self.library.key)
+        with freeze_time(self.container.created):
+            library_api.publish_changes(self.library.key)
         block_2 = library_api.create_library_block(
             self.library.key,
             "html",
@@ -624,11 +630,15 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "breadcrumbs": [{"display_name": "some content_library"}],
             "created": 1680674828.0,
             "modified": 1680674828.0,
+            "last_published": 1680674828.0,
             "tags": {
                 "taxonomy": ["Difficulty"],
                 "level0": ["Difficulty > Normal"]
             },
-            "published": {"num_children": 1},
+            "published": {
+                "num_children": 1,
+                "display_name": "A Unit in the Search Index",
+            },
         }
 
     def test_mathjax_plain_text_conversion_for_search(self):

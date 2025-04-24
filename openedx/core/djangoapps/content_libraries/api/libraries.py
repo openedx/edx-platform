@@ -721,14 +721,14 @@ def publish_changes(library_key: LibraryLocatorV2, user_id: int | None = None):
     )
 
 
-def revert_changes(library_key: LibraryLocatorV2) -> None:
+def revert_changes(library_key: LibraryLocatorV2, user_id: int | None = None) -> None:
     """
     Revert all pending changes to the specified library, restoring it to the
     last published version.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
     assert learning_package is not None  # shouldn't happen but it's technically possible.
-    authoring_api.reset_drafts_to_published(learning_package.id)
+    authoring_api.reset_drafts_to_published(learning_package.id, reset_by=user_id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(

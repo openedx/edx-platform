@@ -8,7 +8,7 @@ from hashlib import blake2b
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
-from opaque_keys.edx.keys import LearningContextKey, UsageKey, OpaqueKey
+from opaque_keys.edx.keys import ContainerKey, LearningContextKey, UsageKey, OpaqueKey
 from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
@@ -309,7 +309,7 @@ def _tags_for_content_object(object_id: OpaqueKey) -> dict:
     return {Fields.tags: result}
 
 
-def _collections_for_content_object(object_id: UsageKey | LearningContextKey) -> dict:
+def _collections_for_content_object(object_id: OpaqueKey) -> dict:
     """
     Given an XBlock, course, library, etc., get the collections for its index doc.
 
@@ -340,13 +340,23 @@ def _collections_for_content_object(object_id: UsageKey | LearningContextKey) ->
     # Gather the collections associated with this object
     collections = None
     try:
-        component = lib_api.get_component_from_usage_key(object_id)
-        collections = authoring_api.get_entity_collections(
-            component.learning_package_id,
-            component.key,
-        )
+        if isinstance(object_id, UsageKey):
+            component = lib_api.get_component_from_usage_key(object_id)
+            collections = authoring_api.get_entity_collections(
+                component.learning_package_id,
+                component.key,
+            )
+        elif isinstance(object_id, LibraryContainerLocator):
+            container = lib_api.get_container_from_key(object_id)
+            collections = authoring_api.get_entity_collections(
+                container.publishable_entity.learning_package_id,
+                container.key,
+            )
+        else:
+            log.warning(f"Unexpected key type for {object_id}")
+
     except ObjectDoesNotExist:
-        log.warning(f"No component found for {object_id}")
+        log.warning(f"No library item found for {object_id}")
 
     if not collections:
         return result
@@ -438,13 +448,13 @@ def searchable_doc_tags(key: OpaqueKey) -> dict:
     return doc
 
 
-def searchable_doc_collections(usage_key: UsageKey) -> dict:
+def searchable_doc_collections(opaque_key: OpaqueKey) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
     like Meilisearch or Elasticsearch, with the collections data for the given content object.
     """
-    doc = searchable_doc_for_key(usage_key)
-    doc.update(_collections_for_content_object(usage_key))
+    doc = searchable_doc_for_key(opaque_key)
+    doc.update(_collections_for_content_object(opaque_key))
 
     return doc
 
@@ -513,7 +523,7 @@ def searchable_doc_for_collection(
         ).count()
 
         doc.update({
-            Fields.context_key: str(collection_key.library_key),
+            Fields.context_key: str(collection_key.context_key),
             Fields.org: str(collection_key.org),
             Fields.usage_key: str(collection_key),
             Fields.block_id: collection.key,
@@ -526,7 +536,7 @@ def searchable_doc_for_collection(
             Fields.published: {
                 Fields.published_num_children: published_num_children,
             },
-            Fields.access_id: _meili_access_id_from_context_key(collection_key.library_key),
+            Fields.access_id: _meili_access_id_from_context_key(collection_key.context_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })
 
@@ -539,7 +549,7 @@ def searchable_doc_for_collection(
 
 
 def searchable_doc_for_container(
-    container_key: LibraryContainerLocator,
+    container_key: ContainerKey,
 ) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
@@ -552,7 +562,7 @@ def searchable_doc_for_container(
     """
     doc = {
         Fields.id: meili_id_from_opaque_key(container_key),
-        Fields.context_key: str(container_key.library_key),
+        Fields.context_key: str(container_key.context_key),
         Fields.org: str(container_key.org),
         # In the future, this may be either course_container or library_container
         Fields.type: DocType.library_container,
@@ -560,8 +570,9 @@ def searchable_doc_for_container(
         Fields.block_type: container_key.container_type,
         Fields.usage_key: str(container_key),  # Field name isn't exact but this is the closest match
         Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
-        Fields.access_id: _meili_access_id_from_context_key(container_key.library_key),
+        Fields.access_id: _meili_access_id_from_context_key(container_key.context_key),
         Fields.publish_status: PublishStatus.never,
+        Fields.last_published: None,
     }
 
     try:
@@ -583,16 +594,17 @@ def searchable_doc_for_container(
         Fields.modified: container.modified.timestamp(),
         Fields.num_children: draft_num_children,
         Fields.publish_status: publish_status,
+        Fields.last_published: container.last_published.timestamp() if container.last_published else None,
     })
-    library = lib_api.get_library(container_key.library_key)
+    library = lib_api.get_library(container_key.context_key)
     if library:
         doc[Fields.breadcrumbs] = [{"display_name": library.title}]
 
     if container.published_version_num is not None:
         published_num_children = lib_api.get_container_children_count(container_key, published=True)
         doc[Fields.published] = {
-            # Fields.published_display_name: container_published.title, TODO: set the published title
             Fields.published_num_children: published_num_children,
+            Fields.published_display_name: container.published_display_name,
         }
 
     return doc

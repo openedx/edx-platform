@@ -1667,6 +1667,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
     'cms.djangoapps.export_course_metadata.apps.ExportCourseMetadataConfig',
+    'cms.djangoapps.import_from_modulestore.apps.ImportFromModulestoreConfig',
 
     # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
@@ -1862,6 +1863,8 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
     "openedx_learning.apps.authoring.units",
+    "openedx_learning.apps.authoring.subsections",
+    "openedx_learning.apps.authoring.sections",
 ]
 
 
@@ -2909,6 +2912,7 @@ LIBRARY_ENABLED_BLOCKS = [
     'video',
     'html',
     'drag-and-drop-v2',
+    'openassessment',
     'conditional',
     'done',
     'freetextresponse',
