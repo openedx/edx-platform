@@ -49,7 +49,7 @@ def evaluate_entrance_exam(course_grade, user):
     fulfilled for the user.
     """
     course = course_grade.course_data.course
-    if are_entrance_exams_enabled() and getattr(course, 'entrance_exam_enabled', False):
+    if ENTRANCE_EXAMS.is_enabled() and getattr(course, 'entrance_exam_enabled', False):
         if get_entrance_exam_content(user, course):
             exam_chapter_key = get_entrance_exam_usage_key(course)
             exam_score = get_entrance_exam_score(course_grade, exam_chapter_key)
