@@ -45,7 +45,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # Entrance Exams: Chapter module positioning
         child_position = None
-        if ENTRANCE_EXAMS.is_enabled():
+        if are_entrance_exams_enabled():
             if category == 'chapter' and is_entrance_exam:
                 fields['is_entrance_exam'] = is_entrance_exam
                 fields['in_entrance_exam'] = True  # Inherited metadata, all children will have it
@@ -69,7 +69,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         )
 
         # Entrance Exams: Grader assignment
-        if ENTRANCE_EXAMS.is_enabled():
+        if are_entrance_exams_enabled():
             course_key = usage_key.course_key
             course = store.get_course(course_key)
             if hasattr(course, 'entrance_exam_enabled') and course.entrance_exam_enabled:

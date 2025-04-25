@@ -109,7 +109,7 @@ def _filter_entrance_exam_grader(graders):
     views/controls like the 'Grade as' dropdown that allows a course author to select
     the grader type for a given section of a course
     """
-    if ENTRANCE_EXAMS.is_enabled():
+    if are_entrance_exams_enabled():
         graders = [
             grader for grader in graders if grader.get("type") != "Entrance Exam"
         ]
