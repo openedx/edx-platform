@@ -1448,7 +1448,7 @@ class EntranceExamConfiguration(models.Model):
         Return True if given user can skip entrance exam for given course otherwise False.
         """
         can_skip = False
-        if ENTRANCE_EXAMS.is_enabled():
+        if are_entrance_exams_enabled():
             try:
                 record = EntranceExamConfiguration.objects.get(user=user, course_id=course_key)
                 can_skip = record.skip_entrance_exam
