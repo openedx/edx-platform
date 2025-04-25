@@ -62,7 +62,7 @@ from openedx.core.djangoapps.signals.signals import USER_ACCOUNT_ACTIVATED
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
-from openedx.core.toggles import ENTRANCE_EXAMS
+from openedx.core.toggles import are_entrance_exams_enabled
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
