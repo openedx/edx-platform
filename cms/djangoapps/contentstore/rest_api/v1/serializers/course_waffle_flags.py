@@ -156,7 +156,7 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
 
     def get_use_react_markdown_editor(self, obj):
         """
-        Method to get the use_react_markdown_editor waffle flag
+        Method to get the use_react_markdown_editor switch
         """
         course_key = self.get_course_key()
         return toggles.use_react_markdown_editor(course_key)

@@ -33,7 +33,7 @@ class CourseWaffleFlagsViewTest(CourseTestCase):
         'use_new_unit_page': True,
         'use_new_updates_page': True,
         'use_new_video_uploads_page': False,
-        'use_react_markdown_editor': False,
+        'use_react_markdown_editor': True,
     }
 
     def setUp(self):
