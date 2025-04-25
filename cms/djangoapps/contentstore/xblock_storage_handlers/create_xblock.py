@@ -9,7 +9,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from openedx.core.toggles import ENTRANCE_EXAMS
+from openedx.core.toggles import are_entrance_exams_enabled
 
 from .xblock_helpers import usage_key_with_run
 from ..helpers import GRADER_TYPES, remove_entrance_exam_graders
