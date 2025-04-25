@@ -2,7 +2,7 @@
 Feature toggles used across the platform. Toggles should only be added to this module if we don't have a better place
 for them. Generally speaking, they should be added to the most appropriate app or repo.
 """
-from edx_toggles.toggles import SettingDictToggle
+from edx_toggles.toggles import SettingDictToggle, WaffleFlag
 
 # .. toggle_name: FEATURES['ENTRANCE_EXAMS']
 # .. toggle_implementation: SettingDictToggle
