@@ -235,17 +235,7 @@ class ComponentLink(EntityLinkBase):
             new_values['upstream_block'] = upstream_block
         try:
             link = cls.objects.get(downstream_usage_key=downstream_usage_key)
-            # TODO: until we save modified datetime for course xblocks in index, the modified time for links are updated
-            # everytime a downstream/course block is updated.
-            # Hardcoding has_changes = True makes sure that the link modified time is updated whenever downstream block
-            # is updated and this allows us to sort upstream links in course libraries page by recently modified
-            # downstream blocks: [1].
-            # pylint: disable=line-too-long
-            # 1. https://github.com/open-craft/frontend-app-course-authoring/blob/0443d88824095f6f65a3a64b77244af590d4edff/src/course-libraries/ReviewTabContent.tsx#L222-L233
-            # Ideally, in the future, whenever you modify a downstream XBlock, the code will change the ComponentLink
-            # "last modified at" time only if something relevant to the upstream sync was modified, like the upstream
-            # source was changed, or the sync was dismissed (skip the update for this particular version) or accepted.
-            has_changes = True  # change to false once we save modified time in course xblocks
+            has_changes = False
             for key, new_value in new_values.items():
                 prev_value = getattr(link, key)
                 if prev_value != new_value:
@@ -320,17 +310,7 @@ class ContainerLink(EntityLinkBase):
             new_values['upstream_container'] = upstream_container
         try:
             link = cls.objects.get(downstream_usage_key=downstream_usage_key)
-            # TODO: until we save modified datetime for course xblocks in index, the modified time for links are updated
-            # everytime a downstream/course block is updated.
-            # Hardcoding has_changes = True makes sure that the link modified time is updated whenever downstream block
-            # is updated and this allows us to sort upstream links in course libraries page by recently modified
-            # downstream blocks: [1].
-            # pylint: disable=line-too-long
-            # 1. https://github.com/open-craft/frontend-app-course-authoring/blob/0443d88824095f6f65a3a64b77244af590d4edff/src/course-libraries/ReviewTabContent.tsx#L222-L233
-            # Ideally, in the future, whenever you modify a downstream XBlock, the code will change the ComponentLink
-            # "last modified at" time only if something relevant to the upstream sync was modified, like the upstream
-            # source was changed, or the sync was dismissed (skip the update for this particular version) or accepted.
-            has_changes = True  # change to false once we save modified time in course xblocks
+            has_changes = False
             for key, new_value in new_values.items():
                 prev_value = getattr(link, key)
                 if prev_value != new_value:
