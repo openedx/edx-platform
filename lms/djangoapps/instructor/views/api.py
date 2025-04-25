@@ -925,6 +925,16 @@ class BulkBetaModifyAccess(DeveloperErrorViewMixin, APIView):
     permission_name = permissions.CAN_BETATEST
     serializer_class = ModifyAccessSerializer
 
+    @apidocs.schema(
+        body=ModifyAccessSerializer,
+        responses={
+            200: ModifyAccessSerializer,
+            400: "Invalid input, such as an unrecognized action or malformed request data.",
+            401: "The requesting user is not authenticated.",
+            403: "The requesting user lacks access to modify beta testers.",
+        }
+    )
+    
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
@@ -932,6 +942,19 @@ class BulkBetaModifyAccess(DeveloperErrorViewMixin, APIView):
         - identifiers is string containing a list of emails and/or usernames separated by
           anything split_input_list can handle.
         - action is one of ['add', 'remove']
+
+        Returns an analog to this JSON structure: {
+            "action": "remove",
+            "results": [
+                {
+                "identifier": "student@email.com",
+                "error": false,
+                "userDoesNotExist": false,
+                "is_active": true
+                }
+            ]
+        }
+
         """
         course_id = CourseKey.from_string(course_id)
         serializer = self.serializer_class(data=request.data)
