@@ -2,6 +2,7 @@
 Django admin page for Site Configuration models
 """
 from dal import autocomplete
+import json
 
 from django import forms
 from django.urls import path
@@ -42,7 +43,6 @@ class SiteConfigurationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['site_values'].widget = forms.HiddenInput()
         current_values = self.instance.site_values or {}
         selected_labels = []
         for label, mapping in FEATURE_FLAGS.items():
@@ -55,19 +55,23 @@ class SiteConfigurationForm(forms.ModelForm):
 
     def clean(self):
         cleaned = super().clean()
-
+        current_site_values = json.loads(self.data.get('site_values', {}))
         selected_flags = self.data.getlist('feature_flags')
         if not isinstance(selected_flags, list):
             selected_flags = [selected_flags] if selected_flags else []
+
+        flag_keys = {key for group in FEATURE_FLAGS.values() for key in group}
 
         site_values = {}
         for label in selected_flags:
             site_values.update(FEATURE_FLAGS.get(label, {}))
 
+        for key, value in current_site_values.items():
+            if key not in flag_keys:
+                site_values[key] = value
+
         cleaned['feature_flags'] = selected_flags
         cleaned['site_values'] = site_values
-        # self.selected_flags = selected_flags
-        # self.site_values = site_values
 
         return cleaned
 
