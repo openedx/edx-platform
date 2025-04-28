@@ -14,13 +14,14 @@ from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment, EnrollmentNotAllowed
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.courseware import courses
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.enrollments.api import add_enrollment
 from openedx.core.djangoapps.enrollments.views import EnrollmentCrossDomainSessionAuth
+from openedx.core.djangoapps.enrollments.errors import InvalidEnrollmentAttribute
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
@@ -151,11 +152,11 @@ class BasketsView(APIView):
             log.info(msg)
             try:
                 self._enroll(course_key, user, default_enrollment_mode.slug)
-            except Exception as e:
+            except (EnrollmentNotAllowed, InvalidEnrollmentAttribute) as e:
                 log.exception("Enrollment failed: %s", str(e))
                 error_msg = f"Failed to enroll user {user.username} in course {course_id}: {str(e)}"
                 return DetailResponse(error_msg, status=403)
-            self._enroll(course_key, user, default_enrollment_mode.slug)
+
             mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR  # lint-amnesty, pylint: disable=unused-variable
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
