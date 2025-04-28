@@ -139,6 +139,13 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', False)
     generated_notification_audience = []
 
+    if group_by_id and not grouping_enabled:
+        logger.info(
+            f"Waffle flag for group notifications: {waffle_flag_enabled}. "
+            f"Grouper registered for '{notification_type}': {bool(grouping_function)}. "
+            f"Group by ID: {group_by_id} ==Temp Log=="
+        )
+
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
         logger.debug(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
         batch_user_ids = NotificationFilter().apply_filters(batch_user_ids, course_key, notification_type)

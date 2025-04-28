@@ -2,6 +2,7 @@
 Tests for Learning-Core-based Content Libraries
 """
 from contextlib import contextmanager
+import json
 from io import BytesIO
 from urllib.parse import urlencode
 
@@ -9,6 +10,7 @@ from organizations.models import Organization
 from rest_framework.test import APITransactionTestCase, APIClient
 
 from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.json_request import JsonResponse as SpecialJsonResponse
 from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
@@ -113,6 +115,8 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         response = getattr(self.client, method)(url, data, format="json")
         assert response.status_code == expect_response,\
             'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
+        if isinstance(response, SpecialJsonResponse):  # Required for some old APIs in the CMS that aren't using DRF
+            return json.loads(response.content)
         return response.data
 
     @contextmanager

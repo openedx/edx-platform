@@ -6,14 +6,11 @@ import json
 import ddt
 from django.test import override_settings
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag
 from milestones.tests.utils import MilestonesTestCaseMixin
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.toggles import ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE
 
 
-@override_waffle_flag(ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE, active=True)
 @ddt.ddt
 class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
     """
