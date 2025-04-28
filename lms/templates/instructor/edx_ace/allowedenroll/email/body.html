@@ -3,113 +3,103 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
-    <tr>
-        <td style="width: 100%;
-            max-width: 800px;
+<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+       style="box-shadow: 0px 0px 10px 2px #c8c8c8; width: 100%; border-collapse: collapse;">
+  <tr>
+    <td style="padding: 0;">
+      <table align="center" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation"
+             style="max-width: 600px; width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="
+            width: 100%;
             background-color: #FFF;
+            background-image: url('https://pearson-production-media.s3.us-east-1.amazonaws.com/backgroundIP.png');
+            background-repeat: no-repeat;
+            background-position: right center;
+            background-size: cover;
             color: #000000;
-            margin: auto;
             text-align: center;
-            padding: 20px;
-            ">
+            padding: 5%;
+            box-sizing: border-box;
+          ">
+            <img src="https://partner-courses.pearson.com/static/pearson-theme/images/logo.png"
+                 alt="Pearson Logo"
+                 style="width: 25%; max-width: 150px; padding: 1%; display: inline !important;" />
 
-            <img src="https://partner-courses.pearson.com/static/pearson-theme/images/logo.png" style="width: 150px; padding: 5px; margin: auto;" />
-
-            <div style="width: 90%;
-                        text-align: left;
-                        padding: 2% 5%;
-                        background-color: #D4EAE4;
-                        background-size: 50%;
-                        background-position: right bottom;
-                        background-repeat: no-repeat;
-                        padding-bottom: 35%;
-                        ">
-
-                <h1 style="font-family:'Playfair Display', serif; font-weight: 700;">
-                    {% filter force_escape %}
-                    {% blocktrans %}You have been invited to {{ course_name }}{% endblocktrans %}
-                    {% endfilter %}
-                </h1>
-                <p style="padding: 0px;
-                          width: 50%;
-                          min-width: 300px;
-                          margin-top: 20px;
-                          ">
-                    {% filter force_escape %}
-                    {% blocktrans %}You have been invited to join {{ course_name }} at {{ site_name }} by a member of the course staff.{% endblocktrans %}
-                    {% endfilter %}
-                    <br />
-                </p>
-
-                {% if is_shib_course %}
-                {% if auto_enroll %}
-                    <p style="padding: 0px;
-                            width: 50%;
-                            min-width: 300px;
-                            margin-top: 20px;
-                            ">
-                        {% filter force_escape %}
-                        {% blocktrans %}To access this course click on the button below and log in.{% endblocktrans %}
-                        {% endfilter %}
-                        <br />
-                    </p>
-
-                    {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_url %}
-                {% elif course_about_url is not None %}
-                    <p style="padding: 0px;
-                            width: 50%;
-                            min-width: 300px;
-                            margin-top: 20px;
-                            ">
-                        {% filter force_escape %}
-                        {% blocktrans %}To access this course visit it and register:{% endblocktrans %}
-                        {% endfilter %}
-                        <br />
-                    </p>
-
-                    {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_about_url %}
-                {% endif %}
+            <div style="width: 100%; text-align: left; box-sizing: border-box;">
+              <h1 style="font-family:'Playfair Display', serif; font-weight: 600; font-size: 1.5em;">
+                {% if class_name != none %}
+                  You have been invited to join <br/> {{ course_name }} <br/> {{ class_name }}
                 {% else %}
-                <p style="padding: 0px;
-                            width: 50%;
-                            min-width: 300px;
-                            margin-top: 20px;
-                            ">
-                    {% filter force_escape %}
-                    {% blocktrans %}Please finish your registration and fill out the registration form, making sure to use {{ email_address }} in the Email field:{% endblocktrans %}
-                    {% endfilter %}
-                    <br />
+                  You have been invited to join <br/> {{ course_name }}
+                {% endif %}
+              </h1>
+
+              <p style="padding: 0; width: 100%; margin-top: 5%;">
+                {% blocktrans %}You have been invited to join a class by the course staff at {{ institution_name }}.{% endblocktrans %}
+              </p>
+
+              <p style="padding: 0; width: 100%; margin-top: 5%;">
+                {% blocktrans with date=class_start_date %}Your class begins on: <strong>{{ date }}</strong>.{% endblocktrans %}
+              </p>
+
+              {% if is_shib_course %}
+                {% if auto_enroll %}
+                  <p style="padding: 0; width: 100%; margin-top: 5%;">
+                    {% blocktrans %}To access this course click on the button below and log in.{% endblocktrans %}
+                  </p>
+                  {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_url %}
+                {% elif course_about_url %}
+                  <p style="padding: 0; width: 100%; margin-top: 5%;">
+                    {% blocktrans %}To access this course visit it and register:{% endblocktrans %}
+                  </p>
+                  {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_about_url %}
+                {% endif %}
+              {% else %}
+                <p style="padding: 0; width: 100%; margin-top: 5%;">
+                  <strong>Step 1:</strong> {% trans "Create your Pearson account." %}<br />
+                  {% blocktrans with email=email_address %}
+                    Be sure to use your invited email address <strong>{{ email }}</strong> when creating your account.
+                  {% endblocktrans %}
                 </p>
-                {# xss-lint: disable=django-trans-missing-escape #}
-                {% trans "Finish Your Registration" as button_cta_text %}
+
+                <p style="padding: 0; width: 100%; margin-top: 5%;">
+                  <strong>Step 2:</strong> {% trans "Log in to your class." %}<br />
+                  {% blocktrans with url=new_domain_url %}
+                    Visit this <a href="{{ course_url }}" target="_blank">url</a> to access your class.
+                  {% endblocktrans %}
+                </p>
+
+                {% trans "Create your Pearson Account" as button_cta_text %}
                 {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=button_cta_text course_cta_url=registration_url %}
 
-                <p style="padding: 0px;
-                            width: 50%;
-                            min-width: 300px;
-                            margin-top: 20px;
-                            ">
-                    {% if auto_enroll %}
-                    {% filter force_escape %}
-                    {% blocktrans %}Once you have registered and activated your account, you will see {{ course_name }} listed on your dashboard.{% endblocktrans %}
-                    {% endfilter %}
-                    {% elif course_about_url is not None %}
-                    {% filter force_escape %}
+                <p style="padding: 0; width: 100%; margin-top: 5%;">
+                  {% if auto_enroll %}
+                    {% blocktrans %}Once you have registered and activated your account, you will see {{ class_name }} listed on your dashboard.{% endblocktrans %}
+                  {% elif course_about_url %}
                     {% blocktrans %}Once you have registered and activated your account, you will be able to access this course:{% endblocktrans %}
-                    {% endfilter %}
                     {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_about_url %}
-                    {% else %}
-                    {% filter force_escape %}
+                  {% else %}
                     {% blocktrans %}You can then enroll in {{ course_name }}.{% endblocktrans %}
-                    {% endfilter %}
-                    {% endif %}
-                    <br />
+                  {% endif %}
                 </p>
-                {% endif %}
+              {% endif %}
 
+              <p style="padding: 0; width: 100%; margin-top: 5%;">
+                {% blocktrans with name=institution_name email=institution_admin_email %}
+                  If you have questions about this invitation, please send an email to the administrator at {{ name }}:
+                  <a href="mailto:{{ institution_admin_email }}">{{ institution_admin_email }}</a>
+                {% endblocktrans %}
+              </p>
+
+              <p style="padding: 0; width: 100%; margin-top: 5%;">
+                {% trans "The Pearson Team" %}
+              </p>
             </div>
-        </td>
-    </tr>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
 </table>
 {% endblock %}
