@@ -170,6 +170,7 @@ django==4.2.21
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   django-appconf
+    #   django-autocomplete-light
     #   django-celery-results
     #   django-classy-tags
     #   django-config-models
@@ -239,6 +240,8 @@ django==4.2.21
     #   xss-utils
 django-appconf==1.1.0
     # via django-statici18n
+django-autocomplete-light==3.12.1
+    # via -r requirements/edx/kernel.in
 django-cache-memoize==0.2.1
     # via edx-enterprise
 django-celery-results==2.6.0
