@@ -214,9 +214,8 @@ chardet==5.2.0
     #   diff-cover
     #   pysrt
     #   tox
-charset-normalizer==2.0.12
+charset-normalizer==3.4.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   requests
