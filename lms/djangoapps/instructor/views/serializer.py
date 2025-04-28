@@ -22,8 +22,6 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 
 from .tools import get_student_from_identifier
 
-from .tools import get_student_from_identifier
-
 
 class RoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
