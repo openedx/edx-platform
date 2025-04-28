@@ -24,10 +24,8 @@ cffi==1.17.1
     # via
     #   cryptography
     #   pynacl
-charset-normalizer==2.0.12
-    # via
-    #   -c scripts/user_retirement/requirements/../../../requirements/constraints.txt
-    #   requests
+charset-normalizer==3.4.1
+    # via requests
 click==8.1.8
     # via
     #   -r scripts/user_retirement/requirements/base.in

@@ -19,12 +19,6 @@
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35280
 celery>=5.2.2,<6.0.0
 
-# Date: 2022-07-20
-# edx-enterprise, snowflake-connector-python require charset-normalizer==2.0.0
-# Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35278
-charset-normalizer<2.1.0
-
 # Date: 2024-02-02
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0

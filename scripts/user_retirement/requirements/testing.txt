@@ -37,7 +37,7 @@ cffi==1.17.1
     #   -r scripts/user_retirement/requirements/base.txt
     #   cryptography
     #   pynacl
-charset-normalizer==2.0.12
+charset-normalizer==3.4.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests

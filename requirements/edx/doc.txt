@@ -155,9 +155,8 @@ chardet==5.2.0
     # via
     #   -r requirements/edx/base.txt
     #   pysrt
-charset-normalizer==2.0.12
+charset-normalizer==3.4.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   requests
     #   snowflake-connector-python

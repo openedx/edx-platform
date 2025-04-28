@@ -19,10 +19,8 @@ bracex==2.5.post1
     # via wcmatch
 certifi==2025.1.31
     # via requests
-charset-normalizer==2.0.12
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   requests
+charset-normalizer==3.4.1
+    # via requests
 click==8.1.8
     # via
     #   click-option-group
