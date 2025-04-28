@@ -97,6 +97,16 @@ class ForumAdminRequiresInstructorAccess(BasePermission):
     instructor-level access to proceed.
     """
     def has_permission(self, request, view):
+        """
+        Permission class for forum endpoints.
+
+        Only allow if:
+        - User is an instructor, OR
+        - User is staff AND forum admin.
+
+        Special case:
+        - If the action relates to forum admin (FORUM_ROLE_ADMINISTRATOR), user must be instructor.
+       """
         rolename = request.data.get('rolename')
         course_id = view.kwargs.get('course_id')
         course = get_course_by_id(CourseKey.from_string(course_id))
@@ -106,12 +116,14 @@ class ForumAdminRequiresInstructorAccess(BasePermission):
             request.user, course_id, FORUM_ROLE_ADMINISTRATOR
         )
 
-        # default roles require either (staff & forum admin) or (instructor)
-        if not (has_forum_admin or has_instructor_access):
-            raise PermissionDenied("Operation requires staff & forum admin or instructor access")
-
-        # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-        if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
+        # Special case first: if role is FORUM_ROLE_ADMINISTRATOR
+        if rolename == FORUM_ROLE_ADMINISTRATOR:
+            if has_instructor_access:
+                return True
             raise PermissionDenied("Operation requires instructor access.")
 
-        return True
+        # default roles require either (staff & forum admin) or (instructor)
+        if has_instructor_access or has_forum_admin:
+            return True
+
+        raise PermissionDenied("Operation requires staff & forum admin or instructor access")
