@@ -503,7 +503,7 @@
             */
             updateGoogleDisclaimer: function(captions) {
                 const aIGeneratedSpanText = '<span id="captions-ai-generated"',
-                      aiProviderRegexp = /data\-provider=["'](?<provider>\w+)["']/,
+                      aiProviderRegexp = /data\-provider=["'](?<provider>\w+)["']/;
                 var self = this,
                     state = this.state,
                     aiGeneratedSpan = captions.find(caption => caption.includes(aIGeneratedSpanText)),
