@@ -68,6 +68,21 @@ class UniqueStudentIdentifierSerializer(serializers.Serializer):
         return user
 
 
+class AccessSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for managing user access changes.
+    This serializer validates and processes the data required to modify
+    user access within a system.
+    """
+    rolename = serializers.CharField(
+        help_text="Role name to assign to the user"
+    )
+    action = serializers.ChoiceField(
+        choices=['allow', 'revoke'],
+        help_text="Action to perform on the user's access"
+    )
+
+
 class ForumRoleNameSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for forum rolename.
@@ -109,6 +124,20 @@ class ForumRoleNameSerializer(serializers.Serializer):  # pylint: disable=abstra
             users = []
 
         return [extract_user_info(user, self.context.get('course_discussion_settings')) for user in users]
+
+
+def extract_user_info(user, course_discussion_settings):
+    """ utility method to convert user into dict for JSON rendering. """
+    group_id = get_group_id_for_user(user, course_discussion_settings)
+    group_name = get_group_name(group_id, course_discussion_settings)
+
+    return {
+        'username': user.username,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'group_name': group_name,
+    }
 
 
 class ListInstructorTaskInputSerializer(serializers.Serializer):  # pylint: disable=abstract-method

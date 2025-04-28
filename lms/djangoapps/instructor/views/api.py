@@ -104,6 +104,7 @@ from lms.djangoapps.instructor.views.serializer import (
     BlockDueDateSerializer,
     CertificateSerializer,
     CertificateStatusesSerializer,
+    ForumRoleNameSerializer,
     ListInstructorTaskInputSerializer,
     ModifyAccessSerializer,
     RoleNameSerializer,
