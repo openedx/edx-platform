@@ -36,6 +36,19 @@
                         // If so, redirect to a page explaining to the user
                         // why they were blocked.
                         this.redirect(responseData.user_message_url);
+                    } else if (jqXHR.status === 403 && !responseData.user_message_url) {
+                        // If we are blocked but no user_message_url is provided,
+                        // show the JSON response in the frontend.
+                        this.showMessage(responseData);
+
+                        // Add timeout before redirecting to allow user to see the message
+                        var self = this;
+                        setTimeout(function() {
+                            // Redirect to the provided redirectUrl after 5 seconds
+                            if (redirectUrl) {
+                                self.redirect(redirectUrl);
+                            }
+                        }, 5000); // 5000 milliseconds = 5 seconds
                     } else {
                         // Otherwise, redirect the user to the next page.
                         if (redirectUrl) {
@@ -51,6 +64,23 @@
                         this.redirect(redirectUrl);
                     }
                 });
+            },
+            /**
+             * Show a message in the frontend.
+             * @param  {Object} message The message to display.
+             */
+            showMessage: function(message) {
+                // Create a new div element
+                var messageDiv = document.createElement('div');
+                messageDiv.setAttribute('id', 'messageDiv');
+                messageDiv.style.color = 'red'; // Example styling
+                messageDiv.style.marginTop = '40px';
+
+                // Set the message content
+                messageDiv.textContent = JSON.stringify(message);
+
+                // Append the messageDiv to the body or a specific container
+                document.body.appendChild(messageDiv);
             },
 
             /**

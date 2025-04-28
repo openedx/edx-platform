@@ -28,7 +28,7 @@ from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, User
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, User, EnrollmentNotAllowed
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
@@ -899,6 +899,15 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                         "'{username}' in course '{course_id}'"
                     ).format(username=username, course_id=course_id)
                 },
+            )
+        except EnrollmentNotAllowed as error:
+            log.warning("Enrollment not allowed for user [%s] in course run [%s]: %s",
+                        username, course_id, str(error))
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
+                data={
+                    "message": str(error)
+                }
             )
         except CourseUserGroup.DoesNotExist:
             log.exception("Missing cohort [%s] in course run [%s]", cohort_name, course_id)
