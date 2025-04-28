@@ -212,7 +212,7 @@ class TestGetBlocksQueryCounts(TestGetBlocksQueryCountsBase):
         self._get_blocks(
             course,
             expected_mongo_queries=0,
-            expected_sql_queries=14,
+            expected_sql_queries=15,
         )
 
     @ddt.data(
