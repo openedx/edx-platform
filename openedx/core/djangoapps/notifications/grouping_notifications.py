@@ -22,6 +22,19 @@ class BaseNotificationGrouper(ABC):
     def group(self, new_notification, old_notification):
         pass
 
+    def extend_task_ids_in_context(self, new_notification, old_notification):
+        """
+            It extends the context with new notification and old notification using task ID.
+        """
+        content_context = old_notification.content_context or {}
+        new_task_ids = new_notification.content_context.get("task_id", [])
+
+        if new_task_ids:
+            content_context.setdefault("task_id", [])
+            content_context["task_id"].extend(map(str, new_task_ids))
+
+        return content_context
+
 
 class NotificationRegistry:
     """
@@ -115,6 +128,7 @@ def group_user_notifications(new_notification: Notification, old_notification: N
 
     if grouper_class:
         old_notification.content_context = grouper_class.group(new_notification, old_notification)
+        old_notification.content_context = grouper_class.extend_task_ids_in_context(new_notification, old_notification)
         old_notification.web = old_notification.web or new_notification.web
         old_notification.email = old_notification.email or new_notification.email
         old_notification.content_url = new_notification.content_url

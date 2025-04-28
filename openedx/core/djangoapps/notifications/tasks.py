@@ -1,6 +1,7 @@
 """
 This file contains celery tasks for notifications.
 """
+import uuid
 from datetime import datetime, timedelta
 from typing import List
 
@@ -114,6 +115,7 @@ def delete_expired_notifications():
     logger.info(f'{total_deleted} Notifications deleted in {time_elapsed} seconds.')
 
 
+# pylint: disable=too-many-statements
 @shared_task
 @set_code_owner_attribute
 def send_notifications(user_ids, course_key: str, app_name, notification_type, context, content_url):
@@ -127,6 +129,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     if not is_notification_valid(notification_type, context):
         raise ValidationError(f"Notification is not valid {app_name} {notification_type} {context}")
 
+    task_id = str(uuid.uuid4().hex)
     user_ids = list(set(user_ids))
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
     group_by_id = context.pop('group_by_id', '')
@@ -139,12 +142,14 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', False)
     generated_notification_audience = []
 
-    if group_by_id and not grouping_enabled:
+    if grouping_enabled:
         logger.info(
+            f"Task ID: {task_id} "
             f"Waffle flag for group notifications: {waffle_flag_enabled}. "
             f"Grouper registered for '{notification_type}': {bool(grouping_function)}. "
             f"Group by ID: {group_by_id} ==Temp Log=="
         )
+        context.update({'task_id': [task_id]})
 
     for batch_user_ids in get_list_in_batches(user_ids, batch_size):
         logger.debug(f'Sending notifications to {len(batch_user_ids)} users in {course_key}')
@@ -196,6 +201,12 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                         notifications_generated = True
                         notification_content = new_notification.content
                 else:
+                    logger.info(
+                        f"Task ID: {task_id} "
+                        f"New {notification_type} notification created for user {user_id} "
+                        f"Course: {course_key} "
+                        f"Group by ID: {group_by_id} ==Temp Log=="
+                    )
                     notifications.append(new_notification)
                 generated_notification_audience.append(user_id)
 
