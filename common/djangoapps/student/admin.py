@@ -318,9 +318,19 @@ class LanguageAutocomplete(autocomplete.Select2ListView):
 
 class CountryAutocomplete(autocomplete.Select2ListView):
     def get_list(self):
-        return [
-            name for code, name in countries if self.q.lower() in name.lower()
-        ]
+        results = []
+        for code, name in countries:
+            if self.q.lower() in name.lower():
+                results.append((code, name))
+        return results
+
+    def get_result_label(self, item):
+        """ What the user sees in the dropdown """
+        return dict(countries).get(item, item)
+
+    def get_result_value(self, item):
+        """ What gets sent back on selection (the code) """
+        return item
 
 class UserProfileInlineForm(forms.ModelForm):
     language = forms.CharField(
