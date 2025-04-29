@@ -18,7 +18,7 @@ from lxml.etree import XMLParser as _XMLParser
 from lxml.etree import *  # lint-amnesty, pylint: disable=redefined-builtin
 # These private elements are used in some libraries to also defuse xml exploits for their own purposes.
 # We need to re-expose them so that the libraries still work.
-from lxml.etree import _Comment, _Element, _ElementTree, _Entity, _ProcessingInstruction
+from lxml.etree import _Comment, _Element, _ElementTree, _Entity, _ProcessingInstruction, __version__
 from .xmlparser import XML, fromstring, parse
 
 
