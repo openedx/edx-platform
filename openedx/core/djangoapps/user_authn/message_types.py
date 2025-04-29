@@ -14,6 +14,7 @@ class PasswordReset(BaseMessageType):
 
         # pylint: disable=unsupported-assignment-operation
         self.options['transactional'] = True
+        self.options['skip_disable_user_policy'] = True
 
 
 class PasswordResetSuccess(BaseMessageType):
