@@ -222,8 +222,8 @@ def use_new_custom_pages(course_key):
 # .. toggle_name: contentstore.disable_react_markdown_editor
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag disables the Markdown editor in the authoring MFE
-# .. toggle_use_cases: opt_in
+# .. toggle_description: This flag disables the use of the Markdown editor when creating or editing problems in the authoring MFE
+# .. toggle_use_cases: opt_out
 # .. toggle_creation_date: 2025-4-11
 # .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4517232656/Re-enable+Markdown+editing+of+CAPA+problems+to+meet+various+use+cases
 DISABLE_REACT_MARKDOWN_EDITOR = CourseWaffleFlag(
