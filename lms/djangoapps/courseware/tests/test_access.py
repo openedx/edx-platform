@@ -49,8 +49,10 @@ from xmodule.course_block import (  # lint-amnesty, pylint: disable=wrong-import
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
+
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
@@ -245,18 +247,39 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         course_key = self.course.id
         chapter = BlockFactory.create(category="chapter", parent_location=self.course.location)
         overview = CourseOverview.get_from_id(course_key)
+        subsection = BlockFactory.create(category="sequential", parent_location=chapter.location)
+        unit = BlockFactory.create(category="vertical", parent_location=subsection.location)
 
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            html_block = BlockFactory.create(
+                category="html",
+                parent_location=unit.location,
+                display_name = "Unpublished Block",
+                data = '<p>This block should not be published.</p>',
+                publish_item = False,
+            )
+            print(self.store.get_branch_setting())
+
+        print(self.store.get_branch_setting())
         # Enroll student to the course
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
         modules = [
             self.course,
-            overview,
             chapter,
+            overview,
+            subsection,
+            unit,
+
         ]
         # Student should have access to modules they're enrolled in
         for obj in modules:
-            assert bool(access.has_access(self.student, 'load', obj, course_key=self.course.id))
+            assert bool(access.has_access(self.student, 'load', self.store.get_item(obj.location), course_key=self.course.id))
+
+        # If the document is not published yet, it should return an error when we try to fetch it from
+        # the store.  This check confirms that the student would not be able to access it.
+        with pytest.raises(ItemNotFoundError):
+            self.store.get_item(html_block.location)
 
     def test_has_access_based_on_roles(self):
         """
