@@ -301,7 +301,8 @@ def emsg_normalizers():
     """
     default = [
         {
-            'search': r'/tmp/codejail-[0-9a-zA-Z]+',
+            # Character range should be at least as broad as what Python's `tempfile` uses.
+            'search': r'/tmp/codejail-[0-9a-zA-Z_]+',
             'replace': r'/tmp/codejail-<SANDBOX_DIR_NAME>',
         },
     ]

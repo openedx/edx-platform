@@ -193,7 +193,7 @@ COURSE_NOTIFICATION_TYPES = {
         'notification_app': 'grading',
         'name': 'ora_staff_notifications',
         'is_core': False,
-        'info': '',
+        'info': 'Notifications for when a submission is made for ORA that includes staff grading step.',
         'web': True,
         'email': False,
         'push': False,

@@ -351,7 +351,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             raise SafeExecException("stack trace involving /tmp/codejail-1234567/whatever.py")
 
         def remote_exec(data):
-            emsg = "stack trace involving /tmp/codejail-abcdefgh/whatever.py"
+            emsg = "stack trace involving /tmp/codejail-abcd_EFG/whatever.py"
             return (emsg, SafeExecException(emsg))
 
         results = self.run_dark_launch(
@@ -372,7 +372,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
                 ),
                 call(
                     "Codejail darklaunch remote results for slug=None: globals={}, "
-                    "emsg='stack trace involving /tmp/codejail-abcdefgh/whatever.py', exception=None"
+                    "emsg='stack trace involving /tmp/codejail-abcd_EFG/whatever.py', exception=None"
                 ),
             ],
             expect_globals_contains={},
