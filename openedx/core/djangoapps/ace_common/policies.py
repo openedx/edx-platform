@@ -22,7 +22,11 @@ class DisableUserOptout(Policy):
         skip_disable_user_policy = message.options.get('skip_disable_user_policy', False)
         if skip_disable_user_policy:
             return PolicyResult(deny=set())
-        user = User.objects.get(id=message.recipient.lms_user_id)
+        try:
+            user = User.objects.get(id=message.recipient.lms_user_id)
+        except User.DoesNotExist:
+            log.info(f"Disable User Policy - User not found - {message.recipient.lms_user_id} - {message.name}")
+            return PolicyResult(deny=set())
         if user.has_usable_password():
             return PolicyResult(deny=set())
         log.info(f"===> User is disabled - {user.email} - {message.name}")
