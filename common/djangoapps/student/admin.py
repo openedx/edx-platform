@@ -345,6 +345,9 @@ class UserProfileInlineForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = '__all__'
+        labels = {
+            'profile_image_uploaded_at': 'Uploaded At',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -368,6 +371,25 @@ class UserProfileInline(admin.StackedInline):
     form = UserProfileInlineForm
     can_delete = False
     verbose_name_plural = _('User profile')
+    show_change_link = False
+
+    fieldsets = (
+        (_('User Profile'), {
+            'classes': ('wide',),
+            'fields': ('name', 'meta', 'courseware', 'language', 'year_of_birth', 'gender', 'level_of_education', 'goals'),
+            'description': 'Add profile details.',
+        }),
+        (_('Address'), {
+            'classes': ('wide',),
+            'fields': ('country', 'mailing_address', 'city', 'state', 'phone_number'),
+            'description': 'Add mailing address and contact details.',
+        }),
+        (_('Profile Image'), {
+            'classes': ('wide',),
+            'fields': ('profile_image_uploaded_at',),
+            'description': 'Add details for profile image.',
+        }),
+    )
 
 
 class AccountRecoveryInline(admin.StackedInline):
@@ -402,6 +424,14 @@ class UserAdmin(BaseUserAdmin):
     """ Admin interface for the User model. """
     inlines = (UserProfileInline, AccountRecoveryInline)
     form = UserChangeForm
+
+    add_fieldsets = (
+        ('Adding a user', {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2'),
+            'description': 'Start by creating a username and password and then add profile details.',
+        }),
+    )
 
     def get_readonly_fields(self, request, obj=None):
         """
