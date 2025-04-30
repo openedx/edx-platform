@@ -36,6 +36,21 @@ COURSE_HOME_NEW_DISCUSSION_SIDEBAR_VIEW = CourseWaffleFlag(
 )
 
 
+# Waffle flag to enable emission of course progress analytics for students in their courses.
+#
+# .. toggle_name: course_home.send_course_progress_analytics_for_student
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This toggle controls whether the system will enqueue a Celery task responsible for emitting an
+#   analytics events describing how much course content a learner has completed in a course.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2025-04-02
+# .. toggle_target_removal_date: None
+COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.send_course_progress_analytics_for_student', __name__
+)
+
+
 def course_home_mfe_progress_tab_is_active(course_key):
     # Avoiding a circular dependency
     from .models import DisableProgressPageStackedConfig
@@ -51,3 +66,10 @@ def new_discussion_sidebar_view_is_enabled(course_key):
     Returns True if the new discussion sidebar view is enabled for the given course.
     """
     return COURSE_HOME_NEW_DISCUSSION_SIDEBAR_VIEW.is_enabled(course_key)
+
+
+def send_course_progress_analytics_for_student_is_enabled(course_key):
+    """
+    Returns True if the course completion analytics feature is enabled for a given course.
+    """
+    return COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT.is_enabled(course_key)
