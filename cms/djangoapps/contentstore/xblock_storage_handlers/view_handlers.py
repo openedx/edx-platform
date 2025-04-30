@@ -548,8 +548,7 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
             notices = []
             # Store final children keys to update order of components in unit
             children = []
-            for i in range(len(upstream_children)):
-                upstream_child = upstream_children[i]
+            for i, upstream_child in enumerate(upstream_children):
                 assert isinstance(upstream_child, LibraryXBlockMetadata)  # for now we only support units
                 if upstream_child.usage_key not in downstream_children_keys:
                     # This upstream_child is new, create it.
@@ -574,6 +573,7 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
             for child in downstream_children:
                 if child.usage_key not in children:
                     # This downstream block was added, or deleted from upstream block.
+                    # NOTE: This will also delete any local additions to a unit in the next upstream sync.
                     store.delete_item(child.usage_key, user_id=request.user.id)
             downstream.children = children
             store.update_item(downstream, request.user.id)
