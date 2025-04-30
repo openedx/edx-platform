@@ -129,3 +129,18 @@ class IDVerificationDetailsSerializer(serializers.Serializer):  # lint-amnesty, 
             return obj.receipt_id
         else:
             return None
+
+
+class DisableUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer to return flattened email field
+    """
+    class Meta:
+        model = User
+        fields = ('email',)
+
+    def to_representation(self, instance):
+        """
+        Returns email of the user
+        """
+        return instance['email']

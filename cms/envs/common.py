@@ -2892,3 +2892,6 @@ LIBRARY_ENABLED_BLOCKS = [
     'survey',
     'word_cloud',
 ]
+
+# Settings for token based permission_classes view
+API_TOKEN = {}

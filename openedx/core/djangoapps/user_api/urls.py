@@ -213,4 +213,6 @@ urlpatterns = [
     # Moved from user_api/legacy_urls.py
     path('v1/preferences/time_zones/', user_api_views.CountryTimeZoneListView.as_view(),
          ),
+
+    path('v1/disable_users/', user_api_views.DisableUserListView.as_view(), name='disable_user_list'),
 ]

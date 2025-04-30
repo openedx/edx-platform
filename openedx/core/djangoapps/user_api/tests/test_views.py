@@ -647,3 +647,58 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         assert len(results) == len(common_timezones)
         for time_zone_info in results:
             self._assert_time_zone_is_valid(time_zone_info)
+
+
+@ddt.ddt
+@skip_unless_lms
+@override_settings(API_TOKEN={"disabled_user_api_token": "abcd"})
+class DisableUserListViewTest(UserApiTestCase):
+    """
+    Test cases covering the list viewing behavior for disabled users
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.disabled_user = UserFactory.create(
+            email="disabled_user@example.com",
+            username="disabled_user"
+        )
+        self.disabled_user.set_unusable_password()
+        self.disabled_user.save()
+        self.url = reverse("disable_user_list")
+
+    def test_success(self):
+        """
+        Tests if the endpoint returns the correct disabled user if correct token is provided
+        """
+        response = self.client.get(self.url, headers={"Authorization": "abcd"})
+        assert response.status_code == 200
+        assert response.data['count'] == 1
+        assert response.data['results'] == [self.disabled_user.email]
+
+    def test_failure_if_no_token_provided(self):
+        """
+        Tests if the endpoint returns 403 if no token is provided
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == 403
+
+    def test_failure_if_invalid_token(self):
+        """
+        Tests if endpoint returns 403 if invalid token is provided
+        """
+        response = self.client.get(self.url, headers={"Authorization": "def"})
+        assert response.status_code == 403
+
+    @ddt.data(
+        ("abcd", 200),
+        ("abc", 403),
+    )
+    @ddt.unpack
+    def test_authenticated_user_has_no_effect_on_response(self, token, response_code):
+        """
+        Tests if the endpoint returns the correct disabled user if correct token is provided
+        """
+        self.client.login(username=self.users[0].username, password=self.users[0].password)
+        response = self.client.get(self.url, headers={"Authorization": token})
+        assert response.status_code == response_code

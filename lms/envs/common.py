@@ -5642,3 +5642,6 @@ USE_EXTRACTED_PROBLEM_BLOCK = False
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
 USE_EXTRACTED_VIDEO_BLOCK = False
+
+# Settings for token based permission_classes view
+API_TOKEN = {}
