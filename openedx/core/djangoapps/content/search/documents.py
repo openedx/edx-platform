@@ -212,6 +212,8 @@ def _fields_from_block(block) -> dict:
         Fields.access_id: _meili_access_id_from_context_key(block.usage_key.context_key),
         Fields.breadcrumbs: [],
     }
+    if hasattr(block, "edited_on"):
+        block_data[Fields.modified] = block.edited_on.timestamp()
     # Get the breadcrumbs (course, section, subsection, etc.):
     if block.usage_key.context_key.is_course:  # Getting parent is not yet implemented in Learning Core (for libraries).
         cur_block = block
