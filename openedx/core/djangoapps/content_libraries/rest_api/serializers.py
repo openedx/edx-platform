@@ -253,6 +253,10 @@ class LibraryContainerMetadataSerializer(PublishableItemSerializer):
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True, required=False)
 
+    # Unit fields
+    hide_from_learners = serializers.BooleanField(read_only=True, required=False)
+    enable_discussion = serializers.BooleanField(read_only=True, required=False)
+
     def to_internal_value(self, data):
         """
         Convert JSON-ish data back to native python types.

@@ -3,7 +3,7 @@ API for containers (Sections, Subsections, Units) in Content Libraries
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from enum import Enum
 import logging
@@ -155,6 +155,28 @@ class ContainerMetadata(PublishableItem):
         )
 
 
+@dataclass(frozen=True, kw_only=True)
+class UnitMetadata(ContainerMetadata):
+    """
+    Class that represents the metadata about a Unit in a content library
+    """
+    hide_from_learners: bool
+    enable_discussion: bool
+
+    @classmethod
+    def from_container(cls, library_key, container: Container, associated_collections=None):
+        """
+        Construct a UnitMetadata object from a Container object.
+        """
+        metadata = ContainerMetadata.from_container(library_key, container, associated_collections)
+        draft = container.versioning.draft
+        return cls(
+            **asdict(metadata),
+            hide_from_learners=draft.hide_from_learners,
+            enable_discussion=draft.enable_discussion,
+        )
+
+
 def library_container_locator(
     library_key: LibraryLocatorV2,
     container: Container,
@@ -184,10 +206,19 @@ def _get_container_from_key(container_key: LibraryContainerLocator, isDeleted=Fa
     content_library = ContentLibrary.objects.get_by_key(container_key.lib_key)
     learning_package = content_library.learning_package
     assert learning_package is not None
-    container = authoring_api.get_container_by_key(
-        learning_package.id,
-        key=container_key.container_id,
-    )
+
+    match container_key.container_type:
+        case ContainerType.Unit.value:
+            container = authoring_api.get_unit_by_key(
+                learning_package.id,
+                key=container_key.container_id,
+            )
+        case _:
+            container = authoring_api.get_container_by_key(
+                learning_package.id,
+                key=container_key.container_id,
+            )
+
     if container and (isDeleted or container.versioning.draft):
         return container
     raise ContentLibraryContainerNotFound
@@ -209,11 +240,20 @@ def get_container(
         ).values('key', 'title')
     else:
         associated_collections = None
-    container_meta = ContainerMetadata.from_container(
-        container_key.lib_key,
-        container,
-        associated_collections=associated_collections,
-    )
+
+    match container_key.container_type:
+        case ContainerType.Unit.value:
+            container_meta = UnitMetadata.from_container(
+                container_key.lib_key,
+                container,
+                associated_collections=associated_collections,
+            )
+        case _:
+            container_meta = ContainerMetadata.from_container(
+                container_key.lib_key,
+                container,
+                associated_collections=associated_collections,
+            )
     assert container_meta.container_type.value == container_key.container_type
     return container_meta
 
@@ -253,6 +293,7 @@ def create_container(
                 created=created or datetime.now(),
                 created_by=user_id,
             )
+            result = UnitMetadata.from_container(library_key, container)
         case _:
             raise NotImplementedError(f"Library support for {container_type} is in progress")
 
@@ -261,8 +302,7 @@ def create_container(
             container_key=container_key,
         )
     )
-
-    return ContainerMetadata.from_container(library_key, container)
+    return result
 
 
 def update_container(
@@ -290,7 +330,7 @@ def update_container(
         )
     )
 
-    return ContainerMetadata.from_container(library_key, unit_version.container)
+    return UnitMetadata.from_container(library_key, unit_version.unit)
 
 
 def delete_container(
