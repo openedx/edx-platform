@@ -2894,4 +2894,4 @@ LIBRARY_ENABLED_BLOCKS = [
 ]
 
 # Settings for token based permission_classes view
-API_TOKEN = {}
+API_ACCESS_TOKENS = {}

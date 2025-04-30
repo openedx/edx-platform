@@ -651,7 +651,7 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
 
 @ddt.ddt
 @skip_unless_lms
-@override_settings(API_TOKEN={"disabled_user_api_token": "abcd"})
+@override_settings(API_ACCESS_TOKENS={"disabled_user_api_token": "abcd"})
 class DisableUserListViewTest(UserApiTestCase):
     """
     Test cases covering the list viewing behavior for disabled users
@@ -702,3 +702,13 @@ class DisableUserListViewTest(UserApiTestCase):
         self.client.login(username=self.users[0].username, password=self.users[0].password)
         response = self.client.get(self.url, headers={"Authorization": token})
         assert response.status_code == response_code
+
+    @override_settings(API_ACCESS_TOKENS={})
+    def test_forbidden_access_if_token_not_specified(self):
+        response = self.client.get(self.url)
+        assert response.status_code == 403
+
+    @override_settings(API_ACCESS_TOKENS={"disabled_user_api_token": ""})
+    def test_forbidden_access_if_is_empty(self):
+        response = self.client.get(self.url)
+        assert response.status_code == 403

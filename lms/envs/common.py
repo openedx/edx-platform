@@ -5644,4 +5644,4 @@ USE_EXTRACTED_PROBLEM_BLOCK = False
 USE_EXTRACTED_VIDEO_BLOCK = False
 
 # Settings for token based permission_classes view
-API_TOKEN = {}
+API_ACCESS_TOKENS = {}
