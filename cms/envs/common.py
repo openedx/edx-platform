@@ -2892,3 +2892,13 @@ LIBRARY_ENABLED_BLOCKS = [
     'survey',
     'word_cloud',
 ]
+
+
+OPEN_EDX_FILTERS_CONFIG = {
+    "org.edly.templates.fetch.requested.v1": {
+        "pipeline": [
+            "course_import.pipeline.GithubTemplatesPipeline",
+        ],
+        "fail_silently": False,
+    },
+}
