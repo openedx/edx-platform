@@ -19,7 +19,6 @@ from openedx_events.content_authoring.data import (
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_DELETED,
-    CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
@@ -48,7 +47,6 @@ from .tasks import (
     delete_library_block_index_doc,
     delete_library_container_index_doc,
     delete_xblock_index_doc,
-    update_content_library_index_docs,
     update_library_collection_index_doc,
     update_library_container_index_doc,
     upsert_library_block_index_doc,
@@ -150,26 +148,6 @@ def library_block_deleted(**kwargs) -> None:
     # Update content library index synchronously to make sure that search index is updated before
     # the frontend invalidates/refetches results. This is only a single document update so is very fast.
     delete_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
-
-
-@receiver(CONTENT_LIBRARY_UPDATED)
-@only_if_meilisearch_enabled
-def content_library_updated_handler(**kwargs) -> None:
-    """
-    Update the index for the content library
-    """
-    content_library_data = kwargs.get("content_library", None)
-    if not content_library_data or not isinstance(content_library_data, ContentLibraryData):  # pragma: no cover
-        log.error("Received null or incorrect data for event")
-        return
-
-    # Update content library index synchronously to make sure that search index is updated before
-    # the frontend invalidates/refetches index.
-    # Currently, this is only required to make sure that removed/discarded components are removed
-    # from the search index and displayed to user properly. If it becomes a performance bottleneck
-    # for other update operations other than discard, we can update CONTENT_LIBRARY_UPDATED event
-    # to include a parameter which can help us decide if the task needs to run sync or async.
-    update_content_library_index_docs.apply(args=[str(content_library_data.library_key)])
 
 
 @receiver(LIBRARY_COLLECTION_CREATED)

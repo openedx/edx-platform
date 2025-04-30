@@ -23,11 +23,30 @@ from celery_utils.logged_task import LoggedTask
 from celery.utils.log import get_task_logger
 from edx_django_utils.monitoring import set_code_owner_attribute, set_code_owner_attribute_from_module
 from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import (
+    BlockUsageLocator,
+    LibraryCollectionLocator,
+    LibraryContainerLocator,
+    LibraryLocatorV2,
+)
+from openedx_learning.api import authoring as authoring_api
+from openedx_learning.api.authoring_models import DraftChangeLog, PublishLog
+from openedx_events.content_authoring.data import (
+    ContentLibraryData,
+    LibraryBlockData,
+    LibraryCollectionData,
+    LibraryContainerData,
+)
+from openedx_events.content_authoring.signals import (
+    CONTENT_LIBRARY_UPDATED,
+    LIBRARY_BLOCK_UPDATED,
+    LIBRARY_COLLECTION_UPDATED,
+    LIBRARY_CONTAINER_UPDATED,
+)
 
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.fields import Scope
 
-from opaque_keys.edx.locator import BlockUsageLocator
 from openedx.core.lib import ensure_cms
 from xmodule.capa_block import ProblemBlock
 from xmodule.library_content_block import ANY_CAPA_TYPE_VALUE, LegacyLibraryContentBlock
@@ -39,8 +58,180 @@ from xmodule.modulestore.mixed import MixedModuleStore
 from . import api
 from .models import ContentLibraryBlockImportTask
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 TASK_LOGGER = get_task_logger(__name__)
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def send_events_after_publish(publish_log_pk: int, library_key_str: str) -> None:
+    """
+    Send events to trigger actions like updating the search index, after we've
+    published some items in a library.
+    
+    We use the PublishLog record so we can detect exactly what was changed,
+    including any auto-published changes like child items in containers.
+
+    This happens in a celery task so that it can be run asynchronously if
+    needed, because the "publish all changes" action can potentially publish
+    hundreds or even thousands of components/containers at once, and synchronous
+    event handlers like updating the search index may a while to complete in
+    that case.
+    """
+    publish_log = PublishLog.objects.get(pk=publish_log_pk)
+    library_key = LibraryLocatorV2.from_string(library_key_str)
+    affected_entities = publish_log.records.select_related("entity", "entity__container", "entity__component").all()
+
+    # Update anything that needs to be updated (e.g. search index):
+    for record in affected_entities:
+        if hasattr(record.entity, "component"):
+            usage_key = api.library_component_usage_key(library_key, record.entity.component)
+            LIBRARY_BLOCK_UPDATED.send_event(
+                library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key)
+            )
+        elif hasattr(record.entity, "container"):
+            container_key = api.library_container_locator(library_key, record.entity.container)
+            LIBRARY_CONTAINER_UPDATED.send_event(
+                library_container=LibraryContainerData(container_key=container_key)
+            )
+        else:
+            log.warning(
+                f"PublishableEntity {record.entity.pk} / {record.entity.key} was modified during publish operation "
+                "but is of unknown type."
+            )
+
+    # This publish will have impacted fields like "last_published",
+    # "published_by", and possibly "has_unpublished_changes" on the library
+    # overall, so send a CONTENT_LIBRARY_UPDATED event.
+    CONTENT_LIBRARY_UPDATED.send_event(
+        content_library=ContentLibraryData(
+            library_key=library_key,
+            # Deprecated: this meant to re-index all blocks, but we now send specific LIBRARY_BLOCK_UPDATED
+            # events for each block changed.
+            update_blocks=True,
+        )
+    )
+
+
+def wait_for_post_publish_events(publish_log: PublishLog, library_key: LibraryLocatorV2):
+    """
+    After publishing some changes, trigger the required event handlers (e.g.
+    update the search index). Try to wait for that to complete before returning,
+    up to some reasonable timeout, and then finish anything remaining
+    asynchonrously.
+    """
+    # Update the search index (and anything else) for the affected blocks
+    result = send_events_after_publish.apply_async(args=(publish_log.pk, str(library_key)))
+    # Try waiting a bit for those post-publish events to be handled:
+    try:
+        result.get(timeout=15)
+    except TimeoutError:
+        pass
+        # This is fine! The search index is still being updated, and/or other
+        # event handlers are still following up on the results, but the publish
+        # already *did* succeed, and the events will continue to be processed in
+        # the background by the celery worker until everything is updated.
+
+
+@shared_task(base=LoggedTask)
+@set_code_owner_attribute
+def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> None:
+    """
+    Send events to trigger actions like updating the search index, after we've
+    reverted some unpublished changes in a library.
+
+    See notes on the analogous function above, send_events_after_publish.
+    """
+    try:
+        draft_change_log = DraftChangeLog.objects.get(id=draft_change_log_id)
+    except DraftChangeLog.DoesNotExist:
+        # When a revert operation is a no-op, Learning Core deletes the empty
+        # DraftChangeLog, so we'll assume that's what happened here.
+        log.info(f"Library revert in {library_key_str} did not result in any changes.")
+        return
+
+    library_key = LibraryLocatorV2.from_string(library_key_str)
+    affected_entities = draft_change_log.records.select_related(
+        "entity", "entity__container", "entity__component",
+    ).all()
+
+    affected_container_keys: set[LibraryContainerLocator] = set()
+    affected_collection_keys: set[LibraryCollectionLocator] = set()
+
+    # Update anything that needs to be updated (e.g. search index):
+    for record in affected_entities:
+        if hasattr(record.entity, "component"):
+            usage_key = api.library_component_usage_key(library_key, record.entity.component)
+            LIBRARY_BLOCK_UPDATED.send_event(
+                library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key)
+            )
+            # If any containers contain this component, their child list / component count may need to be updated
+            # e.g. if this was a newly created component in the container and is now deleted, or this was deleted and
+            # is now restored.
+            for parent_container in api.get_containers_contains_component(usage_key):
+                affected_container_keys.add(parent_container.container_key)
+
+            # TODO: do we also need to send CONTENT_OBJECT_ASSOCIATIONS_CHANGED for this component, or is
+            # LIBRARY_BLOCK_UPDATED sufficient?
+        elif hasattr(record.entity, "container"):
+            container_key = api.library_container_locator(library_key, record.entity.container)
+            affected_container_keys.add(container_key)
+        else:
+            log.warning(
+                f"PublishableEntity {record.entity.pk} / {record.entity.key} was modified during publish operation "
+                "but is of unknown type."
+            )
+        # If any collections contain this entity, their item count may need to be updated, e.g. if this was a
+        # newly created component in the collection and is now deleted, or this was deleted and is now re-added.
+        for parent_collection in authoring_api.get_entity_collections(
+            record.entity.learning_package_id, record.entity.key,
+        ):
+            collection_key = api.library_collection_locator(
+                library_key=library_key,
+                collection_key=parent_collection.key,
+            )
+            affected_collection_keys.add(collection_key)
+
+    for container_key in affected_container_keys:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(container_key=container_key)
+        )
+
+    for collection_key in affected_collection_keys:
+        LIBRARY_COLLECTION_UPDATED.send_event(
+            library_collection=LibraryCollectionData(collection_key=collection_key)
+        )
+
+    # This revert will have impacted the "has_unpublished_changes" field on the
+    # library overall, so send a CONTENT_LIBRARY_UPDATED event.
+    CONTENT_LIBRARY_UPDATED.send_event(
+        content_library=ContentLibraryData(
+            library_key=library_key,
+            # Deprecated: this meant to re-index all blocks, but we now send specific LIBRARY_BLOCK_UPDATED
+            # events for each block changed.
+            update_blocks=True,
+        )
+    )
+
+
+def wait_for_post_revert_events(draft_change_log: DraftChangeLog, library_key: LibraryLocatorV2):
+    """
+    After discard all changes in a library, trigger the required event handlers
+    (e.g. update the search index). Try to wait for that to complete before
+    returning, up to some reasonable timeout, and then finish anything remaining
+    asynchonrously.
+    """
+    # Update the search index (and anything else) for the affected blocks
+    result = send_events_after_revert.apply_async(args=(draft_change_log.pk, str(library_key)))
+    # Try waiting a bit for those post-publish events to be handled:
+    try:
+        result.get(timeout=15)
+    except TimeoutError:
+        pass
+        # This is fine! The search index is still being updated, and/or other
+        # event handlers are still following up on the results, but the revert
+        # already *did* succeed, and the events will continue to be processed in
+        # the background by the celery worker until everything is updated.
 
 
 @shared_task(base=LoggedTask)
@@ -57,9 +248,9 @@ def import_blocks_from_course(import_task_id, course_key_str, use_course_key_as_
 
         def on_progress(block_key, block_num, block_count, exception=None):
             if exception:
-                logger.exception('Import block failed: %s', block_key)
+                log.exception('Import block failed: %s', block_key)
             else:
-                logger.info('Import block succesful: %s', block_key)
+                log.info('Import block succesful: %s', block_key)
             import_task.save_progress(block_num / block_count)
 
         edx_client = api.EdxModulestoreImportClient(
@@ -121,6 +312,9 @@ def sync_from_library(
 ) -> None:
     """
     Celery task to update the children of the library_content block at `dest_block_id`.
+
+    FIXME: this is related to legacy modulestore libraries and shouldn't be part of the
+    openedx.core.djangoapps.content_libraries app, which is the app for v2 libraries.
     """
     set_code_owner_attribute_from_module(__name__)
     store = modulestore()
@@ -143,6 +337,9 @@ def duplicate_children(
 ) -> None:
     """
     Celery task to duplicate the children from `source_block_id` to `dest_block_id`.
+
+    FIXME: this is related to legacy modulestore libraries and shouldn't be part of the
+    openedx.core.djangoapps.content_libraries app, which is the app for v2 libraries.
     """
     set_code_owner_attribute_from_module(__name__)
     store = modulestore()
@@ -180,6 +377,9 @@ def _sync_children(
     Implementation helper for `sync_from_library` and `duplicate_children` Celery tasks.
 
     Can update children with a specific library `library_version`, or latest (`library_version=None`).
+
+    FIXME: this is related to legacy modulestore libraries and shouldn't be part of the
+    openedx.core.djangoapps.content_libraries app, which is the app for v2 libraries.
     """
     source_blocks = []
     library_key = dest_block.source_library_key.for_branch(
@@ -220,6 +420,9 @@ def _copy_overrides(
 ) -> None:
     """
     Copy any overrides the user has made on children of `source` over to the children of `dest_block`, recursively.
+
+    FIXME: this is related to legacy modulestore libraries and shouldn't be part of the
+    openedx.core.djangoapps.content_libraries app, which is the app for v2 libraries.
     """
     for field in source_block.fields.values():
         if field.scope == Scope.settings and field.is_set_on(source_block):

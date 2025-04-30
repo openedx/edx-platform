@@ -63,10 +63,8 @@ from .containers import (
     ContainerMetadata,
     ContainerType,
 )
-from .libraries import (
-    library_collection_locator,
-    PublishableItem,
-)
+from .collections import library_collection_locator
+from .libraries import PublishableItem
 
 # This content_libraries API is sometimes imported in the LMS (should we prevent that?), but the content_staging app
 # cannot be. For now we only need this one type import at module scope, so only import it during type checks.
