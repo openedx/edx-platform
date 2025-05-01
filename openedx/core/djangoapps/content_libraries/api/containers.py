@@ -425,6 +425,14 @@ def update_container_children(
                 created_by=user_id,
                 entities_action=entities_action,
             )
+
+            for key in children_ids:
+                CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                    content_object=ContentObjectChangedData(
+                        object_id=str(key),
+                        changes=["units"],
+                    ),
+                )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
