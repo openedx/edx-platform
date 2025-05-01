@@ -41,18 +41,7 @@ from openedx.core.djangoapps.content.search.models import IncrementalIndexComple
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 
-from .documents import (
-    Fields,
-    meili_id_from_opaque_key,
-    searchable_doc_collections,
-    searchable_doc_for_collection,
-    searchable_doc_for_container,
-    searchable_doc_for_course_block,
-    searchable_doc_for_library_block,
-    searchable_doc_for_key,
-    searchable_doc_tags,
-    searchable_doc_tags_for_collection,
-)
+from .documents import *
 
 log = logging.getLogger(__name__)
 
@@ -451,6 +440,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     doc.update(searchable_doc_for_library_block(metadata))
                     doc.update(searchable_doc_tags(metadata.usage_key))
                     doc.update(searchable_doc_collections(metadata.usage_key))
+                    doc.update(searchable_doc_units(metadata.usage_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing library component {component}: {err}")
@@ -873,6 +863,15 @@ def upsert_item_collections_index_docs(opaque_key: OpaqueKey):
     """
     doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
     doc.update(searchable_doc_collections(opaque_key))
+    _update_index_docs([doc])
+
+
+def upsert_item_units_index_docs(opaque_key: OpaqueKey):
+    """
+    Updates the units data in documents for the given Course/Library block
+    """
+    doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
+    doc.update(searchable_doc_units(opaque_key))
     _update_index_docs([doc])
 
 
