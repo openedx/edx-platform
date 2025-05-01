@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.storage import get_storage_instance
 from common.djangoapps.student.models import UserProfile
 
 from ..errors import UserNotFound
@@ -25,9 +26,8 @@ def get_profile_image_storage():
     Configures and returns a django Storage instance that can be used
     to physically locate, read and write profile images.
     """
-    config = settings.PROFILE_IMAGE_BACKEND
-    storage_class = get_storage_class(config['class'])
-    return storage_class(**config['options'])
+
+    return get_storage_instance(settings.PROFILE_IMAGE_BACKEND)
 
 
 def _make_profile_image_name(username):

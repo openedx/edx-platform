@@ -7,6 +7,8 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import StaticFilesStorage
 from django.core.files.storage import get_storage_class, FileSystemStorage
 from django.utils.deconstruct import deconstructible
+from django.utils.module_loading import import_string
+
 from functools import lru_cache
 from pipeline.storage import NonPackagingMixin
 from require.storage import OptimizedFilesMixin
@@ -112,3 +114,29 @@ def get_storage(storage_class=None, **kwargs):
     example.
     """
     return get_storage_class(storage_class)(**kwargs)
+
+
+def get_storage_instance(config, options=None):
+    """
+    Returns a Django storage instance from a string path or config dict.
+
+    Args:
+        config (str or dict): Either a string with the full class path, or a dict with:
+            - 'class': import path to the storage class
+            - 'options' (optional): kwargs for the constructor
+
+    Returns:
+        An instance of the specified storage backend.
+    """
+    if isinstance(config, str):
+        storage_class = import_string(config)
+        return storage_class(**(options or {}))
+    elif isinstance(config, dict):
+        class_path = config.get('class')
+        opts = config.get('options', {})
+        if not class_path:
+            raise ValueError("Missing 'class' key in config dict")
+        storage_class = import_string(class_path)
+        return storage_class(**opts)
+    else:
+        raise TypeError("Expected config to be a string or a dict")

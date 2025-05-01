@@ -12,7 +12,6 @@ import pytz
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.files.storage import get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
 from edxval.api import create_profile, create_video, get_course_video_image_url, update_video_image
@@ -26,6 +25,7 @@ from cms.djangoapps.contentstore.video_utils import (
     validate_video_image
 )
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
+from openedx.core.storage import get_storage_instance
 
 
 class ValidateVideoImageTestCase(TestCase):
@@ -390,9 +390,10 @@ class S3Boto3TestCase(TestCase):
     def test_video_backend(self):
         self.assertEqual(
             S3Boto3Storage,
-            get_storage_class(
+            get_storage_instance(
                 'storages.backends.s3boto3.S3Boto3Storage',
-            )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {})).__class__
+                settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {})
+            ).__class__
         )
 
     @override_settings(VIDEO_IMAGE_SETTINGS={
@@ -401,10 +402,10 @@ class S3Boto3TestCase(TestCase):
             {'bucket_name': 'test', 'default_acl': None, 'location': 'abc/def'}}
     )
     def test_boto3_backend_with_params(self):
-        storage = get_storage_class(
-            settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_CLASS', {})
-        )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {}))
-
+        storage = get_storage_instance({
+                'class': settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_CLASS'),
+                'options': settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {})
+        })
         self.assertEqual(S3Boto3Storage, storage.__class__)
 
     def test_storage_without_global_default_acl_setting(self):
