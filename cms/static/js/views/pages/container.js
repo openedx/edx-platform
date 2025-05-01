@@ -64,6 +64,8 @@ function($, _, Backbone, gettext, BasePage,
             this.isLibraryPage = this.model.attributes.category === 'library';
             this.isLibraryContentPage = this.model.attributes.category === 'library_content';
             this.isSplitTestContentPage = this.model.attributes.category === 'split_test';
+            this.isVerticalContentPage = this.model.attributes.category === 'vertical';
+
             this.nameEditor = new XBlockStringFieldEditor({
                 el: this.$('.wrapper-xblock-field'),
                 model: this.model
@@ -159,6 +161,9 @@ function($, _, Backbone, gettext, BasePage,
                         break;
                     case 'completeManageXBlockAccess':
                         this.refreshXBlock(xblockElement, false);
+                        break;
+                    case 'completeXBlockDuplicating':
+                        this.refreshXBlock(xblockElement, true, true);
                         break;
                     case 'completeXBlockMoving':
                         xblockWrapper.hide();
@@ -1138,7 +1143,6 @@ function($, _, Backbone, gettext, BasePage,
         onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
             var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
                 useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
-                useVideoGalleryFlow = this.$('.xblock-header-primary').attr("use-video-gallery-flow"),
                 useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
             // find the block type in the locator if availible
@@ -1151,15 +1155,7 @@ function($, _, Backbone, gettext, BasePage,
                     || (useNewVideoEditor === 'True' && blockType.includes('video'))
                     || (useNewProblemEditor === 'True' && blockType.includes('problem')))
             ){
-                var destinationUrl;
-                if (useVideoGalleryFlow === 'True' && blockType.includes('video')) {
-                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/course-videos/' + encodeURI(data.locator);
-                }
-                else {
-                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
-                }
-
-                if (this.options.isIframeEmbed && this.isSplitTestContentPage) {
+                if (this.options.isIframeEmbed && (this.isSplitTestContentPage || this.isVerticalContentPage)) {
                     return this.postMessageToParent({
                         type: 'handleRedirectToXBlockEditPage',
                         message: 'Redirect to xBlock edit page',
@@ -1169,8 +1165,6 @@ function($, _, Backbone, gettext, BasePage,
                         },
                     });
                 }
-
-                window.location.href = destinationUrl;
                 return;
             }
             if (!this.options.isIframeEmbed) {
