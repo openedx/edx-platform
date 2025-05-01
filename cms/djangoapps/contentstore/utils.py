@@ -2429,8 +2429,5 @@ def create_or_update_xblock_upstream_link(xblock, course_key: CourseKey, created
         _create_or_update_component_link(course_key, created, xblock)
     except InvalidKeyError:
         # It is possible that the upstream is a container and UsageKeyV2 parse failed
-        # Create upstream container link
-        try:
-            _create_or_update_container_link(course_key, created, xblock)
-        except InvalidKeyError:
-            log.error(f"Invalid key: {xblock.upstream}")
+        # Create upstream container link and raise InvalidKeyError if xblock.upstream is a valid key.
+        _create_or_update_container_link(course_key, created, xblock)
