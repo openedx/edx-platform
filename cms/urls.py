@@ -254,7 +254,7 @@ urlpatterns.append(
 urlpatterns.append(path('admin/', admin.site.urls))
 
 # enable entrance exams
-if core_toggles.ENTRANCE_EXAMS.is_enabled():
+if core_toggles.are_entrance_exams_enabled():
     urlpatterns.append(re_path(fr'^course/{settings.COURSE_KEY_PATTERN}/entrance_exam/?$',
                        contentstore_views.entrance_exam))
 
