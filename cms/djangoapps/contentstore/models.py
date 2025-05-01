@@ -293,7 +293,7 @@ class ContainerLink(EntityLinkBase):
     @classmethod
     def update_or_create(
         cls,
-        upstream_container: Container | None,
+        upstream_container: int | None,
         /,
         upstream_container_key: LibraryContainerLocator,
         upstream_context_key: str,

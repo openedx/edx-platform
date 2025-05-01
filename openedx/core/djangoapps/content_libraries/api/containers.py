@@ -43,7 +43,6 @@ __all__ = [
     "ContainerMetadata",
     "ContainerType",
     # API methods
-    "get_container_from_key",
     "get_container",
     "create_container",
     "get_container_children",
@@ -111,6 +110,7 @@ class ContainerMetadata(PublishableItem):
     """
     container_key: LibraryContainerLocator
     container_type: ContainerType
+    container_pk: int
     published_display_name: str | None
 
     @classmethod
@@ -139,6 +139,7 @@ class ContainerMetadata(PublishableItem):
         return cls(
             container_key=container_key,
             container_type=container_type,
+            container_pk=container.pk,
             display_name=draft.title,
             created=container.created,
             modified=draft.created,
@@ -173,7 +174,7 @@ def library_container_locator(
     )
 
 
-def get_container_from_key(container_key: LibraryContainerLocator, isDeleted=False) -> Container:
+def _get_container_from_key(container_key: LibraryContainerLocator, isDeleted=False) -> Container:
     """
     Internal method to fetch the Container object from its LibraryContainerLocator
 
@@ -196,14 +197,11 @@ def get_container(
     container_key: LibraryContainerLocator,
     *,
     include_collections=False,
-    container: Container | None = None,
 ) -> ContainerMetadata:
     """
     Get a container (a Section, Subsection, or Unit).
     """
-    if not container:
-        container = get_container_from_key(container_key)
-    assert container.key == container_key.container_id
+    container = _get_container_from_key(container_key)
     if include_collections:
         associated_collections = authoring_api.get_entity_collections(
             container.publishable_entity.learning_package_id,
@@ -275,7 +273,7 @@ def update_container(
     """
     Update a container (e.g. a Unit) title.
     """
-    container = get_container_from_key(container_key)
+    container = _get_container_from_key(container_key)
     library_key = container_key.lib_key
 
     assert container.unit
@@ -304,7 +302,7 @@ def delete_container(
     No-op if container doesn't exist or has already been soft-deleted.
     """
     library_key = container_key.lib_key
-    container = get_container_from_key(container_key)
+    container = _get_container_from_key(container_key)
 
     affected_collections = authoring_api.get_entity_collections(
         container.publishable_entity.learning_package_id,
@@ -339,7 +337,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     Restore the specified library container.
     """
     library_key = container_key.lib_key
-    container = get_container_from_key(container_key, isDeleted=True)
+    container = _get_container_from_key(container_key, isDeleted=True)
 
     affected_collections = authoring_api.get_entity_collections(
         container.publishable_entity.learning_package_id,
@@ -381,14 +379,11 @@ def get_container_children(
     container_key: LibraryContainerLocator,
     *,
     published=False,
-    container: Container | None = None,
 ) -> list[LibraryXBlockMetadata | ContainerMetadata]:
     """
     Get the entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    if not container:
-        container = get_container_from_key(container_key)
-    assert container.key == container_key.container_id
+    container = _get_container_from_key(container_key)
     if container_key.container_type == ContainerType.Unit.value:
         child_components = authoring_api.get_components_in_unit(container.unit, published=published)
         return [LibraryXBlockMetadata.from_component(
@@ -410,7 +405,7 @@ def get_container_children_count(
     """
     Get the count of entities contained in the given container (e.g. the components/xblocks in a unit)
     """
-    container = get_container_from_key(container_key)
+    container = _get_container_from_key(container_key)
     return authoring_api.get_container_children_count(container, published=published)
 
 
@@ -425,7 +420,7 @@ def update_container_children(
     """
     library_key = container_key.lib_key
     container_type = container_key.container_type
-    container = get_container_from_key(container_key)
+    container = _get_container_from_key(container_key)
     match container_type:
         case ContainerType.Unit.value:
             components = [get_component_from_usage_key(key) for key in children_ids]  # type: ignore[arg-type]
@@ -470,7 +465,7 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
     Publish all unpublished changes in a container and all its child
     containers/blocks.
     """
-    container = get_container_from_key(container_key)
+    container = _get_container_from_key(container_key)
     library_key = container_key.lib_key
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     learning_package = content_library.learning_package

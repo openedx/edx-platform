@@ -347,13 +347,10 @@ def _collections_for_content_object(object_id: OpaqueKey) -> dict:
             collections = authoring_api.get_entity_collections(
                 component.learning_package_id,
                 component.key,
-            )
+            ).values('key', 'title')
         elif isinstance(object_id, LibraryContainerLocator):
-            container = lib_api.get_container_from_key(object_id)
-            collections = authoring_api.get_entity_collections(
-                container.publishable_entity.learning_package_id,
-                container.key,
-            )
+            container = lib_api.get_container(object_id, include_collections=True)
+            collections = container.collections
         else:
             log.warning(f"Unexpected key type for {object_id}")
 
@@ -364,8 +361,8 @@ def _collections_for_content_object(object_id: OpaqueKey) -> dict:
         return result
 
     for collection in collections:
-        result[Fields.collections][Fields.collections_display_name].append(collection.title)
-        result[Fields.collections][Fields.collections_key].append(collection.key)
+        result[Fields.collections][Fields.collections_display_name].append(collection["title"])
+        result[Fields.collections][Fields.collections_key].append(collection["key"])
 
     return result
 
@@ -578,11 +575,7 @@ def searchable_doc_for_container(
     }
 
     try:
-        container_obj = lib_api.get_container_from_key(container_key)
-        container = lib_api.get_container(
-            container_key,
-            container=container_obj,
-        )
+        container = lib_api.get_container(container_key)
     except lib_api.ContentLibraryContainerNotFound:
         # Container not found, so we can only return the base doc
         log.error(f"Container {container_key} not found")
@@ -591,7 +584,6 @@ def searchable_doc_for_container(
     draft_children = lib_api.get_container_children(
         container_key,
         published=False,
-        container=container_obj,
     )
     publish_status = PublishStatus.published
     if container.last_published is None:
@@ -621,7 +613,6 @@ def searchable_doc_for_container(
         published_children = lib_api.get_container_children(
             container_key,
             published=True,
-            container=container_obj,
         )
         doc[Fields.published] = {
             Fields.published_display_name: container.published_display_name,

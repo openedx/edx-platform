@@ -28,6 +28,8 @@ from openedx_events.content_authoring.signals import (
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx_learning.api import authoring as authoring_api
 
+from openedx.core.djangoapps.xblock import api as xblock_api
+
 from .. import api
 from ..models import ContentLibrary
 from .base import ContentLibrariesRestApiTest
@@ -546,11 +548,11 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         collection_update_event_receiver = mock.Mock()
         LIBRARY_COLLECTION_UPDATED.connect(collection_update_event_receiver)
         assert not list(self.col2.entities.all())
-        component = api.get_component_from_usage_key(UsageKey.from_string(self.lib2_problem_block["id"]))
-
+        component_key = UsageKey.from_string(self.lib2_problem_block["id"])
+        entity_key = xblock_api.entity_key_from_usage_key(component_key)
         api.set_library_item_collections(
             self.lib2.library_key,
-            component.publishable_entity,
+            entity_key,
             collection_keys=[self.col2.key, self.col3.key],
         )
 
