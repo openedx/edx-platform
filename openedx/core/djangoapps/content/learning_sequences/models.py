@@ -228,8 +228,9 @@ class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
         unique_together = [
             ['course_context', 'usage_key'],
         ]
-        index_together = [
-            ['course_context', 'ordering'],
+
+        indexes = [
+            models.Index(fields=['course_context', 'ordering'],name='idx_user_task_exc')
         ]
 
 

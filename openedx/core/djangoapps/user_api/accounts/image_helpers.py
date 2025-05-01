@@ -8,7 +8,6 @@ import hashlib
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.files.storage import get_storage_class
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.storage import get_storage_instance
