@@ -22,23 +22,35 @@ _PROFILE_IMAGE_SIZES = list(settings.PROFILE_IMAGE_SIZES_MAP.values())
 
 def get_profile_image_storage():
     """
-        Returns a configured Django Storage instance for handling profile images.
-        The storage backend is defined in the Django setting `PROFILE_IMAGE_BACKEND`,
-        which should be a dictionary with the following structure:
-            {
-                'class': 'full.path.to.StorageClass',
-                'options': {
-                    # Optional keyword arguments passed to the storage class constructor
-                }
-            }
+    Returns a configured Django Storage instance for handling profile images.
 
-        This function dynamically loads the specified storage class and initializes it
-        with the provided options.
+    The storage backend is defined in the Django setting `PROFILE_IMAGE_BACKEND`,
+    which should be a dictionary with the following structure:
+        {
+            'class': 'full.path.to.StorageClass',
+            'options': {
+                # Optional keyword arguments passed to the storage class constructor
+            }
+        }
+
+    If `PROFILE_IMAGE_BACKEND` is not defined or does not include a 'class' key,
+    the default storage backend defined in `DEFAULT_FILE_STORAGE` is used.
+
+    Returns:
+        An instance of the configured Django storage class.
     """
-    config = settings.PROFILE_IMAGE_BACKEND
-    storage_class_path = config.get('class')
+
+    if hasattr(settings, 'PROFILE_IMAGE_BACKEND') and 'class' in settings.PROFILE_IMAGE_BACKEND:
+        storage_class_path = settings.PROFILE_IMAGE_BACKEND['class']
+        options = settings.PROFILE_IMAGE_BACKEND.get('options', {})
+    else:
+        storage_class_path = getattr(
+            settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage'
+        )
+        options = {}
+
     storage_class = import_string(storage_class_path)
-    return storage_class(**config.get('options', {}))
+    return storage_class(**options)
 
 
 def _make_profile_image_name(username):
