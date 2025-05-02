@@ -948,11 +948,21 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
         self._validate_calls_of_html_block(container_update_event_receiver)
 
     def test_call_object_changed_signal_when_remove_component(self):
+        html_block_1 = self._add_block_to_library(
+            self.lib1.library_key, "html", "html3",
+        )
+        api.update_container_children(
+            self.unit2.container_key,
+            [UsageKey.from_string(html_block_1["id"])],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+        )
+
         event_reciver = mock.Mock()
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
         api.update_container_children(
             self.unit2.container_key,
-            [self.html_block_usage_key],
+            [UsageKey.from_string(html_block_1["id"])],
             None,
             entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
         )
@@ -963,7 +973,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectChangedData(
-                    object_id=str(self.html_block_usage_key),
+                    object_id=html_block_1["id"],
                     changes=["units"],
                 ),
             },
@@ -974,10 +984,10 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
         event_reciver = mock.Mock()
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
         html_block_1 = self._add_block_to_library(
-            self.lib1.library_key, "html", "html3",
+            self.lib1.library_key, "html", "html4",
         )
         html_block_2 = self._add_block_to_library(
-            self.lib1.library_key, "html", "html4",
+            self.lib1.library_key, "html", "html5",
         )
 
         api.update_container_children(
@@ -996,7 +1006,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectChangedData(
-                    object_id=str(UsageKey.from_string(html_block_1["id"])),
+                    object_id=html_block_1["id"],
                     changes=["units"],
                 ),
             },
@@ -1007,7 +1017,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
                 "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
                 "sender": None,
                 "content_object": ContentObjectChangedData(
-                    object_id=str(UsageKey.from_string(html_block_2["id"])),
+                    object_id=html_block_2["id"],
                     changes=["units"],
                 ),
             },
