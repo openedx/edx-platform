@@ -293,7 +293,7 @@ class ContainerLink(EntityLinkBase):
     @classmethod
     def update_or_create(
         cls,
-        upstream_container: int | None,
+        upstream_container_id: int | None,
         /,
         upstream_container_key: LibraryContainerLocator,
         upstream_context_key: str,
@@ -316,10 +316,10 @@ class ContainerLink(EntityLinkBase):
             'version_synced': version_synced,
             'version_declined': version_declined,
         }
-        if upstream_container:
+        if upstream_container_id:
             new_values.update(
                 {
-                    'upstream_container': upstream_container,
+                    'upstream_container_id': upstream_container_id,
                 }
             )
         try:

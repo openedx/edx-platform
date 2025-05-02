@@ -193,15 +193,6 @@ def get_block_display_name(block: XBlock) -> str:
         return xblock_type_display_name(block.scope_ids.block_type)
 
 
-def entity_key_from_usage_key(usage_key: UsageKeyV2) -> str:
-    """
-    Construct the PublishableEntity key string for a given usage key.
-
-    Note: this method mirrors logic in openedx-learning; see authoring_api.create_component()
-    """
-    return f"xblock.v1:{usage_key.block_type}:{usage_key.block_id}"
-
-
 def get_component_from_usage_key(usage_key: UsageKeyV2) -> Component:
     """
     Fetch the Component object for a given usage key.

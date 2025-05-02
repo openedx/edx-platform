@@ -268,11 +268,11 @@ class LibraryBlockCollectionsView(APIView):
         serializer = ContentLibraryItemCollectionsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        entity_key = xblock_api.entity_key_from_usage_key(key)
+        component = api.get_component_from_usage_key(key)
         collection_keys = serializer.validated_data['collection_keys']
         api.set_library_item_collections(
             library_key=key.lib_key,
-            entity_key=entity_key,
+            entity_key=component.publishable_entity.key,
             collection_keys=collection_keys,
             created_by=request.user.id,
             content_library=content_library,
