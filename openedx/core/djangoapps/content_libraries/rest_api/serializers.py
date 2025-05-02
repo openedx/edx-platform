@@ -138,6 +138,7 @@ class PublishableItemSerializer(serializers.Serializer):
     """
     id = serializers.SerializerMethodField()
     display_name = serializers.CharField()
+    tags_count = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
     published_by = serializers.CharField(read_only=True)
     last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
@@ -149,7 +150,6 @@ class PublishableItemSerializer(serializers.Serializer):
     # When creating a new XBlock in a library, the slug becomes the ID part of
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True)
-    tags_count = serializers.IntegerField(read_only=True)
 
     collections = CollectionMetadataSerializer(many=True, required=False)
     can_stand_alone = serializers.BooleanField(read_only=True)
