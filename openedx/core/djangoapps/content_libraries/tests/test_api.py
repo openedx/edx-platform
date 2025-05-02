@@ -564,28 +564,20 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
                 changes=["collections"],
             ),
         }.items() <= event_receiver.call_args_list[0].kwargs.items()
-        assert {
-            "signal": LIBRARY_COLLECTION_UPDATED,
-            "sender": None,
-            "library_collection": LibraryCollectionData(
-                collection_key=api.library_collection_locator(
-                    self.lib2.library_key,
-                    collection_key=self.col2.key,
-                ),
+
+        assert len(collection_update_event_receiver.call_args_list) == 2
+        collection_update_events = [call.kwargs for call in collection_update_event_receiver.call_args_list]
+        assert all(event["signal"] == LIBRARY_COLLECTION_UPDATED for event in collection_update_events)
+        assert {event["library_collection"] for event in collection_update_events} == {
+            LibraryCollectionData(
+                collection_key=api.library_collection_locator(self.lib2.library_key, collection_key=self.col2.key),
                 background=True,
             ),
-        }.items() <= collection_update_event_receiver.call_args_list[0].kwargs.items()
-        assert {
-            "signal": LIBRARY_COLLECTION_UPDATED,
-            "sender": None,
-            "library_collection": LibraryCollectionData(
-                collection_key=api.library_collection_locator(
-                    self.lib2.library_key,
-                    collection_key=self.col3.key,
-                ),
+            LibraryCollectionData(
+                collection_key=api.library_collection_locator(self.lib2.library_key, collection_key=self.col3.key),
                 background=True,
-            ),
-        }.items() <= collection_update_event_receiver.call_args_list[1].kwargs.items()
+            )
+        }
 
     def test_delete_library_block(self):
         api.update_library_collection_items(
