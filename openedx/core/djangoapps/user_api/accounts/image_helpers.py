@@ -39,14 +39,13 @@ def get_profile_image_storage():
     Returns:
         An instance of the configured Django storage class.
     """
+    config = getattr(settings, 'PROFILE_IMAGE_BACKEND', None)
 
-    if hasattr(settings, 'PROFILE_IMAGE_BACKEND') and 'class' in settings.PROFILE_IMAGE_BACKEND:
-        storage_class_path = settings.PROFILE_IMAGE_BACKEND['class']
-        options = settings.PROFILE_IMAGE_BACKEND.get('options', {})
+    if config and isinstance(config, dict):
+        storage_class_path = config.get('class') or config.get('STORAGE_CLASS')
+        options = config.get('options') or config.get('STORAGE_KWARGS', {})
     else:
-        storage_class_path = getattr(
-            settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage'
-        )
+        storage_class_path = getattr(settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
         options = {}
 
     storage_class = import_string(storage_class_path)
