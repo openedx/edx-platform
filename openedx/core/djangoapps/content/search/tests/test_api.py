@@ -61,19 +61,27 @@ class TestSearchApi(ModuleStoreTestCase):
         # Clear the Meilisearch client to avoid side effects from other tests
         api.clear_meilisearch_client()
 
+        modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
         # Create course
-        self.course = self.store.create_course(
-            "org1",
-            "test_course",
-            "test_run",
-            self.user_id,
-            fields={"display_name": "Test Course"},
-        )
-        course_access, _ = SearchAccess.objects.get_or_create(context_key=self.course.id)
-        self.course_block_key = "block-v1:org1+test_course+test_run+type@course+block@course"
+        with freeze_time(modified_date):
+            self.course = self.store.create_course(
+                "org1",
+                "test_course",
+                "test_run",
+                self.user_id,
+                fields={"display_name": "Test Course"},
+            )
+            course_access, _ = SearchAccess.objects.get_or_create(context_key=self.course.id)
+            self.course_block_key = "block-v1:org1+test_course+test_run+type@course+block@course"
 
-        # Create XBlocks
-        self.sequential = self.store.create_child(self.user_id, self.course.location, "sequential", "test_sequential")
+            # Create XBlocks
+            self.sequential = self.store.create_child(
+                self.user_id,
+                self.course.location,
+                "sequential",
+                "test_sequential"
+            )
+            self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical")
         self.doc_sequential = {
             "id": "block-v1org1test_coursetest_runtypesequentialblocktest_sequential-f702c144",
             "type": "course_block",
@@ -90,8 +98,8 @@ class TestSearchApi(ModuleStoreTestCase):
             ],
             "content": {},
             "access_id": course_access.id,
+            "modified": modified_date.timestamp(),
         }
-        self.store.create_child(self.user_id, self.sequential.location, "vertical", "test_vertical")
         self.doc_vertical = {
             "id": "block-v1org1test_coursetest_runtypeverticalblocktest_vertical-e76a10a4",
             "type": "course_block",
@@ -112,6 +120,7 @@ class TestSearchApi(ModuleStoreTestCase):
             ],
             "content": {},
             "access_id": course_access.id,
+            "modified": modified_date.timestamp(),
         }
         # Make sure the CourseOverview for the course is created:
         CourseOverview.get_from_id(self.course.id)
@@ -130,7 +139,6 @@ class TestSearchApi(ModuleStoreTestCase):
             self.problem1 = library_api.create_library_block(self.library.key, "problem", "p1")
             self.problem2 = library_api.create_library_block(self.library.key, "problem", "p2")
         # Update problem1, freezing the date so we can verify modified date serializes correctly.
-        modified_date = datetime(2024, 5, 6, 7, 8, 9, tzinfo=timezone.utc)
         with freeze_time(modified_date):
             library_api.set_library_block_olx(self.problem1.usage_key, "<problem />")
 
@@ -230,6 +238,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Unit 1",
             # description is not set for containers
             "num_children": 0,
+            "content": {"child_usage_keys": []},
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",

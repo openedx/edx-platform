@@ -184,6 +184,7 @@ class LibraryItem:
     created: datetime
     modified: datetime
     display_name: str
+    tags_count: int = 0
 
 
 @dataclass(frozen=True, kw_only=True)

@@ -547,10 +547,9 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         LIBRARY_COLLECTION_UPDATED.connect(collection_update_event_receiver)
         assert not list(self.col2.entities.all())
         component = api.get_component_from_usage_key(UsageKey.from_string(self.lib2_problem_block["id"]))
-
         api.set_library_item_collections(
-            self.lib2.library_key,
-            component.publishable_entity,
+            library_key=self.lib2.library_key,
+            entity_key=component.publishable_entity.key,
             collection_keys=[self.col2.key, self.col3.key],
         )
 
