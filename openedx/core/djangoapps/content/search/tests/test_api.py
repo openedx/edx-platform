@@ -978,7 +978,7 @@ class TestSearchApi(ModuleStoreTestCase):
         new_unit_dict = {
             **self.unit_dict,
             "num_children": 1,
-            'content': {'child_usage_keys': [self.doc_problem1["id"]]}
+            'content': {'child_usage_keys': [self.doc_problem1["usage_key"]]}
         }
 
         assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
