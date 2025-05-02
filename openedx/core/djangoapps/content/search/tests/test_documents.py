@@ -531,6 +531,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "display_name": "A Unit in the Search Index",
             # description is not set for containers
             "num_children": 0,
+            "content": {
+                "child_usage_keys": [],
+            },
             "publish_status": "never",
             "context_key": "lib:edX:2012_Fall",
             "access_id": self.library_access_id,
@@ -571,6 +574,11 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "display_name": "A Unit in the Search Index",
             # description is not set for containers
             "num_children": 1,
+            "content": {
+                "child_usage_keys": [
+                    "lb:edX:2012_Fall:html:text2",
+                ],
+            },
             "publish_status": "published",
             "context_key": "lib:edX:2012_Fall",
             "access_id": self.library_access_id,
@@ -585,6 +593,11 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "published": {
                 "num_children": 1,
                 "display_name": "A Unit in the Search Index",
+                "content": {
+                    "child_usage_keys": [
+                        "lb:edX:2012_Fall:html:text2",
+                    ],
+                },
             },
         }
 
@@ -627,6 +640,12 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "display_name": "A Unit in the Search Index",
             # description is not set for containers
             "num_children": 2,
+            "content": {
+                "child_usage_keys": [
+                    "lb:edX:2012_Fall:html:text2",
+                    "lb:edX:2012_Fall:html:text3",
+                ],
+            },
             "publish_status": "modified",
             "context_key": "lib:edX:2012_Fall",
             "access_id": self.library_access_id,
@@ -641,6 +660,11 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "published": {
                 "num_children": 1,
                 "display_name": "A Unit in the Search Index",
+                "content": {
+                    "child_usage_keys": [
+                        "lb:edX:2012_Fall:html:text2",
+                    ],
+                },
             },
         }
 

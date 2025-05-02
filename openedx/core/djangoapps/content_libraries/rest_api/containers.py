@@ -184,7 +184,7 @@ class LibraryContainerChildrenView(GenericAPIView):
             request.user,
             permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
         )
-        child_entities = api.get_container_children(container_key, published)
+        child_entities = api.get_container_children(container_key, published=published)
         if container_key.container_type == api.ContainerType.Unit.value:
             data = serializers.LibraryXBlockMetadataSerializer(child_entities, many=True).data
         else:
@@ -314,14 +314,13 @@ class LibraryContainerCollectionsView(GenericAPIView):
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
-        container = api.get_container_from_key(container_key)
         serializer = serializers.ContentLibraryItemCollectionsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         collection_keys = serializer.validated_data['collection_keys']
         api.set_library_item_collections(
             library_key=container_key.lib_key,
-            publishable_entity=container.publishable_entity,
+            entity_key=container_key.container_id,
             collection_keys=collection_keys,
             created_by=request.user.id,
             content_library=content_library,

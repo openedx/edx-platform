@@ -181,7 +181,7 @@ def update_library_collection_items(
 
 def set_library_item_collections(
     library_key: LibraryLocatorV2,
-    publishable_entity: PublishableEntity,
+    entity_key: str,
     *,
     collection_keys: list[str],
     created_by: int | None = None,
@@ -206,6 +206,11 @@ def set_library_item_collections(
     assert content_library
     assert content_library.learning_package_id
     assert content_library.library_key == library_key
+
+    publishable_entity = authoring_api.get_publishable_entity_by_key(
+        content_library.learning_package_id,
+        key=entity_key,
+    )
 
     # Note: Component.key matches its PublishableEntity.key
     collection_qs = authoring_api.get_collections(content_library.learning_package_id).filter(
