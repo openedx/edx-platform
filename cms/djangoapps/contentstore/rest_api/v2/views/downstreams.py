@@ -267,7 +267,7 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
                     fetch_customizable_fields_from_block(downstream=downstream, user=request.user)
                 else:
                     assert isinstance(link.upstream_key, LibraryContainerLocator)
-                    fetch_customizable_fields_from_container(downstream=downstream, user=request.user)
+                    fetch_customizable_fields_from_container(downstream=downstream)
         except BadDownstream as exc:
             logger.exception(
                 "'%s' is an invalid downstream; refusing to set its upstream to '%s'",
