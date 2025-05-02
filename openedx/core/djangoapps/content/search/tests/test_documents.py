@@ -52,23 +52,23 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.store = modulestore()
-        cls.org = Organization.objects.create(name="edX", short_name="edX")
-        cls.toy_course = ToyCourseFactory.create()  # See xmodule/modulestore/tests/sample_courses.py
-        cls.toy_course_key = cls.toy_course.id
-
-        # Get references to some blocks in the toy course
-        cls.html_block_key = cls.toy_course_key.make_usage_key("html", "toyjumpto")
-        # Create a problem in course
-        cls.problem_block = BlockFactory.create(
-            category="problem",
-            parent_location=cls.toy_course_key.make_usage_key("vertical", "vertical_test"),
-            display_name='Test Problem',
-            data="<problem>What is a test?<multiplechoiceresponse></multiplechoiceresponse></problem>",
-        )
-
         # Create a library and collection with a block
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
+        cls.created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(cls.created_date):
+            # Get references to some blocks in the toy course
+            cls.org = Organization.objects.create(name="edX", short_name="edX")
+            cls.toy_course = ToyCourseFactory.create()  # See xmodule/modulestore/tests/sample_courses.py
+            cls.toy_course_key = cls.toy_course.id
+
+            cls.html_block_key = cls.toy_course_key.make_usage_key("html", "toyjumpto")
+            # Create a problem in course
+            cls.problem_block = BlockFactory.create(
+                category="problem",
+                parent_location=cls.toy_course_key.make_usage_key("vertical", "vertical_test"),
+                display_name='Test Problem',
+                data="<problem>What is a test?<multiplechoiceresponse></multiplechoiceresponse></problem>",
+            )
+
             cls.library = library_api.create_library(
                 org=cls.org,
                 slug="2012_Fall",
@@ -190,6 +190,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                     'usage_key': 'block-v1:edX+toy+2012_Fall+type@vertical+block@vertical_test',
                 },
             ],
+            "modified": self.created_date.timestamp(),
             "content": {
                 "capa_content": "What is a test?",
                 "problem_types": ["multiplechoiceresponse"],
@@ -223,6 +224,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "display_name": "Text",
             "description": "This is a link to another page and some Chinese 四節比分和七年前 Some "
                          "more Chinese 四節比分和七年前 ",
+            "modified": self.created_date.timestamp(),
             "breadcrumbs": [
                 {
                     'display_name': 'Toy Course',
@@ -276,6 +278,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 },
             ],
             "content": {},
+            "modified": self.created_date.timestamp(),
             # This video has no tags.
         }
 

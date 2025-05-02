@@ -678,33 +678,35 @@ function($, _, Backbone, gettext, BasePage,
             // Calculate the viewport height and the dropdown menu height.
             // Check if the dropdown would overflow beyond the iframe height based on the user's click position.
             // If the dropdown overflows, adjust its position to display above the click point.
-            const courseUnitXBlockIframeHeight = window.innerHeight;
-            const courseXBlockDropdownHeight = subMenu.offsetHeight;
-            const clickYPosition = event.clientY;
+            const iframeHeight = window.innerHeight;
+            const dropdownHeight = subMenu.offsetHeight;
+            const offsetBuffer = 10;
 
-            if (courseUnitXBlockIframeHeight < courseXBlockDropdownHeight) {
-                // If the dropdown menu is taller than the iframe, adjust the height of the dropdown menu.
+            const targetRect = event.target.getBoundingClientRect();
+            const targetBottom = targetRect.bottom;
+            const targetTop = targetRect.top;
+
+            // Calculate total space needed below the target to fit dropdown
+            const dropdownBottom = targetBottom + dropdownHeight + offsetBuffer;
+
+            const dropdownFitsBelow = dropdownBottom <= iframeHeight;
+            const dropdownFitsAbove = dropdownHeight + offsetBuffer < targetTop;
+
+            if (!dropdownFitsBelow) {
+              if (dropdownFitsAbove && this.options.isIframeEmbed) {
+                // Display the dropdown above the button
+                subMenu.style.top = `-${dropdownHeight}px`;
+              } else {
+                // Request parent to expand iframe height to fit dropdown
+                const requiredExtraHeight = dropdownBottom - iframeHeight;
                 this.postMessageToParent({
-                    type: 'toggleCourseXBlockDropdown',
-                    message: 'Adjust the height of the dropdown menu',
-                    payload: { courseXBlockDropdownHeight },
+                  type: 'toggleCourseXBlockDropdown',
+                  message: 'Expand iframe to fit dropdown',
+                  payload: {
+                    courseXBlockDropdownHeight: requiredExtraHeight,
+                  },
                 });
-            } else if ((courseXBlockDropdownHeight + clickYPosition) > courseUnitXBlockIframeHeight) {
-                if (courseXBlockDropdownHeight > courseUnitXBlockIframeHeight / 2) {
-                    // If the dropdown menu is taller than half the iframe, send a message to adjust its height.
-                    this.postMessageToParent({
-                      type: 'toggleCourseXBlockDropdown',
-                      message: 'Adjust the height of the dropdown menu',
-                      payload: {
-                        courseXBlockDropdownHeight: courseXBlockDropdownHeight / 2,
-                      },
-                    });
-                } else {
-                    // Move the dropdown menu upward to prevent it from overflowing out of the viewport.
-                    if (this.options.isIframeEmbed) {
-                        subMenu.style.top = `-${courseXBlockDropdownHeight}px`;
-                    }
-                }
+              }
             }
 
             // if propagation is not stopped, the event will bubble up to the
