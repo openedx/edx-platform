@@ -341,7 +341,6 @@ HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
 ################### Make tests faster
 
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 

@@ -230,7 +230,7 @@ class CourseSection(CourseContentVisibilityMixin, TimeStampedModel):
         ]
 
         indexes = [
-            models.Index(fields=['course_context', 'ordering'],name='idx_user_task_exc')
+            models.Index(fields=['course_context', 'ordering'],name='idx_user_task_exc4')
         ]
 
 

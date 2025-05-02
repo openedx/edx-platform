@@ -2,7 +2,7 @@
 
 
 import django.db.models.deletion
-import django.utils.timezone
+from django.utils import timezone
 import model_utils.fields
 from django.conf import settings
 from django.db import migrations, models
@@ -20,8 +20,8 @@ class Migration(migrations.Migration):
             name='UserRetirementPartnerReportingStatus',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
-                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
+                ('created', model_utils.fields.AutoCreatedField(default=timezone.now, editable=False, verbose_name='created')),
+                ('modified', model_utils.fields.AutoLastModifiedField(default=timezone.now, editable=False, verbose_name='modified')),
                 ('original_username', models.CharField(db_index=True, max_length=150)),
                 ('original_email', models.EmailField(db_index=True, max_length=254)),
                 ('original_name', models.CharField(blank=True, db_index=True, max_length=255)),

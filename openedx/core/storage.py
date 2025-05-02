@@ -114,7 +114,7 @@ def get_storage(storage_class=None, **kwargs):
     example.
     """
     if storage_class is None:
-        storage_class = settings.DEFAULT_FILE_STORAGE
+        storage_class = 'storages.backends.s3boto3.S3Boto3Storage'
 
     cls = import_string(storage_class)
     return cls(**kwargs)

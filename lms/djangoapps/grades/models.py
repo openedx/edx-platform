@@ -572,7 +572,7 @@ class PersistentCourseGrade(TimeStampedModel):
         ]
 
         indexes = [
-            models.Index(fields=['passed_timestamp', 'course_id'], name='idx_user_task_exc')
+            models.Index(fields=['passed_timestamp', 'course_id'], name='idx_user_task_exc1')
         ]
 
     # primary key will need to be large for this table

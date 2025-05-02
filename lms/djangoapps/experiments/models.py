@@ -24,7 +24,7 @@ class ExperimentData(TimeStampedModel):
 
     class Meta:
         indexes = [
-            models.Index(fields=['user', 'experiment_id'], name='idx_user_task_exc')
+            models.Index(fields=['user', 'experiment_id'], name='idx_user_task_exc3')
         ]
 
         verbose_name = 'Experiment Data'

@@ -34,7 +34,7 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
         app_label = 'coursewarehistoryextended'
         get_latest_by = "created"
         indexes = [
-            models.Index(fields=['student_module'], name='idx_user_task_exc')
+            models.Index(fields=['student_module'], name='idx_user_task_exc2')
         ]
 
     id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
