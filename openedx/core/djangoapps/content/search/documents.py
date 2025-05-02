@@ -71,7 +71,6 @@ class Fields:
     units = "units"
     units_display_name = "display_name"
     units_key = "key"
-    
 
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
@@ -415,11 +414,11 @@ def _units_for_content_object(object_id: OpaqueKey) -> dict:
 
     if not units:
         return result
-    
+
     for unit in units:
         result[Fields.units][Fields.units_display_name].append(unit.display_name)
         result[Fields.units][Fields.units_key].append(str(unit.container_key))
-    
+
     return result
 
 

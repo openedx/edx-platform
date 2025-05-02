@@ -41,7 +41,19 @@ from openedx.core.djangoapps.content.search.models import IncrementalIndexComple
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 
-from .documents import *
+from .documents import (
+    Fields,
+    meili_id_from_opaque_key,
+    searchable_doc_collections,
+    searchable_doc_for_collection,
+    searchable_doc_for_container,
+    searchable_doc_for_course_block,
+    searchable_doc_for_library_block,
+    searchable_doc_for_key,
+    searchable_doc_tags,
+    searchable_doc_tags_for_collection,
+    searchable_doc_units,
+)
 
 log = logging.getLogger(__name__)
 

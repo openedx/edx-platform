@@ -38,7 +38,13 @@ from openedx_events.content_authoring.signals import (
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import SearchAccess
 
-from .api import *
+from .api import (
+    only_if_meilisearch_enabled,
+    upsert_content_object_tags_index_doc,
+    upsert_collection_tags_index_docs,
+    upsert_item_collections_index_docs,
+    upsert_item_units_index_docs,
+)
 from .tasks import (
     delete_library_block_index_doc,
     delete_library_container_index_doc,
