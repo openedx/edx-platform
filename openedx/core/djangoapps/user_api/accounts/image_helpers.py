@@ -40,14 +40,7 @@ def get_profile_image_storage():
         An instance of the configured Django storage class.
     """
     config = settings.PROFILE_IMAGE_BACKEND
-    storage_class_path = config.get('class')
-
-    if not storage_class_path:
-        # for Django==4.2 DEFAULT_FILE_STORAGE exists but with django5.2 need to add dict `STORAGES` in settings
-        storage_class_path = getattr(
-            settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage'
-        )
-
+    storage_class_path = config.get('class') or getattr(settings, 'DEFAULT_FILE_STORAGE')
     storage_class = import_string(storage_class_path)
     return storage_class(**config.get('options'))
 
