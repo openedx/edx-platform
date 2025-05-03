@@ -22,22 +22,15 @@ _PROFILE_IMAGE_SIZES = list(settings.PROFILE_IMAGE_SIZES_MAP.values())
 
 def get_profile_image_storage():
     """
-    Returns a configured Django Storage instance for handling profile images.
+    Returns an instance of the configured Django storage class for profile images.
 
-    The storage backend is defined in the Django setting `PROFILE_IMAGE_BACKEND`,
-    which should be a dictionary with the following structure:
-        {
-            'class': 'full.path.to.StorageClass',
-            'options': {
-                # Optional keyword arguments passed to the storage class constructor
-            }
-        }
-
-    If `PROFILE_IMAGE_BACKEND` is not defined or does not include a 'class' key,
-    the default storage backend defined in `DEFAULT_FILE_STORAGE` is used.
+    The function looks for the `PROFILE_IMAGE_BACKEND` setting in the Django settings.
+    If it exists and includes a `'class'` key, that class is used as the storage backend.
+    If the setting is missing or does not include a `'class'`, the default storage backend
+    DEFAULT_FILE_STORAGE will return.
 
     Returns:
-        An instance of the configured Django storage class.
+        An instance of the configured storage backend.
     """
     config = settings.PROFILE_IMAGE_BACKEND
     storage_class_path = config.get('class') or getattr(settings, 'DEFAULT_FILE_STORAGE')
