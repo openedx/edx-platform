@@ -39,17 +39,17 @@ def get_profile_image_storage():
     Returns:
         An instance of the configured Django storage class.
     """
-    config = getattr(settings, 'PROFILE_IMAGE_BACKEND', None)
+    config = settings.PROFILE_IMAGE_BACKEND
+    storage_class_path = config.get('class')
 
-    if config and isinstance(config, dict):
-        storage_class_path = config.get('class') or config.get('STORAGE_CLASS')
-        options = config.get('options') or config.get('STORAGE_KWARGS', {})
-    else:
-        storage_class_path = getattr(settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage')
-        options = {}
+    if not storage_class_path:
+        # for Django==4.2 DEFAULT_FILE_STORAGE exists but with django5.2 need to add dict `STORAGES` in settings
+        storage_class_path = getattr(
+            settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage'
+        )
 
     storage_class = import_string(storage_class_path)
-    return storage_class(**options)
+    return storage_class(**config.get('options'))
 
 
 def _make_profile_image_name(username):
