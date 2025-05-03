@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.db.models import Count, F, Q, QuerySet
+from django.db.models import Count, F, Q, QuerySet, Max
 from django.db.models.fields import IntegerField, TextField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import GreaterThan
@@ -186,13 +186,15 @@ class ComponentLink(EntityLinkBase):
                 "upstream_context_title": "CS problems 3",
                 "upstream_context_key": "lib:OpenedX:CSPROB3",
                 "ready_to_sync_count": 11,
-                "total_count": 14
+                "total_count": 14,
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
             },
             {
                 "upstream_context_title": "CS problems 2",
                 "upstream_context_key": "lib:OpenedX:CSPROB2",
                 "ready_to_sync_count": 15,
-                "total_count": 24
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
             },
         ]
         """
@@ -201,7 +203,8 @@ class ComponentLink(EntityLinkBase):
             upstream_context_title=F("upstream_block__publishable_entity__learning_package__title"),
         ).annotate(
             ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
-            total_count=Count('id')
+            total_count=Count("id"),
+            last_published_at=Max("upstream_block__publishable_entity__published__version__created")
         )
         return result
 
@@ -332,13 +335,15 @@ class ContainerLink(EntityLinkBase):
                 "upstream_context_title": "CS problems 3",
                 "upstream_context_key": "lib:OpenedX:CSPROB3",
                 "ready_to_sync_count": 11,
-                "total_count": 14
+                "total_count": 14,
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
             },
             {
                 "upstream_context_title": "CS problems 2",
                 "upstream_context_key": "lib:OpenedX:CSPROB2",
                 "ready_to_sync_count": 15,
-                "total_count": 24
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
             },
         ]
         """
@@ -347,7 +352,8 @@ class ContainerLink(EntityLinkBase):
             upstream_context_title=F("upstream_container__publishable_entity__learning_package__title"),
         ).annotate(
             ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
-            total_count=Count('id')
+            total_count=Count('id'),
+            last_published_at=Max("upstream_container__publishable_entity__published__version__created"),
         )
         return result
 
