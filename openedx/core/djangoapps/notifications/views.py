@@ -18,9 +18,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.email.utils import update_user_preferences_from_patch
 from openedx.core.djangoapps.notifications.models import get_course_notification_preference_config_version
 from openedx.core.djangoapps.notifications.permissions import allow_any_authenticated_user
+from openedx.core.djangoapps.notifications.serializers import add_info_to_notification_config
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 from .base_notification import COURSE_NOTIFICATION_APPS
 from .config.waffle import ENABLE_NOTIFICATIONS
@@ -29,7 +32,7 @@ from .events import (
     notification_preferences_viewed_event,
     notification_read_event,
     notification_tray_opened_event,
-    notifications_app_all_read_event,
+    notifications_app_all_read_event
 )
 from .models import CourseNotificationPreference, Notification
 from .serializers import (
@@ -39,10 +42,11 @@ from .serializers import (
     UserNotificationPreferenceUpdateAllSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
-from .utils import get_is_new_notification_view_enabled, get_show_notifications_tray, aggregate_notification_configs, \
-    filter_out_visible_preferences_by_course_ids
-from openedx.core.djangoapps.user_api.models import UserPreference
-from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
+from .utils import (
+    aggregate_notification_configs,
+    filter_out_visible_preferences_by_course_ids,
+    get_show_notifications_tray
+)
 
 
 @allow_any_authenticated_user()
@@ -338,7 +342,6 @@ class NotificationCountView(APIView):
         )
         count_total = 0
         show_notifications_tray = get_show_notifications_tray(self.request.user)
-        is_new_notification_view_enabled = get_is_new_notification_view_enabled()
         count_by_app_name_dict = {
             app_name: 0
             for app_name in COURSE_NOTIFICATION_APPS
@@ -355,7 +358,6 @@ class NotificationCountView(APIView):
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
             "notification_expiry_days": settings.NOTIFICATIONS_EXPIRY,
-            "is_new_notification_view_enabled": is_new_notification_view_enabled
         })
 
 
@@ -591,8 +593,7 @@ class AggregatedNotificationPreferences(APIView):
         """
         API view for getting the aggregate notification preferences for the current user.
         """
-        notification_preferences = CourseNotificationPreference.objects.filter(user=request.user, is_active=True)
-
+        notification_preferences = CourseNotificationPreference.get_user_notification_preferences(request.user)
         if not notification_preferences.exists():
             return Response({
                 'status': 'error',
@@ -608,6 +609,7 @@ class AggregatedNotificationPreferences(APIView):
             notification_preferences.values_list('course_id', flat=True),
         )
         notification_preferences_viewed_event(request)
+        notification_configs = add_info_to_notification_config(notification_configs)
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved',

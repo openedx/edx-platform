@@ -369,12 +369,13 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                     'enabled': True,
                     'core_notification_types': [],
                     'notification_types': {
-                        'ora_staff_notification': {
-                            'web': False,
+                        'ora_staff_notifications': {
+                            'web': True,
                             'email': False,
                             'push': False,
                             'email_cadence': 'Daily',
-                            'info': ''
+                            'info': 'Notifications for when a submission is made for ORA that includes staff grading '
+                                    'step.'
                         },
                         'core': {
                             'web': True,
@@ -1088,7 +1089,7 @@ class UpdateAllNotificationPreferencesViewTests(APITestCase):
                         "email": True,
                         "email_cadence": "Daily"
                     },
-                    "ora_staff_notification": {
+                    "ora_staff_notifications": {
                         "web": False,
                         "push": False,
                         "email": False,
@@ -1360,7 +1361,7 @@ class GetAggregateNotificationPreferencesTest(APITestCase):
         Test case: Active notification preferences found for the user
         """
         # Mock aggregate_notification_configs for a controlled output
-        mock_aggregate.return_value = {'mocked': 'data'}
+        mock_aggregate.return_value = {'mocked': {'notification_types': {}}}
 
         # Create active notification preferences for the user
         CourseNotificationPreference.objects.create(
@@ -1368,12 +1369,11 @@ class GetAggregateNotificationPreferencesTest(APITestCase):
             is_active=True,
             notification_preference_config={'example': 'config'}
         )
-
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
         self.assertEqual(response.data['message'], 'Notification preferences retrieved')
-        self.assertEqual(response.data['data'], {'mocked': 'data'})
+        self.assertEqual(response.data['data'], {'mocked': {'notification_types': {}}})
 
     def test_unauthenticated_user(self):
         """

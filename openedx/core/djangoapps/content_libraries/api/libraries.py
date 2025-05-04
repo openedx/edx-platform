@@ -75,6 +75,7 @@ from openedx.core.types import User as UserType
 from .. import permissions
 from ..constants import ALL_RIGHTS_RESERVED
 from ..models import ContentLibrary, ContentLibraryPermission
+from .collections import library_collection_locator
 from .exceptions import (
     LibraryAlreadyExists,
     LibraryPermissionIntegrityError,
@@ -183,6 +184,7 @@ class LibraryItem:
     created: datetime
     modified: datetime
     display_name: str
+    tags_count: int = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -202,49 +204,6 @@ class PublishableItem(LibraryItem):
     has_unpublished_changes: bool = False
     collections: list[CollectionMetadata] = dataclass_field(default_factory=list)
     can_stand_alone: bool = True
-
-
-@dataclass(frozen=True, kw_only=True)
-class LibraryXBlockMetadata(PublishableItem):
-    """
-    Class that represents the metadata about an XBlock in a content library.
-    """
-    usage_key: LibraryUsageLocatorV2
-
-    @classmethod
-    def from_component(cls, library_key, component, associated_collections=None):
-        """
-        Construct a LibraryXBlockMetadata from a Component object.
-        """
-        last_publish_log = component.versioning.last_publish_log
-
-        published_by = None
-        if last_publish_log and last_publish_log.published_by:
-            published_by = last_publish_log.published_by.username
-
-        draft = component.versioning.draft
-        published = component.versioning.published
-        last_draft_created = draft.created if draft else None
-        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
-
-        return cls(
-            usage_key=library_component_usage_key(
-                library_key,
-                component,
-            ),
-            display_name=draft.title,
-            created=component.created,
-            modified=draft.created,
-            draft_version_num=draft.version_num,
-            published_version_num=published.version_num if published else None,
-            last_published=None if last_publish_log is None else last_publish_log.published_at,
-            published_by=published_by,
-            last_draft_created=last_draft_created,
-            last_draft_created_by=last_draft_created_by,
-            has_unpublished_changes=component.versioning.has_unpublished_changes,
-            collections=associated_collections or [],
-            can_stand_alone=component.publishable_entity.can_stand_alone,
-        )
 
 
 @dataclass(frozen=True)
@@ -715,14 +674,14 @@ def publish_changes(library_key: LibraryLocatorV2, user_id: int | None = None):
     )
 
 
-def revert_changes(library_key: LibraryLocatorV2) -> None:
+def revert_changes(library_key: LibraryLocatorV2, user_id: int | None = None) -> None:
     """
     Revert all pending changes to the specified library, restoring it to the
     last published version.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
     assert learning_package is not None  # shouldn't happen but it's technically possible.
-    authoring_api.reset_drafts_to_published(learning_package.id)
+    authoring_api.reset_drafts_to_published(learning_package.id, reset_by=user_id)
 
     CONTENT_LIBRARY_UPDATED.send_event(
         content_library=ContentLibraryData(
@@ -739,8 +698,10 @@ def revert_changes(library_key: LibraryLocatorV2) -> None:
     for collection in authoring_api.get_collections(learning_package.id):
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
+                collection_key=library_collection_locator(
+                    library_key=library_key,
+                    collection_key=collection.key,
+                ),
                 background=True,
             )
         )
