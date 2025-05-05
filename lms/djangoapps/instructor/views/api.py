@@ -2768,22 +2768,27 @@ def export_ora2_submission_files(request, course_id):
     })
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def calculate_grades_csv(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CalculateGradesCsvView(DeveloperErrorViewMixin, APIView):
     """
+    Initiates a Celery task to calculate grades CSV.
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
-    report_type = _('grade')
-    course_key = CourseKey.from_string(course_id)
-    task_api.submit_calculate_grades_csv(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Initiates a Celery task to calculate grades CSV.
+        """
+        report_type = _('grade')
+        course_key = CourseKey.from_string(course_id)
+        task_api.submit_calculate_grades_csv(request, course_key)
+        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+        return Response({"status": success_status})
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
