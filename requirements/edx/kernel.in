@@ -78,8 +78,6 @@ edx-name-affirmation
 edx-opaque-keys>=2.12.0
 edx-organizations
 edx-proctoring>=2.0.1
-# using hash to support django42
-# edx-proctoring-proctortrack==1.2.1  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
 edx-submissions
