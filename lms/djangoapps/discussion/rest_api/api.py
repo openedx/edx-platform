@@ -990,7 +990,11 @@ def get_thread_list(
             except ValueError:
                 pass
 
-    if (group_id is None) and not context["has_moderation_privilege"]:
+    # If no group_id was specified and the user is a TA or non-moderator,
+    # get their group ID from the course discussion settings.
+    # If the group ID is passed as query params to the forum API, it will filter threads with that group_id.
+    # A cohort TA can only see posts from their cohort, not all posts.
+    if (group_id is None) and (context["has_ta_privilege"] or not context["has_moderation_privilege"]):
         group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
     query_params = {
