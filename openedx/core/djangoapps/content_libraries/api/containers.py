@@ -207,6 +207,7 @@ def _get_container_from_key(container_key: LibraryContainerLocator, isDeleted=Fa
     learning_package = content_library.learning_package
     assert learning_package is not None
 
+    container: Container
     match container_key.container_type:
         case ContainerType.Unit.value:
             container = authoring_api.get_unit_by_key(
