@@ -5,6 +5,7 @@ Tests for Celery tasks used by the `course_home_api` app.
 from unittest.mock import patch
 
 from opaque_keys.edx.keys import CourseKey
+from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -13,6 +14,8 @@ from lms.djangoapps.course_home_api.tasks import (
     collect_progress_for_user_in_course
 )
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory
+
+LOG_PATH = 'lms.djangoapps.course_home_api.tasks'
 
 
 class CalculateCompletionTaskTests(ModuleStoreTestCase):
@@ -66,6 +69,27 @@ class CalculateCompletionTaskTests(ModuleStoreTestCase):
             COURSE_COMPLETION_FOR_USER_EVENT_NAME,
             expected_data,
         )
+
+    @patch("lms.djangoapps.course_home_api.tasks.calculate_progress_for_learner_in_course")
+    @patch("lms.djangoapps.course_home_api.tasks.get_course_enrollment")
+    @patch("lms.djangoapps.course_home_api.tasks.tracker.emit")
+    def test_cannot_retrieve_enrollment_info(self, mock_tracker, mock_get_enrollment, mock_progress):
+        """
+        Test to ensure the task is aborted if we cannot retrieve enrollment info for the user in the specified course.
+        """
+        mock_get_enrollment.return_value = None
+
+        expected_message = (
+            f"Could not retrieve enrollment info for user {self.user.id} in course {self.course_run_key_string}"
+        )
+
+        with LogCapture() as log:
+            collect_progress_for_user_in_course(self.course_run_key_string, self.user.id)
+
+        mock_get_enrollment.assert_called_once_with(self.user, CourseKey.from_string(self.course_run_key_string))
+        log.check_present((LOG_PATH, "WARNING", expected_message),)
+        mock_progress.assert_not_called()
+        mock_tracker.assert_not_called()
 
     @patch("lms.djangoapps.course_home_api.tasks.calculate_progress_for_learner_in_course")
     @patch("lms.djangoapps.course_home_api.tasks.tracker.emit")
