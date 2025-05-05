@@ -5060,49 +5060,70 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
 EXAMS_DASHBOARD_MICROFRONTEND_URL = None
+
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy.
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the password reset flow.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-12-03
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
 ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
+
 # .. toggle_name: ENABLE_AUTHN_REGISTER_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy on Authn MFE's registration.
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the registration flow if their frequency exceeds a threshold.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-25
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
 ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
-HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
+# .. setting_name: HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 3.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_REGISTER_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3.0
 
 # .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
+# .. toggle_description: When enabled, the login flow detects vulnerable passwords
+#   and prompts users to change their password if their frequency exceeds a threshold.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
 ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
-HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
+# .. setting_name: HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 3.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3.0
 
 # .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the login flow if their frequency exceeds a threshold. Passwords are assessed by calling the
+#   Pwned Passwords service using a k-anonymity method that does not expose the password. The
+#   service tells us whether the password has been seen in any data breaches, and if so, how
+#   often. This count is converted to a "frequency" by taking the logarithm base 10. The login flow
+#   can reject all vulnerable passwords, or only passwords with a frequency above a configured
+#   threshold. In existing deployments, the threshold should be set high and tightened
+#   gradually in order to avoid large spikes in password resets and support requests. For example,
+#   setting ``HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD`` to 5 would reject logins when the
+#   password has been seen 100,000 or more times in the Pwned Passwords dataset. The goal should be
+#   to gradually reduce this to 0, meaning even a single occurrence will cause a rejection. (The
+#   threshold can take any real-number value.)
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
 ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
-HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
+# .. setting_name: HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 5.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5.0
 
 # .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
 # .. toggle_implementation: DjangoSetting
