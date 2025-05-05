@@ -6,6 +6,7 @@ import json
 
 from django import forms
 from django.urls import path
+from django.core.exceptions import ValidationError
 from django.contrib import admin
 
 from .constants import FEATURE_FLAGS
@@ -35,6 +36,18 @@ class SiteConfigurationForm(forms.ModelForm):
         ),
         label="Enabled Features",
     )
+    extra_site_values = forms.CharField(
+        required=False,
+        label="Extra Site Values (JSON)",
+        widget=forms.Textarea(attrs={'rows': 4}),
+        help_text="Enter a JSON object with additional configuration."
+    )
+
+    site_values_display = forms.CharField(
+        required=False,
+        label="Computed Site Values",
+        widget=forms.Textarea(attrs={'readonly': 'readonly', 'rows': 6}),
+    )
 
     class Meta:
         model = SiteConfiguration
@@ -48,32 +61,54 @@ class SiteConfigurationForm(forms.ModelForm):
         for label, mapping in FEATURE_FLAGS.items():
             if all(current_values.get(k) == v for k, v in mapping.items()):
                 selected_labels.append(label)
+        
+        flag_keys = {key for group in FEATURE_FLAGS.values() for key in group}
+        extra_values = {
+            k: v for k, v in current_values.items() if k not in flag_keys
+        }
 
         self.fields['feature_flags'].initial = selected_labels
         self.fields['feature_flags'].widget.choices = [(v, v) for v in selected_labels]
+        self.fields['extra_site_values'].initial = json.dumps(extra_values, indent=2)
+        self.fields['site_values_display'].initial = json.dumps(current_values, indent=2)
 
-
+    def clean_extra_site_values(self):
+        raw = self.cleaned_data.get('extra_site_values', '')
+        if not raw.strip():
+            return {}
+        try:
+            data = json.loads(raw)
+            if not isinstance(data, dict):
+                raise ValidationError("Must be a JSON object.")
+            return data
+        except json.JSONDecodeError:
+            raise ValidationError("Invalid JSON.")
+        
     def clean(self):
         cleaned = super().clean()
-        current_site_values = json.loads(self.data.get('site_values', {}))
         selected_flags = self.data.getlist('feature_flags')
         if not isinstance(selected_flags, list):
             selected_flags = [selected_flags] if selected_flags else []
-
-        flag_keys = {key for group in FEATURE_FLAGS.values() for key in group}
 
         site_values = {}
         for label in selected_flags:
             site_values.update(FEATURE_FLAGS.get(label, {}))
 
-        for key, value in current_site_values.items():
-            if key not in flag_keys:
-                site_values[key] = value
+        extra = self.cleaned_data.get('extra_site_values', {})
+        site_values.update(extra)
 
         cleaned['feature_flags'] = selected_flags
         cleaned['site_values'] = site_values
-
         return cleaned
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.site_values = self.cleaned_data.get('site_values', {})
+
+        if commit:
+            instance.save()
+        return instance
+
 
 class SiteConfigurationAdmin(admin.ModelAdmin):
     """
@@ -82,7 +117,17 @@ class SiteConfigurationAdmin(admin.ModelAdmin):
     form = SiteConfigurationForm
     list_display = ('site', 'enabled', 'site_values')
     search_fields = ('site__domain', 'site_values')
-
+    fieldsets = (
+        (None, {
+            'fields': (
+                'site',
+                'enabled',
+                'feature_flags',
+                'extra_site_values',
+                'site_values_display',
+            ),
+        }),
+    )
     class Meta:
         """
         Meta class for SiteConfiguration admin model
