@@ -50,18 +50,8 @@ ENABLE_ORA_GRADE_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora
 # .. toggle_tickets: INF-1472
 ENABLE_NOTIFICATION_GROUPING = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification_grouping', __name__)
 
-# .. toggle_name: notifications.enable_new_notification_view
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable new notification view
-# .. toggle_use_cases: temporary, open_edx
-# .. toggle_creation_date: 2024-09-30
-# .. toggle_target_removal_date: 2025-10-10
-# .. toggle_tickets: INF-1603
-ENABLE_NEW_NOTIFICATION_VIEW = WaffleFlag(f"{WAFFLE_NAMESPACE}.enable_new_notification_view", __name__)
-
 # .. toggle_name: notifications.enable_push_notifications
-# .. toggle_implementation: WaffleFlag
+# .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable push Notifications feature on mobile devices
 # .. toggle_use_cases: temporary, open_edx
@@ -69,4 +59,4 @@ ENABLE_NEW_NOTIFICATION_VIEW = WaffleFlag(f"{WAFFLE_NAMESPACE}.enable_new_notifi
 # .. toggle_target_removal_date: 2026-02-11
 # .. toggle_warning: When the flag is ON, Notifications will go through using braze on mobile devices.
 # .. toggle_tickets: LEARNER-10298
-ENABLE_PUSH_NOTIFICATIONS = WaffleFlag(f'{WAFFLE_NAMESPACE}.enable_push_notifications', __name__)
+ENABLE_PUSH_NOTIFICATIONS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_push_notifications', __name__)
