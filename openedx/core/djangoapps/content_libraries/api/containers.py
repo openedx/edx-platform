@@ -308,8 +308,9 @@ def create_container(
 
 def update_container(
     container_key: LibraryContainerLocator,
-    display_name: str,
     user_id: int | None,
+    display_name: str | None = None,
+    metadata: dict | None = None,
 ) -> ContainerMetadata:
     """
     Update a container (e.g. a Unit) title.
@@ -318,11 +319,14 @@ def update_container(
     library_key = container_key.lib_key
 
     assert container.unit
+    if metadata is None:
+        metadata = {}
     unit_version = authoring_api.create_next_unit_version(
         container.unit,
         title=display_name,
         created=datetime.now(),
         created_by=user_id,
+        **metadata,
     )
 
     LIBRARY_CONTAINER_UPDATED.send_event(

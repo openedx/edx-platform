@@ -105,6 +105,10 @@ class LibraryContainerView(GenericAPIView):
             container_key,
             display_name=serializer.validated_data['display_name'],
             user_id=request.user.id,
+            metadata={
+                'hide_from_learners': serializer.validated_data['hide_from_learners'],
+                'enable_discussion': serializer.validated_data['enable_discussion'],
+            }
         )
 
         return Response(serializers.LibraryContainerMetadataSerializer(container).data)

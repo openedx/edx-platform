@@ -271,7 +271,9 @@ class LibraryContainerUpdateSerializer(serializers.Serializer):
     """
     Serializer for updating metadata for Containers like Sections, Subsections, Units
     """
-    display_name = serializers.CharField()
+    display_name = serializers.CharField(default=None, required=False)
+    hide_from_learners = serializers.BooleanField(default=None, required=False)
+    enable_discussion = serializers.BooleanField(default=None, required=False)
 
 
 class ContentLibraryBlockImportTaskSerializer(serializers.ModelSerializer):
