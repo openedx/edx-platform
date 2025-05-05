@@ -31,15 +31,18 @@ def send_ace_msg_to_braze_push_channel(audience_ids, notification_object, sender
     }
     emails = list(User.objects.filter(id__in=audience_ids).values_list('email', flat=True))
     context = {'post_data': post_data}
-
-    sender = User.objects.get(id=sender_id)
-    recipient = Recipient(sender.id, sender.email)
+    try:
+        sender = User.objects.get(id=sender_id)
+        recipient = Recipient(sender.id, sender.email)
+    except User.DoesNotExist:
+        recipient = None
 
     message = PushNotificationMessageType(
         app_label="notifications", name="braze_push"
     ).personalize(recipient, 'en', context)
     message.options['emails'] = emails
     message.options['braze_campaign'] = notification_type
+    message.options['skip_disable_user_policy'] = True
 
     ace.send(message, limit_to_channels=[ChannelType.BRAZE_PUSH])
     logger.info('Sent mobile notification for %s to ace channel', notification_type)

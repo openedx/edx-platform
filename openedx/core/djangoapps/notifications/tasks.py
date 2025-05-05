@@ -28,8 +28,9 @@ from openedx.core.djangoapps.notifications.config.waffle import (
 )
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.grouping_notifications import (
+    NotificationRegistry,
     get_user_existing_notifications,
-    group_user_notifications, NotificationRegistry,
+    group_user_notifications
 )
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
@@ -38,7 +39,6 @@ from openedx.core.djangoapps.notifications.models import (
 )
 from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_braze_push_channel
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
-
 
 logger = get_task_logger(__name__)
 
@@ -128,6 +128,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     """
     Send notifications to the users.
     """
+    # pylint: disable=too-many-statements
     course_key = CourseKey.from_string(course_key)
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
         return
@@ -147,7 +148,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     generated_notification_audience = []
     email_notification_mapping = {}
     push_notification_audience = []
-    is_push_notification_enabled = ENABLE_PUSH_NOTIFICATIONS.is_enabled()
+    is_push_notification_enabled = ENABLE_PUSH_NOTIFICATIONS.is_enabled(course_key)
 
     if group_by_id and not grouping_enabled:
         logger.info(
