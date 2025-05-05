@@ -91,7 +91,6 @@ class CalculateCompletionTaskTests(ModuleStoreTestCase):
         mock_progress.assert_not_called()
         mock_tracker.assert_not_called()
 
-
     @patch("lms.djangoapps.course_home_api.tasks.calculate_progress_for_learner_in_course")
     @patch("lms.djangoapps.course_home_api.tasks.tracker.emit")
     def test_aborted_task_user_dne(self, mock_tracker, mock_progress):
