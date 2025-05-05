@@ -131,7 +131,7 @@ class IDVerificationDetailsSerializer(serializers.Serializer):  # lint-amnesty, 
             return None
 
 
-class DisableUserSerializer(serializers.ModelSerializer):
+class DisabledUserSerializer(serializers.ModelSerializer):
     """
     Serializer to return flattened email field
     """

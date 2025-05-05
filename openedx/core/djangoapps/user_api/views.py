@@ -20,7 +20,7 @@ from openedx.core.djangoapps.user_api.permissions import TokenPermission
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
 from openedx.core.djangoapps.user_api.serializers import (
     CountryTimeZoneSerializer,
-    DisableUserSerializer,
+    DisabledUserSerializer,
     UserPreferenceSerializer,
     UserSerializer,
 )
@@ -165,11 +165,11 @@ class CountryTimeZoneListView(generics.ListAPIView):
         return get_country_time_zones(country_code)
 
 
-class DisableUserListView(generics.ListAPIView):
+class DisabledUserListView(generics.ListAPIView):
     """
     Paginated view to return list of disabled users
     """
     permission_classes = (TokenPermission,)
-    serializer_class = DisableUserSerializer
+    serializer_class = DisabledUserSerializer
     queryset = User.objects.filter(password__startswith="!").values("email")
     token_name = "disabled_user_api_token"
