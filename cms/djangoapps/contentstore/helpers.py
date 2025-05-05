@@ -496,11 +496,11 @@ def _import_xml_node_to_parent(
 
     if xblock_class.has_children and temp_xblock.children:
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
-    temp_xblock.parent = parent_key
     if copied_from_block:
         _fetch_and_set_upstream_link(copied_from_block, copied_from_version_num, temp_xblock, user)
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
     new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
+    new_xblock.parent = parent_key
     parent_xblock.children.append(new_xblock.location)
     store.update_item(parent_xblock, user.id)
 
