@@ -403,6 +403,7 @@ class GeneratedCertificate(models.Model):
         )
 
         # .. event_implemented_name: CERTIFICATE_REVOKED
+        # .. event_type: org.openedx.learning.certificate.revoked.v1
         CERTIFICATE_REVOKED.send_event(
             time=self.modified_date.astimezone(timezone.utc),
             certificate=CertificateData(
@@ -487,6 +488,7 @@ class GeneratedCertificate(models.Model):
         )
 
         # .. event_implemented_name: CERTIFICATE_CHANGED
+        # .. event_type: org.openedx.learning.certificate.changed.v1
         CERTIFICATE_CHANGED.send_event(
             time=timestamp,
             certificate=CertificateData(
@@ -520,6 +522,7 @@ class GeneratedCertificate(models.Model):
             )
 
             # .. event_implemented_name: CERTIFICATE_CREATED
+            # .. event_type: org.openedx.learning.certificate.created.v1
             CERTIFICATE_CREATED.send_event(
                 time=timestamp,
                 certificate=CertificateData(

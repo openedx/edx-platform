@@ -57,7 +57,7 @@ from openedx.core.djangolib.js_utils import (
                     <h4 class="hd hd-5">${_('Video')}</h4>
                     % if download_video_link:
                         <span class="icon fa fa-download" aria-hidden="true"></span>
-                        <a class="btn-link video-sources video-download-button" href="${download_video_link}">
+                        <a class="btn-link video-sources video-download-button" href="${download_video_link}" target="${'_blank' if not is_video_from_same_origin else '_self'}">
                             ${_('Download video file')}
                         </a>
                     % endif

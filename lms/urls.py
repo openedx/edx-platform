@@ -192,12 +192,12 @@ urlpatterns = [
     path('api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
                                namespace='api_admin')),
 
-    # Learner Dashboard
-    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
-    path('api/dashboard/', include('lms.djangoapps.learner_dashboard.api.urls', namespace='dashboard_api')),
-
-    # Learner Home
+    # Learner Home and Program Dashboard
     path('api/learner_home/', include('lms.djangoapps.learner_home.urls', namespace='learner_home')),
+    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
+    # This is the legacy URL for the program dashboard API when the legacy learner dashboard existed.
+    # Current-and-future advertised URLs for this API will be under 'api/learner_home'
+    path('api/dashboard/', include('openedx.core.djangoapps.programs.rest_api.urls', namespace='dashboard_api')),
 
     path(
         'api/experiments/',

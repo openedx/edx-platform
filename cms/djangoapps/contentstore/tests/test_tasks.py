@@ -29,8 +29,9 @@ from openedx.core.djangoapps.embargo.models import Country, CountryAccessRule, R
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 from ..tasks import (
+    LinkState,
     export_olx,
     update_special_exams_and_publish,
     rerun_course,
@@ -39,7 +40,8 @@ from ..tasks import (
     _get_urls,
     _check_broken_links,
     _is_studio_url,
-    _scan_course_for_links
+    _scan_course_for_links,
+    _convert_to_standard_url
 )
 
 logging = logging.getLogger(__name__)
@@ -238,10 +240,18 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@1", "http://example.com/valid"],
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid"],
             ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3", f'http://{settings.CMS_BASE}/locked'],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3", 'https://outsider.com/about'],
         ]
         self.expected_file_contents = [
-            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid", False],
-            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3", f"http://{settings.CMS_BASE}/locked", True],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@2", "http://example.com/invalid", LinkState.BROKEN],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3",
+             f"http://{settings.CMS_BASE}/locked",
+             LinkState.LOCKED
+             ],
+            ["block-v1:edX+DemoX+Demo_Course+type@vertical+block@3",
+             'https://outsider.com/about',
+             LinkState.EXTERNAL_FORBIDDEN
+             ],
         ]
 
     @mock.patch('cms.djangoapps.contentstore.tasks.UserTaskArtifact', autospec=True)
@@ -249,7 +259,7 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
     @mock.patch('cms.djangoapps.contentstore.tasks._save_broken_links_file', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks._write_broken_links_to_file', autospec=True)
     @mock.patch('cms.djangoapps.contentstore.tasks._validate_urls_access_in_batches', autospec=True)
-    def test_check_broken_links_stores_broken_and_locked_urls(
+    def test_check_broken_links_stores_broken_locked_and_forbidden_urls(
         self,
         mock_validate_urls,
         mock_write_broken_links_to_file,
@@ -286,6 +296,11 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
                 "url": f"http://{settings.CMS_BASE}/locked",
                 "status": 403,
             },
+            {
+                "block_id": "block-v1:edX+DemoX+Demo_Course+type@vertical+block@3",
+                "url": "https://outsider.com/about",
+                "status": 403,
+            }
         ]
 
         _check_broken_links(mock_task, mock_user.id, mock_course_key_string, 'en')  # pylint: disable=no-value-for-parameter
@@ -365,6 +380,49 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         _scan_course_for_links(self.test_course.id)
         self.assertEqual(len(expected_blocks), mock_get_urls.call_count)
 
+    @mock.patch('cms.djangoapps.contentstore.tasks.get_block_info', autospec=True)
+    @mock.patch('cms.djangoapps.contentstore.tasks.modulestore', autospec=True)
+    def test_scan_course_excludes_drag_and_drop(self, mock_modulestore, mock_get_block_info):
+        """
+        Test that `_scan_course_for_links` excludes blocks of category 'drag-and-drop-v2'.
+        """
+        vertical = BlockFactory.create(
+            category='vertical',
+            parent_location=self.test_course.location
+        )
+        drag_and_drop_block = BlockFactory.create(
+            category='drag-and-drop-v2',
+            parent_location=vertical.location,
+        )
+        text_block = BlockFactory.create(
+            category='html',
+            parent_location=vertical.location,
+            data='Test Link -> <a href="http://example.com">Example.com</a>'
+        )
+
+        mock_modulestore_instance = mock.Mock()
+        mock_modulestore.return_value = mock_modulestore_instance
+        mock_modulestore_instance.get_items.return_value = [vertical]
+        vertical.get_children = mock.Mock(return_value=[drag_and_drop_block, text_block])
+
+        def get_block_side_effect(block):
+            block_data = getattr(block, 'data', '')
+            if isinstance(block_data, str):
+                return {'data': block_data}
+            raise TypeError("expected string or bytes-like object, got 'dict'")
+        mock_get_block_info.side_effect = get_block_side_effect
+
+        urls = _scan_course_for_links(self.test_course.id)
+        # The drag-and-drop block should not appear in the results
+        self.assertFalse(
+            any(block_id == str(drag_and_drop_block.usage_key) for block_id, _ in urls),
+            "Drag and Drop blocks should be excluded"
+        )
+        self.assertTrue(
+            any(block_id == str(text_block.usage_key) for block_id, _ in urls),
+            "Text block should be included"
+        )
+
     @pytest.mark.asyncio
     async def test_every_detected_link_is_validated(self):
         '''
@@ -428,6 +486,38 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         assert len(broken_or_locked_urls) == 2  # The inputs with status = 403 and 500
         assert len(retry_list) == 1             # The input with status = None
         assert retry_list[0][1] == '5'      # The only URL fit for a retry operation (status == None)
+
+    def test_filter_by_status(self):
+        """
+        Test the _filter_by_status function to ensure it correctly categorize links
+        based on the given status codes and returns appropriate lists of filtered
+        results and retry attempts.
+        """
+        # Test data
+        results = [
+            {'status': 200, 'block_id': 'block1', 'url': 'https://example.com'},
+            {'status': None, 'block_id': 'block2', 'url': 'https://retry.com'},
+            {'status': 403, 'block_id': 'block3', 'url': 'https://' + settings.CMS_BASE},
+            {'status': None, 'block_id': 'block3', 'url': 'https://' + settings.CMS_BASE},
+            {'status': 403, 'block_id': 'block4', 'url': 'https://external.com'},
+            {'status': 404, 'block_id': 'block5', 'url': 'https://broken.com'}
+        ]
+
+        expected_filtered_results = [
+            ['block2', 'https://retry.com', LinkState.EXTERNAL_FORBIDDEN],
+            ['block3', 'https://' + settings.CMS_BASE, LinkState.LOCKED],
+            ['block4', 'https://external.com', LinkState.EXTERNAL_FORBIDDEN],
+            ['block5', 'https://broken.com', LinkState.BROKEN],
+        ]
+
+        expected_retry_list = [
+            ['block3', 'https://' + settings.CMS_BASE]
+        ]
+
+        filtered_results, retry_list = _filter_by_status(results)
+
+        self.assertEqual(filtered_results, expected_filtered_results)
+        self.assertEqual(retry_list, expected_retry_list)
 
     @patch("cms.djangoapps.contentstore.tasks._validate_user", return_value=MagicMock())
     @patch("cms.djangoapps.contentstore.tasks._scan_course_for_links", return_value=["url1", "url2"])
@@ -505,3 +595,56 @@ class CheckBrokenLinksTaskTest(ModuleStoreTestCase):
         mock_filter.assert_called_once_with(validated_url_list)
         if retry_list:
             mock_retry_validation.assert_called_once_with(retry_list, course_key, retry_count=3)
+
+    def test_convert_to_standard_url(self):
+        """Test _convert_to_standard_url function with expected URLs."""
+        course_key = CourseKey.from_string("course-v1:test+course1+run1")
+        test_cases = [
+            (
+                "/static/getting-started_x250.png",
+                f"https://{settings.CMS_BASE}/asset-v1:test+course1+run1+type@asset+block/getting-started_x250.png",
+            ),
+            (
+                "/jump_to_id/123abc",
+                f"https://{settings.LMS_BASE}/courses/{course_key}/jump_to_id/123abc",
+            ),
+            (
+                "/container/block-v1:test+course1+type@vertical+block@123",
+                f"https://{settings.CMS_BASE}/container/block-v1:test+course1+type@vertical+block@123",
+            ),
+            ("/unknown/path", f"https://{settings.CMS_BASE}/unknown/path"),
+            ("https://external.com/some/path", "https://external.com/some/path"),
+            ("studio-url", "https://localhost:8001/container/studio-url"),
+        ]
+
+        for url, expected in test_cases:
+            self.assertEqual(
+                _convert_to_standard_url(url, course_key),
+                expected,
+                f"Failed for URL: {url}",
+            )
+
+    def test_get_urls(self):
+        """Test _get_urls function for correct URL extraction."""
+
+        content = '''
+            <a href="https://example.com">Link</a>
+            <img src="https://images.com/pic.jpg">
+            <link href="https://fonts.googleapis.com/css?family=Roboto">
+            <a href="#">Home</a>
+            <a href="https://validsite.com">Valid</a>
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...">
+            <a href="data:application/pdf;base64,JVBERi0xLjQK...">
+            <a href="https://another-valid.com">Another</a>
+            <p>No links here!</p>
+            <img alt="Just an image without src">
+        '''
+
+        expected = [
+            "https://example.com",
+            "https://images.com/pic.jpg",
+            "https://fonts.googleapis.com/css?family=Roboto",
+            "https://validsite.com",
+            "https://another-valid.com"
+        ]
+        self.assertEqual(_get_urls(content), expected)

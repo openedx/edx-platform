@@ -3469,8 +3469,58 @@ paths:
   /dashboard/v0/programs/{enterprise_uuid}/:
     get:
       operationId: dashboard_v0_programs_read
-      description: Return a list of a enterprise learner's all enrolled programs with
-        their progress.
+      summary: For an enterprise learner, get list of enrolled programs with progress.
+      description: |-
+        **Example Request**
+
+            GET /api/dashboard/v1/programs/{enterprise_uuid}/
+
+        **Parameters**
+
+        * `enterprise_uuid`: UUID of an enterprise customer.
+
+        **Example Response**
+
+            [
+                {
+                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                    "title": "Demonstration Program",
+                    "type": "MicroMasters",
+                    "banner_image": {
+                        "large": {
+                            "url": "http://example.com/images/foo.large.jpg",
+                            "width": 1440,
+                            "height": 480
+                        },
+                        "medium": {
+                            "url": "http://example.com/images/foo.medium.jpg",
+                            "width": 726,
+                            "height": 242
+                        },
+                        "small": {
+                            "url": "http://example.com/images/foo.small.jpg",
+                            "width": 435,
+                            "height": 145
+                        },
+                        "x-small": {
+                            "url": "http://example.com/images/foo.x-small.jpg",
+                            "width": 348,
+                            "height": 116
+                        }
+                    },
+                    "authoring_organizations": [
+                        {
+                            "key": "example"
+                        }
+                    ],
+                    "progress": {
+                        "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                        "completed": 0,
+                        "in_progress": 0,
+                        "not_started": 2
+                    }
+                }
+            ]
       parameters: []
       responses:
         '200':
@@ -3485,7 +3535,118 @@ paths:
   /dashboard/v0/programs/{program_uuid}/progress_details/:
     get:
       operationId: dashboard_v0_programs_progress_details_list
-      description: Retrieves progress details of a user in a specified program.
+      summary: Retrieves progress details of a learner in a specified program.
+      description: |-
+        **Example Request**
+
+            GET api/dashboard/v1/programs/{program_uuid}/progress_details/
+
+        **Parameters**
+
+        * `program_uuid`: A string representation of the uuid of the program.
+
+        **Response Values**
+
+        If the request for information about the program is successful, an HTTP 200 "OK" response
+        is returned.
+
+        The HTTP 200 response has the following values.
+
+        * `urls`: Urls to enroll/purchase a course or view program record.
+
+        * `program_data`: Holds meta information about the program.
+
+        * `course_data`: Learner's progress details for all courses in the program (in-progress/remaining/completed).
+
+        * `certificate_data`: Details about learner's certificates status for all courses in the program and the
+            program itself.
+
+        * `industry_pathways`: Industry pathways for the program, comes under additional credit opportunities.
+
+        * `credit_pathways`: Credit pathways for the program, comes under additional credit opportunities.
+
+        **Example Response**
+
+            {
+                "urls": {
+                    "program_listing_url": "/dashboard/programs/",
+                    "track_selection_url": "/course_modes/choose/",
+                    "commerce_api_url": "/api/commerce/v1/baskets/",
+                    "buy_button_url": "http://example.com/basket/add/?",
+                    "program_record_url": "https://example.com/records/programs/8675309"
+                },
+                "program_data": {
+                    "uuid": "a156a6e2-de91-4ce7-947a-888943e6b12a",
+                    "title": "Demonstration Program",
+                    "subtitle": "",
+                    "type": "MicroMasters",
+                    "status": "active",
+                    "marketing_slug": "demo-program",
+                    "marketing_url": "micromasters/demo-program",
+                    "authoring_organizations": [],
+                    "card_image_url": "http://example.com/asset-v1:DemoX+Demo_Course.jpg",
+                    "is_program_eligible_for_one_click_purchase": false,
+                    "pathway_ids": [
+                        1,
+                        2
+                    ],
+                    "is_learner_eligible_for_one_click_purchase": false,
+                    "skus": ["AUD90210"],
+                },
+                "course_data": {
+                    "uuid": "a156a6e2-de91-4ce7-947a-888943e6b12a",
+                    "completed": [],
+                    "in_progress": [],
+                    "not_started": [
+                        {
+                            "key": "example+DemoX",
+                            "uuid": "fe1a9ad4-a452-45cd-80e5-9babd3d43f96",
+                            "title": "Demonstration Course",
+                            "course_runs": [],
+                            "entitlements": [],
+                            "owners": [],
+                            "image": "",
+                            "short_description": "",
+                            "type": "457f07ec-a78f-45b4-ba09-5fb176520d8a",
+                        }
+                    ],
+                },
+                "certificate_data": [{
+                    "type": "course",
+                    "title": "Demo Course",
+                    'url': "/certificates/8675309",
+                }],
+                "industry_pathways": [
+                    {
+                        "id": 2,
+                        "uuid": "1b8fadf1-f6aa-4282-94e3-325b922a027f",
+                        "name": "Demo Industry Pathway",
+                        "org_name": "example",
+                        "email": "example@example.com",
+                        "description": "Sample demo industry pathway",
+                        "destination_url": "http://example.edu/online/pathways/example-methods",
+                        "pathway_type": "industry",
+                        "program_uuids": [
+                            "a156a6e2-de91-4ce7-947a-888943e6b12a"
+                        ]
+                    }
+                ],
+                "credit_pathways": [
+                    {
+                        "id": 1,
+                        "uuid": "86b9701a-61e6-48a2-92eb-70a824521c1f",
+                        "name": "Demo Credit Pathway",
+                        "org_name": "example",
+                        "email": "example@example.com",
+                        "description": "Sample demo credit pathway!",
+                        "destination_url": "http://example.edu/online/pathways/example-thinking",
+                        "pathway_type": "credit",
+                        "program_uuids": [
+                            "a156a6e2-de91-4ce7-947a-888943e6b12a"
+                        ]
+                    }
+                ]
+            }
       parameters: []
       responses:
         '200':
@@ -5145,26 +5306,6 @@ paths:
         Override the list method to expire records that are past the
         policy and requested via the API before returning those records.
       parameters:
-      - name: uuid
-        in: query
-        description: uuid
-        required: false
-        type: string
-      - name: user
-        in: query
-        description: user
-        required: false
-        type: string
-      - name: course_uuid
-        in: query
-        description: course_uuid
-        required: false
-        type: string
-      - name: expired_at__isnull
-        in: query
-        description: expired_at__isnull
-        required: false
-        type: string
       - name: page
         in: query
         description: A page number within the paginated result set.
@@ -5351,16 +5492,6 @@ paths:
       operationId: experiments_v0_data_list
       description: ''
       parameters:
-      - name: experiment_id
-        in: query
-        description: experiment_id
-        required: false
-        type: string
-      - name: key
-        in: query
-        description: key
-        required: false
-        type: string
       - name: page
         in: query
         description: A page number within the paginated result set.
@@ -5493,16 +5624,6 @@ paths:
       operationId: experiments_v0_key-value_list
       description: ''
       parameters:
-      - name: experiment_id
-        in: query
-        description: experiment_id
-        required: false
-        type: string
-      - name: key
-        in: query
-        description: key
-        required: false
-        type: string
       - name: page
         in: query
         description: A page number within the paginated result set.
@@ -6245,6 +6366,198 @@ paths:
       tags:
       - learner_home
     parameters: []
+  /learner_home/v1/programs/{enterprise_uuid}/:
+    get:
+      operationId: learner_home_v1_programs_read
+      summary: For an enterprise learner, get list of enrolled programs with progress.
+      description: |-
+        **Example Request**
+
+            GET /api/dashboard/v1/programs/{enterprise_uuid}/
+
+        **Parameters**
+
+        * `enterprise_uuid`: UUID of an enterprise customer.
+
+        **Example Response**
+
+            [
+                {
+                    "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                    "title": "Demonstration Program",
+                    "type": "MicroMasters",
+                    "banner_image": {
+                        "large": {
+                            "url": "http://example.com/images/foo.large.jpg",
+                            "width": 1440,
+                            "height": 480
+                        },
+                        "medium": {
+                            "url": "http://example.com/images/foo.medium.jpg",
+                            "width": 726,
+                            "height": 242
+                        },
+                        "small": {
+                            "url": "http://example.com/images/foo.small.jpg",
+                            "width": 435,
+                            "height": 145
+                        },
+                        "x-small": {
+                            "url": "http://example.com/images/foo.x-small.jpg",
+                            "width": 348,
+                            "height": 116
+                        }
+                    },
+                    "authoring_organizations": [
+                        {
+                            "key": "example"
+                        }
+                    ],
+                    "progress": {
+                        "uuid": "ff41a5eb-2a73-4933-8e80-a1c66068ed2c",
+                        "completed": 0,
+                        "in_progress": 0,
+                        "not_started": 2
+                    }
+                }
+            ]
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - learner_home
+    parameters:
+    - name: enterprise_uuid
+      in: path
+      required: true
+      type: string
+  /learner_home/v1/programs/{program_uuid}/progress_details/:
+    get:
+      operationId: learner_home_v1_programs_progress_details_list
+      summary: Retrieves progress details of a learner in a specified program.
+      description: |-
+        **Example Request**
+
+            GET api/dashboard/v1/programs/{program_uuid}/progress_details/
+
+        **Parameters**
+
+        * `program_uuid`: A string representation of the uuid of the program.
+
+        **Response Values**
+
+        If the request for information about the program is successful, an HTTP 200 "OK" response
+        is returned.
+
+        The HTTP 200 response has the following values.
+
+        * `urls`: Urls to enroll/purchase a course or view program record.
+
+        * `program_data`: Holds meta information about the program.
+
+        * `course_data`: Learner's progress details for all courses in the program (in-progress/remaining/completed).
+
+        * `certificate_data`: Details about learner's certificates status for all courses in the program and the
+            program itself.
+
+        * `industry_pathways`: Industry pathways for the program, comes under additional credit opportunities.
+
+        * `credit_pathways`: Credit pathways for the program, comes under additional credit opportunities.
+
+        **Example Response**
+
+            {
+                "urls": {
+                    "program_listing_url": "/dashboard/programs/",
+                    "track_selection_url": "/course_modes/choose/",
+                    "commerce_api_url": "/api/commerce/v1/baskets/",
+                    "buy_button_url": "http://example.com/basket/add/?",
+                    "program_record_url": "https://example.com/records/programs/8675309"
+                },
+                "program_data": {
+                    "uuid": "a156a6e2-de91-4ce7-947a-888943e6b12a",
+                    "title": "Demonstration Program",
+                    "subtitle": "",
+                    "type": "MicroMasters",
+                    "status": "active",
+                    "marketing_slug": "demo-program",
+                    "marketing_url": "micromasters/demo-program",
+                    "authoring_organizations": [],
+                    "card_image_url": "http://example.com/asset-v1:DemoX+Demo_Course.jpg",
+                    "is_program_eligible_for_one_click_purchase": false,
+                    "pathway_ids": [
+                        1,
+                        2
+                    ],
+                    "is_learner_eligible_for_one_click_purchase": false,
+                    "skus": ["AUD90210"],
+                },
+                "course_data": {
+                    "uuid": "a156a6e2-de91-4ce7-947a-888943e6b12a",
+                    "completed": [],
+                    "in_progress": [],
+                    "not_started": [
+                        {
+                            "key": "example+DemoX",
+                            "uuid": "fe1a9ad4-a452-45cd-80e5-9babd3d43f96",
+                            "title": "Demonstration Course",
+                            "course_runs": [],
+                            "entitlements": [],
+                            "owners": [],
+                            "image": "",
+                            "short_description": "",
+                            "type": "457f07ec-a78f-45b4-ba09-5fb176520d8a",
+                        }
+                    ],
+                },
+                "certificate_data": [{
+                    "type": "course",
+                    "title": "Demo Course",
+                    'url': "/certificates/8675309",
+                }],
+                "industry_pathways": [
+                    {
+                        "id": 2,
+                        "uuid": "1b8fadf1-f6aa-4282-94e3-325b922a027f",
+                        "name": "Demo Industry Pathway",
+                        "org_name": "example",
+                        "email": "example@example.com",
+                        "description": "Sample demo industry pathway",
+                        "destination_url": "http://example.edu/online/pathways/example-methods",
+                        "pathway_type": "industry",
+                        "program_uuids": [
+                            "a156a6e2-de91-4ce7-947a-888943e6b12a"
+                        ]
+                    }
+                ],
+                "credit_pathways": [
+                    {
+                        "id": 1,
+                        "uuid": "86b9701a-61e6-48a2-92eb-70a824521c1f",
+                        "name": "Demo Credit Pathway",
+                        "org_name": "example",
+                        "email": "example@example.com",
+                        "description": "Sample demo credit pathway!",
+                        "destination_url": "http://example.edu/online/pathways/example-thinking",
+                        "pathway_type": "credit",
+                        "program_uuids": [
+                            "a156a6e2-de91-4ce7-947a-888943e6b12a"
+                        ]
+                    }
+                ]
+            }
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - learner_home
+    parameters:
+    - name: program_uuid
+      in: path
+      required: true
+      type: string
   /learning_sequences/v1/course_outline/{course_key_str}:
     get:
       operationId: learning_sequences_v1_course_outline_read
@@ -9338,16 +9651,6 @@ paths:
       operationId: user_v1_user_prefs_list
       description: DRF class for interacting with the UserPreference ORM
       parameters:
-      - name: key
-        in: query
-        description: key
-        required: false
-        type: string
-      - name: user
-        in: query
-        description: user
-        required: false
-        type: string
       - name: page
         in: query
         description: A page number within the paginated result set.
@@ -9850,6 +10153,16 @@ paths:
           description: ''
       tags:
       - val
+    patch:
+      operationId: val_v0_videos_video-transcripts_partial_update
+      description: Partially update a video transcript, only supporting updating the
+        `provider` field.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - val
     delete:
       operationId: val_v0_videos_video-transcripts_delete
       description: Delete a video transcript instance with the given information.
@@ -9867,6 +10180,16 @@ paths:
       parameters: []
       responses:
         '201':
+          description: ''
+      tags:
+      - val
+    patch:
+      operationId: val_v0_videos_video-transcripts_create_partial_update
+      description: Partially update a video transcript, only supporting updating the
+        `provider` field.
+      parameters: []
+      responses:
+        '200':
           description: ''
       tags:
       - val

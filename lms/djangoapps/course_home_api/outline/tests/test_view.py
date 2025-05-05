@@ -3,17 +3,16 @@ Tests for Outline Tab API in the Course Home API
 """
 
 import itertools
+import json
 from datetime import datetime, timedelta, timezone
-from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
-from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
+from unittest.mock import Mock, patch
 
-import ddt  # lint-amnesty, pylint: disable=wrong-import-order
-import json  # lint-amnesty, pylint: disable=wrong-import-order
+import ddt
 from completion.models import BlockCompletion
-from django.conf import settings  # lint-amnesty, pylint: disable=wrong-import-order
+from django.conf import settings
 from django.test import override_settings
-from django.urls import reverse  # lint-amnesty, pylint: disable=wrong-import-order
-from edx_toggles.toggles.testutils import override_waffle_flag  # lint-amnesty, pylint: disable=wrong-import-order
+from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from cms.djangoapps.contentstore.outlines import update_outline_from_modulestore
 from common.djangoapps.course_modes.models import CourseMode
@@ -21,7 +20,9 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.course_home_api.toggles import COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
+from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.learning_sequences.api import replace_course_outline
 from openedx.core.djangoapps.content.learning_sequences.data import CourseOutlineData, CourseVisibility
@@ -31,15 +32,17 @@ from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactor
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience import (
     COURSE_ENABLE_UNENROLLED_ACCESS_FLAG,
-    DISPLAY_COURSE_SOCK_FLAG,
     ENABLE_COURSE_GOALS
 )
-from openedx.features.discounts.applicability import (
-    DISCOUNT_APPLICABILITY_FLAG,
-    FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG
+from openedx.features.discounts.applicability import DISCOUNT_APPLICABILITY_FLAG, FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG
+from xmodule.course_block import (
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE
 )
-from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import (
+    BlockFactory,
+    CourseFactory
+)
 
 
 @ddt.ddt
@@ -362,12 +365,6 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         assert (data['access_expiration'] is not None) == show_enrolled
         assert (data['resume_course']['url'] is not None) == show_enrolled
 
-    @ddt.data(True, False)
-    def test_can_show_upgrade_sock(self, sock_enabled):
-        with override_waffle_flag(DISPLAY_COURSE_SOCK_FLAG, active=sock_enabled):
-            response = self.client.get(self.url)
-            assert response.data['can_show_upgrade_sock'] == sock_enabled
-
     def test_verified_mode(self):
         enrollment = CourseEnrollment.enroll(self.user, self.course.id)
         CourseDurationLimitConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
@@ -467,6 +464,25 @@ class OutlineTabTestViews(BaseCourseHomeTests):
         self.update_course_and_overview()
         CourseEnrollment.enroll(UserFactory(), self.course.id)  # grr, some rando took our spot!
         self.assert_can_enroll(False)
+
+    @override_waffle_flag(COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT, active=True)
+    @patch("lms.djangoapps.course_home_api.outline.views.collect_progress_for_user_in_course.delay")
+    def test_course_progress_analytics_enabled(self, mock_task):
+        """
+        Ensures that the `calculate_course_progress_for_user_in_course` task is enqueued, with the correct args, only
+        if the feature is enabled.
+        """
+        self.client.get(self.url)
+        mock_task.assert_called_once_with(str(self.course.id), self.user.id)
+
+    @override_waffle_flag(COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT, active=False)
+    @patch("lms.djangoapps.course_home_api.outline.views.collect_progress_for_user_in_course.delay")
+    def test_course_progress_analytics_disabled(self, mock_task):
+        """
+        Ensures that the `calculate_course_progress_for_user_in_course` task is not run if the feature is disabled.
+        """
+        self.client.get(self.url)
+        mock_task.assert_not_called()
 
 
 @ddt.ddt

@@ -13,26 +13,20 @@ urlpatterns = [
         home.HomePageCoursesViewV2.as_view(),
         name="courses",
     ),
-    # TODO: Potential future path.
-    # re_path(
-    #     fr'^downstreams/$',
-    #     downstreams.DownstreamsListView.as_view(),
-    #     name="downstreams_list",
-    # ),
+    re_path(
+        r'^downstreams/$',
+        downstreams.DownstreamListView.as_view(),
+        name="downstreams_list",
+    ),
     re_path(
         fr'^downstreams/{settings.USAGE_KEY_PATTERN}$',
         downstreams.DownstreamView.as_view(),
         name="downstream"
     ),
     re_path(
-        f'^upstreams/{settings.COURSE_KEY_PATTERN}$',
-        downstreams.UpstreamListView.as_view(),
-        name='upstream-list'
-    ),
-    re_path(
-        f'^upstream/{settings.USAGE_KEY_PATTERN}/downstream-links$',
-        downstreams.DownstreamContextListView.as_view(),
-        name='downstream-link-list'
+        f'^downstreams/{settings.COURSE_KEY_PATTERN}/summary$',
+        downstreams.DownstreamSummaryView.as_view(),
+        name='upstream-summary-list'
     ),
     re_path(
         fr'^downstreams/{settings.USAGE_KEY_PATTERN}/sync$',

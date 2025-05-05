@@ -45,11 +45,29 @@ https://github.com/openedx/edx-platform/issues/35653):
     GET: List all downstream blocks linked to a library block.
         200: A list of downstream usage_keys linked to the library block.
 
-  # NOT YET IMPLEMENTED -- Will be needed for full Libraries Relaunch in ~Teak.
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
       GET: List downstream blocks that can be synced, filterable by course or sync-readiness.
-        200: A paginated list of applicable & accessible downstream blocks. Entries are UpstreamLinks.
+        200: A paginated list of applicable & accessible downstream blocks. Entries are ComponentLinks.
+
+  /api/contentstore/v2/downstreams/<course_key>/summary
+      GET: List summary of links by course key
+        200: A list of summary of links by course key
+        Example:
+        [
+            {
+                "upstream_context_title": "CS problems 3",
+                "upstream_context_key": "lib:OpenedX:CSPROB3",
+                "ready_to_sync_count": 11,
+                "total_count": 14
+            },
+            {
+                "upstream_context_title": "CS problems 2",
+                "upstream_context_key": "lib:OpenedX:CSPROB2",
+                "ready_to_sync_count": 15,
+                "total_count": 24
+            },
+        ]
 
 UpstreamLink response schema:
   {
@@ -66,20 +84,23 @@ import logging
 
 from attrs import asdict as attrs_asdict
 from django.contrib.auth.models import User  # pylint: disable=imported-auth-user
+from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryContainerLocator
 from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.fields import BooleanField
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.core import XBlock
 
-from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
-from cms.djangoapps.contentstore.models import PublishableEntityLink
+from cms.djangoapps.contentstore.models import ComponentLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
-    PublishableEntityLinksSerializer,
-    PublishableEntityLinksUsageKeySerializer,
+    ComponentLinksSerializer,
+    PublishableEntityLinksSummarySerializer,
 )
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import sync_library_content
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
     BadUpstream,
@@ -87,18 +108,18 @@ from cms.lib.xblock.upstream_sync import (
     UpstreamLink,
     UpstreamLinkException,
     decline_sync,
-    fetch_customizable_fields,
     sever_upstream_link,
-    sync_from_upstream,
 )
+from cms.lib.xblock.upstream_sync_block import fetch_customizable_fields_from_block
+from cms.lib.xblock.upstream_sync_container import fetch_customizable_fields_from_container
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
     view_auth_classes,
 )
-from xmodule.video_block.transcripts_utils import clear_transcripts
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.video_block.transcripts_utils import clear_transcripts
 
 logger = logging.getLogger(__name__)
 
@@ -113,57 +134,92 @@ class _AuthenticatedRequest(Request):
     user: User
 
 
-# TODO: Potential future view.
-# @view_auth_classes(is_authenticated=True)
-# class DownstreamListView(DeveloperErrorViewMixin, APIView):
-#     """
-#     List all blocks which are linked to upstream content, with optional filtering.
-#     """
-#     def get(self, request: _AuthenticatedRequest) -> Response:
-#         """
-#         Handle the request.
-#         """
-#         course_key_string = request.GET['course_id']
-#         syncable = request.GET['ready_to_sync']
-#         ...
+class DownstreamListPaginator(DefaultPagination):
+    """Custom paginator for downstream entity links"""
+    page_size = 100
+    max_page_size = 1000
+
+    def paginate_queryset(self, queryset, request, view=None):
+        if 'no_page' in request.query_params:
+            return queryset
+
+        return super().paginate_queryset(queryset, request, view)
+
+    def get_paginated_response(self, data, *args, **kwargs):
+        if 'no_page' in args[0].query_params:
+            return Response(data)
+        response = super().get_paginated_response(data)
+        # replace next and previous links by next and previous page number
+        response.data.update({
+            'next_page_num': self.page.next_page_number() if self.page.has_next() else None,
+            'previous_page_num': self.page.previous_page_number() if self.page.has_previous() else None,
+        })
+        return response
 
 
 @view_auth_classes()
-class UpstreamListView(DeveloperErrorViewMixin, APIView):
+class DownstreamListView(DeveloperErrorViewMixin, APIView):
     """
-    Serves course->library publishable entity links
+    List all blocks which are linked to an upstream context, with optional filtering.
+    """
+
+    def get(self, request: _AuthenticatedRequest):
+        """
+        Fetches publishable entity links for given course key
+        """
+        course_key_string = request.GET.get('course_id')
+        ready_to_sync = request.GET.get('ready_to_sync')
+        upstream_usage_key = request.GET.get('upstream_usage_key')
+        link_filter: dict[str, CourseKey | UsageKey | bool] = {}
+        paginator = DownstreamListPaginator()
+        if course_key_string:
+            try:
+                link_filter["downstream_context_key"] = CourseKey.from_string(course_key_string)
+            except InvalidKeyError as exc:
+                raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
+        if ready_to_sync is not None:
+            link_filter["ready_to_sync"] = BooleanField().to_internal_value(ready_to_sync)
+        if upstream_usage_key:
+            try:
+                link_filter["upstream_usage_key"] = UsageKey.from_string(upstream_usage_key)
+            except InvalidKeyError as exc:
+                raise ValidationError(detail=f"Malformed usage key: {upstream_usage_key}") from exc
+        links = ComponentLink.filter_links(**link_filter)
+        paginated_links = paginator.paginate_queryset(links, self.request, view=self)
+        serializer = ComponentLinksSerializer(paginated_links, many=True)
+        return paginator.get_paginated_response(serializer.data, self.request)
+
+
+@view_auth_classes()
+class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
+    """
+    Serves course->library publishable entity links summary
     """
     def get(self, request: _AuthenticatedRequest, course_key_string: str):
         """
-        Fetches publishable entity links for given course key
+        Fetches publishable entity links summary for given course key
+        Example:
+        [
+            {
+                "upstream_context_title": "CS problems 3",
+                "upstream_context_key": "lib:OpenedX:CSPROB3",
+                "ready_to_sync_count": 11,
+                "total_count": 14
+            },
+            {
+                "upstream_context_title": "CS problems 2",
+                "upstream_context_key": "lib:OpenedX:CSPROB2",
+                "ready_to_sync_count": 15,
+                "total_count": 24
+            },
+        ]
         """
         try:
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        links = PublishableEntityLink.get_by_downstream_context(downstream_context_key=course_key)
-        serializer = PublishableEntityLinksSerializer(links, many=True)
-        return Response(serializer.data)
-
-
-@view_auth_classes()
-class DownstreamContextListView(DeveloperErrorViewMixin, APIView):
-    """
-    Serves library block->downstream usage keys
-    """
-    def get(self, request: _AuthenticatedRequest, usage_key_string: str) -> Response:
-        """
-        Fetches downstream links for given publishable entity
-        """
-        try:
-            usage_key = UsageKey.from_string(usage_key_string)
-        except InvalidKeyError as exc:
-            raise ValidationError(detail=f"Malformed usage key: {usage_key_string}") from exc
-
-        links = PublishableEntityLink.get_by_upstream_usage_key(upstream_usage_key=usage_key)
-
-        serializer = PublishableEntityLinksUsageKeySerializer(links, many=True)
-
+        links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
+        serializer = PublishableEntityLinksSummarySerializer(links, many=True)
         return Response(serializer.data)
 
 
@@ -197,12 +253,21 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
             raise ValidationError({"sync": "must be 'true' or 'false'"})
         try:
             if sync_param == "true" or sync_param is True:
-                sync_from_upstream(downstream=downstream, user=request.user)
+                sync_library_content(
+                    downstream=downstream,
+                    request=request,
+                    store=modulestore()
+                )
             else:
                 # Even if we're not syncing (i.e., updating the downstream's values with the upstream's), we still need
                 # to fetch the upstream's customizable values and store them as hidden fields on the downstream. This
                 # ensures that downstream authors can restore defaults based on the upstream.
-                fetch_customizable_fields(downstream=downstream, user=request.user)
+                link = UpstreamLink.get_for_block(downstream)
+                if isinstance(link.upstream_key, LibraryUsageLocatorV2):
+                    fetch_customizable_fields_from_block(downstream=downstream, user=request.user)
+                else:
+                    assert isinstance(link.upstream_key, LibraryContainerLocator)
+                    fetch_customizable_fields_from_container(downstream=downstream)
         except BadDownstream as exc:
             logger.exception(
                 "'%s' is an invalid downstream; refusing to set its upstream to '%s'",
@@ -231,7 +296,7 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
         downstream = _load_accessible_block(request.user, usage_key_string, require_write_access=True)
         try:
             sever_upstream_link(downstream)
-        except NoUpstream as exc:
+        except NoUpstream:
             logger.exception(
                 "Tried to DELETE upstream link of '%s', but it wasn't linked to anything in the first place. "
                 "Will do nothing. ",
@@ -257,8 +322,11 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
             if downstream.usage_key.block_type == "video":
                 # Delete all transcripts so we can copy new ones from upstream
                 clear_transcripts(downstream)
-            upstream = sync_from_upstream(downstream, request.user)
-            static_file_notices = import_static_assets_for_library_sync(downstream, upstream, request)
+            static_file_notices = sync_library_content(
+                downstream=downstream,
+                request=request,
+                store=modulestore()
+            )
         except UpstreamLinkException as exc:
             logger.exception(
                 "Could not sync from upstream '%s' to downstream '%s'",
@@ -266,7 +334,6 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
                 usage_key_string,
             )
             raise ValidationError(detail=str(exc)) from exc
-        modulestore().update_item(downstream, request.user.id)
         # Note: We call `get_for_block` (rather than `try_get_for_block`) because if anything is wrong with the
         #       upstream at this point, then that is completely unexpected, so it's appropriate to let the 500 happen.
         response = UpstreamLink.get_for_block(downstream).to_json()
