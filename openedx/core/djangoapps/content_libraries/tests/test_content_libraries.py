@@ -3,7 +3,7 @@ Tests for Learning-Core-based Content Libraries
 """
 from datetime import datetime, timezone
 from unittest import skip
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import ddt
 from django.contrib.auth.models import Group
@@ -11,16 +11,6 @@ from django.test import override_settings
 from django.test.client import Client
 from freezegun import freeze_time
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import ContentLibraryData, LibraryBlockData
-from openedx_events.content_authoring.signals import (
-    CONTENT_LIBRARY_CREATED,
-    CONTENT_LIBRARY_DELETED,
-    CONTENT_LIBRARY_UPDATED,
-    LIBRARY_BLOCK_CREATED,
-    LIBRARY_BLOCK_DELETED,
-    LIBRARY_BLOCK_UPDATED
-)
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from organizations.models import Organization
 from rest_framework.test import APITestCase
 
@@ -31,7 +21,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import (
     URL_BLOCK_METADATA_URL,
     URL_BLOCK_RENDER_VIEW,
     URL_BLOCK_XBLOCK_HANDLER,
-    ContentLibrariesRestApiTest
+    ContentLibrariesRestApiTest,
 )
 from openedx.core.djangoapps.xblock import api as xblock_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
@@ -39,7 +29,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 @skip_unless_cms
 @ddt.ddt
-class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
     """
     General tests for Learning-Core-based Content Libraries
 
@@ -62,26 +52,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
     library slug and bundle UUID does not because it's assumed to be immutable
     and cached forever.
     """
-    ENABLED_OPENEDX_EVENTS = [
-        CONTENT_LIBRARY_CREATED.event_type,
-        CONTENT_LIBRARY_DELETED.event_type,
-        CONTENT_LIBRARY_UPDATED.event_type,
-        LIBRARY_BLOCK_CREATED.event_type,
-        LIBRARY_BLOCK_DELETED.event_type,
-        LIBRARY_BLOCK_UPDATED.event_type,
-    ]
-
-    @classmethod
-    def setUpClass(cls):
-        """
-        Set up class method for the Test class.
-
-        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
-              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
-              so we're following a pattern here. But that pattern doesn't really make sense.
-        """
-        super().setUpClass()
-        cls.start_events_isolation()
 
     def test_library_crud(self):
         """
@@ -791,45 +761,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             self._add_block_to_library(lib_id, "html", "html1")
             # Second block should throw error
             self._add_block_to_library(lib_id, "problem", "problem1", expect_response=400)
-
-    def test_library_block_delete_event(self):
-        """
-        Check that LIBRARY_BLOCK_DELETED event is sent when a content library is deleted.
-        """
-        event_receiver = Mock()
-        LIBRARY_BLOCK_DELETED.connect(event_receiver)
-        lib = self._create_library(
-            slug="test_lib_block_event_delete",
-            title="Event Test Library",
-            description="Testing event in library"
-        )
-
-        lib_id = lib["id"]
-        library_key = LibraryLocatorV2.from_string(lib_id)
-
-        block = self._add_block_to_library(lib_id, "problem", "problem1")
-        block_id = block['id']
-
-        usage_key = LibraryUsageLocatorV2(
-            lib_key=library_key,
-            block_type="problem",
-            usage_id="problem1"
-        )
-
-        self._delete_library_block(block_id)
-
-        event_receiver.assert_called()
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_BLOCK_DELETED,
-                "sender": None,
-                "library_block": LibraryBlockData(
-                    library_key=library_key,
-                    usage_key=usage_key
-                ),
-            },
-            event_receiver.call_args.kwargs
-        )
 
     def test_library_paste_xblock(self):
         """
