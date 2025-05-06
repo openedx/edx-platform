@@ -428,7 +428,7 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest, OpenEdxEventsT
         })
 
         # Revert changes, which will re-create the unit:
-        self._restore_container(container_data["id"])
+        self._revert_library_changes(self.lib1_key)
 
         self.expect_new_events({
             "signal": LIBRARY_CONTAINER_CREATED,

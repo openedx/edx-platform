@@ -44,6 +44,8 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_BLOCK_PUBLISHED,
     LIBRARY_COLLECTION_UPDATED,
+    LIBRARY_CONTAINER_CREATED,
+    LIBRARY_CONTAINER_DELETED,
     LIBRARY_CONTAINER_UPDATED,
     LIBRARY_CONTAINER_PUBLISHED,
 )
@@ -149,7 +151,9 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
         "entity", "entity__container", "entity__component",
     ).all()
 
-    affected_container_keys: set[LibraryContainerLocator] = set()
+    created_container_keys: set[LibraryContainerLocator] = set()
+    updated_container_keys: set[LibraryContainerLocator] = set()
+    deleted_container_keys: set[LibraryContainerLocator] = set()
     affected_collection_keys: set[LibraryCollectionLocator] = set()
 
     # Update anything that needs to be updated (e.g. search index):
@@ -170,13 +174,18 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
             # e.g. if this was a newly created component in the container and is now deleted, or this was deleted and
             # is now restored.
             for parent_container in api.get_containers_contains_component(usage_key):
-                affected_container_keys.add(parent_container.container_key)
+                updated_container_keys.add(parent_container.container_key)
 
             # TODO: do we also need to send CONTENT_OBJECT_ASSOCIATIONS_CHANGED for this component, or is
             # LIBRARY_BLOCK_UPDATED sufficient?
         elif hasattr(record.entity, "container"):
             container_key = api.library_container_locator(library_key, record.entity.container)
-            affected_container_keys.add(container_key)
+            if is_deleted:
+                deleted_container_keys.add(container_key)
+            elif is_undeleted:
+                created_container_keys.add(container_key)
+            else:
+                updated_container_keys.add(container_key)
         else:
             log.warning(
                 f"PublishableEntity {record.entity.pk} / {record.entity.key} was modified during publish operation "
@@ -193,7 +202,19 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
             )
             affected_collection_keys.add(collection_key)
 
-    for container_key in affected_container_keys:
+    for container_key in deleted_container_keys:
+        LIBRARY_CONTAINER_DELETED.send_event(
+            library_container=LibraryContainerData(container_key=container_key)
+        )
+        # Don't bother sending UPDATED events for these containers that are now deleted
+        created_container_keys.remove(container_key)
+
+    for container_key in created_container_keys:
+        LIBRARY_CONTAINER_CREATED.send_event(
+            library_container=LibraryContainerData(container_key=container_key)
+        )
+
+    for container_key in updated_container_keys:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(container_key=container_key)
         )
