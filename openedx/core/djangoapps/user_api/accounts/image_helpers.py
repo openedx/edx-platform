@@ -10,8 +10,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.module_loading import import_string
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from common.djangoapps.student.models import UserProfile
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from ..errors import UserNotFound
 
@@ -32,10 +32,12 @@ def get_profile_image_storage():
     Returns:
         An instance of the configured storage backend.
     """
-    config = settings.PROFILE_IMAGE_BACKEND
-    storage_class_path = config.get('class', 'django.core.files.storage.FileSystemStorage')
+    config = getattr(settings, 'PROFILE_IMAGE_BACKEND', {})
+    storage_class_path = config.get('class') or getattr(
+        settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage'
+    )
     storage_class = import_string(storage_class_path)
-    return storage_class(**config.get('options'))
+    return storage_class(**config.get('options', {}))
 
 
 def _make_profile_image_name(username):
