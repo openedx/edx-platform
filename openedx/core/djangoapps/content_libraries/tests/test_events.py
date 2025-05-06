@@ -70,18 +70,6 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest, OpenEdxEventsT
     ]
     ENABLED_OPENEDX_EVENTS = [e.event_type for e in ALL_EVENTS]
 
-    @classmethod
-    def setUpClass(cls):
-        """
-        Set up class method for the Test class.
-
-        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
-              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
-              so we're following a pattern here. But that pattern doesn't really make sense.
-        """
-        super().setUpClass()
-        cls.start_events_isolation()
-
     def setUp(self):
         super().setUp()
 
@@ -131,6 +119,8 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest, OpenEdxEventsT
             raise AssertionError(f"Events were emitted but not expected: {self.new_events}")
         self.clear_events()
 
+    ############################## Libraries ##################################
+
     def test_content_library_crud_events(self):
         """
         Check that CONTENT_LIBRARY_CREATED event is sent when a content library is created, updated, and deleted
@@ -167,6 +157,8 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest, OpenEdxEventsT
         })
 
     # Should deleting a library send out _DELETED events for all the items in the library too?
+
+    ############################## Components (XBlocks) ##################################
 
     def test_library_block_create_event(self):
         """
@@ -284,6 +276,7 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest, OpenEdxEventsT
         })
 
     ############################## Containers ##################################
+
     def test_unit_crud(self):
         """
         Test Create, Read, Update, and Delete of a Unit
