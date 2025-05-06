@@ -272,7 +272,7 @@ def safe_exec(
                 local_exc_unexpected = None if isinstance(exception, SafeExecException) else exception
 
                 report_darklaunch_results(
-                    slug=slug,
+                    limit_overrides_context=limit_overrides_context, slug=slug,
                     globals_local=globals_dict, emsg_local=emsg, unexpected_exc_local=local_exc_unexpected,
                     globals_remote=darklaunch_globals, emsg_remote=remote_emsg, unexpected_exc_remote=remote_exception,
                 )
@@ -347,14 +347,14 @@ def normalize_error_message(emsg):
 
 
 def report_darklaunch_results(
-        *, slug,
+        *, limit_overrides_context, slug,
         globals_local, emsg_local, unexpected_exc_local,
         globals_remote, emsg_remote, unexpected_exc_remote,
 ):
     """Send telemetry for results of darklaunch."""
     can_compare_output = True
 
-    def report_arm(arm, globals_dict, emsg, unexpected_exception):
+    def report_arm(arm, emsg, unexpected_exception):
         nonlocal can_compare_output
         if unexpected_exception:
             # .. custom_attribute_name: codejail.darklaunch.status.{local,remote}
@@ -373,24 +373,32 @@ def report_darklaunch_results(
             set_custom_attribute(f'codejail.darklaunch.status.{arm}', 'ok' if emsg is None else 'safe_error')
             set_custom_attribute(f'codejail.darklaunch.exception.{arm}', None)
 
-        # Logs include full globals and emsg
-        log.info(
-            f"Codejail darklaunch {arm} results for slug={slug}: globals={globals_dict!r}, "
-            f"emsg={emsg!r}, exception={unexpected_exception!r}"
-        )
-
-    report_arm('local', globals_local, emsg_local, unexpected_exc_local)
-    report_arm('remote', globals_remote, emsg_remote, unexpected_exc_remote)
+    report_arm('local', emsg_local, unexpected_exc_local)
+    report_arm('remote', emsg_remote, unexpected_exc_remote)
 
     # If the arms can't be compared (unexpected errors), stop early -- the rest
     # is about output comparison.
     if not can_compare_output:
         set_custom_attribute('codejail.darklaunch.globals_match', 'N/A')
         set_custom_attribute('codejail.darklaunch.emsg_match', 'N/A')
+        log.info(
+            "Codejail darklaunch had unexpected exception for "
+            f"course={limit_overrides_context}, slug={slug}:\n"
+            f"Local exception: {unexpected_exc_local!r}\n"
+            f"Remote exception: {unexpected_exc_remote!r}"
+        )
         return
 
     globals_match = globals_local == globals_remote
     emsg_match = normalize_error_message(emsg_local) == normalize_error_message(emsg_remote)
+
+    if not globals_match or not emsg_match:
+        log.info(
+            f"Codejail darklaunch had mismatch for course={limit_overrides_context}, slug={slug}:\n"
+            f"{emsg_match=}, {globals_match=}\n"
+            f"Local: globals={globals_local!r}, emsg={emsg_local!r}\n"
+            f"Remote: globals={globals_remote!r}, emsg={emsg_remote!r}"
+        )
 
     # .. custom_attribute_name: codejail.darklaunch.globals_match
     # .. custom_attribute_description: True if local and remote globals_dict
