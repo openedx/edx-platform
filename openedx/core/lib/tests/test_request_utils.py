@@ -95,6 +95,12 @@ class RequestUtilTestCase(unittest.TestCase):
         course_id = course_id_from_url('/api/courses/v1/courses/edX/maths/2020')
         self.assertCourseIdFieldsMatch(course_id=course_id, org='edX', course='maths', run='2020')
 
+        course_id = course_id_from_url('/enterprise/5d566680-12a8-4b85-89d8-d9eacbf0f9eb/course/edX+math/enroll/')
+        self.assertCourseIdFieldsMatch(course_id=course_id, org='edX', course='maths', run=None)
+
+        course_id = course_id_from_url('/enterprise/5d566680-12a8-4b85-89d8-d9eacbf0f9eb/course/edX+math+2020/enroll/')
+        self.assertCourseIdFieldsMatch(course_id=course_id, org='edX', course='maths', run='2020')
+
     def assertCourseIdFieldsMatch(self, course_id, org, course, run):
         """ Asserts that the passed-in course id matches the specified fields"""
         assert course_id.org == org
