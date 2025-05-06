@@ -33,7 +33,7 @@ def get_profile_image_storage():
         An instance of the configured storage backend.
     """
     config = settings.PROFILE_IMAGE_BACKEND
-    storage_class_path = config.get('class') or getattr(settings, 'DEFAULT_FILE_STORAGE')
+    storage_class_path = config.get('class', 'django.core.files.storage.FileSystemStorage')
     storage_class = import_string(storage_class_path)
     return storage_class(**config.get('options'))
 
