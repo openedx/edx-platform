@@ -314,10 +314,14 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
 
 class LanguageAutocomplete(autocomplete.Select2ListView):
     def get_list(self):
+        if not self.request.user.is_staff:
+            return []
         return [lang for lang in LANGUAGE_CHOICES if self.q.lower() in lang.lower()]
 
 class CountryAutocomplete(autocomplete.Select2ListView):
     def get_list(self):
+        if not self.request.user.is_staff:
+            return []
         results = []
         for code, name in countries:
             if self.q.lower() in name.lower():
