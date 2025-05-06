@@ -195,7 +195,10 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             mock_remote_exec.side_effect = remote
 
             try:
-                safe_exec("<IGNORED BY MOCKS>", globals_dict)
+                safe_exec(
+                    "<IGNORED BY MOCKS>", globals_dict,
+                    limit_overrides_context="course-v1:org+course+run", slug="hw1",
+                )
             except BaseException as e:
                 safe_exec_e = e
             else:
@@ -215,8 +218,8 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
 
     # These don't change between the tests
     standard_codejail_attr_calls = [
-        call('codejail.slug', None),
-        call('codejail.limit_overrides_context', None),
+        call('codejail.slug', 'hw1'),
+        call('codejail.limit_overrides_context', 'course-v1:org+course+run'),
         call('codejail.extra_files_count', 0),
     ]
 
@@ -256,12 +259,11 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch local results for slug=None: globals={'overwrite': 'mock local'}, "
-                    "emsg=None, exception=None"
-                ),
-                call(
-                    "Codejail darklaunch remote results for slug=None: globals={'overwrite': 'mock remote'}, "
-                    "emsg=None, exception=None"
+                    "Codejail darklaunch had mismatch for "
+                    "course='course-v1:org+course+run', slug='hw1':\n"
+                    "emsg_match=True, globals_match=False\n"
+                    "Local: globals={'overwrite': 'mock local'}, emsg=None\n"
+                    "Remote: globals={'overwrite': 'mock remote'}, emsg=None"
                 ),
             ],
             # Should only see behavior of local exec
@@ -296,12 +298,10 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch local results for slug=None: globals={}, "
-                    "emsg='unexpected', exception=BaseException('unexpected')"
-                ),
-                call(
-                    "Codejail darklaunch remote results for slug=None: globals={}, "
-                    "emsg=None, exception=None"
+                    "Codejail darklaunch had unexpected exception "
+                    "for course='course-v1:org+course+run', slug='hw1':\n"
+                    "Local exception: BaseException('unexpected')\n"
+                    "Remote exception: None"
                 ),
             ],
             expect_globals_contains={},
@@ -332,12 +332,11 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch local results for slug=None: globals={}, "
-                    "emsg='oops', exception=None"
-                ),
-                call(
-                    "Codejail darklaunch remote results for slug=None: globals={}, "
-                    "emsg='OH NO', exception=None"
+                    "Codejail darklaunch had mismatch for "
+                    "course='course-v1:org+course+run', slug='hw1':\n"
+                    "emsg_match=False, globals_match=True\n"
+                    "Local: globals={}, emsg='oops'\n"
+                    "Remote: globals={}, emsg='OH NO'"
                 ),
             ],
             expect_globals_contains={},
@@ -365,16 +364,7 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
                 call('codejail.darklaunch.globals_match', True),
                 call('codejail.darklaunch.emsg_match', True),  # even though not exact match
             ],
-            expect_log_info_calls=[
-                call(
-                    "Codejail darklaunch local results for slug=None: globals={}, "
-                    "emsg='stack trace involving /tmp/codejail-1234567/whatever.py', exception=None"
-                ),
-                call(
-                    "Codejail darklaunch remote results for slug=None: globals={}, "
-                    "emsg='stack trace involving /tmp/codejail-abcd_EFG/whatever.py', exception=None"
-                ),
-            ],
+            expect_log_info_calls=[],
             expect_globals_contains={},
         )
         assert isinstance(results['raised'], SafeExecException)
