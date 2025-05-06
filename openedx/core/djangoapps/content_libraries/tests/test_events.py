@@ -284,6 +284,34 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest, OpenEdxEventsT
         })
 
     ############################## Containers ##################################
+    def test_unit_crud(self):
+        """
+        Test Create, Read, Update, and Delete of a Unit
+        """
+        # Create a unit:
+        container_data = self._create_container(self.lib1_key, "unit", slug="u1", display_name="Test Unit")
+        container_key = LibraryContainerLocator.from_string(container_data["id"])
+
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_CREATED,
+            "library_container": LibraryContainerData(container_key),
+        })
+
+        # Update the unit:
+        self._update_container(container_key, display_name="Unit ABC")
+
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_UPDATED,
+            "library_container": LibraryContainerData(container_key),
+        })
+
+        # Delete the unit
+        self._delete_container(container_key)
+        self._get_container(container_key, expect_response=404)
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_DELETED,
+            "library_container": LibraryContainerData(container_key),
+        })
 
     def test_publish_container(self):
         """
@@ -337,3 +365,72 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest, OpenEdxEventsT
         # and container 2 is still unpublished
         c2_after = self._get_container(container2["id"])
         assert c2_after["has_unpublished_changes"]
+
+    def test_restore_unit(self):
+        """
+        Test restoring a deleted unit via the "restore" API.
+        """
+        # Create a unit:
+        container_data = self._create_container(self.lib1_key, "unit", slug="u1", display_name="Test Unit")
+        container_key=LibraryContainerLocator.from_string(container_data["id"])
+
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_CREATED,
+            "library_container": LibraryContainerData(container_key),
+        })
+
+        # Delete the unit
+        self._delete_container(container_data["id"])
+
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_DELETED,
+            "library_container": LibraryContainerData(container_key),
+        })
+
+        # Restore the unit
+        self._restore_container(container_data["id"])
+
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_CREATED,
+            "library_container": LibraryContainerData(container_key),
+        })
+
+    def test_restore_unit_via_revert(self):
+        """
+        Test restoring a deleted unit by reverting changes.
+        """
+        # Publish the existing setup and clear events
+        self._commit_library_changes(self.lib1_key)
+        self.clear_events()
+
+        # Create a unit:
+        container_data = self._create_container(self.lib1_key, "unit", slug="u1", display_name="Test Unit")
+        container_key=LibraryContainerLocator.from_string(container_data["id"])
+
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_CREATED,
+            "library_container": LibraryContainerData(container_key),
+        })
+
+        # Publish changes
+        self._publish_container(container_key)
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_PUBLISHED,
+            "library_container": LibraryContainerData(container_key),
+        })
+
+        # Delete the unit
+        self._delete_container(container_data["id"])
+
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_DELETED,
+            "library_container": LibraryContainerData(container_key),
+        })
+
+        # Revert changes, which will re-create the unit:
+        self._restore_container(container_data["id"])
+
+        self.expect_new_events({
+            "signal": LIBRARY_CONTAINER_CREATED,
+            "library_container": LibraryContainerData(container_key),
+        })
