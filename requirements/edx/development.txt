@@ -580,7 +580,7 @@ django-stubs==5.2.0
     #   djangorestframework-stubs
 django-stubs-ext==5.2.0
     # via django-stubs
-django-user-tasks==3.4.0
+django-user-tasks==3.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1181,7 +1181,7 @@ lti-consumer-xblock==9.14.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-lxml[html-clean]==5.4.0
+lxml[html-clean]==5.3.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

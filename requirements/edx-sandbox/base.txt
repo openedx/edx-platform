@@ -24,7 +24,7 @@ joblib==1.5.0
     # via nltk
 kiwisolver==1.4.8
     # via matplotlib
-lxml[html-clean,html_clean]==5.4.0
+lxml[html-clean,html_clean]==5.3.2
     # via
     #   -r requirements/edx-sandbox/base.in
     #   lxml-html-clean

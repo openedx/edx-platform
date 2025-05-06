@@ -450,7 +450,7 @@ django-storages==1.14.3
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edxval
-django-user-tasks==3.4.0
+django-user-tasks==3.3.0
     # via -r requirements/edx/base.txt
 django-waffle==4.2.0
     # via
@@ -899,7 +899,7 @@ loremipsum==1.0.5
     #   ora2
 lti-consumer-xblock==9.14.0
     # via -r requirements/edx/base.txt
-lxml[html-clean]==5.4.0
+lxml[html-clean]==5.3.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-i18n-tools
