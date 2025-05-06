@@ -4,7 +4,7 @@ API for containers (Sections, Subsections, Units) in Content Libraries
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import logging
 from uuid import uuid4
@@ -244,7 +244,7 @@ def create_container(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
-                created=created or datetime.now(),
+                created=created or datetime.now(tz=timezone.utc),
                 created_by=user_id,
             )
         case _:
@@ -274,7 +274,7 @@ def update_container(
     unit_version = authoring_api.create_next_unit_version(
         container.unit,
         title=display_name,
-        created=datetime.now(),
+        created=datetime.now(tz=timezone.utc),
         created_by=user_id,
     )
 
@@ -420,7 +420,7 @@ def update_container_children(
             new_version = authoring_api.create_next_unit_version(
                 container.unit,
                 components=components,  # type: ignore[arg-type]
-                created=datetime.now(),
+                created=datetime.now(tz=timezone.utc),
                 created_by=user_id,
                 entities_action=entities_action,
             )
