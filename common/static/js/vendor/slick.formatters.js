@@ -9,18 +9,6 @@
  */
 
 (function ($) {
-  // register namespace
-  $.extend(true, window, {
-    "Slick": {
-      "Formatters": {
-        "PercentComplete": PercentCompleteFormatter,
-        "PercentCompleteBar": PercentCompleteBarFormatter,
-        "YesNo": YesNoFormatter,
-        "Checkmark": CheckmarkFormatter
-      }
-    }
-  });
-
   function PercentCompleteFormatter(row, cell, value, columnDef, dataContext) {
     if (value == null || value === "") {
       return "-";
@@ -46,14 +34,32 @@
       color = "green";
     }
 
-    return "<span class='percent-complete-bar' style='background:" + color + ";width:" + value + "%'></span>";
+    return "<span class='percent-complete-bar' style='background:" + color + ";width:" + value + "%' title='" + value + "%'></span>";
   }
 
   function YesNoFormatter(row, cell, value, columnDef, dataContext) {
     return value ? "Yes" : "No";
   }
 
+  function CheckboxFormatter(row, cell, value, columnDef, dataContext) {
+    return '<img class="slick-edit-preclick" src="../images/' + (value ? "CheckboxY" : "CheckboxN") + '.png">';
+  }
+
   function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
     return value ? "<img src='../images/tick.png'>" : "";
   }
+
+  // exports
+  $.extend(true, window, {
+    "Slick": {
+      "Formatters": {
+        "PercentComplete": PercentCompleteFormatter,
+        "PercentCompleteBar": PercentCompleteBarFormatter,
+        "YesNo": YesNoFormatter,
+        "Checkmark": CheckmarkFormatter,
+        "Checkbox": CheckboxFormatter
+
+      }
+    }
+  });
 })(jQuery);
