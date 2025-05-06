@@ -5,8 +5,10 @@ Helper functions for the accounts API.
 
 import hashlib
 
+from django import VERSION
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.files.storage import storages
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.module_loading import import_string
 
@@ -33,11 +35,22 @@ def get_profile_image_storage():
         An instance of the configured storage backend.
     """
     config = getattr(settings, 'PROFILE_IMAGE_BACKEND', {})
-    storage_class_path = config.get('class') or getattr(
-        settings, 'DEFAULT_FILE_STORAGE', 'django.core.files.storage.FileSystemStorage'
-    )
+    storage_class_path = config.get('class')
+    options = config.get('options', {})
+
+    if not storage_class_path:
+        # Django 5.x STORAGES fallback
+        if django_version[0] >= 5 and hasattr(settings, 'STORAGES') and 'default' in settings.STORAGES:
+            return storages['default']
+        else:
+            # Legacy fallback
+            storage_class_path = getattr(
+                settings, 'DEFAULT_FILE_STORAGE',
+                'django.core.files.storage.FileSystemStorage'
+            )
+
     storage_class = import_string(storage_class_path)
-    return storage_class(**config.get('options', {}))
+    return storage_class(**options)
 
 
 def _make_profile_image_name(username):
