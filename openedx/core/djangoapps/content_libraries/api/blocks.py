@@ -838,7 +838,10 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     publish_log = authoring_api.publish_from_drafts(
         learning_package.id, draft_qset=drafts_to_publish, published_by=user.id,
     )
-    tasks.wait_for_post_publish_events(publish_log, library_key=library_key)
+    # Since this is a single component, it should be safe to process synchronously and in-process:
+    tasks.send_events_after_publish(publish_log.pk, str(library_key))
+    # IF this is found to be a performance issue, we could instead make it async where necessary:
+    # tasks.wait_for_post_publish_events(publish_log, library_key=library_key)
 
 
 def _component_exists(usage_key: UsageKeyV2) -> bool:
