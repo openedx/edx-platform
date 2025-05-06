@@ -272,6 +272,16 @@ class ContainerLink(EntityLinkBase):
             "or were deleted."
         )
     )
+    ready_to_sync = models.BooleanField(
+        default=False,
+        help_text=_(
+            "True if the downstream has an available sync from upstream. "
+            "It changes to True when the upstream is published, and it changes to False "
+            "when the sync is declined/accepted. "
+            "The version number is not used to check this value because containers do not change "
+            "version if a component is edited/deleted within them. "
+        ),
+    )
 
     class Meta:
         verbose_name = _("Container Link")
@@ -303,24 +313,15 @@ class ContainerLink(EntityLinkBase):
         """
         Get all links along with sync flag, upstream context title and version, with optional filtering.
         """
-        ready_to_sync = link_filter.pop('ready_to_sync', None)
         result = cls.objects.filter(**link_filter).select_related(
             "upstream_container__publishable_entity__published__version",
             "upstream_container__publishable_entity__learning_package"
-        ).annotate(
-            ready_to_sync=(
-                GreaterThan(
-                    Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
-                    Coalesce("version_synced", 0)
-                ) & GreaterThan(
-                    Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
-                    Coalesce("version_declined", 0)
-                )
-            )
         )
-        if ready_to_sync is not None:
-            result = result.filter(ready_to_sync=ready_to_sync)
         return result
+    
+    @classmethod
+    def get_link(cls, downstream_key) -> "EntityLinkBase":
+        return cls.objects.get(downstream_usage_key=downstream_key)
 
     @classmethod
     def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
