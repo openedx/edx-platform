@@ -39,6 +39,8 @@ from openedx_events.content_authoring.data import (
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_UPDATED,
+    LIBRARY_BLOCK_CREATED,
+    LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_UPDATED,
@@ -100,18 +102,6 @@ def send_events_after_publish(publish_log_pk: int, library_key_str: str) -> None
                 "but is of unknown type."
             )
 
-    # This publish will have impacted fields like "last_published",
-    # "published_by", and possibly "has_unpublished_changes" on the library
-    # overall, so send a CONTENT_LIBRARY_UPDATED event.
-    CONTENT_LIBRARY_UPDATED.send_event(
-        content_library=ContentLibraryData(
-            library_key=library_key,
-            # Deprecated: this meant to re-index all blocks, but we now send specific LIBRARY_BLOCK_UPDATED
-            # events for each block changed.
-            update_blocks=True,
-        )
-    )
-
 
 def wait_for_post_publish_events(publish_log: PublishLog, library_key: LibraryLocatorV2):
     """
@@ -160,11 +150,18 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
 
     # Update anything that needs to be updated (e.g. search index):
     for record in affected_entities:
+        # This will be true if the entity was [soft] deleted, but we're now reverting that deletion:
+        is_undeleted = (record.old_version is None and record.new_version is not None)
+        # This will be true if the entity was created and we're now deleting it by reverting that creation:
+        is_deleted = (record.old_version is not None and record.new_version is None)
         if hasattr(record.entity, "component"):
             usage_key = api.library_component_usage_key(library_key, record.entity.component)
-            LIBRARY_BLOCK_UPDATED.send_event(
-                library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key)
-            )
+            event = LIBRARY_BLOCK_UPDATED
+            if is_deleted:
+                event = LIBRARY_BLOCK_DELETED
+            elif is_undeleted:
+                event = LIBRARY_BLOCK_CREATED
+            event.send_event(library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key))
             # If any containers contain this component, their child list / component count may need to be updated
             # e.g. if this was a newly created component in the container and is now deleted, or this was deleted and
             # is now restored.
@@ -201,17 +198,6 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(collection_key=collection_key)
         )
-
-    # This revert will have impacted the "has_unpublished_changes" field on the
-    # library overall, so send a CONTENT_LIBRARY_UPDATED event.
-    CONTENT_LIBRARY_UPDATED.send_event(
-        content_library=ContentLibraryData(
-            library_key=library_key,
-            # Deprecated: this meant to re-index all blocks, but we now send specific LIBRARY_BLOCK_UPDATED
-            # events for each block changed.
-            update_blocks=True,
-        )
-    )
 
 
 def wait_for_post_revert_events(draft_change_log: DraftChangeLog, library_key: LibraryLocatorV2):
