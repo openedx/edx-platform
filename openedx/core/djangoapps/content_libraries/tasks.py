@@ -70,7 +70,7 @@ def send_events_after_publish(publish_log_pk: int, library_key_str: str) -> None
     """
     Send events to trigger actions like updating the search index, after we've
     published some items in a library.
-    
+
     We use the PublishLog record so we can detect exactly what was changed,
     including any auto-published changes like child items in containers.
 

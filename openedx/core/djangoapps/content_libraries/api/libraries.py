@@ -653,9 +653,6 @@ def get_allowed_block_types(library_key: LibraryLocatorV2):  # pylint: disable=u
     return info
 
 
-
-
-
 def publish_changes(library_key: LibraryLocatorV2, user_id: int | None = None):
     """
     Publish all pending changes to the specified library.
