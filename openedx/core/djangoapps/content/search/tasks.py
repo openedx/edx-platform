@@ -77,6 +77,19 @@ def delete_library_block_index_doc(usage_key_str: str) -> None:
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
 @set_code_owner_attribute
+def update_content_library_index_docs(library_key_str: str) -> None:
+    """
+    Celery task to update the content index documents for all library blocks in a library
+    """
+    library_key = LibraryLocatorV2.from_string(library_key_str)
+
+    log.info("Updating content index documents for library with id: %s", library_key)
+
+    api.upsert_content_library_index_docs(library_key)
+
+
+@shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
+@set_code_owner_attribute
 def update_library_collection_index_doc(collection_key_str: str) -> None:
     """
     Celery task to update the content index document for a library collection
