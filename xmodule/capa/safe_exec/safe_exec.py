@@ -355,6 +355,11 @@ def report_darklaunch_results(
     can_compare_output = True
 
     def report_arm(arm, emsg, unexpected_exception):
+        """
+        Set custom attributes for each arm of the darklaunch experiment.
+
+        `arm` should be 'local' or 'remote'.
+        """
         nonlocal can_compare_output
         if unexpected_exception:
             # .. custom_attribute_name: codejail.darklaunch.status.{local,remote}
