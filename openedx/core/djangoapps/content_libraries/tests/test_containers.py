@@ -82,6 +82,8 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
             'created': '2024-09-08T07:06:05Z',
             'modified': '2024-09-08T07:06:05Z',
             'collections': [],
+            'hide_from_learners': False,
+            'enable_discussion': True,
         }
 
         self.assertDictContainsEntries(container_data, expected_data)

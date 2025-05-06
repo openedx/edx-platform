@@ -988,7 +988,7 @@ openedx-filters==2.0.1
     #   ora2
 openedx-forum==0.2.0
     # via -r requirements/edx/base.txt
-openedx-learning==0.26.0
+openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@chris/FAL-4071-new-fields-to-units
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
