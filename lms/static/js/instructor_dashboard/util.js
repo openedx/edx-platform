@@ -491,8 +491,8 @@
             options = {
                 enableCellNavigation: true,
                 enableColumnReorder: false,
-                rowHeight: 30,
-                forceFitColumns: true
+                forceFitColumns: true,
+                autoHeight: true
             };
             columns = [
                 {
