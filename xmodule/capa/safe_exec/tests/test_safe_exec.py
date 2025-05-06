@@ -195,7 +195,10 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             mock_remote_exec.side_effect = remote
 
             try:
-                safe_exec("<IGNORED BY MOCKS>", globals_dict)
+                safe_exec(
+                    "<IGNORED BY MOCKS>", globals_dict,
+                    limit_overrides_context="course-v1:org+course+run", slug="hw1",
+                )
             except BaseException as e:
                 safe_exec_e = e
             else:
@@ -215,8 +218,8 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
 
     # These don't change between the tests
     standard_codejail_attr_calls = [
-        call('codejail.slug', None),
-        call('codejail.limit_overrides_context', None),
+        call('codejail.slug', 'hw1'),
+        call('codejail.limit_overrides_context', 'course-v1:org+course+run'),
         call('codejail.extra_files_count', 0),
     ]
 
@@ -256,7 +259,8 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch had mismatch for course=None, slug=None:\n"
+                    "Codejail darklaunch had mismatch for "
+                    "course='course-v1:org+course+run', slug='hw1':\n"
                     "emsg_match=True, globals_match=False\n"
                     "Local: globals={'overwrite': 'mock local'}, emsg=None\n"
                     "Remote: globals={'overwrite': 'mock remote'}, emsg=None"
@@ -294,7 +298,8 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch had unexpected exception for course=None, slug=None:\n"
+                    "Codejail darklaunch had unexpected exception "
+                    "for course='course-v1:org+course+run', slug='hw1':\n"
                     "Local exception: BaseException('unexpected')\n"
                     "Remote exception: None"
                 ),
@@ -327,7 +332,8 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
             ],
             expect_log_info_calls=[
                 call(
-                    "Codejail darklaunch had mismatch for course=None, slug=None:\n"
+                    "Codejail darklaunch had mismatch for "
+                    "course='course-v1:org+course+run', slug='hw1':\n"
                     "emsg_match=False, globals_match=True\n"
                     "Local: globals={}, emsg='oops'\n"
                     "Remote: globals={}, emsg='OH NO'"

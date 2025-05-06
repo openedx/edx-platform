@@ -383,7 +383,7 @@ def report_darklaunch_results(
         set_custom_attribute('codejail.darklaunch.emsg_match', 'N/A')
         log.info(
             "Codejail darklaunch had unexpected exception for "
-            f"course={limit_overrides_context}, slug={slug}:\n"
+            f"course={limit_overrides_context!r}, slug={slug!r}:\n"
             f"Local exception: {unexpected_exc_local!r}\n"
             f"Remote exception: {unexpected_exc_remote!r}"
         )
@@ -394,7 +394,7 @@ def report_darklaunch_results(
 
     if not globals_match or not emsg_match:
         log.info(
-            f"Codejail darklaunch had mismatch for course={limit_overrides_context}, slug={slug}:\n"
+            f"Codejail darklaunch had mismatch for course={limit_overrides_context!r}, slug={slug!r}:\n"
             f"{emsg_match=}, {globals_match=}\n"
             f"Local: globals={globals_local!r}, emsg={emsg_local!r}\n"
             f"Remote: globals={globals_remote!r}, emsg={emsg_remote!r}"
