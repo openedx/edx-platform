@@ -1,19 +1,26 @@
 """
 Tests for Learning-Core-based Content Libraries
 """
-import ddt
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import (
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
+from openedx_events.content_authoring.signals import (
     ContentLibraryData,
     LibraryBlockData,
-)
-from openedx_events.content_authoring.signals import (
+    LibraryCollectionData,
+    LibraryContainerData,
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
-    LIBRARY_BLOCK_UPDATED
+    LIBRARY_BLOCK_UPDATED,
+    LIBRARY_BLOCK_PUBLISHED,
+    LIBRARY_COLLECTION_CREATED,
+    LIBRARY_COLLECTION_DELETED,
+    LIBRARY_COLLECTION_UPDATED,
+    LIBRARY_CONTAINER_CREATED,
+    LIBRARY_CONTAINER_DELETED,
+    LIBRARY_CONTAINER_UPDATED,
+    LIBRARY_CONTAINER_PUBLISHED,
 )
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
@@ -22,8 +29,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 
 @skip_unless_cms
-@ddt.ddt
-class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
     """
     General tests for Learning-Core-based Content Libraries
 
@@ -53,6 +59,14 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         LIBRARY_BLOCK_CREATED,
         LIBRARY_BLOCK_DELETED,
         LIBRARY_BLOCK_UPDATED,
+        LIBRARY_BLOCK_PUBLISHED,
+        LIBRARY_COLLECTION_CREATED,
+        LIBRARY_COLLECTION_DELETED,
+        LIBRARY_COLLECTION_UPDATED,
+        LIBRARY_CONTAINER_CREATED,
+        LIBRARY_CONTAINER_DELETED,
+        LIBRARY_CONTAINER_UPDATED,
+        LIBRARY_CONTAINER_PUBLISHED,
     ]
     ENABLED_OPENEDX_EVENTS = [e.event_type for e in ALL_EVENTS]
 
@@ -207,7 +221,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
         # Then publish the block:
         self._publish_library_block(usage_key)
         self.expect_new_events({
-            "signal": LIBRARY_BLOCK_UPDATED,  # FIXME: this should be a _PUBLISHED event
+            "signal": LIBRARY_BLOCK_PUBLISHED,
             "library_block": LibraryBlockData(self.lib1_key, usage_key),
         })
 
@@ -268,3 +282,58 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
             "signal": LIBRARY_BLOCK_DELETED,
             "library_block": LibraryBlockData(self.lib1_key, usage_key),
         })
+
+    ############################## Containers ##################################
+
+    def test_publish_container(self):
+        """
+        Test that we can publish the changes to a specific container
+        """
+        # Create two containers and add some components
+        container1 = self._create_container(self.lib1_key, "unit", display_name="Alpha Unit", slug=None)
+        container2 = self._create_container(self.lib1_key, "unit", display_name="Bravo Unit", slug=None)
+        problem_block = self._add_block_to_library(self.lib1_key, "problem", "Problem1", can_stand_alone=False)
+        html_block = self._add_block_to_library(self.lib1_key, "html", "Html1", can_stand_alone=False)
+        html_block2 = self._add_block_to_library(self.lib1_key, "html", "Html2", can_stand_alone=False)
+        self._add_container_components(container1["id"], children_ids=[problem_block["id"], html_block["id"]])
+        self._add_container_components(container2["id"], children_ids=[html_block["id"], html_block2["id"]])
+        # At first everything is unpublished:
+        c1_before = self._get_container(container1["id"])
+        assert c1_before["has_unpublished_changes"]
+        c2_before = self._get_container(container2["id"])
+        assert c2_before["has_unpublished_changes"]
+
+        # clear event log after the initial mock data setup is complete:
+        self.clear_events()
+
+        # Now publish only Container 1
+        self._publish_container(container1["id"])
+
+        # Now it is published:
+        c1_after = self._get_container(container1["id"])
+        assert c1_after["has_unpublished_changes"] is False
+        # And publish events were emitted:
+        self.expect_new_events(
+            {  # An event for container 1 being published:
+                "signal": LIBRARY_CONTAINER_PUBLISHED,
+                "library_container": LibraryContainerData(
+                    container_key=LibraryContainerLocator.from_string(container1["id"]),
+                ),
+            },
+            {  # An event for the problem block in container 1:
+                "signal": LIBRARY_BLOCK_PUBLISHED,
+                "library_block": LibraryBlockData(
+                    self.lib1_key, LibraryUsageLocatorV2.from_string(problem_block["id"]),
+                ),
+            },
+            {  # An event for the html block in container 1 (and container 2):
+                "signal": LIBRARY_BLOCK_PUBLISHED,
+                "library_block": LibraryBlockData(
+                    self.lib1_key, LibraryUsageLocatorV2.from_string(html_block["id"]),
+                ),
+            },
+        )
+
+        # and container 2 is still unpublished
+        c2_after = self._get_container(container2["id"])
+        assert c2_after["has_unpublished_changes"]

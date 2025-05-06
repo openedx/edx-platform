@@ -42,8 +42,10 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
+    LIBRARY_BLOCK_PUBLISHED,
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_UPDATED,
+    LIBRARY_CONTAINER_PUBLISHED,
 )
 
 from user_tasks.tasks import UserTask, UserTaskStatus
@@ -88,12 +90,14 @@ def send_events_after_publish(publish_log_pk: int, library_key_str: str) -> None
     for record in affected_entities:
         if hasattr(record.entity, "component"):
             usage_key = api.library_component_usage_key(library_key, record.entity.component)
-            LIBRARY_BLOCK_UPDATED.send_event(
+            # Note that this item may be newly created, updated, or even deleted - but all we care about for this event
+            # is that the published version is now different. Only for draft changes do we send differentiated events.
+            LIBRARY_BLOCK_PUBLISHED.send_event(
                 library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key)
             )
         elif hasattr(record.entity, "container"):
             container_key = api.library_container_locator(library_key, record.entity.container)
-            LIBRARY_CONTAINER_UPDATED.send_event(
+            LIBRARY_CONTAINER_PUBLISHED.send_event(
                 library_container=LibraryContainerData(container_key=container_key)
             )
         else:
