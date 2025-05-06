@@ -23,12 +23,14 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED,
+    LIBRARY_BLOCK_PUBLISHED,
     LIBRARY_COLLECTION_CREATED,
     LIBRARY_COLLECTION_DELETED,
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_CREATED,
     LIBRARY_CONTAINER_DELETED,
     LIBRARY_CONTAINER_UPDATED,
+    LIBRARY_CONTAINER_PUBLISHED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
@@ -37,6 +39,7 @@ from openedx_events.content_authoring.signals import (
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.search.models import SearchAccess
+from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from .api import (
     only_if_meilisearch_enabled,
@@ -129,6 +132,32 @@ def library_block_updated_handler(**kwargs) -> None:
     library_block_data = kwargs.get("library_block", None)
     if not library_block_data or not isinstance(library_block_data, LibraryBlockData):  # pragma: no cover
         log.error("Received null or incorrect data for event")
+        return
+
+    # Update content library index synchronously to make sure that search index is updated before
+    # the frontend invalidates/refetches results. This is only a single document update so is very fast.
+    upsert_library_block_index_doc.apply(args=[str(library_block_data.usage_key)])
+
+
+@receiver(LIBRARY_BLOCK_PUBLISHED)
+@only_if_meilisearch_enabled
+def library_block_published_handler(**kwargs) -> None:
+    """
+    Update the index for the content library block when its published version
+    has changed.
+    """
+    library_block_data = kwargs.get("library_block", None)
+    if not library_block_data or not isinstance(library_block_data, LibraryBlockData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+
+    # The PUBLISHED event is sent for any change to the published version including deletes, so check if it exists:
+    try:
+        lib_api.get_library_block(library_block_data.usage_key)
+    except lib_api.ContentLibraryBlockNotFound:
+        log.info(f"Observed published deletion of library block {str(library_block_data.usage_key)}.")
+        # The document should already have been deleted from the search index
+        # via the DELETED handler, so there's nothing to do now.
         return
 
     # Update content library index synchronously to make sure that search index is updated before
@@ -248,17 +277,34 @@ def library_container_updated_handler(**kwargs) -> None:
         log.error("Received null or incorrect data for event")
         return
 
-    if library_container.background:
-        update_library_container_index_doc.delay(
-            str(library_container.container_key),
-        )
-    else:
-        # Update container index synchronously to make sure that search index is updated before
-        # the frontend invalidates/refetches index.
-        # See content_library_updated_handler for more details.
-        update_library_container_index_doc.apply(args=[
-            str(library_container.container_key),
-        ])
+    update_library_container_index_doc.apply(args=[
+        str(library_container.container_key),
+    ])
+
+
+@receiver(LIBRARY_CONTAINER_PUBLISHED)
+@only_if_meilisearch_enabled
+def library_container_published_handler(**kwargs) -> None:
+    """
+    Update the index for the content library container when its published
+    version has changed.
+    """
+    library_container = kwargs.get("library_container", None)
+    if not library_container or not isinstance(library_container, LibraryContainerData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+    # The PUBLISHED event is sent for any change to the published version including deletes, so check if it exists:
+    try:
+        lib_api.get_container(library_container.container_key)
+    except lib_api.ContentLibraryContainerNotFound:
+        log.info(f"Observed published deletion of container {str(library_container.container_key)}.")
+        # The document should already have been deleted from the search index
+        # via the DELETED handler, so there's nothing to do now.
+        return
+
+    update_library_container_index_doc.apply(args=[
+        str(library_container.container_key),
+    ])
 
 
 @receiver(LIBRARY_CONTAINER_DELETED)
@@ -275,3 +321,6 @@ def library_container_deleted(**kwargs) -> None:
     # Update content library index synchronously to make sure that search index is updated before
     # the frontend invalidates/refetches results. This is only a single document update so is very fast.
     delete_library_container_index_doc.apply(args=[str(library_container.container_key)])
+    # TODO: post-Teak, move all the celery tasks directly inline into this handlers? Because now the
+    # events are emitted in an [async] worker, so it doesn't matter if the handlers are synchronous.
+    # See https://github.com/openedx/edx-platform/pull/36640 discussion.
