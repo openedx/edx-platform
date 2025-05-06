@@ -972,7 +972,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==10.0.0
+openedx-events @ git+https://github.com/open-craft/openedx-events.git@braden/clarify-library-events
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
