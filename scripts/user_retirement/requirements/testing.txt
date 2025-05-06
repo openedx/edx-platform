@@ -130,7 +130,7 @@ more-itertools==10.6.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-moto==4.2.14
+moto==5.1.4
     # via -r scripts/user_retirement/requirements/testing.in
 newrelic==10.9.0
     # via

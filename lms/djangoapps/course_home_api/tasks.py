@@ -37,12 +37,19 @@ def collect_progress_for_user_in_course(course_id: str, user_id: str) -> None:
         log.warning(f"Could not retrieve a user with id {user_id}, aborting task.")
         return
 
+    try:
+        enrollment = get_course_enrollment(user, course_key)
+        enrollment_mode = enrollment.mode
+    except AttributeError:
+        log.warning(f"Could not retrieve enrollment info for user {user.id} in course {course_id}")
+        return
+
     progress = calculate_progress_for_learner_in_course(course_key, user)
-    enrollment = get_course_enrollment(user, course_key)
+
     # add a few extra fields to the returned data to make the event payload a bit more usable
     progress["user_id"] = user.id
     progress["course_id"] = course_id
-    progress["enrollment_mode"] = enrollment.mode
+    progress["enrollment_mode"] = enrollment_mode
 
     tracker.emit(
         COURSE_COMPLETION_FOR_USER_EVENT_NAME,
