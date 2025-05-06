@@ -1054,7 +1054,7 @@ openedx-mongodbproxy==0.2.2
     # via -r requirements/edx/base.txt
 optimizely-sdk==5.2.0
     # via -r requirements/edx/base.txt
-ora2==6.16.1
+ora2==6.16.2
     # via -r requirements/edx/base.txt
 packaging==25.0
     # via
