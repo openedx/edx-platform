@@ -13,12 +13,14 @@ from django.contrib.admin.sites import NotRegistered
 from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm
 from django.db import models, router, transaction
 from django.http import HttpResponseRedirect
 from django.http.request import QueryDict
 from django.urls import reverse, path
+from django.utils.decorators import method_decorator
 from django.utils.translation import ngettext
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
@@ -311,13 +313,14 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
-
+@method_decorator(login_required, name='dispatch')
 class LanguageAutocomplete(autocomplete.Select2ListView):
     def get_list(self):
         if not self.request.user.is_staff:
             return []
         return [lang for lang in LANGUAGE_CHOICES if self.q.lower() in lang.lower()]
 
+@method_decorator(login_required, name='dispatch')
 class CountryAutocomplete(autocomplete.Select2ListView):
     def get_list(self):
         if not self.request.user.is_staff:
