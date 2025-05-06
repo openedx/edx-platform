@@ -672,3 +672,29 @@ class TestUserProfileAutocompleteAdmin(TestCase):
         response = self.client.get(f'{self.country_url}?q=pakistan')
         data = json.loads(response.content)
         self.assertEqual(data['results'], [])
+
+    def test_language_autocomplete_blocks_anonymous_user(self):
+        """Ensure anonymous user gets blocked or redirected."""
+        self.client.logout()
+        response = self.client.get(f'{self.language_url}?q=English')
+        self.assertIn(response.status_code, [302, 403])
+
+    def test_country_autocomplete_blocks_anonymous_user(self):
+        """Ensure anonymous user gets blocked or redirected."""
+        self.client.logout()
+        response = self.client.get(f'{self.country_url}?q=Pakistan')
+        self.assertIn(response.status_code, [302, 403])
+
+    def test_language_autocomplete_status_for_non_staff(self):
+        self.client.logout()
+        self.client.login(username=self.non_staff_user.username, password='test')
+        response = self.client.get(f'{self.language_url}?q=English')
+        self.assertEqual(response.status_code, 200)  # still 200, but empty results expected
+        self.assertEqual(json.loads(response.content)['results'], [])
+
+    def test_unknown_autocomplete_path_404s(self):
+        logged_in = self.client.login(username=self.staff_user.username, password='test')
+        assert logged_in, "Login failed — test user not authenticated"
+
+        response = self.client.get('/admin/myapp/mymodel/fake-autocomplete/')
+        self.assertEqual(response.status_code, 404)
