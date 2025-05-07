@@ -1,6 +1,9 @@
 """Tests for the certificates Python Data Class. """
 from django.test import TestCase
 from lms.djangoapps.certificates.data import CertificateStatuses
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class CertificateStatusAPITests(TestCase):

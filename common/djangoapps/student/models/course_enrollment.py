@@ -179,13 +179,11 @@ class CourseEnrollmentQuerySet(models.QuerySet):
 
     def get_user_course_ids_with_certificates(self, username):
         """
-        Gets user's course ids with certificates.
+        Retrieve the list of course IDs for which the given user has earned certificates.
         """
-        from lms.djangoapps.certificates.models import GeneratedCertificate  # pylint: disable=import-outside-toplevel
-        course_ids_with_certificates = GeneratedCertificate.objects.filter(
-            user__username=username
-        ).values_list('course_id', flat=True)
-        return course_ids_with_certificates
+        from lms.djangoapps.certificates.api import get_course_ids_for_username
+
+        return get_course_ids_for_username(username)
 
 
 class CourseEnrollmentManager(models.Manager):

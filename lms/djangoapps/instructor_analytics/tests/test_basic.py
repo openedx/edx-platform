@@ -16,6 +16,7 @@ from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint:
     PROGRAM_ENROLLMENT_FEATURES,
     STUDENT_FEATURES,
     StudentModule,
+    issued_certificates,
     enrolled_students_features,
     get_proctored_exam_results,
     get_response_state,
@@ -23,6 +24,7 @@ from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint:
     list_problem_responses
 )
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
+from lms.djangoapps.certificates.api import create_generated_certificate
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import InstructorFactory
@@ -122,6 +124,36 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         for userreport in userreports:
             assert list(userreport.keys()) == ['username']
             assert userreport['username'] in [user.username for user in self.users]
+
+    def test_issued_certificates_basic(self):
+        """
+        Test that the `issued_certificates` function returns correct aggregated data
+        for a single downloadable certificate.
+
+        Creates a downloadable certificate for a user and verifies that the result:
+        - Is a list with one item
+        - Contains the expected course ID
+        - Includes the correct total count of issued certificates
+        - Includes the 'report_run_date' field
+        """
+        cert_args = {
+            "user": UserFactory(),
+            "course_id": self.course_key,
+            "mode": "honor",
+            "status": "downloadable",
+            "grade": "Pass"
+        }
+        create_generated_certificate(cert_args)
+        features = ['course_id', 'mode', 'status', 'grade']
+        results = issued_certificates(self.course_key, features)
+
+        assert isinstance(results, list)
+        assert len(results) == 1
+
+        cert = results[0]
+        assert cert['course_id'] == str(self.course_key)
+        assert cert['total_issued_certificate'] == 1
+        assert 'report_run_date' in cert
 
     def test_enrolled_students_features_keys(self):
         query_features = ('username', 'name', 'email', 'city', 'country',)
