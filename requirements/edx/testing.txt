@@ -1525,7 +1525,7 @@ super-csv==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
-sympy==1.13.3
+sympy==1.14.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-calc

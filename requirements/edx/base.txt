@@ -1141,7 +1141,7 @@ stevedore==5.4.1
     #   edx-opaque-keys
 super-csv==4.1.0
     # via edx-bulk-grades
-sympy==1.13.3
+sympy==1.14.0
     # via openedx-calc
 testfixtures==8.3.0
     # via edx-enterprise
