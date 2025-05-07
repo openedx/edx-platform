@@ -6,7 +6,6 @@ import logging
 from eventtracking import tracker
 
 from forum import api as forum_api
-from forum.backends.mongodb.threads import CommentThread
 
 from . import models, settings, utils
 
@@ -217,18 +216,6 @@ class Thread(models.Model):
         )
         self._update_from_response(response)
 
-    @classmethod
-    def get_user_threads_count(cls, user_id, course_ids):
-        """
-        Returns threads and responses count of user in the given course_ids.
-        TODO: Add support for MySQL backend as well
-        """
-        query_params = {
-            "course_id": {"$in": course_ids},
-            "author_id": str(user_id),
-            "_type": "CommentThread"
-        }
-        return CommentThread()._collection.count_documents(query_params)  # pylint: disable=protected-access
 
 def _clean_forum_params(params):
     """Convert string booleans to actual booleans and remove None values from forum parameters."""

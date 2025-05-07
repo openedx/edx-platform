@@ -1,4 +1,4 @@
-# pylint: skip-file
+# pylint: disable=unused-import
 """
 Tests for the external REST API endpoints of the Discussion API (views_v2.py).
 
@@ -8,44 +8,71 @@ and integration with the underlying discussion service. These tests ensure that 
 various user roles, input data, and edge cases, and that they return appropriate HTTP status codes and response bodies.
 """
 
-
 import json
+import random
 from datetime import datetime
 from unittest import mock
 
 import ddt
-from forum.backends.mongodb.comments import Comment
-from forum.backends.mongodb.threads import CommentThread
 import httpretty
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
+from forum.backends.mongodb.comments import Comment
+from forum.backends.mongodb.comments import CommentThread
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status
 from rest_framework.parsers import JSONParser
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from common.djangoapps.student.tests.factories import (
-    CourseEnrollmentFactory,
-    UserFactory,
+from lms.djangoapps.discussion.django_comment_client.tests.utils import (
+    ForumsEnableMixin,
+    config_course_discussions,
+    topic_name_to_id,
 )
-from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
-from common.test.utils import disable_signal
-from lms.djangoapps.discussion.tests.utils import (
-    make_minimal_cs_comment,
-    make_minimal_cs_thread,
-)
-from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api import api
 from lms.djangoapps.discussion.rest_api.tests.utils import (
+    CommentsServiceMockMixin,
     ForumMockUtilsMixin,
     ProfileImageTestMixin,
     make_paginated_api_response,
+    make_minimal_cs_comment,
+    make_minimal_cs_thread,
 )
+from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
+
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.tests.factories import (
+    AdminFactory,
+    CourseEnrollmentFactory,
+    SuperuserFactory,
+    UserFactory
+)
+from common.djangoapps.student.models import get_retired_username_by_username, CourseEnrollment
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff
+from common.djangoapps.util.testing import PatchMediaTypeMixin, UrlResetMixin
+from common.test.utils import disable_signal
+
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
+from openedx.core.djangoapps.user_api.models import RetirementState, UserRetirementStatus
 from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT,
-    assign_role
+    CourseDiscussionSettings, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA,
+    FORUM_ROLE_MODERATOR, FORUM_ROLE_STUDENT, assign_role, Role
 )
+from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 
 
@@ -1010,139 +1037,6 @@ class BulkDeleteUserPostsTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         response = get_usernames_from_search_string(self.course_key, username_search_string, 1, 1)
         assert response == (username_search_string.lower(), 1, 1)
 
-
-@httpretty.activate
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
-    """Tests for CourseView"""
-
-    def setUp(self):
-        super().setUp()
-        RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
-        self.retire_forums_state = RetirementState.objects.create(state_name='RETIRE_FORUMS', state_execution_order=11)
-
-        self.retirement = UserRetirementStatus.create_retirement(self.user)
-        self.retirement.current_state = self.retire_forums_state
-        self.retirement.save()
-
-        self.superuser = SuperuserFactory()
-        self.superuser_client = APIClient()
-        self.retired_username = get_retired_username_by_username(self.user.username)
-        self.url = reverse("retire_discussion_user")
-
-    def assert_response_correct(self, response, expected_status, expected_content):
-        """
-        Assert that the response has the given status code and content
-        """
-        assert response.status_code == expected_status
-
-        if expected_content:
-            assert response.content.decode('utf-8') == expected_content
-
-    def build_jwt_headers(self, user):
-        """
-        Helper function for creating headers for the JWT authentication.
-        """
-        token = create_jwt_for_user(user)
-        headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
-        return headers
-
-    def test_basic(self):
-        """
-        Intentionally left empty because this test case is inherited from parent
-        """
-
-    def mock_comment_and_thread_count(self, comment_count=1, thread_count=1):
-        """
-        Patches count_documents() for Comment and CommentThread._collection.
-        """
-        nonexistent_username = "nonexistent user"
-        self.retired_username = get_retired_username_by_username(nonexistent_username)
-        data = {'username': nonexistent_username}
-        headers = self.build_jwt_headers(self.superuser)
-        response = self.superuser_client.post(self.url, data, **headers)
-        self.assert_response_correct(response, 404, None)
-
-    def test_not_authenticated(self):
-        """
-        Override the parent implementation of this, we JWT auth for this API
-        """
-        pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class UploadFileViewTest(ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin, ModuleStoreTestCase):
-    """
-    Tests for UploadFileView.
-    """
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
-        super().setUp()
-        self.valid_file = {
-            "uploaded_file": SimpleUploadedFile(
-                "test.jpg",
-                b"test content",
-                content_type="image/jpeg",
-            ),
-        }
-        self.user = UserFactory.create(password=self.TEST_PASSWORD)
-        self.course = CourseFactory.create(org='a', course='b', run='c', start=datetime.now(UTC))
-        self.url = reverse("upload_file", kwargs={"course_id": str(self.course.id)})
-
-        comment_collection = mock.MagicMock()
-        comment_collection.count_documents.return_value = comment_count
-        patch_comment = mock.patch.object(
-            Comment, "_collection", new_callable=mock.PropertyMock, return_value=comment_collection
-        )
-
-        thread_mock = patch_thread.start()
-        comment_mock = patch_comment.start()
-
-        self.addCleanup(patch_comment.stop)
-        self.addCleanup(patch_thread.stop)
-        return thread_mock, comment_mock
-
-    @ddt.data(FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT)
-    def test_bulk_delete_denied_for_discussion_roles(self, role):
-        """
-        Test bulk delete user posts denied with discussion roles.
-        """
-        thread_mock, comment_mock = self.mock_comment_and_thread_count(comment_count=1, thread_count=1)
-        assign_role(self.course.id, self.user, role)
-        response = self.client.post(
-            f"{self.url}?username={self.user2.username}",
-            format="json",
-        )
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-        thread_mock.count_documents.assert_not_called()
-        comment_mock.count_documents.assert_not_called()
-
-    @ddt.data(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR)
-    def test_bulk_delete_allowed_for_discussion_roles(self, role):
-        """
-        Test bulk delete user posts passed with discussion roles.
-        """
-        self.mock_comment_and_thread_count(comment_count=1, thread_count=1)
-        assign_role(self.course.id, self.user, role)
-        response = self.client.post(
-            f"{self.url}?username={self.user2.username}",
-            format="json",
-        )
-        assert response.status_code == status.HTTP_202_ACCEPTED
-        assert response.json() == {"comment_count": 1, "thread_count": 1}
-
-    @mock.patch('lms.djangoapps.discussion.rest_api.views.delete_course_post_for_user.apply_async')
-    @ddt.data(True, False)
-    def test_task_only_runs_if_execute_param_is_true(self, execute, task_mock):
-        """
-        Test bulk delete user posts task runs only if execute parameter is set to true.
-        """
-        self.user_login()
-        GlobalStaff().add_users(self.user)
-        response = self.client.post(self.url, self.valid_file)
-        self.assert_upload_success(response)
-
     def test_file_upload_by_instructor(self):
         """
         Should succeed when a valid file is uploaded by a course instructor.
@@ -1659,6 +1553,690 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         expected_non_courseware_keys.remove('courseware')
         vertical_keys = list(data[1]['children'][0]['children'][0].keys())
         assert vertical_keys == expected_non_courseware_keys
+
+
+@ddt.ddt
+@httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for LearnerThreadView list"""
+
+    def setUp(self):
+        """
+        Sets up the test case
+        """
+        super().setUp()
+        self.author = self.user
+        self.remove_keys = [
+            "abuse_flaggers",
+            "body",
+            "children",
+            "commentable_id",
+            "endorsed",
+            "last_activity_at",
+            "resp_total",
+            "thread_type",
+            "user_id",
+            "username",
+            "votes",
+        ]
+        self.replace_keys = [
+            {"from": "unread_comments_count", "to": "unread_comment_count"},
+            {"from": "comments_count", "to": "comment_count"},
+        ]
+        self.add_keys = [
+            {"key": "author", "value": self.author.username},
+            {"key": "abuse_flagged", "value": False},
+            {"key": "author_label", "value": None},
+            {"key": "can_delete", "value": True},
+            {"key": "close_reason", "value": None},
+            {
+                "key": "comment_list_url",
+                "value": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread"
+            },
+            {
+                "key": "editable_fields",
+                "value": [
+                    'abuse_flagged', 'anonymous', 'copy_link', 'following', 'raw_body',
+                    'read', 'title', 'topic_id', 'type'
+                ]
+            },
+            {"key": "endorsed_comment_list_url", "value": None},
+            {"key": "following", "value": False},
+            {"key": "group_name", "value": None},
+            {"key": "has_endorsed", "value": False},
+            {"key": "last_edit", "value": None},
+            {"key": "non_endorsed_comment_list_url", "value": None},
+            {"key": "preview_body", "value": "Test body"},
+            {"key": "raw_body", "value": "Test body"},
+
+            {"key": "rendered_body", "value": "<p>Test body</p>"},
+            {"key": "response_count", "value": 0},
+            {"key": "topic_id", "value": "test_topic"},
+            {"key": "type", "value": "discussion"},
+            {"key": "users", "value": {
+                self.user.username: {
+                    "profile": {
+                        "image": {
+                            "has_image": False,
+                            "image_url_full": "http://testserver/static/default_500.png",
+                            "image_url_large": "http://testserver/static/default_120.png",
+                            "image_url_medium": "http://testserver/static/default_50.png",
+                            "image_url_small": "http://testserver/static/default_30.png",
+                        }
+                    }
+                }
+            }},
+            {"key": "vote_count", "value": 4},
+            {"key": "voted", "value": False},
+
+        ]
+        self.url = reverse("discussion_learner_threads", kwargs={'course_id': str(self.course.id)})
+
+    def update_thread(self, thread):
+        """
+        This function updates the thread by adding and remove some keys.
+        Value of these keys has been defined in setUp function
+        """
+        for element in self.add_keys:
+            thread[element['key']] = element['value']
+        for pair in self.replace_keys:
+            thread[pair['to']] = thread.pop(pair['from'])
+        for key in self.remove_keys:
+            thread.pop(key)
+        thread['comment_count'] += 1
+        return thread
+
+    def test_basic(self):
+        """
+        Tests the data is fetched correctly
+
+        Note: test_basic is required as the name because DiscussionAPIViewTestMixin
+              calls this test case automatically
+        """
+        self.register_get_user_response(self.user)
+        expected_cs_comments_response = {
+            "collection": [make_minimal_cs_thread({
+                "id": "test_thread",
+                "course_id": str(self.course.id),
+                "commentable_id": "test_topic",
+                "user_id": str(self.user.id),
+                "username": self.user.username,
+                "created_at": "2015-04-28T00:00:00Z",
+                "updated_at": "2015-04-28T11:11:11Z",
+                "title": "Test Title",
+                "body": "Test body",
+                "votes": {"up_count": 4},
+                "comments_count": 5,
+                "unread_comments_count": 3,
+                "closed_by_label": None,
+                "edit_by_label": None,
+            })],
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        self.url += f"?username={self.user.username}"
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        response_data = json.loads(response.content.decode('utf-8'))
+        expected_api_response = expected_cs_comments_response['collection']
+
+        for thread in expected_api_response:
+            self.update_thread(thread)
+
+        assert response_data['results'] == expected_api_response
+        assert response_data['pagination'] == {
+            "next": None,
+            "previous": None,
+            "count": 1,
+            "num_pages": 1,
+        }
+
+    def test_no_username_given(self):
+        """
+        Tests that 404 response is returned when no username is passed
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == 404
+
+    def test_not_authenticated(self):
+        """
+        This test is called by DiscussionAPIViewTestMixin and is not required in
+        our case
+        """
+        assert True
+
+    @ddt.data("None", "discussion", "question")
+    def test_thread_type_by(self, thread_type):
+        """
+        Tests the thread_type parameter
+
+        Arguments:
+            thread_type (str): Value of thread_type can be 'None',
+                          'discussion' and 'question'
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "thread_type": thread_type,
+            }
+        )
+        assert response.status_code == 200
+        params = {
+            "user_id": str(self.user.id),
+            "course_id": str(self.course.id),
+            "page": 1,
+            "per_page": 10,
+            "thread_type": thread_type,
+            "sort_key": 'activity',
+            "count_flagged": False
+        }
+
+        self.check_mock_called_with("get_user_active_threads", -1, **params)
+
+    @ddt.data(
+        ("last_activity_at", "activity"),
+        ("comment_count", "comments"),
+        ("vote_count", "votes")
+    )
+    @ddt.unpack
+    def test_order_by(self, http_query, cc_query):
+        """
+        Tests the order_by parameter for active threads
+
+        Arguments:
+            http_query (str): Query string sent in the http request
+            cc_query (str): Query string used for the comments client service
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "order_by": http_query,
+            }
+        )
+        assert response.status_code == 200
+        params = {
+            "user_id": str(self.user.id),
+            "course_id": str(self.course.id),
+            "page": 1,
+            "per_page": 10,
+            "sort_key": cc_query,
+            "count_flagged": False
+        }
+        self.check_mock_called_with("get_user_active_threads", -1, **params)
+
+    @ddt.data("flagged", "unanswered", "unread", "unresponded")
+    def test_status_by(self, post_status):
+        """
+        Tests the post_status parameter
+
+        Arguments:
+            post_status (str): Value of post_status can be 'flagged',
+                          'unanswered' and 'unread'
+        """
+        threads = [make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(self.user.id),
+            "username": self.user.username,
+            "created_at": "2015-04-28T00:00:00Z",
+            "updated_at": "2015-04-28T11:11:11Z",
+            "title": "Test Title",
+            "body": "Test body",
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+        })]
+        expected_cs_comments_response = {
+            "collection": threads,
+            "page": 1,
+            "num_pages": 1,
+        }
+        self.register_get_user_response(self.user)
+        self.register_user_active_threads(self.user.id, expected_cs_comments_response)
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": str(self.course.id),
+                "username": self.user.username,
+                "status": post_status,
+            }
+        )
+        if post_status == "flagged":
+            assert response.status_code == 403
+        else:
+            assert response.status_code == 200
+            params = {
+                "user_id": str(self.user.id),
+                "course_id": str(self.course.id),
+                "page": 1,
+                "per_page": 10,
+                post_status: True,
+                "sort_key": 'activity',
+                "count_flagged": False
+            }
+            self.check_mock_called_with("get_user_active_threads", -1, **params)
+
+
+@ddt.ddt
+@httpretty.activate
+@override_waffle_flag(ENABLE_DISCUSSIONS_MFE, True)
+class CourseActivityStatsTest(ForumsEnableMixin, UrlResetMixin, ForumMockUtilsMixin, APITestCase,
+                              SharedModuleStoreTestCase):
+    """
+    Tests for the course stats endpoint
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self) -> None:
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.course_key = str(self.course.id)
+        seed_permissions_roles(self.course.id)
+        self.user = UserFactory(username='user')
+        self.moderator = UserFactory(username='moderator')
+        moderator_role = Role.objects.get(name="Moderator", course_id=self.course.id)
+        moderator_role.users.add(self.moderator)
+        self.stats = [
+            {
+                "active_flags": random.randint(0, 3),
+                "inactive_flags": random.randint(0, 2),
+                "replies": random.randint(0, 30),
+                "responses": random.randint(0, 100),
+                "threads": random.randint(0, 10),
+                "username": f"user-{idx}"
+            }
+            for idx in range(10)
+        ]
+
+        for stat in self.stats:
+            user = UserFactory.create(
+                username=stat['username'],
+                email=f"{stat['username']}@example.com",
+                password=self.TEST_PASSWORD
+            )
+            CourseEnrollment.enroll(user, self.course.id, mode='audit')
+
+        CourseEnrollment.enroll(self.moderator, self.course.id, mode='audit')
+        self.stats_without_flags = [{**stat, "active_flags": None, "inactive_flags": None} for stat in self.stats]
+        self.register_course_stats_response(self.course_key, self.stats, 1, 3)
+        self.url = reverse("discussion_course_activity_stats", kwargs={"course_key_string": self.course_key})
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_regular_user(self):
+        """
+        Tests that for a regular user stats are returned without flag counts
+        """
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+        response = self.client.get(self.url)
+        data = response.json()
+        assert data["results"] == self.stats_without_flags
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_moderator_user(self):
+        """
+        Tests that for a moderator user stats are returned with flag counts
+        """
+        self.client.login(username=self.moderator.username, password=self.TEST_PASSWORD)
+        response = self.client.get(self.url)
+        data = response.json()
+        assert data["results"] == self.stats
+
+    @ddt.data(
+        ("moderator", "flagged", "flagged"),
+        ("moderator", "activity", "activity"),
+        ("moderator", "recency", "recency"),
+        ("moderator", None, "flagged"),
+        ("user", None, "activity"),
+        ("user", "activity", "activity"),
+        ("user", "recency", "recency"),
+    )
+    @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_sorting(self, username, ordering_requested, ordering_performed):
+        """
+        Test valid sorting options and defaults
+        """
+        self.client.login(username=username, password=self.TEST_PASSWORD)
+        params = {}
+        if ordering_requested:
+            params = {"order_by": ordering_requested}
+        self.client.get(self.url, params)
+        self.check_mock_called("get_user_course_stats")
+        params = self.get_mock_func_calls("get_user_course_stats")[-1][1]
+        assert params["sort_key"] == ordering_performed
+
+    @ddt.data("flagged", "xyz")
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def test_sorting_error_regular_user(self, order_by):
+        """
+        Test for invalid sorting options for regular users.
+        """
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+        response = self.client.get(self.url, {"order_by": order_by})
+        assert "order_by" in response.json()["field_errors"]
+
+    @ddt.data(
+        ('user', 'user-0,user-1,user-2,user-3,user-4,user-5,user-6,user-7,user-8,user-9'),
+        ('moderator', 'moderator'),
+    )
+    @ddt.unpack
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param(self, username_search_string, comma_separated_usernames):
+        """
+        Test for endpoint with username param.
+        """
+        params = {'username': username_search_string}
+        self.client.login(username=self.moderator.username, password=self.TEST_PASSWORD)
+        self.client.get(self.url, params)
+        self.check_mock_called("get_user_course_stats")
+        params = self.get_mock_func_calls("get_user_course_stats")[-1][1]
+        assert params["usernames"] == comma_separated_usernames
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_with_no_matches(self):
+        """
+        Test for endpoint with username param with no matches.
+        """
+        params = {'username': 'unknown'}
+        self.client.login(username=self.moderator.username, password=self.TEST_PASSWORD)
+        response = self.client.get(self.url, params)
+        data = response.json()
+        self.assertFalse(data['results'])
+        assert data['pagination']['count'] == 0
+
+    @ddt.data(
+        'user-0',
+        'USER-1',
+        'User-2',
+        'UsEr-3'
+    )
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_DISCUSSION_SERVICE': True})
+    def test_with_username_param_case(self, username_search_string):
+        """
+        Test user search function is case-insensitive.
+        """
+        response = get_usernames_from_search_string(self.course_key, username_search_string, 1, 1)
+        assert response == (username_search_string.lower(), 1, 1)
+
+
+@httpretty.activate
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
+    """Tests for CourseView"""
+
+    def setUp(self):
+        super().setUp()
+        RetirementState.objects.create(state_name='PENDING', state_execution_order=1)
+        self.retire_forums_state = RetirementState.objects.create(state_name='RETIRE_FORUMS', state_execution_order=11)
+
+        self.retirement = UserRetirementStatus.create_retirement(self.user)
+        self.retirement.current_state = self.retire_forums_state
+        self.retirement.save()
+
+        self.superuser = SuperuserFactory()
+        self.superuser_client = APIClient()
+        self.retired_username = get_retired_username_by_username(self.user.username)
+        self.url = reverse("retire_discussion_user")
+
+    def assert_response_correct(self, response, expected_status, expected_content):
+        """
+        Assert that the response has the given status code and content
+        """
+        assert response.status_code == expected_status
+
+        if expected_content:
+            assert response.content.decode('utf-8') == expected_content
+
+    def build_jwt_headers(self, user):
+        """
+        Helper function for creating headers for the JWT authentication.
+        """
+        token = create_jwt_for_user(user)
+        headers = {'HTTP_AUTHORIZATION': 'JWT ' + token}
+        return headers
+
+    def test_basic(self):
+        """
+        Check successful retirement case
+        """
+        self.register_get_user_retire_response(self.user)
+        headers = self.build_jwt_headers(self.superuser)
+        data = {'username': self.user.username}
+        response = self.superuser_client.post(self.url, data, **headers)
+        self.assert_response_correct(response, 204, b"")
+
+    def test_nonexistent_user(self):
+        """
+        Check that we handle unknown users appropriately
+        """
+        nonexistent_username = "nonexistent user"
+        self.retired_username = get_retired_username_by_username(nonexistent_username)
+        data = {'username': nonexistent_username}
+        headers = self.build_jwt_headers(self.superuser)
+        response = self.superuser_client.post(self.url, data, **headers)
+        self.assert_response_correct(response, 404, None)
+
+    def test_not_authenticated(self):
+        """
+        Override the parent implementation of this, we JWT auth for this API
+        """
+        pass  # lint-amnesty, pylint: disable=unnecessary-pass
+
+
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+class UploadFileViewTest(ForumsEnableMixin, ForumMockUtilsMixin, UrlResetMixin, ModuleStoreTestCase):
+    """
+    Tests for UploadFileView.
+    """
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super().setUp()
+        self.valid_file = {
+            "uploaded_file": SimpleUploadedFile(
+                "test.jpg",
+                b"test content",
+                content_type="image/jpeg",
+            ),
+        }
+        self.user = UserFactory.create(password=self.TEST_PASSWORD)
+        self.course = CourseFactory.create(org='a', course='b', run='c', start=datetime.now(UTC))
+        self.url = reverse("upload_file", kwargs={"course_id": str(self.course.id)})
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setUpClassAndForumMock()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    def user_login(self):
+        """
+        Authenticates the test client with the example user.
+        """
+        self.client.login(username=self.user.username, password=self.TEST_PASSWORD)
+
+    def enroll_user_in_course(self):
+        """
+        Makes the example user enrolled to the course.
+        """
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
+    def assert_upload_success(self, response):
+        """
+        Asserts that the upload response was successful and returned the
+        expected contents.
+        """
+        assert response.status_code == status.HTTP_200_OK
+        assert response.content_type == "application/json"
+        response_data = json.loads(response.content)
+        assert "location" in response_data
+
+    def test_file_upload_by_unauthenticated_user(self):
+        """
+        Should fail if an unauthenticated user tries to upload a file.
+        """
+        response = self.client.post(self.url, self.valid_file)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_file_upload_by_unauthorized_user(self):
+        """
+        Should fail if the user is not either staff or a student
+        enrolled in the course.
+        """
+        self.user_login()
+        response = self.client.post(self.url, self.valid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_by_enrolled_user(self):
+        """
+        Should succeed when a valid file is uploaded by an authenticated
+        user who's enrolled in the course.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_global_staff(self):
+        """
+        Should succeed when a valid file is uploaded by a global staff
+        member.
+        """
+        self.user_login()
+        GlobalStaff().add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_instructor(self):
+        """
+        Should succeed when a valid file is uploaded by a course instructor.
+        """
+        self.user_login()
+        CourseInstructorRole(course_key=self.course.id).add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_by_course_staff(self):
+        """
+        Should succeed when a valid file is uploaded by a course staff
+        member.
+        """
+        self.user_login()
+        CourseStaffRole(course_key=self.course.id).add_users(self.user)
+        response = self.client.post(self.url, self.valid_file)
+        self.assert_upload_success(response)
+
+    def test_file_upload_with_thread_key(self):
+        """
+        Should contain the given thread_key in the uploaded file name.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, {
+            **self.valid_file,
+            "thread_key": "somethread",
+        })
+        response_data = json.loads(response.content)
+        assert "/somethread/" in response_data["location"]
+
+    def test_file_upload_with_invalid_file(self):
+        """
+        Should fail if the uploaded file format is not allowed.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        invalid_file = {
+            "uploaded_file": SimpleUploadedFile(
+                "test.txt",
+                b"test content",
+                content_type="text/plain",
+            ),
+        }
+        response = self.client.post(self.url, invalid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_with_invalid_course_id(self):
+        """
+        Should fail if the course does not exist.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        url = reverse("upload_file", kwargs={"course_id": "d/e/f"})
+        response = self.client.post(url, self.valid_file)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_file_upload_with_no_data(self):
+        """
+        Should fail when the user sends a request missing an
+        `uploaded_file` field.
+        """
+        self.user_login()
+        self.enroll_user_in_course()
+        response = self.client.post(self.url, data={})
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @ddt.ddt

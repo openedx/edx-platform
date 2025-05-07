@@ -5,7 +5,6 @@ Tests for Discussion API serializers
 
 import itertools
 from unittest import mock
-from urllib.parse import urlparse
 
 import ddt
 import httpretty
@@ -23,7 +22,6 @@ from lms.djangoapps.discussion.rest_api.tests.utils import (
     ForumMockUtilsMixin,
     make_minimal_cs_comment,
     make_minimal_cs_thread,
-    parsed_body,
 )
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -316,6 +314,76 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, ForumMockUtilsMixi
         assert saved['endorsed_by_label'] is None
         assert saved['endorsed_at'] is None
 
+    def test_create_missing_field(self):
+        for field in self.minimal_data:
+            data = self.minimal_data.copy()
+            data.pop(field)
+            serializer = CommentSerializer(
+                data=data,
+                context=get_context(self.course, self.request, make_minimal_cs_thread())
+            )
+            assert not serializer.is_valid()
+            assert serializer.errors == {field: ['This field is required.']}
+
+    def test_update_empty(self):
+        self.register_put_comment_response(self.existing_comment.attributes)
+        self.save_and_reserialize({}, instance=self.existing_comment)
+        parsed_body = {
+            'body': 'Original body',
+            'course_id': str(self.course.id),
+            'user_id': str(self.user.id),
+            'anonymous': False,
+            'anonymous_to_peers': False,
+            'endorsed': False,
+            'comment_id': 'existing_comment',
+        }
+        self.check_mock_called("update_comment")
+        self.check_mock_called_with(
+            "update_comment",
+            -1,
+            **parsed_body
+        )
+
+    def test_update_anonymous(self):
+        """
+        Test that serializer correctly deserializes the anonymous field when
+        updating an existing comment.
+        """
+        self.register_put_comment_response(self.existing_comment.attributes)
+        data = {
+            "anonymous": True,
+        }
+        self.save_and_reserialize(data, self.existing_comment)
+        call_args = self.get_mock_func_calls("update_comment")[0]
+        args, kwargs = call_args
+        assert kwargs['anonymous']
+
+    def test_update_anonymous_to_peers(self):
+        """
+        Test that serializer correctly deserializes the anonymous_to_peers
+        field when updating an existing comment.
+        """
+        self.register_put_comment_response(self.existing_comment.attributes)
+        data = {
+            "anonymous_to_peers": True,
+        }
+        self.save_and_reserialize(data, self.existing_comment)
+
+        call_args = self.get_mock_func_calls("update_comment")[0]
+        args, kwargs = call_args
+        assert kwargs['anonymous_to_peers']
+
+    @ddt.data("thread_id", "parent_id")
+    def test_update_non_updatable(self, field):
+        serializer = CommentSerializer(
+            self.existing_comment,
+            data={field: "different_value"},
+            partial=True,
+            context=get_context(self.course, self.request)
+        )
+        assert not serializer.is_valid()
+        assert serializer.errors == {field: ['This field is not allowed in an update.']}
+
 
 @ddt.ddt
 class ThreadSerializerDeserializationTest(
@@ -491,7 +559,6 @@ class SerializerTestMixin(ForumsEnableMixin, UrlResetMixin, ForumMockUtilsMixin)
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
-
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
         )
