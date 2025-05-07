@@ -1,7 +1,6 @@
 """
 Tests for tasks in import_from_modulestore app.
 """
-from django.core.exceptions import ObjectDoesNotExist
 from organizations.models import Organization
 from openedx_learning.api.authoring_models import LearningPackage
 from unittest.mock import patch
@@ -104,7 +103,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
             self.import_event.uuid,
             self.content_library.learning_package.id,
             self.user.id,
-            'component',
+            'xblock',
             override=True
         )
 
@@ -118,22 +117,21 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         self.assertEqual(library_learning_package.content_set.count(), len(expected_imported_xblocks))
         self.assertEqual(self.import_event.publishableentityimport_set.count(), len(expected_imported_xblocks))
 
-    @patch('cms.djangoapps.import_from_modulestore.tasks.import_from_staged_content')
-    def test_import_library_block_not_found(self, mock_import_from_staged_content):
+    @patch('cms.djangoapps.import_from_modulestore.tasks.ImportClient')
+    def test_import_library_block_not_found(self, mock_import_client):
         """ Test that if a block is not found in the staged content, it is not imported. """
         non_existent_usage_ids = ['block-v1:edX+Demo+2023+type@vertical+block@12345']
         save_legacy_content_to_staged_content_task(self.import_event.uuid)
-        with self.allow_transaction_exception():
-            with self.assertRaises(ObjectDoesNotExist):
-                import_staged_content_to_library_task(
-                    non_existent_usage_ids,
-                    str(self.import_event.uuid),
-                    self.content_library.learning_package.id,
-                    self.user.id,
-                    'component',
-                    override=True,
-                )
-                mock_import_from_staged_content.assert_not_called()
+
+        import_staged_content_to_library_task(
+            non_existent_usage_ids,
+            str(self.import_event.uuid),
+            self.content_library.learning_package.id,
+            self.user.id,
+            'xblock',
+            override=True,
+        )
+        mock_import_client.assert_not_called()
 
     def test_cannot_import_staged_content_twice(self):
         """
@@ -153,7 +151,7 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
             str(self.import_event.uuid),
             self.content_library.learning_package.id,
             self.user.id,
-            'component',
+            'xblock',
             override=True,
         )
 

@@ -1,9 +1,7 @@
 """
 API for course to library import.
 """
-from typing import Sequence
-
-from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from opaque_keys.edx.keys import LearningContextKey
 
 from .helpers import cancel_incomplete_old_imports
 from .models import Import as _Import
@@ -22,7 +20,7 @@ def stage_content_for_import(source_key: LearningContextKey, user_id: int) -> _I
 
 
 def import_staged_content_to_library(
-    usage_ids: Sequence[str | UsageKey],
+    usage_ids: list[str],
     import_uuid: str,
     target_learning_package_id: int,
     user_id: int,
@@ -35,7 +33,7 @@ def import_staged_content_to_library(
     validate_usage_keys_to_import(usage_ids)
     import_staged_content_to_library_task.apply_async(
         kwargs={
-            'usage_key_strings': usage_ids,
+            'usage_keys_string': usage_ids,
             'import_uuid': import_uuid,
             'learning_package_id': target_learning_package_id,
             'user_id': user_id,
