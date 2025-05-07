@@ -12,11 +12,11 @@ Open edX Platform
 
 Purpose
 *******
-The `Open edX Platform <https://openedx.org>`_ is a service-oriented platform for authoring and
-delivering online learning at any scale.  The platform is written in
+The `Open edX Platform <https://openedx.org>`_ enables the authoring and
+delivery of online learning at any scale.  The platform is written in
 Python and JavaScript and makes extensive use of the Django
 framework. At the highest level, the platform is composed of a
-monolith, some independently deployable applications (IDAs), and
+modular monolith, some independently deployable applications (IDAs), and
 micro-frontends (MFEs) based on the ReactJS.
 
 This repository hosts the monolith at the center of the Open edX
@@ -79,7 +79,7 @@ Interperters/Tools:
 
 * Python 3.11
 
-* Node 18
+* Node: See the ``.nvmrc`` file in this repository.
 
 Services:
 

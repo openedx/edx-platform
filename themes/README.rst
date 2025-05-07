@@ -65,7 +65,7 @@ There are two example themes provided within edx-platform's themes directory:
 
 For more details, see `Changing Themes for an Open edX Site`_.
 
-.. _Changing Themes for an Open edX Site: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/index.html
+.. _Changing Themes for an Open edX Site: https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/changing_appearance/index.html
 
 HTML Templates
 --------------

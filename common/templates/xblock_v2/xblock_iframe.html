@@ -15,6 +15,8 @@
   {% endif %}
   <!-- Most XBlocks require jQuery: -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <!-- ORA2 blocks require timepicker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.min.js"></script>
   <!-- The Video XBlock requires "ajaxWithPrefix" -->
   <script type="text/javascript">
     $.postWithPrefix = $.post;
@@ -40,32 +42,38 @@
     define = define || RequireJS.define;
     (function (require, define) {
         if ('{{ view_name | safe }}' === 'studio_view') {
-          // Call `require-config.js` of the CMS
-          var script = document.createElement('script');
-          script.type = 'text/javascript';
-          script.src = "{{ cms_root_url }}/static/studio/cms/js/require-config.js";
-          document.head.appendChild(script);
+            // Call `require-config.js` of the CMS
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = "{{ cms_root_url }}/static/studio/cms/js/require-config.js";
+            document.head.appendChild(script);
 
-          require.config({
-              baseUrl: "{{ cms_root_url }}/static/studio",
-              paths: {
-                  accessibility: 'js/src/accessibility_tools',
-                  draggabilly: 'js/vendor/draggabilly',
-                  hls: 'common/js/vendor/hls',
-                  moment: 'common/js/vendor/moment-with-locales',
-              },
-          });
+            require.config({
+                baseUrl: "{{ cms_root_url }}/static/studio",
+                paths: {
+                        accessibility: 'js/src/accessibility_tools',
+                        draggabilly: 'js/vendor/draggabilly',
+                        hls: 'common/js/vendor/hls',
+                        moment: 'common/js/vendor/moment-with-locales',
+                        'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
+                        'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce.min',
+                },
+            });
+            require([
+                "{{ lms_root_url }}/static/dist{{ oa_manifest.oa_editor_tinymce_js }}",
+                "{{ lms_root_url }}/static/dist{{ oa_manifest.oa_editor_textarea_js }}",
+            ]);
         } else {
-          require.config({
-              baseUrl: "{{ lms_root_url }}/static/",
-              paths: {
-                  accessibility: 'js/src/accessibility_tools',
-                  draggabilly: 'js/vendor/draggabilly',
-                  hls: 'common/js/vendor/hls',
-                  moment: 'common/js/vendor/moment-with-locales',
-                  HtmlUtils: 'edx-ui-toolkit/js/utils/html-utils',
-              },
-          });
+            require.config({
+                baseUrl: "{{ lms_root_url }}/static/",
+                paths: {
+                    accessibility: 'js/src/accessibility_tools',
+                    draggabilly: 'js/vendor/draggabilly',
+                    hls: 'common/js/vendor/hls',
+                    moment: 'common/js/vendor/moment-with-locales',
+                    HtmlUtils: 'edx-ui-toolkit/js/utils/html-utils',
+                },
+            });
         }
         define('gettext', [], function() { return window.gettext; });
         define('jquery', [], function() { return window.jQuery; });
@@ -104,8 +112,11 @@
   <link rel="stylesheet" href="{{ lms_root_url }}/static/js/vendor/CodeMirror/codemirror.css">
   <!-- Additional CSS for the XBlock Editor on the Library Authoring -->
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/vendor/normalize.css">
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/vendor/hint.css">
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/studio-main-v1.css" />
   <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/course-unit-mfe-iframe-bundle.css" />
+  <link rel="stylesheet" href="{{ lms_root_url }}/static/dist{{ oa_manifest.oa_ltr_css }}">
+  <script type="text/javascript" src="{{ lms_root_url }}/static/dist{{ oa_manifest.oa_ltr_js }}"></script>
 
   <!-- Configure and load MathJax -->
   <script type="text/x-mathjax-config">
@@ -180,8 +191,8 @@
 <!-- The default stylesheet will set the body min-height to 100% (a common strategy to allow for background
   images to fill the viewport), but this has the undesireable side-effect of causing an infinite loop via the onResize
   event listeners below, in certain situations.  Resetting it to the default "auto" skirts the problem.-->
-<body style="min-height: auto; background-color: white;" class="view-container">
-  <div class="wrapper xblock-iframe-content">
+<body style="background-color: white;" class="view-container">
+  <div id="content" class="wrapper xblock-iframe-content">
       <!-- fragment body -->
       {{ fragment.body_html | safe }}
       <!-- fragment foot -->
@@ -360,7 +371,7 @@
                                     error_message_div.html('Error: '+response.message);
                                     error_message_div.css('display', 'block');
                                 }
-                            });         
+                            });
                         });
                     });
                 }
@@ -378,6 +389,8 @@
                   '.save-button',
                   '.action-cancel',
                   '.action-save',
+                  '.openassessment_cancel_button',
+                  '.openassessment_save_button',
               ];
 
               for (const selector of selectors) {
@@ -437,21 +450,48 @@
         const rootNode = document.querySelector('.xblock, .xblock-v1'); // will always return the first matching element
         initializeXBlockAndChildren(rootNode, () => {
         });
+        (function() {
+            // If this view is rendered in an iframe within the authoring microfrontend app
+            // it will report the height of its contents to the parent window when the
+            // document loads, window resizes, or DOM mutates.
+            if (window !== window.parent) {
+                function dispatchResizeMessage(event) {
+                    // Note: event is actually an Array of MutationRecord objects when fired from the MutationObserver
+                    var newHeight = rootNode.scrollHeight;
+                    var newWidth = rootNode.offsetWidth;
 
-        let lastHeight = -1;
-        function checkFrameHeight() {
-            const newHeight = document.documentElement.scrollHeight;
-            if (newHeight !== lastHeight) {
-                lastHeight = newHeight;
+                    window.parent.postMessage(
+                        {
+                            type: 'plugin.resize',
+                            payload: {
+                                width: newWidth,
+                                height: newHeight,
+                            }
+                        }, document.referrer
+                    );
+                    // Within the authoring microfrontend the iframe resizes to match the
+                    // height of this document and it should never scroll. It does scroll
+                    // ocassionally when javascript is used to focus elements on the page
+                    // before the parent iframe has been resized to match the content
+                    // height. This window.scrollTo is an attempt to keep the content at the
+                    // top of the page.
+                    window.scrollTo(0, 0);
+                }
+
+                // Create an observer instance linked to the callback function
+                const observer = new MutationObserver(dispatchResizeMessage);
+
+                // Start observing the target node for configured mutations
+                observer.observe(rootNode, { attributes: true, childList: true, subtree: true });
+
+                const resizeObserver = new ResizeObserver(dispatchResizeMessage);
+                resizeObserver.observe(rootNode);
             }
-        }
-        // Check the size whenever the DOM changes:
-        new MutationObserver(checkFrameHeight).observe(document.body, { attributes: true, childList: true, subtree: true });
-        // And whenever the IFrame is resized
-        window.addEventListener('resize', checkFrameHeight);
+        }());
     }
 
     window.addEventListener('load', blockFrameJS);
+
   </script>
 </body>
 </html>

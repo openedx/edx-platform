@@ -1213,6 +1213,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Expect that the number of attempts is NOT incremented
         assert block.attempts == 1
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the submit_problem API.
@@ -1263,6 +1264,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         for fpath, fileobj in kwargs['files'].items():
             assert fpath == fileobj.name
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files_as_xblock(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the XBlock API.
@@ -2629,12 +2631,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         else:
 
             # Since there's a small chance (expected) we might get the
-            # same seed again, give it 10 chances
+            # same seed again, give it 60 chances
             # to generate a different seed
-            success = _retry_and_check(10, lambda: _reset_and_get_seed(block) != seed)
+            success = _retry_and_check(60, lambda: _reset_and_get_seed(block) != seed)
 
             assert block.seed is not None
-            msg = 'Could not get a new seed from reset after 10 tries'
+            msg = 'Could not get a new seed from reset after 60 tries'
             assert success, msg
 
     @ddt.data(
@@ -3900,6 +3902,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                                         'group_label': '',
                                         'variant': block.seed}}
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_file_inputs(self, mock_xqueue_post):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]

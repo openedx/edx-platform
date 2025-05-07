@@ -61,8 +61,8 @@ class Model:
     def get(self, *args, **kwargs):
         return self.attributes.get(*args, **kwargs)
 
-    def to_dict(self):
-        self.retrieve()
+    def to_dict(self, course_key=None):
+        self.retrieve(course_key=course_key)
         return self.attributes
 
     def retrieve(self, *args, **kwargs):
@@ -72,7 +72,7 @@ class Model:
         return self
 
     def _retrieve(self, *args, **kwargs):
-        course_id = self.attributes.get("course_id") or kwargs.get("course_id")
+        course_id = self.attributes.get("course_id") or kwargs.get("course_key")
         if course_id:
             course_key = get_course_key(course_id)
             use_forumv2 = is_forum_v2_enabled(course_key)
@@ -175,8 +175,8 @@ class Model:
         self._update_from_response(response)
         self.after_save(self)
 
-    def delete(self):
-        course_key = get_course_key(self.attributes.get("course_id"))
+    def delete(self, course_id=None):
+        course_key = get_course_key(self.attributes.get("course_id") or course_id)
         if is_forum_v2_enabled(course_key):
             response = None
             if self.type == "comment":
