@@ -32,7 +32,7 @@ click==8.1.8
     # via
     #   -r scripts/user_retirement/requirements/base.in
     #   edx-django-utils
-cryptography==44.0.2
+cryptography==44.0.3
     # via pyjwt
 django==4.2.20
     # via
@@ -51,9 +51,9 @@ edx-rest-api-client==6.2.0
     # via -r scripts/user_retirement/requirements/base.in
 google-api-core==2.24.2
     # via google-api-python-client
-google-api-python-client==2.167.0
+google-api-python-client==2.169.0
     # via -r scripts/user_retirement/requirements/base.in
-google-auth==2.39.0
+google-auth==2.40.1
     # via
     #   google-api-core
     #   google-api-python-client
@@ -78,9 +78,9 @@ jmespath==1.0.1
     #   botocore
 lxml==5.3.2
     # via zeep
-more-itertools==10.6.0
+more-itertools==10.7.0
     # via simple-salesforce
-newrelic==10.9.0
+newrelic==10.11.0
     # via edx-django-utils
 pbr==6.1.1
     # via stevedore

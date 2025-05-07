@@ -14,13 +14,13 @@ codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/base.in
 contourpy==1.3.2
     # via matplotlib
-cryptography==44.0.2
+cryptography==44.0.3
     # via -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
 fonttools==4.57.0
     # via matplotlib
-joblib==1.4.2
+joblib==1.5.0
     # via nltk
 kiwisolver==1.4.8
     # via matplotlib
