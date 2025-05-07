@@ -16,7 +16,7 @@ from cms.djangoapps.contentstore.models import (
     ComponentLink,
     ContainerLink,
     LearningContextLinksStatus,
-    VideoUploadConfig,
+    VideoUploadConfig, CourseImportTemplate,
 )
 from cms.djangoapps.contentstore.outlines_regenerate import CourseOutlineRegenerate
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
@@ -196,3 +196,4 @@ admin.site.register(BackfillCourseTabsConfig, ConfigurationModelAdmin)
 admin.site.register(VideoUploadConfig, ConfigurationModelAdmin)
 admin.site.register(CourseOutlineRegenerate, CourseOutlineRegenerateAdmin)
 admin.site.register(CleanStaleCertificateAvailabilityDatesConfig, ConfigurationModelAdmin)
+admin.site.register(CourseImportTemplate)

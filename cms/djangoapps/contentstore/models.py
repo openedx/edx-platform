@@ -6,6 +6,7 @@ Models for contentstore
 from datetime import datetime, timezone
 
 from config_models.models import ConfigurationModel
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Count, F, Q, QuerySet
 from django.db.models.fields import IntegerField, TextField
@@ -22,6 +23,9 @@ from openedx_learning.lib.fields import (
     key_field,
     manual_date_time_field,
 )
+
+
+User = get_user_model()
 
 
 class VideoUploadConfig(ConfigurationModel):
@@ -468,3 +472,15 @@ class LearningContextLinksStatus(models.Model):
         self.status = status
         self.updated = updated or datetime.now(tz=timezone.utc)
         self.save()
+
+
+class CourseImportTemplate(models.Model):
+    name = models.CharField(max_length=255)
+    thumbnail = models.ImageField(upload_to='course_thumbnails/')
+    description = models.TextField()
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_templates')
+    course_template = models.URLField(help_text="Link to the .gz (gzip) course template file")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
