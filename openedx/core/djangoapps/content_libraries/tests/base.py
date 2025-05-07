@@ -70,11 +70,6 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         entire response has some specific shape. That way, things like adding
         new fields to an API response, which are backwards compatible, won't
         break any tests, but backwards-incompatible API changes will.
-
-    WARNING: every test should have a unique library slug, because even though
-    the django/mysql database gets reset for each test case, the lookup between
-    library slug and bundle UUID does not because it's assumed to be immutable
-    and cached forever.
     """
 
     def setUp(self):

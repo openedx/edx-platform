@@ -25,7 +25,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 @skip_unless_cms
 @ddt.ddt
-class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
+class ContainersTestCase(ContentLibrariesRestApiTest):
     """
     Tests for containers (Sections, Subsections, Units) in Content Libraries.
 
@@ -43,12 +43,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         new fields to an API response, which are backwards compatible, won't
         break any tests, but backwards-incompatible API changes will.
     """
-    ENABLED_OPENEDX_EVENTS = [
-        LIBRARY_BLOCK_UPDATED.event_type,
-        LIBRARY_CONTAINER_CREATED.event_type,
-        LIBRARY_CONTAINER_DELETED.event_type,
-        LIBRARY_CONTAINER_UPDATED.event_type,
-    ]
 
     def test_unit_crud(self):
         """

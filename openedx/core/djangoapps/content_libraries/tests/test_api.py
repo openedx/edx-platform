@@ -25,7 +25,6 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_UPDATED,
 )
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from openedx_learning.api import authoring as authoring_api
 
 from .. import api
@@ -259,30 +258,12 @@ class EdxApiImportClientTest(TestCase):
         mock_publish_changes.assert_not_called()
 
 
-class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest):
     """
     Tests for Content Library API collections methods.
 
     Same guidelines as ContentLibrariesTestCase.
     """
-    ENABLED_OPENEDX_EVENTS = [
-        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.event_type,
-        LIBRARY_COLLECTION_CREATED.event_type,
-        LIBRARY_COLLECTION_DELETED.event_type,
-        LIBRARY_COLLECTION_UPDATED.event_type,
-    ]
-
-    @classmethod
-    def setUpClass(cls):
-        """
-        Set up class method for the Test class.
-
-        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
-              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
-              so we're following a pattern here. But that pattern doesn't really make sense.
-        """
-        super().setUpClass()
-        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()
@@ -817,25 +798,10 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest, OpenEdxEventsTe
         )
 
 
-class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+class ContentLibraryContainersTest(ContentLibrariesRestApiTest):
     """
     Tests for Content Library API containers methods.
     """
-    ENABLED_OPENEDX_EVENTS = [
-        LIBRARY_CONTAINER_UPDATED.event_type,
-    ]
-
-    @classmethod
-    def setUpClass(cls):
-        """
-        Set up class method for the Test class.
-
-        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
-              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
-              so we're following a pattern here. But that pattern doesn't really make sense.
-        """
-        super().setUpClass()
-        cls.start_events_isolation()
 
     def setUp(self):
         super().setUp()

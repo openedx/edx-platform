@@ -20,7 +20,6 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_BLOCK_DELETED,
     LIBRARY_BLOCK_UPDATED
 )
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from organizations.models import Organization
 from rest_framework.test import APITestCase
 
@@ -39,7 +38,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 @skip_unless_cms
 @ddt.ddt
-class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
     """
     General tests for Learning-Core-based Content Libraries
 
@@ -62,26 +61,6 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMix
     library slug and bundle UUID does not because it's assumed to be immutable
     and cached forever.
     """
-    ENABLED_OPENEDX_EVENTS = [
-        CONTENT_LIBRARY_CREATED.event_type,
-        CONTENT_LIBRARY_DELETED.event_type,
-        CONTENT_LIBRARY_UPDATED.event_type,
-        LIBRARY_BLOCK_CREATED.event_type,
-        LIBRARY_BLOCK_DELETED.event_type,
-        LIBRARY_BLOCK_UPDATED.event_type,
-    ]
-
-    @classmethod
-    def setUpClass(cls):
-        """
-        Set up class method for the Test class.
-
-        TODO: It's unclear why we need to call start_events_isolation ourselves rather than relying on
-              OpenEdxEventsTestMixin.setUpClass to handle it. It fails it we don't, and many other test cases do it,
-              so we're following a pattern here. But that pattern doesn't really make sense.
-        """
-        super().setUpClass()
-        cls.start_events_isolation()
 
     def test_library_crud(self):
         """
