@@ -663,7 +663,7 @@ class DisabledUserListViewTest(UserApiTestCase):
         Setup test cases
         """
         super().setUp()
-        self.application_access = ApplicationAccessFactory(scopes=["read"])
+        self.application_access = ApplicationAccessFactory(scopes=["disabled_users:read"])
         self.oauth_client = self.application_access.application
         self.oauth_client.authorization_grant_type = "client-credentials"
         self.oauth_client.save()
@@ -683,7 +683,7 @@ class DisabledUserListViewTest(UserApiTestCase):
             "grant_type": "client_credentials",
             "client_id": self.oauth_client.client_id,
             "client_secret": self.oauth_client.client_secret,
-            "scope": "read",
+            "scope": "disabled_users:read",
         }
         response = self.client.post("/oauth2/access_token", data=data)
         return response.json()['access_token']

@@ -173,4 +173,4 @@ class DisabledUserListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, TokenHasScope]
     serializer_class = DisabledUserSerializer
     queryset = User.objects.filter(password__startswith="!").values("email")
-    required_scopes = ['read']
+    required_scopes = ['disabled_users:read']

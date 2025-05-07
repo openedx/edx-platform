@@ -1268,6 +1268,7 @@ OAUTH2_PROVIDER = {
         'tpa:read': _('Retrieve your third-party authentication username mapping'),
         # user_id is added in code as a default scope for JWT cookies and all password grant_type JWTs
         'user_id': _('Know your user identifier'),
+        'disabled_users:read': _('Retrieve list of disabled users'),
     }),
     'DEFAULT_SCOPES': OAUTH2_DEFAULT_SCOPES,
     'REQUEST_APPROVAL_PROMPT': 'auto_even_if_expired',
