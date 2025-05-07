@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django_filters.rest_framework import DjangoFilterBackend
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from oauth2_provider.contrib.rest_framework import OAuth2Authentication, TokenHasScope
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx import locator
 from opaque_keys.edx.keys import CourseKey
@@ -16,7 +17,6 @@ from rest_framework.views import APIView
 
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.user_api.models import UserPreference
-from openedx.core.djangoapps.user_api.permissions import TokenPermission
 from openedx.core.djangoapps.user_api.preferences.api import get_country_time_zones, update_email_opt_in
 from openedx.core.djangoapps.user_api.serializers import (
     CountryTimeZoneSerializer,
@@ -169,7 +169,8 @@ class DisabledUserListView(generics.ListAPIView):
     """
     Paginated view to return list of disabled users
     """
-    permission_classes = (TokenPermission,)
+    authentication_classes = [OAuth2Authentication]
+    permission_classes = [IsAuthenticated, TokenHasScope]
     serializer_class = DisabledUserSerializer
     queryset = User.objects.filter(password__startswith="!").values("email")
-    token_name = "disabled_user_api_token"
+    required_scopes = ['read']
