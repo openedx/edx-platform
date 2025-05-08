@@ -36,6 +36,7 @@ from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
+from cms.djangoapps.contentstore.models import ContainerLink
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.ai_aside_summary_config import AiAsideSummaryConfig
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
@@ -577,6 +578,14 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
                     store.delete_item(child.usage_key, user_id=request.user.id)
             downstream.children = children
             store.update_item(downstream, request.user.id)
+            # Mark the container link as not ready to sync (synchronized)
+            # The other data is updated with the XBLOCK_UPDATED signal,
+            # see: ../signals/handlers.py
+            ContainerLink.update_or_create(
+                None,
+                ready_to_sync=False,
+                downstream_usage_key=downstream.usage_key
+            )
         static_file_notices = concat_static_file_notices(notices)
     return static_file_notices
 

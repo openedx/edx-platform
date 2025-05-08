@@ -357,12 +357,13 @@ class ContainerLink(EntityLinkBase):
         cls,
         upstream_container: Container | None,
         /,
-        upstream_container_key: LibraryContainerLocator,
-        upstream_context_key: str,
         downstream_usage_key: UsageKey,
-        downstream_context_key: CourseKey,
-        version_synced: int,
+        upstream_container_key: LibraryContainerLocator | None = None,
+        upstream_context_key: str | None = None,
+        downstream_context_key: CourseKey | None = None,
+        version_synced: int | None = None,
         version_declined: int | None = None,
+        ready_to_sync: bool | None = None,
         created: datetime | None = None,
     ) -> "ContainerLink":
         """
@@ -377,6 +378,7 @@ class ContainerLink(EntityLinkBase):
             'downstream_context_key': downstream_context_key,
             'version_synced': version_synced,
             'version_declined': version_declined,
+            'ready_to_sync': ready_to_sync,
         }
         if upstream_container:
             new_values['upstream_container'] = upstream_container
@@ -385,7 +387,7 @@ class ContainerLink(EntityLinkBase):
             has_changes = False
             for key, new_value in new_values.items():
                 prev_value = getattr(link, key)
-                if prev_value != new_value:
+                if new_value is not None and prev_value != new_value:
                     has_changes = True
                     setattr(link, key, new_value)
             if has_changes:

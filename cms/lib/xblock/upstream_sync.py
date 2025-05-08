@@ -80,6 +80,7 @@ class UpstreamLink:
     version_synced: int | None  # Version of the upstream to which the downstream was last synced.
     version_available: int | None  # Latest version of the upstream that's available, or None if it couldn't be loaded.
     version_declined: int | None  # Latest version which the user has declined to sync with, if any.
+    force_ready_to_sync: bool  # Bypass the verification of versions to be ready to sync. This is used by containers.
     error_message: str | None  # If link is valid, None. Otherwise, a localized, human-friendly error message.
 
     @property
@@ -89,9 +90,11 @@ class UpstreamLink:
         """
         return bool(
             self.upstream_ref and
-            self.version_available and
-            self.version_available > (self.version_synced or 0) and
-            self.version_available > (self.version_declined or 0)
+            self.force_ready_to_sync or (
+                self.version_available and
+                self.version_available > (self.version_synced or 0) and
+                self.version_available > (self.version_declined or 0)
+            )
         )
 
     @property
@@ -141,6 +144,7 @@ class UpstreamLink:
                 version_synced=getattr(downstream, "upstream_version", None),
                 version_available=None,
                 version_declined=None,
+                force_ready_to_sync=False,
                 error_message=str(exc),
             )
 
@@ -159,6 +163,7 @@ class UpstreamLink:
         """
         # We import this here b/c UpstreamSyncMixin is used by cms/envs, which loads before the djangoapps are ready.
         from openedx.core.djangoapps.content_libraries import api as lib_api
+        from cms.djangoapps.contentstore.models import ContainerLink
 
         if not isinstance(downstream, UpstreamSyncMixin):
             raise BadDownstream(_("Downstream is not an XBlock or is missing required UpstreamSyncMixin"))
@@ -177,6 +182,7 @@ class UpstreamLink:
             except InvalidKeyError as exc:
                 raise BadUpstream(_("Reference to linked library item is malformed")) from exc
 
+        force_ready_to_sync = False
         if isinstance(upstream_key, LibraryUsageLocatorV2):
             # The upstream is an XBlock
             if downstream.has_children:
@@ -196,6 +202,12 @@ class UpstreamLink:
                 container_meta = lib_api.get_container(upstream_key)
             except lib_api.ContentLibraryContainerNotFound as exc:
                 raise BadUpstream(_("Linked upstream library container was not found in the system")) from exc
+            try:
+                link = ContainerLink.get_link(downstream.usage_key)
+            except ContainerLink.DoesNotExist as exec:
+                raise BadUpstream(_("Container link was not found in the system")) from exec
+
+            force_ready_to_sync = link.ready_to_sync
             expected_downstream_block_type = container_meta.container_type.olx_tag
             version_available = container_meta.published_version_num
 
@@ -220,6 +232,7 @@ class UpstreamLink:
             version_synced=downstream.upstream_version,
             version_available=version_available,
             version_declined=downstream.upstream_version_declined,
+            force_ready_to_sync=force_ready_to_sync,
             error_message=None,
         )
 

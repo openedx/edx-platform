@@ -11,18 +11,20 @@ from django.core.cache import cache
 from django.db import transaction
 from django.dispatch import receiver
 from edx_toggles.toggles import SettingToggle
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_events.content_authoring.data import (
     CourseCatalogData,
     CourseData,
     CourseScheduleData,
     LibraryBlockData,
     XBlockData,
+    LibraryContainerData,
 )
 from openedx_events.content_authoring.signals import (
     COURSE_CATALOG_INFO_CHANGED,
     COURSE_IMPORT_COMPLETED,
     LIBRARY_BLOCK_DELETED,
+    LIBRARY_CONTAINER_PUBLISHED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
@@ -40,6 +42,7 @@ from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -264,7 +267,6 @@ def create_or_update_upstream_downstream_link_handler(**kwargs):
     if not xblock_info or not isinstance(xblock_info, XBlockData):
         log.error("Received null or incorrect data for event")
         return
-
     handle_create_or_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
 
 
@@ -314,3 +316,31 @@ def unlink_upstream_block_handler(**kwargs):
         return
 
     handle_unlink_upstream_block.delay(str(library_block.usage_key))
+
+
+@receiver(LIBRARY_CONTAINER_PUBLISHED)
+def library_container_published_handler(**kwargs) -> None:
+    """
+    Handle publish a container. Mark all related links to ready to sync.
+    """
+    library_container = kwargs.get("library_container", None)
+
+    if not library_container or not isinstance(library_container, LibraryContainerData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+    # The PUBLISHED event is sent for any change to the published version including deletes, so check if it exists:
+    try:
+        lib_api.get_container(library_container.container_key)
+    except lib_api.ContentLibraryContainerNotFound:
+        log.info(f"Observed published deletion of container {str(library_container.container_key)}.")
+        # The document should already have been deleted from the search index
+        # via the DELETED handler, so there's nothing to do now.
+        return
+    
+    # Get all container links that has the published container as the upstream
+    link_filter: dict[str, CourseKey | UsageKey | bool] = {}
+    link_filter["upstream_container_key"] = library_container.container_key
+    links = ContainerLink.filter_links(**link_filter)
+
+    # Mark all links to ready to sync
+    links.update(ready_to_sync=True)
