@@ -160,7 +160,8 @@ class ComponentLink(EntityLinkBase):
         ready_to_sync = link_filter.pop('ready_to_sync', None)
         result = cls.objects.filter(**link_filter).select_related(
             "upstream_block__publishable_entity__published__version",
-            "upstream_block__publishable_entity__learning_package"
+            "upstream_block__publishable_entity__learning_package",
+            "upstream_block__publishable_entity__published__publish_log_record__publish_log",
         ).annotate(
             ready_to_sync=(
                 GreaterThan(
@@ -204,7 +205,9 @@ class ComponentLink(EntityLinkBase):
         ).annotate(
             ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
             total_count=Count("id"),
-            last_published_at=Max("upstream_block__publishable_entity__published__version__created")
+            last_published_at=Max(
+                "upstream_block__publishable_entity__published__publish_log_record__publish_log__published_at"
+            )
         )
         return result
 
@@ -310,6 +313,7 @@ class ContainerLink(EntityLinkBase):
         result = cls.objects.filter(**link_filter).select_related(
             "upstream_container__publishable_entity__published__version",
             "upstream_container__publishable_entity__learning_package"
+            "upstream_container__publishable_entity__published__publish_log_record__publish_log",
         ).annotate(
             ready_to_sync=(
                 GreaterThan(
@@ -353,7 +357,9 @@ class ContainerLink(EntityLinkBase):
         ).annotate(
             ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
             total_count=Count('id'),
-            last_published_at=Max("upstream_container__publishable_entity__published__version__created"),
+            last_published_at=Max(
+                "upstream_container__publishable_entity__published__publish_log_record__publish_log__published_at"
+            )
         )
         return result
 
