@@ -387,6 +387,26 @@ class DataTest(AuthorizedApiTest, DataTestMixin):
         assert data['plugin_configuration'] == {'key': 'value'}
         assert data['lti_configuration'] == DEFAULT_LTI_CONFIGURATION
 
+    @ddt.data(
+        True,
+        False,
+    )
+    def test_enabled_configuration(self, enabled):
+        """
+        Test that enabling discussions unhides it.
+        """
+        payload = {
+            "provider_type": Provider.PIAZZA,
+            "enabled": enabled,
+        }
+        self._post(payload)
+
+        data = self.get()
+        for tab in self.store.get_course(self.course.id).tabs:
+            if tab.tab_id == "discussion":
+                assert data["enabled"] == (not tab.is_hidden)
+                break
+
     def test_change_plugin_configuration(self):
         """
         Tests custom config values persist that when changing discussion
