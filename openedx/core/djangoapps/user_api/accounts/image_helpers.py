@@ -39,15 +39,14 @@ def get_profile_image_storage():
     options = config.get('options', {})
 
     if not storage_class_path:
-        # Django 5.x STORAGES fallback
-        if django_version[0] >= 5 and hasattr(settings, 'STORAGES') and 'default' in settings.STORAGES:
-            return storages['default']
-        else:
-            # Legacy fallback
-            storage_class_path = getattr(
-                settings, 'DEFAULT_FILE_STORAGE',
-                'django.core.files.storage.FileSystemStorage'
-            )
+        storage_class_path = (
+            getattr(settings, 'DEFAULT_FILE_STORAGE', None) or
+            getattr(settings, 'STORAGES', {}).get('default', {}).get('BACKEND') or
+            'django.core.files.storage.FileSystemStorage'
+        )
+
+        # For Django 5.x, pick options if available
+        options = getattr(settings, 'STORAGES', {}).get('default', {}).get('OPTIONS', {})
 
     storage_class = import_string(storage_class_path)
     return storage_class(**options)
