@@ -44,6 +44,7 @@ from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
 from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.split_test_block import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -860,7 +861,7 @@ class ProblemResponses:
             try:
                 block = modulestore().get_item(root)
                 name = getattr(block, 'display_name', None) or root.block_type
-            except Exception:
+            except ItemNotFoundError:
                 name = root.block_type
         if path is None:
             path = [name]
