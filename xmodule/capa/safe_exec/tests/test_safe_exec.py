@@ -371,7 +371,11 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         assert 'whatever.py' in repr(results['raised'])
 
     def test_default_normalizers(self):
-        """Default normalizers handle false mismatches we've observed."""
+        """
+        Default normalizers handle false mismatches we've observed.
+
+        This just provides coverage for some of the more complicated patterns.
+        """
         side_1 = (
             'Couldn\'t execute jailed code: stdout: b\'\', stderr: b\'Traceback'
             ' (most recent call last):\\n  File "/tmp/codejail-9g9715g_/jailed_code"'
@@ -424,9 +428,13 @@ class TestCodeJailDarkLaunch(unittest.TestCase):
         },
     ])
     @patch('xmodule.capa.safe_exec.safe_exec.record_exception')
-    def test_normalizers_validate(self, mock_record_exception):
+    @patch('xmodule.capa.safe_exec.safe_exec.log.error')
+    def test_normalizers_validate(self, mock_log_error, mock_record_exception):
         """Normalizers are validated, and fall back to default list on error."""
         assert len(emsg_normalizers()) > 0  # pylint: disable=use-implicit-booleaness-not-comparison
+        mock_log_error.assert_called_once_with(
+            "Could not load custom codejail darklaunch emsg normalizers"
+        )
         mock_record_exception.assert_called_once()
 
 
