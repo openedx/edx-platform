@@ -215,7 +215,7 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
             library_container=LibraryContainerData(container_key=container_key)
         )
         # Don't bother sending UPDATED events for these containers that are now deleted
-        created_container_keys.remove(container_key)
+        created_container_keys.discard(container_key)
 
     for container_key in created_container_keys:
         LIBRARY_CONTAINER_CREATED.send_event(
