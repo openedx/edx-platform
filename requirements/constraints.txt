@@ -68,7 +68,7 @@ django-storages<1.14.4
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==5.12.5
+edx-enterprise==5.13.3
 
 # Date: 2024-05-09
 # This has to be constrained as well because newer versions of edx-i18n-tools need the
@@ -97,11 +97,6 @@ libsass==0.10.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35271
 markdown<3.4.0
 
-# Date: 2024-04-24
-# moto==5.0 contains breaking changes. Needs to be updated separately.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35270
-moto<5.0
-
 # Date: 2024-07-16
 # We need to upgrade the version of elasticsearch to atleast 7.15 before we can upgrade to Numpy 2.0.0
 # Otherwise we see a failure while running the following command:
@@ -112,7 +107,7 @@ numpy<2.0.0
 # Date: 2023-09-18
 # pinning this version to avoid updates while the library is being developed
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35269
-openedx-learning==0.23.1
+openedx-learning==0.26.0
 
 # Date: 2023-11-29
 # Open AI version 1.0.0 dropped support for openai.ChatCompletion which is currently in use in enterprise.

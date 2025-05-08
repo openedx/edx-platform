@@ -105,16 +105,18 @@ def send_ace_message(goal, session_id):
         'programs_url': getattr(settings, 'ACE_EMAIL_PROGRAMS_URL', None),
     })
 
-    options = {'transactional': True}
+    options = {
+        'transactional': True,
+        'skip_disable_user_policy': True
+    }
 
     is_ses_enabled = ENABLE_SES_FOR_GOALREMINDER.is_enabled(goal.course_key)
 
     if is_ses_enabled:
-        options = {
-            'transactional': True,
+        options.update({
             'from_address': settings.LMS_COMM_DEFAULT_FROM_EMAIL,
             'override_default_channel': 'django_email',
-        }
+        })
 
     msg = Message(
         name="goalreminder",

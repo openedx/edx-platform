@@ -20,11 +20,6 @@
 # 4. If the package is not needed in production, add it to another file such
 #    as development.in or testing.in instead.
 
-# Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
-# Using the fork because official package has been removed from PyPI/GitHub
-# Follow up issue to remove this fork: https://github.com/openedx/edx-platform/issues/33456
-https://github.com/overhangio/py2neo/releases/download/2021.2.3/py2neo-2021.2.3.tar.gz
-
 # i18n_tool is needed at build time for pulling translations
 edx-i18n-tools>=0.4.6               # Commands for developers and translators to extract, compile and validate translations
 

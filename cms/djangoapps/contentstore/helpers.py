@@ -31,7 +31,8 @@ from edxval.api import (
 )
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fetch_customizable_fields
+from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException
+from cms.lib.xblock.upstream_sync_block import fetch_customizable_fields_from_block
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
@@ -416,7 +417,7 @@ def _fetch_and_set_upstream_link(
     user: User
 ):
     """
-    Fetch and set upstream link for the given xblock. This function handles following cases:
+    Fetch and set upstream link for the given xblock which is being pasted. This function handles following cases:
     * the xblock is copied from a v2 library; the library block is set as upstream.
     * the xblock is copied from a course; no upstream is set, only copied_from_block is set.
     * the xblock is copied from a course where the source block was imported from a library; the original libary block
@@ -425,7 +426,7 @@ def _fetch_and_set_upstream_link(
     # Try to link the pasted block (downstream) to the copied block (upstream).
     temp_xblock.upstream = copied_from_block
     try:
-        UpstreamLink.get_for_block(temp_xblock)
+        upstream_link = UpstreamLink.get_for_block(temp_xblock)
     except UpstreamLinkException:
         # Usually this will fail. For example, if the copied block is a modulestore course block, it can't be an
         # upstream. That's fine! Instead, we store a reference to where this block was copied from, in the
@@ -456,7 +457,8 @@ def _fetch_and_set_upstream_link(
         # later wants to restore it, it will restore to the value that the field had when the block was pasted. Of
         # course, if the author later syncs updates from a *future* published upstream version, then that will fetch
         # new values from the published upstream content.
-        fetch_customizable_fields(upstream=temp_xblock, downstream=temp_xblock, user=user)
+        if isinstance(upstream_link.upstream_key, UsageKey):  # only if upstream is a block, not a container
+            fetch_customizable_fields_from_block(downstream=temp_xblock, user=user, upstream=temp_xblock)
 
 
 def _import_xml_node_to_parent(
@@ -790,3 +792,26 @@ def _get_usage_key_from_node(node, parent_id: str) -> UsageKey | None:
         )
 
     return usage_key
+
+
+def concat_static_file_notices(notices: list[StaticFileNotices]) -> StaticFileNotices:
+    """Combines multiple static file notices into a single object
+
+    Args:
+        notices: list of StaticFileNotices
+
+    Returns:
+        Single StaticFileNotices
+    """
+    new_files = []
+    conflicting_files = []
+    error_files = []
+    for notice in notices:
+        new_files.extend(notice.new_files)
+        conflicting_files.extend(notice.conflicting_files)
+        error_files.extend(notice.error_files)
+    return StaticFileNotices(
+        new_files=list(set(new_files)),
+        conflicting_files=list(set(conflicting_files)),
+        error_files=list(set(error_files)),
+    )

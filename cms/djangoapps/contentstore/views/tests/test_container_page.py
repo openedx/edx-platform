@@ -10,10 +10,12 @@ from unittest.mock import Mock, patch
 from django.http import Http404
 from django.test.client import RequestFactory
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 from pytz import UTC
 from urllib.parse import quote
 
 import cms.djangoapps.contentstore.views.component as views
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -83,6 +85,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
             ),
         )
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UNIT_EDITOR, True)
     def test_container_on_container_html(self):
         """
         Create the scenario of an xblock with children (non-vertical) on the container page.
@@ -221,6 +224,7 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         'cms.djangoapps.contentstore.views.component.render_to_response',
         Mock(return_value=Mock(status_code=200, content=''))
     )
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UNIT_EDITOR, True)
     def test_container_page_with_valid_and_invalid_usage_key_string(self):
         """
         Check that invalid 'usage_key_string' raises Http404.
@@ -263,6 +267,7 @@ class ContainerEmbedPageTestCase(ContainerPageTestCase):  # lint-amnesty, pylint
             ),
         )
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UNIT_EDITOR, True)
     def test_container_on_container_html(self):
         """
         Create the scenario of an xblock with children (non-vertical) on the container page.

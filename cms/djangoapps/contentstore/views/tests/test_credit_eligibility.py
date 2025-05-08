@@ -4,7 +4,9 @@ Unit tests for credit eligibility UI in Studio.
 
 
 from unittest import mock
+from edx_toggles.toggles.testutils import override_waffle_flag
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from openedx.core.djangoapps.credit.api import get_credit_requirements
@@ -24,6 +26,7 @@ class CreditEligibilityTest(CourseTestCase):
         self.course_details_url = reverse_course_url('settings_handler', str(self.course.id))
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': False})
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_disabled_setting(self):
         """
         Test that user don't see credit eligibility requirements in response
@@ -35,6 +38,7 @@ class CreditEligibilityTest(CourseTestCase):
         self.assertNotContains(response, "Steps required to earn course credit")
 
     @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_CREDIT_ELIGIBILITY': True})
+    @override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True)
     def test_course_details_with_enabled_setting(self):
         """
         Test that credit eligibility requirements are present in

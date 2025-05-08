@@ -140,6 +140,6 @@ def get_user_existing_notifications(user_ids, notification_type, group_by_id, co
         notifications_mapping[notification.user_id].append(notification)
 
     for user_id, notifications in notifications_mapping.items():
-        notifications.sort(key=lambda elem: elem.created)
+        notifications.sort(key=lambda elem: elem.created, reverse=True)
         notifications_mapping[user_id] = notifications[0] if notifications else None
     return notifications_mapping

@@ -5,7 +5,7 @@ import ddt
 from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
-from pytz import common_timezones_set
+from pytz import common_timezones_set, common_timezones, country_timezones
 
 from openedx.core.djangoapps.django_comment_common import models
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
@@ -634,13 +634,16 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         assert time_zone_name in common_timezones_set
         assert time_zone_info['description'] == get_display_time_zone(time_zone_name)
 
-    # The time zones count may need to change each time we upgrade pytz
-    @ddt.data((ALL_TIME_ZONES_URI, 432),
-              (COUNTRY_TIME_ZONES_URI, 23))
-    @ddt.unpack
-    def test_get_basic(self, country_uri, expected_count):
+    def test_get_country_timezones(self):
         """ Verify that correct time zone info is returned """
-        results = self.get_json(country_uri)
-        assert len(results) == expected_count
+        results = self.get_json(self.COUNTRY_TIME_ZONES_URI)
+        assert len(results) == len(country_timezones['cA'])
+        for time_zone_info in results:
+            self._assert_time_zone_is_valid(time_zone_info)
+
+    def test_get_all_common_timezones(self):
+        """ Verify that correct time zone info is returned """
+        results = self.get_json(self.ALL_TIME_ZONES_URI)
+        assert len(results) == len(common_timezones)
         for time_zone_info in results:
             self._assert_time_zone_is_valid(time_zone_info)

@@ -131,7 +131,6 @@ class UserClipboard(models.Model):
 
     def clean(self):
         """ Check that this model is being used correctly. """
-        # These could probably be replaced with constraints in Django 4.1+
         if self.user.id != self.content.user.id:
             raise ValidationError("User ID mismatch.")
         if self.content.purpose != CLIPBOARD_PURPOSE:

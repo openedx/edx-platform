@@ -752,10 +752,11 @@ class _BuiltInVideoBlock(
         block_type = 'video'
         definition_id = runtime.id_generator.create_definition(block_type, url_name)
         usage_id = runtime.id_generator.create_usage(definition_id)
+        aside_children = []
         if is_pointer_tag(node):
             filepath = cls._format_filepath(node.tag, name_to_pathname(url_name))
             node = cls.load_file(filepath, runtime.resources_fs, usage_id)
-            runtime.parse_asides(node, definition_id, usage_id, runtime.id_generator)
+            aside_children = runtime.parse_asides(node, definition_id, usage_id, runtime.id_generator)
         field_data = cls.parse_video_xml(node, runtime.id_generator)
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
@@ -774,6 +775,9 @@ class _BuiltInVideoBlock(
             runtime.resources_fs,
             getattr(runtime.id_generator, 'target_course_id', None)
         )
+
+        if aside_children:
+            cls.add_applicable_asides_to_block(video, runtime, aside_children)
 
         return video
 

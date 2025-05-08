@@ -21,10 +21,48 @@ from .utils import remove_preferences_with_no_access
 
 def add_info_to_notification_config(config_obj):
     """
-    Add info of all notification types
+    Enhances the notification configuration by appending descriptive 'info' to each notification type.
+
+    This function supports two different structures of `config_obj`, depending on the source of the data:
+    either from the account preferences API (`AggregatedNotificationPreferences`) or the course preferences
+    API (`UserNotificationPreferenceView`).
+
+    Supported input structures:
+
+    1. From account preferences API:
+        {
+            'notification_app': {
+                'notification_types': {
+                    'core': { ... },
+                    'non-core': { ... }
+                }
+            }
+        }
+
+    2. From course preferences API:
+        {
+            'notification_preference_config': {
+                'notification_app': {
+                    'notification_types': {
+                        'core': { ... },
+                        'non-core': { ... }
+                    }
+                }
+            }
+        }
+
+    For each notification type:
+    - If the type is 'core', its info is fetched from `COURSE_NOTIFICATION_APPS[notification_app]['core_info']`.
+    - For all other types, info is fetched from `COURSE_NOTIFICATION_TYPES[notification_type]['info']`.
+
+    Parameters:
+        config_obj (dict): The notification configuration object to enhance.
+
+    Returns:
+        dict: The enhanced configuration object with added 'info' fields.
     """
 
-    config = config_obj['notification_preference_config']
+    config = config_obj.get('notification_preference_config', config_obj)
     for notification_app, app_prefs in config.items():
         notification_types = app_prefs.get('notification_types', {})
         for notification_type, type_prefs in notification_types.items():

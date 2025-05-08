@@ -5,7 +5,9 @@ from unittest import SkipTest
 
 from django.conf import settings
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from common.djangoapps.util.testing import UrlResetMixin
@@ -21,6 +23,7 @@ FEATURES_WITH_EXAM_SETTINGS_DISABLED['ENABLE_EXAM_SETTINGS_HTML_VIEW'] = False
 
 
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 class TestHeaderMenu(CourseTestCase, UrlResetMixin):
     """
     Unit tests for the course header menu.
@@ -61,6 +64,7 @@ class TestHeaderMenu(CourseTestCase, UrlResetMixin):
         self.assertContains(resp, '<li class="nav-item nav-course-settings-certificates">')
 
     @override_settings(FEATURES=FEATURES_WITH_EXAM_SETTINGS_DISABLED)
+    @override_waffle_flag(toggles.LEGACY_STUDIO_EXAM_SETTINGS, True)
     def test_header_menu_without_exam_settings_enabled(self):
         """
         Tests course header menu should not have `Exam Settings` menu item

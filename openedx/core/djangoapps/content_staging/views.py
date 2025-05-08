@@ -81,6 +81,12 @@ class ClipboardEndpoint(APIView):
     def post(self, request):
         """
         Put some piece of content into the user's clipboard.
+
+        FIXME: This API needs to be deprecated and replaced by dedicated APIs
+        within each learning context (POST /course/foo/bar/copy, POST
+        /library/foo/bar/copy, etc.) We don't want to encode course- and
+        library-specific logic in content staging, and it shouldn't import
+        course or library modules.
         """
         # Check if the content exists and the user has permission to read it.
         # Parse the usage key:

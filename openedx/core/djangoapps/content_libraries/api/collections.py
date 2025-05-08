@@ -181,7 +181,7 @@ def update_library_collection_items(
 
 def set_library_item_collections(
     library_key: LibraryLocatorV2,
-    publishable_entity: PublishableEntity,
+    entity_key: str,
     *,
     collection_keys: list[str],
     created_by: int | None = None,
@@ -206,6 +206,11 @@ def set_library_item_collections(
     assert content_library
     assert content_library.learning_package_id
     assert content_library.library_key == library_key
+
+    publishable_entity = authoring_api.get_publishable_entity_by_key(
+        content_library.learning_package_id,
+        key=entity_key,
+    )
 
     # Note: Component.key matches its PublishableEntity.key
     collection_qs = authoring_api.get_collections(content_library.learning_package_id).filter(
@@ -251,7 +256,7 @@ def get_library_collection_from_locator(
     """
     Return a Collection using the LibraryCollectionLocator
     """
-    library_key = collection_locator.library_key
+    library_key = collection_locator.lib_key
     collection_key = collection_locator.collection_id
     content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
     assert content_library.learning_package_id is not None  # shouldn't happen but it's technically possible.

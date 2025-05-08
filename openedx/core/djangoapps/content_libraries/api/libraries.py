@@ -184,6 +184,7 @@ class LibraryItem:
     created: datetime
     modified: datetime
     display_name: str
+    tags_count: int = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -203,54 +204,6 @@ class PublishableItem(LibraryItem):
     has_unpublished_changes: bool = False
     collections: list[CollectionMetadata] = dataclass_field(default_factory=list)
     can_stand_alone: bool = True
-
-
-@dataclass(frozen=True, kw_only=True)
-class LibraryXBlockMetadata(PublishableItem):
-    """
-    Class that represents the metadata about an XBlock in a content library.
-    """
-    usage_key: LibraryUsageLocatorV2
-    # TODO: move tags_count to LibraryItem as all objects under a library can be tagged.
-    tags_count: int = 0
-
-    @classmethod
-    def from_component(cls, library_key, component, associated_collections=None):
-        """
-        Construct a LibraryXBlockMetadata from a Component object.
-        """
-        # Import content_tagging.api here to avoid circular imports
-        from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
-
-        last_publish_log = component.versioning.last_publish_log
-
-        published_by = None
-        if last_publish_log and last_publish_log.published_by:
-            published_by = last_publish_log.published_by.username
-
-        draft = component.versioning.draft
-        published = component.versioning.published
-        last_draft_created = draft.created if draft else None
-        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
-        usage_key = library_component_usage_key(library_key, component)
-        tags = get_object_tag_counts(str(usage_key), count_implicit=True)
-
-        return cls(
-            usage_key=usage_key,
-            display_name=draft.title,
-            created=component.created,
-            modified=draft.created,
-            draft_version_num=draft.version_num,
-            published_version_num=published.version_num if published else None,
-            last_published=None if last_publish_log is None else last_publish_log.published_at,
-            published_by=published_by,
-            last_draft_created=last_draft_created,
-            last_draft_created_by=last_draft_created_by,
-            has_unpublished_changes=component.versioning.has_unpublished_changes,
-            collections=associated_collections or [],
-            can_stand_alone=component.publishable_entity.can_stand_alone,
-            tags_count=tags.get(str(usage_key), 0),
-        )
 
 
 @dataclass(frozen=True)

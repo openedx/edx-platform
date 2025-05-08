@@ -188,5 +188,5 @@ class TestGetUserExistingNotifications(unittest.TestCase):
         result = get_user_existing_notifications(user_ids, notification_type, group_by_id, course_id)
 
         # Verify the results
-        self.assertEqual(result[1], mock_notification1)
+        self.assertEqual(result[1], mock_notification2)
         self.assertIsNone(result[2])  # user 2 has no notifications

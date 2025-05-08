@@ -1,5 +1,9 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
+# TODO: Rewrite several of these assertions so that they check the output of the REST or Python
+# APIs rather than parsing HTML from the deprecated legacy frontend pages. In particular, any
+# test case using override_waffle_flag(toggles.LEGACY_STUDIO_*, True) will need to be fixed.
+# Part of https://github.com/openedx/edx-platform/issues/36275.
 
 import copy
 import re
@@ -17,7 +21,7 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.test.utils import override_settings
-from edx_toggles.toggles.testutils import override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_switch, override_waffle_flag
 from edxval.api import create_video, get_videos_for_course
 from fs.osfs import OSFS
 from lxml import etree
@@ -43,6 +47,7 @@ from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xli
 from xmodule.seq_block import SequenceBlock
 from xmodule.video_block import VideoBlock
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.config import waffle
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, get_url, parse_json
 from cms.djangoapps.contentstore.utils import (
@@ -587,6 +592,7 @@ class MiscCourseTests(ContentStoreTestCase):
         for expected in expected_types:
             self.assertContains(resp, expected)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UNIT_EDITOR, True)
     @ddt.data("<script>alert(1)</script>", "alert('hi')", "</script><script>alert(1)</script>")
     def test_container_handler_xss_prevent(self, malicious_code):
         """
@@ -596,6 +602,7 @@ class MiscCourseTests(ContentStoreTestCase):
         # Test that malicious code does not appear in html
         self.assertNotContains(resp, malicious_code)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UNIT_EDITOR, True)
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the
         # page response HTML
@@ -697,9 +704,11 @@ class MiscCourseTests(ContentStoreTestCase):
         # Remove tempdir
         shutil.rmtree(root_dir)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UNIT_EDITOR, True)
     def test_advanced_components_require_two_clicks(self):
         self.check_components_on_page(['word_cloud'], ['Word cloud'])
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UNIT_EDITOR, True)
     def test_edit_unit(self):
         """Verifies rendering the editor in all the verticals in the given test course"""
         self._check_verticals([self.vert_loc])
@@ -1379,6 +1388,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self.client.ajax_post('/course/', self.course_data)
         self.assertEqual(resp.status_code, 403)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
         resp = self.client.get_html('/home/')
@@ -1400,6 +1410,7 @@ class ContentStoreTest(ContentStoreTestCase):
         item = BlockFactory.create(parent_location=course.location)
         self.assertIsInstance(item, SequenceBlock)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
         course = CourseFactory.create()
@@ -1499,7 +1510,8 @@ class ContentStoreTest(ContentStoreTestCase):
         )
         course_key = course_items[0].id
 
-        resp = self._show_course_overview(course_key)
+        with override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True):
+            resp = self._show_course_overview(course_key)
 
         # course_handler raise 404 for old mongo course
         if course_key.deprecated:
@@ -1510,20 +1522,31 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertContains(resp, 'Chapter 2')
 
         # go to various pages
-        test_get_html('import_handler')
-        test_get_html('export_handler')
-        test_get_html('course_team_handler')
-        test_get_html('course_info_handler')
-        test_get_html('assets_handler')
-        test_get_html('tabs_handler')
-        test_get_html('settings_handler')
-        test_get_html('grading_handler')
-        test_get_html('advanced_settings_handler')
-        test_get_html('textbooks_list_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_IMPORT, True):
+            test_get_html('import_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_EXPORT, True):
+            test_get_html('export_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True):
+            test_get_html('course_team_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True):
+            test_get_html('course_info_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_FILES_UPLOADS, True):
+            test_get_html('assets_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_CUSTOM_PAGES, True):
+            test_get_html('tabs_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_SCHEDULE_DETAILS, True):
+            test_get_html('settings_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_GRADING, True):
+            test_get_html('grading_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_ADVANCED_SETTINGS, True):
+            test_get_html('advanced_settings_handler')
+        with override_waffle_flag(toggles.LEGACY_STUDIO_TEXTBOOKS, True):
+            test_get_html('textbooks_list_handler')
 
         # go look at the Edit page
         unit_key = course_key.make_usage_key('vertical', 'test_vertical')
-        resp = self.client.get_html(get_url('container_handler', unit_key))
+        with override_waffle_flag(toggles.LEGACY_STUDIO_UNIT_EDITOR, True):
+            resp = self.client.get_html(get_url('container_handler', unit_key))
         self.assertEqual(resp.status_code, 200)
 
         def delete_item(category, name):
@@ -1856,20 +1879,23 @@ class RerunCourseTest(ContentStoreTestCase):
         """
         Asserts that the given course key is NOT in the unsucceeded course action section of the html.
         """
-        course_listing = lxml.html.fromstring(self.client.get_html('/home/').content)
+        with override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True):
+            course_listing = lxml.html.fromstring(self.client.get_html('/home/').content)
         self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 0)
 
     def assertInUnsucceededCourseActions(self, course_key):
         """
         Asserts that the given course key is in the unsucceeded course action section of the html.
         """
-        course_listing = lxml.html.fromstring(self.client.get_html('/home/').content)
+        with override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True):
+            course_listing = lxml.html.fromstring(self.client.get_html('/home/').content)
         self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 1)
 
     def verify_rerun_course(self, source_course_key, destination_course_key, destination_display_name):
         """
         Verify the contents of the course rerun action
         """
+
         rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
         expected_states = {
             'state': CourseRerunUIStateManager.State.SUCCEEDED,
@@ -2138,8 +2164,12 @@ class EntryPageTestCase(TestCase):
         resp = self.client.get_html(page)
         self.assertEqual(resp.status_code, status_code)
 
-    def test_how_it_works(self):
+    @override_waffle_flag(toggles.LEGACY_STUDIO_LOGGED_OUT_HOME, True)
+    def test_how_it_works_legacy(self):
         self._test_page("/howitworks")
+
+    def test_how_it_works_redirect_to_signin(self):
+        self._test_page("/howitworks", 302)
 
     def test_signup(self):
         # deprecated signup url redirects to LMS register.

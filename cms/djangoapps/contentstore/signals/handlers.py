@@ -44,7 +44,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from ..models import PublishableEntityLink
+from ..models import ComponentLink, ContainerLink
 from ..tasks import (
     create_or_update_upstream_links,
     handle_create_or_update_xblock_upstream_link,
@@ -230,7 +230,7 @@ def handle_item_deleted(**kwargs):
             gating_api.set_required_content(course_key, block.location, None, None, None)
             id_list.add(block.location)
 
-        PublishableEntityLink.objects.filter(downstream_usage_key__in=id_list).delete()
+        ComponentLink.objects.filter(downstream_usage_key__in=id_list).delete()
 
 
 @receiver(GRADING_POLICY_CHANGED)
@@ -278,7 +278,10 @@ def delete_upstream_downstream_link_handler(**kwargs):
         log.error("Received null or incorrect data for event")
         return
 
-    PublishableEntityLink.objects.filter(
+    ComponentLink.objects.filter(
+        downstream_usage_key=xblock_info.usage_key
+    ).delete()
+    ContainerLink.objects.filter(
         downstream_usage_key=xblock_info.usage_key
     ).delete()
 

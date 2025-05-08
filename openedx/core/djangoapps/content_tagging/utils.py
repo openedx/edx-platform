@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from edx_django_utils.cache import RequestCache
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey, UsageKey, LibraryItemKey
+from opaque_keys.edx.keys import CourseKey, CollectionKey, ContainerKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import Taxonomy
 from organizations.models import Organization
@@ -18,22 +18,16 @@ def get_content_key_from_string(key_str: str) -> ContentKey:
     """
     Get content key from string
     """
-    try:
-        return CourseKey.from_string(key_str)
-    except InvalidKeyError:
+    for key_type in (LibraryLocatorV2, CourseKey, UsageKey, ContainerKey, CollectionKey):
         try:
-            return LibraryLocatorV2.from_string(key_str)
+            return key_type.from_string(key_str)
         except InvalidKeyError:
-            try:
-                return UsageKey.from_string(key_str)
-            except InvalidKeyError:
-                try:
-                    return LibraryItemKey.from_string(key_str)
-                except InvalidKeyError as usage_key_error:
-                    raise ValueError(
-                        "object_id must be one of the following "
-                        "keys: CourseKey, LibraryLocatorV2, UsageKey or LibraryItemKey"
-                    ) from usage_key_error
+            continue
+    raise ValueError(
+        "For tagging, object_id must be one of the following "
+        "key types: LibraryLocatorV2, CourseKey, UsageKey, ContainerKey, CollectionKey. "
+        f"got: {key_str}"
+    )
 
 
 def get_context_key_from_key(content_key: ContentKey) -> ContextKey:
@@ -41,20 +35,11 @@ def get_context_key_from_key(content_key: ContentKey) -> ContextKey:
     Returns the context key from a given content key.
     """
     # If the content key is a CourseKey or a LibraryLocatorV2, return it
-    if isinstance(content_key, (CourseKey, LibraryLocatorV2)):
+    if isinstance(content_key, (LibraryLocatorV2, CourseKey)):
         return content_key
-
-    # If the content key is a LibraryItemKey, return the LibraryLocatorV2
-    if isinstance(content_key, LibraryItemKey):
-        return content_key.library_key
-
-    # If the content key is a UsageKey, return the context key
-    context_key = content_key.context_key
-
-    if isinstance(context_key, (CourseKey, LibraryLocatorV2)):
-        return context_key
-
-    raise ValueError("context must be a CourseKey or a LibraryLocatorV2")
+    else:
+        assert isinstance(content_key.context_key, (CourseKey, LibraryLocatorV2))  # for type checker
+        return content_key.context_key
 
 
 def get_context_key_from_key_string(key_str: str) -> ContextKey:

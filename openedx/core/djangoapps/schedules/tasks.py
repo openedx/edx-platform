@@ -274,6 +274,7 @@ def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):  # lint-a
     site = Site.objects.select_related('configuration').get(pk=site_id)
     if _is_delivery_enabled(site, delivery_config_var, log_prefix):
         msg = Message.from_string(msg_str)
+        msg.options['skip_disable_user_policy'] = True
 
         user = User.objects.get(id=msg.recipient.lms_user_id)
         if not user.has_usable_password():
