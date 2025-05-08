@@ -1,3 +1,12 @@
+"""
+Backfill the is_disabled attribute for existing users in Segment and Braze.
+
+This management command identifies users with unusable passwords (starting with
+UNUSABLE_PASSWORD_PREFIX) and syncs the is_disabled=true attribute to their Segment
+profiles using the segment.identify() function. It processes users in
+batches to minimize memory usage and supports a dry-run mode for testing.
+"""
+
 import logging
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
@@ -9,6 +18,9 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
+    """
+    Back fill is_disabled for users with unusable passwords in Segment.
+    """
     help = 'Back fill is_disabled attribute for existing disabled users in Segment'
 
     def add_arguments(self, parser):
@@ -51,11 +63,11 @@ class Command(BaseCommand):
                         segment.identify(user['id'], {'is_disabled': 'true'})
                         LOGGER.info(f"Successfully updated user {user['id']} with is_disabled=true")
                     processed += 1
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     LOGGER.error(f"Failed to update user {user['id']}: {str(e)}")
 
             LOGGER.info(f"Back fill completed: processed {processed}/{total_users} users")
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             LOGGER.error(f"Back fill failed: {str(e)}")
             raise
