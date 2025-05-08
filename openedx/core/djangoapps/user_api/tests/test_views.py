@@ -650,9 +650,7 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
             self._assert_time_zone_is_valid(time_zone_info)
 
 
-@ddt.ddt
 @skip_unless_lms
-@override_settings(API_ACCESS_TOKENS={"disabled_user_api_token": "abcd"})
 class DisabledUserListViewTest(UserApiTestCase):
     """
     Test cases covering the list viewing behavior for disabled users
