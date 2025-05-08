@@ -623,7 +623,7 @@ edx-when==2.5.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.10.0
+git+https://github.com/irtazaakram/edx-val.git@update-python-django
     # via -r requirements/edx/base.txt
 elasticsearch==7.9.1
     # via
