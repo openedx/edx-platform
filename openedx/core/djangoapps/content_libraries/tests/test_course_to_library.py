@@ -3,7 +3,6 @@ Tests for Imports from Courses to Learning-Core-based Content Libraries
 """
 import ddt
 from opaque_keys.edx.locator import LibraryContainerLocator
-from openedx_events.content_authoring import signals
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory

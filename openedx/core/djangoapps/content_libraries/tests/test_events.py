@@ -27,7 +27,6 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_UPDATED,
     LIBRARY_CONTAINER_PUBLISHED,
 )
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
 from openedx.core.djangolib.testing.utils import skip_unless_cms
