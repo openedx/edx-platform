@@ -89,9 +89,9 @@ opentelemetry-util-http==0.46b0
     # via opentelemetry-instrumentation-requests
 packaging==25.0
     # via semgrep
-peewee==3.17.9
+peewee==3.18.1
     # via semgrep
-protobuf==4.25.6
+protobuf==4.25.7
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
@@ -115,7 +115,7 @@ ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.119.0
+semgrep==1.121.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep

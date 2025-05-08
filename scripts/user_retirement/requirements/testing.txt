@@ -45,7 +45,7 @@ click==8.1.8
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-cryptography==44.0.2
+cryptography==44.0.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
@@ -76,9 +76,9 @@ google-api-core==2.24.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.167.0
+google-api-python-client==2.169.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.39.0
+google-auth==2.40.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -126,13 +126,13 @@ markupsafe==3.0.2
     #   werkzeug
 mock==5.2.0
     # via -r scripts/user_retirement/requirements/testing.in
-more-itertools==10.6.0
+more-itertools==10.7.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-moto==4.2.14
+moto==5.1.4
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==10.9.0
+newrelic==10.11.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
