@@ -81,7 +81,7 @@ six==1.17.0
     # via
     #   codejail-includes
     #   python-dateutil
-sympy==1.13.3
+sympy==1.14.0
     # via
     #   -r requirements/edx-sandbox/base.in
     #   openedx-calc

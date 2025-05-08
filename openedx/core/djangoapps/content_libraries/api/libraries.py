@@ -323,8 +323,10 @@ def require_permission_for_library_key(library_key: LibraryLocatorV2, user: User
     Raises django.core.exceptions.PermissionDenied if the user doesn't have
     permission.
     """
-    library_obj = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    if not user.has_perm(permission, obj=library_obj):
+    library_obj = ContentLibrary.objects.get_by_key(library_key)
+    # obj should be able to read any valid model object but mypy thinks it can only be
+    # "User | AnonymousUser | None"
+    if not user.has_perm(permission, obj=library_obj):  # type:ignore[arg-type]
         raise PermissionDenied
 
     return library_obj
