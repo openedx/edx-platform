@@ -98,12 +98,12 @@ TEST_ROOT = path("test_root")
 STATIC_ROOT = TEST_ROOT / "staticfiles"
 # Mocks the bundle loading logic during tests
 WEBPACK_LOADER = {
-        "DEFAULT": {
-            "BUNDLE_DIR_NAME": "bundles/",
-            "STATS_FILE": "/dev/null",
-            "LOADER_CLASS": "webpack_loader.loader.FakeWebpackLoader",
-        }
+    "DEFAULT": {
+        "BUNDLE_DIR_NAME": "bundles/",
+        "STATS_FILE": "/dev/null",
+        "LOADER_CLASS": "webpack_loader.loader.FakeWebpackLoader",
     }
+}
 
 STATUS_MESSAGE_PATH = TEST_ROOT / "status_message.json"
 

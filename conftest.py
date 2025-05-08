@@ -6,6 +6,7 @@ from unittest import TestCase
 
 import pytest
 
+
 # Import hooks and fixture overrides from the cms package to
 # avoid duplicating the implementation
 
@@ -20,9 +21,9 @@ TestCase.maxDiff = None
 
 @pytest.fixture(autouse=True)
 def patch_render_bundle(monkeypatch):
-   """Monkey Patch the template tag to prevent errors due to missing bundles"""
-   monkeypatch.setattr(
-       webpack_loader,
-       "render_bundle",
-       lambda bundle_name, extension=None, config="DEFAULT", attrs="": ""
-   )
+    """Monkey Patch the template tag to prevent errors due to missing bundles"""
+    monkeypatch.setattr(
+        webpack_loader,
+        "render_bundle",
+        lambda bundle_name, extension=None, config="DEFAULT", attrs="": ""
+    )
