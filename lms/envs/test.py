@@ -100,7 +100,6 @@ STATIC_ROOT = TEST_ROOT / "staticfiles"
 WEBPACK_LOADER = {
     "DEFAULT": {
         "BUNDLE_DIR_NAME": "bundles/",
-        "STATS_FILE": "/dev/null",
         "LOADER_CLASS": "webpack_loader.loader.FakeWebpackLoader",
     }
 }
