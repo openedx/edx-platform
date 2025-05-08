@@ -823,6 +823,7 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
     """
     ENABLED_OPENEDX_EVENTS = [
         LIBRARY_CONTAINER_UPDATED.event_type,
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.event_type,
     ]
 
     @classmethod
@@ -944,3 +945,80 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest, OpenEdxEventsTes
 
         self._set_library_block_fields(self.html_block_usage_key, {"data": block_olx, "metadata": {}})
         self._validate_calls_of_html_block(container_update_event_receiver)
+
+    def test_call_object_changed_signal_when_remove_component(self):
+        html_block_1 = self._add_block_to_library(
+            self.lib1.library_key, "html", "html3",
+        )
+        api.update_container_children(
+            self.unit2.container_key,
+            [UsageKey.from_string(html_block_1["id"])],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+        )
+
+        event_reciver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
+        api.update_container_children(
+            self.unit2.container_key,
+            [UsageKey.from_string(html_block_1["id"])],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
+        )
+
+        assert event_reciver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=html_block_1["id"],
+                    changes=["units"],
+                ),
+            },
+            event_reciver.call_args_list[0].kwargs,
+        )
+
+    def test_call_object_changed_signal_when_add_component(self):
+        event_reciver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
+        html_block_1 = self._add_block_to_library(
+            self.lib1.library_key, "html", "html4",
+        )
+        html_block_2 = self._add_block_to_library(
+            self.lib1.library_key, "html", "html5",
+        )
+
+        api.update_container_children(
+            self.unit2.container_key,
+            [
+                UsageKey.from_string(html_block_1["id"]),
+                UsageKey.from_string(html_block_2["id"])
+            ],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+        )
+
+        assert event_reciver.call_count == 2
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=html_block_1["id"],
+                    changes=["units"],
+                ),
+            },
+            event_reciver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=html_block_2["id"],
+                    changes=["units"],
+                ),
+            },
+            event_reciver.call_args_list[1].kwargs,
+        )
