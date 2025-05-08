@@ -801,7 +801,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==10.1.0
+openedx-events==10.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise

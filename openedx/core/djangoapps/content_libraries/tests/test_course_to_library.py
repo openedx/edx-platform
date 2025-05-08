@@ -3,8 +3,6 @@ Tests for Imports from Courses to Learning-Core-based Content Libraries
 """
 import ddt
 from opaque_keys.edx.locator import LibraryContainerLocator
-from openedx_events.content_authoring import signals
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -15,15 +13,10 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 @skip_unless_cms
 @ddt.ddt
-class CourseToLibraryTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest, ModuleStoreTestCase):
+class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
     """
     Tests that involve copying content from courses to libraries.
     """
-    ENABLED_OPENEDX_EVENTS = [
-        signals.LIBRARY_CONTAINER_CREATED.event_type,
-        signals.LIBRARY_CONTAINER_DELETED.event_type,
-        signals.LIBRARY_CONTAINER_UPDATED.event_type,
-    ]
 
     def test_library_paste_unit_from_course(self):
         """
