@@ -11,6 +11,7 @@ import logging
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
+from django.db import DatabaseError
 from common.djangoapps.track import segment
 
 LOGGER = logging.getLogger(__name__)
@@ -19,9 +20,9 @@ User = get_user_model()
 
 class Command(BaseCommand):
     """
-    Back fill is_disabled for users with unusable passwords in Segment.
+    Backfill is_disabled attribute for users with unusable passwords in Segment.
     """
-    help = 'Back fill is_disabled attribute for existing disabled users in Segment'
+    help = 'Backfill is_disabled attribute for existing disabled users in Segment'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -48,11 +49,12 @@ class Command(BaseCommand):
             ).values('id', 'password')
 
             total_users = queryset.count()
-            LOGGER.info(f"Found {total_users} users that are disabled")
 
             if total_users == 0:
                 LOGGER.info("No users to process, exiting")
                 return
+
+            LOGGER.info(f"Found {total_users} users that are disabled")
 
             processed = 0
             for user in queryset.iterator(chunk_size=batch_size):
@@ -63,11 +65,10 @@ class Command(BaseCommand):
                         segment.identify(user['id'], {'is_disabled': 'true'})
                         LOGGER.info(f"Successfully updated user {user['id']} with is_disabled=true")
                     processed += 1
-                except Exception as e:  # pylint: disable=broad-exception-caught
+                except (ConnectionError, ValueError) as e:
                     LOGGER.error(f"Failed to update user {user['id']}: {str(e)}")
 
             LOGGER.info(f"Back fill completed: processed {processed}/{total_users} users")
 
-        except Exception as e:  # pylint: disable=broad-exception-caught
+        except DatabaseError as e:
             LOGGER.error(f"Back fill failed: {str(e)}")
-            raise
