@@ -1490,7 +1490,6 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
                 'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
             ]
-        keep_field_private(query_features, 'year_of_birth')  # protected information
 
         # Provide human-friendly and translatable names for these features. These names
         # will be displayed in the table generated in data_download.js. It is not (yet)
@@ -1502,8 +1501,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'email': _('Email'),
             'language': _('Language'),
             'location': _('Location'),
-            #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683,
-            #  not to go in reports
+            'year_of_birth': _('Birth Year'),
             'gender': _('Gender'),
             'level_of_education': _('Level of Education'),
             'mailing_address': _('Mailing Address'),
@@ -1513,6 +1511,10 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'date_joined': _('Date Joined'),
             'external_user_key': _('External User Key'),
         }
+
+        if not settings.FEATURES.get('SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_CSV', False):
+            keep_field_private(query_features, 'year_of_birth')
+            query_features_names.pop('year_of_birth', None)
 
         if is_course_cohorted(course.id):
             # Translators: 'Cohort' refers to a group of students within a course.
