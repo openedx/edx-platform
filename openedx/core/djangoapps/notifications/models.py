@@ -109,6 +109,7 @@ class Notification(TimeStampedModel):
     content_url = models.URLField(null=True, blank=True)
     web = models.BooleanField(default=True, null=False, blank=False)
     email = models.BooleanField(default=False, null=False, blank=False)
+    push = models.BooleanField(default=False, null=False, blank=False)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     group_by_id = models.CharField(max_length=255, db_index=True, null=False, default="")
