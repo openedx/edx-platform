@@ -5,13 +5,15 @@ Helper functions for the accounts API.
 
 import hashlib
 
+from django import VERSION
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.files.storage import storages
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.files.storage import get_storage_class
+from django.utils.module_loading import import_string
 
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from common.djangoapps.student.models import UserProfile
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from ..errors import UserNotFound
 
@@ -22,12 +24,32 @@ _PROFILE_IMAGE_SIZES = list(settings.PROFILE_IMAGE_SIZES_MAP.values())
 
 def get_profile_image_storage():
     """
-    Configures and returns a django Storage instance that can be used
-    to physically locate, read and write profile images.
+    Returns an instance of the configured Django storage class for profile images.
+
+    The function looks for the `PROFILE_IMAGE_BACKEND` setting in the Django settings.
+    If it exists and includes a `'class'` key, that class is used as the storage backend.
+    If the setting is missing or does not include a `'class'`, the default storage backend
+    DEFAULT_FILE_STORAGE will return.
+
+    Returns:
+        An instance of the configured storage backend.
     """
-    config = settings.PROFILE_IMAGE_BACKEND
-    storage_class = get_storage_class(config['class'])
-    return storage_class(**config['options'])
+    config = getattr(settings, 'PROFILE_IMAGE_BACKEND', {})
+    storage_class_path = config.get('class')
+    options = config.get('options', {})
+
+    if not storage_class_path:
+        storage_class_path = (
+            getattr(settings, 'DEFAULT_FILE_STORAGE', None) or
+            getattr(settings, 'STORAGES', {}).get('default', {}).get('BACKEND') or
+            'django.core.files.storage.FileSystemStorage'
+        )
+
+        # For Django 5.x, pick options if available
+        options = getattr(settings, 'STORAGES', {}).get('default', {}).get('OPTIONS', {})
+
+    storage_class = import_string(storage_class_path)
+    return storage_class(**options)
 
 
 def _make_profile_image_name(username):
