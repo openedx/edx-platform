@@ -31,7 +31,6 @@ from common.djangoapps.student.auth import user_has_role
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, User
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
-from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.course_groups.cohorts import CourseUserGroup, add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -68,7 +67,7 @@ REQUIRED_ATTRIBUTES = {
 }
 
 
-class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
+class EnrollmentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser):
     """Session authentication that allows inactive users and cross-domain requests."""
 
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
