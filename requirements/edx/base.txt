@@ -1181,7 +1181,7 @@ unicodecsv==0.14.1
 unicodeit==0.7.5
     # via -r requirements/edx/kernel.in
 uritemplate==4.1.1
-    # via
+    # viaf
     #   drf-spectacular
     #   drf-yasg
     #   google-api-python-client
@@ -1225,7 +1225,7 @@ wheel==0.45.1
     # via django-pipeline
 wrapt==1.17.2
     # via -r requirements/edx/kernel.in
-xblock[django]==5.2.0
+git+https://github.com/ttqureshi/Xblock.git@ttqureshi/pointer-tag
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock
