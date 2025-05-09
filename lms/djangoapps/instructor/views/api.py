@@ -1512,7 +1512,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'external_user_key': _('External User Key'),
         }
 
-        if not settings.FEATURES.get('SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_CSV', False):
+        if not settings.FEATURES.get('SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_REPORT', False):
             keep_field_private(query_features, 'year_of_birth')
             query_features_names.pop('year_of_birth', None)
 
