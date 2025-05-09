@@ -172,6 +172,7 @@ class LibraryXBlockMetadataSerializer(PublishableItemSerializer):
     Serializer for LibraryXBlockMetadata
     """
     block_type = serializers.CharField(source="usage_key.block_type")
+    published_display_name = serializers.CharField()
 
 
 class LibraryXBlockTypeSerializer(serializers.Serializer):
