@@ -139,6 +139,7 @@ module.exports = Merge.smart({
             ReactRenderer: './common/static/js/src/ReactRenderer.jsx',
             XModuleShim: './xmodule/js/src/xmodule.js',
             VerticalStudentView: './xmodule/assets/vertical/public/js/vertical_student_view.js',
+            VideoBlockMain: './xmodule/assets/video/public/js/10_main.js',
             commons: 'babel-polyfill'
         },
 
@@ -496,15 +497,6 @@ module.exports = Merge.smart({
                 },
                 {
                     test: /xmodule\/js\/src\/vertical\/edit.js/,
-                    use: [
-                        {
-                            loader: 'imports-loader',
-                            options: 'this=>window'
-                        }
-                    ]
-                },
-                {
-                    test: /xmodule\/js\/src\/video\/10_main.js/,
                     use: [
                         {
                             loader: 'imports-loader',
