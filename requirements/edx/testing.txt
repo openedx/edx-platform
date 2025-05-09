@@ -569,7 +569,7 @@ edx-drf-extensions==10.6.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.13.3
+edx-enterprise==5.13.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -1031,7 +1031,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==10.1.0
+openedx-events==10.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1525,7 +1525,7 @@ super-csv==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
-sympy==1.13.3
+sympy==1.14.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-calc
