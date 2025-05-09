@@ -101,7 +101,7 @@ def compile_xblock_js_messages():
         xblock_conf_locale_dir = xmodule_api.get_python_locale_root() / xblock_module
         i18n_js_namespace = xblock_class.get_i18n_js_namespace()
 
-        for locale_dir in xblock_conf_locale_dir.listdir():
+        for locale_dir in xblock_conf_locale_dir.iterdir():
             locale_code = str(locale_dir.basename())
             locale_messages_dir = locale_dir / 'LC_MESSAGES'
             js_translations_domain = None
