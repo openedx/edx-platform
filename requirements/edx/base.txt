@@ -467,9 +467,8 @@ edx-event-bus-kafka==6.1.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.6.1
     # via -r requirements/edx/kernel.in
-edx-i18n-tools==1.5.0
+edx-i18n-tools==1.9.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
     #   ora2
     #   xblocks-contrib
