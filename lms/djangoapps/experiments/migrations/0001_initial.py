@@ -27,12 +27,4 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'Experiment Data',
             },
         ),
-        migrations.AlterUniqueTogether(
-            name='experimentdata',
-            unique_together={('user', 'experiment_id', 'key')},
-        ),
-        migrations.AlterIndexTogether(
-            name='experimentdata',
-            index_together={('user', 'experiment_id')},
-        ),
     ]

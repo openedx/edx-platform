@@ -13,8 +13,5 @@ class Migration(migrations.Migration):
             name='passed_timestamp',
             field=models.DateTimeField(null=True, verbose_name='Date learner earned a passing grade', blank=True),
         ),
-        migrations.AlterIndexTogether(
-            name='persistentcoursegrade',
-            index_together={('passed_timestamp', 'course_id')},
-        ),
+
     ]

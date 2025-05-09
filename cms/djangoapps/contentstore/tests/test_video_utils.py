@@ -12,7 +12,7 @@ import pytz
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.files.storage import get_storage_class
+# from django.core.files.storage import get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
 from edxval.api import create_profile, create_video, get_course_video_image_url, update_video_image

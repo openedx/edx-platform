@@ -8,6 +8,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext as _
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 
 from openedx.core.djangoapps.user_api.accounts.forms import RetirementQueueDeletionForm
 
@@ -150,6 +151,17 @@ class UserRetirementRequestAdmin(admin.ModelAdmin):
     """
     list_display = ('user', 'created')
     raw_id_fields = ('user',)
+    search_fields = ('user__id',)
+
+    def user_id(self, obj):
+        """
+        List display for the user_id field.
+
+        This is an alternative to listing the "user" field directly, since that would print the retired (hashed)
+        username which isn't super helpful.
+        """
+        aa = get_profile_image_storage()
+        return obj.user.id
 
     class Meta:
         model = UserRetirementRequest
@@ -183,6 +195,7 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
         This is an alternative to listing the "user" field directly, since that would print the retired (hashed)
         username which isn't super helpful.
         """
+        aa = get_profile_image_storage()
         return obj.user.id
 
     def reset_state(self, request, queryset):

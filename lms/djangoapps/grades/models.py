@@ -575,9 +575,9 @@ class PersistentCourseGrade(TimeStampedModel):
         unique_together = [
             ('course_id', 'user_id'),
         ]
-        indexes = [
-            models.Index(fields=['passed_timestamp', 'course_id'], name="passed_timestamp_course_id_idx"),
-            models.Index(fields=['modified', 'course_id'], name="modified_course_id_idx")
+        index_together = [
+            ('passed_timestamp', 'course_id'),
+            ('modified', 'course_id')
         ]
 
     # primary key will need to be large for this table

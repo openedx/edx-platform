@@ -45,10 +45,6 @@ class Migration(migrations.Migration):
             name='coursesectionsequence',
             unique_together={('course_context', 'ordering')},
         ),
-        migrations.AlterIndexTogether(
-            name='coursesection',
-            index_together={('course_context', 'ordering')},
-        ),
         migrations.RemoveField(
             model_name='coursesection',
             name='learning_context',
