@@ -872,7 +872,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
         except InvalidEnrollmentAttribute as error:
             return Response(
-                status=status.HTTP_403_FORBIDDEN,
+                status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": str(error),
                     "localizedMessage": str(error),
