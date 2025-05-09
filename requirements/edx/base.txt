@@ -113,9 +113,8 @@ cffi==1.17.1
     #   snowflake-connector-python
 chardet==5.2.0
     # via pysrt
-charset-normalizer==2.0.12
+charset-normalizer==3.4.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   requests
     #   snowflake-connector-python
 chem==1.3.0
@@ -468,9 +467,8 @@ edx-event-bus-kafka==6.1.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.6.1
     # via -r requirements/edx/kernel.in
-edx-i18n-tools==1.5.0
+edx-i18n-tools==1.9.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/bundled.in
     #   ora2
     #   xblocks-contrib

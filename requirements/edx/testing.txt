@@ -161,9 +161,8 @@ chardet==5.2.0
     #   diff-cover
     #   pysrt
     #   tox
-charset-normalizer==2.0.12
+charset-normalizer==3.4.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   requests
     #   snowflake-connector-python
@@ -577,9 +576,8 @@ edx-event-bus-kafka==6.1.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.6.1
     # via -r requirements/edx/base.txt
-edx-i18n-tools==1.5.0
+edx-i18n-tools==1.9.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   ora2
     #   xblocks-contrib

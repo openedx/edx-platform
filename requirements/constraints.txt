@@ -19,12 +19,6 @@
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35280
 celery>=5.2.2,<6.0.0
 
-# Date: 2022-07-20
-# edx-enterprise, snowflake-connector-python require charset-normalizer==2.0.0
-# Can be removed once snowflake-connector-python>2.7.9 is released with the fix.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35278
-charset-normalizer<2.1.0
-
 # Date: 2024-02-02
 # Stay on LTS version, remove once this is added to common constraint
 Django<5.0
@@ -69,13 +63,6 @@ django-storages<1.14.4
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
 edx-enterprise==5.13.4
-
-# Date: 2024-05-09
-# This has to be constrained as well because newer versions of edx-i18n-tools need the
-# newer version of lxml but that requirement was not made expilict in the 1.6.0 version
-# of the package.  This can be un-pinned when we're upgrading lxml.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35274
-edx-i18n-tools<1.6.0
 
 # Date: 2024-07-26
 # To override the constraint of edx-lint

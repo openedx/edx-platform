@@ -51,7 +51,12 @@ def collect_progress_for_user_in_course(course_id: str, user_id: str) -> None:
     progress["course_id"] = course_id
     progress["enrollment_mode"] = enrollment_mode
 
-    tracker.emit(
-        COURSE_COMPLETION_FOR_USER_EVENT_NAME,
-        progress
-    )
+    context = {
+        "course_id": course_id,
+        "user_id": user.id,
+    }
+    with tracker.get_tracker().context(COURSE_COMPLETION_FOR_USER_EVENT_NAME, context):
+        tracker.emit(
+            COURSE_COMPLETION_FOR_USER_EVENT_NAME,
+            progress
+        )
