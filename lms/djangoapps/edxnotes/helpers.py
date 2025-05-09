@@ -247,7 +247,6 @@ def get_block_context(course, block):
     """
     Returns dispay_name and url for the parent block.
     """
-
     block_dict = {
         'location': str(block.location),
         'display_name': Text(block.display_name_with_default),
