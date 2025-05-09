@@ -1077,15 +1077,15 @@ FEATURES = {
     # .. toggle_target_removal_date: None
     'BADGES_ENABLED': False,
 
-    # .. toggle_name: FEATURES['SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_CSV']
+    # .. toggle_name: FEATURES['SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_REPORT']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Adds private fields to the profile information CSV export.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2025-05-12
     # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/xxxxx
-    'SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_CSV': False,
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/36688
+    'SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_REPORT': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
