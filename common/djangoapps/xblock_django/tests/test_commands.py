@@ -64,7 +64,7 @@ def test_compile_xblock_translations(tmp_translations_dir):
                     'msgfmt', '--check-format', '-o', str(po_file.with_suffix('.mo')), str(po_file),
                 ], 'Compiles the .po files'
 
-            js_file_text = get_javascript_i18n_file_path('done', 'tr').text()
+            js_file_text = get_javascript_i18n_file_path('done', 'tr').read_text()
             assert 'Merhaba' in js_file_text, 'Ensures the JavaScript catalog is compiled'
             assert 'TestingDoneXBlockI18n' in js_file_text, 'Ensures the namespace is used'
             assert 'gettext' in js_file_text, 'Ensures the gettext function is defined'
