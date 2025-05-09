@@ -256,6 +256,7 @@ django==4.2.20
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-appconf
+    #   django-autocomplete-light
     #   django-celery-results
     #   django-classy-tags
     #   django-config-models
@@ -326,6 +327,8 @@ django-appconf==1.1.0
     # via
     #   -r requirements/edx/base.txt
     #   django-statici18n
+django-autocomplete-light==3.12.1
+    # via -r requirements/edx/base.txt
 django-cache-memoize==0.2.1
     # via
     #   -r requirements/edx/base.txt
