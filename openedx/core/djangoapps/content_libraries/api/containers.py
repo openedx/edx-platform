@@ -110,7 +110,6 @@ class ContainerMetadata(PublishableItem):
     container_key: LibraryContainerLocator
     container_type: ContainerType
     container_pk: int
-    published_display_name: str | None
 
     @classmethod
     def from_container(cls, library_key, container: Container, associated_collections=None):

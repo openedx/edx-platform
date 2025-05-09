@@ -327,6 +327,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         block_data["has_unpublished_changes"] = False
         block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
         block_data["published_by"] = "Bob"
+        block_data["published_display_name"] = "Blank Problem"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
@@ -440,6 +441,7 @@ class ContentLibrariesTestCase(ContentLibrariesRestApiTest):
         block_data["has_unpublished_changes"] = False
         block_data["last_published"] = publish_date.isoformat().replace('+00:00', 'Z')
         block_data["published_by"] = "Bob"
+        block_data["published_display_name"] = "Text"
         self.assertDictContainsEntries(self._get_library_block(block_id), block_data)
         assert self._get_library_blocks(lib_id)['results'] == [block_data]
 
