@@ -3399,7 +3399,7 @@ class ImageResponse(LoncapaResponse):
                         parsed_region = [parsed_region]
                     for region in parsed_region:
                         polygon = MultiPoint(region).convex_hull
-                        if (polygon.type == 'Polygon' and
+                        if (polygon.geom_type == 'Polygon' and
                                 polygon.contains(Point(ans_x, ans_y))):
                             correct_map.set(aid, 'correct')
                             break
