@@ -64,13 +64,6 @@ django-storages<1.14.4
 # for them.
 edx-enterprise==5.13.4
 
-# Date: 2024-05-09
-# This has to be constrained as well because newer versions of edx-i18n-tools need the
-# newer version of lxml but that requirement was not made expilict in the 1.6.0 version
-# of the package.  This can be un-pinned when we're upgrading lxml.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35274
-edx-i18n-tools<1.6.0
-
 # Date: 2024-07-26
 # To override the constraint of edx-lint
 # This can be removed once https://github.com/openedx/edx-platform/issues/34586 is resolved
