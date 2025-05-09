@@ -22,6 +22,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.client import MULTIPART_CONTENT
+from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import gettext as _
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -2738,6 +2739,23 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             assert student_json['email'] == student.email
             assert student_json['city'] == student.profile.city
             assert student_json['country'] == ''
+
+    @ddt.data(True, False)
+    def test_get_students_features_private_fields(self, show_private_fields):
+        """
+        Test that the get_students_features returns the expected private fields
+        """
+        with override_settings(FEATURES={'SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_REPORT': show_private_fields}):
+            url = reverse('get_students_features', kwargs={'course_id': str(self.course.id)})
+            response = self.client.post(url, {})
+            res_json = json.loads(response.content.decode('utf-8'))
+
+            assert 'students' in res_json
+            for student in res_json['students']:
+                if show_private_fields:
+                    assert 'year_of_birth' in student
+                else:
+                    assert 'year_of_birth' not in student
 
     @ddt.data(True, False)
     def test_get_students_features_cohorted(self, is_cohorted):
