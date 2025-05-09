@@ -1030,7 +1030,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.1.0
     # via -r requirements/edx/base.txt
-openedx-events==10.0.0
+openedx-events==10.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
