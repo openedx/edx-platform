@@ -110,6 +110,8 @@ class _BaseDownstreamViewTestMixin:
         self.learner = UserFactory(username="learner", password="password")
         self._set_library_block_olx(self.html_lib_id, "<html><b>Hello world!</b></html>")
         self._publish_library_block(self.html_lib_id)
+        self._publish_library_block(self.video_lib_id)
+        self._publish_library_block(self.html_lib_id)
 
     def _api(self, method, url, data, expect_response):
         """
@@ -546,6 +548,7 @@ class GetDownstreamSummaryViewTest(
             'upstream_context_key': self.library_id,
             'ready_to_sync_count': 0,
             'total_count': 3,
+            'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)
         response = self.call_api(str(self.course.id))
@@ -556,5 +559,6 @@ class GetDownstreamSummaryViewTest(
             'upstream_context_key': self.library_id,
             'ready_to_sync_count': 1,
             'total_count': 2,
+            'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)

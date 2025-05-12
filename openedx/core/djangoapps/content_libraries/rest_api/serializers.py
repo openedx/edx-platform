@@ -138,6 +138,7 @@ class PublishableItemSerializer(serializers.Serializer):
     """
     id = serializers.SerializerMethodField()
     display_name = serializers.CharField()
+    published_display_name = serializers.CharField(required=False)
     tags_count = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
     published_by = serializers.CharField(read_only=True)

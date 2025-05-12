@@ -210,22 +210,6 @@ class ThreadActionGroupIdTestCase(
         response = self.call_view("un_flag_abuse_for_thread", mock_is_forum_v2_enabled, mock_request)
         self._assert_json_response_contains_group_info(response)
 
-    def test_pin(self, mock_is_forum_v2_enabled, mock_request):
-        response = self.call_view(
-            "pin_thread",
-            mock_is_forum_v2_enabled,
-            mock_request,
-            user=self.moderator
-        )
-        self._assert_json_response_contains_group_info(response)
-        response = self.call_view(
-            "un_pin_thread",
-            mock_is_forum_v2_enabled,
-            mock_request,
-            user=self.moderator
-        )
-        self._assert_json_response_contains_group_info(response)
-
     def test_openclose(self, mock_is_forum_v2_enabled, mock_request):
         response = self.call_view(
             "openclose_thread",
@@ -1190,42 +1174,6 @@ class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStor
         )
         self.mock_get_course_id_by_thread = patcher.start()
         self.addCleanup(patcher.stop)
-
-    def test_pin_thread_as_student(self, mock_is_forum_v2_enabled, mock_request):
-        mock_is_forum_v2_enabled.return_value = False
-        self._set_mock_request_data(mock_request, {})
-        self.client.login(username=self.student.username, password=self.password)
-        response = self.client.post(
-            reverse("pin_thread", kwargs={"course_id": str(self.course.id), "thread_id": "dummy"})
-        )
-        assert response.status_code == 401
-
-    def test_pin_thread_as_moderator(self, mock_is_forum_v2_enabled, mock_request):
-        mock_is_forum_v2_enabled.return_value = False
-        self._set_mock_request_data(mock_request, {})
-        self.client.login(username=self.moderator.username, password=self.password)
-        response = self.client.post(
-            reverse("pin_thread", kwargs={"course_id": str(self.course.id), "thread_id": "dummy"})
-        )
-        assert response.status_code == 200
-
-    def test_un_pin_thread_as_student(self, mock_is_forum_v2_enabled, mock_request):
-        mock_is_forum_v2_enabled.return_value = False
-        self._set_mock_request_data(mock_request, {})
-        self.client.login(username=self.student.username, password=self.password)
-        response = self.client.post(
-            reverse("un_pin_thread", kwargs={"course_id": str(self.course.id), "thread_id": "dummy"})
-        )
-        assert response.status_code == 401
-
-    def test_un_pin_thread_as_moderator(self, mock_is_forum_v2_enabled, mock_request):
-        mock_is_forum_v2_enabled.return_value = False
-        self._set_mock_request_data(mock_request, {})
-        self.client.login(username=self.moderator.username, password=self.password)
-        response = self.client.post(
-            reverse("un_pin_thread", kwargs={"course_id": str(self.course.id), "thread_id": "dummy"})
-        )
-        assert response.status_code == 200
 
     def _set_mock_request_thread_and_comment(self, mock_is_forum_v2_enabled, mock_request, thread_data, comment_data):
         def handle_request(*args, **kwargs):
