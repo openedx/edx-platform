@@ -1,10 +1,10 @@
 """
-Tests for braze push notifications tasks.
+Tests for push notifications tasks.
 """
 from unittest import mock
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_braze_push_channel
+from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_push_channel
 from openedx.core.djangoapps.notifications.tests.utils import create_notification
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -36,7 +36,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
     def test_send_ace_msg_success(self, mock_ace_send):
         """ Test send_ace_msg_success """
-        send_ace_msg_to_braze_push_channel(
+        send_ace_msg_to_push_channel(
             [self.user_1.id, self.user_2.id],
             self.notification,
             sender_id=self.user_1.id
@@ -50,7 +50,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
     def test_send_ace_msg_no_sender(self, mock_ace_send):
         """ Test when sender is not valid """
-        send_ace_msg_to_braze_push_channel(
+        send_ace_msg_to_push_channel(
             [self.user_1.id, self.user_2.id],
             self.notification,
             sender_id=999
@@ -61,7 +61,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
     def test_send_ace_msg_empty_audience(self, mock_ace_send):
         """ Test send_ace_msg_success with empty audience """
-        send_ace_msg_to_braze_push_channel([], self.notification, sender_id=self.user_1.id)
+        send_ace_msg_to_push_channel([], self.notification, sender_id=self.user_1.id)
         mock_ace_send.assert_not_called()
 
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
@@ -69,5 +69,5 @@ class SendNotificationsTest(ModuleStoreTestCase):
         """ Test send_ace_msg_success with non-discussion app """
         self.notification.app_name = 'ecommerce'
         self.notification.save()
-        send_ace_msg_to_braze_push_channel([1], self.notification, sender_id=self.user_1.id)
+        send_ace_msg_to_push_channel([1], self.notification, sender_id=self.user_1.id)
         mock_ace_send.assert_not_called()

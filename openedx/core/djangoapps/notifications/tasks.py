@@ -37,7 +37,7 @@ from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_course_notification_preference_config_version
 )
-from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_braze_push_channel
+from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_push_channel
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
 
 logger = get_task_logger(__name__)
@@ -232,7 +232,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             generated_notification_audience, app_name, notification_type, course_key, content_url,
             generated_notification.content, sender_id=sender_id
         )
-        send_ace_msg_to_braze_push_channel(push_notification_audience, generated_notification, sender_id)
+        send_ace_msg_to_push_channel(push_notification_audience, generated_notification, sender_id)
 
 def is_notification_valid(notification_type, context):
     """
