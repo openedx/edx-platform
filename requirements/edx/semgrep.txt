@@ -19,7 +19,7 @@ bracex==2.5.post1
     # via wcmatch
 certifi==2025.4.26
     # via requests
-charset-normalizer==3.4.1
+charset-normalizer==3.4.2
     # via requests
 click==8.1.8
     # via
@@ -49,7 +49,7 @@ importlib-metadata==7.1.0
     # via opentelemetry-api
 jsonschema==4.23.0
     # via semgrep
-jsonschema-specifications==2024.10.1
+jsonschema-specifications==2025.4.1
     # via jsonschema
 markdown-it-py==3.0.0
     # via rich
