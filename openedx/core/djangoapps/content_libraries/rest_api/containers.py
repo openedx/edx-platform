@@ -77,7 +77,7 @@ class LibraryContainerView(GenericAPIView):
         Get information about a container
         """
         api.require_permission_for_library_key(
-            container_key.library_key,
+            container_key.lib_key,
             request.user,
             permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
         )
@@ -94,7 +94,7 @@ class LibraryContainerView(GenericAPIView):
         Update a Container.
         """
         api.require_permission_for_library_key(
-            container_key.library_key,
+            container_key.lib_key,
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
@@ -115,7 +115,7 @@ class LibraryContainerView(GenericAPIView):
         Delete a Container (soft delete).
         """
         api.require_permission_for_library_key(
-            container_key.library_key,
+            container_key.lib_key,
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
@@ -178,13 +178,13 @@ class LibraryContainerChildrenView(GenericAPIView):
             }
         ]
         """
-        published = request.GET.get('published', False)
+        published = request.GET.get('published', 'false').lower() == 'true'
         api.require_permission_for_library_key(
-            container_key.library_key,
+            container_key.lib_key,
             request.user,
             permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
         )
-        child_entities = api.get_container_children(container_key, published)
+        child_entities = api.get_container_children(container_key, published=published)
         if container_key.container_type == api.ContainerType.Unit.value:
             data = serializers.LibraryXBlockMetadataSerializer(child_entities, many=True).data
         else:
@@ -201,7 +201,7 @@ class LibraryContainerChildrenView(GenericAPIView):
         Helper function to update children in container.
         """
         api.require_permission_for_library_key(
-            container_key.library_key,
+            container_key.lib_key,
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
@@ -288,7 +288,7 @@ class LibraryContainerRestore(GenericAPIView):
         Restores a soft-deleted library container
         """
         api.require_permission_for_library_key(
-            container_key.library_key,
+            container_key.lib_key,
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
@@ -310,18 +310,17 @@ class LibraryContainerCollectionsView(GenericAPIView):
         Collection and Components must all be part of the given library/learning package.
         """
         content_library = api.require_permission_for_library_key(
-            container_key.library_key,
+            container_key.lib_key,
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY
         )
-        container = api.get_container_from_key(container_key)
         serializer = serializers.ContentLibraryItemCollectionsUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         collection_keys = serializer.validated_data['collection_keys']
         api.set_library_item_collections(
-            library_key=container_key.library_key,
-            publishable_entity=container.publishable_entity,
+            library_key=container_key.lib_key,
+            entity_key=container_key.container_id,
             collection_keys=collection_keys,
             created_by=request.user.id,
             content_library=content_library,
@@ -342,7 +341,7 @@ class LibraryContainerPublishView(GenericAPIView):
         Publish the container and its children
         """
         api.require_permission_for_library_key(
-            container_key.library_key,
+            container_key.lib_key,
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )

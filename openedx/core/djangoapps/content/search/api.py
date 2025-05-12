@@ -653,29 +653,6 @@ def _delete_index_doc(doc_id) -> None:
     _wait_for_meili_tasks(tasks)
 
 
-def delete_all_draft_docs_for_library(library_key: LibraryLocatorV2) -> None:
-    """
-    Deletes draft documents for the given XBlocks from the search index
-    """
-    current_rebuild_index_name = _get_running_rebuild_index_name()
-    client = _get_meilisearch_client()
-    # Delete all documents where last_published is null i.e. never published before.
-    delete_filter = [
-        f'{Fields.context_key}="{library_key}"',
-        # This field should only be NULL or have a value, but we're also checking IS EMPTY just in case.
-        # Inner arrays are connected by an OR
-        [f'{Fields.last_published} IS EMPTY', f'{Fields.last_published} IS NULL'],
-    ]
-
-    tasks = []
-    if current_rebuild_index_name:
-        # If there is a rebuild in progress, the documents will also be deleted from the new index.
-        tasks.append(client.index(current_rebuild_index_name).delete_documents(filter=delete_filter))
-    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(filter=delete_filter))
-
-    _wait_for_meili_tasks(tasks)
-
-
 def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
     """
     Creates or updates the document for the given Library Block in the search index
@@ -760,7 +737,7 @@ def update_library_components_collections(
 
     Because there may be a lot of components, we send these updates to Meilisearch in batches.
     """
-    library_key = collection_key.library_key
+    library_key = collection_key.lib_key
     library = lib_api.get_library(library_key)
     components = authoring_api.get_collection_components(
         library.learning_package_id,
@@ -795,7 +772,7 @@ def update_library_containers_collections(
 
     Because there may be a lot of containers, we send these updates to Meilisearch in batches.
     """
-    library_key = collection_key.library_key
+    library_key = collection_key.lib_key
     library = lib_api.get_library(library_key)
     containers = authoring_api.get_collection_containers(
         library.learning_package_id,

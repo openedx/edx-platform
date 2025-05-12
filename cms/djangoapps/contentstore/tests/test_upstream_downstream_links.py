@@ -9,7 +9,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -17,7 +17,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
-from ..models import LearningContextLinksStatus, LearningContextLinksStatusChoices, PublishableEntityLink
+from ..models import ContainerLink, LearningContextLinksStatus, LearningContextLinksStatusChoices, ComponentLink
 
 
 class BaseUpstreamLinksHelpers(TestCase):
@@ -44,6 +44,39 @@ class BaseUpstreamLinksHelpers(TestCase):
             upstream_version=num,
         )
 
+    def _create_unit(self, num: int):
+        """
+        Create xblock with random upstream key and version number.
+        """
+        random_upstream = LibraryContainerLocator.from_string(
+            f"lct:OpenedX:CSPROB2:unit:{uuid4()}"
+        )
+        return random_upstream, BlockFactory.create(
+            parent=self.sequence,  # pylint: disable=attribute-defined-outside-init
+            category='vertical',
+            display_name=f"An unit Block - {num}",
+            upstream=str(random_upstream),
+            upstream_version=num,
+        )
+
+    def _create_unit_and_expected_container_link(self, course_key: str | CourseKey, num_blocks: int = 3):
+        """
+        Create unit xblock with random upstream key and version number.
+        """
+        data = []
+        for i in range(num_blocks):
+            upstream, block = self._create_unit(i + 1)
+            data.append({
+                "upstream_container": None,
+                "downstream_context_key": course_key,
+                "downstream_usage_key": block.usage_key,
+                "upstream_container_key": upstream,
+                "upstream_context_key": str(upstream.context_key),
+                "version_synced": i + 1,
+                "version_declined": None,
+            })
+        return data
+
     def _create_block_and_expected_links_data(self, course_key: str | CourseKey, num_blocks: int = 3):
         """
         Creates xblocks and its expected links data for given course_key
@@ -62,11 +95,11 @@ class BaseUpstreamLinksHelpers(TestCase):
             })
         return data
 
-    def _compare_links(self, course_key, expected):
+    def _compare_links(self, course_key, expected_component_links, expected_container_links):
         """
         Compares links for given course with passed expected list of dicts.
         """
-        links = list(PublishableEntityLink.objects.filter(downstream_context_key=course_key).values(
+        links = list(ComponentLink.objects.filter(downstream_context_key=course_key).values(
             'upstream_block',
             'upstream_usage_key',
             'upstream_context_key',
@@ -75,7 +108,17 @@ class BaseUpstreamLinksHelpers(TestCase):
             'version_synced',
             'version_declined',
         ))
-        self.assertListEqual(links, expected)
+        self.assertListEqual(links, expected_component_links)
+        container_links = list(ContainerLink.objects.filter(downstream_context_key=course_key).values(
+            'upstream_container',
+            'upstream_container_key',
+            'upstream_context_key',
+            'downstream_usage_key',
+            'downstream_context_key',
+            'version_synced',
+            'version_declined',
+        ))
+        self.assertListEqual(container_links, expected_container_links)
 
 
 @skip_unless_cms
@@ -95,16 +138,19 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         with self.store.bulk_operations(course_key_1):
             self._set_course_data(course_1)
             self.expected_links_1 = self._create_block_and_expected_links_data(course_key_1)
+            self.expected_container_links_1 = self._create_unit_and_expected_container_link(course_key_1)
         self.course_2 = course_2 = CourseFactory.create(emit_signals=True)
         self.course_key_2 = course_key_2 = self.course_2.id
         with self.store.bulk_operations(course_key_2):
             self._set_course_data(course_2)
             self.expected_links_2 = self._create_block_and_expected_links_data(course_key_2)
+            self.expected_container_links_2 = self._create_unit_and_expected_container_link(course_key_2)
         self.course_3 = course_3 = CourseFactory.create(emit_signals=True)
         self.course_key_3 = course_key_3 = self.course_3.id
         with self.store.bulk_operations(course_key_3):
             self._set_course_data(course_3)
             self.expected_links_3 = self._create_block_and_expected_links_data(course_key_3)
+            self.expected_container_links_3 = self._create_unit_and_expected_container_link(course_key_3)
 
     def call_command(self, *args, **kwargs):
         """
@@ -132,14 +178,14 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         """
         # Pre-checks
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_1)).exists()
-        assert not PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_1).exists()
+        assert not ComponentLink.objects.filter(downstream_context_key=self.course_key_1).exists()
         # Run command
         self.call_command('--course', str(self.course_key_1))
         # Post verfication
         assert LearningContextLinksStatus.objects.filter(
             context_key=str(self.course_key_1)
         ).first().status == LearningContextLinksStatusChoices.COMPLETED
-        self._compare_links(self.course_key_1, self.expected_links_1)
+        self._compare_links(self.course_key_1, self.expected_links_1, self.expected_container_links_1)
 
     def test_call_for_multiple_course(self):
         """
@@ -147,9 +193,9 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         """
         # Pre-checks
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_2)).exists()
-        assert not PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_2).exists()
+        assert not ComponentLink.objects.filter(downstream_context_key=self.course_key_2).exists()
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_3)).exists()
-        assert not PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_3).exists()
+        assert not ComponentLink.objects.filter(downstream_context_key=self.course_key_3).exists()
 
         # Run command
         self.call_command('--course', str(self.course_key_2), '--course', str(self.course_key_3))
@@ -161,8 +207,8 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         assert LearningContextLinksStatus.objects.filter(
             context_key=str(self.course_key_3)
         ).first().status == LearningContextLinksStatusChoices.COMPLETED
-        self._compare_links(self.course_key_2, self.expected_links_2)
-        self._compare_links(self.course_key_3, self.expected_links_3)
+        self._compare_links(self.course_key_2, self.expected_links_2, self.expected_container_links_2)
+        self._compare_links(self.course_key_3, self.expected_links_3, self.expected_container_links_3)
 
     def test_call_for_all_courses(self):
         """
@@ -170,7 +216,7 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         """
         # Delete all links and status just to make sure --all option works
         LearningContextLinksStatus.objects.all().delete()
-        PublishableEntityLink.objects.all().delete()
+        ComponentLink.objects.all().delete()
         # Pre-checks
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_1)).exists()
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_2)).exists()
@@ -189,9 +235,9 @@ class TestRecreateUpstreamLinks(ModuleStoreTestCase, OpenEdxEventsTestMixin, Bas
         assert LearningContextLinksStatus.objects.filter(
             context_key=str(self.course_key_3)
         ).first().status == LearningContextLinksStatusChoices.COMPLETED
-        self._compare_links(self.course_key_1, self.expected_links_1)
-        self._compare_links(self.course_key_2, self.expected_links_2)
-        self._compare_links(self.course_key_3, self.expected_links_3)
+        self._compare_links(self.course_key_1, self.expected_links_1, self.expected_container_links_1)
+        self._compare_links(self.course_key_2, self.expected_links_2, self.expected_container_links_2)
+        self._compare_links(self.course_key_3, self.expected_links_3, self.expected_container_links_3)
 
     def test_call_for_invalid_course(self):
         """
@@ -239,16 +285,19 @@ class TestUpstreamLinksEvents(ModuleStoreTestCase, OpenEdxEventsTestMixin, BaseU
         with self.store.bulk_operations(course_key_1):
             self._set_course_data(course_1)
             self.expected_links_1 = self._create_block_and_expected_links_data(course_key_1)
+            self.expected_container_links_1 = self._create_unit_and_expected_container_link(course_key_1)
         self.course_2 = course_2 = CourseFactory.create(emit_signals=True)
         self.course_key_2 = course_key_2 = self.course_2.id
         with self.store.bulk_operations(course_key_2):
             self._set_course_data(course_2)
             self.expected_links_2 = self._create_block_and_expected_links_data(course_key_2)
+            self.expected_container_links_2 = self._create_unit_and_expected_container_link(course_key_2)
         self.course_3 = course_3 = CourseFactory.create(emit_signals=True)
         self.course_key_3 = course_key_3 = self.course_3.id
         with self.store.bulk_operations(course_key_3):
             self._set_course_data(course_3)
             self.expected_links_3 = self._create_block_and_expected_links_data(course_key_3)
+            self.expected_container_links_3 = self._create_unit_and_expected_container_link(course_key_3)
 
     def test_create_or_update_events(self):
         """
@@ -257,18 +306,23 @@ class TestUpstreamLinksEvents(ModuleStoreTestCase, OpenEdxEventsTestMixin, BaseU
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_1)).exists()
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_2)).exists()
         assert not LearningContextLinksStatus.objects.filter(context_key=str(self.course_key_3)).exists()
-        assert PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_1).count() == 3
-        assert PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_2).count() == 3
-        assert PublishableEntityLink.objects.filter(downstream_context_key=self.course_key_3).count() == 3
-        self._compare_links(self.course_key_1, self.expected_links_1)
-        self._compare_links(self.course_key_2, self.expected_links_2)
-        self._compare_links(self.course_key_3, self.expected_links_3)
+        assert ComponentLink.objects.filter(downstream_context_key=self.course_key_1).count() == 3
+        assert ComponentLink.objects.filter(downstream_context_key=self.course_key_2).count() == 3
+        assert ComponentLink.objects.filter(downstream_context_key=self.course_key_3).count() == 3
+        self._compare_links(self.course_key_1, self.expected_links_1, self.expected_container_links_1)
+        self._compare_links(self.course_key_2, self.expected_links_2, self.expected_container_links_2)
+        self._compare_links(self.course_key_3, self.expected_links_3, self.expected_container_links_3)
 
     def test_delete_handler(self):
         """
         Test whether links are deleted on deletion of xblock.
         """
         usage_key = self.expected_links_1[0]["downstream_usage_key"]
-        assert PublishableEntityLink.objects.filter(downstream_usage_key=usage_key).exists()
+        assert ComponentLink.objects.filter(downstream_usage_key=usage_key).exists()
         self.store.delete_item(usage_key, self.user.id)
-        assert not PublishableEntityLink.objects.filter(downstream_usage_key=usage_key).exists()
+        assert not ComponentLink.objects.filter(downstream_usage_key=usage_key).exists()
+
+        usage_key = self.expected_container_links_1[0]["downstream_usage_key"]
+        assert ContainerLink.objects.filter(downstream_usage_key=usage_key).exists()
+        self.store.delete_item(usage_key, self.user.id)
+        assert not ContainerLink.objects.filter(downstream_usage_key=usage_key).exists()
