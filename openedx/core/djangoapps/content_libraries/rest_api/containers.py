@@ -178,7 +178,7 @@ class LibraryContainerChildrenView(GenericAPIView):
             }
         ]
         """
-        published = request.GET.get('published', False)
+        published = request.GET.get('published', 'false').lower() == 'true'
         api.require_permission_for_library_key(
             container_key.lib_key,
             request.user,
