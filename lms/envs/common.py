@@ -1080,7 +1080,7 @@ FEATURES = {
     # .. toggle_name: FEATURES['SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_REPORT']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
-    # .. toggle_description: Adds private fields to the profile information CSV export.
+    # .. toggle_description: Adds private fields to the profile information report.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2025-05-12
     # .. toggle_target_removal_date: None
