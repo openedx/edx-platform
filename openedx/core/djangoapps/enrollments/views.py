@@ -934,6 +934,8 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
         GET /api/enrollment/v1/enrollments?course_id={course_id}
 
+        GET /api/enrollment/v1/enrollments?course_ids={course_id},{course_id},{course_id}
+
         GET /api/enrollment/v1/enrollments?username={username},{username},{username}
 
         GET /api/enrollment/v1/enrollments?course_id={course_id}&username={username}
@@ -1011,13 +1013,16 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         if not form.is_valid():
             raise ValidationError(form.errors)
 
-        queryset = CourseEnrollment.objects.all()
+        queryset = CourseEnrollment.objects.all().select_related("user", "course")
         course_id = form.cleaned_data.get("course_id")
+        course_ids = form.cleaned_data.get("course_ids")
         usernames = form.cleaned_data.get("username")
         emails = form.cleaned_data.get("email")
 
         if course_id:
             queryset = queryset.filter(course__id=course_id)
+        if course_ids:
+            queryset = queryset.filter(course__id__in=course_ids)
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
         if emails:
