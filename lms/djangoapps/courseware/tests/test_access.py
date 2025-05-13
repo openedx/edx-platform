@@ -254,13 +254,11 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             html_block = BlockFactory.create(
                 category="html",
                 parent_location=unit.location,
-                display_name = "Unpublished Block",
-                data = '<p>This block should not be published.</p>',
-                publish_item = False,
+                display_name="Unpublished Block",
+                data='<p>This block should not be published.</p>',
+                publish_item=False,
             )
-            print(self.store.get_branch_setting())
 
-        print(self.store.get_branch_setting())
         # Enroll student to the course
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
@@ -274,10 +272,15 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         ]
         # Student should have access to modules they're enrolled in
         for obj in modules:
-            assert bool(access.has_access(self.student, 'load', self.store.get_item(obj.location), course_key=self.course.id))
+            assert bool(access.has_access(
+                self.student,
+                'load',
+                self.store.get_item(obj.location),
+                course_key=self.course.id)
+            )
 
-        # If the document is not published yet, it should return an error when we try to fetch it from
-        # the store.  This check confirms that the student would not be able to access it.
+        # If the document is not published yet, it should return an error when we try to fetch
+        # it from the store.  This check confirms that the student would not be able to access it.
         with pytest.raises(ItemNotFoundError):
             self.store.get_item(html_block.location)
 

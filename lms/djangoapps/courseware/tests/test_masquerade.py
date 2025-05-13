@@ -249,7 +249,7 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
 # being tested by this page.
 #
 # This is a temporary change, until we can remove the old courseware pages
-# all together. 
+# all together.
 @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
