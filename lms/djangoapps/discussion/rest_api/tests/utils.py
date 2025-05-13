@@ -675,14 +675,14 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         }
         self.set_mock_side_effect('get_user', make_user_callbacks(self.users_map))
 
-    def register_get_user_retire_response(self, user, body=""):
+    def register_get_user_retire_response(self, user, status=200, body=""):
         self.set_mock_return_value('retire_user', body)
 
     def register_get_username_replacement_response(self, user, status=200, body=""):
         self.set_mock_return_value('update_username', body)
 
     def register_subscribed_threads_response(self, user, threads, page, num_pages):
-        self.set_mock_return_value('get_user_subscriptions', {
+        self.set_mock_return_value('get_user_threads', {
             "collection": threads,
             "page": page,
             "num_pages": num_pages,

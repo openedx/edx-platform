@@ -60,46 +60,19 @@ class TestSendResponseNotifications(DiscussionAPIViewTestMixin, ModuleStoreTestC
 
         self.course = CourseFactory.create()
 
-        # Patch 1
-        patcher1 = mock.patch(
-            'openedx.core.djangoapps.django_comment_common.comment_client.thread.is_forum_v2_enabled_for_thread',
-            autospec=True
-        )
-        mock_forum_v2 = patcher1.start()
-        mock_forum_v2.return_value = (True, str(self.course.id))
-        self.addCleanup(patcher1.stop)
-
-        # Patch 2
-        patcher2 = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher2.start()
-        self.addCleanup(patcher2.stop)
-
-        # Patch 3
-        patcher3 = mock.patch(
+        patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread",
             return_value=self.course.id
         )
-        self.mock_get_course_id_by_thread = patcher3.start()
-        self.addCleanup(patcher3.stop)
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
 
-        # Patch 4
-        patcher4 = mock.patch(
+        patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment",
             return_value=self.course.id
         )
-        self.mock_get_course_id_by_comment = patcher4.start()
-        self.addCleanup(patcher4.stop)
-
-        # Patch 5
-        patcher5 = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.is_forum_v2_enabled_for_comment",
-            return_value=(True, str(self.course.id))
-        )
-        self.mock_is_forum_v2_enabled_for_comment = patcher5.start()
-        self.addCleanup(patcher5.stop)
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
 
         self.user_1 = UserFactory.create()
         CourseEnrollment.enroll(self.user_1, self.course.id)
@@ -410,20 +383,6 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
         super().setUp()
         httpretty.reset()
         httpretty.enable()
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-
-        patcher = mock.patch(
-            'openedx.core.djangoapps.django_comment_common.comment_client.thread.is_forum_v2_enabled_for_thread',
-            autospec=True
-        )
-        mock_forum_v2 = patcher.start()
-        mock_forum_v2.return_value = (True, str(self.course.id))
-        self.addCleanup(patcher.stop)
 
         self.course = CourseFactory.create()
         patcher = mock.patch(
@@ -437,13 +396,6 @@ class TestSendCommentNotification(DiscussionAPIViewTestMixin, ModuleStoreTestCas
             return_value=self.course.id
         )
         self.mock_get_course_id_by_comment = patcher.start()
-        self.addCleanup(patcher.stop)
-
-        patcher = mock.patch(
-            "openedx.core.djangoapps.django_comment_common.comment_client.models.is_forum_v2_enabled_for_comment",
-            return_value=(True, str(self.course.id))
-        )
-        self.mock_is_forum_v2_enabled_for_comment = patcher.start()
         self.addCleanup(patcher.stop)
 
         self.user_1 = UserFactory.create()
