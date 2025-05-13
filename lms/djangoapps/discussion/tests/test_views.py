@@ -92,12 +92,6 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):  # lint-amnest
         config.enabled = True
         config.save()
         patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-        patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
         )
         self.mock_get_course_id_by_thread = patcher.start()
@@ -336,12 +330,6 @@ class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, Mo
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super().setUp()
-        patcher = mock.patch(
-            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
-            return_value=False
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
         patcher = mock.patch(
             "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
         )
