@@ -455,9 +455,6 @@
             // it will report the height of its contents to the parent window when the
             // document loads, window resizes, or DOM mutates.
             if (window !== window.parent) {
-                var lastHeight = window.parent[0].offsetHeight;
-                var lastWidth = window.parent[0].offsetWidth;
-
                 function dispatchResizeMessage(event) {
                     // Note: event is actually an Array of MutationRecord objects when fired from the MutationObserver
                     var newHeight = rootNode.scrollHeight;
@@ -472,10 +469,6 @@
                             }
                         }, document.referrer
                     );
-
-                    lastHeight = newHeight;
-                    lastWidth = newWidth;
-
                     // Within the authoring microfrontend the iframe resizes to match the
                     // height of this document and it should never scroll. It does scroll
                     // ocassionally when javascript is used to focus elements on the page

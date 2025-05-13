@@ -7,7 +7,6 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.courses import get_course_blocks_completion_summary
 
-
 User = get_user_model()
 
 
@@ -28,9 +27,12 @@ def calculate_progress_for_learner_in_course(course_key: CourseKey, user: User) 
     # refactored in the future so that the calculation is handled solely on the backend, eliminating the need for it to
     # be done in the frontend.
     num_total_units = complete_count + incomplete_count + locked_count
-    complete_percentage = round(complete_count / num_total_units, 2)
-    locked_percentage = round(locked_count / num_total_units, 2)
-    incomplete_percentage = 1.00 - complete_percentage - locked_percentage
+    if num_total_units == 0:
+        complete_percentage = locked_percentage = incomplete_percentage = 0.0
+    else:
+        complete_percentage = round(complete_count / num_total_units, 2)
+        locked_percentage = round(locked_count / num_total_units, 2)
+        incomplete_percentage = 1.00 - complete_percentage - locked_percentage
 
     return {
         "complete_count": complete_count,

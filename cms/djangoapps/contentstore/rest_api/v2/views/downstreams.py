@@ -205,12 +205,14 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
                 "upstream_context_key": "lib:OpenedX:CSPROB3",
                 "ready_to_sync_count": 11,
                 "total_count": 14
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
             },
             {
                 "upstream_context_title": "CS problems 2",
                 "upstream_context_key": "lib:OpenedX:CSPROB2",
                 "ready_to_sync_count": 15,
-                "total_count": 24
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
             },
         ]
         """
@@ -267,7 +269,7 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
                     fetch_customizable_fields_from_block(downstream=downstream, user=request.user)
                 else:
                     assert isinstance(link.upstream_key, LibraryContainerLocator)
-                    fetch_customizable_fields_from_container(downstream=downstream, user=request.user)
+                    fetch_customizable_fields_from_container(downstream=downstream)
         except BadDownstream as exc:
             logger.exception(
                 "'%s' is an invalid downstream; refusing to set its upstream to '%s'",

@@ -49,27 +49,27 @@ possible states required by all members of the Open edX community.
 This example state diagram outlines the pathways users follow throughout the
 workflow:
 
-.. digraph:: retirement_states_example
-   :align: center
+.. graphviz::
+    digraph retirement_states_example {
+        ranksep = "0.3";
 
-      ranksep = "0.3";
+        node[fontname=Courier,fontsize=12,shape=box,group=main]
+        { rank = same INIT[style=invis] PENDING }
+        INIT -> PENDING;
+        "..."[shape=none]
+        PENDING -> RETIRING_ENROLLMENTS -> ENROLLMENTS_COMPLETE -> RETIRING_FORUMS -> FORUMS_COMPLETE -> "..." -> COMPLETE;
 
-      node[fontname=Courier,fontsize=12,shape=box,group=main]
-      { rank = same INIT[style=invis] PENDING }
-      INIT -> PENDING;
-      "..."[shape=none]
-      PENDING -> RETIRING_ENROLLMENTS -> ENROLLMENTS_COMPLETE -> RETIRING_FORUMS -> FORUMS_COMPLETE -> "..." -> COMPLETE;
+        node[group=""];
+        RETIRING_ENROLLMENTS -> ERRORED;
+        RETIRING_FORUMS -> ERRORED;
+        PENDING -> ABORTED;
 
-      node[group=""];
-      RETIRING_ENROLLMENTS -> ERRORED;
-      RETIRING_FORUMS -> ERRORED;
-      PENDING -> ABORTED;
-
-      subgraph cluster_terminal_states {
-          label = "Terminal States";
-          labelloc = b  // put label at bottom
-          {rank = same ERRORED COMPLETE ABORTED}
-      }
+        subgraph cluster_terminal_states {
+            label = "Terminal States";
+            labelloc = b  // put label at bottom
+            {rank = same ERRORED COMPLETE ABORTED}
+        }
+    }
 
 Unless an error occurs internal to the user retirement tooling, a user's
 retirement state should always land in one of the terminal states.  At that

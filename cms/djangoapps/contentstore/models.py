@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.db.models import Count, F, Q, QuerySet
+from django.db.models import Count, F, Q, QuerySet, Max
 from django.db.models.fields import IntegerField, TextField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import GreaterThan
@@ -106,77 +106,6 @@ class EntityLinkBase(models.Model):
     class Meta:
         abstract = True
 
-    @property
-    def upstream_version_num(self) -> int | None:
-        """
-        Returns upstream block version number if available.
-        """
-        published_version = get_published_version(self.upstream_block.publishable_entity.id)
-        return published_version.version_num if published_version else None
-
-    @property
-    def upstream_context_title(self) -> str:
-        """
-        Returns upstream context title.
-        """
-        return self.upstream_block.publishable_entity.learning_package.title
-
-    @classmethod
-    def filter_links(
-        cls,
-        **link_filter,
-    ) -> QuerySet["EntityLinkBase"]:
-        """
-        Get all links along with sync flag, upstream context title and version, with optional filtering.
-        """
-        ready_to_sync = link_filter.pop('ready_to_sync', None)
-        result = cls.objects.filter(**link_filter).select_related(
-            "upstream_block__publishable_entity__published__version",
-            "upstream_block__publishable_entity__learning_package"
-        ).annotate(
-            ready_to_sync=(
-                GreaterThan(
-                    Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
-                    Coalesce("version_synced", 0)
-                ) & GreaterThan(
-                    Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
-                    Coalesce("version_declined", 0)
-                )
-            )
-        )
-        if ready_to_sync is not None:
-            result = result.filter(ready_to_sync=ready_to_sync)
-        return result
-
-    @classmethod
-    def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
-        """
-        Returns a summary of links by upstream context for given downstream_context_key.
-        Example:
-        [
-            {
-                "upstream_context_title": "CS problems 3",
-                "upstream_context_key": "lib:OpenedX:CSPROB3",
-                "ready_to_sync_count": 11,
-                "total_count": 14
-            },
-            {
-                "upstream_context_title": "CS problems 2",
-                "upstream_context_key": "lib:OpenedX:CSPROB2",
-                "ready_to_sync_count": 15,
-                "total_count": 24
-            },
-        ]
-        """
-        result = cls.filter_links(downstream_context_key=downstream_context_key).values(
-            "upstream_context_key",
-            upstream_context_title=F("upstream_block__publishable_entity__learning_package__title"),
-        ).annotate(
-            ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
-            total_count=Count('id')
-        )
-        return result
-
 
 class ComponentLink(EntityLinkBase):
     """
@@ -205,6 +134,83 @@ class ComponentLink(EntityLinkBase):
     def __str__(self):
         return f"ComponentLink<{self.upstream_usage_key}->{self.downstream_usage_key}>"
 
+    @property
+    def upstream_version_num(self) -> int | None:
+        """
+        Returns upstream block version number if available.
+        """
+        published_version = get_published_version(self.upstream_block.publishable_entity.id)
+        return published_version.version_num if published_version else None
+
+    @property
+    def upstream_context_title(self) -> str:
+        """
+        Returns upstream context title.
+        """
+        return self.upstream_block.publishable_entity.learning_package.title
+
+    @classmethod
+    def filter_links(
+        cls,
+        **link_filter,
+    ) -> QuerySet["EntityLinkBase"]:
+        """
+        Get all links along with sync flag, upstream context title and version, with optional filtering.
+        """
+        ready_to_sync = link_filter.pop('ready_to_sync', None)
+        result = cls.objects.filter(**link_filter).select_related(
+            "upstream_block__publishable_entity__published__version",
+            "upstream_block__publishable_entity__learning_package",
+            "upstream_block__publishable_entity__published__publish_log_record__publish_log",
+        ).annotate(
+            ready_to_sync=(
+                GreaterThan(
+                    Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
+                    Coalesce("version_synced", 0)
+                ) & GreaterThan(
+                    Coalesce("upstream_block__publishable_entity__published__version__version_num", 0),
+                    Coalesce("version_declined", 0)
+                )
+            )
+        )
+        if ready_to_sync is not None:
+            result = result.filter(ready_to_sync=ready_to_sync)
+        return result
+
+    @classmethod
+    def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
+        """
+        Returns a summary of links by upstream context for given downstream_context_key.
+        Example:
+        [
+            {
+                "upstream_context_title": "CS problems 3",
+                "upstream_context_key": "lib:OpenedX:CSPROB3",
+                "ready_to_sync_count": 11,
+                "total_count": 14,
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
+            },
+            {
+                "upstream_context_title": "CS problems 2",
+                "upstream_context_key": "lib:OpenedX:CSPROB2",
+                "ready_to_sync_count": 15,
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
+            },
+        ]
+        """
+        result = cls.filter_links(downstream_context_key=downstream_context_key).values(
+            "upstream_context_key",
+            upstream_context_title=F("upstream_block__publishable_entity__learning_package__title"),
+        ).annotate(
+            ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
+            total_count=Count("id"),
+            last_published_at=Max(
+                "upstream_block__publishable_entity__published__publish_log_record__publish_log__published_at"
+            )
+        )
+        return result
+
     @classmethod
     def update_or_create(
         cls,
@@ -232,25 +238,15 @@ class ComponentLink(EntityLinkBase):
             'version_declined': version_declined,
         }
         if upstream_block:
-            new_values.update(
-                {
-                    'upstream_block': upstream_block,
-                }
-            )
+            new_values['upstream_block'] = upstream_block
         try:
             link = cls.objects.get(downstream_usage_key=downstream_usage_key)
-            # TODO: until we save modified datetime for course xblocks in index, the modified time for links are updated
-            # everytime a downstream/course block is updated. This allows us to order links[1] based on recently
-            # modified downstream version.
-            # pylint: disable=line-too-long
-            # 1. https://github.com/open-craft/frontend-app-course-authoring/blob/0443d88824095f6f65a3a64b77244af590d4edff/src/course-libraries/ReviewTabContent.tsx#L222-L233
-            has_changes = True  # change to false once above condition is met.
-            for key, value in new_values.items():
-                prev = getattr(link, key)
-                # None != None is True, so we need to check for it specially
-                if prev != value and ~(prev is None and value is None):
+            has_changes = False
+            for key, new_value in new_values.items():
+                prev_value = getattr(link, key)
+                if prev_value != new_value:
                     has_changes = True
-                    setattr(link, key, value)
+                    setattr(link, key, new_value)
             if has_changes:
                 link.updated = created
                 link.save()
@@ -290,10 +286,87 @@ class ContainerLink(EntityLinkBase):
     def __str__(self):
         return f"ContainerLink<{self.upstream_container_key}->{self.downstream_usage_key}>"
 
+    @property
+    def upstream_version_num(self) -> int | None:
+        """
+        Returns upstream container version number if available.
+        """
+        published_version = get_published_version(self.upstream_container.publishable_entity.id)
+        return published_version.version_num if published_version else None
+
+    @property
+    def upstream_context_title(self) -> str:
+        """
+        Returns upstream context title.
+        """
+        return self.upstream_container.publishable_entity.learning_package.title
+
+    @classmethod
+    def filter_links(
+        cls,
+        **link_filter,
+    ) -> QuerySet["EntityLinkBase"]:
+        """
+        Get all links along with sync flag, upstream context title and version, with optional filtering.
+        """
+        ready_to_sync = link_filter.pop('ready_to_sync', None)
+        result = cls.objects.filter(**link_filter).select_related(
+            "upstream_container__publishable_entity__published__version",
+            "upstream_container__publishable_entity__learning_package"
+            "upstream_container__publishable_entity__published__publish_log_record__publish_log",
+        ).annotate(
+            ready_to_sync=(
+                GreaterThan(
+                    Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
+                    Coalesce("version_synced", 0)
+                ) & GreaterThan(
+                    Coalesce("upstream_container__publishable_entity__published__version__version_num", 0),
+                    Coalesce("version_declined", 0)
+                )
+            )
+        )
+        if ready_to_sync is not None:
+            result = result.filter(ready_to_sync=ready_to_sync)
+        return result
+
+    @classmethod
+    def summarize_by_downstream_context(cls, downstream_context_key: CourseKey) -> QuerySet:
+        """
+        Returns a summary of links by upstream context for given downstream_context_key.
+        Example:
+        [
+            {
+                "upstream_context_title": "CS problems 3",
+                "upstream_context_key": "lib:OpenedX:CSPROB3",
+                "ready_to_sync_count": 11,
+                "total_count": 14,
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
+            },
+            {
+                "upstream_context_title": "CS problems 2",
+                "upstream_context_key": "lib:OpenedX:CSPROB2",
+                "ready_to_sync_count": 15,
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
+            },
+        ]
+        """
+        result = cls.filter_links(downstream_context_key=downstream_context_key).values(
+            "upstream_context_key",
+            upstream_context_title=F("upstream_container__publishable_entity__learning_package__title"),
+        ).annotate(
+            ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
+            total_count=Count('id'),
+            last_published_at=Max(
+                "upstream_container__publishable_entity__published__publish_log_record__publish_log__published_at"
+            )
+        )
+        return result
+
     @classmethod
     def update_or_create(
         cls,
-        upstream_container: Container | None,
+        upstream_container_id: int | None,
         /,
         upstream_container_key: LibraryContainerLocator,
         upstream_context_key: str,
@@ -316,26 +389,16 @@ class ContainerLink(EntityLinkBase):
             'version_synced': version_synced,
             'version_declined': version_declined,
         }
-        if upstream_container:
-            new_values.update(
-                {
-                    'upstream_container': upstream_container,
-                }
-            )
+        if upstream_container_id:
+            new_values['upstream_container_id'] = upstream_container_id
         try:
             link = cls.objects.get(downstream_usage_key=downstream_usage_key)
-            # TODO: until we save modified datetime for course xblocks in index, the modified time for links are updated
-            # everytime a downstream/course block is updated. This allows us to order links[1] based on recently
-            # modified downstream version.
-            # pylint: disable=line-too-long
-            # 1. https://github.com/open-craft/frontend-app-course-authoring/blob/0443d88824095f6f65a3a64b77244af590d4edff/src/course-libraries/ReviewTabContent.tsx#L222-L233
-            has_changes = True  # change to false once above condition is met.
-            for key, value in new_values.items():
-                prev = getattr(link, key)
-                # None != None is True, so we need to check for it specially
-                if prev != value and ~(prev is None and value is None):
+            has_changes = False
+            for key, new_value in new_values.items():
+                prev_value = getattr(link, key)
+                if prev_value != new_value:
                     has_changes = True
-                    setattr(link, key, value)
+                    setattr(link, key, new_value)
             if has_changes:
                 link.updated = created
                 link.save()

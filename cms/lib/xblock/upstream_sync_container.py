@@ -45,7 +45,7 @@ def sync_from_upstream_container(
         user,
         permission=lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
     )
-    upstream_meta = lib_api.get_container(link.upstream_key, user)
+    upstream_meta = lib_api.get_container(link.upstream_key)
     upstream_children = lib_api.get_container_children(link.upstream_key, published=True)
     _update_customizable_fields(upstream=upstream_meta, downstream=downstream, only_fetch=False)
     _update_non_customizable_fields(upstream=upstream_meta, downstream=downstream)
@@ -54,7 +54,7 @@ def sync_from_upstream_container(
     return upstream_children
 
 
-def fetch_customizable_fields_from_container(*, downstream: XBlock, user: User) -> None:
+def fetch_customizable_fields_from_container(*, downstream: XBlock) -> None:
     """
     Fetch upstream-defined value of customizable fields and save them on the downstream.
 
@@ -62,7 +62,7 @@ def fetch_customizable_fields_from_container(*, downstream: XBlock, user: User) 
 
     Basically, this sets the value of "upstream_display_name" on the downstream block.
     """
-    upstream = lib_api.get_container(LibraryContainerLocator.from_string(downstream.upstream), user)
+    upstream = lib_api.get_container(LibraryContainerLocator.from_string(downstream.upstream))
     _update_customizable_fields(upstream=upstream, downstream=downstream, only_fetch=True)
 
 

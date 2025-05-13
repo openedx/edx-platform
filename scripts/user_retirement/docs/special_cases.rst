@@ -20,8 +20,6 @@ retirement errored during forums retirement, so we manually reset their state
 from ``ERRORED`` to ``ENROLLMENTS_COMPLETE``.
 
 .. graphviz::
-   :align: center
-
     digraph G {
       //rankdir=LR;  // Rank Direction Left to Right
       ranksep = "0.3";

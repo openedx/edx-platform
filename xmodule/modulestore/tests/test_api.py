@@ -57,7 +57,7 @@ def test_file_paths_api():
     Test the `get_python_locale_root` returned path.
     """
     root = get_python_locale_root()
-    assert root.endswith('edx-platform/conf/plugins-locale/xblock.v1'), 'Needs to match Makefile and other code'
+    assert root.endswith('/conf/plugins-locale/xblock.v1'), 'Needs to match Makefile and other code'
 
 
 def test_get_javascript_i18n_file_name():

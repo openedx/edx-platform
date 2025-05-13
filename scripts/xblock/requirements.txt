@@ -4,12 +4,10 @@
 #
 #    make upgrade
 #
-certifi==2025.1.31
+certifi==2025.4.26
     # via requests
-charset-normalizer==2.0.12
-    # via
-    #   -c scripts/xblock/../../requirements/constraints.txt
-    #   requests
+charset-normalizer==3.4.2
+    # via requests
 idna==3.10
     # via requests
 requests==2.32.3

@@ -73,6 +73,18 @@ function(
 
         // nav - dropdown related
         $body.click(function() {
+            // Reset iframe height to default when the XBlock action dropdown is closed
+            if ($('.nav-dd .nav-item .wrapper-nav-sub.is-shown').length && window.self !== window.top) {
+              try {
+                window.parent.postMessage({
+                  type: 'toggleCourseXBlockDropdown',
+                  message: 'Adjust the height of the dropdown menu',
+                  payload: { courseXBlockDropdownHeight: 0 }
+                }, document.referrer);
+              } catch (e) {
+                console.error('Failed to post message:', e);
+              }
+            }
             $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $('.nav-dd .nav-item .title').removeClass('is-selected');
             $('.custom-dropdown .dropdown-options').hide();

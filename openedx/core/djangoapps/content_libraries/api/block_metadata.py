@@ -26,8 +26,6 @@ class LibraryXBlockMetadata(PublishableItem):
     Class that represents the metadata about an XBlock in a content library.
     """
     usage_key: LibraryUsageLocatorV2
-    # TODO: move tags_count to LibraryItem as all objects under a library can be tagged.
-    tags_count: int = 0
 
     @classmethod
     def from_component(cls, library_key, component, associated_collections=None):
@@ -59,6 +57,7 @@ class LibraryXBlockMetadata(PublishableItem):
             modified=draft.created,
             draft_version_num=draft.version_num,
             published_version_num=published.version_num if published else None,
+            published_display_name=published.title if published else None,
             last_published=None if last_publish_log is None else last_publish_log.published_at,
             published_by=published_by,
             last_draft_created=last_draft_created,
