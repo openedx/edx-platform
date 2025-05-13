@@ -149,11 +149,3 @@ def _url_for_thread_comments(thread_id):
 
 def _url_for_comment(comment_id):
     return f"{settings.PREFIX}/comments/{comment_id}"
-
-
-def _url_for_flag_abuse_comment(comment_id):
-    return f"{settings.PREFIX}/comments/{comment_id}/abuse_flag"
-
-
-def _url_for_unflag_abuse_comment(comment_id):
-    return f"{settings.PREFIX}/comments/{comment_id}/abuse_unflag"
