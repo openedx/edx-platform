@@ -7,7 +7,6 @@ import hashlib
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.files.storage import storages
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.module_loading import import_string
 
