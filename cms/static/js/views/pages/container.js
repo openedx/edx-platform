@@ -1143,6 +1143,7 @@ function($, _, Backbone, gettext, BasePage,
         onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
             var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
                 useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
+                useVideoGalleryFlow = this.$('.xblock-header-primary').attr("use-video-gallery-flow"),
                 useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
             // find the block type in the locator if availible
@@ -1165,6 +1166,14 @@ function($, _, Backbone, gettext, BasePage,
                         },
                     });
                 }
+                var destinationUrl;
+                if (useVideoGalleryFlow === 'True' && blockType.includes('video')) {
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/course-videos/' + encodeURI(data.locator);
+                }
+                else {
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                }
+                window.location.href = destinationUrl;
                 return;
             }
             if (!this.options.isIframeEmbed) {
