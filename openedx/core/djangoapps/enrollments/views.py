@@ -11,6 +11,7 @@ from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-impo
     ValidationError,
 )
 from django.db import IntegrityError  # lint-amnesty, pylint: disable=wrong-import-order
+from django.db.models import Q  # lint-amnesty, pylint: disable=wrong-import-order
 from django.utils.decorators import method_decorator  # lint-amnesty, pylint: disable=wrong-import-order
 from edx_rest_framework_extensions.auth.jwt.authentication import (
     JwtAuthentication,
@@ -1022,7 +1023,11 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         if course_id:
             queryset = queryset.filter(course__id=course_id)
         if course_ids:
-            queryset = queryset.filter(course__id__in=course_ids)
+            # Handles the case if parent course ID is sent rather than course run ID
+            query = Q()
+            for cours_id in course_ids:
+                query |= Q(course__id__icontains=cours_id)
+            queryset = queryset.filter(query)
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
         if emails:

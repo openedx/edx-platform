@@ -66,13 +66,7 @@ class CourseEnrollmentsApiListForm(Form):
                         self.MAX_INPUT_COUNT,
                     )
                 )
-            clean_course_ids = []
-            for course_id in course_ids:
-                try:
-                    clean_course_ids.append(CourseKey.from_string(course_id))
-                except InvalidKeyError:
-                    raise ValidationError(f"'{course_id}' is not a valid course id.")  # lint-amnesty, pylint: disable=raise-missing-from
-            return clean_course_ids
+            return course_ids
 
         return course_ids_csv_string
 
