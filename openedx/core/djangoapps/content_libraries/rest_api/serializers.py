@@ -7,8 +7,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from opaque_keys import OpaqueKey
-from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import LibraryContainerLocator
+from opaque_keys.edx.locator import LibraryContainerLocator, LibraryUsageLocatorV2
 from opaque_keys import InvalidKeyError
 
 from openedx_learning.api.authoring_models import Collection
@@ -139,6 +138,8 @@ class PublishableItemSerializer(serializers.Serializer):
     """
     id = serializers.SerializerMethodField()
     display_name = serializers.CharField()
+    published_display_name = serializers.CharField(required=False)
+    tags_count = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
     published_by = serializers.CharField(read_only=True)
     last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
@@ -150,7 +151,6 @@ class PublishableItemSerializer(serializers.Serializer):
     # When creating a new XBlock in a library, the slug becomes the ID part of
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True)
-    tags_count = serializers.IntegerField(read_only=True)
 
     collections = CollectionMetadataSerializer(many=True, required=False)
     can_stand_alone = serializers.BooleanField(read_only=True)
@@ -319,22 +319,22 @@ class ContentLibraryCollectionUpdateSerializer(serializers.Serializer):
 
 class UsageKeyV2Serializer(serializers.BaseSerializer):
     """
-    Serializes a UsageKeyV2.
+    Serializes a library Component (XBlock) key.
     """
-    def to_representation(self, value: UsageKeyV2) -> str:
+    def to_representation(self, value: LibraryUsageLocatorV2) -> str:
         """
-        Returns the UsageKeyV2 value as a string.
+        Returns the LibraryUsageLocatorV2 value as a string.
         """
         return str(value)
 
-    def to_internal_value(self, value: str) -> UsageKeyV2:
+    def to_internal_value(self, value: str) -> LibraryUsageLocatorV2:
         """
-        Returns a UsageKeyV2 from the string value.
+        Returns a LibraryUsageLocatorV2 from the string value.
 
-        Raises ValidationError if invalid UsageKeyV2.
+        Raises ValidationError if invalid LibraryUsageLocatorV2.
         """
         try:
-            return UsageKeyV2.from_string(value)
+            return LibraryUsageLocatorV2.from_string(value)
         except InvalidKeyError as err:
             raise ValidationError from err
 
@@ -359,12 +359,12 @@ class OpaqueKeySerializer(serializers.BaseSerializer):
 
     def to_internal_value(self, value: str) -> OpaqueKey:
         """
-        Returns a UsageKeyV2 or a LibraryContainerLocator from the string value.
+        Returns a LibraryUsageLocatorV2 or a LibraryContainerLocator from the string value.
 
         Raises ValidationError if invalid UsageKeyV2 or LibraryContainerLocator.
         """
         try:
-            return UsageKeyV2.from_string(value)
+            return LibraryUsageLocatorV2.from_string(value)
         except InvalidKeyError:
             try:
                 return LibraryContainerLocator.from_string(value)

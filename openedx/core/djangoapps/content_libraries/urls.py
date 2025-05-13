@@ -84,7 +84,8 @@ urlpatterns = [
             path('restore/', containers.LibraryContainerRestore.as_view()),
             # Update collections for a given container
             path('collections/', containers.LibraryContainerCollectionsView.as_view(), name='update-collections-ct'),
-            # path('publish/', views.LibraryContainerPublishView.as_view()),
+            # Publish a container (or reset to last published)
+            path('publish/', containers.LibraryContainerPublishView.as_view()),
         ])),
         re_path(r'^lti/1.3/', include([
             path('login/', libraries.LtiToolLoginView.as_view(), name='lti-login'),

@@ -123,6 +123,17 @@ from lms.envs.common import (
     AUTH_PASSWORD_VALIDATORS
 )
 from lms.envs.common import (
+    # FIXME: The HIBP settings are only used in the LMS, but CMS unit tests fail
+    # without them. Perhaps moving some code would allow us to remove these from
+    # this file.
+    ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY,
+    ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY,
+    ENABLE_AUTHN_REGISTER_HIBP_POLICY,
+    ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY,
+    HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD,
+    HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD,
+    HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD,
+
     USE_EXTRACTED_WORD_CLOUD_BLOCK,
     USE_EXTRACTED_ANNOTATABLE_BLOCK,
     USE_EXTRACTED_POLL_QUESTION_BLOCK,
@@ -595,49 +606,6 @@ IDA_LOGOUT_URI_LIST = []
 COURSE_AUTHORING_MICROFRONTEND_URL = None
 DISCUSSIONS_MICROFRONTEND_URL = None
 DISCUSSIONS_MFE_FEEDBACK_URL = None
-# .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2021-12-03
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
-ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
-# .. toggle_name: ENABLE_AUTHN_REGISTER_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy on Authn MFE's registration.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2022-03-25
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
-ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
-HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
-
-# .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
-ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
-HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
-
-# .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
-ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
-HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
 
 # .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
 # .. toggle_implementation: DjangoSetting
@@ -1667,6 +1635,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'cms.djangoapps.xblock_config.apps.XBlockConfig',
     'cms.djangoapps.export_course_metadata.apps.ExportCourseMetadataConfig',
+    'cms.djangoapps.import_from_modulestore.apps.ImportFromModulestoreConfig',
 
     # New (Learning-Core-based) XBlock runtime
     'openedx.core.djangoapps.xblock.apps.StudioXBlockAppConfig',
@@ -1862,6 +1831,8 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
     "openedx_learning.apps.authoring.units",
+    "openedx_learning.apps.authoring.subsections",
+    "openedx_learning.apps.authoring.sections",
 ]
 
 
@@ -2909,6 +2880,7 @@ LIBRARY_ENABLED_BLOCKS = [
     'video',
     'html',
     'drag-and-drop-v2',
+    'openassessment',
     'conditional',
     'done',
     'freetextresponse',

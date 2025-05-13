@@ -475,7 +475,7 @@ class LibraryCommitView(APIView):
         """
         key = LibraryLocatorV2.from_string(lib_key_str)
         api.require_permission_for_library_key(key, request.user, permissions.CAN_EDIT_THIS_CONTENT_LIBRARY)
-        api.revert_changes(key)
+        api.revert_changes(key, request.user.id)
         return Response({})
 
 
