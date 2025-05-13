@@ -5,7 +5,6 @@ Helper functions for the accounts API.
 
 import hashlib
 
-from django import VERSION
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import storages
