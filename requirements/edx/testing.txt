@@ -53,7 +53,7 @@ asn1crypto==1.5.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-astroid==3.3.9
+astroid==3.3.10
     # via
     #   pylint
     #   pylint-celery
@@ -101,14 +101,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.38.12
+boto3==1.38.14
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.38.12
+botocore==1.38.14
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -168,7 +168,7 @@ charset-normalizer==3.4.2
     #   snowflake-connector-python
 chem==2.0.0
     # via -r requirements/edx/base.txt
-click==8.1.8
+click==8.2.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -982,7 +982,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-newrelic==10.11.0
+newrelic==10.12.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1256,7 +1256,7 @@ pyparsing==3.2.3
     #   chem
     #   httplib2
     #   openedx-calc
-pyproject-api==1.9.0
+pyproject-api==1.9.1
     # via tox
 pyquery==2.0.1
     # via -r requirements/edx/testing.in
@@ -1605,7 +1605,7 @@ urllib3==2.2.3
     #   elasticsearch
     #   pact-python
     #   requests
-user-util==1.1.0
+user-util==2.0.0
     # via -r requirements/edx/base.txt
 uvicorn==0.34.2
     # via pact-python
