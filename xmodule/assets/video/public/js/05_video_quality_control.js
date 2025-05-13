@@ -2,7 +2,7 @@
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 import _ from 'underscore';
-import $ from 'jquery';
+
 
 let template = HtmlUtils.interpolateHtml(
     HtmlUtils.HTML([

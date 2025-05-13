@@ -2,7 +2,7 @@
 
 import _ from 'underscore';
 import { convert, format, formatFull } from './utils/time.js';
-import $ from 'jquery';
+
 
 /**
  * Save state module.

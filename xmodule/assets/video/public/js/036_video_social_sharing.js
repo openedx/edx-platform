@@ -2,7 +2,7 @@
 'use strict';
 
 import _ from 'underscore';
-import $ from 'jquery';
+
 
 /**
  * Video Social Sharing control module.

@@ -2,7 +2,7 @@
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 import _ from 'underscore';
-import $ from 'jquery';
+
 
 /**
  * Auto advance control module.

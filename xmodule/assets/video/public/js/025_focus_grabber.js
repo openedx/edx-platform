@@ -25,7 +25,7 @@
  * ~ Zen saying
  */
 
-import $ from 'jquery';
+
 
 // FocusGrabber module.
 let FocusGrabber = function(state) {
