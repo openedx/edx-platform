@@ -737,7 +737,7 @@ function figureOutStartEndTime(duration) {
     videoPlayer.endTime = this.config.endTime;
     if (
         videoPlayer.endTime <= videoPlayer.startTime
-&& videoPlayer.endTime >= duration
+            || videoPlayer.endTime >= duration
     ) {
         videoPlayer.endTime = null;
     } else if (this.isFlashMode()) {

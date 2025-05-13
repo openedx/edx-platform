@@ -1,7 +1,7 @@
 'use strict';
 
 import _ from 'underscore';
-import $ from 'jquery';
+
 
 let VideoPoster = function(element, options) {
     if (!(this instanceof VideoPoster)) {

@@ -1,7 +1,7 @@
 'use strict';
 
 import _ from 'underscore';
-import $ from 'jquery';
+
 
 /**
  * Video skip control module.

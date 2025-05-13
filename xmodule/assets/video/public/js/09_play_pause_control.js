@@ -1,7 +1,7 @@
 'use strict';
 
 import _ from 'underscore';
-import $ from 'jquery';
+
 
 /**
  * Play/pause control module.

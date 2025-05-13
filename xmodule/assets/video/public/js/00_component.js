@@ -1,7 +1,7 @@
 'use strict';
 
 import _ from 'underscore';
-import $ from 'jquery';
+
 
 /**
  * Creates a new object with the specified prototype object and properties.

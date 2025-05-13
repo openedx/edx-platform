@@ -1,7 +1,7 @@
 'use strict';
 
 import { convert, format, formatFull } from './utils/time.js';
-import $ from 'jquery';
+
 
 // VideoControl module.
 let VideoControl = function(state) {
