@@ -1185,7 +1185,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         self.assertEqual(storage.default_acl, 'public')
         self.assertEqual(storage.location, "abc/def")
 
-    @override_settings(PROFILE_IMAGE_BACKEND={'class': None, 'options':{}})
+    @override_settings(PROFILE_IMAGE_BACKEND={'class': None, 'options': {}})
     def test_profile_backend_without_backend(self):
         storage = get_profile_image_storage()
         self.assertIsInstance(storage, FileSystemStorage)
