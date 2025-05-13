@@ -244,6 +244,12 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
         assert is_target_available == expected
 
 
+# These tests are testing a capability of the old courseware page.  We have to not
+# force redirect to the new MFE in order to be able to load the old pages which are
+# being tested by this page.
+#
+# This is a temporary change, until we can remove the old courseware pages
+# all together. 
 @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
