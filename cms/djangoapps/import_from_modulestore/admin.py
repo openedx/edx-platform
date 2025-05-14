@@ -12,22 +12,18 @@ class ImportAdmin(admin.ModelAdmin):
     """
 
     list_display = (
-        'uuid',
         'created',
-        'status',
         'source_key',
+        'target_key',
+        'override',
+        'composition_level',
         'target_change',
-    )
-    list_filter = (
-        'status',
     )
     search_fields = (
         'source_key',
+        'target_key',
         'target_change',
     )
-
-    raw_id_fields = ('user',)
-    readonly_fields = ('status',)
 
 
 admin.site.register(Import, ImportAdmin)
