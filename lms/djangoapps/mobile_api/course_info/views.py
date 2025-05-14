@@ -321,7 +321,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
             request - Django request object
         """
 
-        response = super().list(request, kwargs)
+        response = super().list(request)
 
         if request.GET.get('return_type', 'dict') == 'dict':
             api_version = self.kwargs.get('api_version')
