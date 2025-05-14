@@ -1,7 +1,6 @@
 """
 Models for the course to library import app.
 """
-import uuid as uuid_tools
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -14,29 +13,40 @@ from opaque_keys.edx.django.models import (
 )
 from openedx_learning.api.authoring_models import LearningPackage, PublishableEntity
 
-from .data import ImportStatus
+from .data import CompositionLevel, ImportStatus
 
 User = get_user_model()
 
 
-class Import(TimeStampedModel):
+class Import(models.Model):
     """
     Represents the action of a user importing a modulestore-based course or legacy
     library into a learning-core based learning package (today, that is always a content library).
     """
 
-    uuid = models.UUIDField(default=uuid_tools.uuid4, editable=False, unique=True)
-    status = models.CharField(
-        max_length=100,
-        choices=ImportStatus.choices,
-        default=ImportStatus.NOT_STARTED,
-        db_index=True
+    user_task_status = models.OneToOneField(
+        'user_tasks.UserTaskStatus',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='import_event',
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # Note: For now, this will always be a course key. In the future, it may be a legacy library key.
     source_key = LearningContextKeyField(help_text=_('The modulestore course'), max_length=255, db_index=True)
     target_change = models.ForeignKey(to='oel_publishing.DraftChangeLog', on_delete=models.SET_NULL, null=True)
+    composition_level = models.CharField(
+        max_length=255,
+        choices=CompositionLevel.choices(),
+        help_text=_('The composition level of the target learning package'),
+    )
+    override = models.BooleanField(
+        default=False,
+        help_text=_(
+            'If true, the import will override any existing content in the target learning package.'
+        ),
+    )
 
     class Meta:
         verbose_name = _('Import from modulestore')
@@ -49,8 +59,13 @@ class Import(TimeStampedModel):
         """
         Set import status.
         """
-        self.status = status
-        self.save()
+        if status in ImportStatus.FAILED_STATUSES.value:
+            self.user_task_status.fail(status)
+        elif status == ImportStatus.CANCELED:
+            self.user_task_status.cancel()
+        else:
+            self.user_task_status.set_state(status)
+        self.user_task_status.save()
         if status in [ImportStatus.IMPORTED, ImportStatus.CANCELED]:
             self.clean_related_staged_content()
 
