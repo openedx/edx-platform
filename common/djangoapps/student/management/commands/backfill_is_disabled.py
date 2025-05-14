@@ -128,7 +128,7 @@ class Command(BaseCommand):
                 batch_number += 1
                 users_batch = User.objects.filter(
                     password__startswith=UNUSABLE_PASSWORD_PREFIX
-                ).values_list('id', flat=True)[offset:offset+batch_size]
+                ).values_list('id', flat=True)[offset:offset + batch_size]
                 LOGGER.info(f"Processing batch {batch_number} ({len(users_batch)} users)")
 
                 batch_result = self._process_batch(
