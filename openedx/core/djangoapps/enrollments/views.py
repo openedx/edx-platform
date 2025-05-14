@@ -948,6 +948,10 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         * course_id: Filters the result to course enrollments for the course corresponding to the
           given course ID. The value must be URL encoded. Optional.
 
+        * course_ids: List of comma-separated course IDs. Filters the result to course enrollments
+          for the courses corresponding to the given course IDs. Course IDs could be course run IDs
+          or course IDs. The value must be URL encoded. Optional.
+
         * username: List of comma-separated usernames. Filters the result to the course enrollments
           of the given users. Optional.
 
@@ -1025,8 +1029,8 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         if course_ids:
             # Handles the case if parent course ID is sent rather than course run ID
             query = Q()
-            for cours_id in course_ids:
-                query |= Q(course__id__icontains=cours_id)
+            for cid in course_ids:
+                query |= Q(course__id__icontains=cid)
             queryset = queryset.filter(query)
         if usernames:
             queryset = queryset.filter(user__username__in=usernames)
