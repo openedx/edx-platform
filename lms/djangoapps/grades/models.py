@@ -317,11 +317,11 @@ class PersistentSubsectionGrade(TimeStampedModel):
         # (first_attempted, course_id): find all attempted subsections in a course for all users
         indexes = [
             models.Index(
-                fields=['modified', 'course_id', 'usage_key'], 
+                fields=['modified', 'course_id', 'usage_key'],
                 name="course_id_usage_key_idx"
             ),
             models.Index(
-                fields=['first_attempted', 'course_id', 'user_id'], 
+                fields=['first_attempted', 'course_id', 'user_id'],
                 name="first_course_id_user_id_idx"
             ),
         ]
