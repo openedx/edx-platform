@@ -53,8 +53,10 @@ asn1crypto==1.5.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-astroid==3.3.9
-    # via sphinx-autoapi
+astroid==2.13.5
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   sphinx-autoapi
 attrs==25.3.0
     # via
     #   -r requirements/edx/base.txt
@@ -101,14 +103,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.38.12
+boto3==1.38.15
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.38.12
+botocore==1.38.15
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -162,7 +164,7 @@ charset-normalizer==3.4.2
     #   snowflake-connector-python
 chem==2.0.0
     # via -r requirements/edx/base.txt
-click==8.1.8
+click==8.2.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -373,7 +375,7 @@ django-multi-email-field==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-mysql==4.16.0
+django-mysql==4.17.0
     # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.7.1
     # via
@@ -838,6 +840,8 @@ lazy==1.6
     #   lti-consumer-xblock
     #   ora2
     #   xblock
+lazy-object-proxy==1.11.0
+    # via astroid
 loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
@@ -923,7 +927,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-newrelic==10.11.0
+newrelic==10.12.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -973,7 +977,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==3.1.0
     # via -r requirements/edx/base.txt
-openedx-events==10.2.0
+openedx-events==10.2.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -993,7 +997,7 @@ openedx-learning==0.26.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-openedx-mongodbproxy==0.2.2
+openedx-mongodbproxy==0.3.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==5.2.0
     # via -r requirements/edx/base.txt
@@ -1235,9 +1239,9 @@ pyyaml==6.0.2
     #   xblock
 random2==1.0.2
     # via -r requirements/edx/base.txt
-recommender-xblock==3.0.0
+recommender-xblock==3.1.0
     # via -r requirements/edx/base.txt
-redis==6.0.0
+redis==6.1.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus
@@ -1351,7 +1355,7 @@ slumber==0.7.1
     #   edx-enterprise
 smmap==5.0.2
     # via gitdb
-snowballstemmer==3.0.0.1
+snowballstemmer==3.0.1
     # via sphinx
 snowflake-connector-python==3.15.0
     # via
@@ -1506,7 +1510,7 @@ urllib3==2.2.3
     #   botocore
     #   elasticsearch
     #   requests
-user-util==1.1.0
+user-util==2.0.0
     # via -r requirements/edx/base.txt
 vine==5.1.0
     # via
@@ -1549,7 +1553,9 @@ wheel==0.45.1
     #   -r requirements/edx/base.txt
     #   django-pipeline
 wrapt==1.17.2
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   astroid
 xblock[django]==5.2.0
     # via
     #   -r requirements/edx/base.txt

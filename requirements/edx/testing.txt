@@ -53,8 +53,9 @@ asn1crypto==1.5.1
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
-astroid==3.3.9
+astroid==2.13.5
     # via
+    #   -c requirements/edx/../constraints.txt
     #   pylint
     #   pylint-celery
 attrs==25.3.0
@@ -101,14 +102,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.38.12
+boto3==1.38.15
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.38.12
+botocore==1.38.15
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -168,7 +169,7 @@ charset-normalizer==3.4.2
     #   snowflake-connector-python
 chem==2.0.0
     # via -r requirements/edx/base.txt
-click==8.1.8
+click==8.2.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -403,7 +404,7 @@ django-multi-email-field==0.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-mysql==4.16.0
+django-mysql==4.17.0
     # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.7.1
     # via
@@ -833,7 +834,7 @@ isodate==0.7.2
     # via
     #   -r requirements/edx/base.txt
     #   python3-saml
-isort==6.0.1
+isort==5.13.2
     # via
     #   -r requirements/edx/testing.in
     #   pylint
@@ -893,6 +894,8 @@ lazy==1.6
     #   lti-consumer-xblock
     #   ora2
     #   xblock
+lazy-object-proxy==1.11.0
+    # via astroid
 loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
@@ -982,7 +985,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-newrelic==10.11.0
+newrelic==10.12.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1032,7 +1035,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==3.1.0
     # via -r requirements/edx/base.txt
-openedx-events==10.2.0
+openedx-events==10.2.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1052,7 +1055,7 @@ openedx-learning==0.26.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-openedx-mongodbproxy==0.2.2
+openedx-mongodbproxy==0.3.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==5.2.0
     # via -r requirements/edx/base.txt
@@ -1159,7 +1162,7 @@ pyasn1-modules==0.4.2
     # via
     #   -r requirements/edx/base.txt
     #   google-auth
-pycodestyle==2.12.1
+pycodestyle==2.13.0
     # via -r requirements/edx/testing.in
 pycountry==24.6.1
     # via -r requirements/edx/base.txt
@@ -1207,8 +1210,9 @@ pylatexenc==2.10
     # via
     #   -r requirements/edx/base.txt
     #   olxcleaner
-pylint==3.3.7
+pylint==2.15.10
     # via
+    #   -c requirements/edx/../constraints.txt
     #   edx-lint
     #   pylint-celery
     #   pylint-django
@@ -1216,7 +1220,7 @@ pylint==3.3.7
     #   pylint-pytest
 pylint-celery==0.3
     # via edx-lint
-pylint-django==2.6.1
+pylint-django==2.5.5
     # via edx-lint
 pylint-plugin-utils==0.8.2
     # via
@@ -1254,7 +1258,7 @@ pyparsing==3.2.3
     #   chem
     #   httplib2
     #   openedx-calc
-pyproject-api==1.9.0
+pyproject-api==1.9.1
     # via tox
 pyquery==2.0.1
     # via -r requirements/edx/testing.in
@@ -1355,9 +1359,9 @@ pyyaml==6.0.2
     #   xblock
 random2==1.0.2
     # via -r requirements/edx/base.txt
-recommender-xblock==3.0.0
+recommender-xblock==3.1.0
     # via -r requirements/edx/base.txt
-redis==6.0.0
+redis==6.1.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus
@@ -1444,7 +1448,7 @@ simplejson==3.20.1
     #   super-csv
     #   xblock
     #   xblock-utils
-singledispatch==4.1.1
+singledispatch==4.1.2
     # via -r requirements/edx/testing.in
 six==1.17.0
     # via
@@ -1546,7 +1550,7 @@ tomlkit==0.13.2
     #   -r requirements/edx/base.txt
     #   pylint
     #   snowflake-connector-python
-tox==4.25.0
+tox==4.26.0
     # via -r requirements/edx/testing.in
 tqdm==4.67.1
     # via
@@ -1603,7 +1607,7 @@ urllib3==2.2.3
     #   elasticsearch
     #   pact-python
     #   requests
-user-util==1.1.0
+user-util==2.0.0
     # via -r requirements/edx/base.txt
 uvicorn==0.34.2
     # via pact-python
@@ -1650,7 +1654,9 @@ wheel==0.45.1
     #   -r requirements/edx/base.txt
     #   django-pipeline
 wrapt==1.17.2
-    # via -r requirements/edx/base.txt
+    # via
+    #   -r requirements/edx/base.txt
+    #   astroid
 xblock[django]==5.2.0
     # via
     #   -r requirements/edx/base.txt
