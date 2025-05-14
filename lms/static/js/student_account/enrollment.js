@@ -73,7 +73,7 @@
                 if (existing) {
                     existing.remove();
                 }
-                const textContent = message?.detail || String(message);
+                const textContent = (message && message.detail) ? message.detail : String(message);
                 const messageDiv = document.createElement('div');
                 messageDiv.setAttribute('id', componentId);
                 messageDiv.setAttribute('class', 'fixed-top d-flex justify-content-center align-items-center');
