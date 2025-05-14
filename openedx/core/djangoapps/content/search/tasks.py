@@ -86,9 +86,6 @@ def update_content_library_index_docs(library_key_str: str) -> None:
     log.info("Updating content index documents for library with id: %s", library_key)
 
     api.upsert_content_library_index_docs(library_key)
-    # Delete all documents in this library that were not published by above function
-    # as this task is also triggered on discard event.
-    api.delete_all_draft_docs_for_library(library_key)
 
 
 @shared_task(base=LoggedTask, autoretry_for=(MeilisearchError, ConnectionError))
