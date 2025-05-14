@@ -282,7 +282,7 @@ class CourseEnrollmentForm(forms.ModelForm):
 
 
 @admin.register(CourseEnrollment)
-class CourseEnrollmentAdmin(admin.ModelAdmin):
+class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
