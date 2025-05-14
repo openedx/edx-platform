@@ -69,7 +69,7 @@
              */
             showMessage: function(message) {
                 const componentId = 'student-enrrollment-feedback-error';
-                let existing = document.getElementById(componentId);
+                const existing = document.getElementById(componentId);
                 if (existing) {
                     existing.remove();
                 }
