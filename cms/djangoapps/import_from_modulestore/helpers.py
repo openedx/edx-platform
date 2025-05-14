@@ -90,7 +90,7 @@ class ImportClient:
         if block_to_import is None:
             return []
 
-        return self._process_import(self.block_usage_key_to_import, block_to_import)
+        return self._import_complicated_child(block_to_import, self.block_usage_key_to_import)
 
     def _process_import(self, usage_key_string, block_to_import) -> list[PublishableVersionWithMapping]:
         """
@@ -461,6 +461,6 @@ def cancel_incomplete_old_imports(import_event: Import) -> None:
         target_change=import_event.target_change,
         source_key=import_event.source_key,
         staged_content_for_import__isnull=False
-    ).exclude(uuid=import_event.uuid)
+    ).exclude(pk=import_event.pk)
     for incomplete_import in incomplete_user_imports_with_same_target:
         incomplete_import.set_status(ImportStatus.CANCELED)
