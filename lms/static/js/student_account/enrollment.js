@@ -68,45 +68,32 @@
              * @param  {Object} message The message to display.
              */
             showMessage: function(message) {
-                console.log('showMessage called', message);
-                var existing = document.getElementById('messageDiv');
+                const componentId = 'student-enrrollment-feedback-error';
+                let existing = document.getElementById(componentId);
                 if (existing) {
                     existing.remove();
                 }
-                var messageDiv = document.createElement('div');
-                messageDiv.setAttribute('id', 'messageDiv');
-
+                const textContent = message?.detail || String(message);
+                const messageDiv = document.createElement('div');
+                messageDiv.setAttribute('id', componentId);
+                messageDiv.setAttribute('class', 'fixed-top d-flex justify-content-center align-items-center');
                 // Style for popup
                 messageDiv.style.cssText = [
-                    'position:fixed',
-                    'top:0',
-                    'left:0',
                     'width:100vw',
                     'height:100vh',
-                    'display:flex',
-                    'align-items:center',
-                    'justify-content:center',
-                    'background:rgba(0,0,0,0.3)',
+                    'background:rgba(0,0,0,0.5)',
                     'z-index:9999'
                 ].join(';');
 
-                // Internal div inside the popup
-                var innerDiv = document.createElement('div');
-                innerDiv.style.cssText = [
-                    'background:#fff3cd',
-                    'color:#856404',
-                    'border:1px solid #ffeeba',
-                    'padding:24px 32px',
-                    'border-radius:8px',
-                    'max-width:600px',
-                    'font-weight:bold',
-                    'text-align:center',
-                    'font-size:1.1em',
-                    'box-shadow:0 4px 24px rgba(0,0,0,0.15)'
-                ].join(';');
-                innerDiv.textContent = message && message.detail ? message.detail : String(message);
+                messageDiv.innerHTML = `
+                  <div class="page-banner w-75">
+                    <div class="alert alert-warning" role="alert">
+                      <span class="icon icon-alert fa fa-warning" aria-hidden="true"></span>
+                      <div class="message-content">${textContent}</div>
+                    </div>
+                  </div>
+                `;
 
-                messageDiv.appendChild(innerDiv);
                 document.body.appendChild(messageDiv);
             },
             /**
