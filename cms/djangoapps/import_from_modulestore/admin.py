@@ -19,7 +19,7 @@ class ImportAdmin(admin.ModelAdmin):
         'target_change',
     )
     list_filter = (
-        'status',
+        'user_task_status__state',
     )
     search_fields = (
         'source_key',
@@ -27,7 +27,26 @@ class ImportAdmin(admin.ModelAdmin):
     )
 
     raw_id_fields = ('user',)
-    readonly_fields = ('status',)
+    readonly_fields = ('user_task_status',)
+
+    def uuid(self, obj):
+        """
+        Returns the UUID of the import.
+        """
+        return getattr(obj.user_task_status, 'uuid', None)
+    uuid.short_description = 'UUID'
+
+    def created(self, obj):
+        """
+        Returns the creation date of the import.
+        """
+        return getattr(obj.user_task_status, 'created', None)
+
+    def status(self, obj):
+        """
+        Returns the status of the import.
+        """
+        return getattr(obj.user_task_status, 'state', None)
 
 
 admin.site.register(Import, ImportAdmin)

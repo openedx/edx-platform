@@ -1,6 +1,8 @@
 """
 Tests for the import_from_modulestore helper functions.
 """
+import uuid
+
 import ddt
 from organizations.models import Organization
 from unittest import mock
@@ -8,14 +10,19 @@ from unittest.mock import patch
 
 from lxml import etree
 from openedx_learning.api.authoring_models import LearningPackage
+from user_tasks.models import UserTaskStatus
 
-from cms.djangoapps.import_from_modulestore import api
+from cms.djangoapps.import_from_modulestore import api, constants
 from cms.djangoapps.import_from_modulestore.helpers import ImportClient
+from cms.djangoapps.import_from_modulestore.models import StagedContentForImport
+from cms.djangoapps.import_from_modulestore.tests.factories import ImportFactory
 from common.djangoapps.student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.content_libraries import api as content_libraries_api
+from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from xmodule.modulestore.django import modulestore
 
 
 @ddt.ddt
@@ -50,8 +57,35 @@ class TestImportClient(ModuleStoreTestCase):
             display_name='Video',
             data="""<video youtube="1.00:3_yD_cEKoCk" url_name="SampleProblem"/>""",
         )
-        with self.captureOnCommitCallbacks(execute=True):
-            self.import_event = api.stage_content_for_import(source_key=self.course.id, user_id=self.user.id)
+        self.import_event = ImportFactory(
+            user=self.user,
+            source_key=self.course.id,
+        )
+        # get blocks to update their children
+        self.chapter = modulestore().get_item(self.chapter.location)
+        self.sequential = modulestore().get_item(self.sequential.location)
+        self.vertical = modulestore().get_item(self.vertical.location)
+        # mock staged content
+        staged_content = content_staging_api.stage_xblock_temporarily(
+            self.chapter,
+            self.user.id,
+            purpose=constants.IMPORT_FROM_MODULESTORE_STAGING_PURPOSE,
+        )
+        StagedContentForImport.objects.create(
+            import_event=self.import_event,
+            staged_content=staged_content,
+            source_usage_key=self.chapter.location,
+        )
+        #mock user task status
+        self.import_event.user_task_status = UserTaskStatus.objects.create(
+            user=self.user,
+            task_id=uuid.uuid4(),
+            task_class='cms.djangoapps.import_from_modulestore.tasks.ImportToLibraryTask',
+            name='Test',
+            total_steps=2
+        )
+        self.import_event.save()
+
         self.parser = etree.XMLParser(strip_cdata=False)
 
     def test_import_from_staged_content(self):
@@ -64,8 +98,8 @@ class TestImportClient(ModuleStoreTestCase):
             import_event=self.import_event,
             staged_content=staged_content,
             target_learning_package=self.learning_package,
-            block_usage_key_to_import=str(self.chapter.location),
-            composition_level='xblock',
+            block_usage_key_to_import=str(self.vertical.location),
+            composition_level='component',
             override=False
         )
 
@@ -84,7 +118,7 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import='block-v1:edX+Demo+2025+type@chapter+block@12345',
-            composition_level='xblock',
+            composition_level='component',
             override=False
         )
 
@@ -109,7 +143,7 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='xblock',
+            composition_level='component',
             override=False
         )
         import_client.get_or_create_container(
@@ -131,7 +165,7 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='xblock',
+            composition_level='component',
             override=False
         )
         with self.assertRaises(ValueError):
@@ -157,10 +191,9 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content,
             block_usage_key_to_import=block_usage_key_to_import,
             target_learning_package=self.learning_package,
-            composition_level='xblock',
+            composition_level='component',
             override=False
         )
-        block_to_import = etree.fromstring(staged_content.olx, parser=self.parser)
         # pylint: disable=protected-access
         result = import_client.import_from_staged_content()
 
@@ -180,7 +213,7 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='xblock',
+            composition_level='component',
             override=False
         )
 
@@ -204,7 +237,7 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='xblock',
+            composition_level='component',
             override=False
         )
 
@@ -213,19 +246,32 @@ class TestImportClient(ModuleStoreTestCase):
         result1 = import_client._process_import(block_usage_key_to_import, block_xml)
         self.assertEqual(len(result1), 1)
 
-        with self.captureOnCommitCallbacks(execute=True):
-            new_import_event = api.stage_content_for_import(source_key=self.course.id, user_id=self.user.id)
-
-        staged_content_for_import = new_import_event.staged_content_for_import.get(
-            source_usage_key=self.chapter.location
+        new_import_event = api.import_to_library(
+            source_key=self.course.id,
+            usage_ids=[str(self.chapter.location)],
+            target_learning_package_id=self.learning_package.id,
+            user_id=self.user.id,
+            composition_level='component',
+            override=override,
         )
-        new_staged_content = staged_content_for_import.staged_content
+        # mock staged content
+        new_staged_content = content_staging_api.stage_xblock_temporarily(
+            self.vertical,
+            self.user.id,
+            purpose=constants.IMPORT_FROM_MODULESTORE_STAGING_PURPOSE,
+        )
+        staged_content_for_import = StagedContentForImport.objects.create(
+            import_event=new_import_event,
+            staged_content=new_staged_content,
+            source_usage_key=self.chapter.location,
+        )
+
         import_client = ImportClient(
             import_event=new_import_event,
             staged_content=new_staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='xblock',
+            composition_level='component',
             override=override
         )
 
@@ -294,9 +340,9 @@ class TestImportClient(ModuleStoreTestCase):
         assert overrided_container_version is not None
         assert overrided_container_version.title == 'New Display Name'
 
-    @ddt.data('xblock', 'vertical')
+    @ddt.data('component', 'vertical')
     def test_composition_levels(self, composition_level):
-        if composition_level == 'xblock':
+        if composition_level == 'component':
             expected_imported_blocks = [self.problem, self.video]
         else:
             # The vertical block is expected to be imported as a container
@@ -321,7 +367,7 @@ class TestImportClient(ModuleStoreTestCase):
 
         block_xml = etree.fromstring(staged_content.olx, parser=self.parser)
         # pylint: disable=protected-access
-        result = import_client._process_import(block_usage_key_to_import, block_xml)
+        result = import_client._import_complicated_child(block_xml, block_usage_key_to_import)
 
         self.assertEqual(len(result), len(expected_imported_blocks))
 
@@ -339,7 +385,7 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='xblock',
+            composition_level='component',
             override=False
         )
 
