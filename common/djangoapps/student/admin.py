@@ -2,6 +2,8 @@
 
 
 from functools import wraps
+from dal import autocomplete
+from django_countries import countries
 
 from config_models.admin import ConfigurationModelAdmin
 from django import forms
@@ -16,7 +18,7 @@ from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm
 from django.db import models, router, transaction
 from django.http import HttpResponseRedirect
 from django.http.request import QueryDict
-from django.urls import reverse
+from django.urls import reverse, path
 from django.utils.translation import ngettext
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
@@ -45,6 +47,7 @@ from common.djangoapps.student.models import (
     UserProfile,
     UserTestGroup
 )
+from common.djangoapps.student.constants import LANGUAGE_CHOICES
 from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -309,11 +312,84 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
         return super().get_queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 
+class LanguageAutocomplete(autocomplete.Select2ListView):
+    def get_list(self):
+        return [lang for lang in LANGUAGE_CHOICES if self.q.lower() in lang.lower()]
+
+class CountryAutocomplete(autocomplete.Select2ListView):
+    def get_list(self):
+        results = []
+        for code, name in countries:
+            if self.q.lower() in name.lower():
+                results.append((code, name))
+        return results
+
+    def get_result_label(self, item):
+        """ What the user sees in the dropdown """
+        return dict(countries).get(item, item)
+
+    def get_result_value(self, item):
+        """ What gets sent back on selection (the code) """
+        return item
+
+class UserProfileInlineForm(forms.ModelForm):
+    language = forms.CharField(
+        required=False,
+        widget=autocomplete.ListSelect2(url='admin:language-autocomplete')
+    )
+    country = forms.CharField(
+        required=False,
+        widget=autocomplete.ListSelect2(url='admin:country-autocomplete')
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+        labels = {
+            'profile_image_uploaded_at': 'Uploaded At',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance and self.instance.pk:
+            if self.instance.country:
+                code = self.instance.country
+                name = countries.name(code) if code in countries else code
+                self.fields['country'].widget.choices = [(code, name)]
+                self.initial['country'] = code
+
+            if self.instance.language:
+                language = self.instance.language
+                self.fields['language'].initial = language
+                self.fields['language'].widget.choices = [(language, language)]
+
+
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
     model = UserProfile
+    form = UserProfileInlineForm
     can_delete = False
     verbose_name_plural = _('User profile')
+    show_change_link = False
+
+    fieldsets = (
+        (_('User Profile'), {
+            'classes': ('wide',),
+            'fields': ('name', 'meta', 'courseware', 'language', 'year_of_birth', 'gender', 'level_of_education', 'goals'),
+            'description': 'Add profile details.',
+        }),
+        (_('Address'), {
+            'classes': ('wide',),
+            'fields': ('country', 'mailing_address', 'city', 'state', 'phone_number'),
+            'description': 'Add mailing address and contact details.',
+        }),
+        (_('Profile Image'), {
+            'classes': ('wide',),
+            'fields': ('profile_image_uploaded_at',),
+            'description': 'Add details for profile image.',
+        }),
+    )
 
 
 class AccountRecoveryInline(admin.StackedInline):
@@ -349,6 +425,14 @@ class UserAdmin(BaseUserAdmin):
     inlines = (UserProfileInline, AccountRecoveryInline)
     form = UserChangeForm
 
+    add_fieldsets = (
+        ('Adding a user', {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2'),
+            'description': 'Start by creating a username and password and then add profile details.',
+        }),
+    )
+
     def get_readonly_fields(self, request, obj=None):
         """
         Allows editing the users while skipping the username check, so we can have Unicode username with no problems.
@@ -358,6 +442,18 @@ class UserAdmin(BaseUserAdmin):
         if obj:
             return django_readonly + ('username',)
         return django_readonly
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'language-autocomplete/',
+                LanguageAutocomplete.as_view(),
+                name='language-autocomplete'
+            ),
+            path('country-autocomplete/', CountryAutocomplete.as_view(), name='country-autocomplete'),
+        ]
+        return custom_urls + urls
 
 
 @admin.register(UserAttribute)

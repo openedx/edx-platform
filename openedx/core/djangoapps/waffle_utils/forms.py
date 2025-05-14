@@ -1,6 +1,7 @@
 """
 Defines a form for providing validation of waffle overrides.
 """
+from dal import autocomplete
 
 from django import forms
 
@@ -13,6 +14,28 @@ class WaffleFlagCourseOverrideAdminForm(forms.ModelForm):
     """
     Input form for course-level override of waffle flags, allowing us to verify data.
     """
+
+    course_id = forms.CharField(
+        required=True,
+        widget=autocomplete.ListSelect2(
+            url='admin:course-id-autocomplete',
+            attrs={
+                'data-placeholder': 'Enter or select a course ID...',
+                'data-minimum-input-length': 2,
+            }
+        )
+    )
+    waffle_flag = forms.CharField(
+        required=True,
+        widget=autocomplete.ListSelect2(
+            url='admin:waffle-flag-autocomplete',
+            attrs={
+                'data-placeholder': 'Start typing a waffle flag…',
+                'data-minimum-input-length': 1,
+                'data-tags': 'true',
+            }
+        )
+    )
     class Meta:
         model = WaffleFlagCourseOverrideModel
         fields = '__all__'
