@@ -51,13 +51,6 @@ djangorestframework<3.15.0
 # Issue: https://github.com/openedx/edx-platform/issues/35275
 django-stubs<6
 
-# Date: 2024-07-23
-# django-storages==1.14.4 breaks course imports
-# Two lines were added in 1.14.4 that make file_exists_in_storage function always return False,
-# as the default value of AWS_S3_FILE_OVERWRITE is True
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35170
-django-storages<1.14.4
-
 # Date: 2019-08-16
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
