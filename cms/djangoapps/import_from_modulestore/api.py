@@ -4,6 +4,7 @@ API for course to library import.
 from typing import Sequence
 
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from user_tasks.tasks import UserTask
 
 from .helpers import cancel_incomplete_old_imports
 from .models import Import as _Import
@@ -18,7 +19,7 @@ def import_to_library(
     user_id: int,
     composition_level: str,
     override: bool = False,
-) -> _Import:
+) -> tuple[_Import, UserTask]:
     """
     Import staged content to a library from staged content.
     """
@@ -32,12 +33,10 @@ def import_to_library(
     )
     cancel_incomplete_old_imports(import_from_modulestore)
 
-    import_to_library_task.apply_async(
-        kwargs={
-            'import_pk': import_from_modulestore.pk,
-            'usage_key_strings': usage_ids,
-            'learning_package_id': target_learning_package_id,
-            'user_id': user_id,
-        },
+    task = import_to_library_task.delay(
+        import_pk=import_from_modulestore.pk,
+        usage_key_strings=usage_ids,
+        learning_package_id=target_learning_package_id,
+        user_id=user_id,
     )
-    return import_from_modulestore
+    return import_from_modulestore, task
