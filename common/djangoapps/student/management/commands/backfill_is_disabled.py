@@ -31,12 +31,12 @@ class Command(BaseCommand):
             '--batch-size',
             type=int,
             default=9000,
-            help='Users per batch'
+            help='Number of users to process per batch'
         )
         parser.add_argument(
             '--dry-run',
             action='store_true',
-            help='Simulate without calling Segment'
+            help='Simulate the back fill without calling Segment'
         )
         parser.add_argument(
             '--retry-limit',
@@ -141,10 +141,10 @@ class Command(BaseCommand):
                     return
                 processed += batch_result
                 offset += batch_size
-                LOGGER.info(f"Processed {processed}/{total_users} users")
+                LOGGER.info(f"Processed {processed} / {total_users} users")
 
             LOGGER.info(
-                f"Completed: processed {processed}/{total_users} users in "
+                f"Completed: processed {processed} / {total_users} users in "
                 f"{batch_number} batches"
             )
 
