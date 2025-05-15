@@ -43,6 +43,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='import',
             name='user_task_status',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='user_tasks.usertaskstatus'),
+            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='import_event', to='user_tasks.usertaskstatus'),
         ),
     ]

@@ -26,14 +26,6 @@ class ImportSerializer(serializers.ModelSerializer):
         required=True,
     )
 
-    def get_fields(self):
-        fields = super().get_fields()
-        request = self.context.get('request')
-        if request and request.method != 'POST':
-            fields.pop('target', None)
-            fields.pop('usage_keys_string', None)
-        return fields
-
     class Meta:
         model = Import
         fields = [
@@ -43,6 +35,14 @@ class ImportSerializer(serializers.ModelSerializer):
             'composition_level',
             'override',
         ]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get('request')
+        if request and request.method != 'POST':
+            fields.pop('target', None)
+            fields.pop('usage_keys_string', None)
+        return fields
 
     def validate_source_key(self, value):
         """
