@@ -6,7 +6,7 @@ i.e. those with the <multiplechoiceresponse> element
 
 import textwrap
 import unittest
-from xmodule.capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
+from xmodule.capa.tests.helpers import load_fixture, new_loncapa_problem, mock_capa_system
 
 
 class CapaTargetedFeedbackTest(unittest.TestCase):
@@ -16,7 +16,7 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
     def setUp(self):
         super(CapaTargetedFeedbackTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.system = test_capa_system()
+        self.system = mock_capa_system()
 
     def test_no_targeted_feedback(self):
         xml_str = textwrap.dedent("""
