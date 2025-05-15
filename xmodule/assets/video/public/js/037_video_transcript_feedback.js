@@ -4,13 +4,13 @@
 import _ from 'underscore';
 
 /**
- * @desc VideoTranscriptFeedbackHandler module exports a function.
+ * @desc VideoTranscriptFeedback module exports a function.
  *
  * @type {function}
  * @access public
  *
  * @param {object} state - The object containing the state of the video
- *     player. All other modules, their parameters, public letiables, etc.
+ *     player. All other modules, their parameters, public variables, etc.
  *     are available via this object.
  *
  * @this {object} The global window object.
@@ -237,5 +237,4 @@ VideoTranscriptFeedback.prototype = {
     }
 };
 
-// Export as ES6 default
 export default VideoTranscriptFeedback;
