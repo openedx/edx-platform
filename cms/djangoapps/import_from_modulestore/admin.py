@@ -34,7 +34,6 @@ class ImportAdmin(admin.ModelAdmin):
         Returns the UUID of the import.
         """
         return getattr(obj.user_task_status, 'uuid', None)
-    uuid.short_description = 'UUID'
 
     def created(self, obj):
         """
