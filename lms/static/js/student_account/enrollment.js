@@ -40,11 +40,9 @@
                         // Show the error message for bad requests (invalid enrollment data)
                         this.showMessage(responseData);
                         // Add timeout before redirecting to allow user to see the message
-                        var self = this;
-                        setTimeout(function() {
-                            // Redirect to the provided redirectUrl after 5 seconds
+                        setTimeout(() => {
                             if (redirectUrl) {
-                                self.redirect(redirectUrl);
+                                this.redirect(redirectUrl);
                             }
                         }, 6000); // 6000 milliseconds = 6 seconds
                     } else {
