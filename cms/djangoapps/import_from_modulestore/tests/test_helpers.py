@@ -99,8 +99,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=str(self.vertical.location),
-            composition_level='component',
-            override=False
         )
 
         import_client.import_from_staged_content()
@@ -118,8 +116,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import='block-v1:edX+Demo+2025+type@chapter+block@12345',
-            composition_level='component',
-            override=False
         )
 
         import_client.import_from_staged_content()
@@ -143,8 +139,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='component',
-            override=False
         )
         import_client.get_or_create_container(
             container_to_import.category,
@@ -165,8 +159,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='component',
-            override=False
         )
         with self.assertRaises(ValueError):
             import_client.get_or_create_container(
@@ -191,8 +183,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content,
             block_usage_key_to_import=block_usage_key_to_import,
             target_learning_package=self.learning_package,
-            composition_level='component',
-            override=False
         )
         # pylint: disable=protected-access
         result = import_client.import_from_staged_content()
@@ -213,8 +203,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='component',
-            override=False
         )
 
         block_to_import = etree.fromstring(block_to_import.data, parser=self.parser)
@@ -237,8 +225,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='component',
-            override=False
         )
 
         block_xml = etree.fromstring(block_to_import.data, parser=self.parser)
@@ -246,7 +232,7 @@ class TestImportClient(ModuleStoreTestCase):
         result1 = import_client._process_import(block_usage_key_to_import, block_xml)
         self.assertEqual(len(result1), 1)
 
-        new_import_event = api.import_to_library(
+        new_import_event, _ = api.import_to_library(
             source_key=self.course.id,
             usage_ids=[str(self.chapter.location)],
             target_learning_package_id=self.learning_package.id,
@@ -271,8 +257,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=new_staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='component',
-            override=override
         )
 
         if override:
@@ -304,13 +288,13 @@ class TestImportClient(ModuleStoreTestCase):
         )
         staged_content = staged_content_for_import.staged_content
 
+        self.import_event.composition_level = "vertical"
+        self.import_event.save()
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='vertical',
-            override=False
         )
 
         container_version_with_mapping = import_client.get_or_create_container(
@@ -322,13 +306,13 @@ class TestImportClient(ModuleStoreTestCase):
         assert container_version_with_mapping is not None
         assert container_version_with_mapping.publishable_version.title == container_to_import.display_name
 
+        self.import_event.override = True
+        self.import_event.save()
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='vertical',
-            override=True
         )
         container_version_with_mapping = import_client.get_or_create_container(
             'vertical',
@@ -356,13 +340,13 @@ class TestImportClient(ModuleStoreTestCase):
         )
         staged_content = staged_content_for_import.staged_content
 
+        self.import_event.composition_level = composition_level
+        self.import_event.save()
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level=composition_level,
-            override=False
         )
 
         block_xml = etree.fromstring(staged_content.olx, parser=self.parser)
@@ -385,8 +369,6 @@ class TestImportClient(ModuleStoreTestCase):
             staged_content=staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='component',
-            override=False
         )
 
         mock_file_data = b'file content'
@@ -417,13 +399,12 @@ class TestImportClient(ModuleStoreTestCase):
             source_usage_key=self.chapter.location
         )
 
+        self.import_event.composition_level = "container"
         import_client = ImportClient(
             import_event=self.import_event,
             staged_content=staged_content_for_import.staged_content,
             target_learning_package=self.learning_package,
             block_usage_key_to_import=block_usage_key_to_import,
-            composition_level='container',
-            override=False
         )
 
         with patch('cms.djangoapps.import_from_modulestore.helpers.authoring_api') as mock_authoring_api:

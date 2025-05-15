@@ -18,6 +18,71 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 class ImportViewSet(StatusViewSet):
     """
     Import course content from modulestore into a content library.
+
+    This viewset handles the import process, including creating the import task and
+    retrieving the status of the import task. Meant to be used by admin users only.
+
+    API Endpoints
+    ------------
+    POST /api/import_from_modulestore/v0/imports/
+        Start the import process.
+
+        Request body:
+            {
+                "source_key": "<source_course_key>",
+                "target": "<target_library>",
+                "usage_keys_string": "<comma_separated_usage_keys>",
+                "composition_level": "<composition_level>",
+                "override": "<boolean>"
+            }
+
+        Example request:
+            {
+                "source_key": "course-v1:edX+DemoX+2014_T1",
+                "target": "library-v1:org1+lib_1",
+                "usage_keys_string": "block-v1:edX+DemoX+2014_T1+type@sequential+block@chapter_1",
+                "composition_level": "component",
+                "override": true
+            }
+
+        Example response:
+            {
+                "name": "Import course to library (library_id=6, import_id=50)",
+                "state": "Succeeded",
+                "state_text": "Succeeded",
+                "completed_steps": 2,
+                "total_steps": 2,
+                "attempts": 1,
+                "created": "2025-05-14T22:24:37.048539Z",
+                "modified": "2025-05-14T22:24:59.128068Z",
+                "artifacts": [],
+                "import_event": {
+                    "source_key": "course-v1:OpenedX+DemoX+DemoCourse",
+                    "composition_level": "component",
+                    "override": true
+                }
+            }
+
+    GET /api/import_from_modulestore/v0/imports/<uuid>/
+        Get the status of the import task.
+
+        Example response:
+            {
+                "name": "Import course to library (library_id=4, import_id=69)",
+                "state": "Importing staged content",
+                "state_text": "Importing staged content",
+                "completed_steps": 1,
+                "total_steps": 2,
+                "attempts": 1,
+                "created": "2025-05-14T22:24:37.048539Z",
+                "modified": "2025-05-14T22:24:59.128068Z",
+                "artifacts": [],
+                "import_event": {
+                    "source_key": "course-v1:OpenedX+DemoX+DemoCourse2",
+                    "composition_level": "component",
+                    "override": false
+                }
+            }
     """
 
     permission_classes = (IsAdminUser,)

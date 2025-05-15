@@ -62,13 +62,11 @@ class TestCourseToLibraryImportAPI(ModuleStoreTestCase):
         assert import_event.override == override
         assert import_event.user_id == user.id
 
-        import_to_library_task_mock.apply_async.assert_called_once_with(
-            kwargs={
-                "import_pk": Import.objects.get().pk,
-                "usage_key_strings": usage_ids,
-                "learning_package_id": self.library.learning_package.id,
-                "user_id": user.id,
-            },
+        import_to_library_task_mock.delay.assert_called_once_with(
+            import_pk=import_event.pk,
+            usage_key_strings=usage_ids,
+            learning_package_id=self.library.learning_package.id,
+            user_id=user.id,
         )
 
     def test_import_to_library_invalid_usage_key(self):
