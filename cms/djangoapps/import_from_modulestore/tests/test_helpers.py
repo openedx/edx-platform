@@ -15,6 +15,7 @@ from user_tasks.models import UserTaskStatus
 from cms.djangoapps.import_from_modulestore import api, constants
 from cms.djangoapps.import_from_modulestore.helpers import ImportClient
 from cms.djangoapps.import_from_modulestore.models import StagedContentForImport
+from cms.djangoapps.import_from_modulestore.tasks import save_leagacy_content_to_staged_content
 from cms.djangoapps.import_from_modulestore.tests.factories import ImportFactory
 from common.djangoapps.student.tests.factories import UserFactory
 
@@ -22,7 +23,6 @@ from openedx.core.djangoapps.content_libraries import api as content_libraries_a
 from openedx.core.djangoapps.content_staging import api as content_staging_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
-from xmodule.modulestore.django import modulestore
 
 
 @ddt.ddt
@@ -61,21 +61,6 @@ class TestImportClient(ModuleStoreTestCase):
             user=self.user,
             source_key=self.course.id,
         )
-        # get blocks to update their children
-        self.chapter = modulestore().get_item(self.chapter.location)
-        self.sequential = modulestore().get_item(self.sequential.location)
-        self.vertical = modulestore().get_item(self.vertical.location)
-        # mock staged content
-        staged_content = content_staging_api.stage_xblock_temporarily(
-            self.chapter,
-            self.user.id,
-            purpose=constants.IMPORT_FROM_MODULESTORE_STAGING_PURPOSE,
-        )
-        StagedContentForImport.objects.create(
-            import_event=self.import_event,
-            staged_content=staged_content,
-            source_usage_key=self.chapter.location,
-        )
         #mock user task status
         self.import_event.user_task_status = UserTaskStatus.objects.create(
             user=self.user,
@@ -85,6 +70,7 @@ class TestImportClient(ModuleStoreTestCase):
             total_steps=2
         )
         self.import_event.save()
+        save_leagacy_content_to_staged_content(self.import_event)
 
         self.parser = etree.XMLParser(strip_cdata=False)
 
