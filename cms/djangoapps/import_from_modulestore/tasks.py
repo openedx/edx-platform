@@ -7,7 +7,6 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute_from_module
-from opaque_keys.edx.keys import UsageKey
 
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import LearningPackage
@@ -61,9 +60,9 @@ class ImportToLibraryTask(UserTask):
 def import_to_library_task(
     self,
     import_pk: int,
-    usage_key_strings: Sequence[str | UsageKey],
+    usage_key_strings: Sequence[str],
     learning_package_id: int,
-    user_id: int,
+    user_id: int,  # pylint: disable=unused-argument
 ) -> None:
     """
     Import to library task.
@@ -73,7 +72,6 @@ def import_to_library_task(
     """
     set_code_owner_attribute_from_module(__name__)
 
-    # Step 1: Save course to staged content task by sections/chapters.
     try:
         import_event = Import.objects.get(pk=import_pk)
         import_event.user_task_status = self.status
@@ -82,6 +80,19 @@ def import_to_library_task(
         log.info('Import event not found for pk %s', import_pk)
         return
 
+    # Step 1: Save course to staged content task by sections/chapters.
+    save_leagacy_content_to_staged_content(import_event)
+
+    self.status.increment_completed_steps()
+
+    # Step 2: Import staged content to library task.
+    import_staged_content_to_library(import_event, learning_package_id, usage_key_strings)
+
+
+def save_leagacy_content_to_staged_content(import_event: Import) -> None:
+    """
+    Save course to staged content task by sections/chapters.
+    """
     import_event.set_status(ImportStatus.WAITNG_TO_STAGE)
     import_event.clean_related_staged_content()
 
@@ -92,7 +103,7 @@ def import_to_library_task(
             for item in items_to_import:
                 staged_content = content_staging_api.stage_xblock_temporarily(
                     item,
-                    user_id,
+                    import_event.user.pk,
                     purpose=IMPORT_FROM_MODULESTORE_STAGING_PURPOSE,
                 )
                 StagedContentForImport.objects.create(
@@ -109,9 +120,13 @@ def import_to_library_task(
         import_event.set_status(ImportStatus.STAGING_FAILED)
         raise exc
 
-    # Step 2: Import staged content to library task.
-    self.status.increment_completed_steps()
 
+def import_staged_content_to_library(
+    import_event: Import, learning_package_id: int, usage_key_strings: Sequence[str]
+) -> None:
+    """
+    Import staged content to library task.
+    """
     target_learning_package = LearningPackage.objects.get(id=learning_package_id)
 
     imported_publishable_versions = []
@@ -127,13 +142,10 @@ def import_to_library_task(
                     usage_key_string,
                     target_learning_package,
                     staged_content_for_import.staged_content,
-                    import_event.composition_level,
-                    import_event.override,
                 )
                 imported_publishable_versions.extend(publishable_versions)
-        except Exception as exc:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             import_event.set_status(ImportStatus.IMPORTING_FAILED)
-            raise exc
         else:
             import_event.set_status(ImportStatus.IMPORTED)
             for imported_component_version in imported_publishable_versions:

@@ -3,7 +3,7 @@ API for course to library import.
 """
 from typing import Sequence
 
-from opaque_keys.edx.keys import LearningContextKey, UsageKey
+from opaque_keys.edx.keys import LearningContextKey
 from user_tasks.tasks import UserTask
 
 from .helpers import cancel_incomplete_old_imports
@@ -14,7 +14,7 @@ from .validators import validate_usage_keys_to_import
 
 def import_to_library(
     source_key: LearningContextKey,
-    usage_ids: Sequence[str | UsageKey],
+    usage_ids: Sequence[str],
     target_learning_package_id: int,
     user_id: int,
     composition_level: str,
