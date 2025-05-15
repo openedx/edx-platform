@@ -1,10 +1,12 @@
 """
 Models for the course to library import app.
 """
+from typing import Self
 
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from user_tasks.models import UserTaskStatus
 
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import (
@@ -25,7 +27,7 @@ class Import(models.Model):
     """
 
     user_task_status = models.OneToOneField(
-        'user_tasks.UserTaskStatus',
+        UserTaskStatus,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -55,17 +57,21 @@ class Import(models.Model):
     def __str__(self):
         return f'{self.source_key} → {self.target_change}'
 
-    def set_status(self, status: ImportStatus):
+    def set_status(self: Self, status: ImportStatus):
         """
         Set import status.
         """
+        user_task_status: UserTaskStatus = self.user_task_status
+
         if status in ImportStatus.FAILED_STATUSES.value:
-            self.user_task_status.fail(status)
+            user_task_status.fail(status.value)
         elif status == ImportStatus.CANCELED:
-            self.user_task_status.cancel()
+            user_task_status.cancel()
         else:
-            self.user_task_status.set_state(status)
-        self.user_task_status.save()
+            user_task_status.set_state(status.value)
+
+        user_task_status.save()
+
         if status in [ImportStatus.IMPORTED, ImportStatus.CANCELED]:
             self.clean_related_staged_content()
 
