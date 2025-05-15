@@ -33,7 +33,6 @@ class Migration(migrations.Migration):
             model_name='import',
             name='composition_level',
             field=models.CharField(choices=[(ContainerType['Section'], 'CHAPTER'), (ContainerType['Subsection'], 'SEQUENTIAL'), (ContainerType['Unit'], 'VERTICAL'), ('component', 'COMPONENT')], default='component', help_text='The composition level of the target learning package', max_length=255),
-            preserve_default=False,
         ),
         migrations.AddField(
             model_name='import',
