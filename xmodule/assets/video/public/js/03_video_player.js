@@ -17,7 +17,6 @@ let VideoPlayer = function(state) {
     return dfd.promise();
 };
 
-/* eslint-disable no-use-before-define */
 let methodsDict = {
     destroy: destroy,
     duration: duration,

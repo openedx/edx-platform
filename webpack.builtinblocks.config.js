@@ -83,6 +83,9 @@ module.exports = {
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/tabs/tabs-aggregator.js'
         ],
+        VideoBlockDisplay: [
+            './xmodule/assets/video/public/js/10_main.js'
+        ],
         WordCloudBlockDisplay: [
             './xmodule/js/src/xmodule.js',
             './xmodule/assets/word_cloud/src/js/word_cloud.js'
