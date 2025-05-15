@@ -38,6 +38,7 @@ def get_profile_image_storage():
 
     if not storage_class_path:
         storage_class_path = (
+            getattr(settings, 'STORAGES', {}).get('profile_images', {}).get('BACKEND') or # named storages
             getattr(settings, 'DEFAULT_FILE_STORAGE', None) or
             getattr(settings, 'STORAGES', {}).get('default', {}).get('BACKEND') or
             'django.core.files.storage.FileSystemStorage'
