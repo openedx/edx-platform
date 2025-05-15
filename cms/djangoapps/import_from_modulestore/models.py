@@ -42,6 +42,7 @@ class Import(models.Model):
         max_length=255,
         choices=CompositionLevel.choices(),
         help_text=_('The composition level of the target learning package'),
+        default=CompositionLevel.COMPONENT.value,
     )
     override = models.BooleanField(
         default=False,
