@@ -1204,6 +1204,37 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
                 'image_url_full': 'http://testserver/static/default_50.png',
                 'image_url_small': 'http://testserver/static/default_10.png'}
 
+    @override_settings(
+        PROFILE_IMAGE_BACKEND={},
+        STORAGES={
+            'profile_images': {
+                'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+                'OPTIONS': {
+                    'bucket_name': 'profiles',
+                    'default_acl': 'public',
+                    'location': 'profile/images',
+                }
+            }
+        }
+    )
+    def test_profile_backend_with_profile_image_settings(self):
+        """ It will use the storages dict with profile_images backend"""
+        storage = get_profile_image_storage()
+        self.assertIsInstance(storage, S3Boto3Storage)
+        self.assertEqual(storage.bucket_name, "profiles")
+        self.assertEqual(storage.default_acl, 'public')
+        self.assertEqual(storage.location, "profile/images")
+
+    @override_settings(
+        PROFILE_IMAGE_BACKEND={},
+        STORAGES={}
+    )
+    def test_profile_backend_with_default_hardcoded_backend(self):
+        """ In case of empty storages scenario uses the hardcoded backend."""
+        del settings.DEFAULT_FILE_STORAGE
+        storage = get_profile_image_storage()
+        self.assertIsInstance(storage, FileSystemStorage)
+        
     @ddt.data(
         ("client", "user", True),
         ("different_client", "different_user", False),
