@@ -1207,7 +1207,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
     @override_settings(
         PROFILE_IMAGE_BACKEND={},
         STORAGES={
-            'profile_images': {
+            'PROFILE_IMAGE_STORAGE': {
                 'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
                 'OPTIONS': {
                     'bucket_name': 'profiles',
