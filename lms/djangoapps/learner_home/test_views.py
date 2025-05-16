@@ -577,6 +577,35 @@ class TestDashboardView(BaseTestDashboardView):
         assert expected_keys == response_data.keys()
 
     @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
+    def test_response_course_advertised_start(self):
+        """Basic test for correct response structure"""
+
+        # Given I am logged in
+        self.log_in()
+
+        # Creating course
+        advertised_start = "Winter 2025"
+        create_test_enrollment(
+            self.user, advertised_start=advertised_start
+        )
+
+        # When I request the dashboard
+        response = self.client.get(self.view_url)
+
+        # Then I get the expected success response
+        assert response.status_code == 200
+
+        response_data = json.loads(response.content)
+        assert "courses" in response_data
+        assert len(response_data["courses"]) > 0
+
+        for course in response_data["courses"]:
+            assert "courseRun" in course
+            course_run = course["courseRun"]
+            assert "advertisedStart" in course_run
+            assert course_run["advertisedStart"] == advertised_start
+
+    @patch.dict(settings.FEATURES, ENTERPRISE_ENABLED=False)
     @patch("lms.djangoapps.learner_home.views.get_user_account_confirmation_info")
     def test_email_confirmation(self, mock_user_conf_info):
         """Test that email confirmation info passes through correctly"""

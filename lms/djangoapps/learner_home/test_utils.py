@@ -64,9 +64,12 @@ def datetime_to_django_format(datetime_obj):
         return datetime_obj.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def create_test_enrollment(user, course_mode=CourseMode.AUDIT):
+def create_test_enrollment(user, course_mode=CourseMode.AUDIT, advertised_start=None):
     """Create a test user, course, course overview, and enrollment. Return the enrollment."""
-    course = CourseFactory(self_paced=True)
+    course = CourseFactory(
+        self_paced=True,
+        advertised_start=advertised_start,
+    )
 
     CourseModeFactory(
         course_id=course.id,
