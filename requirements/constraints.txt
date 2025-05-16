@@ -57,13 +57,6 @@ django-stubs<6
 # for them.
 edx-enterprise==5.13.7
 
-# Date: 2024-07-26
-# To override the constraint of edx-lint
-# This can be removed once https://github.com/openedx/edx-platform/issues/34586 is resolved
-# and the upstream constraint in edx-lint has been removed.
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35273
-event-tracking==3.0.0
-
 # Date: 2023-07-26
 # Our legacy Sass code is incompatible with anything except this ancient libsass version.
 # Here is a ticket to upgrade, but it's of debatable importance given that we are rapidly moving
