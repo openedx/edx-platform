@@ -34,7 +34,7 @@ Decisions
    part of the app's domain API), then test-relevant Python APIs should be
    defined/exported in an intentional Python module called "api_for_tests.py".
 
-Exmaples
+Examples
 ~~~~~~~~
 
 As a reference example, see the Python APIs exposed by the grades app in the

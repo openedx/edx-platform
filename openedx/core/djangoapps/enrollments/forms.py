@@ -18,6 +18,7 @@ class CourseEnrollmentsApiListForm(Form):
     MAX_INPUT_COUNT = 100
     username = CharField(required=False)
     course_id = CharField(required=False)
+    course_ids = CharField(required=False)
     email = CharField(required=False)
 
     def clean_course_id(self):
@@ -50,6 +51,24 @@ class CourseEnrollmentsApiListForm(Form):
                 validate_username(username)
             return usernames
         return usernames_csv_string
+
+    def clean_course_ids(self):
+        """
+        Validate a string of comma-separated course IDs and return a list of course IDs.
+        """
+        course_ids_csv_string = self.cleaned_data.get('course_ids')
+        if course_ids_csv_string:
+            course_ids = course_ids_csv_string.split(',')
+            if len(course_ids) > self.MAX_INPUT_COUNT:
+                raise ValidationError(
+                    "Too many course_ids in a single request - {}. A maximum of {} is allowed".format(
+                        len(course_ids),
+                        self.MAX_INPUT_COUNT,
+                    )
+                )
+            return course_ids
+
+        return course_ids_csv_string
 
     def clean_email(self):
         """

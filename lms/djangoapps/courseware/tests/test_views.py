@@ -46,7 +46,6 @@ import lms.djangoapps.courseware.views.views as views
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseStaffRole
 from common.djangoapps.student.tests.factories import (
     TEST_PASSWORD,
     AdminFactory,
@@ -75,7 +74,7 @@ from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
 from lms.djangoapps.courseware.block_render import get_block, handle_xblock_callback
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
-from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text, set_preview_mode
+from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
@@ -108,7 +107,7 @@ from openedx.features.course_experience import (
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.course_experience.url_helpers import (
-    get_courseware_url,
+    _get_legacy_courseware_url,
     get_learning_mfe_home_url,
     make_learning_mfe_courseware_url
 )
@@ -152,12 +151,10 @@ class TestJumpTo(ModuleStoreTestCase):
 
         # This is fragile, but unfortunately the problem is that within the LMS we
         # can't use the reverse calls from the CMS
-        with set_preview_mode(False):
-            response = self.client.get(jumpto_url)
+        response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    @set_preview_mode(False)
     def test_jump_to_preview_from_sequence(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -171,7 +168,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    @set_preview_mode(False)
     def test_jump_to_mfe_from_sequence(self):
         course = CourseFactory.create()
         chapter = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -184,7 +180,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    @set_preview_mode(False)
     def test_jump_to_preview_from_block(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -211,7 +206,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    @set_preview_mode(False)
     def test_jump_to_mfe_from_block(self):
         course = CourseFactory.create()
         chapter = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -239,7 +233,7 @@ class TestJumpTo(ModuleStoreTestCase):
 
     # The new courseware experience does not support this sort of course structure;
     # it assumes a simple course->chapter->sequence->unit->component tree.
-    @set_preview_mode(True)
+    @patch.object(views, 'get_courseware_url', new=_get_legacy_courseware_url)
     def test_jump_to_legacy_from_nested_block(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -275,11 +269,9 @@ class TestJumpTo(ModuleStoreTestCase):
         ) if preview_mode else (
             f'/courses/{course.id}/jump_to/NoSuchPlace'
         )
-        with set_preview_mode(False):
-            response = self.client.get(jumpto_url)
+        response = self.client.get(jumpto_url)
         assert response.status_code == 404
 
-    @set_preview_mode(True)
     @ddt.data(
         (ModuleStoreEnum.Type.split, False, '1'),
         (ModuleStoreEnum.Type.split, True, '2'),
@@ -316,17 +308,17 @@ class TestJumpTo(ModuleStoreTestCase):
             }
         )
         expected_url += "?{}".format(urlencode({'activate_block_id': str(staff_only_vertical.location)}))
-        assert expected_url == get_courseware_url(usage_key, request)
+        assert expected_url == _get_legacy_courseware_url(usage_key, request)
 
 
-@set_preview_mode(True)
 class IndexQueryTestCase(ModuleStoreTestCase):
     """
     Tests for query count.
     """
     NUM_PROBLEMS = 20
 
-    def test_index_query_counts(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_index_query_counts(self, mock_redirect):
         # TODO: decrease query count as part of REVO-28
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         with self.store.default_store(ModuleStoreEnum.Type.split):
@@ -427,27 +419,8 @@ class BaseViewsTestCase(ModuleStoreTestCase, MasqueradeMixin):
         self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
         assert self.client.login(username=self.global_staff.username, password=TEST_PASSWORD)
 
-    def _get_urls(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        lms_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course_key),
-                'chapter': str(self.chapter.location.block_id),
-                'section': str(self.section2.location.block_id),
-            },
-        ) + '?foo=b$r'
-        mfe_url = '{}/course/{}/{}?foo=b%24r'.format(
-            settings.LEARNING_MICROFRONTEND_URL,
-            self.course_key,
-            self.section2.location
-        )
-        preview_url = "http://" + settings.FEATURES.get('PREVIEW_LMS_BASE') + lms_url
-
-        return lms_url, mfe_url, preview_url
-
 
 @ddt.ddt
-@set_preview_mode(True)
 class CoursewareIndexTestCase(BaseViewsTestCase):
     """
     Tests for the courseware index view, used for instructor previews.
@@ -456,7 +429,8 @@ class CoursewareIndexTestCase(BaseViewsTestCase):
         super().setUp()
         self._create_global_staff_user()  # this view needs staff permission
 
-    def test_index_success(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_index_success(self, mock_redirect):
         response = self._verify_index_response()
         self.assertContains(response, self.problem2.location.replace(branch=None, version_guid=None))
 
@@ -468,7 +442,6 @@ class CoursewareIndexTestCase(BaseViewsTestCase):
         self.assertNotContains(response, self.problem.location.replace(branch=None, version_guid=None))
         self.assertContains(response, self.problem2.location.replace(branch=None, version_guid=None))
 
-    @set_preview_mode(True)
     def test_index_nonexistent_chapter(self):
         self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
 
@@ -505,12 +478,12 @@ class CoursewareIndexTestCase(BaseViewsTestCase):
         assert '/courses/{course_key}/courseware?{activate_block_id}'.format(
             course_key=str(self.course_key),
             activate_block_id=urlencode({'activate_block_id': str(self.course.location)})
-        ) == get_courseware_url(self.course.location)
+        ) == _get_legacy_courseware_url(self.course.location)
         # test a section location
         assert '/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(
             course_key=str(self.course_key),
             activate_block_id=urlencode({'activate_block_id': str(self.section.location)})
-        ) == get_courseware_url(self.section.location)
+        ) == _get_legacy_courseware_url(self.section.location)
 
     def test_index_invalid_position(self):
         request_url = '/'.join([
@@ -542,7 +515,8 @@ class CoursewareIndexTestCase(BaseViewsTestCase):
 
     # TODO: TNL-6387: Remove test
     @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
-    def test_accordion(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_accordion(self, mock_redirect):
         """
         This needs a response_context, which is not included in the render_accordion's main method
         returning a render_to_string, so we will render via the courseware URL in order to include
@@ -1148,12 +1122,21 @@ class TestProgressDueDate(BaseDueDateTests):
 
 
 # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-@set_preview_mode(True)
 class TestAccordionDueDate(BaseDueDateTests):
     """
     Test that the accordion page displays due dates correctly
     """
     __test__ = True
+
+    def setUp(self):
+        super().setUp()
+        self.patcher = patch(
+            'lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+        self.mock_redirect = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+        super().tearDown()
 
     def get_response(self, course):
         """ Returns the HTML for the accordion """
@@ -2363,13 +2346,13 @@ class ViewCheckerBlock(XBlock):
 
 
 @ddt.ddt
-@set_preview_mode(True)
 class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
     @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
-    def test_student_state(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_student_state(self, mock_redirect):
         """
         Verify that saved student state is loaded for xblocks rendered in the index view.
         """
@@ -2409,7 +2392,8 @@ class TestIndexView(ModuleStoreTestCase):
         self.assertContains(response, "ViewCheckerPassed", count=3)
 
     @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
-    def test_activate_block_id(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_activate_block_id(self, mock_redirect):
         course = CourseFactory.create()
         with self.store.bulk_operations(course.id):
             chapter = BlockFactory.create(parent=course, category='chapter')
@@ -2517,7 +2501,6 @@ class TestIndexView(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@set_preview_mode(True)
 class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin):
     """
     Tests CompleteOnView is set up correctly in CoursewareIndex.
@@ -2590,7 +2573,8 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
         assert self.client.login(username=self.user.username, password=self.user_password)
 
-    def test_completion_service_disabled(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_completion_service_disabled(self, mock_redirect):
 
         self.setup_course(ModuleStoreEnum.Type.split)
 
@@ -2600,7 +2584,8 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
         response = self.client.get(self.section_2_url)
         self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
 
-    def test_completion_service_enabled(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_completion_service_enabled(self, mock_redirect):
 
         self.override_waffle_switch(True)
 
@@ -2652,7 +2637,6 @@ class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin
 
 
 @ddt.ddt
-@set_preview_mode(True)
 class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
     """
     Test the index view to handle vertical positions. Confirms that first position is loaded
@@ -2704,7 +2688,8 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
 
     @ddt.data(("-1", 1), ("0", 1), ("-0", 1), ("2", 2), ("5", 1))
     @ddt.unpack
-    def test_vertical_positions(self, input_position, expected_position):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_vertical_positions(self, input_position, expected_position, mock_redirect):
         """
         Tests the following cases:
         * Load first position when negative position inputted.
@@ -3097,7 +3082,6 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disa
         return options
 
 
-@set_preview_mode(True)
 class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
     """
     Ensure that courseware index requests do not trigger student state writes.
@@ -3128,7 +3112,8 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
         super().setUp()
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
 
-    def test_write_by_default(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_write_by_default(self, mock_redirect):
         """By default, always write student state, regardless of user agent."""
         with patch('lms.djangoapps.courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
             # Simulate someone using Chrome
@@ -3140,7 +3125,8 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
             self._load_courseware('edX-downloader/0.1')
             assert patched_state_client_set_many.called
 
-    def test_writes_with_config(self):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_writes_with_config(self, mock_redirect):
         """Test state writes (or lack thereof) based on config values."""
         CrawlersConfig.objects.create(known_user_agents='edX-downloader,crawler_foo', enabled=True)
         with patch('lms.djangoapps.courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
@@ -3158,7 +3144,10 @@ class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
 
         # Disabling the crawlers config should revert us to default behavior
         CrawlersConfig.objects.create(enabled=False)
-        self.test_write_by_default()
+
+        # Disabling the violation because pylint just can't see that we'll get the mock_redirect param passed in via the
+        # patch.
+        self.test_write_by_default()  # pylint: disable=no-value-for-parameter
 
     def _load_courseware(self, user_agent):
         """Helper to load the actual courseware page."""
@@ -3319,25 +3308,6 @@ class MFEUrlTests(TestCase):
             '/block-v1:OpenEdX+MFE+2020+type@sequential+block@Introduction'
             '/block-v1:OpenEdX+MFE+2020+type@vertical+block@Getting_To_Know_You'
         )
-
-
-class PreviewTests(BaseViewsTestCase):
-    """
-    Make sure we allow the Legacy view for course previews.
-    """
-    def test_learner_redirect(self):
-        # learners will be redirected by default
-        lms_url, mfe_url, __ = self._get_urls()
-        assert self.client.get(lms_url).url == mfe_url
-
-    def test_preview_no_redirect(self):
-        __, __, preview_url = self._get_urls()
-        with set_preview_mode(True):
-            # Previews server from PREVIEW_LMS_BASE will not redirect to the mfe
-            course_staff = UserFactory.create(is_staff=False)
-            CourseStaffRole(self.course_key).add_users(course_staff)
-            self.client.login(username=course_staff.username, password=TEST_PASSWORD)
-            assert self.client.get(preview_url).status_code == 200
 
 
 class ContentOptimizationTestCase(ModuleStoreTestCase):
