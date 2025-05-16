@@ -37,15 +37,18 @@ def get_profile_image_storage():
     options = config.get('options', {})
 
     if not storage_class_path:
-        storage_class_path = (
-            getattr(settings, 'STORAGES', {}).get('profile_images', {}).get('BACKEND') or  # custom named storages 
-            getattr(settings, 'DEFAULT_FILE_STORAGE', None) or
-            getattr(settings, 'STORAGES', {}).get('default', {}).get('BACKEND') or
-            'django.core.files.storage.FileSystemStorage'
-        )
+        storages_config = getattr(settings, 'STORAGES', {})
 
-        # For Django 5.x, pick options if available
-        options = getattr(settings, 'STORAGES', {}).get('default', {}).get('OPTIONS', {})
+        if 'profile_images' in storages_config:
+            storage_class_path = storages_config['profile_images'].get('BACKEND')
+            options = storages_config['profile_images'].get('OPTIONS', {})
+        elif 'default' in storages_config:
+            storage_class_path = storages_config['default'].get('BACKEND')
+            options = storages_config['default'].get('OPTIONS', {})
+        else:
+            storage_class_path = getattr(settings, 'DEFAULT_FILE_STORAGE', None) or \
+                                 'django.core.files.storage.FileSystemStorage'
+            options = {}
 
     storage_class = import_string(storage_class_path)
     return storage_class(**options)
