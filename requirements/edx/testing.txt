@@ -399,7 +399,7 @@ django-mptt==0.17.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
-django-multi-email-field==0.7.0
+django-multi-email-field==0.8.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
