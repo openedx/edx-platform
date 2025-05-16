@@ -66,7 +66,13 @@ TEST_ROOT = path("test_root")
 
 # Want static files in the same dir for running on jenkins.
 STATIC_ROOT = TEST_ROOT / "staticfiles"
-WEBPACK_LOADER["DEFAULT"]["STATS_FILE"] = STATIC_ROOT / "webpack-stats.json"
+# Mocks the bundle loading logic during tests
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "BUNDLE_DIR_NAME": "bundles/",
+        "LOADER_CLASS": "webpack_loader.loader.FakeWebpackLoader",
+    }
+}
 
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 DATA_DIR = TEST_ROOT / "data"
