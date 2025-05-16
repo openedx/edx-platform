@@ -53,8 +53,8 @@ def get_profile_image_storage():
         elif 'default' in storages_config:
             return storages['default']
         else:
-            storage_class_path = getattr(settings, 'DEFAULT_FILE_STORAGE', None) or \
-                                 'django.core.files.storage.FileSystemStorage'
+            storage_class_path = (getattr(settings, 'DEFAULT_FILE_STORAGE', None) or
+                                  'django.core.files.storage.FileSystemStorage')
             options = {}
 
     storage_class = import_string(storage_class_path)
