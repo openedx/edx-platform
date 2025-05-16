@@ -10,9 +10,7 @@ from django.utils.translation import gettext_lazy as _
 class XDomainProxyConfiguration(ConfigurationModel):
     """
     Cross-domain proxy configuration.
-
     See `openedx.core.djangoapps.cors_csrf.views.xdomain_proxy` for an explanation of how this works.
-
     .. no_pii:
     """
 
