@@ -33,12 +33,7 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
     class Meta:
         app_label = 'coursewarehistoryextended'
         get_latest_by = "created"
-        indexes = [
-            models.Index(
-                fields=['student_module'],
-                name="student_module_idx"
-            ),
-        ]
+        index_together = ['student_module']
 
     id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
 
