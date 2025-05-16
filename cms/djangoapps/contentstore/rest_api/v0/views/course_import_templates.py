@@ -2,7 +2,6 @@ import datetime
 import uuid
 
 import requests
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from rest_framework import permissions, viewsets
@@ -24,24 +23,21 @@ class CourseImportTemplateViewSet(viewsets.ModelViewSet):
         """
         Return templates from configured plugin pipeline or database model.
         """
-        # Check if the OPEN_EDX_FILTERS_CONFIG is available with the right filter
-        filters_config = getattr(settings, "OPEN_EDX_FILTERS_CONFIG", {})
-        if "org.edly.templates.fetch.requested.v1" in filters_config:
-            try:
-                from course_import.filters import CourseTemplateRequested
+        try:
+            from course_import.filters import CourseTemplateRequested
 
-                templates_result = CourseTemplateRequested.run_filter(
-                    source_type="github",
-                    source_config="https://raw.githubusercontent.com/awais786/courses/refs/heads/main/edly_courses.json",
+            templates_result = CourseTemplateRequested.run_filter(
+                source_type="github",
+                source_config="https://raw.githubusercontent.com/awais786/courses/refs/heads/main/edly_courses.json",
+            )
+
+            if templates_result and "result" in templates_result:
+                # Convert the pipeline result to a format compatible with the serializer
+                return self._convert_pipeline_result_to_queryset(
+                    templates_result["result"]
                 )
-
-                if templates_result and "result" in templates_result:
-                    # Convert the pipeline result to a format compatible with the serializer
-                    return self._convert_pipeline_result_to_queryset(
-                        templates_result["result"]
-                    )
-            except (ImportError, Exception) as exc:
-                pass
+        except (ImportError, Exception) as exc:
+            pass
 
         return CourseImportTemplate.objects.all()
 
