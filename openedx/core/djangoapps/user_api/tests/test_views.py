@@ -8,6 +8,7 @@ from opaque_keys.edx.keys import CourseKey
 from pytz import common_timezones_set, common_timezones, country_timezones
 
 from openedx.core.djangoapps.django_comment_common import models
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationAccessFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api.test_utils import TEST_API_KEY, ApiTestCase
 from openedx.core.lib.time_zone_utils import get_display_time_zone
@@ -647,3 +648,64 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         assert len(results) == len(common_timezones)
         for time_zone_info in results:
             self._assert_time_zone_is_valid(time_zone_info)
+
+
+@skip_unless_lms
+class DisabledUserListViewTest(UserApiTestCase):
+    """
+    Test cases covering the list viewing behavior for disabled users
+    """
+
+    def setUp(self):
+        """
+        Setup test cases
+        """
+        super().setUp()
+        self.application_access = ApplicationAccessFactory(scopes=["disabled_users:read"])
+        self.oauth_client = self.application_access.application
+        self.oauth_client.authorization_grant_type = "client-credentials"
+        self.oauth_client.save()
+        self.disabled_user = UserFactory.create(
+            email="disabled_user@example.com",
+            username="disabled_user"
+        )
+        self.disabled_user.set_unusable_password()
+        self.disabled_user.save()
+        self.url = reverse("disable_user_list")
+
+    def _get_access_token(self):
+        """
+        Get access token
+        """
+        data = {
+            "grant_type": "client_credentials",
+            "client_id": self.oauth_client.client_id,
+            "client_secret": self.oauth_client.client_secret,
+            "scope": "disabled_users:read",
+        }
+        response = self.client.post("/oauth2/access_token", data=data)
+        return response.json()['access_token']
+
+    def test_success(self):
+        """
+        Tests if the endpoint returns the correct disabled user if correct token is provided
+        """
+        token = self._get_access_token()
+        response = self.client.get(self.url, headers={"Authorization": f"Bearer {token}"})
+        assert response.status_code == 200
+        assert response.data['count'] == 1
+        assert response.data['results'] == [self.disabled_user.email]
+
+    def test_failure_if_no_token_provided(self):
+        """
+        Tests if the endpoint returns 403 if no token is provided
+        """
+        response = self.client.get(self.url)
+        assert response.status_code == 401
+
+    def test_failure_if_invalid_token(self):
+        """
+        Tests if endpoint returns 403 if invalid token is provided
+        """
+        response = self.client.get(self.url, headers={"Authorization": "shajbasjknl"})
+        assert response.status_code == 401
