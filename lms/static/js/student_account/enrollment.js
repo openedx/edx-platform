@@ -2,6 +2,11 @@
     'use strict';
 
     define(['jquery', 'jquery.cookie'], function($) {
+        const ErrorStatuses = {
+            forbidden: 403,
+            badRequest: 400
+        };
+
         var EnrollmentInterface = {
 
             urls: {
@@ -30,13 +35,13 @@
                     context: this
                 }).fail(function(jqXHR) {
                     var responseData = JSON.parse(jqXHR.responseText);
-                    if (jqXHR.status === 403 && responseData.user_message_url) {
+                    if (jqXHR.status === ErrorStatuses.forbidden && responseData.user_message_url) {
                         // Check if we've been blocked from the course
                         // because of country access rules.
                         // If so, redirect to a page explaining to the user
                         // why they were blocked.
                         this.redirect(responseData.user_message_url);
-                    } else if (jqXHR.status === 400) {
+                    } else if (jqXHR.status === ErrorStatuses.badRequest) {
                         // Show the error message for bad requests (invalid enrollment data)
                         this.showMessage(responseData);
                     } else {
