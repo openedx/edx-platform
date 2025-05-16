@@ -39,12 +39,6 @@
                     } else if (jqXHR.status === 400) {
                         // Show the error message for bad requests (invalid enrollment data)
                         this.showMessage(responseData);
-                        // Add timeout before redirecting to allow user to see the message
-                        setTimeout(() => {
-                            if (redirectUrl) {
-                                this.redirect(redirectUrl);
-                            }
-                        }, 6000); // 6000 milliseconds = 6 seconds
                     } else {
                         // Otherwise, redirect the user to the next page.
                         if (redirectUrl) {
@@ -64,8 +58,9 @@
             /**
              * Show a message in the frontend.
              * @param  {Object} message The message to display.
+             * @param  {string} redirectUrl The URL to redirect to when the button is clicked.
              */
-            showMessage: function(message) {
+            showMessage: function(message, redirectUrl) {
                 const componentId = 'student-enrrollment-feedback-error';
                 const existing = document.getElementById(componentId);
                 if (existing) {
@@ -75,7 +70,6 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.setAttribute('id', componentId);
                 messageDiv.setAttribute('class', 'fixed-top d-flex justify-content-center align-items-center');
-                // Style for popup
                 messageDiv.style.cssText = [
                     'width:100vw',
                     'height:100vh',
@@ -83,16 +77,35 @@
                     'z-index:9999'
                 ].join(';');
 
+                const buttonText = typeof gettext === 'function' ? gettext('Close') : 'Close';
+
+                const buttonHtml = redirectUrl
+                    ? `<div class="nav-actions mt-3 text-start">
+                           <button type="button" class="action-primary" id="enrollment-redirect-btn">${buttonText}</button>
+                       </div>`
+                    : '';
+
                 messageDiv.innerHTML = `
-                  <div class="page-banner w-75">
+                  <div class="page-banner w-75 has-actions">
                     <div class="alert alert-warning" role="alert">
-                      <span class="icon icon-alert fa fa-warning" aria-hidden="true"></span>
-                      <div class="message-content">${textContent}</div>
+                      <div class="row">
+                        <div class="col d-flex align-items-center">
+                          <span class="icon icon-alert fa fa-warning me-2" aria-hidden="true"></span>
+                          <span class="message-content">${textContent}</span>
+                        </div>
+                      </div>
+                      ${buttonHtml}
                     </div>
                   </div>
                 `;
 
                 document.body.appendChild(messageDiv);
+
+                if (redirectUrl) {
+                    document.getElementById('enrollment-redirect-btn').onclick = () => {
+                        this.redirect(redirectUrl);
+                    };
+                }
             },
             /**
              * Redirect to a URL.  Mainly useful for mocking out in tests.
