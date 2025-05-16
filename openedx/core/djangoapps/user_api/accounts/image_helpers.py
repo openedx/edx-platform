@@ -7,6 +7,7 @@ import hashlib
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.files.storage import storages
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.module_loading import import_string
 
@@ -39,9 +40,8 @@ def get_profile_image_storage():
     if not storage_class_path:
         storages_config = getattr(settings, 'STORAGES', {})
 
-        if 'profile_images' in storages_config:
-            storage_class_path = storages_config['profile_images'].get('BACKEND')
-            options = storages_config['profile_images'].get('OPTIONS', {})
+        if 'PROFILE_IMAGE_STORAGE' in storages_config:
+            return storages['PROFILE_IMAGE_STORAGE']
         elif 'default' in storages_config:
             storage_class_path = storages_config['default'].get('BACKEND')
             options = storages_config['default'].get('OPTIONS', {})
