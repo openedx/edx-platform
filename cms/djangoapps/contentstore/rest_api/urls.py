@@ -15,7 +15,7 @@ app_name = 'cms.djangoapps.contentstore'
 
 
 router = DefaultRouter()
-router.register(r'course-import-templates', CourseImportTemplateViewSet)
+router.register(r'course-import-templates', CourseImportTemplateViewSet, basename='course-import-templates')
 
 
 urlpatterns = [
