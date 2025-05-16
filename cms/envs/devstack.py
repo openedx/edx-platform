@@ -45,7 +45,6 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = f'http://{LMS_BASE}'
-FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 

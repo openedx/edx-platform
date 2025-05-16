@@ -11,8 +11,6 @@
 ---
 
 SECRET_KEY: aseuothsaeotuhaseotisaotenihsaoetih
-FEATURES:
-  PREVIEW_LMS_BASE: "http://localhost"
 TRACKING_BACKENDS: {}
 EVENT_TRACKING_BACKENDS: {}
 JWT_AUTH: {}

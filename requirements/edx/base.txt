@@ -342,9 +342,8 @@ django-statici18n==2.6.0
     #   xblock-drag-and-drop-v2
     #   xblock-poll
     #   xblocks-contrib
-django-storages==1.14.3
+django-storages==1.14.6
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edxval
 django-user-tasks==3.3.0
@@ -461,7 +460,7 @@ edx-drf-extensions==10.6.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==5.13.4
+edx-enterprise==5.13.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
