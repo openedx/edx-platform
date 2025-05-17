@@ -8,5 +8,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-
+        migrations.AlterIndexTogether(
+            name='persistentcoursegrade',
+            index_together={('passed_timestamp', 'course_id'), ('modified', 'course_id')},
+        ),
+        migrations.AlterIndexTogether(
+            name='persistentsubsectiongrade',
+            index_together={('modified', 'course_id', 'usage_key')},
+        ),
     ]

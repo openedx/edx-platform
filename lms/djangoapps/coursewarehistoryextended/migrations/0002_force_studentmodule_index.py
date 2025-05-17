@@ -8,5 +8,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-
+        migrations.AlterIndexTogether(
+            name='studentmodulehistoryextended',
+            index_together={('student_module',)},
+        ),
     ]

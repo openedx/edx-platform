@@ -101,7 +101,10 @@ class Migration(migrations.Migration):
             name='coursesection',
             unique_together={('learning_context', 'usage_key')},
         ),
-        
+        migrations.AlterIndexTogether(
+            name='coursesection',
+            index_together={('learning_context', 'ordering')},
+        ),
 
         # Custom code: Convert columns to utf8_bin because we want to allow
         # case-sensitive comparisons for things like UsageKeys, CourseKeys, and
