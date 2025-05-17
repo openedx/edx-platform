@@ -64,12 +64,6 @@ edx-enterprise==6.0.2
 # https://github.com/openedx/edx-platform/issues/31616
 libsass==0.10.0
 
-# Date: 2018-12-14
-# markdown>=3.4.0 has failures due to internal refactorings which causes the tests to fail
-# pinning the version untill the issue gets resolved in the package itself
-# Issue for unpinning: https://github.com/openedx/edx-platform/issues/35271
-markdown<3.4.0
-
 # Date: 2024-07-16
 # We need to upgrade the version of elasticsearch to atleast 7.15 before we can upgrade to Numpy 2.0.0
 # Otherwise we see a failure while running the following command:
