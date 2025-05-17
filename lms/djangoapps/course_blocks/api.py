@@ -95,7 +95,8 @@ def get_course_blocks(
     """
     if not transformers:
         transformers = BlockStructureTransformers(get_course_block_access_transformers(user))
-
+    if include_completion:
+        transformers += [BlockCompletionTransformer()]
     transformers.usage_info = CourseUsageInfo(
         starting_block_usage_key.course_key,
         user,

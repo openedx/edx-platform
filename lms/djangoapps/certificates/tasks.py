@@ -7,7 +7,7 @@ from logging import getLogger
 from typing import Any, Dict, List
 
 from celery import shared_task
-from celery_utils.persist_on_failure import LoggedTask
+from celery_utils.persist_on_failure import LoggedPersistOnFailureTask, LoggedTask
 from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
@@ -24,7 +24,9 @@ User = get_user_model()
 CERTIFICATE_DELAY_SECONDS = 2
 
 
-
+@shared_task(
+    base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30, max_retries=2
+)
 @set_code_owner_attribute
 def generate_certificate(self, **kwargs):  # pylint: disable=unused-argument
     """
