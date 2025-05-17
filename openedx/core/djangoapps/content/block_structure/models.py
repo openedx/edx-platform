@@ -105,7 +105,7 @@ class CustomizableFileField(models.FileField):
     def deconstruct(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         name, path, args, kwargs = super().deconstruct()
         del kwargs['upload_to']
-        del kwargs['storage']
+        # del kwargs['storage']
         del kwargs['max_length']
         return name, path, args, kwargs
 

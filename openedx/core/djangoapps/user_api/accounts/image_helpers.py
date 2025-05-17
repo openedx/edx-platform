@@ -34,7 +34,6 @@ def get_profile_image_storage():
     Returns:
         An instance of the configured storage backend.
     """
-    breakpoint()
     config = getattr(settings, 'PROFILE_IMAGE_BACKEND', {})
     storage_class_path = config.get('class')
     options = config.get('options', {})
