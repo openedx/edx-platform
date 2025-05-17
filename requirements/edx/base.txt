@@ -720,9 +720,8 @@ mako==1.3.10
     #   lti-consumer-xblock
     #   xblock
     #   xblock-utils
-markdown==3.3.7
+markdown==3.8
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   openedx-django-wiki
     #   staff-graded-xblock
@@ -799,7 +798,7 @@ openedx-django-pyfs==3.8.0
     #   xblocks-contrib
 openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-django-wiki==3.1.0
+openedx-django-wiki==3.1.1
     # via -r requirements/edx/kernel.in
 openedx-events==10.2.0
     # via
