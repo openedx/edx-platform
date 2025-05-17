@@ -7,6 +7,10 @@
 
 (function() {
     'use strict';
+    // constants for denoting the click of submit/save/reset button
+    var submitClick = "submit";
+    var saveClick = "save";
+    var resetClick = "reset";
 
     var indexOfHelper = [].indexOf
         || function(item) {
@@ -135,6 +139,7 @@
             this.element_id = this.el.attr('id');
             this.url = this.el.data('url');
             this.content = this.el.data('content');
+
 
             // has_timed_out and has_response are used to ensure that
             // we wait a minimum of ~ 1s before transitioning the submit
@@ -630,7 +635,7 @@
 
         Problem.prototype.submit = function() {
             if (!this.submit_save_waitfor(this.submit_internal)) {
-                this.disableAllButtonsWhileRunning(this.submit_internal, true);
+                this.disableAllButtonsWhileRunning(this.submit_internal, true, submitClick);
             }
         };
 
@@ -696,7 +701,7 @@
         };
 
         Problem.prototype.reset = function() {
-            return this.disableAllButtonsWhileRunning(this.reset_internal, false);
+            return this.disableAllButtonsWhileRunning(this.reset_internal, false, resetClick);
         };
 
         Problem.prototype.reset_internal = function() {
@@ -802,7 +807,7 @@
 
         Problem.prototype.save = function() {
             if (!this.submit_save_waitfor(this.save_internal)) {
-                this.disableAllButtonsWhileRunning(this.save_internal, false);
+                this.disableAllButtonsWhileRunning(this.save_internal, false, saveClick);
             }
         };
 
@@ -1219,18 +1224,56 @@
          *      'operationCallback' is an operation to be run.
          *      isFromCheckOperation' is a boolean to keep track if 'operationCallback' was
          *           from submit, if so then text of submit button will be changed as well.
+         *      isWhichOperation' is a string to keep track if 'operationCallback' was
+         *           from submit/reset/save, if so then handle the submit button enabling/disabling accordingly.
          *
          */
-        Problem.prototype.disableAllButtonsWhileRunning = function(operationCallback, isFromCheckOperation) {
+        Problem.prototype.disableAllButtonsWhileRunning = function(operationCallback, isFromCheckOperation, isWhichOperation) {
             var that = this;
-            var allButtons = [this.resetButton, this.saveButton, this.showButton, this.hintButton, this.submitButton];
-            var initiallyEnabledButtons = allButtons.filter(function(button) {
+
+            // Array of all buttons except the submit button
+            var buttonsExceptSubmit = [this.resetButton, this.saveButton, this.showButton, this.hintButton];
+            // Array containing only the submit button
+            var submitButtonArr = [this.submitButton];
+
+            // Check if the submit button is initially enabled
+            const submitInitiallyEnabled = !this.submitButton.attr('disabled');
+
+            // Filter out buttons that are initially enabled
+            var initiallyEnabledButtons = buttonsExceptSubmit.filter(function(button) {
                 return !button.attr('disabled');
             });
+
+            if ((isWhichOperation === submitClick) || (isWhichOperation === saveClick)) {
+                // Add the submit button to the initially enabled buttons if it was initially enabled
+                if (submitInitiallyEnabled) {
+                    initiallyEnabledButtons.push(this.submitButton);
+                }
+            } else if (isWhichOperation === resetClick) {
+                // If reset is clicked, disable the submit button if it was initially enabled
+                if (submitInitiallyEnabled) {
+                    this.enableButtons(submitButtonArr, false, isFromCheckOperation);
+                }
+            }
             this.enableButtons(initiallyEnabledButtons, false, isFromCheckOperation);
+
             return operationCallback().always(function() {
-                return that.enableButtons(initiallyEnabledButtons, true, isFromCheckOperation);
+              if (isWhichOperation === resetClick) {
+                  // Enable the submit button if there is a gentle alert visible
+                  if (that.el.find(".notification-gentle-alert .notification-message:visible").length > 0) {
+                      // Ensure the submit button is added to the initially enabled buttons if it was initially enabled
+                      if (submitInitiallyEnabled) {
+                          initiallyEnabledButtons.push(that.submitButton);
+                      }
+                  } else {
+                      // Otherwise, disable the submit button
+                      that.enableButtons(submitButtonArr, false, isFromCheckOperation);
+                  }
+              }
+              // Re-enable all initially enabled buttons
+              return that.enableButtons(initiallyEnabledButtons, true, isFromCheckOperation);
             });
+
         };
 
         /**
