@@ -11,6 +11,7 @@ from functools import lru_cache
 from pipeline.storage import NonPackagingMixin
 from require.storage import OptimizedFilesMixin
 from storages.backends.s3boto3 import S3Boto3Storage
+from django.utils.module_loading import import_string
 
 from openedx.core.djangoapps.theming.storage import ThemeManifestFilesMixin, ThemePipelineMixin, ThemeMixin
 
@@ -111,4 +112,4 @@ def get_storage(storage_class=None, **kwargs):
     the storage implementation makes http requests when instantiated, for
     example.
     """
-    return {}
+    return import_string('storages.backends.s3boto3.S3Boto3Storage')(**kwargs)
