@@ -315,9 +315,15 @@ class PersistentSubsectionGrade(TimeStampedModel):
         #   in a course
         # (first_attempted, course_id, user_id): find all attempted subsections in a course for a user
         # (first_attempted, course_id): find all attempted subsections in a course for all users
-        index_together = [
-            ('modified', 'course_id', 'usage_key'),
-            ('first_attempted', 'course_id', 'user_id')
+        indexes = [
+            models.Index(
+                fields=['modified', 'course_id', 'usage_key'],
+                name="course_id_usage_key_idx"
+            ),
+            models.Index(
+                fields=['first_attempted', 'course_id', 'user_id'],
+                name="first_course_id_user_id_idx"
+            ),
         ]
 
     # primary key will need to be large for this table
@@ -569,9 +575,9 @@ class PersistentCourseGrade(TimeStampedModel):
         unique_together = [
             ('course_id', 'user_id'),
         ]
-        index_together = [
-            ('passed_timestamp', 'course_id'),
-            ('modified', 'course_id')
+        indexes = [
+            models.Index(fields=['passed_timestamp', 'course_id'], name="passed_timestamp_course_id_idx"),
+            models.Index(fields=['modified', 'course_id'], name="modified_course_id_idx")
         ]
 
     # primary key will need to be large for this table

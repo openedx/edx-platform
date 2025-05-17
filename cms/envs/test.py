@@ -131,7 +131,6 @@ DATABASES = {
 
 LMS_BASE = "localhost:8000"
 LMS_ROOT_URL = f"http://{LMS_BASE}"
-FEATURES["PREVIEW_LMS_BASE"] = "preview.localhost"
 
 CMS_BASE = "localhost:8001"
 CMS_ROOT_URL = f"http://{CMS_BASE}"
