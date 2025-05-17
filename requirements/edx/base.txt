@@ -303,7 +303,7 @@ django-mptt==0.17.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-wiki
-django-multi-email-field==0.7.0
+django-multi-email-field==0.8.0
     # via edx-enterprise
 django-mysql==4.16.0
     # via -r requirements/edx/kernel.in
