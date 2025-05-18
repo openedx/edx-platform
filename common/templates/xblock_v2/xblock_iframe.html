@@ -293,13 +293,10 @@
                 // to pass 'element' as a jQuery-wrapped DOM element, whereas the LMS
                 // runtime used to pass 'element' as the pure DOM node. In order not to
                 // break backwards compatibility, we would need to maintain that.
-                // However, this is currently disabled as it causes issues (need to
-                // modify the runtime methods like handlerUrl too), and we decided not
-                // to maintain support for legacy studio_view in this runtime.
-                // const isStudioView = element.className.indexOf('studio_view') !== -1;
-                // const passElement = isStudioView && (window as any).$ ? (window as any).$(element) : element;
-                const blockJS = new InitFunction(runtime, element, data) || {};
-                blockJS.element = element;
+                const isStudioView = element.className.indexOf('studio_view') !== -1;
+                const passElement = isStudioView && window.$ ? window.$(element) : element;
+                const blockJS = new InitFunction(runtime, passElement, data) || {};
+                blockJS.element = passElement;
 
                 if (['MetadataOnlyEditingDescriptor', 'SequenceDescriptor'].includes(data['xmodule-type'])) {
                     // The xmodule type `MetadataOnlyEditingDescriptor` and `SequenceDescriptor` renders a `<div>` with
@@ -327,19 +324,12 @@
                                 </ul>
                             </div>
                         `;
-                        element.innerHTML += xblockActions;
-
-                        const views = editorView.getMetadataEditor().views;
-                        Object.values(views).forEach(view => {
-                            const uniqueId = view.uniqueId;
-                            const input = element.querySelector(`#${uniqueId}`);
-                            if (input) {
-                                input.addEventListener("input", function(event) {
-                                    view.model.setValue(event.target.value);
-                                });
-                            }
-                        });
-
+                        // Check if passElement is a jQuery-wrapped dom element
+                        if (passElement.jquery) {
+                            passElement.append(xblockActions);
+                        } else {
+                            passElement.innerHTML += xblockActions;
+                        }
                         // Adding cancel functionality
                         $('.cancel-button', element).bind('click', function() {
                             runtime.notify('cancel', {});
