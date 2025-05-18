@@ -273,8 +273,6 @@
             // Check if the XBlock has an initialization function:
             const initFunctionName = element.getAttribute('data-init');
             if (initFunctionName !== null) {
-                // Since this block has an init function, it may need to call handlers:
-                element[HANDLER_URL] = HANDLER_URL_MAP[usageId];
                 // Now proceed with initializing the block's JavaScript:
                 const InitFunction = (window)[initFunctionName];
                 // Does the XBlock HTML contain arguments to pass to the InitFunction?
@@ -295,6 +293,8 @@
                 // break backwards compatibility, we would need to maintain that.
                 const isStudioView = element.className.indexOf('studio_view') !== -1;
                 const passElement = isStudioView && window.$ ? window.$(element) : element;
+                // Since this block has an init function, it may need to call handlers:
+                passElement[HANDLER_URL] = HANDLER_URL_MAP[usageId];
                 const blockJS = new InitFunction(runtime, passElement, data) || {};
                 blockJS.element = passElement;
 
@@ -305,7 +305,7 @@
                     // editor using the metadata.
                     require(['{{ cms_root_url }}/static/studio/js/views/xblock_editor.js'], function(XBlockEditorView) {
                         var editorView = new XBlockEditorView({
-                            el: element,
+                            el: passElement,
                             xblock: blockJS,
                         });
                         // To render block using metadata
@@ -331,21 +331,21 @@
                             passElement.innerHTML += xblockActions;
                         }
                         // Adding cancel functionality
-                        $('.cancel-button', element).bind('click', function() {
+                        $('.cancel-button', passElement).bind('click', function() {
                             runtime.notify('cancel', {});
                             event.preventDefault();
                         });
 
                         // Adding save functionality
-                        $('.save-button', element).bind('click', function() {
+                        $('.save-button', passElement).bind('click', function() {
                             //event.preventDefault();
-                            var error_message_div = $('.xblock-editor-error-message', element);
+                            var error_message_div = $('.xblock-editor-error-message', passElement);
                             const modifiedData = editorView.getChangedMetadata();
 
                             error_message_div.html();
                             error_message_div.css('display', 'none');
 
-                            var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
+                            var handlerUrl = runtime.handlerUrl(passElement, 'studio_submit');
 
                             runtime.notify('save', {state: 'start', message: gettext("Saving")});
 
