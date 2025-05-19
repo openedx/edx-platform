@@ -1357,7 +1357,7 @@ random2==1.0.2
     # via -r requirements/edx/base.txt
 recommender-xblock==3.1.0
     # via -r requirements/edx/base.txt
-redis==6.0.0
+redis==6.1.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus
@@ -1404,7 +1404,7 @@ requests-oauthlib==2.0.0
     #   social-auth-core
 rfc3986[idna2008]==1.5.0
     # via httpx
-rpds-py==0.24.0
+rpds-py==0.25.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1435,7 +1435,7 @@ semantic-version==2.10.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
-shapely==2.1.0
+shapely==2.1.1
     # via -r requirements/edx/base.txt
 simplejson==3.20.1
     # via
@@ -1603,7 +1603,7 @@ urllib3==2.2.3
     #   elasticsearch
     #   pact-python
     #   requests
-user-util==1.1.0
+user-util==2.0.0
     # via -r requirements/edx/base.txt
 uvicorn==0.34.2
     # via pact-python

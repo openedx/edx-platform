@@ -1010,7 +1010,7 @@ random2==1.0.2
     # via -r requirements/edx/kernel.in
 recommender-xblock==3.1.0
     # via -r requirements/edx/bundled.in
-redis==6.0.0
+redis==6.1.0
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1050,7 +1050,7 @@ requests-oauthlib==2.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   social-auth-core
-rpds-py==0.24.0
+rpds-py==0.25.0
     # via
     #   jsonschema
     #   referencing
@@ -1070,7 +1070,7 @@ scipy==1.15.3
     # via chem
 semantic-version==2.10.0
     # via edx-drf-extensions
-shapely==2.1.0
+shapely==2.1.1
     # via -r requirements/edx/kernel.in
 simplejson==3.20.1
     # via
@@ -1190,7 +1190,7 @@ urllib3==2.2.3
     #   botocore
     #   elasticsearch
     #   requests
-user-util==1.1.0
+user-util==2.0.0
     # via -r requirements/edx/kernel.in
 vine==5.1.0
     # via
