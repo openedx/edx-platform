@@ -649,7 +649,7 @@ edx-when==2.5.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.10.0
+edxval==3.0.0
     # via -r requirements/edx/base.txt
 elasticsearch==7.9.1
     # via
@@ -678,7 +678,7 @@ faker==37.1.0
     # via factory-boy
 fastapi==0.115.12
     # via pact-python
-fastavro==1.10.0
+fastavro==1.11.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -803,7 +803,7 @@ httpretty==1.1.4
     # via -r requirements/edx/testing.in
 httpx==0.23.3
     # via pact-python
-icalendar==6.2.0
+icalendar==6.3.0
     # via -r requirements/edx/base.txt
 idna==3.10
     # via
@@ -971,7 +971,7 @@ msgpack==1.1.0
     # via
     #   -r requirements/edx/base.txt
     #   cachecontrol
-multidict==6.4.3
+multidict==6.4.4
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp

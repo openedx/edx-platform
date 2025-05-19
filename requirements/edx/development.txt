@@ -839,7 +839,7 @@ edx-when==2.5.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-edxval==2.10.0
+edxval==3.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -881,7 +881,7 @@ fastapi==0.115.12
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
-fastavro==1.10.0
+fastavro==1.11.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1048,7 +1048,7 @@ httpx==0.23.3
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
-icalendar==6.2.0
+icalendar==6.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1272,7 +1272,7 @@ msgpack==1.1.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   cachecontrol
-multidict==6.4.3
+multidict==6.4.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
