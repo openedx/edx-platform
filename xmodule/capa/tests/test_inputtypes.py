@@ -34,7 +34,7 @@ from six.moves import zip
 
 from xmodule.capa import inputtypes
 from xmodule.capa.checker import DemoSystem
-from xmodule.capa.tests.helpers import test_capa_system
+from xmodule.capa.tests.helpers import mock_capa_system
 from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT
 from openedx.core.djangolib.markup import HTML
 
@@ -72,7 +72,7 @@ class OptionInputTest(unittest.TestCase):
             'default_option_text': 'Select an option',
             'response_data': RESPONSE_DATA
         }
-        option_input = lookup_tag('optioninput')(test_capa_system(), element, state)
+        option_input = lookup_tag('optioninput')(mock_capa_system(), element, state)
 
         context = option_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'sky_input'
@@ -138,7 +138,7 @@ class ChoiceGroupTest(unittest.TestCase):
             'response_data': RESPONSE_DATA
         }
 
-        the_input = lookup_tag(tag)(test_capa_system(), element, state)
+        the_input = lookup_tag(tag)(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
 
@@ -233,7 +233,7 @@ class JSInputTest(unittest.TestCase):
             'value': 103,
             'response_data': RESPONSE_DATA
         }
-        the_input = lookup_tag('jsinput')(test_capa_system(), element, state)
+        the_input = lookup_tag('jsinput')(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
 
@@ -270,7 +270,7 @@ class TextLineTest(unittest.TestCase):
             'value': 'BumbleBee',
             'response_data': RESPONSE_DATA
         }
-        the_input = lookup_tag('textline')(test_capa_system(), element, state)
+        the_input = lookup_tag('textline')(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
@@ -306,7 +306,7 @@ class TextLineTest(unittest.TestCase):
             'value': 'BumbleBee',
             'response_data': RESPONSE_DATA
         }
-        the_input = lookup_tag('textline')(test_capa_system(), element, state)
+        the_input = lookup_tag('textline')(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
@@ -354,7 +354,7 @@ class TextLineTest(unittest.TestCase):
                 'value': 'BumbleBee',
                 'response_data': RESPONSE_DATA
             }
-            the_input = lookup_tag('textline')(test_capa_system(), element, state)
+            the_input = lookup_tag('textline')(mock_capa_system(), element, state)
 
             context = the_input._get_render_context()  # pylint: disable=protected-access
             prob_id = 'prob_1_2'
@@ -400,7 +400,7 @@ class FileSubmissionTest(unittest.TestCase):
             'response_data': RESPONSE_DATA
         }
         input_class = lookup_tag('filesubmission')
-        the_input = input_class(test_capa_system(), element, state)
+        the_input = input_class(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
@@ -450,7 +450,7 @@ class CodeInputTest(unittest.TestCase):
         }
 
         input_class = lookup_tag('codeinput')
-        the_input = input_class(test_capa_system(), element, state)
+        the_input = input_class(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
@@ -510,7 +510,7 @@ class MatlabTest(unittest.TestCase):
         }
 
         self.input_class = lookup_tag('matlabinput')
-        self.the_input = self.input_class(test_capa_system(), elt, state)
+        self.the_input = self.input_class(mock_capa_system(), elt, state)
 
     def test_rendering(self):
         context = self.the_input._get_render_context()  # pylint: disable=protected-access
@@ -547,7 +547,7 @@ class MatlabTest(unittest.TestCase):
         }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
         expected = {
@@ -582,7 +582,7 @@ class MatlabTest(unittest.TestCase):
             }
             elt = etree.fromstring(self.xml)
             prob_id = 'prob_1_2'
-            the_input = self.input_class(test_capa_system(), elt, state)
+            the_input = self.input_class(mock_capa_system(), elt, state)
             context = the_input._get_render_context()  # pylint: disable=protected-access
             expected = {
                 'STATIC_URL': '/dummy-static/',
@@ -616,7 +616,7 @@ class MatlabTest(unittest.TestCase):
         }
         elt = etree.fromstring(self.xml)
         prob_id = 'prob_1_2'
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
         expected = {
             'STATIC_URL': '/dummy-static/',
@@ -668,7 +668,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         inner_msg = 'hello!'
         queue_msg = json.dumps({'msg': inner_msg})
 
@@ -687,7 +687,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         inner_msg = 'hello!'
         queue_msg = json.dumps({'msg': inner_msg})
 
@@ -702,7 +702,7 @@ class MatlabTest(unittest.TestCase):
         state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         assert the_input.status == 'queued'
 
     @patch('xmodule.capa.inputtypes.time.time', return_value=45)
@@ -711,7 +711,7 @@ class MatlabTest(unittest.TestCase):
         state = {'input_state': {'queuestate': 'queued', 'queuetime': 5}}
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         assert the_input.status == 'unsubmitted'
         assert the_input.msg == 'No response from Xqueue within {} seconds. Aborted.'.format(XQUEUE_TIMEOUT)
 
@@ -723,7 +723,7 @@ class MatlabTest(unittest.TestCase):
         state = {'input_state': {'queuestate': 'queued'}}
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         assert the_input.status == 'unsubmitted'
 
     def test_matlab_api_key(self):
@@ -731,7 +731,7 @@ class MatlabTest(unittest.TestCase):
         Test that api_key ends up in the xqueue payload
         """
         elt = etree.fromstring(self.xml)
-        system = test_capa_system()
+        system = mock_capa_system()
         system.matlab_api_key = 'test_api_key'
         the_input = lookup_tag('matlabinput')(system, elt, {})
 
@@ -852,7 +852,7 @@ class MatlabTest(unittest.TestCase):
         }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
         self.maxDiff = None
         expected = fromstring('\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')  # lint-amnesty, pylint: disable=line-too-long
@@ -901,7 +901,7 @@ class MatlabTest(unittest.TestCase):
                 'status': 'queued',
             }
             elt = etree.fromstring(self.xml)
-            the_input = self.input_class(test_capa_system(), elt, state)
+            the_input = self.input_class(mock_capa_system(), elt, state)
             assert the_input.queue_msg == queue_msg
 
     def test_matlab_queue_message_not_allowed_tag(self):
@@ -915,7 +915,7 @@ class MatlabTest(unittest.TestCase):
             'status': 'queued',
         }
         elt = etree.fromstring(self.xml)
-        the_input = self.input_class(test_capa_system(), elt, state)
+        the_input = self.input_class(mock_capa_system(), elt, state)
         expected = ""
         assert the_input.queue_msg == expected
 
@@ -974,7 +974,7 @@ class SchematicTest(unittest.TestCase):
             'response_data': RESPONSE_DATA
         }
 
-        the_input = lookup_tag('schematic')(test_capa_system(), element, state)
+        the_input = lookup_tag('schematic')(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
@@ -1021,7 +1021,7 @@ class ImageInputTest(unittest.TestCase):
             'response_data': RESPONSE_DATA
         }
 
-        the_input = lookup_tag('imageinput')(test_capa_system(), element, state)
+        the_input = lookup_tag('imageinput')(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
@@ -1079,7 +1079,7 @@ class CrystallographyTest(unittest.TestCase):
             'response_data': RESPONSE_DATA
         }
 
-        the_input = lookup_tag('crystallography')(test_capa_system(), element, state)
+        the_input = lookup_tag('crystallography')(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
@@ -1124,7 +1124,7 @@ class VseprTest(unittest.TestCase):
             'response_data': RESPONSE_DATA
         }
 
-        the_input = lookup_tag('vsepr_input')(test_capa_system(), element, state)
+        the_input = lookup_tag('vsepr_input')(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'prob_1_2'
@@ -1160,7 +1160,7 @@ class ChemicalEquationTest(unittest.TestCase):
             'value': 'H2OYeah',
             'response_data': RESPONSE_DATA
         }
-        self.the_input = lookup_tag('chemicalequationinput')(test_capa_system(), element, state)
+        self.the_input = lookup_tag('chemicalequationinput')(mock_capa_system(), element, state)
 
     def test_rendering(self):
         """
@@ -1255,7 +1255,7 @@ class FormulaEquationTest(unittest.TestCase):
             'value': 'x^2+1/2',
             'response_data': RESPONSE_DATA
         }
-        self.the_input = lookup_tag('formulaequationinput')(test_capa_system(), element, state)
+        self.the_input = lookup_tag('formulaequationinput')(mock_capa_system(), element, state)
 
     def test_rendering(self):
         """
@@ -1305,7 +1305,7 @@ class FormulaEquationTest(unittest.TestCase):
                 'value': 'x^2+1/2',
                 'response_data': RESPONSE_DATA
             }
-            the_input = lookup_tag('formulaequationinput')(test_capa_system(), element, state)
+            the_input = lookup_tag('formulaequationinput')(mock_capa_system(), element, state)
 
             context = the_input._get_render_context()  # pylint: disable=protected-access
             prob_id = 'prob_1_2'
@@ -1440,7 +1440,7 @@ class DragAndDropTest(unittest.TestCase):
                         ]
         }
 
-        the_input = lookup_tag('drag_and_drop_input')(test_capa_system(), element, state)
+        the_input = lookup_tag('drag_and_drop_input')(mock_capa_system(), element, state)
         prob_id = 'prob_1_2'
         context = the_input._get_render_context()  # pylint: disable=protected-access
         expected = {
@@ -1494,7 +1494,7 @@ class AnnotationInputTest(unittest.TestCase):
 
         tag = 'annotationinput'
 
-        the_input = lookup_tag(tag)(test_capa_system(), element, state)
+        the_input = lookup_tag(tag)(mock_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
         prob_id = 'annotation_input'
@@ -1588,7 +1588,7 @@ class TestChoiceText(unittest.TestCase):
             'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
         }
         expected.update(state)
-        the_input = lookup_tag(tag)(test_capa_system(), element, state)
+        the_input = lookup_tag(tag)(mock_capa_system(), element, state)
         context = the_input._get_render_context()  # pylint: disable=protected-access
         assert context == expected
 
