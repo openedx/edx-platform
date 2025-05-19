@@ -1,8 +1,6 @@
 """
 Django admin page for Site Configuration models
 """
-
-
 from django.contrib import admin
 
 from .models import SiteConfiguration, SiteConfigurationHistory
