@@ -26,6 +26,9 @@
             this.goto = function(event) {
                 return Sequence.prototype.goto.apply(self, [event]);
             };
+            this.toggleDropdown = function(event) {
+                return Sequence.prototype.toggleDropdown.apply(self, [event]);
+            };
             this.toggleArrows = function() {
                 return Sequence.prototype.toggleArrows.apply(self);
             };
@@ -72,12 +75,18 @@
 
         Sequence.prototype.bind = function() {
             this.$('#sequence-list .nav-item').click(this.goto);
+            this.$('#dropdown-sequence-list .dropdown-item').click(this.goto);
+            this.$('#dropdown-sequence-list-button').click(this.toggleDropdown);
             this.$('#sequence-list .nav-item').keypress(this.keyDownHandler);
             this.el.on('bookmark:add', this.addBookmarkIconToActiveNavItem);
             this.el.on('bookmark:remove', this.removeBookmarkIconFromActiveNavItem);
             this.$('#sequence-list .nav-item').on('focus mouseenter', this.displayTabTooltip);
             this.$('#sequence-list .nav-item').on('blur mouseleave', this.hideTabTooltip);
         };
+
+        Sequence.prototype.toggleDropdown = function(event) {
+          $('#dropdown-sequence-list').toggle();
+        }
 
         Sequence.prototype.previousNav = function(focused, index) {
             var $navItemList,
@@ -289,6 +298,7 @@
         Sequence.prototype.goto = function(event) {
             var alertTemplate, alertText, isBottomNav, newPosition, widgetPlacement;
             event.preventDefault();
+            $('#dropdown-sequence-list').hide();
 
             // Links from courseware <a class='seqnav' href='n'>...</a>, was .target_tab
             if ($(event.currentTarget).hasClass('seqnav')) {

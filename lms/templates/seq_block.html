@@ -4,6 +4,10 @@
   from django.conf import settings
 %>
 
+<%
+  show_dropdown = len(items) > 15
+%>
+
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}"
      data-position="${position}"
      data-next-url="${next_url}" data-prev-url="${prev_url}"
@@ -46,7 +50,7 @@
         </li>
         % else:
         % for idx, item in enumerate(items):
-        <li role="presentation">
+        <li role="presentation" class="${'d-none' if idx > 14 else ''}">
           <button class="seq_${item['type']} inactive nav-item tab"
             role="tab"
             tabindex="-1"
@@ -97,6 +101,9 @@
             <li><a href="#" class="seq_paste_unit" data-parent="${item_id}" data-category="vertical" data-default-name="${_('Unit')}">${_("Paste as new unit")}</a></li>
           </ul>
         </li>
+        % endif
+        % if show_dropdown:
+          <%include file='seq_dropdown.html' args="items=items[15:], start_index=15"/>
         % endif
       </ol>
     </nav>
