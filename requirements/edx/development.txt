@@ -506,7 +506,7 @@ django-mptt==0.17.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-django-wiki
-django-multi-email-field==0.7.0
+django-multi-email-field==0.8.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
