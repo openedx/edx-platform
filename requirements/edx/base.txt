@@ -757,7 +757,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-forum
-newrelic==10.11.0
+newrelic==10.12.0
     # via edx-django-utils
 nh3==0.2.21
     # via -r requirements/edx/kernel.in
@@ -798,9 +798,9 @@ openedx-django-pyfs==3.8.0
     #   xblocks-contrib
 openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-django-wiki==3.1.0
+openedx-django-wiki==3.1.1
     # via -r requirements/edx/kernel.in
-openedx-events==10.2.0
+openedx-events==10.2.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -820,7 +820,7 @@ openedx-learning==0.26.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-openedx-mongodbproxy==0.2.2
+openedx-mongodbproxy==0.3.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==5.2.0
     # via -r requirements/edx/bundled.in

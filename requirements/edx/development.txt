@@ -873,7 +873,7 @@ execnet==2.1.1
     #   pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.txt
-faker==37.1.0
+faker==37.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -1287,7 +1287,7 @@ mysqlclient==2.2.7
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-forum
-newrelic==10.11.0
+newrelic==10.12.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1353,11 +1353,11 @@ openedx-django-require==2.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-django-wiki==3.1.0
+openedx-django-wiki==3.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==10.2.0
+openedx-events==10.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1382,7 +1382,7 @@ openedx-learning==0.26.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-mongodbproxy==0.2.2
+openedx-mongodbproxy==0.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
