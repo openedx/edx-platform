@@ -1225,7 +1225,7 @@ wheel==0.45.1
     # via django-pipeline
 wrapt==1.17.2
     # via -r requirements/edx/kernel.in
-git+https://github.com/ttqureshi/Xblock.git@ttqureshi/pointer-tag
+xblock[django]==5.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   acid-xblock

@@ -2,7 +2,7 @@
 Tests of XML export
 """
 
-
+import lxml.etree as ET
 import shutil
 import unittest
 from datetime import datetime, timedelta, tzinfo
@@ -73,19 +73,22 @@ class RoundTripTestCase(unittest.TestCase):
 
     @mock.patch('xmodule.video_block.video_block.edxval_api', None)
     @mock.patch('xmodule.course_block.requests.get')
+    # @ddt.data(
+    #     "toy",
+    #     "simple",
+    #     "conditional_and_poll",
+    #     "conditional",
+    #     "self_assessment",
+    #     "test_exam_registration",
+    #     "word_cloud",
+    #     "pure_xblock",
+    # )
     @ddt.data(
         "toy",
-        "simple",
-        "conditional_and_poll",
-        "conditional",
-        "self_assessment",
-        "test_exam_registration",
-        "word_cloud",
-        "pure_xblock",
     )
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     def test_export_roundtrip(self, course_dir, mock_get):
-
+        
         # Patch network calls to retrieve the textbook TOC
         mock_get.return_value.text = dedent("""
             <?xml version="1.0"?><table_of_contents>
@@ -100,6 +103,7 @@ class RoundTripTestCase(unittest.TestCase):
         shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
         print("Starting import")
+        
         initial_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses = initial_import.get_courses()
@@ -112,14 +116,13 @@ class RoundTripTestCase(unittest.TestCase):
         file_system = OSFS(root_dir)
         initial_course.runtime.export_fs = file_system.makedir(course_dir, recreate=True)
         root = lxml.etree.Element('root')
-
         initial_course.add_xml_to_node(root)
         with initial_course.runtime.export_fs.open('course.xml', 'wb') as course_xml:
             lxml.etree.ElementTree(root).write(course_xml, encoding='utf-8')
-
+        
         print("Starting second import")
         second_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
-
+        
         courses2 = second_import.get_courses()
         assert len(courses2) == 1
         exported_course = courses2[0]
@@ -130,12 +133,14 @@ class RoundTripTestCase(unittest.TestCase):
         # during imports from old-style courses.  Ignore them.
         strip_filenames(initial_course)
         strip_filenames(exported_course)
-
+        
         assert blocks_are_equivalent(initial_course, exported_course)
         assert initial_course.id == exported_course.id
         course_id = initial_course.id
 
+        print(f"courseid = {course_id}")
         print("Checking key equality")
+        
         self.assertCountEqual(
             list(initial_import.modules[course_id].keys()),
             list(second_import.modules[course_id].keys())

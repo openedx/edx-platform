@@ -224,6 +224,7 @@ class _BuiltInPollBlock(
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
+        
         poll_str = HTML('<{tag_name}>{text}</{tag_name}>').format(
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
@@ -231,6 +232,7 @@ class _BuiltInPollBlock(
 
         def add_child(xml_obj, answer):  # lint-amnesty, pylint: disable=unused-argument
             # Escape answer text before adding to xml tree.
+            # import pdb; pdb.set_trace()
             answer_text = str(answer['text'])
             child_str = Text('{tag_begin}{text}{tag_end}').format(
                 tag_begin=HTML('<{tag_name} id="{id}">').format(
@@ -245,7 +247,6 @@ class _BuiltInPollBlock(
 
         for answer in self.answers:
             add_child(xml_object, answer)
-
         return xml_object
 
 
