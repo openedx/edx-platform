@@ -16,7 +16,7 @@ class ImportStatus(TextChoices):
 
     NOT_STARTED = 'not_started', _('Waiting to stage content')
     STAGING = 'staging', _('Staging content for import')
-    STAGING_FAILED = _('Failed to stage content')
+    STAGING_FAILED = 'Failed to stage content', _('Failed to stage content')
     STAGED = 'staged', _('Content is staged and ready for import')
     IMPORTING = 'importing', _('Importing staged content')
     IMPORTING_FAILED = 'importing_failed', _('Failed to import staged content')
