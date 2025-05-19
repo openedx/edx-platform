@@ -8,17 +8,17 @@ cffi==1.17.1
     # via cryptography
 chem==2.0.0
     # via -r requirements/edx-sandbox/base.in
-click==8.2.0
+click==8.1.8
     # via nltk
 codejail-includes==1.0.0
     # via -r requirements/edx-sandbox/base.in
 contourpy==1.3.2
     # via matplotlib
-cryptography==45.0.2
+cryptography==44.0.3
     # via -r requirements/edx-sandbox/base.in
 cycler==0.12.1
     # via matplotlib
-fonttools==4.58.0
+fonttools==4.57.0
     # via matplotlib
 joblib==1.5.0
     # via nltk
