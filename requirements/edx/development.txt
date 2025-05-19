@@ -1464,7 +1464,7 @@ platformdirs==4.3.8
     #   snowflake-connector-python
     #   tox
     #   virtualenv
-pluggy==1.5.0
+pluggy==1.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   diff-cover
@@ -1535,7 +1535,7 @@ pycparser==2.22
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   cffi
-pycryptodomex==3.22.0
+pycryptodomex==3.23.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1641,7 +1641,7 @@ pynliner==0.8.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-pyopenssl==25.0.0
+pyopenssl==25.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1653,7 +1653,7 @@ pyparsing==3.2.3
     #   chem
     #   httplib2
     #   openedx-calc
-pyproject-api==1.9.0
+pyproject-api==1.9.1
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -1780,7 +1780,7 @@ random2==1.0.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-recommender-xblock==3.0.0
+recommender-xblock==3.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
