@@ -6,13 +6,26 @@ from django.core.files.storage import default_storage
 from django.utils.module_loading import import_string
 
 
-if django.VERSION >= (5, 0):
-    from django.core.files.storage import storages
+def resolve_storage_backend(storage_key, options=None):
+    """
+    Configures and returns a Django `Storage` instance, compatible with both Django 4 and Django 5.
 
+    Main goal:
+        Deprecate the use of `django.core.files.storage.get_storage_class`.
+    How:
+        Replace `get_storage_class` with direct configuration logic,
+        ensuring backward compatibility with both Django 4 and Django 5 storage settings.
+    Returns:
+        An instance of the configured storage backend.
+    Raises:
+        ImportError: If the specified storage class cannot be imported.
+    """
 
-def resolve_storage_backend(storage_key, options={}):
-    storage_path = getattr(settings, storage_key)
+    storage_path = getattr(settings, storage_key, None)
     storages_config = getattr(settings, 'STORAGES', {})
+
+    if options is None:
+        options = {}
 
     if storage_key == "default":
         # Use case 1: Default storage
@@ -29,6 +42,7 @@ def resolve_storage_backend(storage_key, options={}):
         #     "custom": {"BACKEND": "...", "OPTIONS": {...}},
         # }
         # See: https://docs.djangoproject.com/en/5.2/ref/settings/#std-setting-STORAGES
+        from django.core.files.storage import storages
         return storages[storage_key]
 
     if not storage_path and storage_key in storages_config:
@@ -37,7 +51,7 @@ def resolve_storage_backend(storage_key, options={}):
         # Manually load the backend and options
         storage_path = storages_config.get(storage_key, {}).get("BACKEND")
         options = storages_config.get(storage_key, {}).get("OPTIONS", {})
-    
+
     if not storage_path:
         # if no specific storage was resolved, use the default storage
         return default_storage
