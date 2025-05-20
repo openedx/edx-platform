@@ -12,6 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx_events.learning.data import LtiLaunchData, LtiLaunchParamsData
+from openedx_events.learning.signals import LTI_PROVIDER_LAUNCH_SUCCESS
 
 from common.djangoapps.util.views import add_p3p_header
 from lms.djangoapps.lti_provider.models import LtiConsumer
@@ -106,6 +108,24 @@ def lti_launch(request, course_id, usage_id):
     # scores back later. We know that the consumer exists, since the record was
     # used earlier to verify the oauth signature.
     store_outcome_parameters(params, request.user, lti_consumer)
+
+    LTI_PROVIDER_LAUNCH_SUCCESS.send_event(
+        launch_data=LtiLaunchData(
+            user=request.user,
+            course_key=course_key,
+            usage_key=usage_key,
+            launch_params=LtiLaunchParamsData(
+                roles=params['roles'],
+                context_id=params['context_id'],
+                user_id=params['user_id'],
+                context_title=params.get('context_title', None),
+                context_label=params.get('context_label', None),
+                lis_result_sourcedid=params.get('lis_result_sourcedid', None),
+                lis_outcome_service_url=params.get('lis_outcome_service_url', None),
+                tool_consumer_instance_guid=params.get('tool_consumer_instance_guid', None),
+            )
+        )
+    )
 
     return render_courseware(request, params['usage_key'])
 
