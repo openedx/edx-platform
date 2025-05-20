@@ -646,11 +646,11 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
         )
     )
 
-    # Add tags and collections back to index
+    # Add tags, collections and units back to index
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
             object_id=str(usage_key),
-            changes=["collections", "tags"],
+            changes=["collections", "tags", "units"],
         ),
     )
 

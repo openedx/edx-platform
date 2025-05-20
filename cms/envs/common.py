@@ -2887,6 +2887,8 @@ LIBRARY_ENABLED_BLOCKS = [
     'google-calendar',
     'google-document',
     'invideoquiz',
+    'lti',
+    'lti_consumer',
     'pdf',
     'poll',
     'survey',
