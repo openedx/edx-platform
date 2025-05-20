@@ -127,7 +127,7 @@ BULK_EMAIL_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
 BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
 CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-CSRF_TRUSTED_ORIGINS = Derived(lambda settings: settings.CSRF_TRUSTED_ORIGINS_WITH_SCHEME)
+CSRF_TRUSTED_ORIGINS = Derived(lambda settings: settings.CSRF_TRUSTED_ORIGINS)
 DEFAULT_ENTERPRISE_API_URL = Derived(
     lambda settings: (
         None if settings.LMS_INTERNAL_ROOT_URL is None
