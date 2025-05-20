@@ -512,8 +512,9 @@ edx-search==4.1.3
     #   openedx-forum
 edx-sga==0.25.3
     # via -r requirements/edx/bundled.in
-edx-submissions==3.10.1
+edx-submissions @ git+https://github.com/aulasneo/edx-submissions.git@XQU-44-add-signal-to-call-xqueue-callback
     # via
+    #   -r requirements/edx/base.in
     #   -r requirements/edx/kernel.in
     #   ora2
 edx-tincan-py35==2.0.0
@@ -800,7 +801,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==3.1.0
     # via -r requirements/edx/kernel.in
-openedx-events==10.2.0
+openedx-events==10.2.1
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
