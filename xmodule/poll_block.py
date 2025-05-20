@@ -224,7 +224,7 @@ class _BuiltInPollBlock(
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
-        
+
         poll_str = HTML('<{tag_name}>{text}</{tag_name}>').format(
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
