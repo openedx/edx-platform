@@ -101,14 +101,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.38.12
+boto3==1.38.18
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.38.12
+botocore==1.38.18
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -168,7 +168,7 @@ charset-normalizer==3.4.2
     #   snowflake-connector-python
 chem==2.0.0
     # via -r requirements/edx/base.txt
-click==8.1.8
+click==8.2.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -403,7 +403,7 @@ django-multi-email-field==0.8.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-django-mysql==4.16.0
+django-mysql==4.17.0
     # via -r requirements/edx/base.txt
 django-oauth-toolkit==1.7.1
     # via
@@ -649,7 +649,7 @@ edx-when==2.5.2
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-edxval==2.10.0
+edxval==3.0.0
     # via -r requirements/edx/base.txt
 elasticsearch==7.9.1
     # via
@@ -674,11 +674,11 @@ execnet==2.1.1
     # via pytest-xdist
 factory-boy==3.3.3
     # via -r requirements/edx/testing.in
-faker==37.1.0
+faker==37.3.0
     # via factory-boy
 fastapi==0.115.12
     # via pact-python
-fastavro==1.10.0
+fastavro==1.11.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -803,7 +803,7 @@ httpretty==1.1.4
     # via -r requirements/edx/testing.in
 httpx==0.23.3
     # via pact-python
-icalendar==6.2.0
+icalendar==6.3.0
     # via -r requirements/edx/base.txt
 idna==3.10
     # via
@@ -971,7 +971,7 @@ msgpack==1.1.0
     # via
     #   -r requirements/edx/base.txt
     #   cachecontrol
-multidict==6.4.3
+multidict==6.4.4
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -980,7 +980,7 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-newrelic==10.11.0
+newrelic==10.12.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -1028,9 +1028,9 @@ openedx-django-pyfs==3.8.0
     #   xblocks-contrib
 openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
-openedx-django-wiki==3.1.0
+openedx-django-wiki==3.1.1
     # via -r requirements/edx/base.txt
-openedx-events==10.2.0
+openedx-events==10.2.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -1050,7 +1050,7 @@ openedx-learning==0.26.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-openedx-mongodbproxy==0.2.2
+openedx-mongodbproxy==0.3.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==5.2.0
     # via -r requirements/edx/base.txt
@@ -1106,7 +1106,7 @@ platformdirs==4.3.8
     #   snowflake-connector-python
     #   tox
     #   virtualenv
-pluggy==1.5.0
+pluggy==1.6.0
     # via
     #   -r requirements/edx/coverage.txt
     #   diff-cover
@@ -1167,7 +1167,7 @@ pycparser==2.22
     # via
     #   -r requirements/edx/base.txt
     #   cffi
-pycryptodomex==3.22.0
+pycryptodomex==3.23.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
@@ -1244,7 +1244,7 @@ pynacl==1.5.0
     #   paramiko
 pynliner==0.8.0
     # via -r requirements/edx/base.txt
-pyopenssl==25.0.0
+pyopenssl==25.1.0
     # via
     #   -r requirements/edx/base.txt
     #   snowflake-connector-python
@@ -1254,7 +1254,7 @@ pyparsing==3.2.3
     #   chem
     #   httplib2
     #   openedx-calc
-pyproject-api==1.9.0
+pyproject-api==1.9.1
     # via tox
 pyquery==2.0.1
     # via -r requirements/edx/testing.in
@@ -1355,9 +1355,9 @@ pyyaml==6.0.2
     #   xblock
 random2==1.0.2
     # via -r requirements/edx/base.txt
-recommender-xblock==3.0.0
+recommender-xblock==3.1.0
     # via -r requirements/edx/base.txt
-redis==6.0.0
+redis==6.1.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus
@@ -1404,7 +1404,7 @@ requests-oauthlib==2.0.0
     #   social-auth-core
 rfc3986[idna2008]==1.5.0
     # via httpx
-rpds-py==0.24.0
+rpds-py==0.25.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1435,7 +1435,7 @@ semantic-version==2.10.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-drf-extensions
-shapely==2.1.0
+shapely==2.1.1
     # via -r requirements/edx/base.txt
 simplejson==3.20.1
     # via
@@ -1603,7 +1603,7 @@ urllib3==2.2.3
     #   elasticsearch
     #   pact-python
     #   requests
-user-util==1.1.0
+user-util==2.0.0
     # via -r requirements/edx/base.txt
 uvicorn==0.34.2
     # via pact-python
