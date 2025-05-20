@@ -6,7 +6,7 @@ from django.urls import include, path
 
 from .v0 import urls as v0_urls
 
-app_name = 'import_from_modulestore'
+app_name = 'modulestore_migrator'
 
 urlpatterns = [
     path('v0/', include(v0_urls)),
