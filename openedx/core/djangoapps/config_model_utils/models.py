@@ -339,6 +339,8 @@ class StackedConfigurationModel(ConfigurationModel):
 
     def clean(self):
         # fail validation if more than one of site/org/course are specified simultaneously
+        self.org = self.org or None
+        self.org_course = self.org_course or None
         if len([arg for arg in [self.site, self.org, self.org_course, self.course] if arg is not None]) > 1:
             raise ValidationError(
                 _('Configuration may not be specified at more than one level at once.')
