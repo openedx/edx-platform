@@ -2,12 +2,12 @@
 JWT Token handling and signing functions.
 """
 
-import json
+import jwt
 from time import time
 
 from django.conf import settings
-from jwkest import Expired, Invalid, MissingKey, jwk
-from jwkest.jws import JWS
+from jwt.api_jwk import PyJWK, PyJWKSet
+from jwt.exceptions import ExpiredSignatureError, InvalidSignatureError, MissingRequiredClaimError
 
 
 def create_jwt(lms_user_id, expires_in_seconds, additional_token_claims, now=None):
@@ -40,15 +40,9 @@ def _encode_and_sign(payload):
 
     The signing key and algorithm are pulled from settings.
     """
-    keys = jwk.KEYS()
-
-    serialized_keypair = json.loads(settings.TOKEN_SIGNING['JWT_PRIVATE_SIGNING_JWK'])
-    keys.add(serialized_keypair)
+    private_key = PyJWK.from_json(settings.TOKEN_SIGNING['JWT_PRIVATE_SIGNING_JWK'])
     algorithm = settings.TOKEN_SIGNING['JWT_SIGNING_ALGORITHM']
-
-    data = json.dumps(payload)
-    jws = JWS(data, alg=algorithm)
-    return jws.sign_compact(keys=keys)
+    return jwt.encode(payload, key=private_key.key, algorithm=algorithm)
 
 
 def unpack_jwt(token, lms_user_id, now=None):
@@ -65,27 +59,40 @@ def unpack_jwt(token, lms_user_id, now=None):
     Returns a valid, decoded json payload (string).
     """
     now = now or int(time())
-    payload = _unpack_and_verify(token)
+    payload = unpack_and_verify(token)
 
     if "lms_user_id" not in payload:
-        raise MissingKey("LMS user id is missing")
+        raise MissingRequiredClaimError("LMS user id is missing")
     if "exp" not in payload:
-        raise MissingKey("Expiration is missing")
+        raise MissingRequiredClaimError("Expiration is missing")
     if payload["lms_user_id"] != lms_user_id:
-        raise Invalid("User does not match")
+        raise InvalidSignatureError("User does not match")
     if payload["exp"] < now:
-        raise Expired("Token is expired")
+        raise ExpiredSignatureError("Token is expired")
 
     return payload
 
 
-def _unpack_and_verify(token):
+def unpack_and_verify(token):  # pylint: disable=inconsistent-return-statements
     """
     Unpack and verify the provided token.
 
     The signing key and algorithm are pulled from settings.
     """
-    keys = jwk.KEYS()
-    keys.load_jwks(settings.TOKEN_SIGNING['JWT_PUBLIC_SIGNING_JWK_SET'])
-    decoded = JWS().verify_compact(token.encode('utf-8'), keys)
-    return decoded
+    key_set = []
+    key_set.extend(
+        PyJWKSet.from_json(settings.TOKEN_SIGNING["JWT_PUBLIC_SIGNING_JWK_SET"]).keys
+    )
+
+    for i in range(len(key_set)):  # pylint: disable=consider-using-enumerate
+        try:
+            decoded = jwt.decode(
+                token,
+                key=key_set[i].key,
+                algorithms=["RS256", "RS512"],
+                options={"verify_signature": True, "verify_aud": False},
+            )
+            return decoded
+        except Exception:  # pylint: disable=broad-exception-caught
+            if i == len(key_set) - 1:
+                raise
