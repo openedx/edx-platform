@@ -49,3 +49,12 @@ ENABLE_ORA_GRADE_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora
 # .. toggle_warning: When the flag is ON, Notifications Grouping feature is enabled.
 # .. toggle_tickets: INF-1472
 ENABLE_NOTIFICATION_GROUPING = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification_grouping', __name__)
+
+# .. toggle_name: notifications.enable_push_notifications
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable push Notifications feature on mobile devices
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2025-05-13
+# .. toggle_warning: When the flag is ON, Notifications will go through using braze on mobile devices.
+ENABLE_PUSH_NOTIFICATIONS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_push_notifications', __name__)
