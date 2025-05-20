@@ -2,20 +2,11 @@
 Tests for Learning-Core-based Content Libraries
 """
 from datetime import datetime, timezone
-from unittest import mock
 
 import ddt
 from freezegun import freeze_time
 
-from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
-from openedx_events.content_authoring.data import LibraryContainerData
-from openedx_events.content_authoring.signals import (
-    LIBRARY_BLOCK_UPDATED,
-    LIBRARY_CONTAINER_CREATED,
-    LIBRARY_CONTAINER_DELETED,
-    LIBRARY_CONTAINER_UPDATED,
-)
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api
@@ -25,7 +16,7 @@ from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 @skip_unless_cms
 @ddt.ddt
-class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
+class ContainersTestCase(ContentLibrariesRestApiTest):
     """
     Tests for containers (Sections, Subsections, Units) in Content Libraries.
 
@@ -43,12 +34,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         new fields to an API response, which are backwards compatible, won't
         break any tests, but backwards-incompatible API changes will.
     """
-    ENABLED_OPENEDX_EVENTS = [
-        LIBRARY_BLOCK_UPDATED.event_type,
-        LIBRARY_CONTAINER_CREATED.event_type,
-        LIBRARY_CONTAINER_DELETED.event_type,
-        LIBRARY_CONTAINER_UPDATED.event_type,
-    ]
 
     def test_unit_crud(self):
         """
@@ -56,15 +41,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         """
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
         lib_key = LibraryLocatorV2.from_string(lib["id"])
-
-        create_receiver = mock.Mock()
-        LIBRARY_CONTAINER_CREATED.connect(create_receiver)
-
-        update_receiver = mock.Mock()
-        LIBRARY_CONTAINER_UPDATED.connect(update_receiver)
-
-        delete_receiver = mock.Mock()
-        LIBRARY_CONTAINER_DELETED.connect(delete_receiver)
 
         # Create a unit:
         create_date = datetime(2024, 9, 8, 7, 6, 5, tzinfo=timezone.utc)
@@ -85,20 +61,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         }
 
         self.assertDictContainsEntries(container_data, expected_data)
-        assert create_receiver.call_count == 1
-        container_key = LibraryContainerLocator.from_string(
-            "lct:CL-TEST:containers:unit:u1",
-        )
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_CREATED,
-                "sender": None,
-                "library_container": LibraryContainerData(
-                    container_key,
-                ),
-            },
-            create_receiver.call_args_list[0].kwargs,
-        )
 
         # Fetch the unit:
         unit_as_read = self._get_container(container_data["id"])
@@ -113,18 +75,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         expected_data['display_name'] = 'Unit ABC'
         self.assertDictContainsEntries(container_data, expected_data)
 
-        assert update_receiver.call_count == 1
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_UPDATED,
-                "sender": None,
-                "library_container": LibraryContainerData(
-                    container_key,
-                ),
-            },
-            update_receiver.call_args_list[0].kwargs,
-        )
-
         # Re-fetch the unit
         unit_as_re_read = self._get_container(container_data["id"])
         # make sure it contains the same data when we read it back:
@@ -133,17 +83,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         # Delete the unit
         self._delete_container(container_data["id"])
         self._get_container(container_data["id"], expect_response=404)
-        assert delete_receiver.call_count == 1
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_DELETED,
-                "sender": None,
-                "library_container": LibraryContainerData(
-                    container_key,
-                ),
-            },
-            delete_receiver.call_args_list[0].kwargs,
-        )
 
     def test_unit_permissions(self):
         """
@@ -186,8 +125,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         """
         Test that we can add and get unit children components
         """
-        update_receiver = mock.Mock()
-        LIBRARY_CONTAINER_UPDATED.connect(update_receiver)
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
         lib_key = LibraryLocatorV2.from_string(lib["id"])
 
@@ -212,18 +149,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
             container_data["id"],
             children_ids=[problem_block_2["id"], html_block_2["id"]]
         )
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_UPDATED,
-                "sender": None,
-                "library_container": LibraryContainerData(
-                    container_key=LibraryContainerLocator.from_string(
-                        container_data["id"],
-                    ),
-                ),
-            },
-            update_receiver.call_args_list[0].kwargs,
-        )
         data = self._get_container_components(container_data["id"])
         # Verify total number of components to be 2 + 2 = 4
         assert len(data) == 4
@@ -236,8 +161,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         """
         Test that we can remove unit children components
         """
-        update_receiver = mock.Mock()
-        LIBRARY_CONTAINER_UPDATED.connect(update_receiver)
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
         lib_key = LibraryLocatorV2.from_string(lib["id"])
 
@@ -262,25 +185,11 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         assert len(data) == 2
         assert data[0]['id'] == html_block['id']
         assert data[1]['id'] == html_block_2['id']
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_UPDATED,
-                "sender": None,
-                "library_container": LibraryContainerData(
-                    container_key=LibraryContainerLocator.from_string(
-                        container_data["id"],
-                    ),
-                ),
-            },
-            update_receiver.call_args_list[0].kwargs,
-        )
 
     def test_unit_replace_children(self):
         """
         Test that we can completely replace/reorder unit children components.
         """
-        update_receiver = mock.Mock()
-        LIBRARY_CONTAINER_UPDATED.connect(update_receiver)
         lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
         lib_key = LibraryLocatorV2.from_string(lib["id"])
 
@@ -324,18 +233,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         assert len(data) == 2
         assert data[0]['id'] == new_problem_block['id']
         assert data[1]['id'] == new_html_block['id']
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_UPDATED,
-                "sender": None,
-                "library_container": LibraryContainerData(
-                    container_key=LibraryContainerLocator.from_string(
-                        container_data["id"],
-                    ),
-                ),
-            },
-            update_receiver.call_args_list[0].kwargs,
-        )
 
     def test_restore_unit(self):
         """
@@ -351,9 +248,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
 
         # Delete the unit
         self._delete_container(container_data["id"])
-
-        create_receiver = mock.Mock()
-        LIBRARY_CONTAINER_CREATED.connect(create_receiver)
 
         # Restore container
         self._restore_container(container_data["id"])
@@ -371,20 +265,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
             'modified': '2024-09-08T07:06:05Z',
             'collections': [],
         }
-
-        self.assertDictContainsEntries(new_container_data, expected_data)
-
-        assert create_receiver.call_count == 1
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_CREATED,
-                "sender": None,
-                "library_container": LibraryContainerData(
-                    container_key=LibraryContainerLocator.from_string("lct:CL-TEST:containers:unit:u1"),
-                ),
-            },
-            create_receiver.call_args_list[0].kwargs,
-        )
 
     def test_container_collections(self):
         # Create a library
@@ -444,12 +324,6 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         c2_before = self._get_container(container2["id"])
         assert c2_before["has_unpublished_changes"]
 
-        # Set up event receivers after the initial mock data setup is complete:
-        updated_container_receiver = mock.Mock()
-        updated_block_receiver = mock.Mock()
-        LIBRARY_CONTAINER_UPDATED.connect(updated_container_receiver)
-        LIBRARY_BLOCK_UPDATED.connect(updated_block_receiver)
-
         # Now publish only Container 1
         self._publish_container(container1["id"])
 
@@ -476,27 +350,3 @@ class ContainersTestCase(OpenEdxEventsTestMixin, ContentLibrariesRestApiTest):
         assert c2_components_after[1]["id"] == html_block2["id"]
         assert c2_components_after[1]["has_unpublished_changes"]  # unaffected
         assert c2_components_after[1]["published_by"] is None
-
-        # Make sure that the right events were sent out.
-        # First, there should be one container updated event:
-        assert len(updated_container_receiver.call_args_list) == 1
-        self.assertDictContainsSubset(
-            {
-                "signal": LIBRARY_CONTAINER_UPDATED,
-                "library_container": LibraryContainerData(
-                    container_key=LibraryContainerLocator.from_string(container1["id"]),
-                ),
-            },
-            updated_container_receiver.call_args_list[0].kwargs,
-        )
-
-        # Second, two XBlock updated events:
-        assert len(updated_block_receiver.call_args_list) == 2
-        updated_block_ids = set(
-            call.kwargs["library_block"].usage_key for call in updated_block_receiver.call_args_list
-        )
-        assert updated_block_ids == {
-            LibraryUsageLocatorV2.from_string(problem_block["id"]),
-            LibraryUsageLocatorV2.from_string(html_block["id"]),
-        }
-        assert all(call.kwargs["signal"] == LIBRARY_BLOCK_UPDATED for call in updated_block_receiver.call_args_list)

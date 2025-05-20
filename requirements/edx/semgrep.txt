@@ -17,13 +17,11 @@ boltons==21.0.0
     #   semgrep
 bracex==2.5.post1
     # via wcmatch
-certifi==2025.1.31
+certifi==2025.4.26
     # via requests
-charset-normalizer==2.0.12
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   requests
-click==8.1.8
+charset-normalizer==3.4.2
+    # via requests
+click==8.2.0
     # via
     #   click-option-group
     #   semgrep
@@ -51,7 +49,7 @@ importlib-metadata==7.1.0
     # via opentelemetry-api
 jsonschema==4.23.0
     # via semgrep
-jsonschema-specifications==2024.10.1
+jsonschema-specifications==2025.4.1
     # via jsonschema
 markdown-it-py==3.0.0
     # via rich
@@ -89,9 +87,9 @@ opentelemetry-util-http==0.46b0
     # via opentelemetry-instrumentation-requests
 packaging==25.0
     # via semgrep
-peewee==3.17.9
+peewee==3.18.1
     # via semgrep
-protobuf==4.25.6
+protobuf==4.25.7
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
@@ -107,7 +105,7 @@ requests==2.32.3
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.24.0
+rpds-py==0.25.0
     # via
     #   jsonschema
     #   referencing
@@ -115,7 +113,7 @@ ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.119.0
+semgrep==1.121.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep

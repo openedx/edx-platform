@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from config_models.models import ConfigurationModel
 from django.db import models
-from django.db.models import Count, F, Q, QuerySet
+from django.db.models import Count, F, Q, QuerySet, Max
 from django.db.models.fields import IntegerField, TextField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import GreaterThan
@@ -160,7 +160,8 @@ class ComponentLink(EntityLinkBase):
         ready_to_sync = link_filter.pop('ready_to_sync', None)
         result = cls.objects.filter(**link_filter).select_related(
             "upstream_block__publishable_entity__published__version",
-            "upstream_block__publishable_entity__learning_package"
+            "upstream_block__publishable_entity__learning_package",
+            "upstream_block__publishable_entity__published__publish_log_record__publish_log",
         ).annotate(
             ready_to_sync=(
                 GreaterThan(
@@ -186,13 +187,15 @@ class ComponentLink(EntityLinkBase):
                 "upstream_context_title": "CS problems 3",
                 "upstream_context_key": "lib:OpenedX:CSPROB3",
                 "ready_to_sync_count": 11,
-                "total_count": 14
+                "total_count": 14,
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
             },
             {
                 "upstream_context_title": "CS problems 2",
                 "upstream_context_key": "lib:OpenedX:CSPROB2",
                 "ready_to_sync_count": 15,
-                "total_count": 24
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
             },
         ]
         """
@@ -201,7 +204,10 @@ class ComponentLink(EntityLinkBase):
             upstream_context_title=F("upstream_block__publishable_entity__learning_package__title"),
         ).annotate(
             ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
-            total_count=Count('id')
+            total_count=Count("id"),
+            last_published_at=Max(
+                "upstream_block__publishable_entity__published__publish_log_record__publish_log__published_at"
+            )
         )
         return result
 
@@ -307,6 +313,7 @@ class ContainerLink(EntityLinkBase):
         result = cls.objects.filter(**link_filter).select_related(
             "upstream_container__publishable_entity__published__version",
             "upstream_container__publishable_entity__learning_package"
+            "upstream_container__publishable_entity__published__publish_log_record__publish_log",
         ).annotate(
             ready_to_sync=(
                 GreaterThan(
@@ -332,13 +339,15 @@ class ContainerLink(EntityLinkBase):
                 "upstream_context_title": "CS problems 3",
                 "upstream_context_key": "lib:OpenedX:CSPROB3",
                 "ready_to_sync_count": 11,
-                "total_count": 14
+                "total_count": 14,
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
             },
             {
                 "upstream_context_title": "CS problems 2",
                 "upstream_context_key": "lib:OpenedX:CSPROB2",
                 "ready_to_sync_count": 15,
-                "total_count": 24
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
             },
         ]
         """
@@ -347,14 +356,17 @@ class ContainerLink(EntityLinkBase):
             upstream_context_title=F("upstream_container__publishable_entity__learning_package__title"),
         ).annotate(
             ready_to_sync_count=Count("id", Q(ready_to_sync=True)),
-            total_count=Count('id')
+            total_count=Count('id'),
+            last_published_at=Max(
+                "upstream_container__publishable_entity__published__publish_log_record__publish_log__published_at"
+            )
         )
         return result
 
     @classmethod
     def update_or_create(
         cls,
-        upstream_container: Container | None,
+        upstream_container_id: int | None,
         /,
         upstream_container_key: LibraryContainerLocator,
         upstream_context_key: str,
@@ -377,8 +389,8 @@ class ContainerLink(EntityLinkBase):
             'version_synced': version_synced,
             'version_declined': version_declined,
         }
-        if upstream_container:
-            new_values['upstream_container'] = upstream_container
+        if upstream_container_id:
+            new_values['upstream_container_id'] = upstream_container_id
         try:
             link = cls.objects.get(downstream_usage_key=downstream_usage_key)
             has_changes = False
