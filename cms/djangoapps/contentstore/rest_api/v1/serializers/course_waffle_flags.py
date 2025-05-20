@@ -156,7 +156,7 @@ class CourseWaffleFlagsSerializer(serializers.Serializer):
 
     def get_use_react_markdown_editor(self, obj):
         """
-        Method to get the use_react_markdown_editor waffle flag
+        Determine whether the new markdown editor should be enabled in the react problem editor
         """
         course_key = self.get_course_key()
         return toggles.use_react_markdown_editor(course_key)
