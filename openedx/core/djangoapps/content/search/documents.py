@@ -67,6 +67,10 @@ class Fields:
     collections = "collections"
     collections_display_name = "display_name"
     collections_key = "key"
+    # Units (dictionary) that this object belongs to.
+    units = "units"
+    units_display_name = "display_name"
+    units_key = "key"
 
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
@@ -369,6 +373,54 @@ def _collections_for_content_object(object_id: OpaqueKey) -> dict:
     return result
 
 
+def _units_for_content_object(object_id: OpaqueKey) -> dict:
+    """
+    Given an XBlock, course, library, etc., get the units for its index doc.
+
+    e.g. for something in Units "UNIT_A" and "UNIT_B", this would return:
+        {
+            "units":  {
+                "display_name": ["Unit A", "Unit B"],
+                "key": ["UNIT_A", "UNIT_B"],
+            }
+        }
+
+    If the object is in no collections, returns:
+        {
+            "collections":  {
+                "display_name": [],
+                "key": [],
+            },
+        }
+    """
+    result = {
+        Fields.units: {
+            Fields.units_display_name: [],
+            Fields.units_key: [],
+        }
+    }
+
+    # Gather the units associated with this object
+    units = None
+    try:
+        if isinstance(object_id, UsageKey):
+            units = lib_api.get_containers_contains_component(object_id)
+        else:
+            log.warning(f"Unexpected key type for {object_id}")
+
+    except ObjectDoesNotExist:
+        log.warning(f"No library item found for {object_id}")
+
+    if not units:
+        return result
+
+    for unit in units:
+        result[Fields.units][Fields.units_display_name].append(unit.display_name)
+        result[Fields.units][Fields.units_key].append(str(unit.container_key))
+
+    return result
+
+
 def _published_data_from_block(block_published) -> dict:
     """
     Given an library block get the published data.
@@ -456,6 +508,17 @@ def searchable_doc_collections(opaque_key: OpaqueKey) -> dict:
     """
     doc = searchable_doc_for_key(opaque_key)
     doc.update(_collections_for_content_object(opaque_key))
+
+    return doc
+
+
+def searchable_doc_units(opaque_key: OpaqueKey) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the units data for the given content object.
+    """
+    doc = searchable_doc_for_key(opaque_key)
+    doc.update(_units_for_content_object(opaque_key))
 
     return doc
 

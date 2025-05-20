@@ -46,6 +46,7 @@ from .api import (
     upsert_content_object_tags_index_doc,
     upsert_collection_tags_index_docs,
     upsert_item_collections_index_docs,
+    upsert_item_units_index_docs,
 )
 from .tasks import (
     delete_library_block_index_doc,
@@ -263,6 +264,8 @@ def content_object_associations_changed_handler(**kwargs) -> None:
             upsert_content_object_tags_index_doc(opaque_key)
     if not content_object.changes or "collections" in content_object.changes:
         upsert_item_collections_index_docs(opaque_key)
+    if not content_object.changes or "units" in content_object.changes:
+        upsert_item_units_index_docs(opaque_key)
 
 
 @receiver(LIBRARY_CONTAINER_CREATED)
