@@ -15,7 +15,15 @@ COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
         'notification_app': 'discussion',
         'name': 'new_comment_on_response',
-        'is_core': True,
+        'is_core': False,
+        'info': '',
+
+        'web': True,
+        'email': True,
+        'push': True,
+        'non_editable': [],
+        'email_cadence': EmailCadence.DAILY,
+
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on your response to the post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -28,7 +36,14 @@ COURSE_NOTIFICATION_TYPES = {
     'new_comment': {
         'notification_app': 'discussion',
         'name': 'new_comment',
-        'is_core': True,
+        'is_core': False,
+        'info': '',
+
+        'web': True,
+        'email': True,
+        'push': True,
+        'non_editable': [],
+        'email_cadence': EmailCadence.DAILY,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -42,7 +57,13 @@ COURSE_NOTIFICATION_TYPES = {
     'new_response': {
         'notification_app': 'discussion',
         'name': 'new_response',
-        'is_core': True,
+        'is_core': False,
+        'info': '',
+        'web': True,
+        'email': True,
+        'push': True,
+        'non_editable': [],
+        'email_cadence': EmailCadence.DAILY,
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to your '
                               'post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -93,7 +114,11 @@ COURSE_NOTIFICATION_TYPES = {
     'response_on_followed_post': {
         'notification_app': 'discussion',
         'name': 'response_on_followed_post',
-        'is_core': True,
+        'is_core': False,
+        'web': True,
+        'email': True,
+        'push': True,
+        'email_cadence': EmailCadence.DAILY,
         'info': '',
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to a post you’re following: '
@@ -108,7 +133,11 @@ COURSE_NOTIFICATION_TYPES = {
     'comment_on_followed_post': {
         'notification_app': 'discussion',
         'name': 'comment_on_followed_post',
-        'is_core': True,
+        'is_core': False,
+        'web': True,
+        'email': True,
+        'push': True,
+        'email_cadence': EmailCadence.DAILY,
         'info': '',
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> commented on <{strong}>{author_name}'
@@ -146,9 +175,13 @@ COURSE_NOTIFICATION_TYPES = {
     'response_endorsed_on_thread': {
         'notification_app': 'discussion',
         'name': 'response_endorsed_on_thread',
-        'is_core': True,
         'info': '',
+        'is_core': False,
+        'web': True,
+        'email': True,
+        'push': True,
         'non_editable': [],
+        'email_cadence': EmailCadence.DAILY,
         'content_template': _('<{p}><{strong}>{replier_name}\'s</{strong}> response has been endorsed in your post '
                               '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -161,7 +194,11 @@ COURSE_NOTIFICATION_TYPES = {
     'response_endorsed': {
         'notification_app': 'discussion',
         'name': 'response_endorsed',
-        'is_core': True,
+        'is_core': False,
+        'web': True,
+        'email': True,
+        'push': True,
+        'email_cadence': EmailCadence.DAILY,
         'info': '',
         'non_editable': [],
         'content_template': _('<{p}>Your response has been endorsed on the post <{strong}>{post_title}</{strong}></{'
@@ -470,9 +507,9 @@ class NotificationAppManager:
             notification_app_preferences = {}
             notification_types, core_notifications, \
                 non_editable_channels = NotificationTypeManager().get_notification_app_preference(
-                    notification_app_key,
-                    email_opt_out
-                )
+                notification_app_key,
+                email_opt_out
+            )
             self.add_core_notification_preference(notification_app_attrs, notification_types, email_opt_out)
             self.add_core_notification_non_editable(notification_app_attrs, non_editable_channels)
 
