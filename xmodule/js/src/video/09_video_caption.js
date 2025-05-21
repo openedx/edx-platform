@@ -38,7 +38,7 @@
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
                 'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie',
-                'updateGoogleDisclaimer', 'toggleGoogleDisclaimer'
+                'updateGoogleDisclaimer', 'toggleGoogleDisclaimer', 'updateProblematicCaptionsContent'
             );
 
             this.state = state;
@@ -541,6 +541,21 @@
             },
 
             /**
+            * @desc Replaces content in a caption
+            *
+            * @param {array} captions List of captions for the video.
+            * @param {string} content content to be replaced
+            * @param {string} replacementContent the replace string
+            *
+            * @returns {array} captions List of captions for the video.
+            */
+            updateProblematicCaptionsContent: function(captions, content = '', replacementContent = '') {
+                var updatedCaptions = captions.map(caption => caption.replace(content, replacementContent));
+
+                return updatedCaptions;
+            },
+
+            /**
             * @desc Fetch the caption file specified by the user. Upon successful
             *     receipt of the file, the captions will be rendered.
             * @param {boolean} [fetchWithYoutubeId] Fetch youtube captions if true.
@@ -594,6 +609,10 @@
                         results = self.getBoundedCaptions();
                         start = results.start;
                         captions = results.captions;
+                        var contentToReplace = CAPTIONS_CONTENT_TO_REPLACE,
+                            replacementContent = CAPTIONS_CONTENT_REPLACEMENT;
+
+                        captions = self.updateProblematicCaptionsContent(captions, contentToReplace, replacementContent);
 
                         self.renderGoogleDisclaimer(captions);
 
