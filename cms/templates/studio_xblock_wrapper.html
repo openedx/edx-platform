@@ -211,13 +211,12 @@ upstream_info = UpstreamLink.try_get_for_block(xblock, log_error=False)
                                 <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
                             </li>
                         % endif
-                        % if not show_inline:
-                            <li class="action-item action-edit action-edit-view-only">
-                                <a href="#" class="edit-button action-button">
-                                    <span class="action-button-text">${_("Details")}</span>
-                                </a>
-                            </li>
-                        % endif
+                    % elif not show_inline:
+                        <li class="action-item action-edit action-edit-view-only">
+                            <a href="#" class="edit-button action-button">
+                                <span class="action-button-text">${_("Details")}</span>
+                            </a>
+                        </li>
                     % endif
                 % endif
             </ul>
