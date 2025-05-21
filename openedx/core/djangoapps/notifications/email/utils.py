@@ -431,3 +431,18 @@ def is_notification_type_channel_editable(app_name, notification_type, channel):
     if notification_type == 'core':
         return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
     return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
+
+
+def get_text_for_notification_type(notification_type):
+    """
+    Returns text for notification type
+    """
+    app_name = COURSE_NOTIFICATION_APPS.get(notification_type, {}).get('notification_app')
+    if not app_name:
+        return ""
+    mapping = {
+        'discussion': 'post',
+        'updates': 'update',
+        'grading': 'assessment',
+    }
+    return mapping.get(app_name, "")
