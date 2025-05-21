@@ -64,7 +64,7 @@ class LibraryContainersView(GenericAPIView):
 @view_auth_classes()
 class LibraryContainerView(GenericAPIView):
     """
-    View to retrieve or update data about a specific container (a section, subsection, or unit)
+    View to retrieve, delete or update data about a specific container (a section, subsection, or unit)
     """
     serializer_class = serializers.LibraryContainerMetadataSerializer
 

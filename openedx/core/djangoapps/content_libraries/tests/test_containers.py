@@ -44,7 +44,12 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # Create unit
         with freeze_time(self.create_date):
             self.unit = self._create_container(self.lib["id"], "unit", display_name="Alpha Bravo", slug=None)
-            self.unit_with_components = self._create_container(self.lib["id"], "unit", display_name="Alpha Charly", slug=None)
+            self.unit_with_components = self._create_container(
+                self.lib["id"],
+                "unit",
+                display_name="Alpha Charly",
+                slug=None,
+            )
 
         # Create blocks
         self.problem_block = self._add_block_to_library(self.lib["id"], "problem", "Problem1", can_stand_alone=False)
@@ -106,6 +111,98 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         self.assertDictContainsEntries(unit_as_re_read, expected_data)
 
         # Delete the unit
+        self._delete_container(container_data["id"])
+        self._get_container(container_data["id"], expect_response=404)
+
+    def test_subsection_crud(self):
+        # Create a subsection:
+        with freeze_time(self.create_date):
+            container_data = self._create_container(
+                self.lib["id"],
+                "subsection",
+                slug="subs1",
+                display_name="Test Subsection",
+            )
+        expected_data = {
+            "id": "lct:CL-TEST:containers:subsection:subs1",
+            "container_type": "subsection",
+            "display_name": "Test Subsection",
+            "last_published": None,
+            "published_by": "",
+            "last_draft_created": "2024-09-08T07:06:05Z",
+            "last_draft_created_by": 'Bob',
+            'has_unpublished_changes': True,
+            'created': '2024-09-08T07:06:05Z',
+            'modified': '2024-09-08T07:06:05Z',
+            'collections': [],
+        }
+
+        self.assertDictContainsEntries(container_data, expected_data)
+
+        # Fetch the subsection:
+        subsection_as_read = self._get_container(container_data["id"])
+        # make sure it contains the same data when we read it back:
+        self.assertDictContainsEntries(subsection_as_read, expected_data)
+
+        # Update the subsection:
+        modified_date = datetime(2024, 10, 9, 8, 7, 6, tzinfo=timezone.utc)
+        with freeze_time(modified_date):
+            container_data = self._update_container(
+                "lct:CL-TEST:containers:subsection:subs1",
+                display_name="Subsection ABC",
+            )
+        expected_data['last_draft_created'] = expected_data['modified'] = '2024-10-09T08:07:06Z'
+        expected_data['display_name'] = 'Subsection ABC'
+        self.assertDictContainsEntries(container_data, expected_data)
+
+        # Re-fetch the subsection
+        subsection_as_re_read = self._get_container(container_data["id"])
+        # make sure it contains the same data when we read it back:
+        self.assertDictContainsEntries(subsection_as_re_read, expected_data)
+
+        # Delete the subsection
+        self._delete_container(container_data["id"])
+        self._get_container(container_data["id"], expect_response=404)
+
+    def test_section_crud(self):
+        # Create a section:
+        with freeze_time(self.create_date):
+            container_data = self._create_container(self.lib["id"], "section", slug="s1", display_name="Test Section")
+        expected_data = {
+            "id": "lct:CL-TEST:containers:section:s1",
+            "container_type": "section",
+            "display_name": "Test Section",
+            "last_published": None,
+            "published_by": "",
+            "last_draft_created": "2024-09-08T07:06:05Z",
+            "last_draft_created_by": 'Bob',
+            'has_unpublished_changes': True,
+            'created': '2024-09-08T07:06:05Z',
+            'modified': '2024-09-08T07:06:05Z',
+            'collections': [],
+        }
+
+        self.assertDictContainsEntries(container_data, expected_data)
+
+        # Fetch the section:
+        section_as_read = self._get_container(container_data["id"])
+        # make sure it contains the same data when we read it back:
+        self.assertDictContainsEntries(section_as_read, expected_data)
+
+        # Update the section:
+        modified_date = datetime(2024, 10, 9, 8, 7, 6, tzinfo=timezone.utc)
+        with freeze_time(modified_date):
+            container_data = self._update_container("lct:CL-TEST:containers:section:s1", display_name="Section ABC")
+        expected_data['last_draft_created'] = expected_data['modified'] = '2024-10-09T08:07:06Z'
+        expected_data['display_name'] = 'Section ABC'
+        self.assertDictContainsEntries(container_data, expected_data)
+
+        # Re-fetch the section
+        section_as_re_read = self._get_container(container_data["id"])
+        # make sure it contains the same data when we read it back:
+        self.assertDictContainsEntries(section_as_re_read, expected_data)
+
+        # Delete the section
         self._delete_container(container_data["id"])
         self._get_container(container_data["id"], expect_response=404)
 
