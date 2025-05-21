@@ -646,14 +646,7 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 SURVEY_REPORT_ENABLE = True
 ANONYMOUS_SURVEY_REPORT = False
 
-CSRF_TRUSTED_ORIGINS = ['.example.com']
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = ['https://*.example.com']
-
-# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
-# case of new django version these values will override.
-if django.VERSION[0] >= 4:  # for greater than django 3.2 use with schemes.
-    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_WITH_SCHEME
-
+CSRF_TRUSTED_ORIGINS = ['https://*.example.com']
 
 ############## Settings for JWT token handling ##############
 TOKEN_SIGNING = {
