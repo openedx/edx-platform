@@ -78,6 +78,7 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
         self.assertEqual(storage.__class__.__name__, "CourseMetadataExportS3Storage")
         self.assertEqual(storage.bucket_name, "bucket_name_test")
 
+    @override_settings()
     def test_resolve_storage_with_no_config(self):
         """ If no storage setup is defined, we get FileSystemStorage by default """
         del settings.DEFAULT_FILE_STORAGE
@@ -114,7 +115,6 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
     )
     def test_resolve_storage_using_django5_settings_with_options(self):
         """ Ensure we call the storage class with the correct parameters and Django 5 setup """
-        del settings.DEFAULT_FILE_STORAGE
         del settings.COURSE_METADATA_EXPORT_STORAGE
         del settings.COURSE_METADATA_EXPORT_BUCKET
         storage = resolve_storage_backend("COURSE_METADATA_EXPORT_STORAGE")
