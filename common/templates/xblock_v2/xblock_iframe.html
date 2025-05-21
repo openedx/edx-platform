@@ -340,7 +340,7 @@
                         $('.save-button', passElement).bind('click', function() {
                             //event.preventDefault();
                             var error_message_div = $('.xblock-editor-error-message', passElement);
-                            const modifiedData = editorView.getChangedMetadata();
+                            const modifiedData = editorView.getChangedMetadata(true);
 
                             error_message_div.html();
                             error_message_div.css('display', 'none');
