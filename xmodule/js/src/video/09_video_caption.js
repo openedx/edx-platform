@@ -507,7 +507,7 @@
                 var self = this,
                     state = this.state,
                     aiGeneratedSpan = captions.find(caption => caption.includes(aIGeneratedSpanText)),
-                    captionsAIGenerated = !(aiGeneratedSpan === undefined);
+                    captionsAIGenerated = !(aiGeneratedSpan === undefined),
                     aiCaptionProviderIsGoogle = true;
 
                 if (captionsAIGenerated) {
@@ -614,7 +614,7 @@
 
                         captions = self.updateProblematicCaptionsContent(captions, contentToReplace, replacementContent);
 
-                        self.renderGoogleDisclaimer(captions);
+                        self.updateGoogleDisclaimer(captions);
 
                         if (self.loaded) {
                             if (self.rendered) {
