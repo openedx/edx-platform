@@ -2915,6 +2915,7 @@ LIBRARY_ENABLED_BLOCKS = [
     'openassessment',
     'conditional',
     'done',
+    'edx_sga',
     'freetextresponse',
     'google-calendar',
     'google-document',
