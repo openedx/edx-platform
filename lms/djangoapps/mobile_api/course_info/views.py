@@ -323,6 +323,10 @@ class BlocksInfoInCourseView(BlocksInCourseView):
 
         api_version = self.kwargs.get('api_version')
         if api_version == 'v4':
+            # Introduced a new version of the Course Blocks API to avoid breaking existing clients.
+            # The previous implementation unintentionally passed **kwargs as the positional argument to
+            # `hide_access_denial`, leading to potential issues. This new version removes that risk
+            # while preserving the original behavior for older clients.
             response = super().list(request)
         else:
             response = super().list(request, kwargs)
