@@ -41,8 +41,9 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         self.lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
         self.lib_key = LibraryLocatorV2.from_string(self.lib["id"])
 
-        # Create unit
+        # Create containers
         with freeze_time(self.create_date):
+            # Unit
             self.unit = self._create_container(self.lib["id"], "unit", display_name="Alpha Bravo", slug=None)
             self.unit_with_components = self._create_container(
                 self.lib["id"],
@@ -50,6 +51,10 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 display_name="Alpha Charly",
                 slug=None,
             )
+            # Subsection
+            self.subsection = self._create_container(self.lib["id"], "subsection", display_name="Subsection Alpha", slug=None)
+            # Section
+            self.section = self._create_container(self.lib["id"], "section", display_name="Section Alpha", slug=None)
 
         # Create blocks
         self.problem_block = self._add_block_to_library(self.lib["id"], "problem", "Problem1", can_stand_alone=False)
@@ -115,6 +120,9 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         self._get_container(container_data["id"], expect_response=404)
 
     def test_subsection_crud(self):
+        """
+        Test Create, Read, Update, and Delete of a Subsection
+        """
         # Create a subsection:
         with freeze_time(self.create_date):
             container_data = self._create_container(
@@ -165,6 +173,9 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         self._get_container(container_data["id"], expect_response=404)
 
     def test_section_crud(self):
+        """
+        Test Create, Read, Update, and Delete of a Section
+        """
         # Create a section:
         with freeze_time(self.create_date):
             container_data = self._create_container(self.lib["id"], "section", slug="s1", display_name="Test Section")
@@ -227,17 +238,66 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
             self._update_container(container_data["id"], display_name="Unit ABC", expect_response=403)
             self._delete_container(container_data["id"], expect_response=403)
 
-    def test_unit_gets_auto_slugs(self):
+    def test_subsection_permissions(self):
         """
-        Test that we can create units by specifying only a title, and they get
+        Test that a regular user with read-only permissions on the library cannot create, update, or delete subsection.
+        """
+        container_data = self._create_container(self.lib["id"], "subsection", slug="subs2", display_name="Test Subsection")
+
+        random_user = UserFactory.create(username="Random", email="random@example.com")
+        with self.as_user(random_user):
+            self._create_container(self.lib["id"], "unit", slug="subs3", display_name="Test Subsection", expect_response=403)
+            self._get_container(container_data["id"], expect_response=403)
+            self._update_container(container_data["id"], display_name="Subsection ABC", expect_response=403)
+            self._delete_container(container_data["id"], expect_response=403)
+
+        # Granting read-only permissions on the library should only allow retrieval, nothing else.
+        self._add_user_by_email(self.lib["id"], random_user.email, access_level="read")
+        with self.as_user(random_user):
+            self._create_container(self.lib["id"], "unit", slug="subs2", display_name="Test Subsection", expect_response=403)
+            self._get_container(container_data["id"], expect_response=200)
+            self._update_container(container_data["id"], display_name="Subsection ABC", expect_response=403)
+            self._delete_container(container_data["id"], expect_response=403)
+
+    def test_section_permissions(self):
+        container_data = self._create_container(self.lib["id"], "section", slug="s2", display_name="Test Section")
+
+        random_user = UserFactory.create(username="Random", email="random@example.com")
+        with self.as_user(random_user):
+            self._create_container(self.lib["id"], "section", slug="s3", display_name="Test Section", expect_response=403)
+            self._get_container(container_data["id"], expect_response=403)
+            self._update_container(container_data["id"], display_name="Section ABC", expect_response=403)
+            self._delete_container(container_data["id"], expect_response=403)
+
+        # Granting read-only permissions on the library should only allow retrieval, nothing else.
+        self._add_user_by_email(self.lib["id"], random_user.email, access_level="read")
+        with self.as_user(random_user):
+            self._create_container(self.lib["id"], "section", slug="s2", display_name="Test Section", expect_response=403)
+            self._get_container(container_data["id"], expect_response=200)
+            self._update_container(container_data["id"], display_name="Section ABC", expect_response=403)
+            self._delete_container(container_data["id"], expect_response=403)
+
+    def test_containers_gets_auto_slugs(self):
+        """
+        Test that we can create containers by specifying only a title, and they get
         unique slugs assigned automatically.
         """
         unit_2 = self._create_container(self.lib["id"], "unit", display_name="Alpha Bravo", slug=None)
+        subsection_2 = self._create_container(self.lib["id"], "subsection", display_name="Subsection Alpha", slug=None)
+        section_2 = self._create_container(self.lib["id"], "section", display_name="Section Alpha", slug=None)
 
-        # Notice the container IDs below are slugified from the title: "alpha-bravo-NNNNN"
         assert self.unit["id"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
         assert unit_2["id"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
         assert self.unit["id"] != unit_2["id"]
+
+        assert self.subsection["id"].startswith("lct:CL-TEST:containers:subsection:subsection-alpha-")
+        assert subsection_2["id"].startswith("lct:CL-TEST:containers:subsection:subsection-alpha-")
+        assert self.subsection["id"] != subsection_2["id"]
+
+        assert self.section["id"].startswith("lct:CL-TEST:containers:section:section-alpha-")
+        assert section_2["id"].startswith("lct:CL-TEST:containers:section:section-alpha-")
+        assert self.section["id"] != section_2["id"]
+
 
     def test_unit_add_children(self):
         """
