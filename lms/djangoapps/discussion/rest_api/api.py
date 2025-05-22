@@ -372,6 +372,18 @@ def get_course(request, course_key, check_tab=True):
             for (reason_code, label) in CLOSE_REASON_CODES.items()
         ],
         'show_discussions': bool(discussion_tab and discussion_tab.is_enabled(course, request.user)),
+        'has_bulk_delete_privileges': bool(user_roles & {
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+        }),
+        'is_notify_all_learners_enabled': getattr(settings, 'ENABLE_NOTIFY_ALL_LEARNERS', False),
+        'captcha_settings': {
+            'enabled': getattr(settings, 'ENABLE_DISCUSSION_CAPTCHA', False),
+            'site_key': getattr(settings, 'RECAPTCHA_PUBLIC_KEY', None),
+        },
+        'is_email_verified': True,  # Default to True for authenticated users
+        'only_verified_users_can_post': getattr(settings, 'DISCUSSION_ONLY_VERIFIED_USERS_CAN_POST', False),
+        'content_creation_rate_limited': getattr(settings, 'DISCUSSION_CONTENT_CREATION_RATE_LIMITED', False),
     }
 
 
@@ -990,7 +1002,10 @@ def get_thread_list(
             except ValueError:
                 pass
 
-    if (group_id is None) and not context["has_moderation_privilege"]:
+    if (group_id is None) and (
+        not context["has_moderation_privilege"]
+        or request.user.id in context["ta_user_ids"]
+    ):
         group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
     query_params = {
@@ -1454,6 +1469,7 @@ def create_thread(request, thread_data):
     """
     course_id = thread_data.get("course_id")
     from_mfe_sidebar = thread_data.pop("enable_in_context_sidebar", False)
+    notify_all_learners = thread_data.pop("notify_all_learners", False)
     user = request.user
     if not course_id:
         raise ValidationError({"course_id": ["This field is required."]})
@@ -1481,12 +1497,12 @@ def create_thread(request, thread_data):
         raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
     serializer.save()
     cc_thread = serializer.instance
-    thread_created.send(sender=None, user=user, post=cc_thread)
+    thread_created.send(sender=None, user=user, post=cc_thread, notify_all_learners=notify_all_learners)
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request)
 
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
-                               from_mfe_sidebar)
+                               from_mfe_sidebar, notify_all_learners)
 
     return api_thread
 
@@ -1526,12 +1542,12 @@ def create_comment(request, comment_data):
     actions_form = CommentActionsForm(comment_data)
     if not (serializer.is_valid() and actions_form.is_valid()):
         raise ValidationError(dict(list(serializer.errors.items()) + list(actions_form.errors.items())))
+    context["cc_requester"].follow(cc_thread)
     serializer.save()
     cc_comment = serializer.instance
     comment_created.send(sender=None, user=request.user, post=cc_comment)
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(comment_data.keys()), actions_form, context, request)
-
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
     return api_comment

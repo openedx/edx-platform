@@ -1,12 +1,18 @@
 # pylint: disable=missing-docstring,protected-access
+import logging
+import time
+
 from bs4 import BeautifulSoup
 
 from openedx.core.djangoapps.django_comment_common.comment_client import models, settings
 
-from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread
-from .utils import CommentClientRequestError, get_course_key, perform_request
+from .thread import Thread
+from .utils import CommentClientRequestError, get_course_key
 from forum import api as forum_api
-from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled
+from forum.backends.mongodb.comments import Comment as ForumComment
+
+
+log = logging.getLogger(__name__)
 
 
 class Comment(models.Model):
@@ -64,71 +70,30 @@ class Comment(models.Model):
             return super().url(action, params)
 
     def flagAbuse(self, user, voteable, course_id=None):
-        if voteable.type == 'thread':
-            url = _url_for_flag_abuse_thread(voteable.id)
-        elif voteable.type == 'comment':
-            url = _url_for_flag_abuse_comment(voteable.id)
-        else:
-            raise CommentClientRequestError("Can only flag/unflag threads or comments")
+        if voteable.type != 'comment':
+            raise CommentClientRequestError("Can only flag comments")
+
         course_key = get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            if voteable.type == 'thread':
-                response = forum_api.update_thread_flag(
-                    voteable.id, "flag", user_id=user.id, course_id=str(course_key)
-                )
-            else:
-                response = forum_api.update_comment_flag(
-                    voteable.id, "flag", user_id=user.id, course_id=str(course_key)
-                )
-        else:
-            params = {'user_id': user.id}
-            response = perform_request(
-                'put',
-                url,
-                params,
-                metric_tags=self._metric_tags,
-                metric_action='comment.abuse.flagged'
-            )
+        response = forum_api.update_comment_flag(
+            comment_id=voteable.id,
+            action="flag",
+            user_id=str(user.id),
+            course_id=str(course_key),
+        )
         voteable._update_from_response(response)
 
     def unFlagAbuse(self, user, voteable, removeAll, course_id=None):
-        if voteable.type == 'thread':
-            url = _url_for_unflag_abuse_thread(voteable.id)
-        elif voteable.type == 'comment':
-            url = _url_for_unflag_abuse_comment(voteable.id)
-        else:
-            raise CommentClientRequestError("Can flag/unflag for threads or comments")
+        if voteable.type != 'comment':
+            raise CommentClientRequestError("Can only unflag comments")
+
         course_key = get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            if voteable.type == "thread":
-                response = forum_api.update_thread_flag(
-                    thread_id=voteable.id,
-                    action="unflag",
-                    user_id=user.id,
-                    update_all=bool(removeAll),
-                    course_id=str(course_key)
-                )
-            else:
-                response = forum_api.update_comment_flag(
-                    comment_id=voteable.id,
-                    action="unflag",
-                    user_id=user.id,
-                    update_all=bool(removeAll),
-                    course_id=str(course_key)
-                )
-        else:
-            params = {'user_id': user.id}
-
-            if removeAll:
-                params['all'] = True
-
-            response = perform_request(
-                'put',
-                url,
-                params,
-                metric_tags=self._metric_tags,
-                metric_action='comment.abuse.unflagged'
-            )
+        response = forum_api.update_comment_flag(
+            comment_id=voteable.id,
+            action="unflag",
+            user_id=str(user.id),
+            update_all=bool(removeAll),
+            course_id=str(course_key),
+        )
         voteable._update_from_response(response)
 
     @property
@@ -139,6 +104,70 @@ class Comment(models.Model):
         soup = BeautifulSoup(self.body, 'html.parser')
         return soup.get_text()
 
+    @classmethod
+    def retrieve_all(cls, params=None):
+        """
+        Retrieve all comments for a user in a course using Forum v2 API.
+
+        Arguments:
+            params: Dictionary with keys:
+                - user_id: The ID of the user
+                - course_id: The ID of the course
+                - flagged: Boolean for flagged comments
+                - page: Page number
+                - per_page: Items per page
+
+        Returns:
+            Dictionary with collection, comment_count, num_pages, page
+        """
+        if params is None:
+            params = {}
+        return forum_api.get_user_comments(
+            user_id=params.get('user_id'),
+            course_id=params.get('course_id'),
+            flagged=params.get('flagged', False),
+            page=params.get('page', 1),
+            per_page=params.get('per_page', 10),
+        )
+
+    @classmethod
+    def get_user_comment_count(cls, user_id, course_ids):
+        """
+        Returns comments and responses count of user in the given course_ids.
+        TODO: Add support for MySQL backend as well
+        """
+        query_params = {
+            "course_id": {"$in": course_ids},
+            "author_id": str(user_id),
+            "_type": "Comment"
+        }
+        return ForumComment()._collection.count_documents(query_params)  # pylint: disable=protected-access
+
+    @classmethod
+    def delete_user_comments(cls, user_id, course_ids):
+        """
+        Deletes comments and responses of user in the given course_ids.
+        TODO: Add support for MySQL backend as well
+        """
+        start_time = time.time()
+        query_params = {
+            "course_id": {"$in": course_ids},
+            "author_id": str(user_id),
+        }
+        comments_deleted = 0
+        comments = ForumComment().get_list(**query_params)
+        log.info(f"<<Bulk Delete>> Fetched comments for user {user_id} in {time.time() - start_time} seconds")
+        for comment in comments:
+            start_time = time.time()
+            comment_id = comment.get("_id")
+            course_id = comment.get("course_id")
+            if comment_id:
+                forum_api.delete_comment(comment_id, course_id=course_id)
+                comments_deleted += 1
+            log.info(f"<<Bulk Delete>> Deleted comment {comment_id} in {time.time() - start_time} seconds."
+                     f" Comment Found: {comment_id is not None}")
+        return comments_deleted
+
 
 def _url_for_thread_comments(thread_id):
     return f"{settings.PREFIX}/threads/{thread_id}/comments"
@@ -146,11 +175,3 @@ def _url_for_thread_comments(thread_id):
 
 def _url_for_comment(comment_id):
     return f"{settings.PREFIX}/comments/{comment_id}"
-
-
-def _url_for_flag_abuse_comment(comment_id):
-    return f"{settings.PREFIX}/comments/{comment_id}/abuse_flag"
-
-
-def _url_for_unflag_abuse_comment(comment_id):
-    return f"{settings.PREFIX}/comments/{comment_id}/abuse_unflag"

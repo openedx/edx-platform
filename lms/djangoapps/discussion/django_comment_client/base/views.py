@@ -161,7 +161,7 @@ def add_truncated_title_to_event_data(event_data, full_title):
     event_data['title'] = full_title[:TRACKING_MAX_FORUM_TITLE]
 
 
-def track_thread_created_event(request, course, thread, followed, from_mfe_sidebar=False):
+def track_thread_created_event(request, course, thread, followed, from_mfe_sidebar=False, notify_all_learners=False):
     """
     Send analytics event for a newly created thread.
     """
@@ -172,7 +172,7 @@ def track_thread_created_event(request, course, thread, followed, from_mfe_sideb
         'thread_type': thread.thread_type,
         'anonymous': thread.anonymous,
         'anonymous_to_peers': thread.anonymous_to_peers,
-        'options': {'followed': followed},
+        'options': {'followed': followed, 'notify_all_learners': notify_all_learners},
         'from_mfe_sidebar': from_mfe_sidebar,
         # There is a stated desire for an 'origin' property that will state
         # whether this thread was created via courseware or the forum.
@@ -367,6 +367,7 @@ def track_comment_reported_event(request, course, comment):
     obj_type = 'comment' if comment.get('parent_id') else 'response'
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='reported')
     event_data = {
+        'discussion': {'id': comment.thread_id},
         'body': comment.body[:TRACKING_MAX_FORUM_BODY],
         'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
         'commentable_id': comment.get('commentable_id', ''),
@@ -405,6 +406,7 @@ def track_comment_unreported_event(request, course, comment):
     obj_type = 'comment' if comment.get('parent_id') else 'response'
     event_name = _EVENT_NAME_TEMPLATE.format(obj_type=obj_type, action_name='unreported')
     event_data = {
+        'discussion': {'id': comment.thread_id},
         'body': comment.body[:TRACKING_MAX_FORUM_BODY],
         'truncated': len(comment.body) > TRACKING_MAX_FORUM_BODY,
         'commentable_id': comment.get('commentable_id', ''),
