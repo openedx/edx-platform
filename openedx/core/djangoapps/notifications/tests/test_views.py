@@ -302,38 +302,79 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             'notification_preference_config': {
                 'discussion': {
                     'enabled': True,
-                    'core_notification_types': [
-                        'new_comment_on_response',
-                        'new_comment',
-                        'new_response',
-                        'response_on_followed_post',
-                        'comment_on_followed_post',
-                        'response_endorsed_on_thread',
-                        'response_endorsed'
-                    ],
+                    'core_notification_types': [],
                     'notification_types': {
-                        'new_discussion_post': {
-                            'web': False,
-                            'email': False,
-                            'push': False,
-                            'email_cadence': 'Daily',
-                            'info': ''
+                        "new_comment_on_response": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
-                        'new_question_post': {
-                            'web': False,
-                            'email': False,
-                            'push': False,
-                            'email_cadence': 'Daily',
-                            'info': ''
+                        "new_comment": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
-                        'core': {
-                            'web': True,
-                            'email': True,
-                            'push': True,
-                            'email_cadence': 'Daily',
-                            'info': 'Notifications for responses and comments on your posts, and the ones you’re '
-                                    'following, including endorsements to your responses and on your posts.'
+                        "new_response": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Daily",
+                            "info": ""
                         },
+                        "new_discussion_post": {
+                            "web": False,
+                            "push": False,
+                            "email": False,
+                            "email_cadence": "Daily",
+                            "info": ""
+                        },
+                        "new_question_post": {
+                            "web": False,
+                            "push": False,
+                            "email": False,
+                            "email_cadence": "Daily",
+                            "info": ""
+                        },
+                        "response_on_followed_post": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Daily",
+                            "info": ""
+                        },
+                        "comment_on_followed_post": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Daily",
+                            "info": ""
+                        },
+                        "response_endorsed_on_thread": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Daily",
+                            "info": ""
+                        },
+                        "response_endorsed": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Daily",
+                            "info": ""
+                        },
+                        "core": {
+                            "web": True,
+                            "push": True,
+                            "email": True,
+                            "email_cadence": "Daily",
+                            "info": "Notifications for responses and comments on your posts, and the ones you’re following, including endorsements to your responses and on your posts."
+                        },
+
                         'content_reported': {
                             'web': True,
                             'email': True,
