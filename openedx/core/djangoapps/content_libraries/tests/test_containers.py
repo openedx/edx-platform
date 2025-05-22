@@ -73,68 +73,30 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
             ]
         )
 
-    def test_unit_crud(self):
+    @ddt.data(
+        ("unit", "u1", "Test Unit"),
+        ("subsection", "subs1", "Test Subsection"),
+        ("section", "s1", "Test Section"),
+    )
+    @ddt.unpack
+    def test_container_crud(self, container_type, slug, display_name):
         """
-        Test Create, Read, Update, and Delete of a Unit
+        Test Create, Read, Update, and Delete of a Containers
         """
-        # Create a unit:
+        # Create container:
         create_date = datetime(2024, 9, 8, 7, 6, 5, tzinfo=timezone.utc)
         with freeze_time(create_date):
-            container_data = self._create_container(self.lib["id"], "unit", slug="u1", display_name="Test Unit")
-        expected_data = {
-            "id": "lct:CL-TEST:containers:unit:u1",
-            "container_type": "unit",
-            "display_name": "Test Unit",
-            "last_published": None,
-            "published_by": "",
-            "last_draft_created": "2024-09-08T07:06:05Z",
-            "last_draft_created_by": 'Bob',
-            'has_unpublished_changes': True,
-            'created': '2024-09-08T07:06:05Z',
-            'modified': '2024-09-08T07:06:05Z',
-            'collections': [],
-        }
-
-        self.assertDictContainsEntries(container_data, expected_data)
-
-        # Fetch the unit:
-        unit_as_read = self._get_container(container_data["id"])
-        # make sure it contains the same data when we read it back:
-        self.assertDictContainsEntries(unit_as_read, expected_data)
-
-        # Update the unit:
-        modified_date = datetime(2024, 10, 9, 8, 7, 6, tzinfo=timezone.utc)
-        with freeze_time(modified_date):
-            container_data = self._update_container("lct:CL-TEST:containers:unit:u1", display_name="Unit ABC")
-        expected_data['last_draft_created'] = expected_data['modified'] = '2024-10-09T08:07:06Z'
-        expected_data['display_name'] = 'Unit ABC'
-        self.assertDictContainsEntries(container_data, expected_data)
-
-        # Re-fetch the unit
-        unit_as_re_read = self._get_container(container_data["id"])
-        # make sure it contains the same data when we read it back:
-        self.assertDictContainsEntries(unit_as_re_read, expected_data)
-
-        # Delete the unit
-        self._delete_container(container_data["id"])
-        self._get_container(container_data["id"], expect_response=404)
-
-    def test_subsection_crud(self):
-        """
-        Test Create, Read, Update, and Delete of a Subsection
-        """
-        # Create a subsection:
-        with freeze_time(self.create_date):
             container_data = self._create_container(
                 self.lib["id"],
-                "subsection",
-                slug="subs1",
-                display_name="Test Subsection",
-            )
+                container_type,
+                slug=slug,
+                display_name=display_name
+        )
+        id = f"lct:CL-TEST:containers:{container_type}:{slug}"
         expected_data = {
-            "id": "lct:CL-TEST:containers:subsection:subs1",
-            "container_type": "subsection",
-            "display_name": "Test Subsection",
+            "id": id,
+            "container_type": container_type,
+            "display_name": display_name,
             "last_published": None,
             "published_by": "",
             "last_draft_created": "2024-09-08T07:06:05Z",
@@ -147,157 +109,72 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
 
         self.assertDictContainsEntries(container_data, expected_data)
 
-        # Fetch the subsection:
-        subsection_as_read = self._get_container(container_data["id"])
+        # Fetch the container:
+        container_as_read = self._get_container(container_data["id"])
         # make sure it contains the same data when we read it back:
-        self.assertDictContainsEntries(subsection_as_read, expected_data)
+        self.assertDictContainsEntries(container_as_read, expected_data)
 
-        # Update the subsection:
+        # Update the container:
         modified_date = datetime(2024, 10, 9, 8, 7, 6, tzinfo=timezone.utc)
         with freeze_time(modified_date):
-            container_data = self._update_container(
-                "lct:CL-TEST:containers:subsection:subs1",
-                display_name="Subsection ABC",
-            )
-        expected_data['last_draft_created'] = expected_data['modified'] = '2024-10-09T08:07:06Z'
-        expected_data['display_name'] = 'Subsection ABC'
+            container_data = self._update_container(id, display_name=f"New Display Name for {container_type}")
+        expected_data["last_draft_created"] = expected_data["modified"] = "2024-10-09T08:07:06Z"
+        expected_data["display_name"] = f"New Display Name for {container_type}"
         self.assertDictContainsEntries(container_data, expected_data)
 
-        # Re-fetch the subsection
-        subsection_as_re_read = self._get_container(container_data["id"])
+        # Re-fetch the container
+        container_as_re_read = self._get_container(container_data["id"])
         # make sure it contains the same data when we read it back:
-        self.assertDictContainsEntries(subsection_as_re_read, expected_data)
+        self.assertDictContainsEntries(container_as_re_read, expected_data)
 
-        # Delete the subsection
+        # Delete the container
         self._delete_container(container_data["id"])
         self._get_container(container_data["id"], expect_response=404)
 
-    def test_section_crud(self):
+    @ddt.data(
+        ("unit", "u2", "Test Unit"),
+        ("subsection", "subs2", "Test Subsection"),
+        ("section", "s2", "Test Section"),
+    )
+    @ddt.unpack
+    def test_container_permissions(self, container_type, slug, display_name):
         """
-        Test Create, Read, Update, and Delete of a Section
+        Test that a regular user with read-only permissions on the library cannot create, update, or delete containers.
         """
-        # Create a section:
-        with freeze_time(self.create_date):
-            container_data = self._create_container(self.lib["id"], "section", slug="s1", display_name="Test Section")
-        expected_data = {
-            "id": "lct:CL-TEST:containers:section:s1",
-            "container_type": "section",
-            "display_name": "Test Section",
-            "last_published": None,
-            "published_by": "",
-            "last_draft_created": "2024-09-08T07:06:05Z",
-            "last_draft_created_by": 'Bob',
-            'has_unpublished_changes': True,
-            'created': '2024-09-08T07:06:05Z',
-            'modified': '2024-09-08T07:06:05Z',
-            'collections': [],
-        }
-
-        self.assertDictContainsEntries(container_data, expected_data)
-
-        # Fetch the section:
-        section_as_read = self._get_container(container_data["id"])
-        # make sure it contains the same data when we read it back:
-        self.assertDictContainsEntries(section_as_read, expected_data)
-
-        # Update the section:
-        modified_date = datetime(2024, 10, 9, 8, 7, 6, tzinfo=timezone.utc)
-        with freeze_time(modified_date):
-            container_data = self._update_container("lct:CL-TEST:containers:section:s1", display_name="Section ABC")
-        expected_data['last_draft_created'] = expected_data['modified'] = '2024-10-09T08:07:06Z'
-        expected_data['display_name'] = 'Section ABC'
-        self.assertDictContainsEntries(container_data, expected_data)
-
-        # Re-fetch the section
-        section_as_re_read = self._get_container(container_data["id"])
-        # make sure it contains the same data when we read it back:
-        self.assertDictContainsEntries(section_as_re_read, expected_data)
-
-        # Delete the section
-        self._delete_container(container_data["id"])
-        self._get_container(container_data["id"], expect_response=404)
-
-    def test_unit_permissions(self):
-        """
-        Test that a regular user with read-only permissions on the library cannot create, update, or delete units.
-        """
-        container_data = self._create_container(self.lib["id"], "unit", slug="u2", display_name="Test Unit")
+        container_data = self._create_container(self.lib["id"], container_type, slug=slug, display_name=display_name)
 
         random_user = UserFactory.create(username="Random", email="random@example.com")
         with self.as_user(random_user):
-            self._create_container(self.lib["id"], "unit", slug="u3", display_name="Test Unit", expect_response=403)
+            self._create_container(self.lib["id"], container_type, slug="new_slug", display_name=display_name, expect_response=403)
             self._get_container(container_data["id"], expect_response=403)
-            self._update_container(container_data["id"], display_name="Unit ABC", expect_response=403)
+            self._update_container(container_data["id"], display_name="New Display Name", expect_response=403)
             self._delete_container(container_data["id"], expect_response=403)
 
         # Granting read-only permissions on the library should only allow retrieval, nothing else.
         self._add_user_by_email(self.lib["id"], random_user.email, access_level="read")
         with self.as_user(random_user):
-            self._create_container(self.lib["id"], "unit", slug="u2", display_name="Test Unit", expect_response=403)
+            self._create_container(self.lib["id"], container_type, slug=slug, display_name=display_name, expect_response=403)
             self._get_container(container_data["id"], expect_response=200)
-            self._update_container(container_data["id"], display_name="Unit ABC", expect_response=403)
+            self._update_container(container_data["id"], display_name="New Display Name", expect_response=403)
             self._delete_container(container_data["id"], expect_response=403)
 
-    def test_subsection_permissions(self):
-        """
-        Test that a regular user with read-only permissions on the library cannot create, update, or delete subsection.
-        """
-        container_data = self._create_container(self.lib["id"], "subsection", slug="subs2", display_name="Test Subsection")
-
-        random_user = UserFactory.create(username="Random", email="random@example.com")
-        with self.as_user(random_user):
-            self._create_container(self.lib["id"], "unit", slug="subs3", display_name="Test Subsection", expect_response=403)
-            self._get_container(container_data["id"], expect_response=403)
-            self._update_container(container_data["id"], display_name="Subsection ABC", expect_response=403)
-            self._delete_container(container_data["id"], expect_response=403)
-
-        # Granting read-only permissions on the library should only allow retrieval, nothing else.
-        self._add_user_by_email(self.lib["id"], random_user.email, access_level="read")
-        with self.as_user(random_user):
-            self._create_container(self.lib["id"], "unit", slug="subs2", display_name="Test Subsection", expect_response=403)
-            self._get_container(container_data["id"], expect_response=200)
-            self._update_container(container_data["id"], display_name="Subsection ABC", expect_response=403)
-            self._delete_container(container_data["id"], expect_response=403)
-
-    def test_section_permissions(self):
-        container_data = self._create_container(self.lib["id"], "section", slug="s2", display_name="Test Section")
-
-        random_user = UserFactory.create(username="Random", email="random@example.com")
-        with self.as_user(random_user):
-            self._create_container(self.lib["id"], "section", slug="s3", display_name="Test Section", expect_response=403)
-            self._get_container(container_data["id"], expect_response=403)
-            self._update_container(container_data["id"], display_name="Section ABC", expect_response=403)
-            self._delete_container(container_data["id"], expect_response=403)
-
-        # Granting read-only permissions on the library should only allow retrieval, nothing else.
-        self._add_user_by_email(self.lib["id"], random_user.email, access_level="read")
-        with self.as_user(random_user):
-            self._create_container(self.lib["id"], "section", slug="s2", display_name="Test Section", expect_response=403)
-            self._get_container(container_data["id"], expect_response=200)
-            self._update_container(container_data["id"], display_name="Section ABC", expect_response=403)
-            self._delete_container(container_data["id"], expect_response=403)
-
-    def test_containers_gets_auto_slugs(self):
+    @ddt.data(
+        ("unit", "Alpha Bravo", "lct:CL-TEST:containers:unit:alpha-bravo-"),
+        ("subsection", "Subsection Alpha", "lct:CL-TEST:containers:subsection:subsection-alpha-"),
+        ("section", "Section Alpha", "lct:CL-TEST:containers:section:section-alpha-"),
+    )
+    @ddt.unpack
+    def test_containers_gets_auto_slugs(self, container_type, display_name, expected_id):
         """
         Test that we can create containers by specifying only a title, and they get
         unique slugs assigned automatically.
         """
-        unit_2 = self._create_container(self.lib["id"], "unit", display_name="Alpha Bravo", slug=None)
-        subsection_2 = self._create_container(self.lib["id"], "subsection", display_name="Subsection Alpha", slug=None)
-        section_2 = self._create_container(self.lib["id"], "section", display_name="Section Alpha", slug=None)
+        container_1 = getattr(self, container_type)
+        container_2 = self._create_container(self.lib["id"], container_type, display_name=display_name, slug=None)
 
-        assert self.unit["id"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
-        assert unit_2["id"].startswith("lct:CL-TEST:containers:unit:alpha-bravo-")
-        assert self.unit["id"] != unit_2["id"]
-
-        assert self.subsection["id"].startswith("lct:CL-TEST:containers:subsection:subsection-alpha-")
-        assert subsection_2["id"].startswith("lct:CL-TEST:containers:subsection:subsection-alpha-")
-        assert self.subsection["id"] != subsection_2["id"]
-
-        assert self.section["id"].startswith("lct:CL-TEST:containers:section:section-alpha-")
-        assert section_2["id"].startswith("lct:CL-TEST:containers:section:section-alpha-")
-        assert self.section["id"] != section_2["id"]
-
+        assert container_1["id"].startswith(expected_id)
+        assert container_2["id"].startswith(expected_id)
+        assert container_1["id"] != container_2["id"]
 
     def test_unit_add_children(self):
         """
@@ -385,20 +262,27 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[0]['id'] == new_problem_block['id']
         assert data[1]['id'] == new_html_block['id']
 
-    def test_restore_unit(self):
+    @ddt.data(
+        "unit",
+        "subsection",
+        "section",
+    )
+    def test_restore_containers(self, container_type):
         """
-        Test restore a deleted unit.
+        Test restore a deleted container.
         """
-        # Delete the unit
-        self._delete_container(self.unit["id"])
+        container = getattr(self, container_type)
+
+        # Delete container
+        self._delete_container(container["id"])
 
         # Restore container
-        self._restore_container(self.unit["id"])
-        new_container_data = self._get_container(self.unit["id"])
+        self._restore_container(container["id"])
+        new_container_data = self._get_container(container["id"])
         expected_data = {
-            "id": self.unit["id"],
-            "container_type": "unit",
-            "display_name": "Alpha Bravo",
+            "id": container["id"],
+            "container_type": container_type,
+            "display_name": container["display_name"],
             "last_published": None,
             "published_by": "",
             "last_draft_created": "2024-09-08T07:06:05Z",
