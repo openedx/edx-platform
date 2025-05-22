@@ -108,7 +108,6 @@ from openedx.features.course_experience import (
 )
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.course_experience.url_helpers import (
-    _get_legacy_courseware_url,
     get_learning_mfe_home_url,
     make_learning_mfe_courseware_url
 )
@@ -232,31 +231,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.status_code == 302
         assert response.url == expected_redirect_url
 
-    # The new courseware experience does not support this sort of course structure;
-    # it assumes a simple course->chapter->sequence->unit->component tree.
-    @patch.object(views, 'get_courseware_url', new=_get_legacy_courseware_url)
-    def test_jump_to_legacy_from_nested_block(self):
-        with self.store.default_store(ModuleStoreEnum.Type.split):
-            course = CourseFactory.create()
-            chapter = BlockFactory.create(category='chapter', parent_location=course.location)
-            sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
-            vertical = BlockFactory.create(category='vertical', parent_location=sequence.location)
-            nested_sequence = BlockFactory.create(category='sequential', parent_location=vertical.location)
-            nested_vertical1 = BlockFactory.create(category='vertical', parent_location=nested_sequence.location)
-            # put a block into nested_vertical1 for completeness
-            BlockFactory.create(category='html', parent_location=nested_vertical1.location)
-            nested_vertical2 = BlockFactory.create(category='vertical', parent_location=nested_sequence.location)
-            block2 = BlockFactory.create(category='html', parent_location=nested_vertical2.location)
-
-        # internal position of block2 will be 1_2 (2nd item withing 1st item)
-        activate_block_id = urlencode({'activate_block_id': str(block2.location)})
-        expected_redirect_url = (
-            f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
-        )
-        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
-        response = self.client.get(jumpto_url)
-        self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
-
     @ddt.data(
         (False, ModuleStoreEnum.Type.split),
         (True, ModuleStoreEnum.Type.split),
@@ -272,44 +246,6 @@ class TestJumpTo(ModuleStoreTestCase):
         )
         response = self.client.get(jumpto_url)
         assert response.status_code == 404
-
-    @ddt.data(
-        (ModuleStoreEnum.Type.split, False, '1'),
-        (ModuleStoreEnum.Type.split, True, '2'),
-    )
-    @ddt.unpack
-    def test_jump_to_legacy_for_learner_with_staff_only_content(self, store_type, is_staff_user, position):
-        """
-        Test for checking correct position in redirect_url for learner when a course has staff-only units.
-
-        (When the MFE is active, it handles this logic itself with the help of the
-         courseware blocks/metadata/outline APIs, so we don't test for it here.)
-        """
-        with self.store.default_store(store_type):
-            course = CourseFactory.create()
-            request = RequestFactory().get('/')
-            request.user = UserFactory(is_staff=is_staff_user, username="staff")
-            request.session = {}
-            course_key = CourseKey.from_string(str(course.id))
-            chapter = BlockFactory.create(category='chapter', parent_location=course.location)
-            sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
-            __ = BlockFactory.create(category='vertical', parent_location=sequence.location)
-            staff_only_vertical = BlockFactory.create(category='vertical', parent_location=sequence.location,
-                                                      metadata=dict(visible_to_staff_only=True))
-            __ = BlockFactory.create(category='vertical', parent_location=sequence.location)
-
-        usage_key = UsageKey.from_string(str(staff_only_vertical.location)).replace(course_key=course_key)
-        expected_url = reverse(
-            'courseware_position',
-            kwargs={
-                'course_id': str(course.id),
-                'chapter': chapter.url_name,
-                'section': sequence.url_name,
-                'position': position,
-            }
-        )
-        expected_url += "?{}".format(urlencode({'activate_block_id': str(staff_only_vertical.location)}))
-        assert expected_url == _get_legacy_courseware_url(usage_key, request)
 
 
 class IndexQueryTestCase(ModuleStoreTestCase):
@@ -473,18 +409,6 @@ class CoursewareIndexTestCase(BaseViewsTestCase):
         response = self.client.get(url)
         assert response.status_code == expected_response_code
         return response
-
-    def test_get_redirect_url(self):
-        # test the course location
-        assert '/courses/{course_key}/courseware?{activate_block_id}'.format(
-            course_key=str(self.course_key),
-            activate_block_id=urlencode({'activate_block_id': str(self.course.location)})
-        ) == _get_legacy_courseware_url(self.course.location)
-        # test a section location
-        assert '/courses/{course_key}/courseware/Chapter_1/Sequential_1/?{activate_block_id}'.format(
-            course_key=str(self.course_key),
-            activate_block_id=urlencode({'activate_block_id': str(self.section.location)})
-        ) == _get_legacy_courseware_url(self.section.location)
 
     def test_index_invalid_position(self):
         request_url = '/'.join([

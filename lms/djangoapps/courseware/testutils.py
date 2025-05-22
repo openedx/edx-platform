@@ -12,7 +12,6 @@ import ddt
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from lms.djangoapps.courseware.utils import is_mode_upsellable
-from openedx.features.course_experience.url_helpers import _get_legacy_courseware_url
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -164,32 +163,6 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         else:
             self.assertNotContains(response, self.html_block.data, status_code=expected_response_code)
         return response
-
-    @ddt.data(
-        ('vertical_block', 4),
-        ('html_block', 4),
-    )
-    @ddt.unpack
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_courseware_html(self, block_name, mongo_calls, mock_redirect):
-        """
-        To verify that the removal of courseware chrome elements is working,
-        we include this test here to make sure the chrome elements that should
-        be removed actually exist in the full courseware page.
-        If this test fails, it's probably because the HTML template for courseware
-        has changed and COURSEWARE_CHROME_HTML_ELEMENTS needs to be updated.
-        """
-        with self.store.default_store(ModuleStoreEnum.Type.split):
-            self.block_name_to_be_tested = block_name
-            self.setup_course(ModuleStoreEnum.Type.split)
-            self.setup_user(admin=True, enroll=True, login=True)
-
-            with check_mongo_calls(mongo_calls):
-                url = _get_legacy_courseware_url(self.block_to_be_tested.location)
-                response = self.client.get(url)
-                expected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
-                for chrome_element in expected_elements:
-                    self.assertContains(response, chrome_element)
 
     def test_success_enrolled_staff(self):
         self.setup_course()
