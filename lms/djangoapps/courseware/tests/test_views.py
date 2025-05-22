@@ -109,6 +109,7 @@ from openedx.features.course_experience import (
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from openedx.features.course_experience.url_helpers import (
     get_learning_mfe_home_url,
+    get_courseware_url,
     make_learning_mfe_courseware_url
 )
 from openedx.features.enterprise_support.tests.factories import (
@@ -248,42 +249,6 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.status_code == 404
 
 
-class IndexQueryTestCase(ModuleStoreTestCase):
-    """
-    Tests for query count.
-    """
-    NUM_PROBLEMS = 20
-
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_index_query_counts(self, mock_redirect):
-        # TODO: decrease query count as part of REVO-28
-        ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
-        with self.store.default_store(ModuleStoreEnum.Type.split):
-            course = CourseFactory.create()
-            with self.store.bulk_operations(course.id):
-                chapter = BlockFactory.create(category='chapter', parent_location=course.location)
-                section = BlockFactory.create(category='sequential', parent_location=chapter.location)
-                vertical = BlockFactory.create(category='vertical', parent_location=section.location)
-                for _ in range(self.NUM_PROBLEMS):
-                    BlockFactory.create(category='problem', parent_location=vertical.location)
-
-        self.client.login(username=self.user.username, password=self.user_password)
-        CourseEnrollment.enroll(self.user, course.id)
-
-        with self.assertNumQueries(152, table_ignorelist=QUERY_COUNT_TABLE_IGNORELIST):
-            with check_mongo_calls(3):
-                url = reverse(
-                    'courseware_section',
-                    kwargs={
-                        'course_id': str(course.id),
-                        'chapter': str(chapter.location.block_id),
-                        'section': str(section.location.block_id),
-                    }
-                )
-                response = self.client.get(url)
-                assert response.status_code == 200
-
-
 class BaseViewsTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Base class for courseware tests"""
     CREATE_USER = False
@@ -355,108 +320,6 @@ class BaseViewsTestCase(ModuleStoreTestCase, MasqueradeMixin):
         """
         self.global_staff = GlobalStaffFactory.create()  # pylint: disable=attribute-defined-outside-init
         assert self.client.login(username=self.global_staff.username, password=TEST_PASSWORD)
-
-
-@ddt.ddt
-class CoursewareIndexTestCase(BaseViewsTestCase):
-    """
-    Tests for the courseware index view, used for instructor previews.
-    """
-    def setUp(self):
-        super().setUp()
-        self._create_global_staff_user()  # this view needs staff permission
-
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_index_success(self, mock_redirect):
-        response = self._verify_index_response()
-        self.assertContains(response, self.problem2.location.replace(branch=None, version_guid=None))
-
-        # re-access to the main course page redirects to last accessed view.
-        url = reverse('courseware', kwargs={'course_id': str(self.course_key)})
-        response = self.client.get(url)
-        assert response.status_code == 302
-        response = self.client.get(response.url)
-        self.assertNotContains(response, self.problem.location.replace(branch=None, version_guid=None))
-        self.assertContains(response, self.problem2.location.replace(branch=None, version_guid=None))
-
-    def test_index_nonexistent_chapter(self):
-        self._verify_index_response(expected_response_code=404, chapter_name='non-existent')
-
-    def test_index_nonexistent_chapter_masquerade(self):
-        self.update_masquerade(username=self.user.username)
-        self._verify_index_response(expected_response_code=302, chapter_name='non-existent')
-
-    def test_index_nonexistent_section(self):
-        self._verify_index_response(expected_response_code=404, section_name='non-existent')
-
-    def test_index_nonexistent_section_masquerade(self):
-        self.update_masquerade(username=self.user.username)
-        self._verify_index_response(expected_response_code=302, section_name='non-existent')
-
-    def _verify_index_response(self, expected_response_code=200, chapter_name=None, section_name=None):
-        """
-        Verifies the response when the courseware index page is accessed with
-        the given chapter and section names.
-        """
-        url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course_key),
-                'chapter': str(self.chapter.location.block_id) if chapter_name is None else chapter_name,
-                'section': str(self.section2.location.block_id) if section_name is None else section_name,
-            }
-        )
-        response = self.client.get(url)
-        assert response.status_code == expected_response_code
-        return response
-
-    def test_index_invalid_position(self):
-        request_url = '/'.join([
-            '/courses',
-            str(self.course.id),
-            'courseware',
-            self.chapter.location.block_id,
-            self.section.location.block_id,
-            'f'
-        ])
-        response = self.client.get(request_url)
-        assert response.status_code == 404
-
-    def test_unicode_handling_in_url(self):
-        url_parts = [
-            '/courses',
-            str(self.course.id),
-            'courseware',
-            self.chapter.location.block_id,
-            self.section.location.block_id,
-            '1'
-        ]
-        for idx, val in enumerate(url_parts):
-            url_parts_copy = url_parts[:]
-            url_parts_copy[idx] = val + 'χ'
-            request_url = '/'.join(url_parts_copy)
-            response = self.client.get(request_url)
-            assert response.status_code == 404
-
-    # TODO: TNL-6387: Remove test
-    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_accordion(self, mock_redirect):
-        """
-        This needs a response_context, which is not included in the render_accordion's main method
-        returning a render_to_string, so we will render via the courseware URL in order to include
-        the needed context
-        """
-        response = self.client.get(
-            reverse('courseware', args=[str(self.course.id)]),
-            follow=True
-        )
-        test_responses = [
-            '<p class="accordion-display-name">Sequential 1 <span class="sr">current section</span></p>',
-            '<p class="accordion-display-name">Sequential 2 </p>'
-        ]
-        for test in test_responses:
-            self.assertContains(response, test)
 
 
 @ddt.ddt
@@ -1044,56 +907,6 @@ class TestProgressDueDate(BaseDueDateTests):
     def get_response(self, course):
         """ Returns the HTML for the progress page """
         return self.client.get(reverse('progress', args=[str(course.id)]))
-
-
-# TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-class TestAccordionDueDate(BaseDueDateTests):
-    """
-    Test that the accordion page displays due dates correctly
-    """
-    __test__ = True
-
-    def setUp(self):
-        super().setUp()
-        self.patcher = patch(
-            'lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-        self.mock_redirect = self.patcher.start()
-
-    def tearDown(self):
-        self.patcher.stop()
-        super().tearDown()
-
-    def get_response(self, course):
-        """ Returns the HTML for the accordion """
-        return self.client.get(
-            reverse('courseware', args=[str(course.id)]),
-            follow=True
-        )
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
-    def test_backwards_compatibility(self):
-        super().test_backwards_compatibility()
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
-    def test_defaults(self):
-        super().test_defaults()
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
-    def test_format_date(self):
-        super().test_format_date()
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
-    def test_format_invalid(self):
-        super().test_format_invalid()
-
-    # TODO: LEARNER-71: Delete entire TestAccordionDueDate class
-    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
-    def test_format_none(self):
-        super().test_format_none()
 
 
 class StartDateTests(ModuleStoreTestCase):
@@ -2275,72 +2088,6 @@ class TestIndexView(ModuleStoreTestCase):
     """
     Tests of the courseware.views.index view.
     """
-    @XBlock.register_temp_plugin(ViewCheckerBlock, 'view_checker')
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_student_state(self, mock_redirect):
-        """
-        Verify that saved student state is loaded for xblocks rendered in the index view.
-        """
-        with modulestore().default_store(ModuleStoreEnum.Type.split):
-            course = CourseFactory.create()
-            chapter = BlockFactory.create(parent_location=course.location, category='chapter')
-            section = BlockFactory.create(parent_location=chapter.location, category='view_checker',
-                                          display_name="Sequence Checker")
-            vertical = BlockFactory.create(parent_location=section.location, category='view_checker',
-                                           display_name="Vertical Checker")
-            block = BlockFactory.create(parent_location=vertical.location, category='view_checker',
-                                        display_name="Block Checker")
-
-        for item in (section, vertical, block):
-            StudentModuleFactory.create(
-                student=self.user,
-                course_id=course.id,
-                module_state_key=item.scope_ids.usage_id,
-                state=json.dumps({'state': str(item.scope_ids.usage_id)})
-            )
-
-        CourseOverview.load_from_module_store(course.id)
-        CourseEnrollmentFactory(user=self.user, course_id=course.id)
-
-        assert self.client.login(username=self.user.username, password=self.user_password)
-        response = self.client.get(
-            reverse(
-                'courseware_section',
-                kwargs={
-                    'course_id': str(course.id),
-                    'chapter': chapter.url_name,
-                    'section': section.url_name,
-                }
-            )
-        )
-        # Trigger the assertions embedded in the ViewCheckerBlocks
-        self.assertContains(response, "ViewCheckerPassed", count=3)
-
-    @XBlock.register_temp_plugin(ActivateIDCheckerBlock, 'id_checker')
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_activate_block_id(self, mock_redirect):
-        course = CourseFactory.create()
-        with self.store.bulk_operations(course.id):
-            chapter = BlockFactory.create(parent=course, category='chapter')
-            section = BlockFactory.create(parent=chapter, category='sequential', display_name="Sequence")
-            vertical = BlockFactory.create(parent=section, category='vertical', display_name="Vertical")
-            BlockFactory.create(parent=vertical, category='id_checker', display_name="ID Checker")
-
-        CourseOverview.load_from_module_store(course.id)
-        CourseEnrollmentFactory(user=self.user, course_id=course.id)
-
-        assert self.client.login(username=self.user.username, password=self.user_password)
-        response = self.client.get(
-            reverse(
-                'courseware_section',
-                kwargs={
-                    'course_id': str(course.id),
-                    'chapter': chapter.url_name,
-                    'section': section.url_name,
-                }
-            ) + '?activate_block_id=test_block_id'
-        )
-        self.assertContains(response, "Activate Block ID: test_block_id")
 
     @patch('lms.djangoapps.courseware.views.views.CourseTabView.course_open_for_learner_enrollment')
     @patch('openedx.core.djangoapps.util.user_messages.PageLevelMessages.register_warning_message')
@@ -2423,207 +2170,6 @@ class TestIndexView(ModuleStoreTestCase):
             course.invitation_only = invitation_only
 
             assert views.CourseTabView.course_open_for_learner_enrollment(course) == expected_should_show_enroll_button
-
-
-@ddt.ddt
-class TestIndexViewCompleteOnView(ModuleStoreTestCase, CompletionWaffleTestMixin):
-    """
-    Tests CompleteOnView is set up correctly in CoursewareIndex.
-    """
-
-    def setup_course(self, default_store):
-        """
-        Set up course content for modulestore.
-        """
-        # pylint:disable=attribute-defined-outside-init
-
-        self.request_factory = RequestFactoryNoCsrf()
-
-        with modulestore().default_store(default_store):
-            self.course = CourseFactory.create()
-
-            with self.store.bulk_operations(self.course.id):
-
-                self.chapter = BlockFactory.create(
-                    parent_location=self.course.location, category='chapter', display_name='Week 1'
-                )
-                self.section_1 = BlockFactory.create(
-                    parent_location=self.chapter.location, category='sequential', display_name='Lesson 1'
-                )
-                self.vertical_1 = BlockFactory.create(
-                    parent_location=self.section_1.location, category='vertical', display_name='Subsection 1'
-                )
-                self.html_1_1 = BlockFactory.create(
-                    parent_location=self.vertical_1.location, category='html', display_name="HTML 1_1"
-                )
-                self.problem_1 = BlockFactory.create(
-                    parent_location=self.vertical_1.location, category='problem', display_name="Problem 1"
-                )
-                self.html_1_2 = BlockFactory.create(
-                    parent_location=self.vertical_1.location, category='html', display_name="HTML 1_2"
-                )
-
-                self.section_2 = BlockFactory.create(
-                    parent_location=self.chapter.location, category='sequential', display_name='Lesson 2'
-                )
-                self.vertical_2 = BlockFactory.create(
-                    parent_location=self.section_2.location, category='vertical', display_name='Subsection 2'
-                )
-                self.video_2 = BlockFactory.create(
-                    parent_location=self.vertical_2.location, category='video', display_name="Video 2"
-                )
-                self.problem_2 = BlockFactory.create(
-                    parent_location=self.vertical_2.location, category='problem', display_name="Problem 2"
-                )
-
-        self.section_1_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course.id),
-                'chapter': self.chapter.url_name,
-                'section': self.section_1.url_name,
-            }
-        )
-
-        self.section_2_url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course.id),
-                'chapter': self.chapter.url_name,
-                'section': self.section_2.url_name,
-            }
-        )
-
-        CourseOverview.load_from_module_store(self.course.id)
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
-        assert self.client.login(username=self.user.username, password=self.user_password)
-
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_completion_service_disabled(self, mock_redirect):
-
-        self.setup_course(ModuleStoreEnum.Type.split)
-
-        response = self.client.get(self.section_1_url)
-        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
-
-        response = self.client.get(self.section_2_url)
-        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
-
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_completion_service_enabled(self, mock_redirect):
-
-        self.override_waffle_switch(True)
-
-        self.setup_course(ModuleStoreEnum.Type.split)
-
-        response = self.client.get(self.section_1_url)
-        self.assertContains(response, 'data-mark-completed-on-view-after-delay')
-        self.assertContains(response, 'data-mark-completed-on-view-after-delay', count=2)
-
-        request = self.request_factory.post(
-            '/',
-            data=json.dumps({"completion": 1}),
-            content_type='application/json',
-        )
-        request.user = self.user
-        request.session = {}
-        response = handle_xblock_callback(
-            request,
-            str(self.course.id),
-            quote_slashes(str(self.html_1_1.scope_ids.usage_id)),
-            'publish_completion',
-        )
-        assert json.loads(response.content.decode('utf-8')) == {'result': 'ok'}
-
-        response = self.client.get(self.section_1_url)
-        self.assertContains(response, 'data-mark-completed-on-view-after-delay')
-        self.assertContains(response, 'data-mark-completed-on-view-after-delay', count=1)
-
-        request = self.request_factory.post(
-            '/',
-            data=json.dumps({"completion": 1}),
-            content_type='application/json',
-        )
-        request.user = self.user
-        request.session = {}
-        response = handle_xblock_callback(
-            request,
-            str(self.course.id),
-            quote_slashes(str(self.html_1_2.scope_ids.usage_id)),
-            'publish_completion',
-        )
-        assert json.loads(response.content.decode('utf-8')) == {'result': 'ok'}
-
-        response = self.client.get(self.section_1_url)
-        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
-
-        response = self.client.get(self.section_2_url)
-        self.assertNotContains(response, 'data-mark-completed-on-view-after-delay')
-
-
-@ddt.ddt
-class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
-    """
-    Test the index view to handle vertical positions. Confirms that first position is loaded
-    if input position is non-positive or greater than number of positions available.
-    """
-
-    def setUp(self):
-        """
-        Set up initial test data
-        """
-        super().setUp()
-
-        # create course with 3 positions
-        self.course = CourseFactory.create()
-        with self.store.bulk_operations(self.course.id):
-            self.chapter = BlockFactory.create(parent_location=self.course.location, category='chapter')
-            self.section = BlockFactory.create(parent_location=self.chapter.location, category='sequential',
-                                               display_name="Sequence")
-            BlockFactory.create(parent_location=self.section.location, category='vertical', display_name="Vertical1")
-            BlockFactory.create(parent_location=self.section.location, category='vertical', display_name="Vertical2")
-            BlockFactory.create(parent_location=self.section.location, category='vertical', display_name="Vertical3")
-
-        CourseOverview.load_from_module_store(self.course.id)
-
-        self.client.login(username=self.user, password=self.user_password)
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
-
-    def _get_course_vertical_by_position(self, input_position):
-        """
-        Returns client response to input position.
-        """
-        return self.client.get(
-            reverse(
-                'courseware_position',
-                kwargs={
-                    'course_id': str(self.course.id),
-                    'chapter': self.chapter.url_name,
-                    'section': self.section.url_name,
-                    'position': input_position,
-                }
-            )
-        )
-
-    def _assert_correct_position(self, response, expected_position):
-        """
-        Asserts that the expected position and the position in the response are the same
-        """
-        self.assertContains(response, f'data-position="{expected_position}"')
-
-    @ddt.data(("-1", 1), ("0", 1), ("-0", 1), ("2", 2), ("5", 1))
-    @ddt.unpack
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_vertical_positions(self, input_position, expected_position, mock_redirect):
-        """
-        Tests the following cases:
-        * Load first position when negative position inputted.
-        * Load first position when 0/-0 position inputted.
-        * Load given position when 0 < input_position <= num_positions_available.
-        * Load first position when positive position > num_positions_available.
-        """
-        resp = self._get_course_vertical_by_position(input_position)
-        self._assert_correct_position(resp, expected_position)
 
 
 @ddt.ddt
@@ -3007,89 +2553,6 @@ class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disa
         return options
 
 
-class TestIndexViewCrawlerStudentStateWrites(SharedModuleStoreTestCase):
-    """
-    Ensure that courseware index requests do not trigger student state writes.
-    This is to prevent locking issues that have caused latency spikes in the
-    courseware_studentmodule table when concurrent requests each try to update
-    the same rows for sequence, section, and course positions.
-    """
-    @classmethod
-    def setUpClass(cls):
-        """Set up the simplest course possible."""
-        # setUpClassAndTestData() already calls setUpClass on SharedModuleStoreTestCase
-        # pylint: disable=super-method-not-called
-        with super().setUpClassAndTestData():
-            cls.course = CourseFactory.create()
-            with cls.store.bulk_operations(cls.course.id):
-                cls.chapter = BlockFactory.create(category='chapter', parent_location=cls.course.location)
-                cls.section = BlockFactory.create(category='sequential', parent_location=cls.chapter.location)
-                cls.vertical = BlockFactory.create(category='vertical', parent_location=cls.section.location)
-
-    @classmethod
-    def setUpTestData(cls):  # lint-amnesty, pylint: disable=super-method-not-called
-        """Set up and enroll our fake user in the course."""
-        cls.user = UserFactory(is_staff=True)
-        CourseEnrollment.enroll(cls.user, cls.course.id)
-
-    def setUp(self):
-        """Do the client login."""
-        super().setUp()
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
-
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_write_by_default(self, mock_redirect):
-        """By default, always write student state, regardless of user agent."""
-        with patch('lms.djangoapps.courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
-            # Simulate someone using Chrome
-            self._load_courseware('Mozilla/5.0 AppleWebKit/537.36')
-            assert patched_state_client_set_many.called
-            patched_state_client_set_many.reset_mock()
-
-            # Common crawler user agent
-            self._load_courseware('edX-downloader/0.1')
-            assert patched_state_client_set_many.called
-
-    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-    def test_writes_with_config(self, mock_redirect):
-        """Test state writes (or lack thereof) based on config values."""
-        CrawlersConfig.objects.create(known_user_agents='edX-downloader,crawler_foo', enabled=True)
-        with patch('lms.djangoapps.courseware.model_data.UserStateCache.set_many') as patched_state_client_set_many:
-            # Exact matching of crawler user agent
-            self._load_courseware('crawler_foo')
-            assert not patched_state_client_set_many.called
-
-            # Partial matching of crawler user agent
-            self._load_courseware('edX-downloader/0.1')
-            assert not patched_state_client_set_many.called
-
-            # Simulate an actual browser hitting it (we should write)
-            self._load_courseware('Mozilla/5.0 AppleWebKit/537.36')
-            assert patched_state_client_set_many.called
-
-        # Disabling the crawlers config should revert us to default behavior
-        CrawlersConfig.objects.create(enabled=False)
-
-        # Disabling the violation because pylint just can't see that we'll get the mock_redirect param passed in via the
-        # patch.
-        self.test_write_by_default()  # pylint: disable=no-value-for-parameter
-
-    def _load_courseware(self, user_agent):
-        """Helper to load the actual courseware page."""
-        url = reverse(
-            'courseware_section',
-            kwargs={
-                'course_id': str(self.course.id),
-                'chapter': str(self.chapter.location.block_id),
-                'section': str(self.section.location.block_id),
-            }
-        )
-        response = self.client.get(url, HTTP_USER_AGENT=user_agent)
-        # Make sure we get back an actual 200, and aren't redirected because we
-        # messed up the setup somehow (e.g. didn't enroll properly)
-        assert response.status_code == 200
-
-
 class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCase):
     """
     Ensure that the Enterprise Data Consent redirects are in place only when consent is required.
@@ -3112,7 +2575,6 @@ class EnterpriseConsentTestCase(EnterpriseTestConsentRequired, ModuleStoreTestCa
 
         course_id = str(self.course.id)
         for url in (
-                reverse("courseware", kwargs=dict(course_id=course_id)),
                 reverse("progress", kwargs=dict(course_id=course_id)),
                 reverse("student_progress", kwargs=dict(course_id=course_id, student_id=str(self.user.id))),
         ):
@@ -3343,7 +2805,6 @@ class TestCourseWideResources(ModuleStoreTestCase):
     """
 
     @ddt.data(
-        ('courseware', 'course_id', False, True),
         ('progress', 'course_id', False, False),
         ('instructor_dashboard', 'course_id', True, False),
         ('forum_form_discussion', 'course_id', False, False),
