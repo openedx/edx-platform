@@ -9,11 +9,6 @@ class MockForumApiMixin:
     """Mixin to mock forum_api across different test cases with a single mock instance."""
 
     @classmethod
-    def setUpClass(cls):
-        """Apply a single forum_api mock at the class level."""
-        cls.setUpClassAndForumMock()
-
-    @classmethod
     def setUpClassAndForumMock(cls):
         """
         Set up the class and apply the forum_api mock.
@@ -49,11 +44,6 @@ class MockForumApiMixin:
         for patcher in cls.forum_api_patchers:
             patcher.stop()
 
-    @classmethod
-    def tearDownClass(cls):
-        """Stop patches after tests complete."""
-        cls.disposeForumMocks()
-
     def set_mock_return_value(self, function_name, return_value):
         """
         Set a return value for a specific method in forum_api mock.
@@ -65,3 +55,50 @@ class MockForumApiMixin:
         setattr(
             self.mock_forum_api, function_name, mock.Mock(return_value=return_value)
         )
+
+    def set_mock_side_effect(self, function_name, side_effect_fn):
+        """
+        Set a side effect for a specific method in forum_api mock.
+
+        Args:
+            function_name (str): The method name in the mock to set a side effect for.
+            side_effect_fn (Callable): A function to be called when the mock is called.
+        """
+        setattr(
+            self.mock_forum_api, function_name, mock.Mock(side_effect=side_effect_fn)
+        )
+
+    def check_mock_called_with(self, function_name, index, *parms, **kwargs):
+        """
+        Check if a specific method in forum_api mock was called with the given parameters.
+
+        Args:
+            function_name (str): The method name in the mock to check.
+            parms (tuple): The parameters to check the method was called with.
+        """
+        call_args = getattr(self.mock_forum_api, function_name).call_args_list[index]
+        assert call_args == mock.call(*parms, **kwargs)
+
+    def check_mock_called(self, function_name):
+        """
+        Check if a specific method in the forum_api mock was called.
+
+        Args:
+            function_name (str): The method name in the mock to check.
+
+        Returns:
+            bool: True if the method was called, False otherwise.
+        """
+        return getattr(self.mock_forum_api, function_name).called
+
+    def get_mock_func_calls(self, function_name):
+        """
+        Returns a list of call arguments for a specific method in the mock_forum_api.
+
+        Args:
+            function_name (str): The name of the method in the mock_forum_api to retrieve call arguments for.
+
+        Returns:
+            list: A list of call arguments for the specified method.
+        """
+        return getattr(self.mock_forum_api, function_name).call_args_list

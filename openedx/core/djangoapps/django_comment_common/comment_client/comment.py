@@ -3,10 +3,9 @@ from bs4 import BeautifulSoup
 
 from openedx.core.djangoapps.django_comment_common.comment_client import models, settings
 
-from .thread import Thread, _url_for_flag_abuse_thread, _url_for_unflag_abuse_thread
-from .utils import CommentClientRequestError, get_course_key, perform_request
+from .thread import Thread
+from .utils import CommentClientRequestError, get_course_key
 from forum import api as forum_api
-from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled
 
 
 class Comment(models.Model):
@@ -64,71 +63,30 @@ class Comment(models.Model):
             return super().url(action, params)
 
     def flagAbuse(self, user, voteable, course_id=None):
-        if voteable.type == 'thread':
-            url = _url_for_flag_abuse_thread(voteable.id)
-        elif voteable.type == 'comment':
-            url = _url_for_flag_abuse_comment(voteable.id)
-        else:
-            raise CommentClientRequestError("Can only flag/unflag threads or comments")
+        if voteable.type != 'comment':
+            raise CommentClientRequestError("Can only flag comments")
+
         course_key = get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            if voteable.type == 'thread':
-                response = forum_api.update_thread_flag(
-                    voteable.id, "flag", user_id=user.id, course_id=str(course_key)
-                )
-            else:
-                response = forum_api.update_comment_flag(
-                    voteable.id, "flag", user_id=user.id, course_id=str(course_key)
-                )
-        else:
-            params = {'user_id': user.id}
-            response = perform_request(
-                'put',
-                url,
-                params,
-                metric_tags=self._metric_tags,
-                metric_action='comment.abuse.flagged'
-            )
+        response = forum_api.update_comment_flag(
+            comment_id=voteable.id,
+            action="flag",
+            user_id=str(user.id),
+            course_id=str(course_key),
+        )
         voteable._update_from_response(response)
 
     def unFlagAbuse(self, user, voteable, removeAll, course_id=None):
-        if voteable.type == 'thread':
-            url = _url_for_unflag_abuse_thread(voteable.id)
-        elif voteable.type == 'comment':
-            url = _url_for_unflag_abuse_comment(voteable.id)
-        else:
-            raise CommentClientRequestError("Can flag/unflag for threads or comments")
+        if voteable.type != 'comment':
+            raise CommentClientRequestError("Can only unflag comments")
+
         course_key = get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            if voteable.type == "thread":
-                response = forum_api.update_thread_flag(
-                    thread_id=voteable.id,
-                    action="unflag",
-                    user_id=user.id,
-                    update_all=bool(removeAll),
-                    course_id=str(course_key)
-                )
-            else:
-                response = forum_api.update_comment_flag(
-                    comment_id=voteable.id,
-                    action="unflag",
-                    user_id=user.id,
-                    update_all=bool(removeAll),
-                    course_id=str(course_key)
-                )
-        else:
-            params = {'user_id': user.id}
-
-            if removeAll:
-                params['all'] = True
-
-            response = perform_request(
-                'put',
-                url,
-                params,
-                metric_tags=self._metric_tags,
-                metric_action='comment.abuse.unflagged'
-            )
+        response = forum_api.update_comment_flag(
+            comment_id=voteable.id,
+            action="unflag",
+            user_id=str(user.id),
+            update_all=bool(removeAll),
+            course_id=str(course_key),
+        )
         voteable._update_from_response(response)
 
     @property
