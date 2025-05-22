@@ -77,6 +77,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
+    FORUM_ROLE_GROUP_MODERATOR,
     Role
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
@@ -885,6 +886,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 FORUM_ROLE_MODERATOR,
                 FORUM_ROLE_COMMUNITY_TA,
                 FORUM_ROLE_STUDENT,
+                FORUM_ROLE_GROUP_MODERATOR,
             ],
             [True, False]
         )
@@ -897,7 +899,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
         self.get_thread_list([], course=cohort_course)
         actual_has_group = "group_id" in httpretty.last_request().querystring  # lint-amnesty, pylint: disable=no-member
-        expected_has_group = (course_is_cohorted and role_name == FORUM_ROLE_STUDENT)
+        expected_has_group = (course_is_cohorted and
+                              role_name in (FORUM_ROLE_STUDENT, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR))
         assert actual_has_group == expected_has_group
 
     def test_pagination(self):
@@ -1787,10 +1790,10 @@ class GetUserCommentsTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedMod
 
         if page in (1, 2):
             assert response.data["pagination"]["next"] is not None
-            assert f"page={page+1}" in response.data["pagination"]["next"]
+            assert f"page={page + 1}" in response.data["pagination"]["next"]
         if page in (2, 3):
             assert response.data["pagination"]["previous"] is not None
-            assert f"page={page-1}" in response.data["pagination"]["previous"]
+            assert f"page={page - 1}" in response.data["pagination"]["previous"]
         if page == 1:
             assert response.data["pagination"]["previous"] is None
         if page == 3:
