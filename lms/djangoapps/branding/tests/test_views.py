@@ -10,9 +10,14 @@ from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test import TestCase
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.branding.models import BrandingApiConfig
+from lms.djangoapps.branding.toggles import (
+    ENABLE_NEW_CATALOG_PAGE,
+    ENABLE_NEW_COURSE_ABOUT_PAGE,
+)
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
@@ -286,3 +291,83 @@ class TestIndex(SiteMixin, TestCase):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
         assert self.site_configuration_other.site_values['MKTG_URLS']['ROOT'] in response.content.decode('utf-8')
+
+
+@ddt.ddt
+class TestWaffleFlags(TestCase):
+    """Tests for the waffle_flags view."""
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("branding_waffle_flags")
+        self.user = UserFactory.create()
+        self.user.set_password("password")
+        self.user.save()
+
+    @ddt.data(True, False)
+    @override_waffle_flag(ENABLE_NEW_CATALOG_PAGE, False)
+    @override_waffle_flag(ENABLE_NEW_COURSE_ABOUT_PAGE, True)
+    def test_anonymous_access(self, new_index_page_value):
+        """Test that anonymous users can access the waffle flags endpoint."""
+        with mock.patch('lms.djangoapps.branding.toggles.use_new_index_page', return_value=new_index_page_value):
+            response = self.client.get(self.url)
+
+            assert response.status_code == 200
+            assert response['Content-Type'] == 'application/json'
+
+            data = json.loads(response.content.decode('utf-8'))
+            assert data['use_new_index_page'] == new_index_page_value
+            assert data['use_new_catalog_page'] is False
+            assert data['use_new_course_about_page'] is True
+
+    @ddt.data(True, False)
+    @override_waffle_flag(ENABLE_NEW_CATALOG_PAGE, True)
+    @override_waffle_flag(ENABLE_NEW_COURSE_ABOUT_PAGE, False)
+    def test_authenticated_access(self, new_index_page_value):
+        """Test that authenticated users can access the waffle flags endpoint."""
+        self.client.login(username=self.user.username, password="password")
+
+        with mock.patch('lms.djangoapps.branding.toggles.use_new_index_page', return_value=new_index_page_value):
+            response = self.client.get(self.url)
+
+            assert response.status_code == 200
+            assert response['Content-Type'] == 'application/json'
+
+            data = json.loads(response.content.decode('utf-8'))
+            assert data['use_new_index_page'] == new_index_page_value
+            assert data['use_new_catalog_page'] is True
+            assert data['use_new_course_about_page'] is False
+
+    @ddt.data(
+        (True, True, True),
+        (True, False, True),
+        (False, True, False),
+        (False, False, False)
+    )
+    @ddt.unpack
+    def test_various_flag_combinations(self, new_index, new_catalog, new_course_about):
+        """Test the endpoint with different combinations of flag values."""
+        with mock.patch('lms.djangoapps.branding.toggles.use_new_index_page', return_value=new_index):
+            with mock.patch('lms.djangoapps.branding.toggles.use_new_catalog_page', return_value=new_catalog):
+                with mock.patch(
+                    'lms.djangoapps.branding.toggles.use_new_course_about_page', return_value=new_course_about
+                ):
+                    response = self.client.get(self.url)
+
+                    assert response.status_code == 200
+                    data = json.loads(response.content.decode('utf-8'))
+
+                    assert data['use_new_index_page'] == new_index
+                    assert data['use_new_catalog_page'] == new_catalog
+                    assert data['use_new_course_about_page'] == new_course_about
+
+    def test_response_structure(self):
+        """Test that the response contains the expected structure."""
+        response = self.client.get(self.url)
+
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+
+        assert 'use_new_index_page' in data
+        assert 'use_new_catalog_page' in data
+        assert 'use_new_course_about_page' in data
