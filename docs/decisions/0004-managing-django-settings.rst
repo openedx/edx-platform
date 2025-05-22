@@ -93,4 +93,4 @@ Cons:
   the public repository.
 * This wouldn't solve the problem where we would still try to "inherit" from other settings files and make it harder to read the current value of any given setting.
 
-This alternative gives us a lot more power but it's power that we don't actually need.  Building limitiations into what settings can be helps us keep them simple and understandable.
+This alternative gives us a lot more power but it's power that we don't actually need. Building limitations into what settings can be helps us keep them simple and understandable.

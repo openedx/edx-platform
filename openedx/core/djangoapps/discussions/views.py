@@ -6,7 +6,9 @@ from typing import Dict
 import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,13 +16,12 @@ from rest_framework.views import APIView
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import validate_course_key
+
 from .config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from .models import AVAILABLE_PROVIDER_MAP, DiscussionsConfiguration, Features, Provider
 from .permissions import IsStaffOrCourseTeam, check_course_permissions
-from .serializers import (
-    DiscussionsConfigurationSerializer,
-    DiscussionsProvidersSerializer,
-)
+from .serializers import DiscussionsConfigurationSerializer, DiscussionsProvidersSerializer
+from .tasks import update_unit_discussion_state_from_discussion_blocks
 
 
 class DiscussionsConfigurationSettingsView(APIView):
@@ -251,3 +252,34 @@ class CombinedDiscussionsConfigurationView(DiscussionsConfigurationSettingsView)
                 },
             }
         )
+
+
+class SyncDiscussionTopicsView(APIView):
+    """
+    View for syncing discussion topics for a course.
+    """
+    authentication_classes = (BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
+    permission_classes = (IsAuthenticated, IsStaffOrCourseTeam)
+
+    def post(self, request, course_key_string):
+        """
+        Sync discussion topics for the course based on data in the request.
+
+        Args:
+            request (Request): a DRF request
+            course_key_string (str): a course key string
+
+        Returns:
+            Response: modified course configuration data
+        """
+        update_unit_discussion_state_from_discussion_blocks(
+            course_key=CourseKey.from_string(course_key_string),
+            user_id=request.user.id,
+            force=True,
+            async_topics=False
+        )
+
+        return Response({
+            "status": "success",
+            "message": "Discussion topics synced successfully."
+        })

@@ -21,13 +21,16 @@ from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
 
+from common.djangoapps.student.auth import has_studio_read_access
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.header_control import force_header_for_response
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import XASSET_LOCATION_TAG, StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import InvalidLocationError
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.sandboxing import course_code_library_asset_name
 
 from .caching import get_cached_content, set_cached_content
 from .models import CdnUserAgentsConfig, CourseAssetCacheTtlConfig
@@ -197,17 +200,21 @@ def process_request(request):
         # middleware we have in place, there's no easy way to use the built-in Django
         # utilities and properly sanitize and modify a response to ensure that it is as
         # cacheable as possible, which is why we do it ourselves.
-        set_caching_headers(content, response)
+        set_caching_headers(content, loc, response)
 
         return response
 
 
-def set_caching_headers(content, response):
+def set_caching_headers(content, location, response):
     """
-    Sets caching headers based on whether or not the asset is locked.
+    Sets caching headers based on whether or not the asset is restricted.
     """
-
     is_locked = getattr(content, "locked", False)
+    is_pylib = location.path == course_code_library_asset_name()
+
+    # All classes of asset that have any kind of access control should be marked
+    # as non-cacheable.
+    is_restricted = is_locked or is_pylib
 
     # We want to signal to the end user's browser, and to any intermediate proxies/caches,
     # whether or not this asset is cacheable.  If we have a TTL configured, we inform the
@@ -215,12 +222,12 @@ def set_caching_headers(content, response):
     # assets should be restricted to enrolled students, we simply send headers that
     # indicate there should be no caching whatsoever.
     cache_ttl = CourseAssetCacheTtlConfig.get_cache_ttl()
-    if cache_ttl > 0 and not is_locked:
+    if cache_ttl > 0 and not is_restricted:
         set_custom_attribute('contentserver.cacheable', True)
 
         response['Expires'] = get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
         response['Cache-Control'] = "public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
-    elif is_locked:
+    elif is_restricted:
         set_custom_attribute('contentserver.cacheable', False)
 
         response['Cache-Control'] = "private, no-cache, no-store"
@@ -264,10 +271,43 @@ def is_content_locked(content):
     return bool(getattr(content, "locked", False))
 
 
+# .. toggle_name: course_assets.allow_download_code_library
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Whether to allow learners to download the course code library
+#   that is used for custom Python-graded problem blocks. (This is conventionally
+#   ``python_lib.zip``, but configurable with Django setting ``PYTHON_LIB_FILENAME``).
+#   This file may contain custom grading code or problem answers that should not be
+#   revealed to learners.
+# .. toggle_warning: This flag is only intended as a temporary override for use
+#   in rollout, to be removed before Ulmo. Courses that rely on learners being able
+#   to download the code library should find an alternative workflow, or the toggle
+#   should be re-documented as permanent.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-05-01
+# .. toggle_target_removal_date: 2025-10-01
+COURSE_CODE_LIBRARY_DOWNLOAD_ALLOWED = CourseWaffleFlag(
+    'course_assets.allow_download_code_library', module_name=__name__,
+)
+
+
 def is_user_authorized(request, content, location):
     """
     Determines whether or not the user for this request is authorized to view the given asset.
+
+    Any asset classes that have restrictions placed on them should also
+    be marked as no-cache in `set_caching_headers`.
     """
+    # Special-case python_lib.zip, since it often contains grading code that
+    # shouldn't be revealed to learners.
+    if location.path == course_code_library_asset_name():
+        if has_studio_read_access(request.user, location.course_key) or \
+           COURSE_CODE_LIBRARY_DOWNLOAD_ALLOWED.is_enabled(location.course_key):
+            # Fall through to other access checks
+            pass
+        else:
+            return False
+
     if not is_content_locked(content):
         return True
 

@@ -330,12 +330,8 @@ YOUTUBE_PORT = 8031
 LTI_PORT = 8765
 VIDEO_SOURCE_PORT = 8777
 
-FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 ############### Module Store Items ##########
-PREVIEW_DOMAIN = FEATURES['PREVIEW_LMS_BASE'].split(':')[0]
-HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
-    PREVIEW_DOMAIN: 'draft-preferred'
-}
+HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
 
 
 ################### Make tests faster
