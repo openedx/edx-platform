@@ -65,12 +65,13 @@
              * @param  {Object} message The message to display.
              * @param  {string} redirectUrl The URL to redirect to when the button is clicked.
              */
-            showMessage: function(message, redirectUrl) {
+            showMessage: function(message) {
                 const componentId = 'student-enrollment-feedback-error';
                 const existing = document.getElementById(componentId);
                 if (existing) {
                     existing.remove();
                 }
+                const DASHBOARD_URL = '/dashboard';
                 const textContent = (message && message.detail) ? message.detail : String(message);
                 const messageDiv = document.createElement('div');
                 messageDiv.setAttribute('id', componentId);
@@ -84,9 +85,7 @@
 
                 const buttonText = typeof gettext === 'function' ? gettext('Close') : 'Close';
 
-              const buttonText = typeof gettext === 'function' ? gettext('Close') : 'Close';
-
-    messageDiv.innerHTML = `
+                messageDiv.innerHTML = `
                   <div class="page-banner w-75 has-actions">
                     <div class="alert alert-warning" role="alert">
                       <div class="row">
@@ -101,13 +100,10 @@
                     </div>
                   </div>
                 `;
-
-    if (redirectUrl) {
-        const actionContainer = messageDiv.querySelector('.nav-actions');
-        actionContainer.classList.replace('d-none', 'd-flex');
-        actionContainer.querySelector('button').addEventListener('click', () => this.redirect(redirectUrl) )
-    }
-    document.body.appendChild(messageDiv);
+                const actionContainer = messageDiv.querySelector('.nav-actions');
+                actionContainer.classList.replace('d-none', 'd-flex');
+                actionContainer.querySelector('button').addEventListener('click', () => this.redirect(DASHBOARD_URL) )
+                document.body.appendChild(messageDiv);
 
             },
             /**
