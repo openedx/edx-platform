@@ -1,9 +1,12 @@
+{% load i18n %}
 <blockquote style="margin: 0; height: 64px; padding: 24px 24px 8px">
     <span style="float: left">
         <img src="{{ logo_url }}" style="width: auto;" height="40" alt="Logo"/>
     </span>
     <span style="float: right">
-        <a href="{{ unsubscribe_url }}" style="color: #00262B; text-decoration: none;">Unsubscribe</a>
+        <a href="{{ unsubscribe_url }}" style="color: #00262B; text-decoration: none;">
+            {% trans "Unsubscribe" as tmsg %}{{ tmsg | force_escape }}
+        </a>
     </span>
 </blockquote>
 <blockquote style="margin: 0; padding: 24px;">
@@ -21,7 +24,7 @@
     <blockquote style="margin: 0; padding: 10px 0">
         <p style="margin: 0; padding: 10px 16px; background-color: #D63328; width: fit-content;">
             <a href="{{ content_url }}" style="font-weight: 500; font-size: 18px; line-height: 24px; color: #FFFFFF; text-decoration: none">
-                View {{ view_text|default:""}}
+                {% trans "View" as tmsg %}{{ tmsg | force_escape }} {{ view_text|default:""}}
             </a>
         </p>
     </blockquote>

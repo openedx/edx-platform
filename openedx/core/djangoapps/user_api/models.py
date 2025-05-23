@@ -105,6 +105,13 @@ class UserPreference(models.Model):
         """
         return cls.objects.filter(user=user, key=preference_key).exists()
 
+    @classmethod
+    def get_preference_for_users(cls, user_ids, preference_key):
+        """
+        Returns preference for list of users
+        """
+        return cls.objects.filter(user__in=user_ids, key=preference_key)
+
 
 @receiver(pre_save, sender=UserPreference)
 def pre_save_callback(sender, **kwargs):
