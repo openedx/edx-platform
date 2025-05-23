@@ -317,6 +317,58 @@ class BaseViewsTestCase(ModuleStoreTestCase, MasqueradeMixin):
 
 
 @ddt.ddt
+class CoursewareIndexTestCase(BaseViewsTestCase):
+    """
+    Tests for the courseware index view, used for instructor previews.
+    """
+    def setUp(self):
+        super().setUp()
+        self._create_global_staff_user()  # this view needs staff permission
+
+    def test_course_redirect(self):
+        lms_url = reverse(
+            'courseware',
+            kwargs={
+                'course_id': str(self.course_key),
+            }
+        )
+
+        mfe_url = make_learning_mfe_courseware_url(self.course.id)
+
+        response = self.client.get(lms_url)
+        assert response.url == mfe_url
+
+    def test_section_redirect(self):
+        lms_url = reverse(
+            'courseware_section',
+            kwargs={
+                'course_id': str(self.course_key),
+                'section': str(self.chapter.location.block_id),
+            }
+        )
+
+        mfe_url = make_learning_mfe_courseware_url(self.course.id)
+
+        response = self.client.get(lms_url)
+        assert response.url == mfe_url
+
+    def test_subsection_redirect(self):
+        lms_url = reverse(
+            'courseware_subsection',
+            kwargs={
+                'course_id': str(self.course_key),
+                'section': str(self.chapter.location.block_id),
+                'subsection': str(self.section2.location.block_id),
+            }
+        )
+
+        mfe_url = make_learning_mfe_courseware_url(self.course.id, self.section2.location)
+
+        response = self.client.get(lms_url)
+        assert response.url == mfe_url
+
+
+@ddt.ddt
 class ViewsTestCase(BaseViewsTestCase):
     """
     Tests for views.py methods.
