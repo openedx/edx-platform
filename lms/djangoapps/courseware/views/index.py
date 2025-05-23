@@ -115,24 +115,6 @@ class CoursewareIndex(View):
         raise Redirect(mfe_url)
 
 
-
-def render_accordion(request, course, table_of_contents):
-    """
-    Returns the HTML that renders the navigation for the given course.
-    Expects the table_of_contents to have data on each chapter and section,
-    including which ones are active.
-    """
-    context = dict(
-        [
-            ('toc', table_of_contents),
-            ('course_id', str(course.id)),
-            ('csrf', csrf(request)['csrf_token']),
-            ('due_date_display_format', course.due_date_display_format),
-        ] + list(TEMPLATE_IMPORTS.items())
-    )
-    return render_to_string('courseware/accordion.html', context)
-
-
 def save_child_position(seq_block, child_name):
     """
     child_name: url_name of the child
