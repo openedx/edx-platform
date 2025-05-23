@@ -84,13 +84,9 @@
 
                 const buttonText = typeof gettext === 'function' ? gettext('Close') : 'Close';
 
-                const buttonHtml = redirectUrl
-                    ? `<div class="nav-actions mt-3 text-start">
-                           <button type="button" class="action-primary" id="enrollment-redirect-btn">${buttonText}</button>
-                       </div>`
-                    : '';
+              const buttonText = typeof gettext === 'function' ? gettext('Close') : 'Close';
 
-                messageDiv.innerHTML = `
+    messageDiv.innerHTML = `
                   <div class="page-banner w-75 has-actions">
                     <div class="alert alert-warning" role="alert">
                       <div class="row">
@@ -98,19 +94,21 @@
                           <span class="icon icon-alert fa fa-warning me-2" aria-hidden="true"></span>
                           <span class="message-content">${textContent}</span>
                         </div>
+                         <div class="nav-actions mt-3 flex-row-reverse d-none">
+                          <button type="button" class="action-primary" id="enrollment-redirect-btn">${buttonText}</button>
+                        </div>
                       </div>
-                      ${buttonHtml}
                     </div>
                   </div>
                 `;
 
-                document.body.appendChild(messageDiv);
+    if (redirectUrl) {
+        const actionContainer = messageDiv.querySelector('.nav-actions');
+        actionContainer.classList.replace('d-none', 'd-flex');
+        actionContainer.querySelector('button').addEventListener('click', () => this.redirect(redirectUrl) )
+    }
+    document.body.appendChild(messageDiv);
 
-                if (redirectUrl) {
-                    document.getElementById('enrollment-redirect-btn').onclick = () => {
-                        this.redirect(redirectUrl);
-                    };
-                }
             },
             /**
              * Redirect to a URL.  Mainly useful for mocking out in tests.
