@@ -88,6 +88,7 @@ from common.djangoapps.xblock_django.api import deprecated_xblocks
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content_libraries.api import get_container
+from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content_tagging.toggles import is_tagging_feature_disabled
 from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -1930,7 +1931,10 @@ def _get_course_index_context(request, course_key, course_block):
     course_block.discussions_settings['discussion_configuration_url'] = (
         f'{get_pages_and_resources_url(course_block.id)}/discussion/settings'
     )
-
+    try:
+        course_overview = CourseOverview.objects.get(id=course_block.id)
+    except CourseOverview.DoesNotExist:
+        course_overview = None
     course_index_context = {
         'language_code': request.LANGUAGE_CODE,
         'context_course': course_block,
@@ -1957,8 +1961,8 @@ def _get_course_index_context(request, course_key, course_block):
         'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
         'proctoring_errors': proctoring_errors,
         'taxonomy_tags_widget_url': get_taxonomy_tags_widget_url(course_block.id),
+        'created_on': course_overview.created if course_overview else None,
     }
-
     return course_index_context
 
 

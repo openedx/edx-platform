@@ -2,7 +2,7 @@
 Tests for Celery tasks used by the `course_home_api` app.
 """
 
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from opaque_keys.edx.keys import CourseKey
 from testfixtures import LogCapture
@@ -36,10 +36,19 @@ class CalculateCompletionTaskTests(ModuleStoreTestCase):
 
     @patch("lms.djangoapps.course_home_api.tasks.calculate_progress_for_learner_in_course")
     @patch("lms.djangoapps.course_home_api.tasks.tracker.emit")
-    def test_successful_event_emission(self, mock_tracker, mock_progress):
+    @patch("lms.djangoapps.course_home_api.tasks.tracker.get_tracker")
+    def test_successful_event_emission(self, mock_get_tracker, mock_tracker, mock_progress):
         """
         Test to ensure a tracker event is emit by the task with the expected completion information.
         """
+        mock_context_manager = MagicMock()
+        mock_context_manager.__enter__.return_value = None
+        mock_context_manager.__exit__.return_value = None
+
+        mock_tracker_instance = MagicMock()
+        mock_tracker_instance.context.return_value = mock_context_manager
+        mock_get_tracker.return_value = mock_tracker_instance
+
         mock_progress.return_value = {
             "complete_count": 5,
             "incomplete_count": 2,
@@ -65,6 +74,13 @@ class CalculateCompletionTaskTests(ModuleStoreTestCase):
 
         collect_progress_for_user_in_course(self.course_run_key_string, self.user.id)
         mock_progress.assert_called_once_with(CourseKey.from_string(self.course_run_key_string), self.user)
+        mock_tracker_instance.context.assert_called_once_with(
+            COURSE_COMPLETION_FOR_USER_EVENT_NAME,
+            {
+                "course_id": self.course_run_key_string,
+                "user_id": self.user.id,
+            },
+        )
         mock_tracker.assert_called_once_with(
             COURSE_COMPLETION_FOR_USER_EVENT_NAME,
             expected_data,

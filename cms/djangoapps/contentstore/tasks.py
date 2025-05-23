@@ -34,7 +34,7 @@ from olxcleaner.exceptions import ErrorLevel
 from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryContainerLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization, OrganizationCourse
@@ -1506,7 +1506,23 @@ def handle_unlink_upstream_block(upstream_usage_key_string: str) -> None:
         upstream_usage_key=upstream_usage_key,
     ):
         make_copied_tags_editable(str(link.downstream_usage_key))
+
+
+@shared_task
+@set_code_owner_attribute
+def handle_unlink_upstream_container(upstream_container_key_string: str) -> None:
+    """
+    Handle updates needed to downstream blocks when the upstream link is severed.
+    """
+    ensure_cms("handle_unlink_upstream_container may only be executed in a CMS context")
+
+    try:
+        upstream_container_key = LibraryContainerLocator.from_string(upstream_container_key_string)
+    except (InvalidKeyError):
+        LOGGER.exception(f'Invalid upstream container_key: {upstream_container_key_string}')
+        return
+
     for link in ContainerLink.objects.filter(
-        upstream_usage_key=upstream_usage_key,
+        upstream_container_key=upstream_container_key,
     ):
         make_copied_tags_editable(str(link.downstream_usage_key))

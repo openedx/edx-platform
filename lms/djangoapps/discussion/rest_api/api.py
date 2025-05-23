@@ -990,7 +990,10 @@ def get_thread_list(
             except ValueError:
                 pass
 
-    if (group_id is None) and not context["has_moderation_privilege"]:
+    if (group_id is None) and (
+        not context["has_moderation_privilege"]
+        or request.user.id in context["ta_user_ids"]
+    ):
         group_id = get_group_id_for_user(request.user, CourseDiscussionSettings.get(course.id))
 
     query_params = {

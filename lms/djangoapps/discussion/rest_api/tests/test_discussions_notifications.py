@@ -47,7 +47,8 @@ class TestDiscussionNotificationSender(unittest.TestCase):
         self.assertEqual(context, {
             'username': self.thread.username,
             'content_type': expected_content_type,
-            'content': 'Thread body'
+            'content': 'Thread body',
+            'email_content': 'Thread body',
         })
         self.assertEqual(audience_filters, {
             'discussion_roles': ['Administrator', 'Moderator', 'Community TA']

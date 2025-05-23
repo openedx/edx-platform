@@ -28,3 +28,4 @@ class PublishableEntityLinksSummarySerializer(serializers.Serializer):
     upstream_context_key = serializers.CharField(read_only=True)
     ready_to_sync_count = serializers.IntegerField(read_only=True)
     total_count = serializers.IntegerField(read_only=True)
+    last_published_at = serializers.DateTimeField(read_only=True)

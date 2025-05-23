@@ -31,7 +31,7 @@
         <tr>
             <td>
                 <p style="margin: 1.5rem 0 0 0;">
-                    You are receiving this email because you have subscribed to email digest
+                    {{ footer_email_reason|default:"You are receiving this email because you have subscribed to email digest" }}
                 </p>
                 <p style="margin: 0.625rem 0">
                     <a href="{{notification_settings_url}}" rel="noopener noreferrer" target="_blank" style="color: black">

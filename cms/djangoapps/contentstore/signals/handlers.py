@@ -17,12 +17,14 @@ from openedx_events.content_authoring.data import (
     CourseData,
     CourseScheduleData,
     LibraryBlockData,
+    LibraryContainerData,
     XBlockData,
 )
 from openedx_events.content_authoring.signals import (
     COURSE_CATALOG_INFO_CHANGED,
     COURSE_IMPORT_COMPLETED,
     LIBRARY_BLOCK_DELETED,
+    LIBRARY_CONTAINER_DELETED,
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
@@ -49,6 +51,7 @@ from ..tasks import (
     create_or_update_upstream_links,
     handle_create_or_update_xblock_upstream_link,
     handle_unlink_upstream_block,
+    handle_unlink_upstream_container,
 )
 from .signals import GRADING_POLICY_CHANGED
 
@@ -314,3 +317,16 @@ def unlink_upstream_block_handler(**kwargs):
         return
 
     handle_unlink_upstream_block.delay(str(library_block.usage_key))
+
+
+@receiver(LIBRARY_CONTAINER_DELETED)
+def unlink_upstream_container_handler(**kwargs):
+    """
+    Handle unlinking the upstream (library) container from any downstream (course) blocks.
+    """
+    library_container = kwargs.get("library_container", None)
+    if not library_container or not isinstance(library_container, LibraryContainerData):  # pragma: no cover
+        log.error("Received null or incorrect data for event")
+        return
+
+    handle_unlink_upstream_container.delay(str(library_container.container_key))

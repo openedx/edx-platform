@@ -90,6 +90,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
             },
             "advance_settings_url": f"/settings/advanced/{self.course.id}",
+            'created_on': None,
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -140,6 +141,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
             },
             "advance_settings_url": f"/settings/advanced/{self.course.id}",
+            'created_on': None,
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -158,6 +160,6 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
         """
         Test to check number of queries made to mysql and mongo
         """
-        with self.assertNumQueries(33, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(34, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(3):
                 self.client.get(self.url)

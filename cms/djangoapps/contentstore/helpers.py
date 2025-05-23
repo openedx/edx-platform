@@ -315,7 +315,8 @@ def _insert_static_files_into_downstream_xblock(
     if hasattr(downstream_xblock, "data") and substitutions:
         data_with_substitutions = downstream_xblock.data
         for old_static_ref, new_static_ref in substitutions.items():
-            data_with_substitutions = data_with_substitutions.replace(
+            data_with_substitutions = _replace_strings(
+                data_with_substitutions,
                 old_static_ref,
                 new_static_ref,
             )
@@ -323,6 +324,26 @@ def _insert_static_files_into_downstream_xblock(
         if store is not None:
             store.update_item(downstream_xblock, request.user.id)
     return notices
+
+
+def _replace_strings(obj: dict | list | str, old_str: str, new_str: str):
+    """
+    Replacing any instances of the given `old_str` string with `new_str` in any strings found in the the given object.
+
+    Returns the updated object.
+    """
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            obj[key] = _replace_strings(value, old_str, new_str)
+
+    elif isinstance(obj, list):
+        for index, item in enumerate(obj):
+            obj[index] = _replace_strings(item, old_str, new_str)
+
+    elif isinstance(obj, str):
+        return obj.replace(old_str, new_str)
+
+    return obj
 
 
 def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> tuple[XBlock | None, StaticFileNotices]:

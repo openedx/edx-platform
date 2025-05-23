@@ -44,6 +44,12 @@ class TestCohortSignals(TestCase, OpenEdxEventsTestMixin):
         super().setUpClass()
         cls.start_events_isolation()
 
+    @classmethod
+    def tearDownClass(cls):
+        """ Don't let our event isolation affect other test cases """
+        super().tearDownClass()
+        cls.enable_all_events()  # Re-enable events other than the ENABLED_OPENEDX_EVENTS subset we isolated.
+
     def setUp(self):
         super().setUp()
         self.course_key = CourseLocator("dummy", "dummy", "dummy")

@@ -181,7 +181,12 @@ def is_discussable_unit(unit, store, enable_graded_units, subsection):
     return True
 
 
-def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, user_id: int, force=False) -> None:
+def update_unit_discussion_state_from_discussion_blocks(
+    course_key: CourseKey,
+    user_id: int,
+    force=False,
+    async_topics=True
+) -> None:
     """
     Migrate existing courses to the new mechanism for linking discussion to units.
 
@@ -192,7 +197,7 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         course_key (CourseKey): CourseKey for course.
         user_id (int): User id for the user performing this operation.
         force (bool): Force migration of data even if not using legacy provider
-
+        async_topics (bool): If True, run the task asynchronously.
     """
     store = modulestore()
     course = store.get_course(course_key)
@@ -255,8 +260,15 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         discussion_config.enable_graded_units = enable_graded_subsections
         discussion_config.unit_level_visibility = True
         discussion_config.save()
-    # added delay of 30 minutes to allow for the course to be published
-    update_discussions_settings_from_course_task.apply_async(
-        args=[str(course_key), [str(unit) for unit in discussable_units]],
-        countdown=1800,
-    )
+
+    if async_topics:
+        # added delay of 30 minutes to allow for the course to be published
+        update_discussions_settings_from_course_task.apply_async(
+            args=[str(course_key), [str(unit) for unit in discussable_units]],
+            countdown=1800,
+        )
+    else:
+        update_discussions_settings_from_course_task(
+            str(course_key),
+            [str(unit) for unit in discussable_units],
+        )

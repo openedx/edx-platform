@@ -15,6 +15,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
     get_notification_content
 )
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.user_api.models import UserPreference
 
 User = get_user_model()
@@ -111,7 +112,7 @@ class Notification(TimeStampedModel):
     email = models.BooleanField(default=False, null=False, blank=False)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
-    group_by_id = models.CharField(max_length=42, db_index=True, null=False, default="")
+    group_by_id = models.CharField(max_length=255, db_index=True, null=False, default="")
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
@@ -303,3 +304,19 @@ class CourseNotificationPreference(TimeStampedModel):
         }
         """
         return self.get_notification_types(app_name).get('core', {})
+
+    def is_email_enabled_for_notification_type(self, app_name, notification_type) -> bool:
+        """
+        Returns True if the email is enabled for the given app name and notification type.
+        """
+        if self.is_core(app_name, notification_type):
+            return self.get_core_config(app_name).get('email', False)
+        return self.get_notification_type_config(app_name, notification_type).get('email', False)
+
+    def get_email_cadence_for_notification_type(self, app_name, notification_type) -> str:
+        """
+        Returns the email cadence for the given app name and notification type.
+        """
+        if self.is_core(app_name, notification_type):
+            return self.get_core_config(app_name).get('email_cadence', EmailCadence.NEVER)
+        return self.get_notification_type_config(app_name, notification_type).get('email_cadence', EmailCadence.NEVER)

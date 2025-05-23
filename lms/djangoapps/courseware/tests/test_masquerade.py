@@ -26,7 +26,7 @@ from lms.djangoapps.courseware.masquerade import (
 )
 
 from lms.djangoapps.courseware.tests.helpers import (
-    LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member, set_preview_mode,
+    LoginEnrollmentTestCase, MasqueradeMixin, masquerade_as_group_member
 )
 from lms.djangoapps.courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -244,14 +244,20 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
         assert is_target_available == expected
 
 
-@set_preview_mode(True)
+# These tests are testing a capability of the old courseware page.  We have to not
+# force redirect to the new MFE in order to be able to load the old pages which are
+# being tested by this page.
+#
+# This is a temporary change, until we can remove the old courseware pages
+# all together.
+@patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
 class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
     """
     Check for staff being able to masquerade as student.
     """
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_staff_debug_with_masquerade(self):
+    def test_staff_debug_with_masquerade(self, mock_redirect):
         """
         Tests that staff debug control is not visible when masquerading as a student.
         """
@@ -267,7 +273,7 @@ class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
         self.verify_staff_debug_present(True)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_show_answer_for_staff(self):
+    def test_show_answer_for_staff(self, mock_redirect):
         """
         Tests that "Show Answer" is not visible when masquerading as a student.
         """

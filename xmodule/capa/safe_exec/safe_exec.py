@@ -272,7 +272,7 @@ def safe_exec(
                 local_exc_unexpected = None if isinstance(exception, SafeExecException) else exception
 
                 report_darklaunch_results(
-                    slug=slug,
+                    limit_overrides_context=limit_overrides_context, slug=slug,
                     globals_local=globals_dict, emsg_local=emsg, unexpected_exc_local=local_exc_unexpected,
                     globals_remote=darklaunch_globals, emsg_remote=remote_emsg, unexpected_exc_remote=remote_exception,
                 )
@@ -291,6 +291,24 @@ def safe_exec(
         raise exception
 
 
+def _compile_normalizers(normalizer_setting):
+    """
+    Compile emsg normalizer search/replace pairs into regex.
+
+    Raises exception on bad settings.
+    """
+    compiled = []
+    for pair in normalizer_setting:
+        search = re.compile(assert_type(pair['search'], str))
+        replace = assert_type(pair['replace'], str)
+
+        # Test the replacement string (might contain errors)
+        re.sub(search, replace, "example")
+
+        compiled.append({'search': search, 'replace': replace})
+    return compiled
+
+
 @lru_cache(maxsize=1)
 def emsg_normalizers():
     """
@@ -299,38 +317,77 @@ def emsg_normalizers():
     The output is like the setting value, except the 'search' patterns have
     been compiled.
     """
-    default = [
+    default_setting = [
         {
             # Character range should be at least as broad as what Python's `tempfile` uses.
             'search': r'/tmp/codejail-[0-9a-zA-Z_]+',
             'replace': r'/tmp/codejail-<SANDBOX_DIR_NAME>',
         },
-    ]
-    try:
-        # .. setting_name: CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS
-        # .. setting_default: (see description)
-        # .. setting_description: A list of patterns to search and replace in codejail error
-        #   messages during comparison in codejail-service darklaunch. Each entry is a dict
-        #   of 'search' (a regular expression string) and 'replace' (the replacement string).
-        #   The default value suppresses differences matching '/tmp/codejail-[0-9a-zA-Z]+',
-        #   the directory structure codejail uses for its random-named sandboxes. Deployers
-        #   may also need to add a search/replace pair for the location of the sandbox
-        #   virtualenv, or any other paths that show up in stack traces.
-        # .. setting_warning: Note that `replace' is a pattern, allowing for
-        #   backreferences. Any backslashes in the replacement pattern that are not
-        #   intended as backreferences should be escaped as `\\`.
-        setting = getattr(settings, 'CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS', default)
 
-        compiled = []
-        for pair in setting:
-            compiled.append({
-                'search': re.compile(assert_type(pair['search'], str)),
-                'replace': assert_type(pair['replace'], str),
-            })
-        return compiled
+        # These are useful for eliding differences in environments due to Python version:
+
+        {
+            # Python 3.8 doesn't include the dir here, but Python 3.12
+            # does. Normalize to the 3.8 version.
+            'search': r'File "/tmp/codejail-<SANDBOX_DIR_NAME>/jailed_code"',
+            'replace': r'File "jailed_code"'
+        },
+        {
+            # Python version shows up in stack traces in the virtualenv paths
+            'search': r'python3\.[0-9]+',
+            'replace': r'python3.XX'
+        },
+        {
+            # Line numbers in stack traces differ between Python versions
+            'search': r', line [0-9]+, in ',
+            'replace': r', line XXX, in '
+        },
+        {
+            # Some time after 3.8, Python started adding '^^^' indicators to stack traces
+            'search': r'\\n\s*\^+\s*\\n',
+            'replace': r'\\n'
+        },
+        {
+            # Python3.8 had these <listcomp> stack trace elements but 3.12 does not
+            'search': r'\\n  File "[^"]+", line [0-9]+, in <listcomp>\\n',
+            'replace': r'\\n'
+        },
+    ]
+    default_normalizers = _compile_normalizers(default_setting)
+
+    # .. setting_name: CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS
+    # .. setting_default: []
+    # .. setting_description: A list of patterns to search and replace in codejail error
+    #   messages during comparison in codejail-service darklaunch. Each entry is a dict
+    #   of 'search' (a regular expression string) and 'replace' (the replacement string).
+    #   Deployers may also need to add a search/replace pair for the location of the sandbox
+    #   virtualenv, or any other paths that show up in stack traces.
+    # .. setting_warning: Note that `replace' is a pattern, allowing for
+    #   backreferences. Any backslashes in the replacement pattern that are not
+    #   intended as backreferences should be escaped as `\\`.
+    #   The default list suppresses differences due to the randomly-named sandboxes
+    #   or to differences due to Python version. See setting
+    #   ``CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS_COMBINE`` for information on how
+    #   this setting interacts with the defaults.
+    custom_setting = getattr(settings, 'CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS', [])
+    try:
+        custom_normalizers = _compile_normalizers(custom_setting)
     except BaseException as e:
+        log.error("Could not load custom codejail darklaunch emsg normalizers")
         record_exception()
-        return []
+        return default_normalizers
+
+    # .. setting_name: CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS_COMBINE
+    # .. setting_default: 'append'
+    # .. setting_description: How to combine ``CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS``
+    #   with the defaults. If the value is 'replace', the defaults will be replaced
+    #   with the specified patterns. If the value is 'append' (the default), the
+    #   specified replacements will be run after the defaults.
+    combine = getattr(settings, 'CODEJAIL_DARKLAUNCH_EMSG_NORMALIZERS_COMBINE', 'append')
+    if combine == 'replace':
+        return custom_normalizers
+    else:  # 'append', or unknown
+        return default_normalizers + custom_normalizers
 
 
 def normalize_error_message(emsg):
@@ -347,14 +404,19 @@ def normalize_error_message(emsg):
 
 
 def report_darklaunch_results(
-        *, slug,
+        *, limit_overrides_context, slug,
         globals_local, emsg_local, unexpected_exc_local,
         globals_remote, emsg_remote, unexpected_exc_remote,
 ):
     """Send telemetry for results of darklaunch."""
     can_compare_output = True
 
-    def report_arm(arm, globals_dict, emsg, unexpected_exception):
+    def report_arm(arm, emsg, unexpected_exception):
+        """
+        Set custom attributes for each arm of the darklaunch experiment.
+
+        `arm` should be 'local' or 'remote'.
+        """
         nonlocal can_compare_output
         if unexpected_exception:
             # .. custom_attribute_name: codejail.darklaunch.status.{local,remote}
@@ -373,24 +435,32 @@ def report_darklaunch_results(
             set_custom_attribute(f'codejail.darklaunch.status.{arm}', 'ok' if emsg is None else 'safe_error')
             set_custom_attribute(f'codejail.darklaunch.exception.{arm}', None)
 
-        # Logs include full globals and emsg
-        log.info(
-            f"Codejail darklaunch {arm} results for slug={slug}: globals={globals_dict!r}, "
-            f"emsg={emsg!r}, exception={unexpected_exception!r}"
-        )
-
-    report_arm('local', globals_local, emsg_local, unexpected_exc_local)
-    report_arm('remote', globals_remote, emsg_remote, unexpected_exc_remote)
+    report_arm('local', emsg_local, unexpected_exc_local)
+    report_arm('remote', emsg_remote, unexpected_exc_remote)
 
     # If the arms can't be compared (unexpected errors), stop early -- the rest
     # is about output comparison.
     if not can_compare_output:
         set_custom_attribute('codejail.darklaunch.globals_match', 'N/A')
         set_custom_attribute('codejail.darklaunch.emsg_match', 'N/A')
+        log.info(
+            "Codejail darklaunch had unexpected exception for "
+            f"course={limit_overrides_context!r}, slug={slug!r}:\n"
+            f"Local exception: {unexpected_exc_local!r}\n"
+            f"Remote exception: {unexpected_exc_remote!r}"
+        )
         return
 
     globals_match = globals_local == globals_remote
     emsg_match = normalize_error_message(emsg_local) == normalize_error_message(emsg_remote)
+
+    if not globals_match or not emsg_match:
+        log.info(
+            f"Codejail darklaunch had mismatch for course={limit_overrides_context!r}, slug={slug!r}:\n"
+            f"{emsg_match=}, {globals_match=}\n"
+            f"Local: globals={globals_local!r}, emsg={emsg_local!r}\n"
+            f"Remote: globals={globals_remote!r}, emsg={emsg_remote!r}"
+        )
 
     # .. custom_attribute_name: codejail.darklaunch.globals_match
     # .. custom_attribute_description: True if local and remote globals_dict

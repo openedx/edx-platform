@@ -8,7 +8,7 @@ import copy
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, Mock, call, patch
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locator import LibraryCollectionLocator
+from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 
 import ddt
 import pytest
@@ -134,8 +134,8 @@ class TestSearchApi(ModuleStoreTestCase):
         lib_access, _ = SearchAccess.objects.get_or_create(context_key=self.library.key)
 
         # Populate it with 2 problems, freezing the date so we can verify created date serializes correctly.
-        created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
-        with freeze_time(created_date):
+        self.created_date = datetime(2023, 4, 5, 6, 7, 8, tzinfo=timezone.utc)
+        with freeze_time(self.created_date):
             self.problem1 = library_api.create_library_block(self.library.key, "problem", "p1")
             self.problem2 = library_api.create_library_block(self.library.key, "problem", "p2")
         # Update problem1, freezing the date so we can verify modified date serializes correctly.
@@ -155,7 +155,7 @@ class TestSearchApi(ModuleStoreTestCase):
             "type": "library_block",
             "access_id": lib_access.id,
             "last_published": None,
-            "created": created_date.timestamp(),
+            "created": self.created_date.timestamp(),
             "modified": modified_date.timestamp(),
             "publish_status": "never",
         }
@@ -172,8 +172,8 @@ class TestSearchApi(ModuleStoreTestCase):
             "type": "library_block",
             "access_id": lib_access.id,
             "last_published": None,
-            "created": created_date.timestamp(),
-            "modified": created_date.timestamp(),
+            "created": self.created_date.timestamp(),
+            "modified": self.created_date.timestamp(),
             "publish_status": "never",
         }
 
@@ -189,7 +189,7 @@ class TestSearchApi(ModuleStoreTestCase):
 
         # Create a collection:
         self.learning_package = authoring_api.get_learning_package_by_key(self.library.key)
-        with freeze_time(created_date):
+        with freeze_time(self.created_date):
             self.collection = authoring_api.create_collection(
                 learning_package_id=self.learning_package.id,
                 key="MYCOL",
@@ -210,8 +210,8 @@ class TestSearchApi(ModuleStoreTestCase):
             "num_children": 0,
             "context_key": "lib:org1:lib",
             "org": "org1",
-            "created": created_date.timestamp(),
-            "modified": created_date.timestamp(),
+            "created": self.created_date.timestamp(),
+            "modified": self.created_date.timestamp(),
             "access_id": lib_access.id,
             "published": {
                 "num_children": 0
@@ -220,7 +220,7 @@ class TestSearchApi(ModuleStoreTestCase):
         }
 
         # Create a unit:
-        with freeze_time(created_date):
+        with freeze_time(self.created_date):
             self.unit = library_api.create_container(
                 library_key=self.library.key,
                 container_type=library_api.ContainerType.Unit,
@@ -242,8 +242,8 @@ class TestSearchApi(ModuleStoreTestCase):
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
-            "created": created_date.timestamp(),
-            "modified": created_date.timestamp(),
+            "created": self.created_date.timestamp(),
+            "modified": self.created_date.timestamp(),
             "last_published": None,
             "access_id": lib_access.id,
             "breadcrumbs": [{"display_name": "Library"}],
@@ -268,9 +268,11 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem1 = copy.deepcopy(self.doc_problem1)
         doc_problem1["tags"] = {}
         doc_problem1["collections"] = {'display_name': [], 'key': []}
+        doc_problem1["units"] = {'display_name': [], 'key': []}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
         doc_problem2["collections"] = {'display_name': [], 'key': []}
+        doc_problem2["units"] = {'display_name': [], 'key': []}
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
         doc_unit = copy.deepcopy(self.unit_dict)
@@ -300,9 +302,11 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem1 = copy.deepcopy(self.doc_problem1)
         doc_problem1["tags"] = {}
         doc_problem1["collections"] = {"display_name": [], "key": []}
+        doc_problem1["units"] = {'display_name': [], 'key': []}
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
         doc_problem2["collections"] = {"display_name": [], "key": []}
+        doc_problem2["units"] = {'display_name': [], 'key': []}
         doc_collection = copy.deepcopy(self.collection_dict)
         doc_collection["tags"] = {}
         doc_unit = copy.deepcopy(self.unit_dict)
@@ -417,6 +421,7 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_problem2 = copy.deepcopy(self.doc_problem2)
         doc_problem2["tags"] = {}
         doc_problem2["collections"] = {'display_name': [], 'key': []}
+        doc_problem2["units"] = {'display_name': [], 'key': []}
 
         orig_from_component = library_api.LibraryXBlockMetadata.from_component
 
@@ -735,21 +740,6 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_all_drafts(self, mock_meilisearch):
-        """
-        Test deleting all draft documents from the index.
-        """
-        api.delete_all_draft_docs_for_library(self.library.key)
-
-        delete_filter = [
-            f'context_key="{self.library.key}"',
-            ['last_published IS EMPTY', 'last_published IS NULL'],
-        ]
-        mock_meilisearch.return_value.index.return_value.delete_documents.assert_called_once_with(
-            filter=delete_filter
-        )
-
-    @override_settings(MEILISEARCH_ENABLED=True)
     def test_index_tags_in_collections(self, mock_meilisearch):
         # Tag collection
         tagging_api.tag_object(str(self.collection_key), self.taxonomyA, ["one", "two"])
@@ -951,6 +941,37 @@ class TestSearchApi(ModuleStoreTestCase):
             [
                 call([doc_unit_with_tags1]),
                 call([doc_unit_with_tags2]),
+            ],
+            any_order=True,
+        )
+
+    @override_settings(MEILISEARCH_ENABLED=True)
+    def test_block_in_units(self, mock_meilisearch):
+        with freeze_time(self.created_date):
+            library_api.update_container_children(
+                LibraryContainerLocator.from_string(self.unit_key),
+                [self.problem1.usage_key],
+                None,
+            )
+
+        doc_block_with_units = {
+            "id": self.doc_problem1["id"],
+            "units": {
+                "display_name": [self.unit.display_name],
+                "key": [self.unit_key],
+            },
+        }
+        new_unit_dict = {
+            **self.unit_dict,
+            "num_children": 1,
+            'content': {'child_usage_keys': [self.doc_problem1["usage_key"]]}
+        }
+
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
+            [
+                call([doc_block_with_units]),
+                call([new_unit_dict]),
             ],
             any_order=True,
         )

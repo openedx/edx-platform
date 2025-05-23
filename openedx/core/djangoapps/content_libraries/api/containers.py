@@ -4,7 +4,7 @@ API for containers (Sections, Subsections, Units) in Content Libraries
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import logging
 from uuid import uuid4
@@ -14,13 +14,11 @@ from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
-    LibraryBlockData,
     LibraryCollectionData,
     LibraryContainerData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
-    LIBRARY_BLOCK_UPDATED,
     LIBRARY_COLLECTION_UPDATED,
     LIBRARY_CONTAINER_CREATED,
     LIBRARY_CONTAINER_DELETED,
@@ -34,8 +32,9 @@ from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
-from .libraries import PublishableItem, library_component_usage_key
+from .libraries import PublishableItem
 from .block_metadata import LibraryXBlockMetadata
+from .. import tasks
 
 # The public API is only the following symbols:
 __all__ = [
@@ -111,7 +110,6 @@ class ContainerMetadata(PublishableItem):
     container_key: LibraryContainerLocator
     container_type: ContainerType
     container_pk: int
-    published_display_name: str | None
 
     @classmethod
     def from_container(cls, library_key, container: Container, associated_collections=None):
@@ -250,7 +248,7 @@ def create_container(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
-                created=created or datetime.now(),
+                created=created or datetime.now(tz=timezone.utc),
                 created_by=user_id,
             )
         case _:
@@ -280,7 +278,7 @@ def update_container(
     unit_version = authoring_api.create_next_unit_version(
         container.unit,
         title=display_name,
-        created=datetime.now(),
+        created=datetime.now(tz=timezone.utc),
         created_by=user_id,
     )
 
@@ -427,10 +425,18 @@ def update_container_children(
             new_version = authoring_api.create_next_unit_version(
                 container.unit,
                 components=components,  # type: ignore[arg-type]
-                created=datetime.now(),
+                created=datetime.now(tz=timezone.utc),
                 created_by=user_id,
                 entities_action=entities_action,
             )
+
+            for key in children_ids:
+                CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                    content_object=ContentObjectChangedData(
+                        object_id=str(key),
+                        changes=["units"],
+                    ),
+                )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
@@ -478,21 +484,6 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
         draft_qset=drafts_to_publish,
         published_by=user_id,
     )
-    # Update anything that needs to be updated (e.g. search index):
-    for record in publish_log.records.select_related("entity", "entity__container", "entity__component").all():
-        if hasattr(record.entity, "component"):
-            # This is a child component like an XBLock in a Unit that was published:
-            usage_key = library_component_usage_key(library_key, record.entity.component)
-            LIBRARY_BLOCK_UPDATED.send_event(
-                library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key)
-            )
-        elif hasattr(record.entity, "container"):
-            # This is a child container like a Unit, or is the same "container" we published above.
-            LIBRARY_CONTAINER_UPDATED.send_event(
-                library_container=LibraryContainerData(container_key=container_key)
-            )
-        else:
-            log.warning(
-                f"PublishableEntity {record.entity.pk} / {record.entity.key} was modified during publish operation "
-                "but is of unknown type."
-            )
+    # Update the search index (and anything else) for the affected container + blocks
+    # This is mostly synchronous but may complete some work asynchronously if there are a lot of changes.
+    tasks.wait_for_post_publish_events(publish_log, library_key)

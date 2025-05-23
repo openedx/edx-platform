@@ -373,7 +373,8 @@ class DiscussionNotificationSender:
         context = {
             'username': self.thread.username,
             'content_type': content_type,
-            'content': thread_body
+            'content': thread_body,
+            'email_content': clean_thread_html_body(thread_body)
         }
         audience_filters = {'discussion_roles': [
             FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA

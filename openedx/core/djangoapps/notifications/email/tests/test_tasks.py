@@ -9,7 +9,8 @@ from unittest.mock import patch
 from edx_toggles.toggles.testutils import override_waffle_flag
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_EMAIL_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.tasks import send_notifications
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.email.tasks import (
     get_audience_for_cadence_email,
@@ -258,3 +259,53 @@ class TestPreferences(ModuleStoreTestCase):
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
         assert not mock_func.called
+
+
+class TestImmediateEmail(ModuleStoreTestCase):
+    """
+    Tests immediate email
+    """
+
+    def setUp(self):
+        """
+        Setup
+        """
+        super().setUp()
+        self.user = UserFactory()
+        self.course = CourseFactory.create(display_name='test course', run="Testing_course")
+
+    @patch('edx_ace.ace.send')
+    def test_email_sent_when_cadence_is_immediate(self, mock_func):
+        """
+        Tests email is sent when cadence is immediate
+        """
+        preference = CourseNotificationPreference.objects.create(user=self.user, course_id=self.course.id)
+        app_prefs = preference.notification_preference_config['discussion']['notification_types']
+        app_prefs['new_discussion_post']['email'] = True
+        app_prefs['new_discussion_post']['email_cadence'] = EmailCadence.IMMEDIATELY
+        preference.save()
+        context = {
+            'username': 'User',
+            'post_title': 'title'
+        }
+        with override_waffle_flag(ENABLE_NOTIFICATIONS, True):
+            with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+                send_notifications([self.user.id], str(self.course.id), 'discussion',
+                                   'new_discussion_post', context, 'http://test.url')
+        assert mock_func.call_count == 1
+
+    @patch('edx_ace.ace.send')
+    def test_email_not_sent_when_cadence_is_not_immediate(self, mock_func):
+        """
+        Tests email is not sent when cadence is not immediate
+        """
+        CourseNotificationPreference.objects.create(user=self.user, course_id=self.course.id)
+        context = {
+            'replier_name': 'User',
+            'post_title': 'title'
+        }
+        with override_waffle_flag(ENABLE_NOTIFICATIONS, True):
+            with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
+                send_notifications([self.user.id], str(self.course.id), 'discussion',
+                                   'new_response', context, 'http://test.url')
+        assert mock_func.call_count == 0

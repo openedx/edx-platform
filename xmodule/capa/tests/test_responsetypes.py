@@ -20,7 +20,7 @@ from pytz import UTC
 
 from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
-from xmodule.capa.tests.helpers import load_fixture, new_loncapa_problem, test_capa_system
+from xmodule.capa.tests.helpers import load_fixture, new_loncapa_problem, mock_capa_system
 from xmodule.capa.tests.response_xml_factory import (
     AnnotationResponseXMLFactory,
     ChoiceResponseXMLFactory,
@@ -2326,7 +2326,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
             import my_helper
             num = my_helper.seventeen()
             """)
-        capa_system = test_capa_system()
+        capa_system = mock_capa_system()
         capa_system.get_python_lib_zip = lambda: zipstring.getvalue()  # lint-amnesty, pylint: disable=unnecessary-lambda
         problem = self.build_problem(script=script, capa_system=capa_system)
         assert problem.context['num'] == 17
