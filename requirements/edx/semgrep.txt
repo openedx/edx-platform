@@ -21,7 +21,7 @@ certifi==2025.4.26
     # via requests
 charset-normalizer==3.4.2
     # via requests
-click==8.2.0
+click==8.1.8
     # via
     #   click-option-group
     #   semgrep
@@ -105,7 +105,7 @@ requests==2.32.3
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.25.0
+rpds-py==0.25.1
     # via
     #   jsonschema
     #   referencing
@@ -113,7 +113,7 @@ ruamel-yaml==0.18.10
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.121.0
+semgrep==1.122.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
