@@ -234,7 +234,7 @@ class User(models.Model):
             retrieve_params['group_id'] = self.group_id
 
         # course key -> id conversation
-        course_id = retrieve_params.get('course_id')
+        course_id = retrieve_params.get('course_id') or retrieve_params.get("course_key")
         if course_id:
             course_id = str(course_id)
             retrieve_params['course_id'] = course_id
