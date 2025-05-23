@@ -244,51 +244,6 @@ class TestMasqueradeOptionsNoContentGroups(StaffMasqueradeTestCase):
         assert is_target_available == expected
 
 
-# These tests are testing a capability of the old courseware page.  We have to not
-# force redirect to the new MFE in order to be able to load the old pages which are
-# being tested by this page.
-#
-# This is a temporary change, until we can remove the old courseware pages
-# all together.
-@patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
-class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
-    """
-    Check for staff being able to masquerade as student.
-    """
-
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_staff_debug_with_masquerade(self, mock_redirect):
-        """
-        Tests that staff debug control is not visible when masquerading as a student.
-        """
-        # Verify staff initially can see staff debug
-        self.verify_staff_debug_present(True)
-
-        # Toggle masquerade to student
-        self.update_masquerade(role='student')
-        self.verify_staff_debug_present(False)
-
-        # Toggle masquerade back to staff
-        self.update_masquerade(role='staff')
-        self.verify_staff_debug_present(True)
-
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    def test_show_answer_for_staff(self, mock_redirect):
-        """
-        Tests that "Show Answer" is not visible when masquerading as a student.
-        """
-        # Verify that staff initially can see "Show Answer".
-        self.verify_show_answer_present(True)
-
-        # Toggle masquerade to student
-        self.update_masquerade(role='student')
-        self.verify_show_answer_present(False)
-
-        # Toggle masquerade back to staff
-        self.update_masquerade(role='staff')
-        self.verify_show_answer_present(True)
-
-
 @ddt.ddt
 class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmissionTestMixin):
     """
