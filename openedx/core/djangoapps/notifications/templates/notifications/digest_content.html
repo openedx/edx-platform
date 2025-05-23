@@ -11,7 +11,7 @@
             {% if notification_app.help_text_url %}
                 <span style="float:right; margin-right: 0.25rem">
                     <a href="{{notification_app.help_text_url}}" style="text-decoration: none; color: #00688D">
-                        {% trans "View all" %}
+                        {% trans "View all" as tmsg %}{{ tmsg | force_escape }}
                     </a>
                 </span>
             {% endif %}
@@ -47,7 +47,7 @@
                                 </span>
                                 <span style="float: right">
                                     <a href="{{notification.content_url}}" style="text-decoration: none; color: #00688D">
-                                        {% trans "View" %}
+                                        {% trans "View" as tmsg %}{{ tmsg | force_escape }}
                                     </a>
                                 </span>
                             </blockquote>
@@ -61,7 +61,7 @@
     {% if notification_app.show_remaining_count %}
         <p style="margin: 0; height: 0.75rem; font-weight: 400; font-size: 14px; line-height: 24px;">
             <a href="{{notification_app.url}}" style="color: #00688d; margin: 0; float:right; text-decoration: none;">
-                + {{ notification_app.remaining_count }} {% trans "more" %}
+                + {{ notification_app.remaining_count }} {% trans "more" as tmsg %}{{ tmsg | force_escape }}
             </a>
         </p>
     {% endif %}
