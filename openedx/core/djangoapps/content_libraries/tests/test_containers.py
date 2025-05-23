@@ -38,7 +38,11 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
     def setUp(self):
         super().setUp()
         self.create_date = datetime(2024, 9, 8, 7, 6, 5, tzinfo=timezone.utc)
-        self.lib = self._create_library(slug="containers", title="Container Test Library", description="Units and more")
+        self.lib = self._create_library(
+            slug="containers",
+            title="Container Test Library",
+            description="Units and more",
+        )
         self.lib_key = LibraryLocatorV2.from_string(self.lib["id"])
 
         # Create containers
@@ -51,10 +55,43 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 display_name="Alpha Charly",
                 slug=None,
             )
+            self.unit_2 = self._create_container(self.lib["id"], "unit", display_name="Test Unit 2", slug=None)
+            self.unit_3 = self._create_container(self.lib["id"], "unit", display_name="Test Unit 3", slug=None)
+
             # Subsection
-            self.subsection = self._create_container(self.lib["id"], "subsection", display_name="Subsection Alpha", slug=None)
+            self.subsection = self._create_container(
+                self.lib["id"],
+                "subsection",
+                display_name="Subsection Alpha",
+                slug=None,
+            )
+            self.subsection_with_units = self._create_container(
+                self.lib["id"],
+                "subsection",
+                display_name="Subsection with units",
+                slug=None,
+            )
+            self.subsection_2 = self._create_container(
+                self.lib["id"],
+                "subsection",
+                display_name="Test Subsection 2",
+                slug=None,
+            )
+            self.subsection_3 = self._create_container(
+                self.lib["id"],
+                "subsection",
+                display_name="Test Subsection 3",
+                slug=None,
+            )
+
             # Section
             self.section = self._create_container(self.lib["id"], "section", display_name="Section Alpha", slug=None)
+            self.section_with_subsections = self._create_container(
+                self.lib["id"],
+                "section",
+                display_name="Section with subsections",
+                slug=None,
+            )
 
         # Create blocks
         self.problem_block = self._add_block_to_library(self.lib["id"], "problem", "Problem1", can_stand_alone=False)
@@ -63,14 +100,34 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         self.html_block_2 = self._add_block_to_library(self.lib["id"], "html", "Html2")
 
         # Add components to `unit_with_components`
-        self._add_container_components(
+        self._add_container_children(
             self.unit_with_components["id"],
             children_ids=[
                 self.problem_block["id"],
                 self.html_block["id"],
                 self.problem_block_2["id"],
                 self.html_block_2["id"],
-            ]
+            ],
+        )
+        # Add units to `subsection_with_units`
+        self._add_container_children(
+            self.subsection_with_units["id"],
+            children_ids=[
+                self.unit["id"],
+                self.unit_with_components["id"],
+                self.unit_2["id"],
+                self.unit_3["id"],
+            ],
+        )
+        # Add subsections to `section_with_subsections`
+        self._add_container_children(
+            self.section_with_subsections["id"],
+            children_ids=[
+                self.subsection["id"],
+                self.subsection_with_units["id"],
+                self.subsection_2["id"],
+                self.subsection_3["id"],
+            ],
         )
 
     @ddt.data(
@@ -92,9 +149,9 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 slug=slug,
                 display_name=display_name
         )
-        id = f"lct:CL-TEST:containers:{container_type}:{slug}"
+        container_id = f"lct:CL-TEST:containers:{container_type}:{slug}"
         expected_data = {
-            "id": id,
+            "id": container_id,
             "container_type": container_type,
             "display_name": display_name,
             "last_published": None,
@@ -117,7 +174,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # Update the container:
         modified_date = datetime(2024, 10, 9, 8, 7, 6, tzinfo=timezone.utc)
         with freeze_time(modified_date):
-            container_data = self._update_container(id, display_name=f"New Display Name for {container_type}")
+            container_data = self._update_container(container_id, display_name=f"New Display Name for {container_type}")
         expected_data["last_draft_created"] = expected_data["modified"] = "2024-10-09T08:07:06Z"
         expected_data["display_name"] = f"New Display Name for {container_type}"
         self.assertDictContainsEntries(container_data, expected_data)
@@ -180,12 +237,12 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         """
         Test that we can add and get unit children components
         """
-        # Create container and add some components
-        self._add_container_components(
+        # Add some components
+        self._add_container_children(
             self.unit["id"],
             children_ids=[self.problem_block["id"], self.html_block["id"]]
         )
-        data = self._get_container_components(self.unit["id"])
+        data = self._get_container_children(self.unit["id"])
         assert len(data) == 2
         assert data[0]['id'] == self.problem_block['id']
         assert not data[0]['can_stand_alone']
@@ -194,11 +251,11 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         problem_block_2 = self._add_block_to_library(self.lib["id"], "problem", "Problem_2", can_stand_alone=False)
         html_block_2 = self._add_block_to_library(self.lib["id"], "html", "Html_2")
         # Add two more components
-        self._add_container_components(
+        self._add_container_children(
             self.unit["id"],
             children_ids=[problem_block_2["id"], html_block_2["id"]]
         )
-        data = self._get_container_components(self.unit["id"])
+        data = self._get_container_children(self.unit["id"])
         # Verify total number of components to be 2 + 2 = 4
         assert len(data) == 4
         assert data[2]['id'] == problem_block_2['id']
@@ -206,27 +263,96 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[3]['id'] == html_block_2['id']
         assert data[3]['can_stand_alone']
 
-    def test_unit_remove_children(self):
-        """
-        Test that we can remove unit children components
-        """
-        data = self._get_container_components(self.unit_with_components["id"])
-        assert len(data) == 4
-        # Remove both problem blocks.
-        self._remove_container_components(
-            self.unit_with_components["id"],
-            children_ids=[self.problem_block_2["id"], self.problem_block["id"]]
+    def test_subsection_add_children(self):
+        # Create units
+        child_unit_1 = self._create_container(self.lib["id"], "unit", display_name="Child unit 1", slug=None)
+        child_unit_2 = self._create_container(self.lib["id"], "unit", display_name="Child unit 2", slug=None)
+
+        # Add the units to subsection
+        self._add_container_children(
+            self.subsection["id"],
+            children_ids=[child_unit_1["id"], child_unit_2["id"]]
         )
-        data = self._get_container_components(self.unit_with_components["id"])
+        data = self._get_container_children(self.subsection["id"])
         assert len(data) == 2
-        assert data[0]['id'] == self.html_block['id']
-        assert data[1]['id'] == self.html_block_2['id']
+        assert data[0]['id'] == child_unit_1['id']
+        assert data[1]['id'] == child_unit_2['id']
+
+        child_unit_3 = self._create_container(self.lib["id"], "unit", display_name="Child unit 3", slug=None)
+        child_unit_4 = self._create_container(self.lib["id"], "unit", display_name="Child unit 4", slug=None)
+
+        # Add two more units to subsection
+        self._add_container_children(
+            self.subsection["id"],
+            children_ids=[child_unit_3["id"], child_unit_4["id"]]
+        )
+        data = self._get_container_children(self.subsection["id"])
+        # Verify total number of units to be 2 + 2 = 4
+        assert len(data) == 4
+        assert data[2]['id'] == child_unit_3['id']        
+        assert data[3]['id'] == child_unit_4['id']
+
+    def test_section_add_children(self):
+        # Create Subsections
+        child_subsection_1 = self._create_container(self.lib["id"], "subsection", display_name="Child Subsection 1", slug=None)
+        child_subsection_2 = self._create_container(self.lib["id"], "subsection", display_name="Child Subsection 2", slug=None)
+
+        # Add the subsections to section
+        self._add_container_children(
+            self.section["id"],
+            children_ids=[child_subsection_1["id"], child_subsection_2["id"]]
+        )
+        data = self._get_container_children(self.section["id"])
+        assert len(data) == 2
+        assert data[0]['id'] == child_subsection_1['id']
+        assert data[1]['id'] == child_subsection_2['id']
+
+        child_subsection_3 = self._create_container(self.lib["id"], "subsection", display_name="Child Subsection 3", slug=None)
+        child_subsection_4 = self._create_container(self.lib["id"], "subsection", display_name="Child Subsection 4", slug=None)
+
+        # Add two more subsections to section
+        self._add_container_children(
+            self.section["id"],
+            children_ids=[child_subsection_3["id"], child_subsection_4["id"]]
+        )
+        data = self._get_container_children(self.section["id"])
+        # Verify total number of subsections to be 2 + 2 = 4
+        assert len(data) == 4
+        assert data[2]['id'] == child_subsection_3['id']        
+        assert data[3]['id'] == child_subsection_4['id']
+
+    @ddt.data(
+        ("unit_with_components", ["problem_block_2", "problem_block"], ["html_block", "html_block_2"]),
+        ("subsection_with_units", ["unit", "unit_with_components"], ["unit_2", "unit_3"]),
+        ("section_with_subsections", ["subsection", "subsection_with_units"], ["subsection_2", "subsection_3"]),
+    )
+    @ddt.unpack
+    def test_container_remove_children(self, container_name, items_to_remove, expected_items):
+        """
+        Test that we can remove container children
+        """
+        container = getattr(self, container_name)
+        item_to_remove_1 = getattr(self, items_to_remove[0])
+        item_to_remove_2 = getattr(self, items_to_remove[1])
+        expected_item_1 = getattr(self, expected_items[0])
+        expected_item_2 = getattr(self, expected_items[1])
+        data = self._get_container_children(container["id"])
+        assert len(data) == 4
+        # Remove items.
+        self._remove_container_components(
+            container["id"],
+            children_ids=[item_to_remove_1["id"], item_to_remove_2["id"]]
+        )
+        data = self._get_container_children(container["id"])
+        assert len(data) == 2
+        assert data[0]['id'] == expected_item_1['id']
+        assert data[1]['id'] == expected_item_2['id']
 
     def test_unit_replace_children(self):
         """
         Test that we can completely replace/reorder unit children components.
         """
-        data = self._get_container_components(self.unit_with_components["id"])
+        data = self._get_container_children(self.unit_with_components["id"])
         assert len(data) == 4
         assert data[0]['id'] == self.problem_block['id']
         assert data[1]['id'] == self.html_block['id']
@@ -243,7 +369,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 self.html_block_2["id"],
             ]
         )
-        data = self._get_container_components(self.unit_with_components["id"])
+        data = self._get_container_children(self.unit_with_components["id"])
         assert len(data) == 4
         assert data[0]['id'] == self.problem_block['id']
         assert data[1]['id'] == self.problem_block_2['id']
@@ -257,10 +383,90 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
             self.unit_with_components["id"],
             children_ids=[new_problem_block["id"], new_html_block["id"]],
         )
-        data = self._get_container_components(self.unit_with_components["id"])
+        data = self._get_container_children(self.unit_with_components["id"])
         assert len(data) == 2
         assert data[0]['id'] == new_problem_block['id']
         assert data[1]['id'] == new_html_block['id']
+
+    def test_subsection_replace_children(self):
+        """
+        Test that we can completely replace/reorder subsection children.
+        """
+        data = self._get_container_children(self.subsection_with_units["id"])
+        assert len(data) == 4
+        assert data[0]['id'] == self.unit['id']
+        assert data[1]['id'] == self.unit_with_components['id']
+        assert data[2]['id'] == self.unit_2['id']
+        assert data[3]['id'] == self.unit_3['id']
+
+        # Reorder the units
+        self._patch_container_components(
+            self.subsection_with_units["id"],
+            children_ids=[
+                self.unit_2["id"],
+                self.unit["id"],
+                self.unit_3["id"],
+                self.unit_with_components["id"],
+            ]
+        )
+        data = self._get_container_children(self.subsection_with_units["id"])
+        assert len(data) == 4
+        assert data[0]['id'] == self.unit_2['id']
+        assert data[1]['id'] == self.unit['id']
+        assert data[2]['id'] == self.unit_3['id']
+        assert data[3]['id'] == self.unit_with_components['id']
+
+        # Replace with new units
+        new_unit_1 = self._create_container(self.lib["id"], "unit", display_name="New Unit 1", slug=None)
+        new_unit_2 = self._create_container(self.lib["id"], "unit", display_name="New Unit 2", slug=None)
+        self._patch_container_components(
+            self.subsection_with_units["id"],
+            children_ids=[new_unit_1["id"], new_unit_2["id"]],
+        )
+        data = self._get_container_children(self.subsection_with_units["id"])
+        assert len(data) == 2
+        assert data[0]['id'] == new_unit_1['id']
+        assert data[1]['id'] == new_unit_2['id']
+
+    def test_section_replace_children(self):
+        """
+        Test that we can completely replace/reorder section children.
+        """
+        data = self._get_container_children(self.section_with_subsections["id"])
+        assert len(data) == 4
+        assert data[0]['id'] == self.subsection['id']
+        assert data[1]['id'] == self.subsection_with_units['id']
+        assert data[2]['id'] == self.subsection_2['id']
+        assert data[3]['id'] == self.subsection_3['id']
+
+        # Reorder the subsections
+        self._patch_container_components(
+            self.section_with_subsections["id"],
+            children_ids=[
+                self.subsection_2["id"],
+                self.subsection["id"],
+                self.subsection_3["id"],
+                self.subsection_with_units["id"],
+            ]
+        )
+        data = self._get_container_children(self.section_with_subsections["id"])
+        assert len(data) == 4
+        assert data[0]['id'] == self.subsection_2['id']
+        assert data[1]['id'] == self.subsection['id']
+        assert data[2]['id'] == self.subsection_3['id']
+        assert data[3]['id'] == self.subsection_with_units['id']
+
+        # Replace with new subsections
+        new_subsection_1 = self._create_container(self.lib["id"], "subsection", display_name="New Subsection 1", slug=None)
+        new_subsection_2 = self._create_container(self.lib["id"], "subsection", display_name="New Subsection 2", slug=None)
+        self._patch_container_components(
+            self.section_with_subsections["id"],
+            children_ids=[new_subsection_1["id"], new_subsection_2["id"]],
+        )
+        data = self._get_container_children(self.section_with_subsections["id"])
+        assert len(data) == 2
+        assert data[0]['id'] == new_subsection_1['id']
+        assert data[1]['id'] == new_subsection_2['id']
 
     @ddt.data(
         "unit",
@@ -323,7 +529,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         Test that we can publish the changes to a specific container
         """
         html_block_3 = self._add_block_to_library(self.lib["id"], "html", "Html3")
-        self._add_container_components(
+        self._add_container_children(
             self.unit["id"],
             children_ids=[
                 self.html_block["id"],
@@ -334,7 +540,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # At first everything is unpublished:
         c1_before = self._get_container(self.unit_with_components["id"])
         assert c1_before["has_unpublished_changes"]
-        c1_components_before = self._get_container_components(self.unit_with_components["id"])
+        c1_components_before = self._get_container_children(self.unit_with_components["id"])
         assert len(c1_components_before) == 4
         assert c1_components_before[0]["id"] == self.problem_block["id"]
         assert c1_components_before[0]["has_unpublished_changes"]
@@ -357,7 +563,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # Now it is published:
         c1_after = self._get_container(self.unit_with_components["id"])
         assert c1_after["has_unpublished_changes"] is False
-        c1_components_after = self._get_container_components(self.unit_with_components["id"])
+        c1_components_after = self._get_container_children(self.unit_with_components["id"])
         assert len(c1_components_after) == 4
         assert c1_components_after[0]["id"] == self.problem_block["id"]
         assert c1_components_after[0]["has_unpublished_changes"] is False
@@ -375,7 +581,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # and container 2 is still unpublished, except for the shared HTML block that is also in container 1:
         c2_after = self._get_container(self.unit["id"])
         assert c2_after["has_unpublished_changes"]
-        c2_components_after = self._get_container_components(self.unit["id"])
+        c2_components_after = self._get_container_children(self.unit["id"])
         assert len(c2_components_after) == 2
         assert c2_components_after[0]["id"] == self.html_block["id"]
         assert c2_components_after[0]["has_unpublished_changes"] is False  # published since it's also in container 1

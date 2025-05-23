@@ -428,21 +428,37 @@ def get_container_children(
     published=False,
 ) -> list[LibraryXBlockMetadata | ContainerMetadata]:
     """
-    Get the entities contained in the given container (e.g. the components/xblocks in a unit)
+    Get the entities contained in the given container
+    (e.g. the components/xblocks in a unit, units in a subsection, subsections in a section)
     """
     container = _get_container_from_key(container_key)
-    if container_key.container_type == ContainerType.Unit.value:
-        child_components = authoring_api.get_components_in_unit(container.unit, published=published)
-        return [LibraryXBlockMetadata.from_component(
-            container_key.lib_key,
-            entry.component
-        ) for entry in child_components]
-    else:
-        child_entities = authoring_api.get_entities_in_container(container, published=published)
-        return [ContainerMetadata.from_container(
-            container_key.lib_key,
-            entry.entity
-        ) for entry in child_entities]
+    container_type = ContainerType(container_key.container_type)
+
+    match container_type:
+        case ContainerType.Unit:
+            child_components = authoring_api.get_components_in_unit(container.unit, published=published)
+            return [LibraryXBlockMetadata.from_component(
+                container_key.lib_key,
+                entry.component
+            ) for entry in child_components]
+        case ContainerType.Subsection:
+            child_units = authoring_api.get_units_in_subsection(container.subsection, published=published)
+            return [ContainerMetadata.from_container(
+                container_key.lib_key,
+                entry.unit
+            ) for entry in child_units]
+        case ContainerType.Section:
+            child_subsections = authoring_api.get_subsections_in_section(container.section, published=published)
+            return [ContainerMetadata.from_container(
+                container_key.lib_key,
+                entry.subsection,
+            ) for entry in child_subsections]
+        case _:
+            child_entities = authoring_api.get_entities_in_container(container, published=published)
+            return [ContainerMetadata.from_container(
+                container_key.lib_key,
+                entry.entity
+            ) for entry in child_entities]
 
 
 def get_container_children_count(
@@ -466,15 +482,16 @@ def update_container_children(
     Adds children components or containers to given container.
     """
     library_key = container_key.lib_key
-    container_type = container_key.container_type
+    container_type = ContainerType(container_key.container_type)
     container = _get_container_from_key(container_key)
+    created = datetime.now(tz=timezone.utc)
     match container_type:
-        case ContainerType.Unit.value:
+        case ContainerType.Unit:
             components = [get_component_from_usage_key(key) for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_unit_version(
                 container.unit,
                 components=components,  # type: ignore[arg-type]
-                created=datetime.now(tz=timezone.utc),
+                created=created,
                 created_by=user_id,
                 entities_action=entities_action,
             )
@@ -486,6 +503,44 @@ def update_container_children(
                         changes=["units"],
                     ),
                 )
+        case ContainerType.Subsection:
+            units = []
+            for key in children_ids:
+                # Verify that all children are units
+                if not key.container_type == ContainerType.Unit.value:
+                    raise ValueError(
+                        f"Invalid children type: {key}. All Subsection children must be Units",
+                    )
+                units.append(_get_container_from_key(key).unit)
+
+            new_version = authoring_api.create_next_subsection_version(
+                container.subsection,
+                units=units,  # type: ignore[arg-type]
+                created=created,
+                created_by=user_id,
+                entities_action=entities_action,
+            )
+
+            # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for subsections
+        case ContainerType.Section:
+            subsections = []
+            for key in children_ids:
+                # Verify that all children are subsections
+                if not key.container_type == ContainerType.Subsection.value:
+                    raise ValueError(
+                        f"Invalid children type: {key}. All Section children must be Subsections",
+                    )
+                subsections.append(_get_container_from_key(key).subsection)
+
+            new_version = authoring_api.create_next_section_version(
+                container.section,
+                subsections=subsections,  # type: ignore[arg-type]
+                created=created,
+                created_by=user_id,
+                entities_action=entities_action,
+            )
+
+            # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for sections
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
