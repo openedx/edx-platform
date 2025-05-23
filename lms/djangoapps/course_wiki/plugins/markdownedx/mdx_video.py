@@ -164,9 +164,9 @@ class VideoExtension(markdown.Extension):  # lint-amnesty, pylint: disable=missi
         pattern = klass(re)
         pattern.md = md
         pattern.ext = self
-        md.inlinePatterns.add(name, pattern, "<reference")
+        md.inlinePatterns.register(pattern, name, 170)
 
-    def extendMarkdown(self, md, md_globals):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def extendMarkdown(self, md):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         self.add_inline(md, 'bliptv', Bliptv,
                         r'([^(]|^)http://(\w+\.|)blip.tv/file/get/(?P<bliptvfile>\S+.flv)')
         self.add_inline(md, 'dailymotion', Dailymotion,
