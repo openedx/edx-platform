@@ -66,7 +66,7 @@
              * @param  {string} redirectUrl The URL to redirect to when the button is clicked.
              */
             showMessage: function(message, redirectUrl) {
-                const componentId = 'student-enrrollment-feedback-error';
+                const componentId = 'student-enrollment-feedback-error';
                 const existing = document.getElementById(componentId);
                 if (existing) {
                     existing.remove();
