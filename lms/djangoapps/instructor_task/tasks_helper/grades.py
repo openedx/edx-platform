@@ -23,7 +23,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import BulkRoleCache
 from lms.djangoapps.certificates import api as certs_api
-from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.certificates.api import get_certs_for_course_id_given_users
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -242,7 +242,7 @@ class _CertificateBulkContext:
         self.certificates_by_user = {
             certificate.user.id: certificate
             for certificate in
-            GeneratedCertificate.objects.filter(course_id=context.course_id, user__in=users)
+            get_certs_for_course_id_given_users(course_id=context.course_id, users=users)
         }
 
 
@@ -280,6 +280,7 @@ class InMemoryReportMixin:
     """
     Mixin for a file report that will generate file in memory and then upload to report store
     """
+
     def _generate(self):
         """
         Internal method for generating a grade report for the given context.
@@ -341,6 +342,7 @@ class TemporaryFileReportMixin:
     """
     Mixin for a file report that will write rows iteratively to a TempFile
     """
+
     def _generate(self):
         """
         Generate a CSV containing all students' problem grades within a given `course_id`.
@@ -415,6 +417,7 @@ class GradeReportBase:
     """
     Base class for grade reports (ProblemGradeReport and CourseGradeReport).
     """
+
     def __init__(self, context):
         self.context = context
 
