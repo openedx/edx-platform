@@ -64,7 +64,7 @@ class LibraryContainersView(GenericAPIView):
 @view_auth_classes()
 class LibraryContainerView(GenericAPIView):
     """
-    View to retrieve or update data about a specific container (a section, subsection, or unit)
+    View to retrieve, delete or update data about a specific container (a section, subsection, or unit)
     """
     serializer_class = serializers.LibraryContainerMetadataSerializer
 
@@ -141,7 +141,7 @@ class LibraryContainerChildrenView(GenericAPIView):
     )
     def get(self, request, container_key: LibraryContainerLocator):
         """
-        Get children components of given container
+        Get children of given container
         Example:
         GET /api/libraries/v2/containers/<container_key>/children/
         Result:
@@ -205,10 +205,8 @@ class LibraryContainerChildrenView(GenericAPIView):
             request.user,
             permissions.CAN_EDIT_THIS_CONTENT_LIBRARY,
         )
-        serializer = serializers.ContentLibraryComponentKeysSerializer(data=request.data)
+        serializer = serializers.ContentLibraryItemContainerKeysSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # Only components under units are supported for now.
-        assert container_key.container_type == api.ContainerType.Unit.value
 
         container = api.update_container_children(
             container_key,
@@ -220,12 +218,12 @@ class LibraryContainerChildrenView(GenericAPIView):
 
     @convert_exceptions
     @swagger_auto_schema(
-        request_body=serializers.ContentLibraryComponentKeysSerializer,
+        request_body=serializers.ContentLibraryItemContainerKeysSerializer,
         responses={200: serializers.LibraryContainerMetadataSerializer}
     )
     def post(self, request, container_key: LibraryContainerLocator):
         """
-        Add components to unit
+        Add items to container
         Example:
         POST /api/libraries/v2/containers/<container_key>/children/
         Request body:
@@ -239,12 +237,12 @@ class LibraryContainerChildrenView(GenericAPIView):
 
     @convert_exceptions
     @swagger_auto_schema(
-        request_body=serializers.ContentLibraryComponentKeysSerializer,
+        request_body=serializers.ContentLibraryItemContainerKeysSerializer,
         responses={200: serializers.LibraryContainerMetadataSerializer}
     )
     def delete(self, request, container_key: LibraryContainerLocator):
         """
-        Remove components from unit
+        Remove items from container
         Example:
         DELETE /api/libraries/v2/containers/<container_key>/children/
         Request body:
@@ -258,12 +256,12 @@ class LibraryContainerChildrenView(GenericAPIView):
 
     @convert_exceptions
     @swagger_auto_schema(
-        request_body=serializers.ContentLibraryComponentKeysSerializer,
+        request_body=serializers.ContentLibraryItemContainerKeysSerializer,
         responses={200: serializers.LibraryContainerMetadataSerializer}
     )
     def patch(self, request, container_key: LibraryContainerLocator):
         """
-        Replace components in unit, can be used to reorder components as well.
+        Replace items in container, can be used to reorder items as well.
         Example:
         PATCH /api/libraries/v2/containers/<container_key>/children/
         Request body:
