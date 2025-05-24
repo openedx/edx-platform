@@ -485,6 +485,7 @@ def update_container_children(
     container_type = ContainerType(container_key.container_type)
     container = _get_container_from_key(container_key)
     created = datetime.now(tz=timezone.utc)
+    new_version: ContainerVersion
     match container_type:
         case ContainerType.Unit:
             components = [get_component_from_usage_key(key) for key in children_ids]  # type: ignore[arg-type]
@@ -507,7 +508,8 @@ def update_container_children(
             units = []
             for key in children_ids:
                 # Verify that all children are units
-                if not key.container_type == ContainerType.Unit.value:
+                if not isinstance(key, LibraryContainerLocator) \
+                    or not key.container_type == ContainerType.Unit.value:
                     raise ValueError(
                         f"Invalid children type: {key}. All Subsection children must be Units",
                     )
@@ -526,7 +528,8 @@ def update_container_children(
             subsections = []
             for key in children_ids:
                 # Verify that all children are subsections
-                if not key.container_type == ContainerType.Subsection.value:
+                if not isinstance(key, LibraryContainerLocator) \
+                    or not key.container_type == ContainerType.Subsection.value:
                     raise ValueError(
                         f"Invalid children type: {key}. All Section children must be Subsections",
                     )

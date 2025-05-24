@@ -148,7 +148,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 container_type,
                 slug=slug,
                 display_name=display_name
-        )
+            )
         container_id = f"lct:CL-TEST:containers:{container_type}:{slug}"
         expected_data = {
             "id": container_id,
@@ -202,7 +202,13 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
 
         random_user = UserFactory.create(username="Random", email="random@example.com")
         with self.as_user(random_user):
-            self._create_container(self.lib["id"], container_type, slug="new_slug", display_name=display_name, expect_response=403)
+            self._create_container(
+                self.lib["id"],
+                container_type,
+                slug="new_slug",
+                display_name=display_name,
+                expect_response=403,
+            )
             self._get_container(container_data["id"], expect_response=403)
             self._update_container(container_data["id"], display_name="New Display Name", expect_response=403)
             self._delete_container(container_data["id"], expect_response=403)
@@ -210,7 +216,13 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # Granting read-only permissions on the library should only allow retrieval, nothing else.
         self._add_user_by_email(self.lib["id"], random_user.email, access_level="read")
         with self.as_user(random_user):
-            self._create_container(self.lib["id"], container_type, slug=slug, display_name=display_name, expect_response=403)
+            self._create_container(
+                self.lib["id"],
+                container_type,
+                slug=slug,
+                display_name=display_name,
+                expect_response=403,
+            )
             self._get_container(container_data["id"], expect_response=200)
             self._update_container(container_data["id"], display_name="New Display Name", expect_response=403)
             self._delete_container(container_data["id"], expect_response=403)
@@ -289,13 +301,23 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         data = self._get_container_children(self.subsection["id"])
         # Verify total number of units to be 2 + 2 = 4
         assert len(data) == 4
-        assert data[2]['id'] == child_unit_3['id']        
+        assert data[2]['id'] == child_unit_3['id']
         assert data[3]['id'] == child_unit_4['id']
 
     def test_section_add_children(self):
         # Create Subsections
-        child_subsection_1 = self._create_container(self.lib["id"], "subsection", display_name="Child Subsection 1", slug=None)
-        child_subsection_2 = self._create_container(self.lib["id"], "subsection", display_name="Child Subsection 2", slug=None)
+        child_subsection_1 = self._create_container(
+            self.lib["id"],
+            "subsection",
+            display_name="Child Subsection 1",
+            slug=None,
+        )
+        child_subsection_2 = self._create_container(
+            self.lib["id"],
+            "subsection",
+            display_name="Child Subsection 2",
+            slug=None,
+        )
 
         # Add the subsections to section
         self._add_container_children(
@@ -307,8 +329,18 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[0]['id'] == child_subsection_1['id']
         assert data[1]['id'] == child_subsection_2['id']
 
-        child_subsection_3 = self._create_container(self.lib["id"], "subsection", display_name="Child Subsection 3", slug=None)
-        child_subsection_4 = self._create_container(self.lib["id"], "subsection", display_name="Child Subsection 4", slug=None)
+        child_subsection_3 = self._create_container(
+            self.lib["id"],
+            "subsection",
+            display_name="Child Subsection 3",
+            slug=None,
+        )
+        child_subsection_4 = self._create_container(
+            self.lib["id"],
+            "subsection",
+            display_name="Child Subsection 4",
+            slug=None,
+        )
 
         # Add two more subsections to section
         self._add_container_children(
@@ -318,7 +350,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         data = self._get_container_children(self.section["id"])
         # Verify total number of subsections to be 2 + 2 = 4
         assert len(data) == 4
-        assert data[2]['id'] == child_subsection_3['id']        
+        assert data[2]['id'] == child_subsection_3['id']
         assert data[3]['id'] == child_subsection_4['id']
 
     @ddt.data(
@@ -457,8 +489,18 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[3]['id'] == self.subsection_with_units['id']
 
         # Replace with new subsections
-        new_subsection_1 = self._create_container(self.lib["id"], "subsection", display_name="New Subsection 1", slug=None)
-        new_subsection_2 = self._create_container(self.lib["id"], "subsection", display_name="New Subsection 2", slug=None)
+        new_subsection_1 = self._create_container(
+            self.lib["id"],
+            "subsection",
+            display_name="New Subsection 1",
+            slug=None,
+        )
+        new_subsection_2 = self._create_container(
+            self.lib["id"],
+            "subsection",
+            display_name="New Subsection 2",
+            slug=None,
+        )
         self._patch_container_components(
             self.section_with_subsections["id"],
             children_ids=[new_subsection_1["id"], new_subsection_2["id"]],
