@@ -252,6 +252,13 @@ class UserViewV2APITests(UserViewsMixin, TpaAPITestCase):
         assert response.status_code == expect_code
         assert (response.data == expect_data)
 
+    def test_unauthorized_delete_social_auth_record_call(self):
+        user = get_user_model().objects.get(username=CARL_USERNAME)
+        auth_token = f"JWT {generate_jwt(user, is_restricted=False, scopes=None, filters=None)}"
+        url = self.make_url({'username': ALICE_USERNAME, 'uid': f'{ALICE_USERNAME}@gmail.com'})
+        response = self.client.delete(url, HTTP_AUTHORIZATION=auth_token)
+        assert response.status_code == 403
+
 
 @override_settings(EDX_API_KEY=VALID_API_KEY)
 @ddt.ddt
