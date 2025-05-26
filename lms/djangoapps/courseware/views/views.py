@@ -236,6 +236,7 @@ def _earned_but_not_available_cert_data(cert_downloadable_status):
         certificate_available_date=cert_downloadable_status.get('certificate_available_date')
     )
 
+
 def _not_earned_but_available_date_cert_data(cert_downloadable_status):
     return CertData(
         NOT_EARNED_BUT_AVAILABLE_DATE_CERT_STATUS,
