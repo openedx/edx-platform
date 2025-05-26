@@ -508,8 +508,10 @@ def update_container_children(
             units = []
             for key in children_ids:
                 # Verify that all children are units
-                if not isinstance(key, LibraryContainerLocator) \
-                    or not key.container_type == ContainerType.Unit.value:
+                if (
+                    not isinstance(key, LibraryContainerLocator)
+                    or not key.container_type == ContainerType.Unit.value
+                ):
                     raise ValueError(
                         f"Invalid children type: {key}. All Subsection children must be Units",
                     )
@@ -528,8 +530,10 @@ def update_container_children(
             subsections = []
             for key in children_ids:
                 # Verify that all children are subsections
-                if not isinstance(key, LibraryContainerLocator) \
-                    or not key.container_type == ContainerType.Subsection.value:
+                if (
+                    not isinstance(key, LibraryContainerLocator)
+                    or not key.container_type == ContainerType.Subsection.value
+                ):
                     raise ValueError(
                         f"Invalid children type: {key}. All Section children must be Subsections",
                     )

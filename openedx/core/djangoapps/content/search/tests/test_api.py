@@ -48,6 +48,7 @@ class TestSearchApi(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
+        # pylint: disable=too-many-statements
         super().setUp()
         self.user = UserFactory.create()
         self.user_id = self.user.id
