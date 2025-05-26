@@ -1,6 +1,7 @@
+{% load i18n %}
 {% for notification_app in email_content %}
     <h3 style="font-size: 22px; font-weight:700; line-height:28px; margin: 0.75rem 0 0;">
-        {{ notification_app.title }}
+        {{ notification_app.translated_title }}
     </h3>
     {% if notification_app.help_text %}
         <p style="margin: 0; height: 1.5rem; font-weight: 400; font-size: 14px; line-height: 24px">
@@ -10,7 +11,7 @@
             {% if notification_app.help_text_url %}
                 <span style="float:right; margin-right: 0.25rem">
                     <a href="{{notification_app.help_text_url}}" style="text-decoration: none; color: #00688D">
-                        View all
+                        {% trans "View all" as tmsg %}{{ tmsg | force_escape }}
                     </a>
                 </span>
             {% endif %}
@@ -46,7 +47,7 @@
                                 </span>
                                 <span style="float: right">
                                     <a href="{{notification.content_url}}" style="text-decoration: none; color: #00688D">
-                                        View
+                                        {% trans "View" as tmsg %}{{ tmsg | force_escape }}
                                     </a>
                                 </span>
                             </blockquote>
@@ -60,7 +61,7 @@
     {% if notification_app.show_remaining_count %}
         <p style="margin: 0; height: 0.75rem; font-weight: 400; font-size: 14px; line-height: 24px;">
             <a href="{{notification_app.url}}" style="color: #00688d; margin: 0; float:right; text-decoration: none;">
-                + {{ notification_app.remaining_count }} more
+                + {{ notification_app.remaining_count }} {% trans "more" as tmsg %}{{ tmsg | force_escape }}
             </a>
         </p>
     {% endif %}
