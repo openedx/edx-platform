@@ -4,6 +4,7 @@ Models for notifications
 import logging
 from typing import Dict
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from model_utils.models import TimeStampedModel
@@ -26,7 +27,7 @@ NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 13
+COURSE_NOTIFICATION_CONFIG_VERSION = settings.COURSE_NOTIFICATION_CONFIG_VERSION
 
 
 def get_course_notification_preference_config():

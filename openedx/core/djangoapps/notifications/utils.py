@@ -280,3 +280,20 @@ def filter_out_visible_preferences_by_course_ids(user, preferences: Dict, course
         forum_roles,
         course_roles
     )
+
+
+def deep_merge_dicts(base, override, is_root=True):
+    """
+    Recursively merges `override` into `base` and returns the merged result.
+    If a top-level key in `override` has a value of None, that key is removed from the final result.
+    """
+    result = base.copy()
+    for key, value in override.items():
+        if is_root and value is None:
+            # Remove this key from the result if it's at the root level and None
+            result.pop(key, None)
+        elif key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = deep_merge_dicts(result[key], value, is_root=False)
+        else:
+            result[key] = value
+    return result

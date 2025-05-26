@@ -2898,6 +2898,14 @@ LIBRARY_ENABLED_BLOCKS = [
     'survey',
     'word_cloud',
 ]
+# These settings allow overriding the default notification configuration.
+# `COURSE_NOTIFICATION_CONFIG_VERSION` can be used to update changes that are made.
+# `COURSE_NOTIFICATION_APPS_OVERRIDE` and `COURSE_NOTIFICATION_TYPES_OVERRIDE` allow customization
+# of notification apps and types without modifying core code.
+# Make sure these value are synced across cms and lms.
+COURSE_NOTIFICATION_CONFIG_VERSION = 16
+COURSE_NOTIFICATION_APPS_OVERRIDE = {}
+COURSE_NOTIFICATION_TYPES_OVERRIDE = {}
 
 SOCIAL_MEDIA_FOOTER_ACE_URLS = {
     'reddit': 'http://www.reddit.com/r/edx',

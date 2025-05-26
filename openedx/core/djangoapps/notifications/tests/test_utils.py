@@ -3,13 +3,21 @@ Test cases for the notification utility functions.
 """
 import copy
 import unittest
+from importlib import reload
 
 import pytest
+from django.conf import settings
+from django.test import override_settings
 
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.django_comment_common.models import assign_role, FORUM_ROLE_MODERATOR
-from openedx.core.djangoapps.notifications.utils import aggregate_notification_configs, \
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_MODERATOR, assign_role
+from openedx.core.djangoapps.notifications import base_notification
+from openedx.core.djangoapps.notifications.base_notification import DEFAULT_COURSE_NOTIFICATION_TYPES
+from openedx.core.djangoapps.notifications.utils import (
+    aggregate_notification_configs,
+    deep_merge_dicts,
     filter_out_visible_preferences_by_course_ids
+)
 
 
 class TestAggregateNotificationConfigs(unittest.TestCase):
@@ -344,3 +352,42 @@ class TestVisibilityFilter(unittest.TestCase):
         )
         assign_role(self.course_key, self.user, FORUM_ROLE_MODERATOR)
         assert updated_preferences == self.mock_preferences
+
+
+@override_settings(COURSE_NOTIFICATION_TYPES_OVERRIDE={
+    'new_response': {
+        'is_core': False,
+    },
+    'new_test_comment': {
+        'notification_app': 'discussion',
+        'name': 'new_test_comment',
+        'is_core': True,
+    },
+    'new_discussion_post': None,
+})
+def test_course_notification_types_override():
+    # Reload the module to reflect overridden settings
+    reload(base_notification)
+
+    # Fetch the merged notification types
+    course_notification_types = base_notification.COURSE_NOTIFICATION_TYPES
+
+    # Compute the expected result manually
+    expected = deep_merge_dicts(
+        DEFAULT_COURSE_NOTIFICATION_TYPES.copy(),
+        settings.COURSE_NOTIFICATION_TYPES_OVERRIDE,
+    )
+
+    # Assert full dictionary equality
+    assert course_notification_types == expected
+
+    # Assert overridden values
+    override = settings.COURSE_NOTIFICATION_TYPES_OVERRIDE
+    assert course_notification_types['new_response']['is_core'] == override['new_response']['is_core']
+    assert course_notification_types['new_test_comment'] == override['new_test_comment']
+    assert 'new_discussion_post' not in course_notification_types
+
+    # Assert preserved values
+    assert (
+        course_notification_types['new_response']['name'] == DEFAULT_COURSE_NOTIFICATION_TYPES['new_response']['name']
+    )

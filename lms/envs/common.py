@@ -5642,3 +5642,12 @@ USE_EXTRACTED_PROBLEM_BLOCK = False
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
 USE_EXTRACTED_VIDEO_BLOCK = False
+
+# These settings allow overriding the default notification configuration.
+# `COURSE_NOTIFICATION_CONFIG_VERSION` can be used to update changes that are made.
+# `COURSE_NOTIFICATION_APPS_OVERRIDE` and `COURSE_NOTIFICATION_TYPES_OVERRIDE` allow customization
+# of notification apps and types without modifying core code.
+# Make sure these value are synced across cms and lms.
+COURSE_NOTIFICATION_CONFIG_VERSION = 0
+COURSE_NOTIFICATION_APPS_OVERRIDE = {}
+COURSE_NOTIFICATION_TYPES_OVERRIDE = {}
