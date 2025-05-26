@@ -3807,7 +3807,7 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': False, 'enable_completion_tracking': False})
-    
+
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=True)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=False)
     @override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, active=True)
