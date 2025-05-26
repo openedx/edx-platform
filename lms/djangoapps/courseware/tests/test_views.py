@@ -3806,7 +3806,11 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': False, 'enable_completion_tracking': False})
+        self.assertEqual(body, {
+            'enable_navigation_sidebar': True,
+            'always_open_auxiliary_sidebar': False,
+            'enable_completion_tracking': False
+            })
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=True)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=False)
@@ -3820,7 +3824,11 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': False, 'enable_completion_tracking': True})
+        self.assertEqual(body, {
+            'enable_navigation_sidebar': True,
+            'always_open_auxiliary_sidebar': False,
+            'enable_completion_tracking': True
+            })
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=True)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=True)
@@ -3834,7 +3842,11 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': True, 'enable_completion_tracking': False})
+        self.assertEqual(body, {
+            'enable_navigation_sidebar': True,
+            'always_open_auxiliary_sidebar': True,
+            'enable_completion_tracking': False
+            })
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=True)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=True)
@@ -3848,7 +3860,11 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body, {'enable_navigation_sidebar': True, 'always_open_auxiliary_sidebar': True, 'enable_completion_tracking': True})
+        self.assertEqual(body, {
+            'enable_navigation_sidebar': True,
+            'always_open_auxiliary_sidebar': True,
+            'enable_completion_tracking': True
+            })
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=False)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=True)
@@ -3862,7 +3878,11 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body, {'enable_navigation_sidebar': False, 'always_open_auxiliary_sidebar': True, 'enable_completion_tracking': False})
+        self.assertEqual(body, {
+            'enable_navigation_sidebar': False,
+            'always_open_auxiliary_sidebar': True,
+            'enable_completion_tracking': False
+            })
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=False)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=True)
@@ -3876,7 +3896,11 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body, {'enable_navigation_sidebar': False, 'always_open_auxiliary_sidebar': True, 'enable_completion_tracking': True})
+        self.assertEqual(body, {
+            'enable_navigation_sidebar': False,
+            'always_open_auxiliary_sidebar': True,
+            'enable_completion_tracking': True
+            })
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=False)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=False)
@@ -3889,7 +3913,11 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body, {'enable_navigation_sidebar': False, 'always_open_auxiliary_sidebar': False, 'enable_completion_tracking': False})
+        self.assertEqual(body, {
+            'enable_navigation_sidebar': False,
+            'always_open_auxiliary_sidebar': False,
+            'enable_completion_tracking': False
+            })
 
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR, active=False)
     @override_waffle_flag(COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR, active=False)
@@ -3902,4 +3930,8 @@ class TestCoursewareMFENavigationSidebarTogglesAPI(SharedModuleStoreTestCase):
         body = json.loads(response.content.decode('utf-8'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(body, {'enable_navigation_sidebar': False, 'always_open_auxiliary_sidebar': False, 'enable_completion_tracking': True})
+        self.assertEqual(body, {
+            'enable_navigation_sidebar': False,
+            'always_open_auxiliary_sidebar': False,
+            'enable_completion_tracking': True
+            })
