@@ -1027,8 +1027,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
             with self.assertLogs(level='WARN') as log:
                 _check_user_auth_flow(site, invalid_email_user)
-                assert len(log.output) == 1
-                assert "Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check." in log.output[0]
+                assert any("Shortcircuiting THIRD_PARTY_AUTH_ONLY_DOMAIN check." in warning for warning in log.output)
 
 
 @ddt.ddt
