@@ -279,7 +279,7 @@ def create_container(
                 created_by=user_id,
             )
         case _:
-            raise NotImplementedError(f"Library support for {container_type} is in progress")
+            raise NotImplementedError(f"Library does not support {container_type} yet")
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
@@ -329,7 +329,7 @@ def update_container(
                 created_by=user_id,
             )
         case _:
-            raise NotImplementedError(f"Library support for {container_type} is in progress")
+            raise NotImplementedError(f"Library does not support {container_type} yet")
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(

@@ -544,7 +544,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         ("section", "section1", "section", "79ee8fa2"),
     )
     @ddt.unpack
-    def test_draft_container_1(self, container_name, container_slug, container_type, doc_id):
+    def test_draft_container(self, container_name, container_slug, container_type, doc_id):
         """
         Test creating a search document for a draft-only container
         """
