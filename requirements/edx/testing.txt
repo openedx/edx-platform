@@ -540,7 +540,7 @@ edx-django-release-util==1.5.0
     #   edxval
 edx-django-sites-extensions==5.1.0
     # via -r requirements/edx/base.txt
-edx-django-utils==7.4.0
+edx-django-utils==8.0.0
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -979,10 +979,6 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-newrelic==10.12.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-django-utils
 nh3==0.2.21
     # via -r requirements/edx/base.txt
 nltk==3.9.1
