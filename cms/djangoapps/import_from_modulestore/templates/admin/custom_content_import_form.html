@@ -1,0 +1,44 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="{{ action_name }}">
+
+        {% for obj in queryset %}
+        <input type="hidden" name="_selected_action" value="{{ obj.pk }}">
+        {% endfor %}
+
+        {% if form.errors %}
+        <p class="errornote">
+            {% blocktranslate count counter=form.errors|escape|length %}
+            Please correct the error below.
+            {% plural %}
+            Please correct the errors below.
+            {% endblocktranslate %}
+        </p>
+        {{ form.non_field_errors }}
+        {% endif %}
+
+        <fieldset class="module aligned">
+            {% for field in form %}
+            <div class="form-row">
+                {{ field.errors }}
+                {{ field.label_tag }}
+                {{ field }}
+
+                {% if field.help_text %}
+                <p class="help">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </fieldset>
+
+        <div class="submit-row">
+            <input type="submit" name="apply" value="{% translate 'Apply'|escape %}">
+        </div>
+    </form>
+</div>
+{% endblock %}
