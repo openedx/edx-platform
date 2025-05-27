@@ -155,6 +155,14 @@ class ThreadActionGroupIdTestCase(
         assert response.status_code == 200
         self._assert_json_response_contains_group_info(response)
 
+    def test_vote(self):
+        response = self.call_view(
+            "vote_for_thread", "update_thread_votes", view_args={"value": "up"}
+        )
+        self._assert_json_response_contains_group_info(response)
+        response = self.call_view("undo_vote_for_thread", "delete_thread_vote")
+        self._assert_json_response_contains_group_info(response)
+
 
 class ViewsTestCaseMixin:
 
@@ -213,6 +221,22 @@ class ViewsTestCaseMixin:
             )
 
             assert self.client.login(username="student", password=self.password)
+
+    def _setup_mock_request(self, mock_function, include_depth=False):
+        """
+        Ensure that mock_request returns the data necessary to make views
+        function correctly
+        """
+        data = {
+            "user_id": str(self.student.id),
+            "closed": False,
+            "commentable_id": "non_team_dummy_id",
+            "thread_id": "dummy",
+            "thread_type": "discussion",
+        }
+        if include_depth:
+            data["depth"] = 0
+        self.set_mock_return_value(mock_function, data)
 
 
 @ddt.ddt
@@ -549,6 +573,26 @@ class ViewsTestCase(
 
         assert response.status_code == 200
 
+    @ddt.data(
+        ("upvote_thread", "update_thread_votes", "thread_id", "thread_voted"),
+        ("upvote_comment", "update_comment_votes", "comment_id", "comment_voted"),
+        ("downvote_thread", "update_thread_votes", "thread_id", "thread_voted"),
+        ("downvote_comment", "update_comment_votes", "comment_id", "comment_voted"),
+    )
+    @ddt.unpack
+    def test_voting(self, view_name, function_name, item_id, signal):
+        self._setup_mock_request("get_thread")
+        self._setup_mock_request("get_parent_comment")
+        self._setup_mock_request(function_name)
+        with self.assert_discussion_signals(signal):
+            response = self.client.post(
+                reverse(
+                    view_name,
+                    kwargs={item_id: "dummy", "course_id": str(self.course_id)},
+                )
+            )
+        assert response.status_code == 200
+
 
 @disable_signal(views, "comment_endorsed")
 class ViewPermissionsTestCase(
@@ -843,15 +887,22 @@ class TeamsPermissionsTestCase(
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user,
-            ["get_parent_comment", "update_comment_flag"],
+            [
+                "get_parent_comment",
+                "update_comment_flag",
+                "update_comment_votes",
+                "delete_comment_vote",
+            ],
             make_minimal_cs_comment(
                 {
+                    "closed": False,
                     "commentable_id": commentable_id,
                     "course_id": str(self.course.id),
                 }
             ),
         )
-        for action in ["un_flag_abuse_for_comment", "flag_abuse_for_comment"]:
+        # "un_flag_abuse_for_comment", "flag_abuse_for_comment",
+        for action in ["upvote_comment", "downvote_comment"]:
             response = self.client.post(
                 reverse(
                     action,
@@ -873,7 +924,12 @@ class TeamsPermissionsTestCase(
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(
             user,
-            ["get_thread", "update_thread_flag"],
+            [
+                "get_thread",
+                "update_thread_flag",
+                "update_thread_votes",
+                "delete_thread_vote",
+            ],
             make_minimal_cs_thread(
                 {
                     "commentable_id": commentable_id,
@@ -882,7 +938,12 @@ class TeamsPermissionsTestCase(
             ),
         )
 
-        for action in ["un_flag_abuse_for_thread", "flag_abuse_for_thread"]:
+        for action in [
+            "un_flag_abuse_for_thread",
+            "flag_abuse_for_thread",
+            "upvote_thread",
+            "downvote_thread",
+        ]:
             response = self.client.post(
                 reverse(
                     action,
@@ -893,3 +954,87 @@ class TeamsPermissionsTestCase(
                 )
             )
             assert response.status_code == status_code
+
+
+@disable_signal(views, "comment_created")
+@ddt.ddt
+class ForumEventTestCase(
+    ForumsEnableMixin, SharedModuleStoreTestCase, MockForumApiMixin
+):
+    """
+    Forum actions are expected to launch analytics events. Test these here.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClassAndForumMock()
+        # pylint: disable=super-method-not-called
+        with super().setUpClassAndTestData():
+            cls.course = CourseFactory.create()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Stop patches after tests complete."""
+        super().tearDownClass()
+        super().disposeForumMocks()
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        seed_permissions_roles(cls.course.id)
+
+        cls.student = UserFactory.create()
+        CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+        cls.student.roles.add(Role.objects.get(name="Student", course_id=cls.course.id))
+        CourseAccessRoleFactory(
+            course_id=cls.course.id, user=cls.student, role="Wizard"
+        )
+
+    @ddt.data(
+        ("vote_for_thread", "update_thread_votes", "thread_id", "thread"),
+        ("undo_vote_for_thread", "delete_thread_vote", "thread_id", "thread"),
+        ("vote_for_comment", "update_comment_votes", "comment_id", "response"),
+        ("undo_vote_for_comment", "delete_comment_vote", "comment_id", "response"),
+    )
+    @ddt.unpack
+    @patch("eventtracking.tracker.emit")
+    def test_thread_voted_event(
+        self, view_name, function_name, obj_id_name, obj_type, mock_emit
+    ):
+        undo = view_name.startswith("undo")
+        cs_thread = make_minimal_cs_thread(
+            {
+                "commentable_id": "test_commentable_id",
+                "username": "gumprecht",
+            }
+        )
+        cs_comment = make_minimal_cs_comment(
+            {
+                "closed": False,
+                "commentable_id": "test_commentable_id",
+                "username": "gumprecht",
+            }
+        )
+        self.set_mock_return_value("get_thread", cs_thread)
+        self.set_mock_return_value("get_parent_comment", cs_comment)
+        self.set_mock_return_value(
+            function_name, cs_thread if "thread" in view_name else cs_comment
+        )
+
+        request = RequestFactory().post("dummy_url", {})
+        request.user = self.student
+        request.view_name = view_name
+        view_function = getattr(views, view_name)
+        kwargs = dict(course_id=str(self.course.id))
+        kwargs[obj_id_name] = obj_id_name
+        if not undo:
+            kwargs.update(value="up")
+        view_function(request, **kwargs)
+
+        assert mock_emit.called
+        event_name, event = mock_emit.call_args[0]
+        assert event_name == f"edx.forum.{obj_type}.voted"
+        assert event["target_username"] == "gumprecht"
+        assert event["undo_vote"] == undo
+        assert event["vote_value"] == "up"
