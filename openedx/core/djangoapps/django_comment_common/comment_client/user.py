@@ -87,69 +87,42 @@ class User(models.Model):
             )
 
     def vote(self, voteable, value, course_id=None):
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if voteable.type == 'thread':
-            url = _url_for_vote_thread(voteable.id)
+            response = forum_api.update_thread_votes(
+                thread_id=voteable.id,
+                user_id=self.id,
+                value=value,
+                course_id=str(course_key)
+            )
         elif voteable.type == 'comment':
-            url = _url_for_vote_comment(voteable.id)
+            response = forum_api.update_comment_votes(
+                comment_id=voteable.id,
+                user_id=self.id,
+                value=value,
+                course_id=str(course_key)
+            )
         else:
             raise utils.CommentClientRequestError("Can only vote / unvote for threads or comments")
-        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            if voteable.type == 'thread':
-                response = forum_api.update_thread_votes(
-                    thread_id=voteable.id,
-                    user_id=self.id,
-                    value=value,
-                    course_id=str(course_key)
-                )
-            else:
-                response = forum_api.update_comment_votes(
-                    comment_id=voteable.id,
-                    user_id=self.id,
-                    value=value,
-                    course_id=str(course_key)
-                )
-        else:
-            params = {'user_id': self.id, 'value': value}
-            response = utils.perform_request(
-                'put',
-                url,
-                params,
-                metric_action='user.vote',
-                metric_tags=self._metric_tags + [f'target.type:{voteable.type}'],
-            )
         voteable._update_from_response(response)
 
     def unvote(self, voteable, course_id=None):
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
         if voteable.type == 'thread':
-            url = _url_for_vote_thread(voteable.id)
+            response = forum_api.delete_thread_vote(
+                thread_id=voteable.id,
+                user_id=self.id,
+                course_id=str(course_key)
+            )
         elif voteable.type == 'comment':
-            url = _url_for_vote_comment(voteable.id)
+            response = forum_api.delete_comment_vote(
+                comment_id=voteable.id,
+                user_id=self.id,
+                course_id=str(course_key)
+            )
         else:
             raise utils.CommentClientRequestError("Can only vote / unvote for threads or comments")
-        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            if voteable.type == 'thread':
-                response = forum_api.delete_thread_vote(
-                    thread_id=voteable.id,
-                    user_id=self.id,
-                    course_id=str(course_key)
-                )
-            else:
-                response = forum_api.delete_comment_vote(
-                    comment_id=voteable.id,
-                    user_id=self.id,
-                    course_id=str(course_key)
-                )
-        else:
-            params = {'user_id': self.id}
-            response = utils.perform_request(
-                'delete',
-                url,
-                params,
-                metric_action='user.unvote',
-                metric_tags=self._metric_tags + [f'target.type:{voteable.type}'],
-            )
+
         voteable._update_from_response(response)
 
     def active_threads(self, query_params=None):

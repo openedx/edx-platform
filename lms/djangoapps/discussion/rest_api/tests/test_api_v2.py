@@ -433,6 +433,17 @@ class UpdateThreadTest(
         self.register_get_thread_response(cs_data)
         self.register_put_thread_response(cs_data)
 
+    def create_user_with_request(self):
+        """
+        Create a user and an associated request for a specific course enrollment.
+        """
+        user = UserFactory.create()
+        self.register_get_user_response(user)
+        request = RequestFactory().get("/test_path")
+        request.user = user
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+        return user, request
+
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
     @mock.patch("eventtracking.tracker.emit")
@@ -564,6 +575,142 @@ class UpdateThreadTest(
         self.assertEqual(actual_event_name, expected_event_name)
         self.assertEqual(actual_event_data, expected_event_data)
 
+    @ddt.data(*itertools.product([True, False], [True, False]))
+    @ddt.unpack
+    @mock.patch("eventtracking.tracker.emit")
+    def test_voted(self, current_vote_status, new_vote_status, mock_emit):
+        """
+        Test attempts to edit the "voted" field.
+
+        current_vote_status indicates whether the thread should be upvoted at
+        the start of the test. new_vote_status indicates the value for the
+        "voted" field in the update. If current_vote_status and new_vote_status
+        are the same, no update should be made. Otherwise, a vote should be PUT
+        or DELETEd according to the new_vote_status value.
+        """
+        # setup
+        user1, request1 = self.create_user_with_request()
+        if current_vote_status:
+            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
+        self.register_thread_votes_response("test_thread")
+        self.register_thread()
+        data = {"voted": new_vote_status}
+        result = update_thread(request1, "test_thread", data)
+        assert result["voted"] == new_vote_status
+
+        vote_update_func_calls = self.get_mock_func_calls("update_thread_votes")
+        last_function_args = (
+            vote_update_func_calls[-1] if vote_update_func_calls else None
+        )
+
+        if current_vote_status == new_vote_status:
+            assert last_function_args is None
+        else:
+            if vote_update_func_calls:
+                assert last_function_args[1]["value"] == (
+                    "up" if new_vote_status else "down"
+                )
+                params = {
+                    "thread_id": "test_thread",
+                    "value": "up" if new_vote_status else "down",
+                    "user_id": str(user1.id),
+                    "course_id": str(self.course.id),
+                }
+                self.check_mock_called_with("update_thread_votes", -1, **params)
+            else:
+                params = {
+                    "thread_id": "test_thread",
+                    "user_id": str(user1.id),
+                    "course_id": str(self.course.id),
+                }
+                self.check_mock_called_with("delete_thread_vote", -1, **params)
+            event_name, event_data = mock_emit.call_args[0]
+            assert event_name == "edx.forum.thread.voted"
+            assert event_data == {
+                "undo_vote": (not new_vote_status),
+                "url": "",
+                "target_username": self.user.username,
+                "vote_value": "up",
+                "user_forums_roles": [FORUM_ROLE_STUDENT],
+                "user_course_roles": [],
+                "commentable_id": "original_topic",
+                "id": "test_thread",
+            }
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count(self, current_vote_status, first_vote, second_vote):
+        """
+        Tests vote_count increases and decreases correctly from the same user
+        """
+        # setup
+        starting_vote_count = 0
+        user, request = self.create_user_with_request()
+        if current_vote_status:
+            self.register_get_user_response(user, upvoted_ids=["test_thread"])
+            starting_vote_count = 1
+        self.register_thread_votes_response("test_thread")
+        self.register_thread(overrides={"votes": {"up_count": starting_vote_count}})
+
+        # first vote
+        data = {"voted": first_vote}
+        result = update_thread(request, "test_thread", data)
+        self.register_thread(overrides={"voted": first_vote})
+        assert result["vote_count"] == (1 if first_vote else 0)
+
+        # second vote
+        # In the previous tests, where we mocked request objects,
+        # the mocked user API returned a user with upvoted_ids=[]. In our case,
+        # we have used register_get_user_response again to set upvoted_ids to None.
+        data = {"voted": second_vote}
+        self.register_get_user_response(user)
+        self.register_thread(overrides={"voted": False})
+        result = update_thread(request, "test_thread", data)
+        assert result["vote_count"] == (1 if second_vote else 0)
+
+    @ddt.data(
+        *itertools.product([True, False], [True, False], [True, False], [True, False])
+    )
+    @ddt.unpack
+    def test_vote_count_two_users(
+        self, current_user1_vote, current_user2_vote, user1_vote, user2_vote
+    ):
+        """
+        Tests vote_count increases and decreases correctly from different users
+        """
+        # setup
+        user1, request1 = self.create_user_with_request()
+        user2, request2 = self.create_user_with_request()
+
+        vote_count = 0
+        if current_user1_vote:
+            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
+            vote_count += 1
+        if current_user2_vote:
+            self.register_get_user_response(user2, upvoted_ids=["test_thread"])
+            vote_count += 1
+
+        for current_vote, user_vote, request in [
+            (current_user1_vote, user1_vote, request1),
+            (current_user2_vote, user2_vote, request2),
+        ]:
+
+            self.register_thread_votes_response("test_thread")
+            self.register_thread(overrides={"votes": {"up_count": vote_count}})
+
+            data = {"voted": user_vote}
+            result = update_thread(request, "test_thread", data)
+            if current_vote == user_vote:
+                assert result["vote_count"] == vote_count
+            elif user_vote:
+                vote_count += 1
+                assert result["vote_count"] == vote_count
+                self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
+            else:
+                vote_count -= 1
+                assert result["vote_count"] == vote_count
+                self.register_get_user_response(self.user, upvoted_ids=[])
+
 
 @ddt.ddt
 @disable_signal(api, "comment_edited")
@@ -635,6 +782,17 @@ class UpdateCommentTest(
         cs_comment_data.update(overrides or {})
         self.register_get_comment_response(cs_comment_data)
         self.register_put_comment_response(cs_comment_data)
+
+    def create_user_with_request(self):
+        """
+        Create a user and an associated request for a specific course enrollment.
+        """
+        user = UserFactory.create()
+        self.register_get_user_response(user)
+        request = RequestFactory().get("/test_path")
+        request.user = user
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+        return user, request
 
     @ddt.data(*itertools.product([True, False], [True, False]))
     @ddt.unpack
@@ -756,3 +914,143 @@ class UpdateCommentTest(
         actual_event_name, actual_event_data = mock_emit.call_args[0]
         self.assertEqual(actual_event_name, expected_event_name)
         self.assertEqual(actual_event_data, expected_event_data)
+
+    @ddt.data(*itertools.product([True, False], [True, False]))
+    @ddt.unpack
+    @mock.patch("eventtracking.tracker.emit")
+    def test_voted(self, current_vote_status, new_vote_status, mock_emit):
+        """
+        Test attempts to edit the "voted" field.
+
+        current_vote_status indicates whether the comment should be upvoted at
+        the start of the test. new_vote_status indicates the value for the
+        "voted" field in the update. If current_vote_status and new_vote_status
+        are the same, no update should be made. Otherwise, a vote should be PUT
+        or DELETEd according to the new_vote_status value.
+        """
+        vote_count = 0
+        user1, request1 = self.create_user_with_request()
+        if current_vote_status:
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
+            vote_count = 1
+        self.register_comment_votes_response("test_comment")
+        self.register_comment(overrides={"votes": {"up_count": vote_count}})
+        data = {"voted": new_vote_status}
+        result = update_comment(request1, "test_comment", data)
+        assert result["vote_count"] == (1 if new_vote_status else 0)
+        assert result["voted"] == new_vote_status
+        vote_update_func_calls = self.get_mock_func_calls("update_comment_votes")
+        last_function_args = (
+            vote_update_func_calls[-1] if vote_update_func_calls else None
+        )
+        if current_vote_status == new_vote_status:
+            assert last_function_args is None
+        else:
+
+            if vote_update_func_calls:
+                assert last_function_args[1]["value"] == (
+                    "up" if new_vote_status else "down"
+                )
+                params = {
+                    "comment_id": "test_comment",
+                    "value": "up" if new_vote_status else "down",
+                    "user_id": str(user1.id),
+                    "course_id": str(self.course.id),
+                }
+                self.check_mock_called_with("update_comment_votes", -1, **params)
+            else:
+                params = {
+                    "comment_id": "test_comment",
+                    "user_id": str(user1.id),
+                    "course_id": str(self.course.id),
+                }
+                self.check_mock_called_with("delete_comment_vote", -1, **params)
+
+            event_name, event_data = mock_emit.call_args[0]
+            assert event_name == "edx.forum.response.voted"
+
+            assert event_data == {
+                "undo_vote": (not new_vote_status),
+                "url": "",
+                "target_username": self.user.username,
+                "vote_value": "up",
+                "user_forums_roles": [FORUM_ROLE_STUDENT],
+                "user_course_roles": [],
+                "commentable_id": "dummy",
+                "id": "test_comment",
+            }
+
+    @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
+    @ddt.unpack
+    def test_vote_count(self, current_vote_status, first_vote, second_vote):
+        """
+        Tests vote_count increases and decreases correctly from the same user
+        """
+        # setup
+        starting_vote_count = 0
+        user1, request1 = self.create_user_with_request()
+        if current_vote_status:
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
+            starting_vote_count = 1
+        self.register_comment_votes_response("test_comment")
+        self.register_comment(overrides={"votes": {"up_count": starting_vote_count}})
+
+        # first vote
+        data = {"voted": first_vote}
+        result = update_comment(request1, "test_comment", data)
+        self.register_comment(overrides={"voted": first_vote})
+        assert result["vote_count"] == (1 if first_vote else 0)
+
+        # second vote
+        # In the previous tests, where we mocked request objects,
+        # the mocked user API returned a user with upvoted_ids=[]. In our case,
+        # we have used register_get_user_response again to set upvoted_ids to None.
+        data = {"voted": second_vote}
+        self.register_get_user_response(user1)
+        result = update_comment(request1, "test_comment", data)
+        assert result["vote_count"] == (1 if second_vote else 0)
+
+    # TODO: Refactor test logic to avoid complex conditionals and in-test logic.
+    # Aim for simpler, more explicit test cases, even if it means more code,
+    # to reduce the risk of introducing logic bugs within the tests themselves.
+    @ddt.data(
+        *itertools.product([True, False], [True, False], [True, False], [True, False])
+    )
+    @ddt.unpack
+    def test_vote_count_two_users(
+        self, current_user1_vote, current_user2_vote, user1_vote, user2_vote
+    ):
+        """
+        Tests vote_count increases and decreases correctly from different users
+        """
+        user1, request1 = self.create_user_with_request()
+        user2, request2 = self.create_user_with_request()
+
+        vote_count = 0
+        if current_user1_vote:
+            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
+            vote_count += 1
+        if current_user2_vote:
+            self.register_get_user_response(user2, upvoted_ids=["test_comment"])
+            vote_count += 1
+
+        for current_vote, user_vote, request in [
+            (current_user1_vote, user1_vote, request1),
+            (current_user2_vote, user2_vote, request2),
+        ]:
+
+            self.register_comment_votes_response("test_comment")
+            self.register_comment(overrides={"votes": {"up_count": vote_count}})
+
+            data = {"voted": user_vote}
+            result = update_comment(request, "test_comment", data)
+            if current_vote == user_vote:
+                assert result["vote_count"] == vote_count
+            elif user_vote:
+                vote_count += 1
+                assert result["vote_count"] == vote_count
+                self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+            else:
+                vote_count -= 1
+                assert result["vote_count"] == vote_count
+                self.register_get_user_response(self.user, upvoted_ids=[])

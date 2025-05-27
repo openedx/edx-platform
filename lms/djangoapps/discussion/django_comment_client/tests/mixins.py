@@ -8,6 +8,8 @@ from unittest import mock
 class MockForumApiMixin:
     """Mixin to mock forum_api across different test cases with a single mock instance."""
 
+    users_map = {}
+
     @classmethod
     def setUpClassAndForumMock(cls):
         """
