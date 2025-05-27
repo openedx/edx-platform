@@ -73,7 +73,7 @@ from opaque_keys.edx.locator import (
     LocalId,
 )
 from path import Path as path
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.core import XBlock
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict, Scope
 
@@ -482,7 +482,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         new_structure['_id'] = ObjectId()
         new_structure['previous_version'] = structure['_id']
         new_structure['edited_by'] = user_id
-        new_structure['edited_on'] = datetime.datetime.now(UTC)
+        new_structure['edited_on'] = datetime.datetime.now(ZoneInfo("UTC"))
         new_structure['schema_version'] = self.SCHEMA_VERSION
 
         # If we're in a bulk write, update the structure used there, and mark it as dirty
@@ -500,7 +500,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         original_usage = block_data.edit_info.original_usage
         original_usage_version = block_data.edit_info.original_usage_version
-        block_data.edit_info.edited_on = datetime.datetime.now(UTC)
+        block_data.edit_info.edited_on = datetime.datetime.now(ZoneInfo("UTC"))
         block_data.edit_info.edited_by = user_id
         block_data.edit_info.previous_version = block_data.edit_info.update_version
         block_data.edit_info.update_version = update_version
@@ -1503,7 +1503,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             "fields": new_def_data,
             "edit_info": {
                 "edited_by": user_id,
-                "edited_on": datetime.datetime.now(UTC),
+                "edited_on": datetime.datetime.now(ZoneInfo("UTC")),
                 "previous_version": None,
                 "original_version": new_id,
             },
@@ -1551,7 +1551,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         new_definition['_id'] = ObjectId()
         new_definition['fields'] = new_def_data
         new_definition['edit_info']['edited_by'] = user_id
-        new_definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+        new_definition['edit_info']['edited_on'] = datetime.datetime.now(ZoneInfo("UTC"))
         # previous version id
         new_definition['edit_info']['previous_version'] = old_definition['_id']
         new_definition['schema_version'] = self.SCHEMA_VERSION
@@ -1890,7 +1890,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 new_fields.update(definition_fields)
                 definition_id = self._update_definition_from_data(locator, old_def, new_fields, user_id).definition_id
                 root_block.definition = definition_id
-                root_block.edit_info.edited_on = datetime.datetime.now(UTC)
+                root_block.edit_info.edited_on = datetime.datetime.now(ZoneInfo("UTC"))
                 root_block.edit_info.edited_by = user_id
                 root_block.edit_info.previous_version = root_block.edit_info.update_version
                 root_block.edit_info.update_version = new_id
@@ -1910,7 +1910,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 'course': get_library_or_course_attribute(locator),
                 'run': locator.run,
                 'edited_by': user_id,
-                'edited_on': datetime.datetime.now(UTC),
+                'edited_on': datetime.datetime.now(ZoneInfo("UTC")),
                 'versions': versions_dict,
                 'schema_version': self.SCHEMA_VERSION,
                 'search_targets': search_targets or {},
@@ -2418,7 +2418,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             dest_info.edit_info.previous_version = dest_info.edit_info.update_version
             dest_info.edit_info.update_version = old_dest_structure_version
             dest_info.edit_info.edited_by = user_id
-            dest_info.edit_info.edited_on = datetime.datetime.now(UTC)
+            dest_info.edit_info.edited_on = datetime.datetime.now(ZoneInfo("UTC"))
 
             orphans = orig_descendants - new_descendants
             for orphan in orphans:
@@ -2487,7 +2487,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # from draft to published as part of publishing workflow.
             # Setting it to the source_block_info structure version here breaks split_draft's has_changes() method.
             new_block_info.edit_info.edited_by = user_id
-            new_block_info.edit_info.edited_on = datetime.datetime.now(UTC)
+            new_block_info.edit_info.edited_on = datetime.datetime.now(ZoneInfo("UTC"))
             new_block_info.edit_info.original_usage = str(usage_key.replace(branch=None, version_guid=None))
             new_block_info.edit_info.original_usage_version = source_block_info.edit_info.update_version
             dest_structure['blocks'][new_block_key] = new_block_info
@@ -2545,7 +2545,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             for parent_block_key in parent_block_keys:
                 parent_block = new_blocks[parent_block_key]
                 parent_block.fields['children'].remove(block_key)
-                parent_block.edit_info.edited_on = datetime.datetime.now(UTC)
+                parent_block.edit_info.edited_on = datetime.datetime.now(ZoneInfo("UTC"))
                 parent_block.edit_info.edited_by = user_id
                 parent_block.edit_info.previous_version = parent_block.edit_info.update_version
                 parent_block.edit_info.update_version = new_id
@@ -3060,7 +3060,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'previous_version': None,
             'original_version': new_id,
             'edited_by': user_id,
-            'edited_on': datetime.datetime.now(UTC),
+            'edited_on': datetime.datetime.now(ZoneInfo("UTC")),
             'blocks': blocks,
             'schema_version': self.SCHEMA_VERSION,
         }
@@ -3126,7 +3126,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             destination_block.edit_info.previous_version = previous_version
             destination_block.edit_info.update_version = destination_version
             destination_block.edit_info.edited_by = user_id
-            destination_block.edit_info.edited_on = datetime.datetime.now(UTC)
+            destination_block.edit_info.edited_on = datetime.datetime.now(ZoneInfo("UTC"))
         else:
             destination_block = self._new_block(
                 user_id, new_block.block_type,
@@ -3200,7 +3200,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'fields': block_fields,
             'asides': asides,
             'edit_info': {
-                'edited_on': datetime.datetime.now(UTC),
+                'edited_on': datetime.datetime.now(ZoneInfo("UTC")),
                 'edited_by': user_id,
                 'previous_version': None,
                 'update_version': new_id

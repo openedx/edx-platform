@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 
 from django.core.management.base import BaseCommand, CommandError
-from pytz import utc
+from zoneinfo import ZoneInfo
 from submissions.models import Submission
 
 from common.djangoapps.student.models import user_by_anonymous_id
@@ -55,8 +55,8 @@ class Command(BaseCommand):
         if 'modified_end' not in options:
             raise CommandError('modified_end must be provided.')
 
-        modified_start = utc.localize(datetime.strptime(options['modified_start'], DATE_FORMAT))
-        modified_end = utc.localize(datetime.strptime(options['modified_end'], DATE_FORMAT))
+        modified_start = datetime.strptime(options['modified_start'], DATE_FORMAT).replace(tzinfo=ZoneInfo("UTC"))
+        modified_end = datetime.strptime(options['modified_end'], DATE_FORMAT).replace(tzinfo=ZoneInfo("UTC"))
         event_transaction_id = create_new_event_transaction_id()
         set_event_transaction_type(PROBLEM_SUBMITTED_EVENT_TYPE)
         kwargs = {'modified__range': (modified_start, modified_end), 'module_type': 'problem'}

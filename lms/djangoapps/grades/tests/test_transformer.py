@@ -8,7 +8,7 @@ import random
 from copy import deepcopy
 
 import ddt
-import pytz
+from zoneinfo import ZoneInfo
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls_range
@@ -35,7 +35,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     problem_metadata = {
         'graded': True,
         'weight': 1,
-        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=ZoneInfo("UTC")),
     }
 
     def setUp(self):
@@ -280,7 +280,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         problem_metadata = {
             'graded': True,
             'weight': 1,
-            'due': datetime.datetime(2016, 10, 16, 0, 4, 0, tzinfo=pytz.utc),
+            'due': datetime.datetime(2016, 10, 16, 0, 4, 0, tzinfo=ZoneInfo("UTC")),
             'visible_to_staff_only': True,
         }
 
@@ -449,7 +449,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                     'metadata': {
                         'graded': True,
                         'weight': 1,
-                        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+                        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=ZoneInfo("UTC")),
                     },
                     '#type': 'problem',
                     '#ref': f'problem_{problem_number}',

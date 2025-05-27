@@ -18,7 +18,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
+from zoneinfo import ZoneInfo
 from xblock.core import XBlock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, check_sum_of_calls
@@ -117,7 +117,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
 
         self.course = CourseFactory.create(
             graded=True,
-            start=datetime.now(UTC),
+            start=datetime.now(ZoneInfo("UTC")),
             grading_policy=grading_policy,
             enable_ccx=enable_ccx,
         )

@@ -2,6 +2,7 @@
 Test CMS's upstream->downstream syncing system
 """
 import datetime
+from zoneinfo import ZoneInfo
 
 import ddt
 from organizations.api import ensure_organization
@@ -291,7 +292,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         # Modifing downstream-only fields are "safe" customizations
         downstream.display_name = "Downstream Title Override"
         downstream.attempts_before_showanswer_button = 2
-        downstream.due = datetime.datetime(2025, 2, 2, tzinfo=utc)
+        downstream.due = datetime.datetime(2025, 2, 2, tzinfo=ZoneInfo('UTC'))
         downstream.force_save_button = True
         downstream.graceperiod = '2d'
         downstream.grading_method = 'last_score'
