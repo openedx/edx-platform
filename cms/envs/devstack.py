@@ -180,6 +180,12 @@ COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 
+################### FRONTEND APPLICATION ACCOUNT ###################
+ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
+
+################### FRONTEND APPLICATION LEARNING ###################
+LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
+
 ################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = None
 

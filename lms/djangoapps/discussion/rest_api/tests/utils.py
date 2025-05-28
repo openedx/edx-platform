@@ -147,6 +147,16 @@ def make_comment_callback(comment_data, thread_id, parent_id):
     return callback
 
 
+def make_user_callbacks(user_map):
+    """
+    Returns a callable that mimics user creation.
+    """
+    def callback(*args, **kwargs):
+        user_id = args[0] if args else kwargs.get('user_id')
+        return user_map[str(user_id)]
+    return callback
+
+
 class CommentsServiceMockMixin:
     """Mixin with utility methods for mocking the comments service"""
 
@@ -650,11 +660,13 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         self.set_mock_return_value('get_parent_comment', comment)
 
     def register_get_user_response(self, user, subscribed_thread_ids=None, upvoted_ids=None):
-        self.set_mock_return_value('get_user', {
+        """Register a mock response for GET on the CS user endpoint"""
+        self.users_map[str(user.id)] = {
             "id": str(user.id),
             "subscribed_thread_ids": subscribed_thread_ids or [],
             "upvoted_ids": upvoted_ids or [],
-        })
+        }
+        self.set_mock_side_effect('get_user', make_user_callbacks(self.users_map))
 
     def register_get_user_retire_response(self, user, body=""):
         self.set_mock_return_value('retire_user', body)

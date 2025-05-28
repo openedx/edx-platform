@@ -58,7 +58,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
                 "can_stand_alone": True,
             })
 
-            children = self._get_container_components(paste_data["id"])
+            children = self._get_container_children(paste_data["id"])
             assert len(children) == 4
 
             self.assertDictContainsEntries(children[0], {"display_name": "default", "block_type": "video"})

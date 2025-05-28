@@ -515,7 +515,7 @@ edx-django-release-util==1.5.0
     #   edxval
 edx-django-sites-extensions==5.1.0
     # via -r requirements/edx/base.txt
-edx-django-utils==7.4.0
+edx-django-utils==8.0.0
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -544,7 +544,7 @@ edx-drf-extensions==10.6.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==6.0.2
+edx-enterprise==6.0.3
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -869,9 +869,8 @@ mako==1.3.10
     #   lti-consumer-xblock
     #   xblock
     #   xblock-utils
-markdown==3.3.7
+markdown==3.8
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   openedx-django-wiki
     #   staff-graded-xblock
@@ -921,10 +920,6 @@ mysqlclient==2.2.7
     # via
     #   -r requirements/edx/base.txt
     #   openedx-forum
-newrelic==10.12.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   edx-django-utils
 nh3==0.2.21
     # via -r requirements/edx/base.txt
 nltk==3.9.1
