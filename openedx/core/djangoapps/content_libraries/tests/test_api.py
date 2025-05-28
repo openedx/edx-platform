@@ -953,6 +953,76 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest):
             event_reciver.call_args_list[0].kwargs,
         )
 
+    def test_call_object_changed_signal_when_remove_unit(self) -> None:
+        unit4 = api.create_container(self.lib1.library_key, api.ContainerType.Unit, 'unit-4', 'Unit 4', None)
+
+        api.update_container_children(
+            self.subsection2.container_key,
+            [unit4.container_key],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+        )
+
+        event_reciver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
+        api.update_container_children(
+            self.subsection2.container_key,
+            [unit4.container_key],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
+        )
+
+        assert event_reciver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(unit4.container_key),
+                    changes=["subsections"],
+                ),
+            },
+            event_reciver.call_args_list[0].kwargs,
+        )
+
+    def test_call_object_changed_signal_when_remove_subsection(self) -> None:
+        subsection3 = api.create_container(
+            self.lib1.library_key,
+            api.ContainerType.Subsection,
+            'subsection-3',
+            'Subsection 3',
+            None,
+        )
+
+        api.update_container_children(
+            self.section2.container_key,
+            [subsection3.container_key],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+        )
+
+        event_reciver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
+        api.update_container_children(
+            self.section2.container_key,
+            [subsection3.container_key],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.REMOVE,
+        )
+
+        assert event_reciver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(subsection3.container_key),
+                    changes=["sections"],
+                ),
+            },
+            event_reciver.call_args_list[0].kwargs,
+        )
+
     def test_call_object_changed_signal_when_add_component(self) -> None:
         event_reciver = mock.Mock()
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
@@ -992,6 +1062,91 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest):
                 "content_object": ContentObjectChangedData(
                     object_id=html_block_2["id"],
                     changes=["units"],
+                ),
+            },
+            event_reciver.call_args_list[1].kwargs,
+        )
+
+    def test_call_object_changed_signal_when_add_unit(self) -> None:
+        event_reciver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
+
+        unit4 = api.create_container(self.lib1.library_key, api.ContainerType.Unit, 'unit-4', 'Unit 4', None)
+        unit5 = api.create_container(self.lib1.library_key, api.ContainerType.Unit, 'unit-5', 'Unit 5', None)
+
+        api.update_container_children(
+            self.subsection2.container_key,
+            [unit4.container_key, unit5.container_key],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+        )
+        assert event_reciver.call_count == 2
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(unit4.container_key),
+                    changes=["subsections"],
+                ),
+            },
+            event_reciver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(unit5.container_key),
+                    changes=["subsections"],
+                ),
+            },
+            event_reciver.call_args_list[1].kwargs,
+        )
+
+    def test_call_object_changed_signal_when_add_subsection(self) -> None:
+        event_reciver = mock.Mock()
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.connect(event_reciver)
+
+        subsection3 = api.create_container(
+            self.lib1.library_key,
+            api.ContainerType.Subsection,
+            'subsection-3',
+            'Subsection 3',
+            None,
+        )
+        subsection4 = api.create_container(
+            self.lib1.library_key,
+            api.ContainerType.Subsection,
+            'subsection-4',
+            'Subsection 4',
+            None,
+        )
+        api.update_container_children(
+            self.section2.container_key,
+            [subsection3.container_key, subsection4.container_key],
+            None,
+            entities_action=authoring_api.ChildrenEntitiesAction.APPEND,
+        )
+        assert event_reciver.call_count == 2
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(subsection3.container_key),
+                    changes=["sections"],
+                ),
+            },
+            event_reciver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
+                "sender": None,
+                "content_object": ContentObjectChangedData(
+                    object_id=str(subsection4.container_key),
+                    changes=["sections"],
                 ),
             },
             event_reciver.call_args_list[1].kwargs,

@@ -513,7 +513,13 @@ def update_container_children(
                 entities_action=entities_action,
             )
 
-            # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for subsections
+            for key in children_ids:
+                CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                    content_object=ContentObjectChangedData(
+                        object_id=str(key),
+                        changes=["subsections"],
+                    ),
+                )
         case ContainerType.Section:
             subsections = [_get_container_from_key(key).subsection for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_section_version(
@@ -524,7 +530,13 @@ def update_container_children(
                 entities_action=entities_action,
             )
 
-            # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for sections
+            for key in children_ids:
+                CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                    content_object=ContentObjectChangedData(
+                        object_id=str(key),
+                        changes=["sections"],
+                    ),
+                )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 

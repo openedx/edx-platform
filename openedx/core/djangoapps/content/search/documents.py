@@ -418,7 +418,7 @@ def _containers_for_content_object(object_id: OpaqueKey, container_type: str) ->
     containers = None
     try:
         if isinstance(object_id, OpaqueKey):
-            containers = lib_api.get_containers_contains_component(object_id)
+            containers = lib_api.get_containers_contains_item(object_id)
         else:
             log.warning(f"Unexpected key type for {object_id}")
 
