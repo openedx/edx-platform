@@ -10,7 +10,6 @@ import logging
 from uuid import uuid4
 
 from django.utils.text import slugify
-from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
@@ -505,18 +504,7 @@ def update_container_children(
                     ),
                 )
         case ContainerType.Subsection:
-            units = []
-            for key in children_ids:
-                # Verify that all children are units
-                if (
-                    not isinstance(key, LibraryContainerLocator)
-                    or not key.container_type == ContainerType.Unit.value
-                ):
-                    raise ValueError(
-                        f"Invalid children type: {key}. All Subsection children must be Units",
-                    )
-                units.append(_get_container_from_key(key).unit)
-
+            units = [_get_container_from_key(key).unit for key in children_ids]
             new_version = authoring_api.create_next_subsection_version(
                 container.subsection,
                 units=units,  # type: ignore[arg-type]
@@ -527,18 +515,7 @@ def update_container_children(
 
             # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for subsections
         case ContainerType.Section:
-            subsections = []
-            for key in children_ids:
-                # Verify that all children are subsections
-                if (
-                    not isinstance(key, LibraryContainerLocator)
-                    or not key.container_type == ContainerType.Subsection.value
-                ):
-                    raise ValueError(
-                        f"Invalid children type: {key}. All Section children must be Subsections",
-                    )
-                subsections.append(_get_container_from_key(key).subsection)
-
+            subsections = [_get_container_from_key(key).subsection for key in children_ids]
             new_version = authoring_api.create_next_section_version(
                 container.section,
                 subsections=subsections,  # type: ignore[arg-type]
