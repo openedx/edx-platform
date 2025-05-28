@@ -38,7 +38,7 @@
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
                 'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie',
-                'updateGoogleDisclaimer', 'toggleGoogleDisclaimer'
+                'updateGoogleDisclaimer', 'toggleGoogleDisclaimer', 'updateProblematicCaptionsContent'
             );
 
             this.state = state;
@@ -507,7 +507,7 @@
                 var self = this,
                     state = this.state,
                     aiGeneratedSpan = captions.find(caption => caption.includes(aIGeneratedSpanText)),
-                    captionsAIGenerated = !(aiGeneratedSpan === undefined);
+                    captionsAIGenerated = !(aiGeneratedSpan === undefined),
                     aiCaptionProviderIsGoogle = true;
 
                 if (captionsAIGenerated) {
@@ -538,6 +538,21 @@
                 } else {
                     state.el.find('.google-disclaimer').hide();
                 }
+            },
+
+            /**
+            * @desc Replaces content in a caption
+            *
+            * @param {array} captions List of captions for the video.
+            * @param {string} content content to be replaced
+            * @param {string} replacementContent the replace string
+            *
+            * @returns {array} captions List of captions for the video.
+            */
+            updateProblematicCaptionsContent: function(captions, content = '', replacementContent = '') {
+                var updatedCaptions = captions.map(caption => caption.replace(content, replacementContent));
+
+                return updatedCaptions;
             },
 
             /**
@@ -594,8 +609,12 @@
                         results = self.getBoundedCaptions();
                         start = results.start;
                         captions = results.captions;
+                        var contentToReplace = CAPTIONS_CONTENT_TO_REPLACE,
+                            replacementContent = CAPTIONS_CONTENT_REPLACEMENT;
 
-                        self.renderGoogleDisclaimer(captions);
+                        captions = self.updateProblematicCaptionsContent(captions, contentToReplace, replacementContent);
+
+                        self.updateGoogleDisclaimer(captions);
 
                         if (self.loaded) {
                             if (self.rendered) {
