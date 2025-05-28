@@ -339,14 +339,6 @@ class UsageKeyV2Serializer(serializers.BaseSerializer):
             raise ValidationError from err
 
 
-class ContentLibraryComponentKeysSerializer(serializers.Serializer):
-    """
-    Serializer for adding/removing Components to/from a Collection.
-    """
-
-    usage_keys = serializers.ListField(child=UsageKeyV2Serializer(), allow_empty=False)
-
-
 class OpaqueKeySerializer(serializers.BaseSerializer):
     """
     Serializes a OpaqueKey with the correct class.
@@ -370,6 +362,14 @@ class OpaqueKeySerializer(serializers.BaseSerializer):
                 return LibraryContainerLocator.from_string(value)
             except InvalidKeyError as err:
                 raise ValidationError from err
+
+
+class ContentLibraryItemContainerKeysSerializer(serializers.Serializer):
+    """
+    Serializer for adding/removing items to/from a Container.
+    """
+
+    usage_keys = serializers.ListField(child=OpaqueKeySerializer(), allow_empty=False)
 
 
 class ContentLibraryItemKeysSerializer(serializers.Serializer):

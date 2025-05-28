@@ -38,7 +38,7 @@ URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specifie
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
 URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
-URL_LIB_CONTAINER_COMPONENTS = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
+URL_LIB_CONTAINER_CHILDREN = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
 URL_LIB_CONTAINER_RESTORE = URL_LIB_CONTAINER + 'restore/'  # Restore a deleted container
 URL_LIB_CONTAINER_COLLECTIONS = URL_LIB_CONTAINER + 'collections/'  # Handle associated collections
 URL_LIB_CONTAINER_PUBLISH = URL_LIB_CONTAINER + 'publish/'  # Publish changes to the specified container + children
@@ -396,25 +396,25 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Restore a deleted a container (unit etc.) """
         return self._api('post', URL_LIB_CONTAINER_RESTORE.format(container_key=container_key), None, expect_response)
 
-    def _get_container_components(self, container_key: ContainerKey | str, expect_response=200):
-        """ Get container components"""
+    def _get_container_children(self, container_key: ContainerKey | str, expect_response=200):
+        """ Get container children"""
         return self._api(
             'get',
-            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
             None,
             expect_response
         )
 
-    def _add_container_components(
+    def _add_container_children(
         self,
         container_key: ContainerKey | str,
         children_ids: list[str],
         expect_response=200,
     ):
-        """ Add container components"""
+        """ Add container children"""
         return self._api(
             'post',
-            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
             {'usage_keys': children_ids},
             expect_response
         )
@@ -428,7 +428,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Remove container components"""
         return self._api(
             'delete',
-            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
             {'usage_keys': children_ids},
             expect_response
         )
@@ -442,7 +442,7 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Update container components"""
         return self._api(
             'patch',
-            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
             {'usage_keys': children_ids},
             expect_response
         )

@@ -44,7 +44,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             '<html display_name="Text Content">This is the HTML.</html>'
         )
         self.upstream_unit = self._create_container(lib_id, "unit", slug="u1", display_name="Unit 1 Title")
-        self._add_container_components(self.upstream_unit["id"], [
+        self._add_container_children(self.upstream_unit["id"], [
             self.upstream_html1["id"],
             self.upstream_problem1["id"],
             self.upstream_problem2["id"],
@@ -362,7 +362,7 @@ class CourseToLibraryTestCase(ContentLibrariesRestApiTest, ModuleStoreTestCase):
             upstream_problem3["id"],
             '<problem display_name="Problem 3 Display Name" max_attempts="22">single select...</problem>'
         )
-        self._add_container_components(self.upstream_unit["id"], [upstream_problem3["id"]])
+        self._add_container_children(self.upstream_unit["id"], [upstream_problem3["id"]])
         self._remove_container_components(self.upstream_unit["id"], [self.upstream_problem2["id"]])
         self._commit_library_changes(self.library["id"])  # publish everything
 

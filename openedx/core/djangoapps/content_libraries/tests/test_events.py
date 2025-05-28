@@ -308,8 +308,8 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest):
         problem_block = self._add_block_to_library(self.lib1_key, "problem", "Problem1", can_stand_alone=False)
         html_block = self._add_block_to_library(self.lib1_key, "html", "Html1", can_stand_alone=False)
         html_block2 = self._add_block_to_library(self.lib1_key, "html", "Html2", can_stand_alone=False)
-        self._add_container_components(container1["id"], children_ids=[problem_block["id"], html_block["id"]])
-        self._add_container_components(container2["id"], children_ids=[html_block["id"], html_block2["id"]])
+        self._add_container_children(container1["id"], children_ids=[problem_block["id"], html_block["id"]])
+        self._add_container_children(container2["id"], children_ids=[html_block["id"], html_block2["id"]])
 
         # Now publish only Container 2 (which will auto-publish both HTML blocks since they're children)
         self._publish_container(container2["id"])
@@ -351,7 +351,7 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest):
         # Create a container and a block
         container1 = self._create_container(self.lib1_key, "unit", display_name="Alpha Unit", slug=None)
         problem_block = self._add_block_to_library(self.lib1_key, "problem", "Problem1", can_stand_alone=False)
-        self._add_container_components(container1["id"], children_ids=[problem_block["id"]])
+        self._add_container_children(container1["id"], children_ids=[problem_block["id"]])
         # Publish all changes
         self._commit_library_changes(self.lib1_key)
         assert self._get_container(container1["id"])["has_unpublished_changes"] is False
@@ -396,8 +396,8 @@ class ContentLibrariesEventsTestCase(ContentLibrariesRestApiTest):
         problem_block = self._add_block_to_library(self.lib1_key, "problem", "Problem1", can_stand_alone=False)
         html_block = self._add_block_to_library(self.lib1_key, "html", "Html1", can_stand_alone=False)
         html_block2 = self._add_block_to_library(self.lib1_key, "html", "Html2", can_stand_alone=False)
-        self._add_container_components(container1["id"], children_ids=[problem_block["id"], html_block["id"]])
-        self._add_container_components(container2["id"], children_ids=[html_block["id"], html_block2["id"]])
+        self._add_container_children(container1["id"], children_ids=[problem_block["id"], html_block["id"]])
+        self._add_container_children(container2["id"], children_ids=[html_block["id"], html_block2["id"]])
         # At first everything is unpublished:
         c1_before = self._get_container(container1["id"])
         assert c1_before["has_unpublished_changes"]

@@ -10,7 +10,6 @@ import logging
 from uuid import uuid4
 
 from django.utils.text import slugify
-from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
@@ -25,7 +24,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Container
+from openedx_learning.api.authoring_models import Container, ContainerVersion
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
@@ -159,11 +158,15 @@ def library_container_locator(
 ) -> LibraryContainerLocator:
     """
     Returns a LibraryContainerLocator for the given library + container.
-
-    Currently only supports Unit-type containers; will support other container types in future.
     """
-    assert container.unit is not None
-    container_type = ContainerType.Unit
+    if hasattr(container, 'unit'):
+        container_type = ContainerType.Unit
+    elif hasattr(container, 'subsection'):
+        container_type = ContainerType.Subsection
+    elif hasattr(container, 'section'):
+        container_type = ContainerType.Section
+
+    assert container_type is not None
 
     return LibraryContainerLocator(
         library_key,
@@ -225,7 +228,7 @@ def create_container(
     created: datetime | None = None,
 ) -> ContainerMetadata:
     """
-    Create a container (e.g. a Unit) in the specified content library.
+    Create a container (a Section, Subsection, or Unit) in the specified content library.
 
     It will initially be empty.
     """
@@ -241,6 +244,13 @@ def create_container(
         container_type=container_type.value,
         container_id=slug,
     )
+
+    if not created:
+        created = datetime.now(tz=timezone.utc)
+
+    container: Container
+    _initial_version: ContainerVersion
+
     # Then try creating the actual container:
     match container_type:
         case ContainerType.Unit:
@@ -248,11 +258,27 @@ def create_container(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
-                created=created or datetime.now(tz=timezone.utc),
+                created=created,
+                created_by=user_id,
+            )
+        case ContainerType.Subsection:
+            container, _initial_version = authoring_api.create_subsection_and_version(
+                content_library.learning_package_id,
+                key=slug,
+                title=title,
+                created=created,
+                created_by=user_id,
+            )
+        case ContainerType.Section:
+            container, _initial_version = authoring_api.create_section_and_version(
+                content_library.learning_package_id,
+                key=slug,
+                title=title,
+                created=created,
                 created_by=user_id,
             )
         case _:
-            raise NotImplementedError(f"Library support for {container_type} is in progress")
+            raise NotImplementedError(f"Library does not support {container_type} yet")
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
@@ -269,18 +295,40 @@ def update_container(
     user_id: int | None,
 ) -> ContainerMetadata:
     """
-    Update a container (e.g. a Unit) title.
+    Update a container (a Section, Subsection, or Unit) title.
     """
     container = _get_container_from_key(container_key)
     library_key = container_key.lib_key
+    created = datetime.now(tz=timezone.utc)
 
-    assert container.unit
-    unit_version = authoring_api.create_next_unit_version(
-        container.unit,
-        title=display_name,
-        created=datetime.now(tz=timezone.utc),
-        created_by=user_id,
-    )
+    container_type = ContainerType(container_key.container_type)
+
+    version: ContainerVersion
+
+    match container_type:
+        case ContainerType.Unit:
+            version = authoring_api.create_next_unit_version(
+                container.unit,
+                title=display_name,
+                created=created,
+                created_by=user_id,
+            )
+        case ContainerType.Subsection:
+            version = authoring_api.create_next_subsection_version(
+                container.subsection,
+                title=display_name,
+                created=created,
+                created_by=user_id,
+            )
+        case ContainerType.Section:
+            version = authoring_api.create_next_section_version(
+                container.section,
+                title=display_name,
+                created=created,
+                created_by=user_id,
+            )
+        case _:
+            raise NotImplementedError(f"Library does not support {container_type} yet")
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
@@ -288,14 +336,14 @@ def update_container(
         )
     )
 
-    return ContainerMetadata.from_container(library_key, unit_version.container)
+    return ContainerMetadata.from_container(library_key, version.container)
 
 
 def delete_container(
     container_key: LibraryContainerLocator,
 ) -> None:
     """
-    Delete a container (e.g. a Unit) (soft delete).
+    Delete a container (a Section, Subsection, or Unit) (soft delete).
 
     No-op if container doesn't exist or has already been soft-deleted.
     """
@@ -379,21 +427,37 @@ def get_container_children(
     published=False,
 ) -> list[LibraryXBlockMetadata | ContainerMetadata]:
     """
-    Get the entities contained in the given container (e.g. the components/xblocks in a unit)
+    Get the entities contained in the given container
+    (e.g. the components/xblocks in a unit, units in a subsection, subsections in a section)
     """
     container = _get_container_from_key(container_key)
-    if container_key.container_type == ContainerType.Unit.value:
-        child_components = authoring_api.get_components_in_unit(container.unit, published=published)
-        return [LibraryXBlockMetadata.from_component(
-            container_key.lib_key,
-            entry.component
-        ) for entry in child_components]
-    else:
-        child_entities = authoring_api.get_entities_in_container(container, published=published)
-        return [ContainerMetadata.from_container(
-            container_key.lib_key,
-            entry.entity
-        ) for entry in child_entities]
+    container_type = ContainerType(container_key.container_type)
+
+    match container_type:
+        case ContainerType.Unit:
+            child_components = authoring_api.get_components_in_unit(container.unit, published=published)
+            return [LibraryXBlockMetadata.from_component(
+                container_key.lib_key,
+                entry.component
+            ) for entry in child_components]
+        case ContainerType.Subsection:
+            child_units = authoring_api.get_units_in_subsection(container.subsection, published=published)
+            return [ContainerMetadata.from_container(
+                container_key.lib_key,
+                entry.unit
+            ) for entry in child_units]
+        case ContainerType.Section:
+            child_subsections = authoring_api.get_subsections_in_section(container.section, published=published)
+            return [ContainerMetadata.from_container(
+                container_key.lib_key,
+                entry.subsection,
+            ) for entry in child_subsections]
+        case _:
+            child_entities = authoring_api.get_entities_in_container(container, published=published)
+            return [ContainerMetadata.from_container(
+                container_key.lib_key,
+                entry.entity
+            ) for entry in child_entities]
 
 
 def get_container_children_count(
@@ -409,7 +473,7 @@ def get_container_children_count(
 
 def update_container_children(
     container_key: LibraryContainerLocator,
-    children_ids: list[UsageKeyV2] | list[LibraryContainerLocator],
+    children_ids: list[LibraryUsageLocatorV2] | list[LibraryContainerLocator],
     user_id: int | None,
     entities_action: authoring_api.ChildrenEntitiesAction = authoring_api.ChildrenEntitiesAction.REPLACE,
 ):
@@ -417,15 +481,17 @@ def update_container_children(
     Adds children components or containers to given container.
     """
     library_key = container_key.lib_key
-    container_type = container_key.container_type
+    container_type = ContainerType(container_key.container_type)
     container = _get_container_from_key(container_key)
+    created = datetime.now(tz=timezone.utc)
+    new_version: ContainerVersion
     match container_type:
-        case ContainerType.Unit.value:
+        case ContainerType.Unit:
             components = [get_component_from_usage_key(key) for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_unit_version(
                 container.unit,
                 components=components,  # type: ignore[arg-type]
-                created=datetime.now(tz=timezone.utc),
+                created=created,
                 created_by=user_id,
                 entities_action=entities_action,
             )
@@ -437,6 +503,28 @@ def update_container_children(
                         changes=["units"],
                     ),
                 )
+        case ContainerType.Subsection:
+            units = [_get_container_from_key(key).unit for key in children_ids]  # type: ignore[arg-type]
+            new_version = authoring_api.create_next_subsection_version(
+                container.subsection,
+                units=units,  # type: ignore[arg-type]
+                created=created,
+                created_by=user_id,
+                entities_action=entities_action,
+            )
+
+            # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for subsections
+        case ContainerType.Section:
+            subsections = [_get_container_from_key(key).subsection for key in children_ids]  # type: ignore[arg-type]
+            new_version = authoring_api.create_next_section_version(
+                container.section,
+                subsections=subsections,  # type: ignore[arg-type]
+                created=created,
+                created_by=user_id,
+                entities_action=entities_action,
+            )
+
+            # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for sections
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
