@@ -63,7 +63,6 @@
             /**
              * Show a message in the frontend.
              * @param  {Object} message The message to display.
-             * @param  {string} redirectUrl The URL to redirect to when the button is clicked.
              */
             showMessage: function(message) {
                 const componentId = 'student-enrollment-feedback-error';
@@ -71,6 +70,9 @@
                 if (existing) {
                     existing.remove();
                 }
+                // Using a fixed dashboard URL as the redirect destination since this is the most logical
+                // place for users to go after encountering an enrollment error. The URL is hardcoded
+                // because environment variables are not injected into the HTML/JavaScript context.
                 const DASHBOARD_URL = '/dashboard';
                 const textContent = (message && message.detail) ? message.detail : String(message);
                 const messageDiv = document.createElement('div');
