@@ -10,6 +10,7 @@ import logging
 from uuid import uuid4
 
 from django.utils.text import slugify
+from opaque_keys.edx.keys import OpaqueKey
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
     ContentObjectChangedData,
@@ -538,16 +539,18 @@ def update_container_children(
 
 
 def get_containers_contains_component(
-    usage_key: LibraryUsageLocatorV2
+    usage_key: OpaqueKey
 ) -> list[ContainerMetadata]:
     """
-    Get containers that contains the component.
+    Get containers that contains the object.
     """
-    assert isinstance(usage_key, LibraryUsageLocatorV2)
-    component = get_component_from_usage_key(usage_key)
-    containers = authoring_api.get_containers_with_entity(
-        component.publishable_entity.pk,
-    )
+    if isinstance(usage_key, LibraryUsageLocatorV2):
+        component = get_component_from_usage_key(usage_key)
+        entity_id = component.publishable_entity.pk
+    elif isinstance(usage_key, LibraryContainerLocator):
+        container = _get_container_from_key(usage_key)
+        entity_id = container.publishable_entity.pk
+    containers = authoring_api.get_containers_with_entity(entity_id)
     return [
         ContainerMetadata.from_container(usage_key.context_key, container)
         for container in containers

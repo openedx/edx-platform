@@ -71,6 +71,14 @@ class Fields:
     units = "units"
     units_display_name = "display_name"
     units_key = "key"
+    # Subsections (dictionary) that this object belongs to.
+    subsections = "subsections"
+    subsections_display_name = "display_name"
+    subsections_key = "key"
+    # Sections (dictionary) that this object belongs to.
+    sections = "sections"
+    sections_display_name = "display_name"
+    sections_key = "key"
 
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
@@ -376,9 +384,9 @@ def _collections_for_content_object(object_id: OpaqueKey) -> dict:
     return result
 
 
-def _units_for_content_object(object_id: OpaqueKey) -> dict:
+def _containers_for_content_object(object_id: OpaqueKey, container_type: str) -> dict:
     """
-    Given an XBlock, course, library, etc., get the units for its index doc.
+    Given an XBlock, course, library, etc., get the containers that it is part of for its index doc.
 
     e.g. for something in Units "UNIT_A" and "UNIT_B", this would return:
         {
@@ -388,38 +396,41 @@ def _units_for_content_object(object_id: OpaqueKey) -> dict:
             }
         }
 
-    If the object is in no collections, returns:
+    If the object is in no containers, returns:
         {
-            "collections":  {
+            "units":  {
                 "display_name": [],
                 "key": [],
             },
         }
     """
+    container_field = getattr(Fields, container_type)
+    container_display_name_field = getattr(Fields, f'{container_type}_display_name')
+    container_key_field = getattr(Fields, f'{container_type}_key')
     result = {
-        Fields.units: {
-            Fields.units_display_name: [],
-            Fields.units_key: [],
+        container_field: {
+            container_display_name_field: [],
+            container_key_field: [],
         }
     }
 
     # Gather the units associated with this object
-    units = None
+    containers = None
     try:
-        if isinstance(object_id, UsageKey):
-            units = lib_api.get_containers_contains_component(object_id)
+        if isinstance(object_id, OpaqueKey):
+            containers = lib_api.get_containers_contains_component(object_id)
         else:
             log.warning(f"Unexpected key type for {object_id}")
 
     except ObjectDoesNotExist:
         log.warning(f"No library item found for {object_id}")
 
-    if not units:
+    if not containers:
         return result
 
-    for unit in units:
-        result[Fields.units][Fields.units_display_name].append(unit.display_name)
-        result[Fields.units][Fields.units_key].append(str(unit.container_key))
+    for container in containers:
+        result[container_field][container_display_name_field].append(container.display_name)
+        result[container_field][container_key_field].append(str(container.container_key))
 
     return result
 
@@ -521,7 +532,29 @@ def searchable_doc_units(opaque_key: OpaqueKey) -> dict:
     like Meilisearch or Elasticsearch, with the units data for the given content object.
     """
     doc = searchable_doc_for_key(opaque_key)
-    doc.update(_units_for_content_object(opaque_key))
+    doc.update(_containers_for_content_object(opaque_key, "units"))
+
+    return doc
+
+
+def searchable_doc_sections(opaque_key: OpaqueKey) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the sections data for the given content object.
+    """
+    doc = searchable_doc_for_key(opaque_key)
+    doc.update(_containers_for_content_object(opaque_key, "sections"))
+
+    return doc
+
+
+def searchable_doc_subsections(opaque_key: OpaqueKey) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the subsections data for the given content object.
+    """
+    doc = searchable_doc_for_key(opaque_key)
+    doc.update(_containers_for_content_object(opaque_key, "subsections"))
 
     return doc
 

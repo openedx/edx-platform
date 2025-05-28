@@ -53,6 +53,8 @@ from .documents import (
     searchable_doc_tags,
     searchable_doc_tags_for_collection,
     searchable_doc_units,
+    searchable_doc_subsections,
+    searchable_doc_sections,
 )
 
 log = logging.getLogger(__name__)
@@ -497,6 +499,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     doc = searchable_doc_for_container(container_key)
                     doc.update(searchable_doc_tags(container_key))
                     doc.update(searchable_doc_collections(container_key))
+                    container_type = lib_api.ContainerType(container_key.container_type)
+                    match container_type:
+                        case lib_api.ContainerType.Unit:
+                            doc.update(searchable_doc_subsections(container_key))
+                        case lib_api.ContainerType.Subsection:
+                            doc.update(searchable_doc_sections(container_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing container {container.key}: {err}")
@@ -861,6 +869,24 @@ def upsert_item_units_index_docs(opaque_key: OpaqueKey):
     """
     doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
     doc.update(searchable_doc_units(opaque_key))
+    _update_index_docs([doc])
+
+
+def upsert_item_subsections_index_docs(opaque_key: OpaqueKey):
+    """
+    Updates the subsections data in documents for the given Course/Library block
+    """
+    doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
+    doc.update(searchable_doc_subsections(opaque_key))
+    _update_index_docs([doc])
+
+
+def upsert_item_sections_index_docs(opaque_key: OpaqueKey):
+    """
+    Updates the sections data in documents for the given Course/Library block
+    """
+    doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
+    doc.update(searchable_doc_sections(opaque_key))
     _update_index_docs([doc])
 
 
