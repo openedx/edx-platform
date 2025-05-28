@@ -47,7 +47,7 @@ class TestSearchApi(ModuleStoreTestCase):
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    def setUp(self):
+    def setUp(self) -> None:
         # pylint: disable=too-many-statements
         super().setUp()
         self.user = UserFactory.create()
@@ -309,14 +309,14 @@ class TestSearchApi(ModuleStoreTestCase):
         }
 
     @override_settings(MEILISEARCH_ENABLED=False)
-    def test_reindex_meilisearch_disabled(self, mock_meilisearch):
+    def test_reindex_meilisearch_disabled(self, mock_meilisearch) -> None:
         with self.assertRaises(RuntimeError):
             api.rebuild_index()
 
         mock_meilisearch.return_value.swap_indexes.assert_not_called()
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_reindex_meilisearch(self, mock_meilisearch):
+    def test_reindex_meilisearch(self, mock_meilisearch) -> None:
 
         # Add tags field to doc, since reindex calls includes tags
         doc_sequential = copy.deepcopy(self.doc_sequential)
@@ -356,7 +356,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_reindex_meilisearch_incremental(self, mock_meilisearch):
+    def test_reindex_meilisearch_incremental(self, mock_meilisearch) -> None:
 
         # Add tags field to doc, since reindex calls includes tags
         doc_sequential = copy.deepcopy(self.doc_sequential)
@@ -413,7 +413,7 @@ class TestSearchApi(ModuleStoreTestCase):
         assert mock_meilisearch.return_value.index.return_value.add_documents.call_count == 8
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_reset_meilisearch_index(self, mock_meilisearch):
+    def test_reset_meilisearch_index(self, mock_meilisearch) -> None:
         api.reset_index()
         mock_meilisearch.return_value.swap_indexes.assert_called_once()
         mock_meilisearch.return_value.create_index.assert_called_once()
@@ -422,7 +422,7 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.delete_index.call_count = 4
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_init_meilisearch_index(self, mock_meilisearch):
+    def test_init_meilisearch_index(self, mock_meilisearch) -> None:
         # Test index already exists
         api.init_index()
         mock_meilisearch.return_value.swap_indexes.assert_not_called()
@@ -453,7 +453,7 @@ class TestSearchApi(ModuleStoreTestCase):
         "openedx.core.djangoapps.content.search.api.searchable_doc_for_collection",
         Mock(side_effect=Exception("Failed to generate document")),
     )
-    def test_reindex_meilisearch_collection_error(self, mock_meilisearch):
+    def test_reindex_meilisearch_collection_error(self, mock_meilisearch) -> None:
 
         mock_logger = Mock()
         api.rebuild_index(mock_logger)
@@ -469,7 +469,7 @@ class TestSearchApi(ModuleStoreTestCase):
         "openedx.core.djangoapps.content.search.api.searchable_doc_for_container",
         Mock(side_effect=Exception("Failed to generate document")),
     )
-    def test_reindex_meilisearch_container_error(self, mock_meilisearch):
+    def test_reindex_meilisearch_container_error(self, mock_meilisearch) -> None:
 
         mock_logger = Mock()
         api.rebuild_index(mock_logger)
@@ -481,7 +481,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_reindex_meilisearch_library_block_error(self, mock_meilisearch):
+    def test_reindex_meilisearch_library_block_error(self, mock_meilisearch) -> None:
 
         # Add tags field to doc, since reindex calls includes tags
         doc_sequential = copy.deepcopy(self.doc_sequential)
@@ -539,7 +539,7 @@ class TestSearchApi(ModuleStoreTestCase):
         False
     )
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_xblock_metadata(self, recursive, mock_meilisearch):
+    def test_index_xblock_metadata(self, recursive, mock_meilisearch) -> None:
         """
         Test indexing an XBlock.
         """
@@ -553,13 +553,13 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with(expected_docs)
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_no_index_excluded_xblocks(self, mock_meilisearch):
+    def test_no_index_excluded_xblocks(self, mock_meilisearch) -> None:
         api.upsert_xblock_index_doc(UsageKey.from_string(self.course_block_key))
 
         mock_meilisearch.return_value.index.return_value.update_document.assert_not_called()
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_xblock_tags(self, mock_meilisearch):
+    def test_index_xblock_tags(self, mock_meilisearch) -> None:
         """
         Test indexing an XBlock with tags.
         """
@@ -593,7 +593,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_index_xblock(self, mock_meilisearch):
+    def test_delete_index_xblock(self, mock_meilisearch) -> None:
         """
         Test deleting an XBlock doc from the index.
         """
@@ -604,7 +604,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_block_metadata(self, mock_meilisearch):
+    def test_index_library_block_metadata(self, mock_meilisearch) -> None:
         """
         Test indexing a Library Block.
         """
@@ -613,7 +613,7 @@ class TestSearchApi(ModuleStoreTestCase):
         mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.doc_problem1])
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_block_tags(self, mock_meilisearch):
+    def test_index_library_block_tags(self, mock_meilisearch) -> None:
         """
         Test indexing an Library Block with tags.
         """
@@ -648,7 +648,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_block_and_collections(self, mock_meilisearch):
+    def test_index_library_block_and_collections(self, mock_meilisearch) -> None:
         """
         Test indexing an Library Block and the Collections it's in.
         """
@@ -788,7 +788,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_index_library_block(self, mock_meilisearch):
+    def test_delete_index_library_block(self, mock_meilisearch) -> None:
         """
         Test deleting a Library Block doc from the index.
         """
@@ -799,7 +799,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_content_library_metadata(self, mock_meilisearch):
+    def test_index_content_library_metadata(self, mock_meilisearch) -> None:
         """
         Test indexing a whole content library.
         """
@@ -810,7 +810,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_tags_in_collections(self, mock_meilisearch):
+    def test_index_tags_in_collections(self, mock_meilisearch) -> None:
         # Tag collection
         tagging_api.tag_object(str(self.collection_key), self.taxonomyA, ["one", "two"])
         tagging_api.tag_object(str(self.collection_key), self.taxonomyB, ["three", "four"])
@@ -841,7 +841,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_collection(self, mock_meilisearch):
+    def test_delete_collection(self, mock_meilisearch) -> None:
         """
         Test soft-deleting, restoring, and hard-deleting a collection.
         """
@@ -970,7 +970,7 @@ class TestSearchApi(ModuleStoreTestCase):
         "section",
     )
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_delete_index_container(self, container_type, mock_meilisearch):
+    def test_delete_index_container(self, container_type, mock_meilisearch) -> None:
         """
         Test delete a container index.
         """
@@ -984,7 +984,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_container_metadata(self, mock_meilisearch):
+    def test_index_library_container_metadata(self, mock_meilisearch) -> None:
         """
         Test indexing a Library Container.
         """
@@ -999,7 +999,7 @@ class TestSearchApi(ModuleStoreTestCase):
     )
     @ddt.unpack
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_tags_in_containers(self, container_type, container_id, mock_meilisearch):
+    def test_index_tags_in_containers(self, container_type, container_id, mock_meilisearch) -> None:
         container_key = getattr(self, f"{container_type}_key")
 
         # Tag container
@@ -1032,7 +1032,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_block_in_units(self, mock_meilisearch):
+    def test_block_in_units(self, mock_meilisearch) -> None:
         with freeze_time(self.created_date):
             library_api.update_container_children(
                 LibraryContainerLocator.from_string(self.unit_key),
@@ -1063,7 +1063,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_units_in_subsection(self, mock_meilisearch):
+    def test_units_in_subsection(self, mock_meilisearch) -> None:
         with freeze_time(self.created_date):
             library_api.update_container_children(
                 LibraryContainerLocator.from_string(self.subsection_key),
@@ -1087,7 +1087,7 @@ class TestSearchApi(ModuleStoreTestCase):
         )
 
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_section_in_usbsections(self, mock_meilisearch):
+    def test_section_in_usbsections(self, mock_meilisearch) -> None:
         with freeze_time(self.created_date):
             library_api.update_container_children(
                 LibraryContainerLocator.from_string(self.section_key),

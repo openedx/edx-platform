@@ -35,7 +35,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         break any tests, but backwards-incompatible API changes will.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.create_date = datetime(2024, 9, 8, 7, 6, 5, tzinfo=timezone.utc)
         self.lib = self._create_library(
@@ -136,7 +136,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         ("section", "s1", "Test Section"),
     )
     @ddt.unpack
-    def test_container_crud(self, container_type, slug, display_name):
+    def test_container_crud(self, container_type, slug, display_name) -> None:
         """
         Test Create, Read, Update, and Delete of a Containers
         """
@@ -194,7 +194,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         ("section", "s2", "Test Section"),
     )
     @ddt.unpack
-    def test_container_permissions(self, container_type, slug, display_name):
+    def test_container_permissions(self, container_type, slug, display_name) -> None:
         """
         Test that a regular user with read-only permissions on the library cannot create, update, or delete containers.
         """
@@ -233,7 +233,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         ("section", "Section Alpha", "lct:CL-TEST:containers:section:section-alpha-"),
     )
     @ddt.unpack
-    def test_containers_gets_auto_slugs(self, container_type, display_name, expected_id):
+    def test_containers_gets_auto_slugs(self, container_type, display_name, expected_id) -> None:
         """
         Test that we can create containers by specifying only a title, and they get
         unique slugs assigned automatically.
@@ -245,7 +245,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert container_2["id"].startswith(expected_id)
         assert container_1["id"] != container_2["id"]
 
-    def test_unit_add_children(self):
+    def test_unit_add_children(self) -> None:
         """
         Test that we can add and get unit children components
         """
@@ -275,7 +275,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[3]['id'] == html_block_2['id']
         assert data[3]['can_stand_alone']
 
-    def test_subsection_add_children(self):
+    def test_subsection_add_children(self) -> None:
         # Create units
         child_unit_1 = self._create_container(self.lib["id"], "unit", display_name="Child unit 1", slug=None)
         child_unit_2 = self._create_container(self.lib["id"], "unit", display_name="Child unit 2", slug=None)
@@ -304,7 +304,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[2]['id'] == child_unit_3['id']
         assert data[3]['id'] == child_unit_4['id']
 
-    def test_section_add_children(self):
+    def test_section_add_children(self) -> None:
         # Create Subsections
         child_subsection_1 = self._create_container(
             self.lib["id"],
@@ -359,7 +359,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         ("section_with_subsections", ["subsection", "subsection_with_units"], ["subsection_2", "subsection_3"]),
     )
     @ddt.unpack
-    def test_container_remove_children(self, container_name, items_to_remove, expected_items):
+    def test_container_remove_children(self, container_name, items_to_remove, expected_items) -> None:
         """
         Test that we can remove container children
         """
@@ -380,7 +380,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[0]['id'] == expected_item_1['id']
         assert data[1]['id'] == expected_item_2['id']
 
-    def test_unit_replace_children(self):
+    def test_unit_replace_children(self) -> None:
         """
         Test that we can completely replace/reorder unit children components.
         """
@@ -420,7 +420,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[0]['id'] == new_problem_block['id']
         assert data[1]['id'] == new_html_block['id']
 
-    def test_subsection_replace_children(self):
+    def test_subsection_replace_children(self) -> None:
         """
         Test that we can completely replace/reorder subsection children.
         """
@@ -460,7 +460,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[0]['id'] == new_unit_1['id']
         assert data[1]['id'] == new_unit_2['id']
 
-    def test_section_replace_children(self):
+    def test_section_replace_children(self) -> None:
         """
         Test that we can completely replace/reorder section children.
         """
@@ -515,7 +515,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         "subsection",
         "section",
     )
-    def test_restore_containers(self, container_type):
+    def test_restore_containers(self, container_type) -> None:
         """
         Test restore a deleted container.
         """
@@ -543,7 +543,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
 
         self.assertDictContainsEntries(new_container_data, expected_data)
 
-    def test_container_collections(self):
+    def test_container_collections(self) -> None:
         # Create a collection
         col1 = api.create_library_collection(
             self.lib_key,
@@ -566,7 +566,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # Verify the collections
         assert unit_as_read['collections'] == [{"title": col1.title, "key": col1.key}]
 
-    def test_publish_container(self):  # pylint: disable=too-many-statements
+    def test_publish_container(self) -> None:  # pylint: disable=too-many-statements
         """
         Test that we can publish the changes to a specific container
         """

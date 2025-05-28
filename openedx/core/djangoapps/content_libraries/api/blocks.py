@@ -493,7 +493,7 @@ def _import_staged_block_as_container(
             title=title,
             user_id=user.id,
         )
-        new_child_keys: list[UsageKeyV2] = []
+        new_child_keys: list[LibraryUsageLocatorV2] = []
         for child_node in olx_node:
             try:
                 child_metadata = _import_staged_block(

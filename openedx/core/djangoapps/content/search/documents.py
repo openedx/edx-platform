@@ -661,7 +661,7 @@ def searchable_doc_for_container(
 
     container_type = lib_api.ContainerType(container_key.container_type)
 
-    def get_child_keys(children):
+    def get_child_keys(children) -> list[str]:
         match container_type:
             case lib_api.ContainerType.Unit:
                 return [

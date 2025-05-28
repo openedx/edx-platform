@@ -474,7 +474,7 @@ def get_container_children_count(
 
 def update_container_children(
     container_key: LibraryContainerLocator,
-    children_ids: list[UsageKeyV2] | list[LibraryContainerLocator],
+    children_ids: list[LibraryUsageLocatorV2] | list[LibraryContainerLocator],
     user_id: int | None,
     entities_action: authoring_api.ChildrenEntitiesAction = authoring_api.ChildrenEntitiesAction.REPLACE,
 ):
