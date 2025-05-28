@@ -30,14 +30,24 @@ from rest_framework.request import Request
 from common.djangoapps.student.role_helpers import get_course_roles
 from common.djangoapps.student.roles import GlobalStaff
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.content.search.index_config import (
-    INDEX_DISTINCT_ATTRIBUTE,
-    INDEX_FILTERABLE_ATTRIBUTES,
-    INDEX_RANKING_RULES,
-    INDEX_SEARCHABLE_ATTRIBUTES,
-    INDEX_SORTABLE_ATTRIBUTES
-)
-from openedx.core.djangoapps.content.search.models import IncrementalIndexCompleted, get_access_ids_for_request
+try:
+    from openedx.core.djangoapps.content.search.index_config import (
+        INDEX_DISTINCT_ATTRIBUTE,
+        INDEX_FILTERABLE_ATTRIBUTES,
+        INDEX_RANKING_RULES,
+        INDEX_SEARCHABLE_ATTRIBUTES,
+        INDEX_SORTABLE_ATTRIBUTES
+    )
+    from openedx.core.djangoapps.content.search.models import IncrementalIndexCompleted, get_access_ids_for_request
+except RuntimeError:
+    INDEX_DISTINCT_ATTRIBUTE = None
+    INDEX_FILTERABLE_ATTRIBUTES = []
+    INDEX_RANKING_RULES = []
+    INDEX_SEARCHABLE_ATTRIBUTES = []
+    INDEX_SORTABLE_ATTRIBUTES = []
+
+    IncrementalIndexCompleted = None
+    get_access_ids_for_request = None
 from openedx.core.djangoapps.content_libraries import api as lib_api
 from xmodule.modulestore.django import modulestore
 
