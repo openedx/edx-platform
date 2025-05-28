@@ -95,6 +95,9 @@ class Fields:
     published_content = "content"
     published_num_children = "num_children"
 
+    # List of children keys
+    child_usage_keys = "child_usage_keys"
+
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
     # command (changing those settings on an large active index is not recommended).
@@ -656,16 +659,28 @@ def searchable_doc_for_container(
     elif container.has_unpublished_changes:
         publish_status = PublishStatus.modified
 
+    container_type = lib_api.ContainerType(container_key.container_type)
+
+    def get_child_keys(children) -> list[str]:
+        match container_type:
+            case lib_api.ContainerType.Unit:
+                return [
+                    str(child.usage_key)
+                    for child in children
+                ]
+            case lib_api.ContainerType.Subsection | lib_api.ContainerType.Section:
+                return [
+                    str(child.container_key)
+                    for child in children
+                ]
+
     doc.update({
         Fields.display_name: container.display_name,
         Fields.created: container.created.timestamp(),
         Fields.modified: container.modified.timestamp(),
         Fields.num_children: len(draft_children),
         Fields.content: {
-            "child_usage_keys": [
-                str(child.usage_key)
-                for child in draft_children
-            ],
+            Fields.child_usage_keys: get_child_keys(draft_children)
         },
         Fields.publish_status: publish_status,
         Fields.last_published: container.last_published.timestamp() if container.last_published else None,
@@ -683,10 +698,7 @@ def searchable_doc_for_container(
             Fields.published_display_name: container.published_display_name,
             Fields.published_num_children: len(published_children),
             Fields.published_content: {
-                "child_usage_keys": [
-                    str(child.usage_key)
-                    for child in published_children
-                ],
+                Fields.child_usage_keys: get_child_keys(published_children),
             },
         }
 
