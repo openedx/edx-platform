@@ -504,7 +504,7 @@ def update_container_children(
                     ),
                 )
         case ContainerType.Subsection:
-            units = [_get_container_from_key(key).unit for key in children_ids]
+            units = [_get_container_from_key(key).unit for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_subsection_version(
                 container.subsection,
                 units=units,  # type: ignore[arg-type]
@@ -515,7 +515,7 @@ def update_container_children(
 
             # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for subsections
         case ContainerType.Section:
-            subsections = [_get_container_from_key(key).subsection for key in children_ids]
+            subsections = [_get_container_from_key(key).subsection for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_section_version(
                 container.section,
                 subsections=subsections,  # type: ignore[arg-type]

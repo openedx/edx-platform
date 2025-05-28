@@ -535,7 +535,7 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest):
             entity_key=component.publishable_entity.key,
             collection_keys=[self.col2.key, self.col3.key],
         )
-        
+
         assert self.lib2.learning_package_id is not None
         assert len(authoring_api.get_collection(self.lib2.learning_package_id, self.col2.key).entities.all()) == 1
         assert len(authoring_api.get_collection(self.lib2.learning_package_id, self.col3.key).entities.all()) == 1
