@@ -65,8 +65,39 @@
             this.showCompletion = this.el.data('show-completion');
             this.keydownHandler($(element).find('#sequence-list .tab'));
             this.base_page_title = ($('title').data('base-title') || '').trim();
+            this.dropdownButtonTpl = _.template($('#dropdown-button-tpl').text())({});
+            this.renderDropdown();
             this.bind();
             this.render(parseInt(this.el.data('position'), 10));
+        }
+
+        Sequence.prototype.renderDropdown = function() {
+          console.log("RESIZING");
+          this.$(`#sequence-list > li.sequence-list-item`).show();
+          const tabListWidth = this.$('#sequence-list').width()
+          const singleTabWidth = this.$('#sequence-list > li:first').width()
+          // Reduce 1 to offsets index and another one to accommodate the button
+          const overFlowIdx = Math.floor(tabListWidth / singleTabWidth) - 2;
+          if (this.$('#sequence-list > #dropdown-container').length===0) {
+            this.$('#sequence-list > li.sequence-list-item').eq(overFlowIdx - 1).after(this.dropdownButtonTpl);
+          } else {
+            this.$('#sequence-list > li.sequence-list-item').eq(overFlowIdx - 1).after(this.$('#sequence-list > #dropdown-container'));
+          }
+          this.$(`#sequence-list > li.sequence-list-item:lt(${overFlowIdx})`).show();
+          this.$(`#sequence-list > li.sequence-list-item:gt(${overFlowIdx-1})`).hide();
+          const dropdownList = this.$('#dropdown-sequence-list > ol');
+          dropdownList.empty();
+          this.$(`#sequence-list > li:gt(${overFlowIdx})`).each(function(idx, el) {
+            const cloneEl = $(el).clone();
+            const unitTitle = cloneEl.find("button").data('page-title');
+            cloneEl.find("button").addClass('d-flex align-items-center px-2').click(this.goto);
+            cloneEl.find("button span.icon").after(
+              '<span class="d-flex flex-row mx-1 overflow-hidden text-truncate" style="flex-grow: 1">' + unitTitle + '</span>'
+            );
+            cloneEl
+              .show()
+              .appendTo(dropdownList);
+          });
         }
 
         Sequence.prototype.$ = function(selector) {
@@ -82,6 +113,7 @@
             this.el.on('bookmark:remove', this.removeBookmarkIconFromActiveNavItem);
             this.$('#sequence-list .nav-item').on('focus mouseenter', this.displayTabTooltip);
             this.$('#sequence-list .nav-item').on('blur mouseleave', this.hideTabTooltip);
+            this.$(window).on('resize', _.debounce(this.renderDropdown, 300));
         };
 
         Sequence.prototype.toggleDropdown = function(event) {
@@ -298,7 +330,7 @@
         Sequence.prototype.goto = function(event) {
             var alertTemplate, alertText, isBottomNav, newPosition, widgetPlacement;
             event.preventDefault();
-            $('#dropdown-sequence-list').hide();
+            this.$('#dropdown-sequence-list').hide();
 
             // Links from courseware <a class='seqnav' href='n'>...</a>, was .target_tab
             if ($(event.currentTarget).hasClass('seqnav')) {

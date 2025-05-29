@@ -8,6 +8,23 @@
   show_dropdown = len(items) > 15
 %>
 
+<script type="text/template" id="dropdown-button-tpl">
+    <li id="dropdown-container" class="h-100">
+        <button
+            id="dropdown-sequence-list-button"
+            class="dropdown-toggle"
+            type="button"
+        >
+            <span class="icon fa fa-chevron-down" aria-hidden="true"></span>
+        </button>
+        <div id="dropdown-sequence-list" style="display: block; position: absolute; width: 240px; right: 0;">
+            <ol class="d-block dropdown-menu bg-white py-0 shadow-sm border"
+                aria-labelledby="dropdown-sequence-list-button">
+            </ol>
+        </div>
+    </li>
+</script>
+
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}"
      data-position="${position}"
      data-next-url="${next_url}" data-prev-url="${prev_url}"
@@ -50,7 +67,7 @@
         </li>
         % else:
         % for idx, item in enumerate(items):
-        <li role="presentation" class="${'d-none' if idx > 14 else ''}">
+          <li role="presentation" class="sequence-list-item">
           <button class="seq_${item['type']} inactive nav-item tab"
             role="tab"
             tabindex="-1"
@@ -103,7 +120,7 @@
         </li>
         % endif
         % if show_dropdown:
-          <%include file='seq_dropdown.html' args="items=items[15:], start_index=15"/>
+          ## <%include file='seq_dropdown.html' args="items=items[15:], start_index=15"/>
         % endif
       </ol>
     </nav>
