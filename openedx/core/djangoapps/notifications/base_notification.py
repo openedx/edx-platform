@@ -1,17 +1,21 @@
 """
 Base setup for Notification Apps and Types.
 """
+import copy
+
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from .email_notifications import EmailCadence
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
-from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
-from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+
+from ..django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR
+from .email_notifications import EmailCadence
 from .notification_content import get_notification_type_context_function
+from .utils import deep_merge_dicts, find_app_in_normalized_apps, find_pref_in_normalized_prefs
 
 FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE = 'filter_audit_expired_users_with_no_role'
 
-COURSE_NOTIFICATION_TYPES = {
+DEFAULT_COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
         'notification_app': 'discussion',
         'name': 'new_comment_on_response',
@@ -232,7 +236,11 @@ COURSE_NOTIFICATION_TYPES = {
     },
 }
 
-COURSE_NOTIFICATION_APPS = {
+COURSE_NOTIFICATION_TYPES = copy.deepcopy(DEFAULT_COURSE_NOTIFICATION_TYPES)
+COURSE_NOTIFICATION_TYPES_OVERRIDE = getattr(settings, 'COURSE_NOTIFICATION_TYPES_OVERRIDE', {})
+COURSE_NOTIFICATION_TYPES = deep_merge_dicts(COURSE_NOTIFICATION_TYPES, COURSE_NOTIFICATION_TYPES_OVERRIDE)
+
+DEFAULT_COURSE_NOTIFICATION_APPS = {
     'discussion': {
         'enabled': True,
         'core_info': _('Notifications for responses and comments on your posts, and the ones you’re '
@@ -262,6 +270,10 @@ COURSE_NOTIFICATION_APPS = {
         'non_editable': []
     },
 }
+
+COURSE_NOTIFICATION_APPS = copy.deepcopy(DEFAULT_COURSE_NOTIFICATION_APPS)
+COURSE_NOTIFICATION_APPS_OVERRIDE = getattr(settings, 'COURSE_NOTIFICATION_APPS_OVERRIDE', {})
+COURSE_NOTIFICATION_APPS = deep_merge_dicts(COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_APPS_OVERRIDE)
 
 
 class NotificationPreferenceSyncManager:
