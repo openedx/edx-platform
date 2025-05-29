@@ -47,7 +47,7 @@
                                 </span>
                                 <span style="float: right">
                                     <a href="{{notification.content_url}}" style="text-decoration: none; color: #00688D">
-                                        {% trans "View" as tmsg %}{{ tmsg | force_escape }}
+                                        {% trans "View" as tmsg %}{{ tmsg | force_escape }} {{ notification.view_text|default:""}}
                                     </a>
                                 </span>
                             </blockquote>
