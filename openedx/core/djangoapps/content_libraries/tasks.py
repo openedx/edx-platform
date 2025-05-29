@@ -182,7 +182,6 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
             # e.g. if this was a newly created component in the container and is now deleted, or this was deleted and
             # is now restored.
             for parent_container in api.get_containers_contains_item(usage_key):
-                print(parent_container)
                 updated_container_keys.add(parent_container.container_key)
 
             # TODO: do we also need to send CONTENT_OBJECT_ASSOCIATIONS_CHANGED for this component, or is

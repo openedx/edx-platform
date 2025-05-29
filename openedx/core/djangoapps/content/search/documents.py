@@ -67,16 +67,13 @@ class Fields:
     collections = "collections"
     collections_display_name = "display_name"
     collections_key = "key"
-    # Units (dictionary) that this object belongs to.
+    # Containers (dictionaries) that this object belongs to.
     units = "units"
-    units_display_name = "display_name"
-    units_key = "key"
-    # Subsections (dictionary) that this object belongs to.
     subsections = "subsections"
-    subsections_display_name = "display_name"
-    subsections_key = "key"
-    # Sections (dictionary) that this object belongs to.
     sections = "sections"
+    containers_display_name = "display_name"
+    containers_key = "key"
+
     sections_display_name = "display_name"
     sections_key = "key"
 
@@ -405,12 +402,10 @@ def _containers_for_content_object(object_id: OpaqueKey, container_type: str) ->
         }
     """
     container_field = getattr(Fields, container_type)
-    container_display_name_field = getattr(Fields, f'{container_type}_display_name')
-    container_key_field = getattr(Fields, f'{container_type}_key')
     result = {
         container_field: {
-            container_display_name_field: [],
-            container_key_field: [],
+            Fields.containers_display_name: [],
+            Fields.containers_key: [],
         }
     }
 
@@ -429,8 +424,8 @@ def _containers_for_content_object(object_id: OpaqueKey, container_type: str) ->
         return result
 
     for container in containers:
-        result[container_field][container_display_name_field].append(container.display_name)
-        result[container_field][container_key_field].append(str(container.container_key))
+        result[container_field][Fields.containers_display_name].append(container.display_name)
+        result[container_field][Fields.containers_key].append(str(container.container_key))
 
     return result
 
