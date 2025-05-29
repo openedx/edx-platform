@@ -52,6 +52,7 @@ from .documents import (
     searchable_doc_for_key,
     searchable_doc_tags,
     searchable_doc_tags_for_collection,
+    searchable_doc_units,
 )
 
 log = logging.getLogger(__name__)
@@ -451,6 +452,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     doc.update(searchable_doc_for_library_block(metadata))
                     doc.update(searchable_doc_tags(metadata.usage_key))
                     doc.update(searchable_doc_collections(metadata.usage_key))
+                    doc.update(searchable_doc_units(metadata.usage_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing library component {component}: {err}")
@@ -653,29 +655,6 @@ def _delete_index_doc(doc_id) -> None:
     _wait_for_meili_tasks(tasks)
 
 
-def delete_all_draft_docs_for_library(library_key: LibraryLocatorV2) -> None:
-    """
-    Deletes draft documents for the given XBlocks from the search index
-    """
-    current_rebuild_index_name = _get_running_rebuild_index_name()
-    client = _get_meilisearch_client()
-    # Delete all documents where last_published is null i.e. never published before.
-    delete_filter = [
-        f'{Fields.context_key}="{library_key}"',
-        # This field should only be NULL or have a value, but we're also checking IS EMPTY just in case.
-        # Inner arrays are connected by an OR
-        [f'{Fields.last_published} IS EMPTY', f'{Fields.last_published} IS NULL'],
-    ]
-
-    tasks = []
-    if current_rebuild_index_name:
-        # If there is a rebuild in progress, the documents will also be deleted from the new index.
-        tasks.append(client.index(current_rebuild_index_name).delete_documents(filter=delete_filter))
-    tasks.append(client.index(STUDIO_INDEX_NAME).delete_documents(filter=delete_filter))
-
-    _wait_for_meili_tasks(tasks)
-
-
 def upsert_library_block_index_doc(usage_key: UsageKey) -> None:
     """
     Creates or updates the document for the given Library Block in the search index
@@ -873,6 +852,15 @@ def upsert_item_collections_index_docs(opaque_key: OpaqueKey):
     """
     doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
     doc.update(searchable_doc_collections(opaque_key))
+    _update_index_docs([doc])
+
+
+def upsert_item_units_index_docs(opaque_key: OpaqueKey):
+    """
+    Updates the units data in documents for the given Course/Library block
+    """
+    doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
+    doc.update(searchable_doc_units(opaque_key))
     _update_index_docs([doc])
 
 
