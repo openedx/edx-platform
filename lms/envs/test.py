@@ -288,6 +288,7 @@ MKTG_URL_LINK_MAP = {
 SUPPORT_SITE_LINK = 'https://example.support.edx.org'
 PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
 ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
+SEND_ACTIVATION_EMAIL_URL = 'https://courses.example.edx.org/api/send_account_activation_email'
 LOGIN_ISSUE_SUPPORT_LINK = 'https://support.example.com/login-issue-help.html'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
     ("utm_campaign", "edX.org Referral"),
