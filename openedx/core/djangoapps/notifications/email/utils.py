@@ -101,6 +101,7 @@ def create_email_template_context(username):
         "platform_name": settings.PLATFORM_NAME,
         "mailing_address": settings.CONTACT_MAILING_ADDRESS,
         "logo_url": get_logo_url_for_email(),
+        "logo_notification_cadence_url": settings.NOTIFICATION_DIGEST_LOGO,
         "social_media": social_media_info,
         "notification_settings_url": f"{settings.ACCOUNT_MICROFRONTEND_URL}/#notifications",
         "unsubscribe_url": get_unsubscribe_link(username, patch)
@@ -120,19 +121,25 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
     context = create_email_template_context(username)
     start_date_str = create_datetime_string(start_date)
     end_date_str = create_datetime_string(end_date if end_date else start_date)
-    email_digest_updates = [{
-        'title': 'Total Notifications',
-        'translated_title': _('Total Notifications'),
-        'count': sum(value['count'] for value in app_notifications_dict.values())
-    }]
-    email_digest_updates.extend([
+    email_digest_updates = [
         {
             'title': value['title'],
             'count': value['count'],
             'translated_title': value.get('translated_title', value['title']),
         }
         for key, value in app_notifications_dict.items()
-    ])
+    ]
+    lookup = {
+        'Updates': 1,
+        'Grading': 2,
+        'Discussion': 3,
+    }
+    email_digest_updates.sort(key=lambda x: lookup.get(x['title'], 4), reverse=False)
+    email_digest_updates.append({
+        'title': 'Total Notifications',
+        'translated_title': _('Total Notifications'),
+        'count': sum(value['count'] for value in app_notifications_dict.values())
+    })
 
     email_content = []
     notifications_in_app = 5
@@ -245,6 +252,7 @@ def add_additional_attributes_to_notifications(notifications, courses_data=None)
         notification.time_ago = get_time_ago(notification.created)
         notification.email_content = add_zero_margin_to_root(notification.content)
         notification.details = add_zero_margin_to_root(notification.content_context.get('email_content', ''))
+        notification.view_text = get_text_for_notification_type(notification_type)
     return notifications
 
 
@@ -447,7 +455,7 @@ def get_translated_app_title(name):
     mapping = {
         'discussion': _('Discussion'),
         'updates': _('Updates'),
-        'grading': _('Grading'),
+        'grading': _('Grades'),
     }
     return mapping.get(name, '')
 
@@ -468,7 +476,7 @@ def get_text_for_notification_type(notification_type):
     if not app_name:
         return ""
     mapping = {
-        'discussion': _('post'),
+        'discussion': _('discussion'),
         'updates': _('update'),
         'grading': _('assessment'),
     }
