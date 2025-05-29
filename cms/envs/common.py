@@ -881,8 +881,6 @@ MIDDLEWARE = [
     # CORS and CSRF
     'django.middleware.csrf.CsrfViewMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
-    'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
 
     # JWT auth
     'edx_rest_framework_extensions.auth.jwt.middleware.JwtAuthCookieMiddleware',
