@@ -17,13 +17,11 @@ boltons==21.0.0
     #   semgrep
 bracex==2.5.post1
     # via wcmatch
-certifi==2025.1.31
+certifi==2025.4.26
     # via requests
-charset-normalizer==2.0.12
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   requests
-click==8.1.8
+charset-normalizer==3.4.2
+    # via requests
+click==8.2.0
     # via
     #   click-option-group
     #   semgrep
@@ -51,7 +49,7 @@ importlib-metadata==7.1.0
     # via opentelemetry-api
 jsonschema==4.23.0
     # via semgrep
-jsonschema-specifications==2024.10.1
+jsonschema-specifications==2025.4.1
     # via jsonschema
 markdown-it-py==3.0.0
     # via rich
@@ -107,7 +105,7 @@ requests==2.32.3
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.24.0
+rpds-py==0.25.0
     # via
     #   jsonschema
     #   referencing

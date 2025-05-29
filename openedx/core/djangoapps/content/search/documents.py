@@ -67,6 +67,10 @@ class Fields:
     collections = "collections"
     collections_display_name = "display_name"
     collections_key = "key"
+    # Units (dictionary) that this object belongs to.
+    units = "units"
+    units_display_name = "display_name"
+    units_key = "key"
 
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
@@ -90,6 +94,9 @@ class Fields:
     published_description = "description"
     published_content = "content"
     published_num_children = "num_children"
+
+    # List of children keys
+    child_usage_keys = "child_usage_keys"
 
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
@@ -369,6 +376,54 @@ def _collections_for_content_object(object_id: OpaqueKey) -> dict:
     return result
 
 
+def _units_for_content_object(object_id: OpaqueKey) -> dict:
+    """
+    Given an XBlock, course, library, etc., get the units for its index doc.
+
+    e.g. for something in Units "UNIT_A" and "UNIT_B", this would return:
+        {
+            "units":  {
+                "display_name": ["Unit A", "Unit B"],
+                "key": ["UNIT_A", "UNIT_B"],
+            }
+        }
+
+    If the object is in no collections, returns:
+        {
+            "collections":  {
+                "display_name": [],
+                "key": [],
+            },
+        }
+    """
+    result = {
+        Fields.units: {
+            Fields.units_display_name: [],
+            Fields.units_key: [],
+        }
+    }
+
+    # Gather the units associated with this object
+    units = None
+    try:
+        if isinstance(object_id, UsageKey):
+            units = lib_api.get_containers_contains_component(object_id)
+        else:
+            log.warning(f"Unexpected key type for {object_id}")
+
+    except ObjectDoesNotExist:
+        log.warning(f"No library item found for {object_id}")
+
+    if not units:
+        return result
+
+    for unit in units:
+        result[Fields.units][Fields.units_display_name].append(unit.display_name)
+        result[Fields.units][Fields.units_key].append(str(unit.container_key))
+
+    return result
+
+
 def _published_data_from_block(block_published) -> dict:
     """
     Given an library block get the published data.
@@ -456,6 +511,17 @@ def searchable_doc_collections(opaque_key: OpaqueKey) -> dict:
     """
     doc = searchable_doc_for_key(opaque_key)
     doc.update(_collections_for_content_object(opaque_key))
+
+    return doc
+
+
+def searchable_doc_units(opaque_key: OpaqueKey) -> dict:
+    """
+    Generate a dictionary document suitable for ingestion into a search engine
+    like Meilisearch or Elasticsearch, with the units data for the given content object.
+    """
+    doc = searchable_doc_for_key(opaque_key)
+    doc.update(_units_for_content_object(opaque_key))
 
     return doc
 
@@ -593,16 +659,28 @@ def searchable_doc_for_container(
     elif container.has_unpublished_changes:
         publish_status = PublishStatus.modified
 
+    container_type = lib_api.ContainerType(container_key.container_type)
+
+    def get_child_keys(children) -> list[str]:
+        match container_type:
+            case lib_api.ContainerType.Unit:
+                return [
+                    str(child.usage_key)
+                    for child in children
+                ]
+            case lib_api.ContainerType.Subsection | lib_api.ContainerType.Section:
+                return [
+                    str(child.container_key)
+                    for child in children
+                ]
+
     doc.update({
         Fields.display_name: container.display_name,
         Fields.created: container.created.timestamp(),
         Fields.modified: container.modified.timestamp(),
         Fields.num_children: len(draft_children),
         Fields.content: {
-            "child_usage_keys": [
-                str(child.usage_key)
-                for child in draft_children
-            ],
+            Fields.child_usage_keys: get_child_keys(draft_children)
         },
         Fields.publish_status: publish_status,
         Fields.last_published: container.last_published.timestamp() if container.last_published else None,
@@ -620,10 +698,7 @@ def searchable_doc_for_container(
             Fields.published_display_name: container.published_display_name,
             Fields.published_num_children: len(published_children),
             Fields.published_content: {
-                "child_usage_keys": [
-                    str(child.usage_key)
-                    for child in published_children
-                ],
+                Fields.child_usage_keys: get_child_keys(published_children),
             },
         }
 

@@ -378,7 +378,6 @@ FEATURES = {
     # Prevent auto auth from creating superusers or modifying existing users
     'RESTRICT_AUTOMATIC_AUTH': True,
 
-    'PREVIEW_LMS_BASE': "preview.localhost:18000",
     'ENABLE_GRADE_DOWNLOADS': True,
     'ENABLE_MKTG_SITE': False,
     'ENABLE_DISCUSSION_HOME_PANEL': True,
@@ -606,6 +605,9 @@ IDA_LOGOUT_URI_LIST = []
 COURSE_AUTHORING_MICROFRONTEND_URL = None
 DISCUSSIONS_MICROFRONTEND_URL = None
 DISCUSSIONS_MFE_FEEDBACK_URL = None
+ACCOUNT_MICROFRONTEND_URL = None
+LEARNING_MICROFRONTEND_URL = None
+
 
 # .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
 # .. toggle_implementation: DjangoSetting
@@ -2640,6 +2642,7 @@ EDXAPP_PARSE_KEYS = {}
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
 NOTIFICATION_CREATION_BATCH_SIZE = 76
+NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
@@ -2883,12 +2886,29 @@ LIBRARY_ENABLED_BLOCKS = [
     'openassessment',
     'conditional',
     'done',
+    'edx_sga',
     'freetextresponse',
     'google-calendar',
     'google-document',
     'invideoquiz',
+    'lti',
+    'lti_consumer',
     'pdf',
     'poll',
     'survey',
     'word_cloud',
 ]
+
+SOCIAL_MEDIA_FOOTER_ACE_URLS = {
+    'reddit': 'http://www.reddit.com/r/edx',
+    'twitter': 'https://twitter.com/edXOnline',
+    'linkedin': 'http://www.linkedin.com/company/edx',
+    'facebook': 'http://www.facebook.com/EdxOnline',
+}
+
+SOCIAL_MEDIA_LOGO_URLS = {
+    'reddit': 'http://email-media.s3.amazonaws.com/edX/2021/social_5_reddit.png',
+    'twitter': 'http://email-media.s3.amazonaws.com/edX/2021/social_2_twitter.png',
+    'linkedin': 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png',
+    'facebook': 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png',
+}
