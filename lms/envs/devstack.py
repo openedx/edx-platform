@@ -29,6 +29,9 @@ SITE_NAME = LMS_BASE
 
 SESSION_COOKIE_NAME = 'lms_sessionid'
 
+#used for maintaining session inactivity
+SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = 86400
+
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 # When the celery task is run eagerly, it is executed locally while sharing the
