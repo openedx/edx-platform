@@ -15,16 +15,16 @@
         </tr>
         <tr align="center">
             <td>
-                <img src="{{ logo_url }}" style="width: 64px" height="auto" alt="logo_url" />
+                <img src="{{ logo_notification_cadence_url }}" style="width: 64px" height="auto" alt="logo_url" />
             </td>
         </tr>
         <tr style="height: 20px"></tr>
         <tr align="center">
             <td style="font-family: Inter, Arial, Verdana, sans-serif; font-size: 32px; font-style: normal; font-weight: 700; line-height: 36px">
                 {% if digest_frequency == "Weekly" %}
-                    {% trans "Weekly email digest" as tmsg %}{{ tmsg | force_escape }}
+                    {% trans "Weekly Notifications Digest" as tmsg %}{{ tmsg | force_escape }}
                 {% else %}
-                    {% trans "Daily email digest" as tmsg %}{{ tmsg | force_escape }}
+                    {% trans "Daily Notifications Digest" as tmsg %}{{ tmsg | force_escape }}
                 {% endif %}
             </td>
         </tr>
