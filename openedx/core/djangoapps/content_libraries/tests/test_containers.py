@@ -155,7 +155,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
             "container_type": container_type,
             "display_name": display_name,
             "last_published": None,
-            "published_by": "",
+            "published_by": None,
             "last_draft_created": "2024-09-08T07:06:05Z",
             "last_draft_created_by": 'Bob',
             'has_unpublished_changes': True,
@@ -371,7 +371,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         data = self._get_container_children(container["id"])
         assert len(data) == 4
         # Remove items.
-        self._remove_container_components(
+        self._remove_container_children(
             container["id"],
             children_ids=[item_to_remove_1["id"], item_to_remove_2["id"]]
         )
@@ -392,7 +392,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[3]['id'] == self.html_block_2['id']
 
         # Reorder the components
-        self._patch_container_components(
+        self._patch_container_children(
             self.unit_with_components["id"],
             children_ids=[
                 self.problem_block["id"],
@@ -411,7 +411,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # Replace with new components
         new_problem_block = self._add_block_to_library(self.lib["id"], "problem", "New_Problem", can_stand_alone=False)
         new_html_block = self._add_block_to_library(self.lib["id"], "html", "New_Html", can_stand_alone=False)
-        self._patch_container_components(
+        self._patch_container_children(
             self.unit_with_components["id"],
             children_ids=[new_problem_block["id"], new_html_block["id"]],
         )
@@ -432,7 +432,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[3]['id'] == self.unit_3['id']
 
         # Reorder the units
-        self._patch_container_components(
+        self._patch_container_children(
             self.subsection_with_units["id"],
             children_ids=[
                 self.unit_2["id"],
@@ -451,7 +451,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # Replace with new units
         new_unit_1 = self._create_container(self.lib["id"], "unit", display_name="New Unit 1", slug=None)
         new_unit_2 = self._create_container(self.lib["id"], "unit", display_name="New Unit 2", slug=None)
-        self._patch_container_components(
+        self._patch_container_children(
             self.subsection_with_units["id"],
             children_ids=[new_unit_1["id"], new_unit_2["id"]],
         )
@@ -472,7 +472,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert data[3]['id'] == self.subsection_3['id']
 
         # Reorder the subsections
-        self._patch_container_components(
+        self._patch_container_children(
             self.section_with_subsections["id"],
             children_ids=[
                 self.subsection_2["id"],
@@ -501,7 +501,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
             display_name="New Subsection 2",
             slug=None,
         )
-        self._patch_container_components(
+        self._patch_container_children(
             self.section_with_subsections["id"],
             children_ids=[new_subsection_1["id"], new_subsection_2["id"]],
         )
@@ -532,7 +532,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
             "container_type": container_type,
             "display_name": container["display_name"],
             "last_published": None,
-            "published_by": "",
+            "published_by": None,
             "last_draft_created": "2024-09-08T07:06:05Z",
             "last_draft_created_by": 'Bob',
             'has_unpublished_changes': True,
@@ -543,7 +543,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
 
         self.assertDictContainsEntries(new_container_data, expected_data)
 
-    def test_container_collections(self) -> None:
+    def test_unit_collections(self) -> None:
         # Create a collection
         col1 = api.create_library_collection(
             self.lib_key,
@@ -566,9 +566,30 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         # Verify the collections
         assert unit_as_read['collections'] == [{"title": col1.title, "key": col1.key}]
 
-    def test_publish_container(self) -> None:  # pylint: disable=too-many-statements
+    def _verify_publish_state(
+        self,
+        container_id,
+        expected_childen_len,
+        expected_has_unpublished_changes,
+        expected_published_by,
+        expected_children_ids,
+    ) -> None:
         """
-        Test that we can publish the changes to a specific container
+        Verify the publish state of a container
+        """
+        container = self._get_container(container_id)
+        assert container["has_unpublished_changes"] == expected_has_unpublished_changes
+        container_children = self._get_container_children(container_id)
+        assert len(container_children) == expected_childen_len
+
+        for index in range(expected_childen_len):
+            assert container_children[index]["id"] == expected_children_ids[index]
+            assert container_children[index]["has_unpublished_changes"] == expected_has_unpublished_changes
+            assert container_children[index]["published_by"] == expected_published_by
+
+    def test_publish_unit(self) -> None:
+        """
+        Test that we can publish the changes to a specific unit
         """
         html_block_3 = self._add_block_to_library(self.lib["id"], "html", "Html3")
         self._add_container_children(
@@ -580,54 +601,200 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         )
 
         # At first everything is unpublished:
-        c1_before = self._get_container(self.unit_with_components["id"])
-        assert c1_before["has_unpublished_changes"]
-        c1_components_before = self._get_container_children(self.unit_with_components["id"])
-        assert len(c1_components_before) == 4
-        assert c1_components_before[0]["id"] == self.problem_block["id"]
-        assert c1_components_before[0]["has_unpublished_changes"]
-        assert c1_components_before[0]["published_by"] is None
-        assert c1_components_before[1]["id"] == self.html_block["id"]
-        assert c1_components_before[1]["has_unpublished_changes"]
-        assert c1_components_before[1]["published_by"] is None
-        assert c1_components_before[2]["id"] == self.problem_block_2["id"]
-        assert c1_components_before[2]["has_unpublished_changes"]
-        assert c1_components_before[2]["published_by"] is None
-        assert c1_components_before[3]["id"] == self.html_block_2["id"]
-        assert c1_components_before[3]["has_unpublished_changes"]
-        assert c1_components_before[3]["published_by"] is None
-        c2_before = self._get_container(self.unit["id"])
-        assert c2_before["has_unpublished_changes"]
+        self._verify_publish_state(
+            container_id=self.unit_with_components["id"],
+            expected_childen_len=4,
+            expected_has_unpublished_changes=True,
+            expected_published_by=None,
+            expected_children_ids=[
+                self.problem_block["id"],
+                self.html_block["id"],
+                self.problem_block_2["id"],
+                self.html_block_2["id"],
+            ],
+        )
+        self._verify_publish_state(
+            container_id=self.unit["id"],
+            expected_childen_len=2,
+            expected_has_unpublished_changes=True,
+            expected_published_by=None,
+            expected_children_ids=[
+                self.html_block["id"],
+                html_block_3["id"],
+            ],
+        )
 
-        # Now publish only Container 1
+        # Now publish only unit 1
         self._publish_container(self.unit_with_components["id"])
 
         # Now it is published:
-        c1_after = self._get_container(self.unit_with_components["id"])
-        assert c1_after["has_unpublished_changes"] is False
-        c1_components_after = self._get_container_children(self.unit_with_components["id"])
-        assert len(c1_components_after) == 4
-        assert c1_components_after[0]["id"] == self.problem_block["id"]
-        assert c1_components_after[0]["has_unpublished_changes"] is False
-        assert c1_components_after[0]["published_by"] == self.user.username
-        assert c1_components_after[1]["id"] == self.html_block["id"]
-        assert c1_components_after[1]["has_unpublished_changes"] is False
-        assert c1_components_after[1]["published_by"] == self.user.username
-        assert c1_components_after[2]["id"] == self.problem_block_2["id"]
-        assert c1_components_after[2]["has_unpublished_changes"] is False
-        assert c1_components_after[2]["published_by"] == self.user.username
-        assert c1_components_after[3]["id"] == self.html_block_2["id"]
-        assert c1_components_after[3]["has_unpublished_changes"] is False
-        assert c1_components_after[3]["published_by"] == self.user.username
+        self._verify_publish_state(
+            container_id=self.unit_with_components["id"],
+            expected_childen_len=4,
+            expected_has_unpublished_changes=False,
+            expected_published_by=self.user.username,
+            expected_children_ids=[
+                self.problem_block["id"],
+                self.html_block["id"],
+                self.problem_block_2["id"],
+                self.html_block_2["id"],
+            ],
+        )
 
-        # and container 2 is still unpublished, except for the shared HTML block that is also in container 1:
+        # and unit 2 is still unpublished, except for the shared HTML block that is also in unit 1:
         c2_after = self._get_container(self.unit["id"])
         assert c2_after["has_unpublished_changes"]
         c2_components_after = self._get_container_children(self.unit["id"])
         assert len(c2_components_after) == 2
         assert c2_components_after[0]["id"] == self.html_block["id"]
-        assert c2_components_after[0]["has_unpublished_changes"] is False  # published since it's also in container 1
+        assert c2_components_after[0]["has_unpublished_changes"] is False  # published since it's also in unit 1
         assert c2_components_after[0]["published_by"] == self.user.username
         assert c2_components_after[1]["id"] == html_block_3["id"]
         assert c2_components_after[1]["has_unpublished_changes"]  # unaffected
         assert c2_components_after[1]["published_by"] is None
+
+    def test_publish_subsection(self) -> None:
+        """
+        Test that we can publish the changes to a specific subsection
+        """
+        unit_4 = self._create_container(self.lib["id"], "unit", display_name="Test Unit 4", slug=None)
+
+        # Add units on subsection
+        self._add_container_children(
+            self.subsection["id"],
+            children_ids=[
+                self.unit["id"],
+                unit_4["id"],
+            ]
+        )
+        # Removing the unit with components because the components (children of children) are not published.
+        # If the unit is kept, the subsection continues to have changes even after it is published.
+        self._remove_container_children(
+            self.subsection_with_units["id"],
+            children_ids=[
+                self.unit_with_components["id"],
+            ]
+        )
+
+        # At first everything is unpublished:
+        self._verify_publish_state(
+            container_id=self.subsection_with_units["id"],
+            expected_childen_len=3,
+            expected_has_unpublished_changes=True,
+            expected_published_by=None,
+            expected_children_ids=[
+                self.unit["id"],
+                self.unit_2["id"],
+                self.unit_3["id"],
+            ],
+        )
+        self._verify_publish_state(
+            container_id=self.subsection["id"],
+            expected_childen_len=2,
+            expected_has_unpublished_changes=True,
+            expected_published_by=None,
+            expected_children_ids=[
+                self.unit["id"],
+                unit_4["id"],
+            ],
+        )
+
+        # Now publish only subsection 1
+        self._publish_container(self.subsection_with_units["id"])
+
+        # Now it is published:
+        self._verify_publish_state(
+            container_id=self.subsection_with_units["id"],
+            expected_childen_len=3,
+            expected_has_unpublished_changes=False,
+            expected_published_by=self.user.username,
+            expected_children_ids=[
+                self.unit["id"],
+                self.unit_2["id"],
+                self.unit_3["id"],
+            ],
+        )
+
+        # and subsection 2 is still unpublished, except for the shared unit that is also in subsection 1:
+        c2_after = self._get_container(self.subsection["id"])
+        assert c2_after["has_unpublished_changes"]
+        c2_units_after = self._get_container_children(self.subsection["id"])
+        assert len(c2_units_after) == 2
+        assert c2_units_after[0]["id"] == self.unit["id"]
+        assert c2_units_after[0]["has_unpublished_changes"] is False  # published since it's also in subsection 1
+        assert c2_units_after[0]["published_by"] == self.user.username
+        assert c2_units_after[1]["id"] == unit_4["id"]
+        assert c2_units_after[1]["has_unpublished_changes"]  # unaffected
+        assert c2_units_after[1]["published_by"] is None
+
+    def test_publish_section(self) -> None:
+        """
+        Test that we can publish the changes to a specific section
+        """
+        subsection_4 = self._create_container(self.lib["id"], "subsection", display_name="Test Subsection 4", slug=None)
+        self._add_container_children(
+            self.section["id"],
+            children_ids=[
+                self.subsection["id"],
+                subsection_4["id"],
+            ]
+        )
+        # Removing the subsection with units because the units (children of children) are not published.
+        # If the subsection is kept, the section continues to have changes even after it is published.
+        self._remove_container_children(
+            self.section_with_subsections["id"],
+            children_ids=[
+                self.subsection_with_units["id"],
+            ]
+        )
+
+        # At first everything is unpublished:
+        self._verify_publish_state(
+            container_id=self.section_with_subsections["id"],
+            expected_childen_len=3,
+            expected_has_unpublished_changes=True,
+            expected_published_by=None,
+            expected_children_ids=[
+                self.subsection["id"],
+                self.subsection_2["id"],
+                self.subsection_3["id"],
+            ],
+        )
+        self._verify_publish_state(
+            container_id=self.section["id"],
+            expected_childen_len=2,
+            expected_has_unpublished_changes=True,
+            expected_published_by=None,
+            expected_children_ids=[
+                self.subsection["id"],
+                subsection_4["id"],
+            ],
+        )
+
+        # Now publish only section 1
+        self._publish_container(self.section_with_subsections["id"])
+
+        # Now it is published:
+        self._verify_publish_state(
+            container_id=self.section_with_subsections["id"],
+            expected_childen_len=3,
+            expected_has_unpublished_changes=False,
+            expected_published_by=self.user.username,
+            expected_children_ids=[
+                self.subsection["id"],
+                self.subsection_2["id"],
+                self.subsection_3["id"],
+            ],
+        )
+
+        # and section 2 is still unpublished, except for the shared subsection that is also in section 1:
+        c2_after = self._get_container(self.section["id"])
+        assert c2_after["has_unpublished_changes"]
+        c2_units_after = self._get_container_children(self.section["id"])
+        assert len(c2_units_after) == 2
+        assert c2_units_after[0]["id"] == self.subsection["id"]
+        assert c2_units_after[0]["has_unpublished_changes"] is False  # published since it's also in section 1
+        assert c2_units_after[0]["published_by"] == self.user.username
+        assert c2_units_after[1]["id"] == subsection_4["id"]
+        assert c2_units_after[1]["has_unpublished_changes"]  # unaffected
+        assert c2_units_after[1]["published_by"] is None
