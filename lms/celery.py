@@ -1,7 +1,7 @@
 """
 Import celery, load its settings from the django settings
 and auto discover tasks in all installed django apps.
-
+foobar
 Taken from: https://celery.readthedocs.org/en/latest/django/first-steps-with-django.html
 """
 
