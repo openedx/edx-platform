@@ -37,6 +37,8 @@ from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.video_block import EXPORT_IMPORT_STATIC_DIR, VideoBlock, create_youtube_string
 from xmodule.video_block.transcripts_utils import save_to_store
+from xblock.core import XBlockAside
+from xmodule.modulestore.tests.test_asides import AsideTestType
 
 from .test_import import DummySystem
 
@@ -315,6 +317,36 @@ class VideoBlockImportTestCase(TestCase):
             'data': '',
             'transcripts': {'uk': 'ukrainian_translation.srt', 'de': 'german_translation.srt'},
         })
+
+    @XBlockAside.register_temp_plugin(AsideTestType, "test_aside")
+    @patch('xmodule.video_block.video_block.VideoBlock.load_file')
+    @patch('xmodule.video_block.video_block.is_pointer_tag')
+    @ddt.data(True, False)
+    def test_parse_xml_with_asides(self, video_xml_has_aside, mock_is_pointer_tag, mock_load_file):
+        """Test that `parse_xml` parses asides from the video xml"""
+        runtime = DummySystem(load_error_blocks=True)
+        if video_xml_has_aside:
+            xml_data = '''
+                <video url_name="a16643fa63234fef8f6ebbc1902e2253">
+                <test_aside xblock-family="xblock_asides.v1" data_field="aside parsed"/>
+                </video>
+            '''
+        else:
+            xml_data = '''
+                <video url_name="a16643fa63234fef8f6ebbc1902e2253">
+                </video>
+            '''
+        mock_is_pointer_tag.return_value = True
+        xml_object = etree.fromstring(xml_data)
+        mock_load_file.return_value = xml_object
+        output = VideoBlock.parse_xml(xml_object, runtime, None)
+        aside = runtime.get_aside_of_type(output, "test_aside")
+        if video_xml_has_aside:
+            assert aside.content == "default_content"
+            assert aside.data_field == "aside parsed"
+        else:
+            assert aside.content == "default_content"
+            assert aside.data_field == "default_data"
 
     @ddt.data(
         ('course-v1:test_org+test_course+test_run',

@@ -416,7 +416,6 @@ FEATURES:
   ENABLE_DISCUSSION_SERVICE: true
   ENABLE_EDXNOTES: true
   ENABLE_ENTERPRISE_INTEGRATION: true
-  ENABLE_EXAM_SETTINGS_HTML_VIEW: true
   ENABLE_EXPORT_GIT: true
   ENABLE_FEEDBACK_SUBMISSION: true
   ENABLE_FINANCIAL_ASSISTANCE_FORM: true
@@ -455,7 +454,6 @@ FEATURES:
   LTI_1P3_ENABLED: true
   MILESTONES_APP: true
   PREVENT_CONCURRENT_LOGINS: true
-  PREVIEW_LMS_BASE: preview.courses.localhost
   SEGMENT_IO_LMS: true
   SEPARATE_VERIFICATION_FROM_PAYMENT: true
   SHOW_FOOTER_LANGUAGE_SELECTOR: true
@@ -501,7 +499,6 @@ IDA_LOGOUT_URI_LIST:
 - https://discovery.localhost/logout/
 - https://commerce-coordinator.localhost/logout/
 ID_VERIFICATION_SUPPORT_LINK: https://support.localhost/hc/en-us/articles/206503858-How-do-I-complete-photo-verification-
-JS_ENV_EXTRA_CONFIG: {}
 JWT_AUTH:
   JWT_AUDIENCE: test_jwt_audience
   JWT_AUTH_COOKIE_HEADER_PAYLOAD: jwt-cookie-header-payload

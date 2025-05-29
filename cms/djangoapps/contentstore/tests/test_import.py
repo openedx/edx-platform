@@ -146,6 +146,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         import_course_from_xml(
             module_store, self.user.id, TEST_DATA_DIR, ['toy'],
             static_content_store=content_store, do_import_static=False,
+            do_import_python_lib=False,  # python_lib.zip is special-cased -- exclude it too
             create_if_not_present=True, verbose=True
         )
 
@@ -153,7 +154,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
         # make sure we have NO assets in our contentstore
         all_assets, count = content_store.get_all_content_for_course(course.id)
-        self.assertEqual(len(all_assets), 0)
+        self.assertEqual(all_assets, [])
         self.assertEqual(count, 0)
 
     def test_no_static_link_rewrites_on_import(self):

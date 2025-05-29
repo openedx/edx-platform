@@ -45,7 +45,6 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = f'http://{LMS_BASE}'
-FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 
@@ -65,9 +64,6 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
-
-# Load development webpack donfiguration
-WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ############################ PYFS XBLOCKS SERVICE #############################
 # Set configuration for Django pyfilesystem
@@ -183,6 +179,12 @@ COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
+
+################### FRONTEND APPLICATION ACCOUNT ###################
+ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
+
+################### FRONTEND APPLICATION LEARNING ###################
+LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 
 ################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = None

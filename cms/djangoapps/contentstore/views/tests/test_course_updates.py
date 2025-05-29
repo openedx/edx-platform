@@ -5,7 +5,9 @@ unit tests for course_info views and models.
 
 import json
 from opaque_keys.edx.keys import UsageKey
+from edx_toggles.toggles.testutils import override_waffle_flag
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.test_course_settings import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from openedx.core.lib.xblock_utils import get_course_update_items
@@ -21,6 +23,7 @@ class CourseUpdateTest(CourseTestCase):  # lint-amnesty, pylint: disable=missing
         return reverse_course_url('course_info_update_handler', course_key, kwargs=kwargs)
 
     # The do all and end all of unit test cases.
+    @override_waffle_flag(toggles.LEGACY_STUDIO_UPDATES, True)
     def test_course_update(self):
         """Go through each interface and ensure it works."""
         def get_response(content, date):

@@ -147,19 +147,21 @@ class TestContextFunctions(ModuleStoreTestCase):
         context = create_email_digest_context(**params)
         expected_start_date = 'Sunday, Mar 24' if digest_frequency == 'Daily' else 'Monday, Mar 18'
         expected_digest_updates = [
-            {'title': 'Total Notifications', 'count': 2},
-            {'title': 'Discussion', 'count': 1},
-            {'title': 'Updates', 'count': 1},
+            {'title': 'Total Notifications', 'translated_title': 'Total Notifications', 'count': 2},
+            {'title': 'Discussion', 'translated_title': 'Discussion', 'count': 1},
+            {'title': 'Updates', 'translated_title': 'Updates', 'count': 1},
         ]
         expected_email_content = [
             {
                 'title': 'Discussion', 'help_text': '', 'help_text_url': '',
+                'translated_title': 'Discussion',
                 'notifications': [discussion_notification],
                 'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
                 'url': 'http://learner-home-mfe/?showNotifications=true&app=discussion'
             },
             {
                 'title': 'Updates', 'help_text': '', 'help_text_url': '',
+                'translated_title': 'Updates',
                 'notifications': [update_notification],
                 'total': 1, 'show_remaining_count': False, 'remaining_count': 0,
                 'url': 'http://learner-home-mfe/?showNotifications=true&app=updates'

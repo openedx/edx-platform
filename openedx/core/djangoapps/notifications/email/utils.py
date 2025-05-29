@@ -8,12 +8,14 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from pytz import utc
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.discussion.notification_prefs.views import UsernameCipher
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_EMAIL_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
@@ -27,6 +29,7 @@ from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.django import modulestore
 
 from .notification_icons import NotificationTypeIcons
+
 
 User = get_user_model()
 
@@ -119,12 +122,14 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
     end_date_str = create_datetime_string(end_date if end_date else start_date)
     email_digest_updates = [{
         'title': 'Total Notifications',
+        'translated_title': _('Total Notifications'),
         'count': sum(value['count'] for value in app_notifications_dict.values())
     }]
     email_digest_updates.extend([
         {
             'title': value['title'],
             'count': value['count'],
+            'translated_title': value.get('translated_title', value['title']),
         }
         for key, value in app_notifications_dict.items()
     ])
@@ -135,6 +140,7 @@ def create_email_digest_context(app_notifications_dict, username, start_date, en
         total = value['count']
         app_content = {
             'title': value['title'],
+            'translated_title': value.get('translated_title', value['title']),
             'help_text': value.get('help_text', ''),
             'help_text_url': value.get('help_text_url', ''),
             'notifications': add_additional_attributes_to_notifications(
@@ -200,7 +206,7 @@ def get_time_ago(datetime_obj):
     current_date = utc.localize(datetime.datetime.today())
     days_diff = (current_date - datetime_obj).days
     if days_diff == 0:
-        return "Today"
+        return _("Today")
     if days_diff >= 7:
         return f"{int(days_diff / 7)}w"
     return f"{days_diff}d"
@@ -252,6 +258,7 @@ def create_app_notifications_dict(notifications):
         name: {
             'count': 0,
             'title': name.title(),
+            'translated_title': get_translated_app_title(name),
             'notifications': []
         }
         for name in app_names
@@ -431,3 +438,38 @@ def is_notification_type_channel_editable(app_name, notification_type, channel):
     if notification_type == 'core':
         return channel not in COURSE_NOTIFICATION_APPS[app_name]['non_editable']
     return channel not in COURSE_NOTIFICATION_TYPES[notification_type]['non_editable']
+
+
+def get_translated_app_title(name):
+    """
+    Returns translated string from notification app_name key
+    """
+    mapping = {
+        'discussion': _('Discussion'),
+        'updates': _('Updates'),
+        'grading': _('Grading'),
+    }
+    return mapping.get(name, '')
+
+
+def get_language_preference_for_users(user_ids):
+    """
+    Returns mapping of user_id and language preference for users
+    """
+    prefs = UserPreference.get_preference_for_users(user_ids, LANGUAGE_KEY)
+    return {pref.user_id: pref.value for pref in prefs}
+
+
+def get_text_for_notification_type(notification_type):
+    """
+    Returns text for notification type
+    """
+    app_name = COURSE_NOTIFICATION_TYPES.get(notification_type, {}).get('notification_app')
+    if not app_name:
+        return ""
+    mapping = {
+        'discussion': _('post'),
+        'updates': _('update'),
+        'grading': _('assessment'),
+    }
+    return mapping.get(app_name, "")

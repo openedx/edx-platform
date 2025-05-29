@@ -8,14 +8,15 @@ import textwrap
 import unittest
 
 from xmodule.capa.responsetypes import LoncapaProblemError
-from xmodule.capa.tests.helpers import new_loncapa_problem, test_capa_system
+from xmodule.capa.tests.helpers import new_loncapa_problem, mock_capa_system
 
 
 class CapaAnswerPoolTest(unittest.TestCase):
     """Capa Answer Pool Test"""
+
     def setUp(self):
         super(CapaAnswerPoolTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.system = test_capa_system()
+        self.system = mock_capa_system()
 
     # XML problem setup used by a few tests.
     common_question_xml = textwrap.dedent("""

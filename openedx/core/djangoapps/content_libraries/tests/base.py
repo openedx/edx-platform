@@ -2,13 +2,17 @@
 Tests for Learning-Core-based Content Libraries
 """
 from contextlib import contextmanager
+import json
 from io import BytesIO
 from urllib.parse import urlencode
 
 from organizations.models import Organization
 from rest_framework.test import APITransactionTestCase, APIClient
+from opaque_keys.edx.keys import ContainerKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
 
 from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.json_request import JsonResponse as SpecialJsonResponse
 from openedx.core.djangoapps.content_libraries.constants import ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
@@ -23,6 +27,7 @@ URL_LIB_LINKS = URL_LIB_DETAIL + 'links/'  # Get the list of links in this libra
 URL_LIB_COMMIT = URL_LIB_DETAIL + 'commit/'  # Commit (POST) or revert (DELETE) all pending changes to this library
 URL_LIB_BLOCKS = URL_LIB_DETAIL + 'blocks/'  # Get the list of XBlocks in this library, or add a new one
 URL_LIB_CONTAINERS = URL_LIB_DETAIL + 'containers/'  # Create a new container in this library
+URL_LIB_COLLECTIONS = URL_LIB_DETAIL + 'collections/'  # Create a new collection in this library
 URL_LIB_TEAM = URL_LIB_DETAIL + 'team/'  # Get the list of users/groups authorized to use this library
 URL_LIB_TEAM_USER = URL_LIB_TEAM + 'user/{username}/'  # Add/edit/remove a user's permission to use this library
 URL_LIB_TEAM_GROUP = URL_LIB_TEAM + 'group/{group_name}/'  # Add/edit/remove a group's permission to use this library
@@ -33,7 +38,12 @@ URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specifie
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
 URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
-URL_LIB_CONTAINER_COMPONENTS = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
+URL_LIB_CONTAINER_CHILDREN = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
+URL_LIB_CONTAINER_RESTORE = URL_LIB_CONTAINER + 'restore/'  # Restore a deleted container
+URL_LIB_CONTAINER_COLLECTIONS = URL_LIB_CONTAINER + 'collections/'  # Handle associated collections
+URL_LIB_CONTAINER_PUBLISH = URL_LIB_CONTAINER + 'publish/'  # Publish changes to the specified container + children
+URL_LIB_COLLECTION = URL_LIB_COLLECTIONS + '{collection_key}/'  # Get a collection in this library
+URL_LIB_COLLECTION_ITEMS = URL_LIB_COLLECTION + 'items/'  # Get a collection in this library
 
 URL_LIB_LTI_PREFIX = URL_PREFIX + 'lti/1.3/'
 URL_LIB_LTI_JWKS = URL_LIB_LTI_PREFIX + 'pub/jwks/'
@@ -65,11 +75,6 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         entire response has some specific shape. That way, things like adding
         new fields to an API response, which are backwards compatible, won't
         break any tests, but backwards-incompatible API changes will.
-
-    WARNING: every test should have a unique library slug, because even though
-    the django/mysql database gets reset for each test case, the lookup between
-    library slug and bundle UUID does not because it's assumed to be immutable
-    and cached forever.
     """
 
     def setUp(self):
@@ -110,6 +115,8 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         response = getattr(self.client, method)(url, data, format="json")
         assert response.status_code == expect_response,\
             'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
+        if isinstance(response, SpecialJsonResponse):  # Required for some old APIs in the CMS that aren't using DRF
+            return json.loads(response.content)
         return response.data
 
     @contextmanager
@@ -304,11 +311,10 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Publish changes from a specified XBlock """
         return self._api('post', URL_LIB_BLOCK_PUBLISH.format(block_key=block_key), None, expect_response)
 
-    def _paste_clipboard_content_in_library(self, lib_key, block_id, expect_response=200):
+    def _paste_clipboard_content_in_library(self, lib_key, expect_response=200):
         """ Paste's the users clipboard content into Library """
         url = URL_LIB_PASTE_CLIPBOARD.format(lib_key=lib_key)
-        data = {"block_id": block_id}
-        return self._api('post', url, data, expect_response)
+        return self._api('post', url, {}, expect_response)
 
     def _render_block_view(self, block_key, view_name, version=None, expect_response=200):
         """
@@ -373,66 +379,134 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             data["slug"] = slug
         return self._api('post', URL_LIB_CONTAINERS.format(lib_key=lib_key), data, expect_response)
 
-    def _get_container(self, container_key: str, expect_response=200):
+    def _get_container(self, container_key: ContainerKey | str, expect_response=200):
         """ Get a container (unit etc.) """
         return self._api('get', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)
 
-    def _update_container(self, container_key: str, display_name: str, expect_response=200):
+    def _update_container(self, container_key: ContainerKey | str, display_name: str, expect_response=200):
         """ Update a container (unit etc.) """
         data = {"display_name": display_name}
         return self._api('patch', URL_LIB_CONTAINER.format(container_key=container_key), data, expect_response)
 
-    def _delete_container(self, container_key: str, expect_response=204):
+    def _delete_container(self, container_key: ContainerKey | str, expect_response=204):
         """ Delete a container (unit etc.) """
         return self._api('delete', URL_LIB_CONTAINER.format(container_key=container_key), None, expect_response)
 
-    def _get_container_components(self, container_key: str, expect_response=200):
-        """ Get container components"""
+    def _restore_container(self, container_key: ContainerKey | str, expect_response=204):
+        """ Restore a deleted a container (unit etc.) """
+        return self._api('post', URL_LIB_CONTAINER_RESTORE.format(container_key=container_key), None, expect_response)
+
+    def _get_container_children(self, container_key: ContainerKey | str, expect_response=200):
+        """ Get container children"""
         return self._api(
             'get',
-            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
             None,
             expect_response
         )
 
-    def _add_container_components(
+    def _add_container_children(
         self,
-        container_key: str,
+        container_key: ContainerKey | str,
         children_ids: list[str],
         expect_response=200,
     ):
-        """ Add container components"""
+        """ Add container children"""
         return self._api(
             'post',
-            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
             {'usage_keys': children_ids},
             expect_response
         )
 
     def _remove_container_components(
         self,
-        container_key: str,
+        container_key: ContainerKey | str,
         children_ids: list[str],
         expect_response=200,
     ):
         """ Remove container components"""
         return self._api(
             'delete',
-            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
             {'usage_keys': children_ids},
             expect_response
         )
 
     def _patch_container_components(
         self,
-        container_key: str,
+        container_key: ContainerKey | str,
         children_ids: list[str],
         expect_response=200,
     ):
         """ Update container components"""
         return self._api(
             'patch',
-            URL_LIB_CONTAINER_COMPONENTS.format(container_key=container_key),
+            URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
             {'usage_keys': children_ids},
             expect_response
         )
+
+    def _patch_container_collections(
+        self,
+        container_key: ContainerKey | str,
+        collection_keys: list[str],
+        expect_response=200,
+    ):
+        """ Update container collections"""
+        return self._api(
+            'patch',
+            URL_LIB_CONTAINER_COLLECTIONS.format(container_key=container_key),
+            {'collection_keys': collection_keys},
+            expect_response
+        )
+
+    def _publish_container(self, container_key: ContainerKey | str, expect_response=200):
+        """ Publish all changes in the specified container + children """
+        return self._api('post', URL_LIB_CONTAINER_PUBLISH.format(container_key=container_key), None, expect_response)
+
+    def _create_collection(
+        self,
+        lib_key: LibraryLocatorV2 | str,
+        title: str,
+        description: str = "",
+        expect_response=200,
+    ):
+        """ Create a new collection in this library """
+        data = {"title": title, "description": description}
+        return self._api('post', URL_LIB_COLLECTIONS.format(lib_key=lib_key), data, expect_response)
+
+    def _soft_delete_collection(self, collection_key: LibraryCollectionLocator, expect_response=204):
+        """ Soft delete (disable) a collection """
+        url = URL_LIB_COLLECTION.format(lib_key=collection_key.lib_key, collection_key=collection_key.collection_id)
+        return self._api('delete', url, {}, expect_response)
+
+    def _update_collection(
+        self,
+        collection_key: LibraryCollectionLocator,
+        title: str | None = None,
+        description: str | None = None,
+        expect_response=200,
+    ):
+        """ Update a collection's title/description """
+        data = {}
+        if title is not None:
+            data["title"] = title
+        if description is not None:
+            data["description"] = description
+        url = URL_LIB_COLLECTION.format(lib_key=collection_key.lib_key, collection_key=collection_key.collection_id)
+        return self._api('patch', url, data, expect_response)
+
+    def _add_items_to_collection(
+        self,
+        collection_key: LibraryCollectionLocator,
+        item_keys: list[str | UsageKey | ContainerKey],
+        expect_response=200,
+    ):
+        """ Add components/containers to a collection """
+        data = {"usage_keys": [str(k) for k in item_keys]}
+        url = URL_LIB_COLLECTION_ITEMS.format(
+            lib_key=collection_key.lib_key,
+            collection_key=collection_key.collection_id,
+        )
+        return self._api('patch', url, data, expect_response)
