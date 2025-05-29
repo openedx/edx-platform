@@ -5,6 +5,7 @@ from edx_toggles.toggles import SettingDictToggle, WaffleFlag
 from openedx.core.djangoapps.content.search import api as search_api
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 
+
 # .. toggle_name: FEATURES['ENABLE_EXPORT_GIT']
 # .. toggle_implementation: SettingDictToggle
 # .. toggle_default: False
@@ -66,61 +67,61 @@ def bypass_olx_failure_enabled():
     return BYPASS_OLX_FAILURE.is_enabled()
 
 
-# .. toggle_name: FEATURES['ENABLE_EXAM_SETTINGS_HTML_VIEW']
-# .. toggle_use_cases: open_edx
-# .. toggle_implementation: SettingDictToggle
+# .. toggle_name: legacy_studio.exam_settings
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: When enabled, users can access the new course authoring view for proctoring exams
-# .. toggle_warning: None
-# .. toggle_creation_date: 2020-07-23
-ENABLE_EXAM_SETTINGS_HTML_VIEW = SettingDictToggle(
-    "FEATURES", "ENABLE_EXAM_SETTINGS_HTML_VIEW", default=False, module_name=__name__
-)
+# .. toggle_description: Temporarily fall back to the old proctored exam settings view.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_EXAM_SETTINGS = CourseWaffleFlag("legacy_studio.exam_settings", __name__)
 
 
-def exam_setting_view_enabled():
+def exam_setting_view_enabled(course_key):
     """
     Returns a boolean if proctoring exam setting mfe view is enabled.
     """
-    return ENABLE_EXAM_SETTINGS_HTML_VIEW.is_enabled()
+    return not LEGACY_STUDIO_EXAM_SETTINGS.is_enabled(course_key)
 
 
-# .. toggle_name: new_core_editors.use_new_text_editor
+# .. toggle_name: legacy_studio.text_editor
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new core text xblock editor
+# .. toggle_description: Temporarily fall back to the old Text component (a.k.a. html block) editor.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-12-1
-# .. toggle_target_removal_date: 2022-1-30
-# .. toggle_tickets: TNL-9306
-# .. toggle_warning:
-ENABLE_NEW_TEXT_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_text_editor', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_TEXT_EDITOR = CourseWaffleFlag("legacy_studio.text_editor", __name__)
 
 
-def use_new_text_editor():
+def use_new_text_editor(course_key):
     """
     Returns a boolean = true if new text editor is enabled
     """
-    return ENABLE_NEW_TEXT_EDITOR_FLAG.is_enabled()
+    return not LEGACY_STUDIO_TEXT_EDITOR.is_enabled(course_key)
 
 
-# .. toggle_name: new_core_editors.use_new_video_editor
+# .. toggle_name: legacy_studio.video_editor
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new core video xblock editor
+# .. toggle_description: Temporarily fall back to the old Video component (a.k.a. video block) editor.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-12-1
-# .. toggle_target_removal_date: 2022-1-30
-# .. toggle_tickets: TNL-9306
-# .. toggle_warning:
-ENABLE_NEW_VIDEO_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_video_editor', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_VIDEO_EDITOR = CourseWaffleFlag('legacy_studio.video_editor', __name__)
 
 
-def use_new_video_editor():
+def use_new_video_editor(course_key):
     """
     Returns a boolean = true if new video editor is enabled
     """
-    return ENABLE_NEW_VIDEO_EDITOR_FLAG.is_enabled()
+    return not LEGACY_STUDIO_VIDEO_EDITOR.is_enabled(course_key)
 
 
 # .. toggle_name: new_core_editors.use_video_gallery_flow
@@ -141,54 +142,23 @@ def use_video_gallery_flow():
     return ENABLE_VIDEO_GALLERY_FLOW_FLAG.is_enabled()
 
 
-# .. toggle_name: new_core_editors.use_new_problem_editor
+# .. toggle_name: legacy_studio.problem_editor
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new core problem xblock editor
+# .. toggle_description: Temporarily fall back to the old Problem component (a.k.a. CAPA/problem block) editor.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2021-12-1
-# .. toggle_target_removal_date: 2022-1-30
-# .. toggle_tickets: TNL-9306
-# .. toggle_warning:
-ENABLE_NEW_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_new_problem_editor', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_PROBLEM_EDITOR = CourseWaffleFlag('legacy_studio.problem_editor', __name__)
 
 
-def use_new_problem_editor():
+def use_new_problem_editor(course_key):
     """
     Returns a boolean if new problem editor is enabled
     """
-    return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
-
-
-# .. toggle_name: new_core_editors.use_advanced_problem_editor
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new core problem xblock advanced editor as the default
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2024-07-25
-# .. toggle_target_removal_date: 2024-08-31
-# .. toggle_tickets: TNL-11694
-# .. toggle_warning:
-ENABLE_DEFAULT_ADVANCED_PROBLEM_EDITOR_FLAG = WaffleFlag('new_core_editors.use_advanced_problem_editor', __name__)
-
-
-# .. toggle_name: new_editors.add_game_block_button
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the creation of the new games block
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-07-26
-# .. toggle_target_removal_date: 2023-09-31
-# .. toggle_tickets: TNL-10924
-# .. toggle_warning:
-ENABLE_ADD_GAME_BLOCK_FLAG = WaffleFlag('new_editors.add_game_block_button', __name__)
-
-
-def use_add_game_block():
-    """
-    Returns a boolean if add game block button is enabled
-    """
-    return ENABLE_ADD_GAME_BLOCK_FLAG.is_enabled()
+    return not LEGACY_STUDIO_PROBLEM_EDITOR.is_enabled(course_key)
 
 
 # .. toggle_name: contentstore.individualize_anonymous_user_id
@@ -211,213 +181,199 @@ def individualize_anonymous_user_id(course_id):
     return INDIVIDUALIZE_ANONYMOUS_USER_ID.is_enabled(course_id)
 
 
-# .. toggle_name: contentstore.enable_studio_content_api
+# .. toggle_name: legacy_studio.home
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Enables the new (experimental and unsafe!) Studio Content REST API for course authors,
-# .. which provides CRUD capabilities for course content and xblock editing.
-# .. Use at your own peril - you can easily delete learner data when editing running courses.
-# .. This can be triggered by deleting blocks, editing subsections, problems, assignments, discussions,
-# .. creating new problems or graded sections, and by other things you do.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-05-26
-# .. toggle_tickets: TNL-10208
-ENABLE_STUDIO_CONTENT_API = WaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.enable_studio_content_api',
-    __name__,
-)
-
-
-def use_studio_content_api():
-    """
-    Returns a boolean if studio editing API is enabled
-    """
-    return ENABLE_STUDIO_CONTENT_API.is_enabled()
-
-
-# .. toggle_name: new_studio_mfe.use_new_home_page
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio home page mfe
+# .. toggle_description: Temporarily fall back to the old Studio logged-in landing page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-9306
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_HOME_PAGE = WaffleFlag('new_studio_mfe.use_new_home_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_HOME = WaffleFlag('legacy_studio.home', __name__)
 
 
 def use_new_home_page():
     """
     Returns a boolean if new studio home page mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_HOME_PAGE.is_enabled()
+    return not LEGACY_STUDIO_HOME.is_enabled()
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_custom_pages
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.custom_pages
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio custom pages mfe
+# .. toggle_description: Temporarily fall back to the old Studio custom pages tab.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_CUSTOM_PAGES = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_custom_pages', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_CUSTOM_PAGES = CourseWaffleFlag("legacy_studio.custom_pages", __name__)
 
 
 def use_new_custom_pages(course_key):
     """
     Returns a boolean if new studio custom pages mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled(course_key)
+    return not LEGACY_STUDIO_CUSTOM_PAGES.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_schedule_details_page
+# .. toggle_name: contentstore.use_react_markdown_editor
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio schedule and details mfe
+# .. toggle_description: This flag enables the use of the Markdown editor when creating or editing problems in the authoring MFE
+# .. toggle_use_cases: opt_in
+# .. toggle_creation_date: 2025-4-11
+# .. toggle_tickets: https://openedx.atlassian.net/wiki/spaces/OEPM/pages/4517232656/Re-enable+Markdown+editing+of+CAPA+problems+to+meet+various+use+cases
+ENABLE_REACT_MARKDOWN_EDITOR = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.use_react_markdown_editor', __name__)
+
+
+def use_react_markdown_editor(course_key):
+    """
+    Returns a boolean if new studio custom pages mfe is enabled
+    """
+    return ENABLE_REACT_MARKDOWN_EDITOR.is_enabled(course_key)
+
+
+# .. toggle_name: legacy_studio.schedule_details
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Temporarily fall back to the old Studio Schedule & Details page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_SCHEDULE_DETAILS_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_schedule_details_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_SCHEDULE_DETAILS = CourseWaffleFlag('legacy_studio.schedule_details', __name__)
 
 
 def use_new_schedule_details_page(course_key):
     """
     Returns a boolean if new studio schedule and details mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_SCHEDULE_DETAILS_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_SCHEDULE_DETAILS.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_advanced_settings_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.advanced_settings
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio advanced settings page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Advanced Settings page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_advanced_settings_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_ADVANCED_SETTINGS = CourseWaffleFlag('legacy_studio.advanced_settings', __name__)
 
 
 def use_new_advanced_settings_page(course_key):
     """
     Returns a boolean if new studio advanced settings pafe mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_ADVANCED_SETTINGS.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_grading_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.grading
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio grading page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Course Grading page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_GRADING_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_grading_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_GRADING = CourseWaffleFlag('legacy_studio.grading', __name__)
 
 
 def use_new_grading_page(course_key):
     """
     Returns a boolean if new studio grading mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_GRADING_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_GRADING.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_updates_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.updates
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio updates page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Course Updates page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_UPDATES_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_updates_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_UPDATES = CourseWaffleFlag('legacy_studio.updates', __name__)
 
 
 def use_new_updates_page(course_key):
     """
     Returns a boolean if new studio updates mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_UPDATES_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_UPDATES.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_import_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.import
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio import page mfe
+# .. toggle_description: Temporarily fall back to the old Course Import page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_IMPORT_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_import_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_IMPORT = CourseWaffleFlag('legacy_studio.import', __name__)
 
 
 def use_new_import_page(course_key):
     """
     Returns a boolean if new studio import mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_IMPORT_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_IMPORT.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_export_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.export
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio export page mfe
+# .. toggle_description: Temporarily fall back to the old Course Export page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_EXPORT_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_export_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_EXPORT = CourseWaffleFlag('legacy_studio.export', __name__)
 
 
 def use_new_export_page(course_key):
     """
     Returns a boolean if new studio export mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_EXPORT_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_EXPORT.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_files_uploads_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.files_uploads
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio files and uploads page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Files & Uploads page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_files_uploads_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_FILES_UPLOADS = CourseWaffleFlag('legacy_studio.files_uploads', __name__)
 
 
 def use_new_files_uploads_page(course_key):
     """
     Returns a boolean if new studio files and uploads mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_FILES_UPLOADS.is_enabled(course_key)
 
 
 # .. toggle_name: contentstore.new_studio_mfe.use_new_video_uploads_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new video uploads page mfe
+# .. toggle_description: This flag enables the use of the new studio video uploads page mfe
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2023-5-15
 # .. toggle_target_removal_date: 2023-8-31
@@ -434,124 +390,118 @@ def use_new_video_uploads_page(course_key):
     return ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_course_outline_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.course_outline
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio course outline page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Course Outline editor.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_COURSE_OUTLINE_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_course_outline_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_COURSE_OUTLINE = CourseWaffleFlag('legacy_studio.course_outline', __name__)
 
 
 def use_new_course_outline_page(course_key):
     """
     Returns a boolean if new studio course outline mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_COURSE_OUTLINE_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_COURSE_OUTLINE.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_unit_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.unit_editor
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio course outline page mfe
+# .. toggle_description: Temporarily fall back to the old Studio unit editing page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_UNIT_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_unit_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_UNIT_EDITOR = CourseWaffleFlag('legacy_studio.unit_editor', __name__)
 
 
 def use_new_unit_page(course_key):
     """
     Returns a boolean if new studio course outline mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_UNIT_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_UNIT_EDITOR.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_course_team_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.course_team
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio course team page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Course Team page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-5-15
-# .. toggle_target_removal_date: 2023-8-31
-# .. toggle_tickets: TNL-10619
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_COURSE_TEAM_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_course_team_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_COURSE_TEAM = CourseWaffleFlag('legacy_studio.course_team', __name__)
 
 
 def use_new_course_team_page(course_key):
     """
     Returns a boolean if new studio course team mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_COURSE_TEAM_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_COURSE_TEAM.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_certificates_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.certificates
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio course certificates page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Course Certificates page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2024-1-18
-# .. toggle_target_removal_date: 2023-4-31
-# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/317
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_CERTIFICATES_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_certificates_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_CERTIFICATES = CourseWaffleFlag('legacy_studio.certificates', __name__)
 
 
 def use_new_certificates_page(course_key):
     """
     Returns a boolean if new studio certificates mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_CERTIFICATES_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_CERTIFICATES.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_textbooks_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.textbooks
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio course textbooks page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Textbooks page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2024-1-18
-# .. toggle_target_removal_date: 2023-4-31
-# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/319
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_TEXTBOOKS_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_textbooks_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_TEXTBOOKS = CourseWaffleFlag('legacy_studio.textbooks', __name__)
 
 
 def use_new_textbooks_page(course_key):
     """
     Returns a boolean if new studio textbooks mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_TEXTBOOKS_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_TEXTBOOKS.is_enabled(course_key)
 
 
-# .. toggle_name: contentstore.new_studio_mfe.use_new_group_configurations_page
-# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_name: legacy_studio.configurations
+# .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
-# .. toggle_description: This flag enables the use of the new studio course group configurations page mfe
+# .. toggle_description: Temporarily fall back to the old Studio Configurations page.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2024-1-18
-# .. toggle_target_removal_date: 2023-4-31
-# .. toggle_tickets: https://github.com/openedx/platform-roadmap/issues/318
-# .. toggle_warning:
-ENABLE_NEW_STUDIO_GROUP_CONFIGURATIONS_PAGE = CourseWaffleFlag(
-    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_group_configurations_page', __name__)
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed. Only the new (React-based) experience will be available.
+LEGACY_STUDIO_CONFIGURATIONS = CourseWaffleFlag('legacy_studio.configurations', __name__)
 
 
 def use_new_group_configurations_page(course_key):
     """
     Returns a boolean if new studio group configurations mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_GROUP_CONFIGURATIONS_PAGE.is_enabled(course_key)
+    return not LEGACY_STUDIO_CONFIGURATIONS.is_enabled(course_key)
 
 
 # .. toggle_name: contentstore.mock_video_uploads
@@ -687,3 +637,25 @@ def enable_course_optimizer(course_id):
     Returns a boolean if course optimizer is enabled on the course
     """
     return ENABLE_COURSE_OPTIMIZER.is_enabled(course_id)
+
+
+# .. toggle_name: legacy_studio.logged_out_home
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Temporarily fall back to the old Studio "How it Works" page when unauthenticated
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-03-14
+# .. toggle_target_removal_date: 2025-09-14
+# .. toggle_tickets: https://github.com/openedx/edx-platform/issues/36275
+# .. toggle_warning: In Ulmo, this toggle will be removed, along with the legacy page. The only available
+#  behavior will be to send the user to the log-in page with a redirect to Studio Course Listing (/home).
+LEGACY_STUDIO_LOGGED_OUT_HOME = WaffleFlag('legacy_studio.logged_out_home', __name__)
+
+
+def use_legacy_logged_out_home():
+    """
+    Returns whether the old "how it works" page should be shown.
+
+    If not, then we should just go to the login page w/ redirect to studio course listing.
+    """
+    return LEGACY_STUDIO_LOGGED_OUT_HOME.is_enabled()

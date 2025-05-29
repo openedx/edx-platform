@@ -48,7 +48,7 @@ https://github.com/openedx/edx-platform/issues/35653):
   /api/contentstore/v2/downstreams
   /api/contentstore/v2/downstreams?course_id=course-v1:A+B+C&ready_to_sync=true
       GET: List downstream blocks that can be synced, filterable by course or sync-readiness.
-        200: A paginated list of applicable & accessible downstream blocks. Entries are PublishableEntityLinks.
+        200: A paginated list of applicable & accessible downstream blocks. Entries are ComponentLinks.
 
   /api/contentstore/v2/downstreams/<course_key>/summary
       GET: List summary of links by course key
@@ -87,6 +87,7 @@ from django.contrib.auth.models import User  # pylint: disable=imported-auth-use
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryContainerLocator
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.fields import BooleanField
 from rest_framework.request import Request
@@ -94,12 +95,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from xblock.core import XBlock
 
-from cms.djangoapps.contentstore.helpers import import_static_assets_for_library_sync
-from cms.djangoapps.contentstore.models import PublishableEntityLink
+from cms.djangoapps.contentstore.models import ComponentLink
 from cms.djangoapps.contentstore.rest_api.v2.serializers import (
-    PublishableEntityLinksSerializer,
+    ComponentLinksSerializer,
     PublishableEntityLinksSummarySerializer,
 )
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import sync_library_content
 from cms.lib.xblock.upstream_sync import (
     BadDownstream,
     BadUpstream,
@@ -107,10 +108,10 @@ from cms.lib.xblock.upstream_sync import (
     UpstreamLink,
     UpstreamLinkException,
     decline_sync,
-    fetch_customizable_fields,
     sever_upstream_link,
-    sync_from_upstream,
 )
+from cms.lib.xblock.upstream_sync_block import fetch_customizable_fields_from_block
+from cms.lib.xblock.upstream_sync_container import fetch_customizable_fields_from_container
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import (
     DeveloperErrorViewMixin,
@@ -183,9 +184,9 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
                 link_filter["upstream_usage_key"] = UsageKey.from_string(upstream_usage_key)
             except InvalidKeyError as exc:
                 raise ValidationError(detail=f"Malformed usage key: {upstream_usage_key}") from exc
-        links = PublishableEntityLink.filter_links(**link_filter)
+        links = ComponentLink.filter_links(**link_filter)
         paginated_links = paginator.paginate_queryset(links, self.request, view=self)
-        serializer = PublishableEntityLinksSerializer(paginated_links, many=True)
+        serializer = ComponentLinksSerializer(paginated_links, many=True)
         return paginator.get_paginated_response(serializer.data, self.request)
 
 
@@ -204,12 +205,14 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
                 "upstream_context_key": "lib:OpenedX:CSPROB3",
                 "ready_to_sync_count": 11,
                 "total_count": 14
+                "last_published_at": "2025-05-02T20:20:44.989042Z"
             },
             {
                 "upstream_context_title": "CS problems 2",
                 "upstream_context_key": "lib:OpenedX:CSPROB2",
                 "ready_to_sync_count": 15,
-                "total_count": 24
+                "total_count": 24,
+                "last_published_at": "2025-05-03T21:20:44.989042Z"
             },
         ]
         """
@@ -217,7 +220,7 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
             course_key = CourseKey.from_string(course_key_string)
         except InvalidKeyError as exc:
             raise ValidationError(detail=f"Malformed course key: {course_key_string}") from exc
-        links = PublishableEntityLink.summarize_by_downstream_context(downstream_context_key=course_key)
+        links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
         serializer = PublishableEntityLinksSummarySerializer(links, many=True)
         return Response(serializer.data)
 
@@ -252,12 +255,21 @@ class DownstreamView(DeveloperErrorViewMixin, APIView):
             raise ValidationError({"sync": "must be 'true' or 'false'"})
         try:
             if sync_param == "true" or sync_param is True:
-                sync_from_upstream(downstream=downstream, user=request.user)
+                sync_library_content(
+                    downstream=downstream,
+                    request=request,
+                    store=modulestore()
+                )
             else:
                 # Even if we're not syncing (i.e., updating the downstream's values with the upstream's), we still need
                 # to fetch the upstream's customizable values and store them as hidden fields on the downstream. This
                 # ensures that downstream authors can restore defaults based on the upstream.
-                fetch_customizable_fields(downstream=downstream, user=request.user)
+                link = UpstreamLink.get_for_block(downstream)
+                if isinstance(link.upstream_key, LibraryUsageLocatorV2):
+                    fetch_customizable_fields_from_block(downstream=downstream, user=request.user)
+                else:
+                    assert isinstance(link.upstream_key, LibraryContainerLocator)
+                    fetch_customizable_fields_from_container(downstream=downstream)
         except BadDownstream as exc:
             logger.exception(
                 "'%s' is an invalid downstream; refusing to set its upstream to '%s'",
@@ -312,8 +324,11 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
             if downstream.usage_key.block_type == "video":
                 # Delete all transcripts so we can copy new ones from upstream
                 clear_transcripts(downstream)
-            upstream = sync_from_upstream(downstream, request.user)
-            static_file_notices = import_static_assets_for_library_sync(downstream, upstream, request)
+            static_file_notices = sync_library_content(
+                downstream=downstream,
+                request=request,
+                store=modulestore()
+            )
         except UpstreamLinkException as exc:
             logger.exception(
                 "Could not sync from upstream '%s' to downstream '%s'",
@@ -321,7 +336,6 @@ class SyncFromUpstreamView(DeveloperErrorViewMixin, APIView):
                 usage_key_string,
             )
             raise ValidationError(detail=str(exc)) from exc
-        modulestore().update_item(downstream, request.user.id)
         # Note: We call `get_for_block` (rather than `try_get_for_block`) because if anything is wrong with the
         #       upstream at this point, then that is completely unexpected, so it's appropriate to let the 500 happen.
         response = UpstreamLink.get_for_block(downstream).to_json()

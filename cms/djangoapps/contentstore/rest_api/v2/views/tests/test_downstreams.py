@@ -3,14 +3,18 @@ Unit tests for /api/contentstore/v2/downstreams/* JSON APIs.
 """
 import json
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from django.conf import settings
+from django.urls import reverse
 from freezegun import freeze_time
 from organizations.models import Organization
 
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
+from opaque_keys.edx.keys import UsageKey
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -29,6 +33,7 @@ URL_LIB_BLOCK_OLX = URL_PREFIX + 'blocks/{block_key}/olx/'
 def _get_upstream_link_good_and_syncable(downstream):
     return UpstreamLink(
         upstream_ref=downstream.upstream,
+        upstream_key=UsageKey.from_string(downstream.upstream),
         version_synced=downstream.upstream_version,
         version_available=(downstream.upstream_version or 0) + 1,
         version_declined=downstream.upstream_version_declined,
@@ -104,6 +109,8 @@ class _BaseDownstreamViewTestMixin:
         self.fake_video_key = self.course.id.make_usage_key("video", "NoSuchVideo")
         self.learner = UserFactory(username="learner", password="password")
         self._set_library_block_olx(self.html_lib_id, "<html><b>Hello world!</b></html>")
+        self._publish_library_block(self.html_lib_id)
+        self._publish_library_block(self.video_lib_id)
         self._publish_library_block(self.html_lib_id)
 
     def _api(self, method, url, data, expect_response):
@@ -232,8 +239,8 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
             content_type="application/json",
         )
 
-    @patch.object(downstreams_views, "fetch_customizable_fields")
-    @patch.object(downstreams_views, "sync_from_upstream")
+    @patch.object(downstreams_views, "fetch_customizable_fields_from_block")
+    @patch.object(downstreams_views, "sync_library_content")
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     def test_200_with_sync(self, mock_sync, mock_fetch):
         """
@@ -247,8 +254,8 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert mock_fetch.call_count == 0
         assert video_after.upstream == self.video_lib_id
 
-    @patch.object(downstreams_views, "fetch_customizable_fields")
-    @patch.object(downstreams_views, "sync_from_upstream")
+    @patch.object(downstreams_views, "fetch_customizable_fields_from_block")
+    @patch.object(downstreams_views, "sync_library_content")
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     def test_200_no_sync(self, mock_sync, mock_fetch):
         """
@@ -262,7 +269,9 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert mock_fetch.call_count == 1
         assert video_after.upstream == self.video_lib_id
 
-    @patch.object(downstreams_views, "fetch_customizable_fields", side_effect=BadUpstream(MOCK_UPSTREAM_ERROR))
+    @patch.object(
+        downstreams_views, "fetch_customizable_fields_from_block", side_effect=BadUpstream(MOCK_UPSTREAM_ERROR),
+    )
     def test_400(self, sync: str):
         """
         Do we raise a 400 if the provided upstream reference is malformed or not accessible?
@@ -329,6 +338,60 @@ class _DownstreamSyncViewTestMixin(SharedErrorTestCases):
         assert "is not linked" in response.data["developer_message"][0]
 
 
+class CreateDownstreamViewTest(CourseTestCase, _BaseDownstreamViewTestMixin, SharedModuleStoreTestCase):
+    """
+    Tests create new downstream blocks
+    """
+    def call_api_post(self, library_content_key, category):
+        """
+        Call the api to create a downstream block using
+        `library_content_key` as upstream
+        """
+        data = {
+            "parent_locator": str(self.course.location),
+            "display_name": "Test block",
+            "library_content_key": library_content_key,
+            "category": category,
+        }
+        return self.client.post(
+            reverse("xblock_handler"),
+            data=json.dumps(data),
+            content_type="application/json",
+        )
+
+    def test_200(self):
+        response = self.call_api_post(self.html_lib_id, "html")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["upstreamRef"] == self.html_lib_id
+
+        usage_key = UsageKey.from_string(data["locator"])
+        item = modulestore().get_item(usage_key)
+        assert item.upstream == self.html_lib_id
+
+    @patch("cms.djangoapps.contentstore.helpers._insert_static_files_into_downstream_xblock")
+    @patch("cms.djangoapps.contentstore.helpers.content_staging_api.stage_xblock_temporarily")
+    @patch("cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers.sync_from_upstream_block")
+    def test_200_video(self, mock_sync, mock_stage, mock_insert):
+        mock_lib_block = MagicMock()
+        mock_lib_block.runtime.get_block_assets.return_value = ['mocked_asset']
+        mock_sync.return_value = mock_lib_block
+        mock_stage.return_value = MagicMock()
+        mock_insert.return_value = StaticFileNotices()
+
+        response = self.call_api_post(self.video_lib_id, "video")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["upstreamRef"] == self.video_lib_id
+
+        usage_key = UsageKey.from_string(data["locator"])
+        item = modulestore().get_item(usage_key)
+        assert item.upstream == self.video_lib_id
+        assert item.edx_video_id is not None
+
+
 class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStoreTestCase):
     """
     Test that `POST /api/v2/contentstore/downstreams/.../sync` initiates a sync from the linked upstream.
@@ -337,17 +400,15 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
         return self.client.post(f"/api/contentstore/v2/downstreams/{usage_key_string}/sync")
 
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
-    @patch.object(downstreams_views, "sync_from_upstream")
-    @patch.object(downstreams_views, "import_static_assets_for_library_sync", return_value=StaticFileNotices())
+    @patch.object(xblock_view_handlers, "import_static_assets_for_library_sync", return_value=StaticFileNotices())
     @patch.object(downstreams_views, "clear_transcripts")
-    def test_200(self, mock_sync_from_upstream, mock_import_staged_content, mock_clear_transcripts):
+    def test_200(self, mock_import_staged_content, mock_clear_transcripts):
         """
         Does the happy path work?
         """
         self.client.login(username="superuser", password="password")
         response = self.call_api(self.downstream_video_key)
         assert response.status_code == 200
-        assert mock_sync_from_upstream.call_count == 1
         assert mock_import_staged_content.call_count == 1
         assert mock_clear_transcripts.call_count == 1
 
@@ -487,6 +548,7 @@ class GetDownstreamSummaryViewTest(
             'upstream_context_key': self.library_id,
             'ready_to_sync_count': 0,
             'total_count': 3,
+            'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)
         response = self.call_api(str(self.course.id))
@@ -497,5 +559,6 @@ class GetDownstreamSummaryViewTest(
             'upstream_context_key': self.library_id,
             'ready_to_sync_count': 1,
             'total_count': 2,
+            'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)

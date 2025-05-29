@@ -19,7 +19,7 @@ from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component, ComponentVersion
 from opaque_keys.edx.keys import UsageKeyV2
-from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchUsage, NoSuchViewError

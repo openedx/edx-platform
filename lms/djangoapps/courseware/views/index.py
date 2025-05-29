@@ -27,7 +27,6 @@ from web_fragments.fragment import Fragment
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
-from xmodule.util.xmodule_django import get_current_request_hostname
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.student.models import CourseEnrollment
@@ -48,7 +47,6 @@ from openedx.features.course_experience import (
     default_course_url
 )
 from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
-from openedx.features.course_experience.views.course_sock import CourseSockFragmentView
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
 from ..access import has_access
@@ -64,7 +62,7 @@ from ..masquerade import check_content_start_date_for_masquerade_user, setup_mas
 from ..model_data import FieldDataCache
 from ..block_render import get_block_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
-from ..toggles import ENABLE_OPTIMIZELY_IN_COURSEWARE, courseware_mfe_is_active
+from ..toggles import ENABLE_OPTIMIZELY_IN_COURSEWARE
 from .views import CourseTabView
 
 log = logging.getLogger("edx.courseware.views.index")
@@ -172,8 +170,7 @@ class CoursewareIndex(View):
         Can the user access this sequence in the courseware MFE? If so, redirect to MFE.
         """
         # If the MFE is active, prefer that
-        if courseware_mfe_is_active():
-            raise Redirect(self.microfrontend_url)
+        raise Redirect(self.microfrontend_url)
 
     @property
     def microfrontend_url(self):
@@ -189,7 +186,7 @@ class CoursewareIndex(View):
                 unit_key = None
         except InvalidKeyError:
             unit_key = None
-        is_preview = settings.FEATURES.get('PREVIEW_LMS_BASE') == get_current_request_hostname()
+        is_preview = False
         url = make_learning_mfe_courseware_url(
             self.course_key,
             self.section.location if self.section else None,
@@ -453,9 +450,6 @@ class CoursewareIndex(View):
             self.course,
             table_of_contents['chapters'],
         )
-
-        courseware_context['course_sock_fragment'] = CourseSockFragmentView().render_to_fragment(
-            request, course=self.course)
 
         # entrance exam data
         self._add_entrance_exam_to_context(courseware_context)

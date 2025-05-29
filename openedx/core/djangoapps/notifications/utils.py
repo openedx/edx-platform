@@ -6,7 +6,7 @@ from typing import Dict, List, Set
 
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NEW_NOTIFICATION_VIEW, ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -46,13 +46,6 @@ def get_show_notifications_tray(user):
             break
 
     return show_notifications_tray
-
-
-def get_is_new_notification_view_enabled():
-    """
-    Returns True if the waffle flag for the new notification view is enabled, False otherwise.
-    """
-    return ENABLE_NEW_NOTIFICATION_VIEW.is_enabled()
 
 
 def get_list_in_batches(input_list, batch_size):
@@ -269,3 +262,21 @@ def aggregate_notification_configs(existing_user_configs: List[Dict]) -> Dict:
                 result_config[app]["notification_types"][type_key]["email_cadence"] = (
                     result_config[app]["notification_types"][type_key]["email_cadence"].pop())
     return result_config
+
+
+def filter_out_visible_preferences_by_course_ids(user, preferences: Dict, course_ids: List) -> Dict:
+    """
+    Filter out notifications visible to forum roles from user preferences.
+    """
+    forum_roles = Role.objects.filter(users__id=user.id).values_list('name', flat=True)
+    course_roles = CourseAccessRole.objects.filter(
+        user=user,
+        course_id__in=course_ids
+    ).values_list('role', flat=True)
+    notification_types_with_visibility = get_notification_types_with_visibility_settings()
+    return filter_out_visible_notifications(
+        preferences,
+        notification_types_with_visibility,
+        forum_roles,
+        course_roles
+    )

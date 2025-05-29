@@ -34,7 +34,7 @@ from olxcleaner.exceptions import ErrorLevel
 from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryContainerLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization, OrganizationCourse
@@ -84,7 +84,7 @@ from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctori
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml
 
-from .models import LearningContextLinksStatus, LearningContextLinksStatusChoices, PublishableEntityLink
+from .models import ContainerLink, LearningContextLinksStatus, LearningContextLinksStatusChoices, ComponentLink
 from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
@@ -98,6 +98,15 @@ FULL_COURSE_REINDEX_THRESHOLD = 1
 ALL_ALLOWED_XBLOCKS = frozenset(
     [entry_point.name for entry_point in entry_points(group="xblock.v1")]
 )
+
+
+class LinkState:
+    """
+    Links State Enumeration
+    """
+    BROKEN = 'broken'
+    LOCKED = 'locked'
+    EXTERNAL_FORBIDDEN = 'external-forbidden'
 
 
 def clone_instance(instance, field_values):
@@ -1215,7 +1224,7 @@ def _get_urls(content):
     """
     Finds and returns a list of URLs in the given content.
     Includes strings following 'href=' and 'src='.
-    Excludes strings that are only '#'.
+    Excludes strings that are only '#' or start with 'data:'.
 
     Arguments:
         content (str): entire content of a block
@@ -1223,7 +1232,7 @@ def _get_urls(content):
     Returns:
         list: urls
     """
-    regex = r'\s+(?:href|src)=["\'](?!#)([^"\']*)["\']'
+    regex = r'\s+(?:href|src)=["\'](?!#|data:)([^"\']*)["\']'
     url_list = re.findall(regex, content)
     return url_list
 
@@ -1334,7 +1343,8 @@ def _filter_by_status(results):
 
     Statuses:
         200: OK. No need to do more
-        403: Forbidden. Record as locked link.
+        403: Forbidden. Record as locked link if it is studio link.
+        403: Forbidden. Record as external-forbidden link if it is external link
         None: Error. Retry up to 3 times.
         Other: Failure. Record as broken link.
 
@@ -1347,7 +1357,7 @@ def _filter_by_status(results):
 
     Example return:
         [
-            [block_id1, filtered_results_url1, is_locked],
+            [block_id1, filtered_results_url1, link_state],
             ...
         ],
         [
@@ -1359,14 +1369,16 @@ def _filter_by_status(results):
     retry_list = []
     for result in results:
         status, block_id, url = result['status'], result['block_id'], result['url']
-        if status is None:
+        if status is None and _is_studio_url(url):
             retry_list.append([block_id, url])
         elif status == 200:
             continue
         elif status == 403 and _is_studio_url(url):
-            filtered_results.append([block_id, url, True])
+            filtered_results.append([block_id, url, LinkState.LOCKED])
+        elif status in [403, 500, None] and not _is_studio_url(url):
+            filtered_results.append([block_id, url, LinkState.EXTERNAL_FORBIDDEN])
         else:
-            filtered_results.append([block_id, url, False])
+            filtered_results.append([block_id, url, LinkState.BROKEN])
 
     return filtered_results, retry_list
 
@@ -1463,7 +1475,8 @@ def create_or_update_upstream_links(
         updated=created,
     )
     if replace:
-        PublishableEntityLink.objects.filter(downstream_context_key=course_key).delete()
+        ComponentLink.objects.filter(downstream_context_key=course_key).delete()
+        ContainerLink.objects.filter(downstream_context_key=course_key).delete()
     try:
         xblocks = store.get_items(course_key, settings={"upstream": lambda x: x is not None})
     except ItemNotFoundError:
@@ -1471,7 +1484,7 @@ def create_or_update_upstream_links(
         course_status.update_status(LearningContextLinksStatusChoices.FAILED)
         return
     for xblock in xblocks:
-        create_or_update_xblock_upstream_link(xblock, course_key_str, created)
+        create_or_update_xblock_upstream_link(xblock, course_key, created)
     course_status.update_status(LearningContextLinksStatusChoices.COMPLETED)
 
 
@@ -1489,7 +1502,27 @@ def handle_unlink_upstream_block(upstream_usage_key_string: str) -> None:
         LOGGER.exception(f'Invalid upstream usage_key: {upstream_usage_key_string}')
         return
 
-    for link in PublishableEntityLink.objects.filter(
+    for link in ComponentLink.objects.filter(
         upstream_usage_key=upstream_usage_key,
+    ):
+        make_copied_tags_editable(str(link.downstream_usage_key))
+
+
+@shared_task
+@set_code_owner_attribute
+def handle_unlink_upstream_container(upstream_container_key_string: str) -> None:
+    """
+    Handle updates needed to downstream blocks when the upstream link is severed.
+    """
+    ensure_cms("handle_unlink_upstream_container may only be executed in a CMS context")
+
+    try:
+        upstream_container_key = LibraryContainerLocator.from_string(upstream_container_key_string)
+    except (InvalidKeyError):
+        LOGGER.exception(f'Invalid upstream container_key: {upstream_container_key_string}')
+        return
+
+    for link in ContainerLink.objects.filter(
+        upstream_container_key=upstream_container_key,
     ):
         make_copied_tags_editable(str(link.downstream_usage_key))
