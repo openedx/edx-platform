@@ -256,7 +256,10 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Unit 1",
             # description is not set for containers
             "num_children": 0,
-            "content": {"child_usage_keys": []},
+            "content": {
+                "child_usage_keys": [],
+                "child_display_names": [],
+            },
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
@@ -276,7 +279,10 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Subsection 1",
             # description is not set for containers
             "num_children": 0,
-            "content": {"child_usage_keys": []},
+            "content": {
+                "child_usage_keys": [],
+                "child_display_names": [],
+            },
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
@@ -296,7 +302,10 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Section 1",
             # description is not set for containers
             "num_children": 0,
-            "content": {"child_usage_keys": []},
+            "content": {
+                "child_usage_keys": [],
+                "child_display_names": [],
+            },
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
@@ -1061,7 +1070,10 @@ class TestSearchApi(ModuleStoreTestCase):
         new_unit_dict = {
             **self.unit_dict,
             "num_children": 1,
-            'content': {'child_usage_keys': [self.doc_problem1["usage_key"]]}
+            'content': {
+                'child_usage_keys': [self.doc_problem1["usage_key"]],
+                'child_display_names': [self.doc_problem1["display_name"]],
+            }
         }
 
         assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
@@ -1092,7 +1104,10 @@ class TestSearchApi(ModuleStoreTestCase):
         new_subsection_dict = {
             **self.subsection_dict,
             "num_children": 1,
-            'content': {'child_usage_keys': [self.unit_key]}
+            'content': {
+                'child_usage_keys': [self.unit_key],
+                'child_display_names': [self.unit.display_name]
+            }
         }
         assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
@@ -1122,7 +1137,10 @@ class TestSearchApi(ModuleStoreTestCase):
         new_section_dict = {
             **self.section_dict,
             "num_children": 1,
-            'content': {'child_usage_keys': [self.subsection_key]}
+            'content': {
+                'child_usage_keys': [self.subsection_key],
+                'child_display_names': [self.subsection.display_name],
+            }
         }
         assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(

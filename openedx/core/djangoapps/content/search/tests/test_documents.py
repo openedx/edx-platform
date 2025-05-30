@@ -564,6 +564,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "num_children": 0,
             "content": {
                 "child_usage_keys": [],
+                "child_display_names": [],
             },
             "publish_status": "never",
             "context_key": "lib:edX:2012_Fall",
@@ -609,6 +610,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "child_usage_keys": [
                     "lb:edX:2012_Fall:html:text2",
                 ],
+                "child_display_names": [
+                    "Text",
+                ],
             },
             "publish_status": "published",
             "context_key": "lib:edX:2012_Fall",
@@ -627,6 +631,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "content": {
                     "child_usage_keys": [
                         "lb:edX:2012_Fall:html:text2",
+                    ],
+                    "child_display_names": [
+                        "Text",
                     ],
                 },
             },
@@ -676,6 +683,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                     "lb:edX:2012_Fall:html:text2",
                     "lb:edX:2012_Fall:html:text3",
                 ],
+                "child_display_names": [
+                    "Text",
+                    "Text",
+                ],
             },
             "publish_status": "modified",
             "context_key": "lib:edX:2012_Fall",
@@ -694,6 +705,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "content": {
                     "child_usage_keys": [
                         "lb:edX:2012_Fall:html:text2",
+                    ],
+                    "child_display_names": [
+                        "Text",
                     ],
                 },
             },

@@ -102,6 +102,8 @@ class Fields:
 
     # List of children keys
     child_usage_keys = "child_usage_keys"
+    # List of children display names
+    child_display_names = "child_display_names"
 
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
@@ -701,6 +703,9 @@ def searchable_doc_for_container(
                     str(child.container_key)
                     for child in children
                 ]
+            
+    def get_child_names(children) -> list[str]:
+        return [child.display_name for child in children]
 
     doc.update({
         Fields.display_name: container.display_name,
@@ -708,7 +713,8 @@ def searchable_doc_for_container(
         Fields.modified: container.modified.timestamp(),
         Fields.num_children: len(draft_children),
         Fields.content: {
-            Fields.child_usage_keys: get_child_keys(draft_children)
+            Fields.child_usage_keys: get_child_keys(draft_children),
+            Fields.child_display_names: get_child_names(draft_children),
         },
         Fields.publish_status: publish_status,
         Fields.last_published: container.last_published.timestamp() if container.last_published else None,
@@ -727,6 +733,7 @@ def searchable_doc_for_container(
             Fields.published_num_children: len(published_children),
             Fields.published_content: {
                 Fields.child_usage_keys: get_child_keys(published_children),
+                Fields.child_display_names: get_child_names(published_children),
             },
         }
 
