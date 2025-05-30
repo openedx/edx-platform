@@ -57,41 +57,28 @@ class Thread(models.Model):
         )
 
         if query_params.get('text'):
-            url = cls.url(action='search')
+            search_params = utils.strip_none(params)
+            if user_id := search_params.get('user_id'):
+                search_params['user_id'] = str(user_id)
+            if group_ids := search_params.get('group_ids'):
+                search_params['group_ids'] = [int(group_id) for group_id in group_ids.split(',')]
+            elif group_id := search_params.get('group_id'):
+                search_params['group_ids'] = [int(group_id)]
+                search_params.pop('group_id', None)
+            if commentable_ids := search_params.get('commentable_ids'):
+                search_params['commentable_ids'] = commentable_ids.split(',')
+            elif commentable_id := search_params.get('commentable_id'):
+                search_params['commentable_ids'] = [commentable_id]
+                search_params.pop('commentable_id', None)
+            response = forum_api.search_threads(**search_params)
         else:
-            url = cls.url(action='get_all', params=utils.extract(params, 'commentable_id'))
-            if params.get('commentable_id'):
-                del params['commentable_id']
-
-        if is_forum_v2_enabled(utils.get_course_key(query_params['course_id'])):
-            if query_params.get('text'):
-                search_params = utils.strip_none(params)
-                if user_id := search_params.get('user_id'):
-                    search_params['user_id'] = str(user_id)
-                if group_ids := search_params.get('group_ids'):
-                    search_params['group_ids'] = [int(group_id) for group_id in group_ids.split(',')]
-                elif group_id := search_params.get('group_id'):
-                    search_params['group_ids'] = [int(group_id)]
-                    search_params.pop('group_id', None)
-                if commentable_ids := search_params.get('commentable_ids'):
-                    search_params['commentable_ids'] = commentable_ids.split(',')
-                elif commentable_id := search_params.get('commentable_id'):
-                    search_params['commentable_ids'] = [commentable_id]
-                    search_params.pop('commentable_id', None)
-                response = forum_api.search_threads(**search_params)
-            else:
-                if user_id := params.get('user_id'):
-                    params['user_id'] = str(user_id)
-                response = forum_api.get_user_threads(**params)
-        else:
-            response = utils.perform_request(
-                'get',
-                url,
-                params,
-                metric_tags=['course_id:{}'.format(query_params['course_id'])],
-                metric_action='thread.search',
-                paged_results=True
-            )
+            params.pop('commentable_id', None)
+            if user_id := params.get('user_id'):
+                params['user_id'] = str(user_id)
+            if author_id := params.get('author_id'):
+                params['author_id'] = str(author_id)
+            params = _clean_forum_params(params)
+            response = forum_api.get_user_threads(**params)
 
         if query_params.get('text'):
             search_query = query_params['text']
@@ -124,7 +111,6 @@ class Thread(models.Model):
                     total_results=total_results
                 )
             )
-
         return utils.CommentClientPaginatedResult(
             collection=response.get('collection', []),
             page=response.get('page', 1),
@@ -259,6 +245,23 @@ def _url_for_pin_thread(thread_id):
 
 def _url_for_un_pin_thread(thread_id):
     return f"{settings.PREFIX}/threads/{thread_id}/unpin"
+
+
+def _clean_forum_params(params):
+    """Convert string booleans to actual booleans and remove None values from forum parameters."""
+    result = {}
+    for k, v in params.items():
+        if v is not None:
+            if isinstance(v, str):
+                if v.lower() == 'true':
+                    result[k] = True
+                elif v.lower() == 'false':
+                    result[k] = False
+                else:
+                    result[k] = v
+            else:
+                result[k] = v
+    return result
 
 
 def is_forum_v2_enabled_for_thread(thread_id: str) -> tuple[bool, t.Optional[str]]:
