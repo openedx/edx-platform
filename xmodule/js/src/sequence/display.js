@@ -41,6 +41,12 @@
             this.displayTabTooltip = function(event) {
                 return Sequence.prototype.displayTabTooltip.apply(self, [event]);
             };
+            this.renderDropdown = function() {
+                return Sequence.prototype.renderDropdown.apply(self);
+            }
+            this.handleClickOutsideDropdown = function(event) {
+                return Sequence.prototype.handleClickOutsideDropdown.apply(self, [event]);
+            }
             this.arrowKeys = {
                 LEFT: 37,
                 UP: 38,
@@ -72,7 +78,6 @@
         }
 
         Sequence.prototype.renderDropdown = function() {
-          console.log("RESIZING");
           this.$(`#sequence-list > li.sequence-list-item`).show();
           const tabListWidth = this.$('#sequence-list').width()
           const singleTabWidth = this.$('#sequence-list > li:first').width()
@@ -89,14 +94,12 @@
           dropdownList.empty();
           this.$(`#sequence-list > li:gt(${overFlowIdx})`).each(function(idx, el) {
             const cloneEl = $(el).clone();
-            const unitTitle = cloneEl.find("button").data('page-title');
-            cloneEl.find("button").addClass('d-flex align-items-center px-2').click(this.goto);
-            cloneEl.find("button span.icon").after(
-              '<span class="d-flex flex-row mx-1 overflow-hidden text-truncate" style="flex-grow: 1">' + unitTitle + '</span>'
-            );
-            cloneEl
-              .show()
-              .appendTo(dropdownList);
+            const navButton = cloneEl.find("button");
+            const unitTitle = navButton.data('page-title');
+            navButton.click(this.goto);
+            navButton.find(".sequence-tooltip").remove();
+            navButton.find("span.icon").after('<span class="unit-title">' + unitTitle + '</span>');
+            cloneEl.show().appendTo(dropdownList);
           });
         }
 
@@ -106,6 +109,7 @@
 
         Sequence.prototype.bind = function() {
             this.$('#sequence-list .nav-item').click(this.goto);
+            $(document).click(this.handleClickOutsideDropdown);
             this.$('#dropdown-sequence-list .dropdown-item').click(this.goto);
             this.$('#dropdown-sequence-list-button').click(this.toggleDropdown);
             this.$('#sequence-list .nav-item').keypress(this.keyDownHandler);
@@ -113,10 +117,16 @@
             this.el.on('bookmark:remove', this.removeBookmarkIconFromActiveNavItem);
             this.$('#sequence-list .nav-item').on('focus mouseenter', this.displayTabTooltip);
             this.$('#sequence-list .nav-item').on('blur mouseleave', this.hideTabTooltip);
-            this.$(window).on('resize', _.debounce(this.renderDropdown, 300));
+            this.$(window).on('resize', _.debounce(this.renderDropdown, 200));
         };
 
-        Sequence.prototype.toggleDropdown = function(event) {
+        Sequence.prototype.handleClickOutsideDropdown = function(event) {
+          if(!this.$('#dropdown-container')[0].contains(event.target)) {
+            this.$('#dropdown-sequence-list').hide();
+          }
+        }
+
+        Sequence.prototype.toggleDropdown = function() {
           $('#dropdown-sequence-list').toggle();
         }
 

@@ -125,6 +125,22 @@
     overflow: visible;
 }
 
+.xmodule_display.xmodule_SequenceBlock .sequence-nav #dropdown-container ol li button {
+    display: flex;
+    align-items: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav #dropdown-container ol li button .unit-title {
+    display: flex;
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0 0.5rem;
+}
+
 .xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button .icon {
     display: inline-block;
     line-height: 100%;
