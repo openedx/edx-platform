@@ -123,3 +123,4 @@
         return EnrollmentInterface;
     });
 }).call(this, define || RequireJS.define);
+
