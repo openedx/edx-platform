@@ -29,10 +29,6 @@ Django<5.0
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35277
 django-oauth-toolkit==1.7.1
 
-# Date: 2024-02-02
-# incremental upgrade
-django-simple-history==3.4.0
-
 # Date: 2021-05-17
 # greater version has breaking changes and requires some migration steps.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/35276
