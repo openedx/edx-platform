@@ -116,7 +116,11 @@ from xmodule.partitions.partitions_service import (
 )
 from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService
 
-from .models import ComponentLink, ContainerLink
+try:
+    from .models import ComponentLink, ContainerLink
+except RuntimeError:
+    ComponentLink = {}
+    ContainerLink = {}
 
 IMPORTABLE_FILE_TYPES = ('.tar.gz', '.zip')
 log = logging.getLogger(__name__)
