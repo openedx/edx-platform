@@ -2243,7 +2243,7 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
 
     # Before anything that looks at cookies, especially the session middleware
-    'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
+    
 
     # Monitoring and logging for ignored errors
     'openedx.core.lib.request_utils.IgnoredErrorMiddleware',
@@ -4463,7 +4463,7 @@ DEFAULT_JWT_ISSUER = {
     'AUDIENCE': 'change-me',
     'SECRET_KEY': 'SET-ME-PLEASE'
 }
-JWT_EXPIRATION = 30
+JWT_EXPIRATION = 300
 JWT_PRIVATE_SIGNING_KEY = None
 
 JWT_AUTH = {
@@ -4476,7 +4476,7 @@ JWT_AUTH = {
     'JWT_AUTH_COOKIE': 'edx-jwt-cookie',
 
     # Number of seconds before JWTs expire
-    'JWT_EXPIRATION': 30,
+    'JWT_EXPIRATION': 300,
     'JWT_IN_COOKIE_EXPIRATION': 60 * 60,
 
     'JWT_LOGIN_CLIENT_ID': 'login-service-client-id',
