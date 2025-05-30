@@ -747,3 +747,5 @@ STATIC_ROOT_BASE = "/edx/var/edxapp/staticfiles"
 STATIC_URL_BASE = "/static/"
 ZENDESK_API_KEY = ""
 ZENDESK_USER = ""
+
+CATALOG_MICROFRONTEND_URL = "http://catalog-mfe"
