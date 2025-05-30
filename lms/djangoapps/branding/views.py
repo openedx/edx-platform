@@ -330,11 +330,28 @@ class WaffleFlagsView(APIView):
             request (HttpRequest): The HTTP request object.
             course_id (str, optional): The ID of the course for which to retrieve the waffle flag settings.
                                        If not provided, defaults to None.
+
         Returns:
             Response: A JSON response containing the status of various waffle flags for the specified course.
+
         **Example Request**
+
             GET .../v1/waffle-flags
             GET .../v1/waffle-flags/course-v1:test+test+test
+
+        **Response Values**
+
+            A JSON response containing the status of various waffle flags for the specified course.
+
+        **Example Response**
+
+        ```json
+        {
+            "use_new_index_page": true,
+            "use_new_catalog_page": true,
+            "use_new_course_about_page": false
+        }
+        ```
         """
         course_key = CourseKey.from_string(course_id) if course_id else None
         serializer = WaffleFlagsSerializer(context={"course_key": course_key}, data={})
