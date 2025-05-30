@@ -242,6 +242,7 @@ django==4.2.21
     #   django-push-notifications
     #   django-sekizai
     #   django-ses
+    #   django-simple-history
     #   django-statici18n
     #   django-storages
     #   django-user-tasks
@@ -398,9 +399,8 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==4.4.0
     # via -r requirements/edx/base.txt
-django-simple-history==3.4.0
+django-simple-history==3.8.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-name-affirmation
