@@ -774,6 +774,45 @@ class SidebarBlocksTestViews(BaseCourseHomeTests):
         assert sequence_data['complete'] == problem_complete
         assert vertical_data['complete'] == problem_complete
 
+    @ddt.data(
+        # In the following tests, the library is treated as an aggregate block. The library completion does not matter.
+        (False, False, False, False),  # Nothing is completed.
+        (True, False, False, True),  # Only the problem is completed.
+        (False, True, False, False),  # Only the library is completed.
+        (True, True, False, True),  # Both the library and the problem are completed.
+        # In the following tests, the library is treated as a completable block. The problem completion does not matter.
+        (False, False, True, False),  # Nothing is completed.
+        (True, False, True, False),  # Only the problem is completed.
+        (False, True, True, True),  # Only the library is completed.
+        (True, True, True, True),  # Both the library and the problem are completed.
+    )
+    @ddt.unpack
+    def test_blocks_complete_with_library_content_block(
+        self, problem_complete, library_complete, library_complete_on_view, expected
+    ):
+        """
+        Test that the API checks the children completion only when the XBlock's completion mode is `AGGREGATOR`.
+
+        The completion of the `COMPLETABLE` XBlocks should not depend on the completion of their children.
+        """
+        self.add_blocks_to_course()
+        library = BlockFactory.create(parent=self.vertical, category='library_content', graded=True, has_score=True)
+        problem = BlockFactory.create(parent=library, category='problem', graded=True, has_score=True)
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.create_completion(problem, int(problem_complete))
+        self.create_completion(library, int(library_complete))
+
+        with override_settings(
+            FEATURES={**settings.FEATURES, 'MARK_LIBRARY_CONTENT_BLOCK_COMPLETE_ON_VIEW': library_complete_on_view}
+        ):
+            response = self.client.get(reverse('course-home:course-navigation', args=[self.course.id]))
+
+        sequence_data = response.data['blocks'][str(self.sequential.location)]
+        vertical_data = response.data['blocks'][str(self.vertical.location)]
+
+        assert sequence_data['complete'] == expected
+        assert vertical_data['complete'] == expected
+
     def test_blocks_completion_stat(self):
         """
         Test that the API returns the correct completion statistics for the blocks.
