@@ -9,12 +9,12 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from requests.exceptions import HTTPError
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_406_NOT_ACCEPTABLE, HTTP_409_CONFLICT, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from rest_framework.views import APIView
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.entitlements.models import CourseEntitlement
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment, EnrollmentNotAllowed
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.courseware import courses
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
@@ -158,6 +158,12 @@ class BasketsView(APIView):
                 log.exception("Invalid enrollment attribute: %s", str(e))
                 error_msg = f"Invalid enrollment data for user {user.username} in course {course_id}: {str(e)}"
                 return DetailResponse(error_msg, status=HTTP_400_BAD_REQUEST)
+
+            # EnrollmentNotAllowed exception is raised when the user is not allowed to enroll in the course
+            except EnrollmentNotAllowed as e:
+                log.exception("Enrollment not allowed: %s", str(e))
+                error_msg = f"Enrollment not allowed for user {user.username} in course {course_id}: {str(e)}"
+                return DetailResponse(error_msg, status=HTTP_403_FORBIDDEN)
 
             mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR  # lint-amnesty, pylint: disable=unused-variable
             self._handle_marketing_opt_in(request, course_key, user)

@@ -44,6 +44,9 @@
                     } else if (jqXHR.status === ErrorStatuses.badRequest) {
                         // Show the error message for bad requests (invalid enrollment data)
                         this.showMessage(responseData);
+                    } else if (jqXHR.status === ErrorStatuses.forbidden) {
+                        // Show the error message for forbidden requests
+                        this.showMessage(responseData);
                     } else {
                         // Otherwise, redirect the user to the next page.
                         if (redirectUrl) {
