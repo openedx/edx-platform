@@ -82,6 +82,10 @@ class CourseMetadata:
         'is_onboarding_exam',
         'discussions_settings',
         'copied_from_block',
+        "upstream",
+        "upstream_version",
+        "upstream_version_declined",
+        "upstream_display_name",
     ]
 
     @classmethod
