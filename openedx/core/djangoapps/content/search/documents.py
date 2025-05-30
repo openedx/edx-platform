@@ -703,7 +703,7 @@ def searchable_doc_for_container(
                     str(child.container_key)
                     for child in children
                 ]
-            
+
     def get_child_names(children) -> list[str]:
         return [child.display_name for child in children]
 
