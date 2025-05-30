@@ -45,7 +45,7 @@
                         // Show the error message for bad requests (invalid enrollment data)
                         this.showMessage(responseData);
                     } else if (jqXHR.status === ErrorStatuses.forbidden) {
-                        // Show the error message for forbidden requests
+                        // Show the error message for forbidden requests (Enrollment not allowed)
                         this.showMessage(responseData);
                     } else {
                         // Otherwise, redirect the user to the next page.
