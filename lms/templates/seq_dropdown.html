@@ -1,0 +1,56 @@
+<%page expression_filter="h" args="items, start_index" />
+
+<%!
+from django.utils.translation import gettext as _
+%>
+
+<li class="h-100">
+    <button
+        id="dropdown-sequence-list-button"
+        class="dropdown-toggle"
+        type="button"
+    >
+        <span class="icon fa fa-chevron-down" aria-hidden="true"></span>
+    </button>
+    <div id="dropdown-sequence-list" style="display: none; position: absolute; width: 240px; right: 0;">
+        <ol class="d-block dropdown-menu bg-white py-0 shadow-sm border"
+            aria-labelledby="dropdown-sequence-list-button">
+            % for idx, item in enumerate(items, start=start_index):
+            <li class="border-bottom">
+                <button
+                    class="dropdown-item px-2 d-flex align-items-center seq_${item['type']}"
+                    data-index="${idx}"
+                    data-id="${item['id']}"
+                    data-element="${idx+1}"
+                    data-page-title="${item['page_title']}"
+                    data-path="${item['path']}"
+                    data-graded="${item['graded']}"
+                    id="tab_${idx}"
+                    href="javascript:void(0);"
+                    title="${item['page_title']}"
+                >
+                    <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
+                    <span class="d-flex flex-row mx-1 overflow-hidden text-truncate" style="flex-grow: 1;">
+                                ${item['page_title']}
+                                </span>
+                    % if 'complete' in item:
+                    <span class="check-circle ${"is-hidden" if not item['complete'] else ""}">
+                    <span
+                        class="fa fa-check-circle"
+                        style="color:green"
+                        aria-hidden="true"
+                    ></span>
+                    </span>
+                    % if item['complete']:
+                    <span class="sr">${_("Completed")}</span>
+                    % endif
+                    % endif
+                    <span class="bookmark-icon ${" is-hidden" if not item['bookmarked'] else "bookmarked"}">
+                    <span class="fa fa-fw fa-bookmark" aria-hidden="true"></span>
+                    </span>
+                </button>
+            </li>
+            % endfor
+        </ol>
+    </div>
+</li>

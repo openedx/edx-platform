@@ -78,6 +78,8 @@
     position: relative;
     height: 100%;
     flex-grow: 1;
+    /*overflow-x: auto;*/
+    max-width: 832px;
 }
 
 @media (max-width: 575.98px) {
@@ -104,7 +106,11 @@
     border-right-style: solid;
 }
 
-.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button {
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li .dropdown-toggle {
+    height: 49px !important;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button, .dropdown-toggle {
     width: 100%;
     height: 49px;
     position: relative;
@@ -117,6 +123,22 @@
     border-bottom-style: solid;
     box-sizing: border-box;
     overflow: visible;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav #dropdown-container ol li button {
+    display: flex;
+    align-items: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.xmodule_display.xmodule_SequenceBlock .sequence-nav #dropdown-container ol li button .unit-title {
+    display: flex;
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0 0.5rem;
 }
 
 .xmodule_display.xmodule_SequenceBlock .sequence-nav ol li button .icon {
@@ -187,7 +209,7 @@ body.touch-based-device .xmodule_display.xmodule_SequenceBlock .sequence-nav ol 
     display: none;
 }
 
-.xmodule_display.xmodule_SequenceBlock .sequence-nav-button {
+.xmodule_display.xmodule_SequenceBlock .sequence-nav-button, .dropdown-toggle {
     display: block;
     top: 0;
     min-width: 40px;
