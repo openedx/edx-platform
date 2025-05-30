@@ -9,6 +9,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartiti
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from common.djangoapps.student.models import CourseEnrollment
+from xmodule.course_block import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
 
 INCLUDE_SCHEMES = [CohortPartitionScheme, RandomUserPartitionScheme, ]
 SCHEME_SUPPORTS_ASSIGNMENT = [RandomUserPartitionScheme, ]
@@ -63,6 +64,6 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
         if not getattr(settings, "SEARCH_SKIP_INVITATION_ONLY_FILTERING", True):
             exclude_dictionary['invitation_only'] = True
         if not getattr(settings, "SEARCH_SKIP_SHOW_IN_CATALOG_FILTERING", True):
-            exclude_dictionary['catalog_visibility'] = 'none'
+            exclude_dictionary['catalog_visibility'] = [CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE]
 
         return exclude_dictionary
