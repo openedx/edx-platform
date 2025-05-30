@@ -256,7 +256,10 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Unit 1",
             # description is not set for containers
             "num_children": 0,
-            "content": {"child_usage_keys": []},
+            "content": {
+                "child_usage_keys": [],
+                "child_display_names": [],
+            },
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
@@ -276,7 +279,10 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Subsection 1",
             # description is not set for containers
             "num_children": 0,
-            "content": {"child_usage_keys": []},
+            "content": {
+                "child_usage_keys": [],
+                "child_display_names": [],
+            },
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
@@ -296,7 +302,10 @@ class TestSearchApi(ModuleStoreTestCase):
             "display_name": "Section 1",
             # description is not set for containers
             "num_children": 0,
-            "content": {"child_usage_keys": []},
+            "content": {
+                "child_usage_keys": [],
+                "child_display_names": [],
+            },
             "publish_status": "never",
             "context_key": "lib:org1:lib",
             "org": "org1",
@@ -336,9 +345,11 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_unit = copy.deepcopy(self.unit_dict)
         doc_unit["tags"] = {}
         doc_unit["collections"] = {'display_name': [], 'key': []}
+        doc_unit["subsections"] = {"display_name": [], "key": []}
         doc_subsection = copy.deepcopy(self.subsection_dict)
         doc_subsection["tags"] = {}
         doc_subsection["collections"] = {'display_name': [], 'key': []}
+        doc_subsection["sections"] = {'display_name': [], 'key': []}
         doc_section = copy.deepcopy(self.section_dict)
         doc_section["tags"] = {}
         doc_section["collections"] = {'display_name': [], 'key': []}
@@ -376,9 +387,11 @@ class TestSearchApi(ModuleStoreTestCase):
         doc_unit = copy.deepcopy(self.unit_dict)
         doc_unit["tags"] = {}
         doc_unit["collections"] = {"display_name": [], "key": []}
+        doc_unit["subsections"] = {"display_name": [], "key": []}
         doc_subsection = copy.deepcopy(self.subsection_dict)
         doc_subsection["tags"] = {}
         doc_subsection["collections"] = {'display_name': [], 'key': []}
+        doc_subsection["sections"] = {'display_name': [], 'key': []}
         doc_section = copy.deepcopy(self.section_dict)
         doc_section["tags"] = {}
         doc_section["collections"] = {'display_name': [], 'key': []}
@@ -983,14 +996,21 @@ class TestSearchApi(ModuleStoreTestCase):
             container_dict["id"],
         )
 
+    @ddt.data(
+        "unit",
+        "subsection",
+        "section",
+    )
     @override_settings(MEILISEARCH_ENABLED=True)
-    def test_index_library_container_metadata(self, mock_meilisearch) -> None:
+    def test_index_library_container_metadata(self, container_type, mock_meilisearch) -> None:
         """
         Test indexing a Library Container.
         """
-        api.upsert_library_container_index_doc(self.unit.container_key)
+        container = getattr(self, container_type)
+        container_dict = getattr(self, f"{container_type}_dict")
+        api.upsert_library_container_index_doc(container.container_key)
 
-        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([self.unit_dict])
+        mock_meilisearch.return_value.index.return_value.update_documents.assert_called_once_with([container_dict])
 
     @ddt.data(
         ("unit", "lctorg1libunitunit-1-e4527f7c"),
@@ -1050,7 +1070,10 @@ class TestSearchApi(ModuleStoreTestCase):
         new_unit_dict = {
             **self.unit_dict,
             "num_children": 1,
-            'content': {'child_usage_keys': [self.doc_problem1["usage_key"]]}
+            'content': {
+                'child_usage_keys': [self.doc_problem1["usage_key"]],
+                'child_display_names': [self.doc_problem1["display_name"]],
+            }
         }
 
         assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
@@ -1071,16 +1094,25 @@ class TestSearchApi(ModuleStoreTestCase):
                 None,
             )
 
-        # TODO verify subsections in units
-
+        doc_block_with_subsections = {
+            "id": self.unit_dict["id"],
+            "subsections": {
+                "display_name": [self.subsection.display_name],
+                "key": [self.subsection_key],
+            },
+        }
         new_subsection_dict = {
             **self.subsection_dict,
             "num_children": 1,
-            'content': {'child_usage_keys': [self.unit_key]}
+            'content': {
+                'child_usage_keys': [self.unit_key],
+                'child_display_names': [self.unit.display_name]
+            }
         }
-        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 1
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
+                call([doc_block_with_subsections]),
                 call([new_subsection_dict]),
             ],
             any_order=True,
@@ -1095,16 +1127,25 @@ class TestSearchApi(ModuleStoreTestCase):
                 None,
             )
 
-        # TODO verify section in subsections
-
+        doc_block_with_sections = {
+            "id": self.subsection_dict["id"],
+            "sections": {
+                "display_name": [self.section.display_name],
+                "key": [self.section_key],
+            },
+        }
         new_section_dict = {
             **self.section_dict,
             "num_children": 1,
-            'content': {'child_usage_keys': [self.subsection_key]}
+            'content': {
+                'child_usage_keys': [self.subsection_key],
+                'child_display_names': [self.subsection.display_name],
+            }
         }
-        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 1
+        assert mock_meilisearch.return_value.index.return_value.update_documents.call_count == 2
         mock_meilisearch.return_value.index.return_value.update_documents.assert_has_calls(
             [
+                call([doc_block_with_sections]),
                 call([new_section_dict]),
             ],
             any_order=True,

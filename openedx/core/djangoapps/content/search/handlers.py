@@ -44,9 +44,8 @@ from openedx.core.djangoapps.content_libraries import api as lib_api
 from .api import (
     only_if_meilisearch_enabled,
     upsert_content_object_tags_index_doc,
-    upsert_collection_tags_index_docs,
     upsert_item_collections_index_docs,
-    upsert_item_units_index_docs,
+    upsert_item_containers_index_docs,
 )
 from .tasks import (
     delete_library_block_index_doc,
@@ -258,14 +257,15 @@ def content_object_associations_changed_handler(**kwargs) -> None:
     # This event's changes may contain both "tags" and "collections", but this will happen rarely, if ever.
     # So we allow a potential double "upsert" here.
     if not content_object.changes or "tags" in content_object.changes:
-        if isinstance(opaque_key, LibraryCollectionLocator):
-            upsert_collection_tags_index_docs(opaque_key)
-        else:
-            upsert_content_object_tags_index_doc(opaque_key)
+        upsert_content_object_tags_index_doc(opaque_key)
     if not content_object.changes or "collections" in content_object.changes:
         upsert_item_collections_index_docs(opaque_key)
     if not content_object.changes or "units" in content_object.changes:
-        upsert_item_units_index_docs(opaque_key)
+        upsert_item_containers_index_docs(opaque_key, "units")
+    if not content_object.changes or "sections" in content_object.changes:
+        upsert_item_containers_index_docs(opaque_key, "sections")
+    if not content_object.changes or "subsections" in content_object.changes:
+        upsert_item_containers_index_docs(opaque_key, "subsections")
 
 
 @receiver(LIBRARY_CONTAINER_CREATED)

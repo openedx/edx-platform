@@ -58,7 +58,7 @@ from .block_metadata import LibraryXBlockMetadata, LibraryXBlockStaticFile
 from .containers import (
     create_container,
     get_container,
-    get_containers_contains_component,
+    get_containers_contains_item,
     update_container_children,
     ContainerMetadata,
     ContainerType,
@@ -229,7 +229,7 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
 
     # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
     # container indexing asynchronously.
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
@@ -585,7 +585,7 @@ def delete_library_block(
     component = get_component_from_usage_key(usage_key)
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
 
     authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
 
@@ -673,7 +673,7 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
     # container indexing asynchronously.
     #
     # To update the components count in containers
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
