@@ -42,7 +42,7 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
 
     id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
 
-    student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.DO_NOTHING)
+    student_module = models.ForeignKey(StudentModule, db_index=False, db_constraint=False, on_delete=models.DO_NOTHING)
 
     @receiver(post_save, sender=StudentModule)
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
