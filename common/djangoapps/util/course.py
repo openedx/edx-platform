@@ -9,6 +9,7 @@ from urllib.parse import urlencode
 from django.conf import settings
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
+from lms.djangoapps.branding.toggles import catalog_mfe_enabled, use_new_course_about_page
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx_filters.learning.filters import CourseAboutPageURLRequested
 
@@ -50,7 +51,9 @@ def get_link_for_about_page(course):
         'SOCIAL_SHARING_SETTINGS',
         getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
     ).get('CUSTOM_COURSE_URLS')
-    if is_social_sharing_enabled and course.social_sharing_url:
+    if catalog_mfe_enabled() and use_new_course_about_page(course.id):
+        course_about_url = f'{settings.CATALOG_MICROFRONTEND_URL}/courses/{course.id}/about'
+    elif is_social_sharing_enabled and course.social_sharing_url:
         course_about_url = course.social_sharing_url
     elif settings.FEATURES.get('ENABLE_MKTG_SITE') and getattr(course, 'marketing_url', None):
         course_about_url = course.marketing_url
