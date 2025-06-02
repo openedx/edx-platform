@@ -24,7 +24,7 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Container, ContainerVersion
+from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
@@ -50,7 +50,7 @@ __all__ = [
     "delete_container",
     "restore_container",
     "update_container_children",
-    "get_containers_contains_component",
+    "get_containers_contains_item",
     "publish_container_changes",
 ]
 
@@ -513,7 +513,13 @@ def update_container_children(
                 entities_action=entities_action,
             )
 
-            # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for subsections
+            for key in children_ids:
+                CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                    content_object=ContentObjectChangedData(
+                        object_id=str(key),
+                        changes=["subsections"],
+                    ),
+                )
         case ContainerType.Section:
             subsections = [_get_container_from_key(key).subsection for key in children_ids]  # type: ignore[arg-type]
             new_version = authoring_api.create_next_section_version(
@@ -524,7 +530,13 @@ def update_container_children(
                 entities_action=entities_action,
             )
 
-            # TODO add CONTENT_OBJECT_ASSOCIATIONS_CHANGED for sections
+            for key in children_ids:
+                CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                    content_object=ContentObjectChangedData(
+                        object_id=str(key),
+                        changes=["sections"],
+                    ),
+                )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
@@ -537,19 +549,26 @@ def update_container_children(
     return ContainerMetadata.from_container(library_key, new_version.container)
 
 
-def get_containers_contains_component(
-    usage_key: LibraryUsageLocatorV2
+def get_containers_contains_item(
+    key: LibraryUsageLocatorV2 | LibraryContainerLocator
 ) -> list[ContainerMetadata]:
     """
-    Get containers that contains the component.
+    Get containers that contains the item,
+    that can be a component or another container.
     """
-    assert isinstance(usage_key, LibraryUsageLocatorV2)
-    component = get_component_from_usage_key(usage_key)
+    item: Component | Container
+
+    if isinstance(key, LibraryUsageLocatorV2):
+        item = get_component_from_usage_key(key)
+
+    elif isinstance(key, LibraryContainerLocator):
+        item = _get_container_from_key(key)
+
     containers = authoring_api.get_containers_with_entity(
-        component.publishable_entity.pk,
+        item.publishable_entity.pk,
     )
     return [
-        ContainerMetadata.from_container(usage_key.context_key, container)
+        ContainerMetadata.from_container(key.lib_key, container)
         for container in containers
     ]
 
