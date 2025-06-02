@@ -8,7 +8,7 @@ import hashlib
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.files.storage import storages
+from django.core.files.storage import default_storage, storages
 from django.utils.module_loading import import_string
 
 from common.djangoapps.student.models import UserProfile
@@ -28,13 +28,14 @@ def get_profile_image_storage():
     This function prioritizes different settings in the following order to determine
     which storage class to use:
 
-    1. If the `PROFILE_IMAGE_BACKEND` setting is defined and includes a `'class'` key,
-       it uses the specified storage backend and options.
-    2. If not, it checks the Django 5+ `STORAGES` setting for a named storage called
-       `'profile_image'` and uses its configured backend.
-    3. If that is also unavailable, it falls back to the `'default'` storage defined in `STORAGES`.
-    4. Finally, if no STORAGES are configured, it uses `DEFAULT_FILE_STORAGE` (legacy setting),
-       or falls back to `'django.core.files.storage.FileSystemStorage'` as the last resort.
+    1. Use 'profile_image' storage from Django's STORAGES if defined (Django 4.2+).
+    2. If not available, check the legacy PROFILE_IMAGE_BACKEND setting.
+    3. If still undefined, fall back to Django's default_storage.
+
+    Note:
+        - Starting in Django 5+, `DEFAULT_FILE_STORAGE` and the `STORAGES` setting
+          are mutually exclusive. Only one of them should be used to avoid
+          `ImproperlyConfigured` errors.
 
     Returns:
         An instance of the configured storage backend for handling profile images.
@@ -42,20 +43,19 @@ def get_profile_image_storage():
     Raises:
         ImportError: If the specified storage class cannot be imported.
     """
+    # Prefer new-style Django 4.2+ STORAGES
+    storages_config = getattr(settings, 'STORAGES', {})
+
+    if 'profile_image' in storages_config:
+        return storages['profile_image']
+
+    # Legacy fallback: PROFILE_IMAGE_BACKEND
     config = getattr(settings, 'PROFILE_IMAGE_BACKEND', {})
     storage_class_path = config.get('class')
     options = config.get('options', {})
-    if not storage_class_path:
-        storages_config = getattr(settings, 'STORAGES', {})
 
-        if 'profile_image' in storages_config:
-            return storages['profile_image']
-        elif 'default' in storages_config:
-            return storages['default']
-        else:
-            storage_class_path = (getattr(settings, 'DEFAULT_FILE_STORAGE', None) or
-                                  'django.core.files.storage.FileSystemStorage')
-            options = {}
+    if not storage_class_path:
+        return default_storage
 
     storage_class = import_string(storage_class_path)
     return storage_class(**options)
