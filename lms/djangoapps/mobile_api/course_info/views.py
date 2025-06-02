@@ -330,7 +330,6 @@ class BlocksInfoInCourseView(BlocksInCourseView):
             # while preserving the original behavior for older clients.
             response = super().list(request)
 
-
         if request.GET.get('return_type', 'dict') == 'dict':
             course_id = request.query_params.get('course_id', None)
             course_key = CourseKey.from_string(course_id)
