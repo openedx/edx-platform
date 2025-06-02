@@ -101,6 +101,7 @@ from lms.djangoapps.courseware.toggles import (
     COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR,
     COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR,
 )
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
@@ -2367,4 +2368,6 @@ def courseware_mfe_navigation_sidebar_toggles(request, course_id=None):
     return JsonResponse({
         "enable_navigation_sidebar": COURSEWARE_MICROFRONTEND_ENABLE_NAVIGATION_SIDEBAR.is_enabled(course_key),
         "always_open_auxiliary_sidebar": COURSEWARE_MICROFRONTEND_ALWAYS_OPEN_AUXILIARY_SIDEBAR.is_enabled(course_key),
+        # Add completion tracking status for the sidebar use while a global place for switches is put in place
+        "enable_completion_tracking": ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled()
     })
