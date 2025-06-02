@@ -1,6 +1,7 @@
 """
 Tests for the Studio content search documents (what gets stored in the index)
 """
+import ddt
 from dataclasses import replace
 from datetime import datetime, timezone
 
@@ -25,13 +26,11 @@ try:
         searchable_doc_for_course_block,
         searchable_doc_for_library_block,
         searchable_doc_tags,
-        searchable_doc_tags_for_collection,
     )
     from ..models import SearchAccess
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
     searchable_doc_tags = lambda x: x
-    searchable_doc_tags_for_collection = lambda x: x
     searchable_doc_for_collection = lambda x: x
     searchable_doc_for_container = lambda x: x
     searchable_doc_for_library_block = lambda x: x
@@ -42,6 +41,7 @@ STUDIO_SEARCH_ENDPOINT_URL = "/api/content_search/v2/studio/"
 
 
 @skip_unless_cms
+@ddt.ddt
 class StudioDocumentsTest(SharedModuleStoreTestCase):
     """
     Tests for the Studio content search documents (what gets stored in the
@@ -100,6 +100,26 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             cls.container_key = LibraryContainerLocator.from_string(
                 "lct:edX:2012_Fall:unit:unit1",
             )
+            cls.subsection = library_api.create_container(
+                cls.library.key,
+                container_type=library_api.ContainerType.Subsection,
+                slug="subsection1",
+                title="A Subsection in the Search Index",
+                user_id=None,
+            )
+            cls.subsection_key = LibraryContainerLocator.from_string(
+                "lct:edX:2012_Fall:subsection:subsection1",
+            )
+            cls.section = library_api.create_container(
+                cls.library.key,
+                container_type=library_api.ContainerType.Section,
+                slug="section1",
+                title="A Section in the Search Index",
+                user_id=None,
+            )
+            cls.section_key = LibraryContainerLocator.from_string(
+                "lct:edX:2012_Fall:section:section1",
+            )
 
             # Add the problem block to the collection
             library_api.update_library_collection_items(
@@ -130,6 +150,8 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         tagging_api.tag_object(str(cls.library_block.usage_key), cls.difficulty_tags, tags=["Normal"])
         tagging_api.tag_object(str(cls.collection_key), cls.difficulty_tags, tags=["Normal"])
         tagging_api.tag_object(str(cls.container_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.subsection_key), cls.difficulty_tags, tags=["Normal"])
+        tagging_api.tag_object(str(cls.section_key), cls.difficulty_tags, tags=["Normal"])
 
     @property
     def toy_course_access_id(self):
@@ -460,7 +482,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
 
     def test_collection_with_library(self):
         doc = searchable_doc_for_collection(self.collection_key)
-        doc.update(searchable_doc_tags_for_collection(self.collection_key))
+        doc.update(searchable_doc_tags(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
@@ -489,7 +511,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         library_api.publish_changes(self.library.key)
 
         doc = searchable_doc_for_collection(self.collection_key)
-        doc.update(searchable_doc_tags_for_collection(self.collection_key))
+        doc.update(searchable_doc_tags(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
@@ -514,25 +536,33 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             }
         }
 
-    def test_draft_container(self):
+    @ddt.data(
+        ("container", "unit1", "unit", "edd13a0c"),
+        ("subsection", "subsection1", "subsection", "c6c172be"),
+        ("section", "section1", "section", "79ee8fa2"),
+    )
+    @ddt.unpack
+    def test_draft_container(self, container_name, container_slug, container_type, doc_id):
         """
         Test creating a search document for a draft-only container
         """
-        doc = searchable_doc_for_container(self.container.container_key)
-        doc.update(searchable_doc_tags(self.container.container_key))
+        container = getattr(self, container_name)
+        doc = searchable_doc_for_container(container.container_key)
+        doc.update(searchable_doc_tags(container.container_key))
 
         assert doc == {
-            "id": "lctedx2012_fallunitunit1-edd13a0c",
-            "block_id": "unit1",
-            "block_type": "unit",
-            "usage_key": "lct:edX:2012_Fall:unit:unit1",
+            "id": f"lctedx2012_fall{container_type}{container_slug}-{doc_id}",
+            "block_id": container_slug,
+            "block_type": container_type,
+            "usage_key": f"lct:edX:2012_Fall:{container_type}:{container_slug}",
             "type": "library_container",
             "org": "edX",
-            "display_name": "A Unit in the Search Index",
+            "display_name": container.display_name,
             # description is not set for containers
             "num_children": 0,
             "content": {
                 "child_usage_keys": [],
+                "child_display_names": [],
             },
             "publish_status": "never",
             "context_key": "lib:edX:2012_Fall",
@@ -578,6 +608,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "child_usage_keys": [
                     "lb:edX:2012_Fall:html:text2",
                 ],
+                "child_display_names": [
+                    "Text",
+                ],
             },
             "publish_status": "published",
             "context_key": "lib:edX:2012_Fall",
@@ -596,6 +629,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "content": {
                     "child_usage_keys": [
                         "lb:edX:2012_Fall:html:text2",
+                    ],
+                    "child_display_names": [
+                        "Text",
                     ],
                 },
             },
@@ -645,6 +681,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                     "lb:edX:2012_Fall:html:text2",
                     "lb:edX:2012_Fall:html:text3",
                 ],
+                "child_display_names": [
+                    "Text",
+                    "Text",
+                ],
             },
             "publish_status": "modified",
             "context_key": "lib:edX:2012_Fall",
@@ -663,6 +703,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "content": {
                     "child_usage_keys": [
                         "lb:edX:2012_Fall:html:text2",
+                    ],
+                    "child_display_names": [
+                        "Text",
                     ],
                 },
             },
