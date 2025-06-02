@@ -14,11 +14,11 @@ attrs==25.3.0
     #   zeep
 backoff==2.2.1
     # via -r scripts/user_retirement/requirements/base.txt
-boto3==1.38.18
+boto3==1.38.27
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
-botocore==1.38.18
+botocore==1.38.27
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -41,11 +41,11 @@ charset-normalizer==3.4.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   requests
-click==8.2.0
+click==8.2.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-cryptography==45.0.2
+cryptography==45.0.3
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   moto
@@ -66,19 +66,19 @@ django-waffle==4.2.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-edx-django-utils==7.4.0
+edx-django-utils==8.0.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-rest-api-client
 edx-rest-api-client==6.2.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-api-core==2.24.2
+google-api-core==2.25.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-python-client
-google-api-python-client==2.169.0
+google-api-python-client==2.170.0
     # via -r scripts/user_retirement/requirements/base.txt
-google-auth==2.40.1
+google-auth==2.40.2
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -130,12 +130,8 @@ more-itertools==10.7.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
-moto==5.1.4
+moto==5.1.5
     # via -r scripts/user_retirement/requirements/testing.in
-newrelic==10.12.0
-    # via
-    #   -r scripts/user_retirement/requirements/base.txt
-    #   edx-django-utils
 packaging==25.0
     # via pytest
 pbr==6.1.1
@@ -152,7 +148,7 @@ proto-plus==1.26.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
-protobuf==6.31.0
+protobuf==6.31.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-api-core
@@ -235,7 +231,7 @@ rsa==4.9.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   google-auth
-s3transfer==0.12.0
+s3transfer==0.13.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   boto3
@@ -256,7 +252,7 @@ stevedore==5.4.1
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   edx-django-utils
-typing-extensions==4.13.2
+typing-extensions==4.14.0
     # via
     #   -r scripts/user_retirement/requirements/base.txt
     #   simple-salesforce
