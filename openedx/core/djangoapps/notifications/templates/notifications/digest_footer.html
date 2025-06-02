@@ -31,25 +31,25 @@
         </tr>
         <tr>
             <td>
-                <p style="margin: 1.5rem 0 0 0;">
+                <blockquote style="margin: 1rem 0 0;">
                     {% if footer_email_reason %}
                         {{ footer_email_reason }}
                     {% else %}
                         {% trans "You are receiving this email because you have subscribed to email digest" as tmsg %}{{ tmsg | force_escape }}
                     {% endif %}
-                </p>
-                <p style="margin: 0.625rem 0">
+                </blockquote>
+                <blockquote style="margin: 0.625rem 0">
                     <a href="{{notification_settings_url}}" rel="noopener noreferrer" target="_blank" style="color: black">
                         {% trans "Notification Settings" as tmsg %}{{ tmsg | force_escape }}
                     </a>
                     <a href="{{unsubscribe_url}}" rel="noopener noreferrer" target="_blank" style="color: black; margin-left: 1rem">
                         {% trans "Unsubscribe from email digest for learning activity" as tmsg %}{{ tmsg | force_escape }}
                     </a>
-                </p>
-                <p>
+                </blockquote>
+                <blockquote style="margin: 0">
                     &copy; {% now "Y" %} {{ platform_name }}. {% trans "All rights reserved" as tmsg %}{{ tmsg | force_escape }} <br/>
                     {{ mailing_address }}
-                </p>
+                </blockquote>
             </td>
         </tr>
     </tbody>
