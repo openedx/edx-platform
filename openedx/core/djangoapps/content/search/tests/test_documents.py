@@ -26,13 +26,11 @@ try:
         searchable_doc_for_course_block,
         searchable_doc_for_library_block,
         searchable_doc_tags,
-        searchable_doc_tags_for_collection,
     )
     from ..models import SearchAccess
 except RuntimeError:
     searchable_doc_for_course_block = lambda x: x
     searchable_doc_tags = lambda x: x
-    searchable_doc_tags_for_collection = lambda x: x
     searchable_doc_for_collection = lambda x: x
     searchable_doc_for_container = lambda x: x
     searchable_doc_for_library_block = lambda x: x
@@ -484,7 +482,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
 
     def test_collection_with_library(self):
         doc = searchable_doc_for_collection(self.collection_key)
-        doc.update(searchable_doc_tags_for_collection(self.collection_key))
+        doc.update(searchable_doc_tags(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
@@ -513,7 +511,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
         library_api.publish_changes(self.library.key)
 
         doc = searchable_doc_for_collection(self.collection_key)
-        doc.update(searchable_doc_tags_for_collection(self.collection_key))
+        doc.update(searchable_doc_tags(self.collection_key))
 
         assert doc == {
             "id": "lib-collectionedx2012_falltoy_collection-d1d907a4",
@@ -564,6 +562,7 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
             "num_children": 0,
             "content": {
                 "child_usage_keys": [],
+                "child_display_names": [],
             },
             "publish_status": "never",
             "context_key": "lib:edX:2012_Fall",
@@ -609,6 +608,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "child_usage_keys": [
                     "lb:edX:2012_Fall:html:text2",
                 ],
+                "child_display_names": [
+                    "Text",
+                ],
             },
             "publish_status": "published",
             "context_key": "lib:edX:2012_Fall",
@@ -627,6 +629,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "content": {
                     "child_usage_keys": [
                         "lb:edX:2012_Fall:html:text2",
+                    ],
+                    "child_display_names": [
+                        "Text",
                     ],
                 },
             },
@@ -676,6 +681,10 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                     "lb:edX:2012_Fall:html:text2",
                     "lb:edX:2012_Fall:html:text3",
                 ],
+                "child_display_names": [
+                    "Text",
+                    "Text",
+                ],
             },
             "publish_status": "modified",
             "context_key": "lib:edX:2012_Fall",
@@ -694,6 +703,9 @@ class StudioDocumentsTest(SharedModuleStoreTestCase):
                 "content": {
                     "child_usage_keys": [
                         "lb:edX:2012_Fall:html:text2",
+                    ],
+                    "child_display_names": [
+                        "Text",
                     ],
                 },
             },
