@@ -1,3 +1,8 @@
+"""
+This is a plugin that helps pylint figure out what DJANGO_SETTINGS_MODULE to use for linting different files.  Since the
+LMS and CMS files have different expectations about what django settings including which installed apps and settings are
+set when the code is run.
+"""
 import os
 import sys
 
@@ -40,7 +45,7 @@ def register(linter):
     """
     Placeholder function to register the plugin with pylint.
     """
-    pass
+    return
 
 
 def load_configuration(linter):
