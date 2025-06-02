@@ -65,6 +65,7 @@ class BaseUserView(APIView):
     identifier_kinds = ['email', 'username']
 
     authentication_classes = (
+        JwtAuthentication,
         # Users may want to view/edit the providers used for authentication before they've
         # activated their account, so we allow inactive users.
         BearerAuthenticationAllowInactiveUser,
@@ -248,6 +249,42 @@ class UserViewV2(BaseUserView):
         """
         identifier = self.get_identifier_for_requested_user(request)
         return self.do_get(request, identifier)
+
+    def delete(self, request):
+        """
+        Delete given social auth record for a user.
+
+        Args:
+            request (Request): The HTTP DELETE request
+
+        Request Parameters:
+            email/username: Must provide one of 'email' or 'username'.  If both are provided,
+            the username will be ignored.
+            uid: UID of the social auth record to delete
+
+        Return:
+            JSON serialized list of the providers linked to this user after the delete operation.
+
+        """
+        identifier = self.get_identifier_for_requested_user(request)
+        uid = request.query_params.get("uid")
+        if not uid:
+            raise exceptions.ValidationError("Must provide uid")
+
+        is_unprivileged = self.is_unprivileged_query(request, identifier)
+
+        if is_unprivileged:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            UserSocialAuth.objects.get(**{"user__" + identifier.kind: identifier.value}, uid=uid).delete()
+        except UserSocialAuth.DoesNotExist:
+            return Response(
+                data={f"Either user {identifier.value} or social auth record {uid} does not exist."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_identifier_for_requested_user(self, request):
         """

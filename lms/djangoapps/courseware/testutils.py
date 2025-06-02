@@ -11,9 +11,8 @@ from urllib.parse import urlencode
 import ddt
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from lms.djangoapps.courseware.tests.helpers import set_preview_mode
 from lms.djangoapps.courseware.utils import is_mode_upsellable
-from openedx.features.course_experience.url_helpers import get_courseware_url
+from openedx.features.course_experience.url_helpers import _get_legacy_courseware_url
 from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -171,8 +170,8 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
         ('html_block', 4),
     )
     @ddt.unpack
-    @set_preview_mode(True)
-    def test_courseware_html(self, block_name, mongo_calls):
+    @patch('lms.djangoapps.courseware.views.index.CoursewareIndex._redirect_to_learning_mfe', return_value=None)
+    def test_courseware_html(self, block_name, mongo_calls, mock_redirect):
         """
         To verify that the removal of courseware chrome elements is working,
         we include this test here to make sure the chrome elements that should
@@ -186,7 +185,7 @@ class RenderXBlockTestMixin(MasqueradeMixin, metaclass=ABCMeta):
             self.setup_user(admin=True, enroll=True, login=True)
 
             with check_mongo_calls(mongo_calls):
-                url = get_courseware_url(self.block_to_be_tested.location)
+                url = _get_legacy_courseware_url(self.block_to_be_tested.location)
                 response = self.client.get(url)
                 expected_elements = self.block_specific_chrome_html_elements + self.COURSEWARE_CHROME_HTML_ELEMENTS
                 for chrome_element in expected_elements:

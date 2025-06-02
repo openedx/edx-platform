@@ -36,6 +36,7 @@ from rest_framework.viewsets import ViewSet
 from wiki.models import ArticleRevision
 from wiki.models.pluginbase import RevisionPluginRevision
 
+from common.djangoapps.track import segment
 from common.djangoapps.entitlements.models import CourseEntitlement
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     CourseEnrollmentAllowed,
@@ -510,7 +511,9 @@ class AccountDeactivationView(APIView):
 
         Marks the user as having no password set for deactivation purposes.
         """
-        _set_unusable_password(User.objects.get(username=username))
+        user = User.objects.get(username=username)
+        segment.identify(user.id, {'is_disabled': 'true'})
+        _set_unusable_password(user)
         return Response(get_account_settings(request, [username])[0])
 
 

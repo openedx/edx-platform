@@ -421,7 +421,7 @@ def _check_user_auth_flow(site, user):
             # we don't record their e-mail in case there is sensitive info accidentally
             # in there.
             set_custom_attribute("login_tpa_domain_shortcircuit_user_id", user.id)
-            log.warning("User %s has nonstandard e-mail. Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check.", user.id)
+            log.warning("User %s has nonstandard e-mail. Shortcircuiting THIRD_PARTY_AUTH_ONLY_DOMAIN check.", user.id)
             return
         user_domain = email_parts[1].strip().lower()
 

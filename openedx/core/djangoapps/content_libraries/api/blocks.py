@@ -58,15 +58,14 @@ from .block_metadata import LibraryXBlockMetadata, LibraryXBlockStaticFile
 from .containers import (
     create_container,
     get_container,
-    get_containers_contains_component,
+    get_containers_contains_item,
     update_container_children,
     ContainerMetadata,
     ContainerType,
 )
-from .libraries import (
-    library_collection_locator,
-    PublishableItem,
-)
+from .collections import library_collection_locator
+from .libraries import PublishableItem
+from .. import tasks
 
 # This content_libraries API is sometimes imported in the LMS (should we prevent that?), but the content_staging app
 # cannot be. For now we only need this one type import at module scope, so only import it during type checks.
@@ -230,7 +229,7 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
 
     # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
     # container indexing asynchronously.
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
@@ -494,7 +493,7 @@ def _import_staged_block_as_container(
             title=title,
             user_id=user.id,
         )
-        new_child_keys: list[UsageKeyV2] = []
+        new_child_keys: list[LibraryUsageLocatorV2] = []
         for child_node in olx_node:
             try:
                 child_metadata = _import_staged_block(
@@ -586,7 +585,7 @@ def delete_library_block(
     component = get_component_from_usage_key(usage_key)
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
 
     authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
 
@@ -647,11 +646,11 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
         )
     )
 
-    # Add tags and collections back to index
+    # Add tags, collections and units back to index
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
             object_id=str(usage_key),
-            changes=["collections", "tags"],
+            changes=["collections", "tags", "units"],
         ),
     )
 
@@ -674,7 +673,7 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None 
     # container indexing asynchronously.
     #
     # To update the components count in containers
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
@@ -836,24 +835,13 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     # The core publishing API is based on draft objects, so find the draft that corresponds to this component:
     drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__key=component.key)
     # Publish the component and update anything that needs to be updated (e.g. search index):
-    authoring_api.publish_from_drafts(learning_package.id, draft_qset=drafts_to_publish, published_by=user.id)
-    LIBRARY_BLOCK_UPDATED.send_event(
-        library_block=LibraryBlockData(
-            library_key=usage_key.lib_key,
-            usage_key=usage_key,
-        )
+    publish_log = authoring_api.publish_from_drafts(
+        learning_package.id, draft_qset=drafts_to_publish, published_by=user.id,
     )
-
-    # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
-    # container indexing asynchronously.
-    affected_containers = get_containers_contains_component(usage_key)
-    for container in affected_containers:
-        LIBRARY_CONTAINER_UPDATED.send_event(
-            library_container=LibraryContainerData(
-                container_key=container.container_key,
-                background=True,
-            )
-        )
+    # Since this is a single component, it should be safe to process synchronously and in-process:
+    tasks.send_events_after_publish(publish_log.pk, str(library_key))
+    # IF this is found to be a performance issue, we could instead make it async where necessary:
+    # tasks.wait_for_post_publish_events(publish_log, library_key=library_key)
 
 
 def _component_exists(usage_key: UsageKeyV2) -> bool:
