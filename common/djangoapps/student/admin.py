@@ -314,14 +314,14 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
         return super().get_queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
 @method_decorator(login_required, name='dispatch')
-class LanguageAutocomplete(autocomplete.Select2ListView):
+class LanguageAutocomplete(autocomplete.Select2ListView):   # pylint: disable=no-member
     def get_list(self):
         if not self.request.user.is_staff:
             return []
         return [lang for lang in LANGUAGE_CHOICES if self.q.lower() in lang.lower()]
 
 @method_decorator(login_required, name='dispatch')
-class CountryAutocomplete(autocomplete.Select2ListView):
+class CountryAutocomplete(autocomplete.Select2ListView):    # pylint: disable=no-member
     """
     Autocomplete view for selecting countries using Select2.
 
@@ -355,11 +355,11 @@ class UserProfileInlineForm(forms.ModelForm):
     """
     language = forms.CharField(
         required=False,
-        widget=autocomplete.ListSelect2(url='admin:language-autocomplete')
+        widget=autocomplete.ListSelect2(url='admin:language-autocomplete')  # pylint: disable=no-member
     )
     country = forms.CharField(
         required=False,
-        widget=autocomplete.ListSelect2(url='admin:country-autocomplete')
+        widget=autocomplete.ListSelect2(url='admin:country-autocomplete')   # pylint: disable=no-member
     )
 
     class Meta:
