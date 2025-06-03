@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-click==8.2.0
+click==8.2.1
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   click-log
@@ -38,7 +38,7 @@ stevedore==5.4.1
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys
-typing-extensions==4.13.2
+typing-extensions==4.14.0
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys
