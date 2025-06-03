@@ -322,7 +322,17 @@ class LanguageAutocomplete(autocomplete.Select2ListView):
 
 @method_decorator(login_required, name='dispatch')
 class CountryAutocomplete(autocomplete.Select2ListView):
+    """
+    Autocomplete view for selecting countries using Select2.
+
+    Only accessible to authenticated staff users. Filters the list of countries
+    based on the user input (query string) and returns matching results.
+    """
+
     def get_list(self):
+        """
+        Returns a filtered list of country tuples (code, name) based on the query.
+        """
         if not self.request.user.is_staff:
             return []
         results = []
@@ -340,6 +350,9 @@ class CountryAutocomplete(autocomplete.Select2ListView):
         return item
 
 class UserProfileInlineForm(forms.ModelForm):
+    """
+    A custom form for editing the UserProfile model within the admin inline.
+    """
     language = forms.CharField(
         required=False,
         widget=autocomplete.ListSelect2(url='admin:language-autocomplete')
