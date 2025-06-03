@@ -571,7 +571,7 @@ django-storages==1.14.6
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-django-stubs==5.2.0
+django-stubs[compatible-mypy]==5.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/development.in
@@ -1278,8 +1278,10 @@ multidict==6.4.4
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==1.16.0
-    # via -r requirements/edx/development.in
+mypy==1.15.0
+    # via
+    #   -r requirements/edx/development.in
+    #   django-stubs
 mypy-extensions==1.1.0
     # via mypy
 mysqlclient==2.2.7
@@ -1427,8 +1429,6 @@ path-py==12.5.0
     #   edx-enterprise
     #   ora2
     #   staff-graded-xblock
-pathspec==0.12.1
-    # via mypy
 pbr==6.1.1
     # via
     #   -r requirements/edx/doc.txt
