@@ -314,12 +314,14 @@ class CourseEnrollmentAdmin(DisableEnrollmentAdminMixin, admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('user')  # lint-amnesty, pylint: disable=no-member, super-with-arguments
 
+
 @method_decorator(login_required, name='dispatch')
 class LanguageAutocomplete(Select2ListView):
     def get_list(self):
         if not self.request.user.is_staff:
             return []
         return [lang for lang in LANGUAGE_CHOICES if self.q.lower() in lang.lower()]
+
 
 @method_decorator(login_required, name='dispatch')
 class CountryAutocomplete(Select2ListView):
@@ -349,6 +351,7 @@ class CountryAutocomplete(Select2ListView):
     def get_result_value(self, item):
         """ What gets sent back on selection (the code) """
         return item
+
 
 class UserProfileInlineForm(forms.ModelForm):
     """

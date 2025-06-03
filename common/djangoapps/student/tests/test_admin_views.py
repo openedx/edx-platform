@@ -33,7 +33,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # 
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-
 class AdminCourseRolesPageTest(SharedModuleStoreTestCase):
     """Test the django admin course roles form saving data in db.
     """
