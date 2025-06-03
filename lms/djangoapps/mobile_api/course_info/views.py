@@ -321,10 +321,16 @@ class BlocksInfoInCourseView(BlocksInCourseView):
             request - Django request object
         """
 
-        response = super().list(request, kwargs)
+        api_version = self.kwargs.get('api_version')
+        if api_version is None or api_version in ['v0.5', 'v1', 'v2', 'v3']:
+            response = super().list(request, kwargs)
+        else:
+            # The previous implementation unintentionally passed kwargs as the positional argument to
+            # `hide_access_denial`, leading to potential issues. This new condition for version > v3 removes that risk
+            # while preserving the original behavior for older clients.
+            response = super().list(request)
 
         if request.GET.get('return_type', 'dict') == 'dict':
-            api_version = self.kwargs.get('api_version')
             course_id = request.query_params.get('course_id', None)
             course_key = CourseKey.from_string(course_id)
             course_overview = CourseOverview.get_from_id(course_key)
