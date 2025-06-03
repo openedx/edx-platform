@@ -12,7 +12,6 @@ import pytest
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django_countries.data import COUNTRIES as countries
 from django.forms import ValidationError
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -651,7 +650,6 @@ class TestUserProfileAutocompleteAdmin(TestCase):
         user = UserFactory()
         user.set_password('test')
         user.save()
-        
         self.client.login(username=admin.username, password='test')  # re-login as admin
 
         response = self.client.get(reverse('admin:auth_user_change', args=[user.id]))
