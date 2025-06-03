@@ -5,7 +5,7 @@ Test utils for CCX
 
 import datetime
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -31,10 +31,10 @@ class CcxTestCase(EmailTemplateTagMixin, SharedModuleStoreTestCase):
 
         # Create a course outline
         cls.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=ZoneInfo("UTC")
+            2010, 5, 12, 2, 42, tzinfo=get_utc_timezone()
         )
         cls.mooc_due = due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=ZoneInfo("UTC")
+            2010, 7, 7, 0, 0, tzinfo=get_utc_timezone()
         )
 
         cls.chapters = [

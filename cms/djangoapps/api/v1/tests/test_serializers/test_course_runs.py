@@ -3,7 +3,7 @@
 
 import datetime
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.test import RequestFactory
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
@@ -22,7 +22,7 @@ class CourseRunSerializerTests(ModuleStoreTestCase):  # lint-amnesty, pylint: di
     def setUp(self):
         super().setUp()
 
-        self.course_start = datetime.datetime.now(ZoneInfo("UTC"))
+        self.course_start = datetime.datetime.now(get_utc_timezone())
         self.course_end = self.course_start + datetime.timedelta(days=30)
 
         self.request = RequestFactory().get('')

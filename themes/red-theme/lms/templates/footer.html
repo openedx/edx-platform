@@ -7,7 +7,7 @@ from django.utils.translation import gettext as _
 from django.conf import settings
 
 from datetime import datetime
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from openedx.core.djangoapps.lang_pref.api import footer_language_selector_is_enabled
 from openedx.core.djangolib.markup import HTML, Text

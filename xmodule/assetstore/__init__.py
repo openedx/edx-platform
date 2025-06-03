@@ -7,7 +7,7 @@ import json
 from datetime import datetime
 
 import dateutil.parser
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from lxml import etree
 from opaque_keys.edx.keys import AssetKey, CourseKey
 
@@ -80,7 +80,7 @@ class AssetMetadata:
         self.thumbnail = thumbnail
         self.curr_version = curr_version
         self.prev_version = prev_version
-        now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(get_utc_timezone())
         self.edited_by = edited_by
         self.edited_by_email = edited_by_email
         self.edited_on = edited_on or now

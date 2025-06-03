@@ -8,7 +8,7 @@ from textwrap import dedent
 
 from celery.states import FAILURE
 from django.core.management.base import BaseCommand, CommandError
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from lms.djangoapps.instructor_task.models import PROGRESS, QUEUING, InstructorTask
 
@@ -72,7 +72,7 @@ class Command(BaseCommand):
         Converts an isoformat string into a python datetime object. Localizes
         that datetime object to UTC.
         """
-        return datetime.strptime(date_string, "%Y-%m-%d").replace(tzinfo=ZoneInfo("UTC"))
+        return datetime.strptime(date_string, "%Y-%m-%d").replace(tzinfo=get_utc_timezone())
 
     def handle(self, *args, **options):
 

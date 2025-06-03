@@ -21,8 +21,8 @@ from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
-from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -167,8 +167,8 @@ def _set_course_discussion_blackout(course, user_id):
             user_id: User id of user enrolled in the course
     """
     course.discussion_blackouts = [
-        datetime.now(UTC) - timedelta(days=3),
-        datetime.now(UTC) + timedelta(days=3),
+        datetime.now(get_utc_timezone()) - timedelta(days=3),
+        datetime.now(get_utc_timezone()) + timedelta(days=3),
     ]
     configuration = DiscussionsConfiguration.get(course.id)
     configuration.posting_restrictions = PostingRestriction.SCHEDULED

@@ -10,7 +10,7 @@ import ddt
 from django.urls import reverse
 from django.utils.timezone import now
 from edx_toggles.toggles.testutils import override_waffle_flag
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from xmodule.modulestore.tests.factories import BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -133,7 +133,7 @@ class ProgressTabTestViews(BaseCourseHomeTests):
         self.update_course(self.course, self.user.id)
         response = self.client.get(self.url)
         assert response.status_code == 200
-        end = dateutil.parser.parse(response.json()['end']).replace(tzinfo=ZoneInfo("UTC"))
+        end = dateutil.parser.parse(response.json()['end']).replace(tzinfo=get_utc_timezone())
         assert end.date() == future.date()
 
     def test_user_has_passing_grade(self):

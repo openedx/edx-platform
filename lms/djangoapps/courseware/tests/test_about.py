@@ -8,7 +8,7 @@ from unittest import mock
 from unittest.mock import patch
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -358,7 +358,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.course = CourseFactory.create(metadata={"invitation_only": False})
 
         # Setup enrollment period to be in future
-        now = datetime.datetime.now(ZoneInfo("UTC"))
+        now = datetime.datetime.now(get_utc_timezone())
         tomorrow = now + datetime.timedelta(days=1)
         nextday = tomorrow + datetime.timedelta(days=1)
 

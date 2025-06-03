@@ -3,7 +3,7 @@ Management command to send Schedule course updates
 """
 
 import datetime
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from textwrap import dedent  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.contrib.sites.models import Site
@@ -23,7 +23,7 @@ class Command(SendEmailBaseCommand):
     def handle(self, *args, ** options):
         current_date = datetime.datetime(
             *[int(x) for x in options['date'].split('-')],
-            tzinfo=ZoneInfo("UTC")
+            tzinfo=get_utc_timezone()
         )
 
         site = Site.objects.get(domain__iexact=options['site_domain_name'])

@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from opaque_keys.edx.keys import CourseKey
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from common.djangoapps.course_modes.models import CourseMode, CourseModeExpirationConfig
 # Technically, we shouldn't be doing this, since verify_student is defined
@@ -107,14 +107,14 @@ class CourseModeForm(forms.ModelForm):
         # django admin saving the date with default timezone to avoid time conversion from form to db
         # changes its tzinfo to UTC
         if self.cleaned_data.get("_expiration_datetime"):
-            return self.cleaned_data.get("_expiration_datetime").replace(tzinfo=ZoneInfo("UTC"))
+            return self.cleaned_data.get("_expiration_datetime").replace(tzinfo=get_utc_timezone())
 
     def clean_verification_deadline(self):
         """
         Ensure that the verification deadline we save uses the UTC timezone.
         """
         if self.cleaned_data.get("verification_deadline"):
-            return self.cleaned_data.get("verification_deadline").replace(tzinfo=ZoneInfo("UTC"))
+            return self.cleaned_data.get("verification_deadline").replace(tzinfo=get_utc_timezone())
 
     def clean(self):
         """

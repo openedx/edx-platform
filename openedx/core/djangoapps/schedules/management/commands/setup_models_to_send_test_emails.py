@@ -7,7 +7,7 @@ import datetime
 from textwrap import dedent
 
 import factory
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
@@ -26,29 +26,29 @@ class ThreeDayNudgeSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 3-day nudge email.
     """
-    start_date = factory.Faker('date_time_between', start_date='-3d', end_date='-3d', tzinfo=ZoneInfo("UTC"))
+    start_date = factory.Faker('date_time_between', start_date='-3d', end_date='-3d', tzinfo=get_utc_timezone())
 
 
 class TenDayNudgeSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 10-day nudge email.
     """
-    start_date = factory.Faker('date_time_between', start_date='-10d', end_date='-10d', tzinfo=ZoneInfo("UTC"))
+    start_date = factory.Faker('date_time_between', start_date='-10d', end_date='-10d', tzinfo=get_utc_timezone())
 
 
 class UpgradeReminderSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a 2-days-remaining upgrade reminder.
     """
-    start_date = factory.Faker('past_datetime', tzinfo=ZoneInfo("UTC"))
-    upgrade_deadline = factory.Faker('date_time_between', start_date='+2d', end_date='+2d', tzinfo=ZoneInfo("UTC"))
+    start_date = factory.Faker('past_datetime', tzinfo=get_utc_timezone())
+    upgrade_deadline = factory.Faker('date_time_between', start_date='+2d', end_date='+2d', tzinfo=get_utc_timezone())
 
 
 class ContentHighlightSchedule(ScheduleFactory):
     """
     A ScheduleFactory that creates a Schedule set up for a course highlights email.
     """
-    start_date = factory.Faker('date_time_between', start_date='-7d', end_date='-7d', tzinfo=ZoneInfo("UTC"))
+    start_date = factory.Faker('date_time_between', start_date='-7d', end_date='-7d', tzinfo=get_utc_timezone())
     experience = factory.RelatedFactory(ScheduleExperienceFactory, 'schedule', experience_type=ScheduleExperience.EXPERIENCES.course_updates)  # lint-amnesty, pylint: disable=line-too-long
 
 

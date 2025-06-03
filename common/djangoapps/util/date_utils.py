@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 import crum
 from django.utils.translation import get_language, gettext, pgettext
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+from openedx.core.lib.time_zone_utils import get_utc_timezone, ZoneInfoNotFoundError
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from openedx.core.djangolib.markup import HTML
@@ -57,7 +57,7 @@ def get_time_display(dtime, format_string=None, coerce_tz=None):
         try:
             to_tz = ZoneInfo(coerce_tz)
         except ZoneInfoNotFoundError:
-            to_tz = ZoneInfo("UTC")
+            to_tz = get_utc_timezone()
         dtime = dtime.astimezone(to_tz)
     if dtime is None or format_string is None:
         return get_default_time_display(dtime)
@@ -83,7 +83,7 @@ def to_timestamp(datetime_value):
     Convert a datetime into a timestamp, represented as the number
     of seconds since January 1, 1970 UTC.
     """
-    return int((datetime_value - datetime(1970, 1, 1, tzinfo=ZoneInfo("UTC"))).total_seconds())
+    return int((datetime_value - datetime(1970, 1, 1, tzinfo=get_utc_timezone())).total_seconds())
 
 
 def from_timestamp(timestamp):
@@ -94,7 +94,7 @@ def from_timestamp(timestamp):
     If the timestamp cannot be converted, returns None instead.
     """
     try:
-        return datetime.fromtimestamp(int(timestamp), tz=ZoneInfo("UTC"))
+        return datetime.fromtimestamp(int(timestamp), tz=get_utc_timezone())
     except (ValueError, TypeError):
         return None
 

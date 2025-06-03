@@ -3,7 +3,7 @@
 
 import json
 from datetime import date, datetime
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 
 class DateTimeJSONEncoder(json.JSONEncoder):
@@ -19,10 +19,10 @@ class DateTimeJSONEncoder(json.JSONEncoder):
         if isinstance(obj, datetime):
             if obj.tzinfo is None:
                 # Localize to UTC naive datetime objects
-                obj = obj.replace(tzinfo=ZoneInfo("UTC"))  # lint-amnesty, pylint: disable=no-value-for-parameter
+                obj = obj.replace(tzinfo=get_utc_timezone())  # lint-amnesty, pylint: disable=no-value-for-parameter
             else:
                 # Convert to UTC datetime objects from other timezones
-                obj = obj.astimezone(ZoneInfo("UTC"))
+                obj = obj.astimezone(get_utc_timezone())
             return obj.isoformat()
         elif isinstance(obj, date):
             return obj.isoformat()

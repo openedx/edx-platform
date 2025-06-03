@@ -23,7 +23,7 @@ from django.utils.encoding import smart_str
 from lms.djangoapps.courseware.user_state_client import XBlockUserState
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from webob.multidict import MultiDict
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -194,7 +194,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     def setUp(self):
         super().setUp()
 
-        now = datetime.datetime.now(ZoneInfo("UTC"))
+        now = datetime.datetime.now(get_utc_timezone())
         day_delta = datetime.timedelta(days=1)
         self.yesterday_str = str(now - day_delta)
         self.today_str = str(now)
@@ -660,11 +660,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Utility to create a datetime object in the past
         def past_datetime(days):
-            return (datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=days))
+            return (datetime.datetime.now(get_utc_timezone()) - datetime.timedelta(days=days))
 
         # Utility to create a datetime object in the future
         def future_datetime(days):
-            return (datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=days))
+            return (datetime.datetime.now(get_utc_timezone()) + datetime.timedelta(days=days))
 
         block = CapaFactory.create(max_attempts="1", attempts="0")
 
@@ -1202,7 +1202,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         )
         with multipatch as values:
             values['is_queued'].return_value = True
-            values['get_recentmost_queuetime'].return_value = datetime.datetime.now(ZoneInfo("UTC"))
+            values['get_recentmost_queuetime'].return_value = datetime.datetime.now(get_utc_timezone())
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = block.submit_problem(get_request_dict)

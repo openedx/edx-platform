@@ -4,7 +4,7 @@ Utility functions for working with discounts and discounted pricing.
 
 from datetime import datetime
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
@@ -89,7 +89,7 @@ def generate_offer_data(user, course):
     ExperimentData.objects.get_or_create(
         user=user, experiment_id=REV1008_EXPERIMENT_ID, key=str(course),
         defaults={
-            'value': datetime.now(tz=ZoneInfo("UTC")).strftime('%Y-%m-%d %H:%M:%S%z'),
+            'value': datetime.now(tz=get_utc_timezone()).strftime('%Y-%m-%d %H:%M:%S%z'),
         },
     )
 

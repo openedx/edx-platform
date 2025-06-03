@@ -5,7 +5,7 @@ Tests for schedules utils
 import datetime
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -26,7 +26,7 @@ class ResetSelfPacedScheduleTests(SharedModuleStoreTestCase):
         # pylint: disable=attribute-defined-outside-init
         self.config = ScheduleConfigFactory()
 
-        start = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=course_start_offset)
+        start = datetime.datetime.now(get_utc_timezone()) + datetime.timedelta(days=course_start_offset)
         self.course = CourseFactory.create(start=start, self_paced=True)
 
         self.enrollment = CourseEnrollmentFactory(

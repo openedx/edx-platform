@@ -15,7 +15,7 @@ import random
 import re
 
 import dateutil
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 import edx_api_doc_tools as apidocs
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -2933,8 +2933,8 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
                 # convert the schedule from a string to a datetime, then check if its a
                 # valid future date and time, dateutil
                 # will throw a ValueError if the schedule is no good.
-                schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=ZoneInfo("UTC"))
-                if schedule_dt < datetime.datetime.now(ZoneInfo("UTC")):
+                schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=get_utc_timezone())
+                if schedule_dt < datetime.datetime.now(get_utc_timezone()):
                     raise ValueError("the requested schedule is in the past")
             except ValueError as value_error:
                 error_message = (

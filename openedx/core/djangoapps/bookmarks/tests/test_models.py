@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from unittest import mock
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from freezegun import freeze_time
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
@@ -352,7 +352,7 @@ class BookmarkModelTests(BookmarksTestsBase):
         bookmark, __ = Bookmark.create(bookmark_data)
         assert bookmark.xblock_cache is not None
 
-        modification_datetime = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(seconds=seconds_delta)
+        modification_datetime = datetime.datetime.now(get_utc_timezone()) + datetime.timedelta(seconds=seconds_delta)
         with freeze_time(modification_datetime):
             bookmark.xblock_cache.paths = paths
             bookmark.xblock_cache.save()

@@ -4,7 +4,7 @@ Instructor Task Django app REST API views.
 import datetime
 import json
 import logging
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 import dateutil
 from celery.states import REVOKED
@@ -117,7 +117,7 @@ class ModifyScheduledBulkEmailInstructorTask(generics.DestroyAPIView, generics.U
 
             with transaction.atomic():
                 if schedule:
-                    schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=ZoneInfo("UTC"))
+                    schedule_dt = dateutil.parser.parse(schedule).replace(tzinfo=get_utc_timezone())
                     self._verify_valid_schedule(schedule_id, schedule_dt)
                     task_schedule.task_due = schedule_dt
                     task_schedule.save()
@@ -149,7 +149,7 @@ class ModifyScheduledBulkEmailInstructorTask(generics.DestroyAPIView, generics.U
         Verifies that the updated schedule data for the task is valid. We check to make sure that the date or time
         requested is not in the past.
         """
-        now = datetime.datetime.now(ZoneInfo("UTC"))
+        now = datetime.datetime.now(get_utc_timezone())
         if schedule < now:
             raise TaskUpdateException(
                 f"Cannot update instructor task schedule '{schedule_id}', the updated schedule occurs in the past"

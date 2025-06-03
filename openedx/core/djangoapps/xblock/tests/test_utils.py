@@ -71,7 +71,7 @@ REFERENCE_PARAMS = {
              },
             True,
         ),
-        # Setting reference_time to 20 seconds before end of a 2 day time periodZoneInfo("UTC")
+        # Setting reference_time to 20 seconds before end of a 2 day time periodget_utc_timezone()
         # Demonstrating minimum possible validity period is just above 2 days
         # This fails because validation time is just above the cutoff point
         (

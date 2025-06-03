@@ -14,7 +14,7 @@ from openedx_filters.learning.filters import VerticalBlockChildRenderStarted, Ve
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xblock.fields import Boolean, Scope
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.progress import Progress
@@ -137,7 +137,7 @@ class VerticalBlock(
             })
 
         completed = self.is_block_complete_for_assignments(completion_service)
-        past_due = completed is False and self.due and self.due < datetime.now(ZoneInfo("UTC"))
+        past_due = completed is False and self.due and self.due < datetime.now(get_utc_timezone())
         cta_service = self.runtime.service(self, 'call_to_action')
         vertical_banner_ctas = cta_service.get_ctas(self, 'vertical_banner', completed) if cta_service else []
 

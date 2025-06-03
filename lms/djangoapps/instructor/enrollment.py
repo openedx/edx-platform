@@ -9,7 +9,7 @@ import logging
 from contextlib import ExitStack, contextmanager
 from datetime import datetime
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.template.loader import render_to_string
@@ -456,7 +456,7 @@ def _fire_score_changed_for_block(
                 usage_id=str(module_state_key),
                 score_deleted=True,
                 only_if_higher=False,
-                modified=datetime.now().replace(tzinfo=ZoneInfo("UTC")),
+                modified=datetime.now().replace(tzinfo=get_utc_timezone()),
                 score_db_table=grades_constants.ScoreDatabaseTableEnum.courseware_student_module,
             )
 

@@ -11,7 +11,7 @@ import sys
 from collections import OrderedDict
 from datetime import datetime
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.utils.translation import gettext_lazy as _
 
 from xmodule.util.misc import get_short_labeler
@@ -497,7 +497,7 @@ class ShowCorrectness:
         elif show_correctness == cls.PAST_DUE:
             # Is it now past the due date?
             return (due_date is None or
-                    due_date < datetime.now(ZoneInfo("UTC")))
+                    due_date < datetime.now(get_utc_timezone()))
 
         # else: show_correctness == cls.ALWAYS
         return True

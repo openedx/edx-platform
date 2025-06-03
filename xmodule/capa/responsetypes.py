@@ -31,7 +31,7 @@ from django.utils import html
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful Soup!!! FIXME?
 from pyparsing import ParseException
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from shapely.geometry import MultiPoint, Point
 from six.moves import map, range, zip
 
@@ -2681,7 +2681,7 @@ class CodeResponse(LoncapaResponse):
         #------------------------------------------------------------
 
         qinterface = self.capa_system.xqueue.interface
-        qtime = datetime.strftime(datetime.now(ZoneInfo("UTC")), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(get_utc_timezone()), xqueue_interface.dateformat)
 
         anonymous_student_id = self.capa_system.anonymous_student_id
 

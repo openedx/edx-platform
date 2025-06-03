@@ -6,7 +6,7 @@ Tests for OverrideDataTransformer.
 import datetime
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
@@ -18,11 +18,11 @@ from openedx.core.djangoapps.content.block_structure.factory import BlockStructu
 
 expected_overrides = {
     'start': datetime.datetime(
-        2017, 1, 20, 2, 42, tzinfo=ZoneInfo("UTC")
+        2017, 1, 20, 2, 42, tzinfo=get_utc_timezone()
     ),
     'display_name': "Section",
     'due': datetime.datetime(
-        2017, 2, 20, 2, 42, tzinfo=ZoneInfo("UTC")
+        2017, 2, 20, 2, 42, tzinfo=get_utc_timezone()
     )
 }
 

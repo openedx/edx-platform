@@ -23,7 +23,7 @@ from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from pyquery import PyQuery
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from bs4 import BeautifulSoup
 from web_fragments.fragment import Fragment
 from webob import Response
@@ -635,11 +635,11 @@ class TestCreateItem(ItemTest):
         self.assertEqual(resp.status_code, 200)
 
     def test_create_with_future_date(self):
-        self.assertEqual(self.course.start, datetime(2030, 1, 1, tzinfo=ZoneInfo("UTC")))
+        self.assertEqual(self.course.start, datetime(2030, 1, 1, tzinfo=get_utc_timezone()))
         resp = self.create_xblock(category="chapter")
         usage_key = self.response_usage_key(resp)
         obj = self.get_item_from_modulestore(usage_key)
-        self.assertEqual(obj.start, datetime(2030, 1, 1, tzinfo=ZoneInfo("UTC")))
+        self.assertEqual(obj.start, datetime(2030, 1, 1, tzinfo=get_utc_timezone()))
 
     def test_static_tabs_initialization(self):
         """
@@ -1984,13 +1984,13 @@ class TestEditItem(TestEditItemSetup):
             self.seq_update_url, data={"metadata": {"due": "2010-11-22T04:00Z"}}
         )
         sequential = self.get_item_from_modulestore(self.seq_usage_key)
-        self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=ZoneInfo("UTC")))
+        self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=get_utc_timezone()))
         self.client.ajax_post(
             self.seq_update_url, data={"metadata": {"start": "2010-09-12T14:00Z"}}
         )
         sequential = self.get_item_from_modulestore(self.seq_usage_key)
-        self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=ZoneInfo("UTC")))
-        self.assertEqual(sequential.start, datetime(2010, 9, 12, 14, 0, tzinfo=ZoneInfo("UTC")))
+        self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=get_utc_timezone()))
+        self.assertEqual(sequential.start, datetime(2010, 9, 12, 14, 0, tzinfo=get_utc_timezone()))
 
     @ddt.data(
         "1000-01-01T00:00Z",
@@ -2305,7 +2305,7 @@ class TestEditItem(TestEditItemSetup):
             self.problem_update_url, data={"metadata": {"due": "2077-10-10T04:00Z"}}
         )
         updated_draft = self.get_item_from_modulestore(self.problem_usage_key)
-        self.assertEqual(updated_draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=ZoneInfo("UTC")))
+        self.assertEqual(updated_draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=get_utc_timezone()))
         self.assertIsNone(published.due)
         # Fetch the published version again to make sure the due date is still unset.
         published = modulestore().get_item(
@@ -2320,7 +2320,7 @@ class TestEditItem(TestEditItemSetup):
             data={"metadata": {"due": "2077-10-10T04:00Z"}, "publish": "make_public"},
         )
         published = self.get_item_from_modulestore(self.problem_usage_key)
-        self.assertEqual(published.due, datetime(2077, 10, 10, 4, 0, tzinfo=ZoneInfo("UTC")))
+        self.assertEqual(published.due, datetime(2077, 10, 10, 4, 0, tzinfo=get_utc_timezone()))
 
     def test_published_and_draft_contents_with_update(self):
         """Create a draft and publish it then modify the draft and check that published content is not modified"""
@@ -3439,7 +3439,7 @@ class TestXBlockInfo(ItemTest):
             parent_location=course.location, category='chapter', display_name='Week 1'
         )
 
-        chapter.start = datetime(year=1899, month=1, day=1, tzinfo=ZoneInfo("UTC"))
+        chapter.start = datetime(year=1899, month=1, day=1, tzinfo=get_utc_timezone())
 
         xblock_info = create_xblock_info(
             chapter,
@@ -4119,7 +4119,7 @@ class TestXBlockPublishingInfo(ItemTest):
         sequential = self._create_child(chapter, "sequential", "Test Sequential")
         self._create_child(sequential, "vertical", "Published Unit", publish_item=True)
         self._create_child(sequential, "vertical", "Staff Only Unit", staff_only=True)
-        self._set_release_date(chapter.location, datetime.now(ZoneInfo("UTC")) + timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(get_utc_timezone()) + timedelta(days=1))
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.ready)
         self._verify_visibility_state(
@@ -4140,7 +4140,7 @@ class TestXBlockPublishingInfo(ItemTest):
         sequential = self._create_child(chapter, "sequential", "Test Sequential")
         self._create_child(sequential, "vertical", "Published Unit", publish_item=True)
         self._create_child(sequential, "vertical", "Staff Only Unit", staff_only=True)
-        self._set_release_date(chapter.location, datetime.now(ZoneInfo("UTC")) - timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(get_utc_timezone()) - timedelta(days=1))
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.live)
         self._verify_visibility_state(
@@ -4184,11 +4184,11 @@ class TestXBlockPublishingInfo(ItemTest):
         released_sequential = self._create_child(chapter, 'sequential', "Released Sequential")
         self._create_child(released_sequential, 'vertical', "Released Unit", publish_item=True)
         self._create_child(released_sequential, 'vertical', "Staff Only Unit 1", staff_only=True)
-        self._set_release_date(chapter.location, datetime.now(ZoneInfo("UTC")) - timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(get_utc_timezone()) - timedelta(days=1))
         published_sequential = self._create_child(chapter, 'sequential', "Published Sequential")
         self._create_child(published_sequential, 'vertical', "Published Unit", publish_item=True)
         self._create_child(published_sequential, 'vertical', "Staff Only Unit 2", staff_only=True)
-        self._set_release_date(published_sequential.location, datetime.now(ZoneInfo("UTC")) + timedelta(days=1))
+        self._set_release_date(published_sequential.location, datetime.now(get_utc_timezone()) + timedelta(days=1))
         xblock_info = self._get_xblock_info(chapter.location)
 
         # Verify the state of the released sequential
@@ -4349,7 +4349,7 @@ class TestXBlockPublishingInfo(ItemTest):
         self._create_child(sequential, "vertical", "Published Unit", publish_item=True)
         self._create_child(sequential, "vertical", "Staff Only Unit", staff_only=True)
         self._set_release_date(
-            sequential.location, datetime.now(ZoneInfo("UTC")) - timedelta(days=1)
+            sequential.location, datetime.now(get_utc_timezone()) - timedelta(days=1)
         )
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
@@ -4368,9 +4368,9 @@ class TestXBlockPublishingInfo(ItemTest):
         sequential = self._create_child(chapter, "sequential", "Test Sequential")
         self._create_child(sequential, "vertical", "Published Unit", publish_item=True)
         self._create_child(sequential, "vertical", "Staff Only Unit", staff_only=True)
-        self._set_release_date(chapter.location, datetime.now(ZoneInfo("UTC")) + timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(get_utc_timezone()) + timedelta(days=1))
         self._set_release_date(
-            sequential.location, datetime.now(ZoneInfo("UTC")) - timedelta(days=1)
+            sequential.location, datetime.now(get_utc_timezone()) - timedelta(days=1)
         )
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
@@ -4428,7 +4428,7 @@ class TestXBlockPublishingInfo(ItemTest):
         # Create course, chapter and setup future release date to make chapter in scheduled state
         course = CourseFactory.create()
         chapter = self._create_child(course, "chapter", "Test Chapter")
-        self._set_release_date(chapter.location, datetime.now(ZoneInfo("UTC")) + timedelta(days=1))
+        self._set_release_date(chapter.location, datetime.now(get_utc_timezone()) + timedelta(days=1))
 
         # Check that chapter has scheduled state
         xblock_info = self._get_xblock_info(chapter.location)
@@ -4471,7 +4471,7 @@ class TestUpdateFromSource(ModuleStoreTestCase):
             parent=course,
             category="course_info",
             display_name="Source Block",
-            metadata={"due": datetime(2010, 11, 22, 4, 0, tzinfo=ZoneInfo("UTC"))},
+            metadata={"due": datetime(2010, 11, 22, 4, 0, tzinfo=get_utc_timezone())},
         )
 
         def_id = self.runtime.id_generator.create_definition("html")
@@ -4491,7 +4491,7 @@ class TestUpdateFromSource(ModuleStoreTestCase):
 
         # quick sanity checks
         source_block = self.store.get_item(source_block.location)
-        self.assertEqual(source_block.due, datetime(2010, 11, 22, 4, 0, tzinfo=ZoneInfo("UTC")))
+        self.assertEqual(source_block.due, datetime(2010, 11, 22, 4, 0, tzinfo=get_utc_timezone()))
         self.assertEqual(source_block.display_name, "Source Block")
         self.assertEqual(
             source_block.runtime.get_asides(source_block)[0].field11, "html_new_value1"
@@ -4550,7 +4550,7 @@ class TestUpdateFromSource(ModuleStoreTestCase):
             parent=course,
             category="course_info",
             display_name="Destination Chapter",
-            metadata={"due": datetime(2025, 10, 21, 6, 5, tzinfo=ZoneInfo("UTC"))},
+            metadata={"due": datetime(2025, 10, 21, 6, 5, tzinfo=get_utc_timezone())},
         )
 
         def_id = self.runtime.id_generator.create_definition("html")

@@ -8,7 +8,7 @@ import random
 from copy import deepcopy
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls_range
@@ -35,7 +35,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
     problem_metadata = {
         'graded': True,
         'weight': 1,
-        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=ZoneInfo("UTC")),
+        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=get_utc_timezone()),
     }
 
     def setUp(self):
@@ -280,7 +280,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         problem_metadata = {
             'graded': True,
             'weight': 1,
-            'due': datetime.datetime(2016, 10, 16, 0, 4, 0, tzinfo=ZoneInfo("UTC")),
+            'due': datetime.datetime(2016, 10, 16, 0, 4, 0, tzinfo=get_utc_timezone()),
             'visible_to_staff_only': True,
         }
 
@@ -449,7 +449,7 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                     'metadata': {
                         'graded': True,
                         'weight': 1,
-                        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=ZoneInfo("UTC")),
+                        'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=get_utc_timezone()),
                     },
                     '#type': 'problem',
                     '#ref': f'problem_{problem_number}',

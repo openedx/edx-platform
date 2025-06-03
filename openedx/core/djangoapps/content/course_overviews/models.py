@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 from urllib.parse import urlparse, urlunparse
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from ccx_keys.locator import CCXLocator
 from config_models.models import ConfigurationModel
 from django.conf import settings
@@ -695,7 +695,7 @@ class CourseOverview(TimeStampedModel):
             course_overviews = course_overviews.filter(**filter_)
         if active_only:
             course_overviews = course_overviews.filter(
-                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=ZoneInfo("UTC")))
+                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=get_utc_timezone()))
             )
 
         return course_overviews
@@ -727,11 +727,11 @@ class CourseOverview(TimeStampedModel):
         """
         if active_only:
             return course_overviews.filter(
-                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=ZoneInfo("UTC")))
+                Q(end__isnull=True) | Q(end__gte=datetime.now().replace(tzinfo=get_utc_timezone()))
             )
         if archived_only:
             return course_overviews.filter(
-                end__lt=datetime.now().replace(tzinfo=ZoneInfo("UTC"))
+                end__lt=datetime.now().replace(tzinfo=get_utc_timezone())
             )
         return course_overviews
 

@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 import ddt
 import pytest
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.locator import CourseLocator
@@ -178,14 +178,14 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
     def test_all_current_course_configs(self):
         # Set up test objects
         for global_setting in (True, False, None):
-            CourseDurationLimitConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))  # lint-amnesty, pylint: disable=line-too-long
+            CourseDurationLimitConfig.objects.create(enabled=global_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))  # lint-amnesty, pylint: disable=line-too-long
             for site_setting in (True, False, None):
                 test_site_cfg = SiteConfigurationFactory.create(
                     site_values={'course_org_filter': []}
                 )
                 CourseDurationLimitConfig.objects.create(
                     site=test_site_cfg.site, enabled=site_setting, enabled_as_of=datetime(
-                        2018, 1, 1, tzinfo=ZoneInfo("UTC"))
+                        2018, 1, 1, tzinfo=get_utc_timezone())
                 )
 
                 for org_setting in (True, False, None):
@@ -194,7 +194,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
                     test_site_cfg.save()
 
                     CourseDurationLimitConfig.objects.create(
-                        org=test_org, enabled=org_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC"))
+                        org=test_org, enabled=org_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone())
                     )
 
                     for course_setting in (True, False, None):
@@ -203,7 +203,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
                             id=CourseLocator(test_org, 'test_course', f'run-{course_setting}')
                         )
                         CourseDurationLimitConfig.objects.create(
-                            course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC"))  # lint-amnesty, pylint: disable=line-too-long
+                            course=test_course, enabled=course_setting, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone())  # lint-amnesty, pylint: disable=line-too-long
                         )
 
             with self.assertNumQueries(4):
@@ -217,23 +217,23 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         # Point-test some of the final configurations
         assert all_configs[CourseLocator('7-True', 'test_course', 'run-None')] == {
             'enabled': (True, Provenance.org),
-            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=ZoneInfo("UTC")),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=get_utc_timezone()),
                               Provenance.run)
         }
         assert all_configs[CourseLocator('7-True', 'test_course', 'run-False')] == {
             'enabled': (False, Provenance.run),
-            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=ZoneInfo("UTC")),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=get_utc_timezone()),
                               Provenance.run)
         }
         assert all_configs[CourseLocator('7-None', 'test_course', 'run-None')] == {
             'enabled': (True, Provenance.site),
-            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=ZoneInfo("UTC")),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=get_utc_timezone()),
                               Provenance.run)
         }
 
     def test_caching_global(self):
         global_config = CourseDurationLimitConfig(
-            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
+            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))
         global_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -259,7 +259,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
 
     def test_caching_site(self):
         site_cfg = SiteConfigurationFactory()
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))  # lint-amnesty, pylint: disable=line-too-long
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))  # lint-amnesty, pylint: disable=line-too-long
         site_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -284,7 +284,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             assert not CourseDurationLimitConfig.current(site=site_cfg.site).enabled
 
         global_config = CourseDurationLimitConfig(
-            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
+            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))
         global_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -298,7 +298,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         site_cfg = SiteConfigurationFactory.create(
             site_values={'course_org_filter': course.org}
         )
-        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))  # lint-amnesty, pylint: disable=line-too-long
+        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))  # lint-amnesty, pylint: disable=line-too-long
         org_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -323,7 +323,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             assert not CourseDurationLimitConfig.current(org=course.org).enabled
 
         global_config = CourseDurationLimitConfig(
-            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
+            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))
         global_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -332,7 +332,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         with self.assertNumQueries(0):
             assert not CourseDurationLimitConfig.current(org=course.org).enabled
 
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))  # lint-amnesty, pylint: disable=line-too-long
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))  # lint-amnesty, pylint: disable=line-too-long
         site_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -346,7 +346,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         site_cfg = SiteConfigurationFactory.create(
             site_values={'course_org_filter': course.org}
         )
-        course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))  # lint-amnesty, pylint: disable=line-too-long
+        course_config = CourseDurationLimitConfig(course=course, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))  # lint-amnesty, pylint: disable=line-too-long
         course_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -371,7 +371,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
             assert not CourseDurationLimitConfig.current(course_key=course.id).enabled
 
         global_config = CourseDurationLimitConfig(
-            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))
+            enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))
         global_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -380,7 +380,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         with self.assertNumQueries(0):
             assert not CourseDurationLimitConfig.current(course_key=course.id).enabled
 
-        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))  # lint-amnesty, pylint: disable=line-too-long
+        site_config = CourseDurationLimitConfig(site=site_cfg.site, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))  # lint-amnesty, pylint: disable=line-too-long
         site_config.save()
 
         RequestCache.clear_all_namespaces()
@@ -389,7 +389,7 @@ class TestCourseDurationLimitConfig(CacheIsolationTestCase):
         with self.assertNumQueries(0):
             assert not CourseDurationLimitConfig.current(course_key=course.id).enabled
 
-        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=ZoneInfo("UTC")))  # lint-amnesty, pylint: disable=line-too-long
+        org_config = CourseDurationLimitConfig(org=course.org, enabled=True, enabled_as_of=datetime(2018, 1, 1, tzinfo=get_utc_timezone()))  # lint-amnesty, pylint: disable=line-too-long
         org_config.save()
 
         RequestCache.clear_all_namespaces()

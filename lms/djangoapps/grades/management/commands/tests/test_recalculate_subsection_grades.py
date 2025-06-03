@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import ddt
 from opaque_keys.edx.keys import CourseKey
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id
 from common.djangoapps.util.date_utils import to_timestamp
@@ -40,7 +40,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
             course_id=CourseKey.from_string('course-v1:x+y+z'),
             item_id='abc',
         )
-        submission.created_at = datetime.strptime('2016-08-23 16:43', DATE_FORMAT).replace(tzinfo=ZoneInfo("UTC"))
+        submission.created_at = datetime.strptime('2016-08-23 16:43', DATE_FORMAT).replace(tzinfo=get_utc_timezone())
         subs_mock.objects.filter.return_value = [submission]
         id_mock.return_value = MagicMock()
         id_mock.return_value.id = "ID"
@@ -54,7 +54,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
         csm_record.student_id = "ID"
         csm_record.course_id = CourseKey.from_string('course-v1:x+y+z')
         csm_record.module_state_key = "abc"
-        csm_record.modified = datetime.strptime('2016-08-23 16:43', DATE_FORMAT).replace(tzinfo=ZoneInfo("UTC"))
+        csm_record.modified = datetime.strptime('2016-08-23 16:43', DATE_FORMAT).replace(tzinfo=get_utc_timezone())
         csm_mock.objects.filter.return_value = [csm_record]
         id_mock.return_value = MagicMock()
         id_mock.return_value.id = "ID"
@@ -69,7 +69,7 @@ class TestRecalculateSubsectionGrades(HasCourseWithProblemsMixin, ModuleStoreTes
             "only_if_higher": False,
             "expected_modified_time": to_timestamp(
                 datetime.strptime('2016-08-23 16:43', DATE_FORMAT).replace(
-                    tzinfo=ZoneInfo("UTC")
+                    tzinfo=get_utc_timezone()
                 )
             ),
             "score_deleted": False,

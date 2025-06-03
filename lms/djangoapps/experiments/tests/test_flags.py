@@ -5,7 +5,7 @@ Tests for experimentation feature flags
 from unittest.mock import patch
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from crum import set_current_request
 from dateutil import parser
 from django.test.client import RequestFactory
@@ -75,7 +75,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     def test_enrollment_start(self, experiment_start, enrollment_created, expected_bucket):
         if enrollment_created:
             enrollment = CourseEnrollmentFactory(user=self.user, course_id='a/b/c')
-            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=ZoneInfo("UTC"))
+            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=get_utc_timezone())
             enrollment.save()
         if experiment_start:
             ExperimentKeyValueFactory(experiment_id=0, key='enrollment_start', value=experiment_start)
@@ -93,7 +93,7 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     def test_enrollment_end(self, experiment_end, enrollment_created, expected_bucket):
         if enrollment_created:
             enrollment = CourseEnrollmentFactory(user=self.user, course_id='a/b/c')
-            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=ZoneInfo("UTC"))
+            enrollment.created = parser.parse(enrollment_created).replace(tzinfo=get_utc_timezone())
             enrollment.save()
         if experiment_end:
             ExperimentKeyValueFactory(experiment_id=0, key='enrollment_end', value=experiment_end)

@@ -4,8 +4,18 @@ Utilities related to timezones
 
 from datetime import datetime
 
-from pytz import common_timezones
+from pytz import common_timezones, UTC
+
 from zoneinfo import ZoneInfo
+
+from . import ENABLE_ZONEINFO_TZ
+
+
+def get_utc_timezone():
+    if ENABLE_ZONEINFO_TZ.is_enabled():
+        return ZoneInfo('UTC')
+    else:
+        return UTC
 
 
 def _format_time_zone_string(time_zone, date_time, format_string):
@@ -24,7 +34,7 @@ def get_time_zone_abbr(time_zone, date_time=None):
     """
     Returns the time zone abbreviation (e.g. EST) of the time zone for given datetime
     """
-    date_time = datetime.now(ZoneInfo("UTC")) if date_time is None else date_time
+    date_time = datetime.now(get_utc_timezone()) if date_time is None else date_time
     return _format_time_zone_string(time_zone, date_time, '%Z')
 
 
@@ -32,7 +42,7 @@ def get_time_zone_offset(time_zone, date_time=None):
     """
     Returns the time zone offset (e.g. -0800) of the time zone for given datetime
     """
-    date_time = datetime.now(ZoneInfo("UTC")) if date_time is None else date_time
+    date_time = datetime.now(get_utc_timezone()) if date_time is None else date_time
     return _format_time_zone_string(time_zone, date_time, '%z')
 
 

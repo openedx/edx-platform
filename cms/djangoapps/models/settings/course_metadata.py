@@ -6,7 +6,7 @@ Django module for Course Metadata class -- manages advanced settings and related
 import logging
 from datetime import datetime
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
@@ -466,7 +466,7 @@ class CourseMetadata:
             cls._has_requested_proctoring_provider_changed(
                 block.proctoring_provider, proctoring_provider_model.get('value')
             ) and
-            datetime.now(ZoneInfo("UTC")) > block.start
+            datetime.now(get_utc_timezone()) > block.start
         ):
             message = (
                 'The proctoring provider cannot be modified after a course has started.'

@@ -4,7 +4,7 @@
 import datetime
 import unittest
 import pytest
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from xmodule.fields import Date, RelativeTime, Timedelta
 
@@ -52,11 +52,11 @@ class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-clas
         assert DateTest.date.enforce_type(None) is None
         assert DateTest.date.enforce_type('') is None
         assert DateTest.date.enforce_type('2012-12-31T23:00:01') ==\
-               datetime.datetime(2012, 12, 31, 23, 0, 1, tzinfo=ZoneInfo("UTC"))
+               datetime.datetime(2012, 12, 31, 23, 0, 1, tzinfo=get_utc_timezone())
         assert DateTest.date.enforce_type(1234567890000) == datetime.datetime(
-            2009, 2, 13, 23, 31, 30, tzinfo=ZoneInfo("UTC"))
-        assert DateTest.date.enforce_type(datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=ZoneInfo("UTC"))) ==\
-               datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=ZoneInfo("UTC"))
+            2009, 2, 13, 23, 31, 30, tzinfo=get_utc_timezone())
+        assert DateTest.date.enforce_type(datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=get_utc_timezone())) ==\
+               datetime.datetime(2014, 5, 9, 21, 1, 27, tzinfo=get_utc_timezone())
         with pytest.raises(TypeError):
             DateTest.date.enforce_type([1])
 
@@ -78,10 +78,10 @@ class DateTest(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-clas
         """
         Test the non-standard args being passed to from_json
         """
-        now = datetime.datetime.now(ZoneInfo("UTC"))
-        delta = now - datetime.datetime.fromtimestamp(0, ZoneInfo("UTC"))
+        now = datetime.datetime.now(get_utc_timezone())
+        delta = now - datetime.datetime.fromtimestamp(0, get_utc_timezone())
         assert DateTest.date.from_json(delta.total_seconds() * 1000) == now
-        yesterday = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=-1)
+        yesterday = datetime.datetime.now(get_utc_timezone()) - datetime.timedelta(days=-1)
         assert DateTest.date.from_json(yesterday) == yesterday
 
     def test_to_json(self):

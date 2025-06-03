@@ -12,7 +12,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory, StaffFactory
@@ -84,8 +84,8 @@ class CourseEmailTest(ModuleStoreTestCase):
             CourseEmail.create(course_id, sender, to_option, subject, html_message)
 
     @ddt.data(
-        datetime.datetime(1999, 1, 1, tzinfo=ZoneInfo("UTC")),
-        datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=ZoneInfo("UTC")),
+        datetime.datetime(1999, 1, 1, tzinfo=get_utc_timezone()),
+        datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=get_utc_timezone()),
     )
     def test_track_target(self, expiration_datetime):
         """

@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import ddt
 import pytest
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -292,7 +292,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
         if should_update:
             assert team.last_activity_at > team_last_activity
             assert team_membership.last_activity_at > team_membership_last_activity
-            now = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
+            now = datetime.utcnow().replace(tzinfo=get_utc_timezone())
             assert now > team.last_activity_at
             assert now > team_membership.last_activity_at
             self.assert_event_emitted(

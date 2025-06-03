@@ -7,7 +7,7 @@ import datetime
 import json
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.test import Client, TestCase
 from django.test.utils import override_settings
@@ -523,7 +523,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
         """
         provider_id = kwargs.get('provider_id', self.provider.provider_id)
         secret_key = kwargs.get('secret_key', '931433d583c84ca7ba41784bad3232e6')
-        timestamp = kwargs.get('timestamp', to_timestamp(datetime.datetime.now(ZoneInfo("UTC"))))
+        timestamp = kwargs.get('timestamp', to_timestamp(datetime.datetime.now(get_utc_timezone())))
         keys = kwargs.get('keys', {self.provider.provider_id: secret_key})
 
         url = reverse('credit:provider_callback', args=[provider_id])
@@ -577,7 +577,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
         if timedelta == 'invalid':
             timestamp = timedelta
         else:
-            timestamp = to_timestamp(datetime.datetime.now(ZoneInfo("UTC")) + timedelta)
+            timestamp = to_timestamp(datetime.datetime.now(get_utc_timezone()) + timedelta)
         request_uuid = self._create_credit_request_and_get_uuid()
         response = self._credit_provider_callback(request_uuid, 'approved', timestamp=timestamp)
         assert response.status_code == 400
@@ -585,7 +585,7 @@ class CreditProviderCallbackViewTests(UserMixin, TestCase):
     def test_post_with_string_timestamp(self):
         """ Verify the endpoint supports timestamps transmitted as strings instead of integers. """
         request_uuid = self._create_credit_request_and_get_uuid()
-        timestamp = str(to_timestamp(datetime.datetime.now(ZoneInfo("UTC"))))
+        timestamp = str(to_timestamp(datetime.datetime.now(get_utc_timezone())))
         response = self._credit_provider_callback(request_uuid, 'approved', timestamp=timestamp)
         assert response.status_code == 200
 

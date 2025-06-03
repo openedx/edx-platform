@@ -10,7 +10,7 @@ from urllib.parse import urljoin
 import ddt
 import freezegun
 import httpretty
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
@@ -50,7 +50,7 @@ class CourseModeViewTest(CatalogIntegrationMixin, UrlResetMixin, ModuleStoreTest
     @patch.dict(settings.FEATURES, {'MODE_CREATION_FOR_TESTING': True})
     def setUp(self):
         super().setUp()
-        now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(get_utc_timezone())
         day = timedelta(days=1)
         tomorrow = now + day
         yesterday = now - day

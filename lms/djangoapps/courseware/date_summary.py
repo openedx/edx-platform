@@ -15,7 +15,7 @@ from django.utils.translation import get_language, to_locale
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 from lazy import lazy
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.api import get_active_web_certificate, can_show_certificate_available_date_field
@@ -42,7 +42,7 @@ class DateSummary:
         Returns a consistent current time.
         """
         if self._current_time is None:
-            self._current_time = datetime.datetime.now(ZoneInfo("UTC"))
+            self._current_time = datetime.datetime.now(get_utc_timezone())
         return self._current_time
 
     @property

@@ -6,7 +6,7 @@ import itertools  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.utils import timezone
 from edx_django_utils.cache import RequestCache
 from unittest.mock import Mock  # lint-amnesty, pylint: disable=wrong-import-order
@@ -217,17 +217,17 @@ class TestContentTypeGatingConfig(CacheIsolationTestCase):  # pylint: disable=mi
         # Point-test some of the final configurations
         assert all_configs[CourseLocator('7-True', 'test_course', 'run-None')] == {
             'enabled': (True, Provenance.org),
-            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=ZoneInfo("UTC")), Provenance.run),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=get_utc_timezone()), Provenance.run),
             'studio_override_enabled': (None, Provenance.default)
         }
         assert all_configs[CourseLocator('7-True', 'test_course', 'run-False')] == {
             'enabled': (False, Provenance.run),
-            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=ZoneInfo("UTC")), Provenance.run),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=get_utc_timezone()), Provenance.run),
             'studio_override_enabled': (None, Provenance.default)
         }
         assert all_configs[CourseLocator('7-None', 'test_course', 'run-None')] == {
             'enabled': (True, Provenance.site),
-            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=ZoneInfo("UTC")), Provenance.run),
+            'enabled_as_of': (datetime(2018, 1, 1, 0, tzinfo=get_utc_timezone()), Provenance.run),
             'studio_override_enabled': (None, Provenance.default)
         }
 

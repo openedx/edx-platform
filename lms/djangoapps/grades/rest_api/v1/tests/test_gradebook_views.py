@@ -16,7 +16,7 @@ from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.locator import BlockUsageLocator
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -1025,7 +1025,7 @@ class GradebookViewTest(GradebookViewTestBase):
             _ = CourseEnrollmentFactory(
                 course_id=self.course.id,
                 user=verified_student,
-                created=datetime(2013, 1, 1, tzinfo=ZoneInfo("UTC")),
+                created=datetime(2013, 1, 1, tzinfo=get_utc_timezone()),
                 mode=CourseMode.VERIFIED,
             )
             with override_waffle_flag(self.waffle_flag, active=True):
@@ -1890,7 +1890,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             "earned_graded": 6.0,
             "possible_graded": 8.0,
             "visible_blocks": cls.block_records,
-            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=ZoneInfo("UTC")),
+            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=get_utc_timezone()),
         }
         cls.grade = PersistentSubsectionGrade.update_or_create_grade(**cls.params)
 
@@ -2225,7 +2225,7 @@ class SubsectionGradeViewTest(GradebookViewTestBase):
             parent_location=self.chapter_1.location,
             category='sequential',
             graded=True,
-            start=datetime(2999, 1, 1, tzinfo=ZoneInfo("UTC")),  # arbitrary future date
+            start=datetime(2999, 1, 1, tzinfo=get_utc_timezone()),  # arbitrary future date
             display_name='Unreleased Section',
         )
 

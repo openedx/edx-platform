@@ -7,7 +7,7 @@ import json
 from io import StringIO
 
 import factory
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.core.management import call_command
 
@@ -22,8 +22,8 @@ from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 XML_COURSE_DIRS = ['simple']
-TEST_COURSE_START = datetime.datetime(2012, 7, 1, tzinfo=ZoneInfo("UTC"))
-TEST_COURSE_END = datetime.datetime(2012, 12, 31, tzinfo=ZoneInfo("UTC"))
+TEST_COURSE_START = datetime.datetime(2012, 7, 1, tzinfo=get_utc_timezone())
+TEST_COURSE_END = datetime.datetime(2012, 12, 31, tzinfo=get_utc_timezone())
 
 
 class CommandsTestBase(SharedModuleStoreTestCase):

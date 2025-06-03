@@ -16,7 +16,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import AssetKey
 from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
@@ -230,7 +230,7 @@ class PaginationTestCase(AssetsTestCase):
         """
         asset_key = self.course.id.make_asset_key(
             AssetMetadata.GENERAL_ASSET_TYPE, 'test.jpg')
-        upload_date = datetime(2015, 1, 12, 10, 30, tzinfo=ZoneInfo("UTC"))
+        upload_date = datetime(2015, 1, 12, 10, 30, tzinfo=get_utc_timezone())
         thumbnail_location = [
             'c4x', 'edX', 'toy', 'thumbnail', 'test_thumb.jpg', None]
 
@@ -429,7 +429,7 @@ class AssetToJsonTestCase(AssetsTestCase):
     """
     @override_settings(LMS_ROOT_URL="https://lms_root_url")
     def test_basic(self):
-        upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=ZoneInfo("UTC"))
+        upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=get_utc_timezone())
         content_type = 'image/jpg'
         course_key = CourseLocator('org', 'class', 'run')
         location = course_key.make_asset_key('asset', 'my_file_name.jpg')
@@ -475,7 +475,7 @@ class LockAssetTestCase(AssetsTestCase):
             """ Helper method for posting asset update. """
             content_type = 'application/txt'
             course_key = CourseLocator('org', 'class', 'run')
-            upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=ZoneInfo("UTC"))
+            upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=get_utc_timezone())
             asset_location = course.id.make_asset_key('asset', 'sample_static.html')
             url = reverse_course_url(
                 'assets_handler', course.id, kwargs={'asset_key_string': str(asset_location)}

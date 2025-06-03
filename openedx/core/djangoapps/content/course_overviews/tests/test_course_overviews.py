@@ -11,7 +11,7 @@ import datetime  # lint-amnesty, pylint: disable=wrong-import-order
 import itertools  # lint-amnesty, pylint: disable=wrong-import-order
 import math  # lint-amnesty, pylint: disable=wrong-import-order
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.db.utils import IntegrityError
 from django.test.utils import override_settings
@@ -93,7 +93,7 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
             """
             if date_time is None:
                 return None
-            epoch = datetime.datetime.fromtimestamp(0, tz=ZoneInfo("UTC"))
+            epoch = datetime.datetime.fromtimestamp(0, tz=get_utc_timezone())
             return math.floor((date_time - epoch).total_seconds())
 
         # Load the CourseOverview from the cache twice. The first load will be a cache miss (because the cache

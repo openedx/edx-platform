@@ -4,7 +4,7 @@ Provides Python APIs exposed from Student models.
 import datetime
 import logging
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from common.djangoapps.student.models import CourseAccessRole as _CourseAccessRole
 from common.djangoapps.student.models import CourseEnrollment as _CourseEnrollment
@@ -158,7 +158,7 @@ def confirm_name_change(user, pending_name_change):
     if 'old_names' not in meta:
         meta['old_names'] = []
     meta['old_names'].append(
-        [user_profile.name, pending_name_change.rationale, datetime.datetime.now(ZoneInfo("UTC")).isoformat()]
+        [user_profile.name, pending_name_change.rationale, datetime.datetime.now(get_utc_timezone()).isoformat()]
     )
     user_profile.set_meta(meta)
 

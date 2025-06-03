@@ -8,7 +8,7 @@ to the templates without having to append every view file.
 import string
 
 from django.utils.translation import get_language
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 
 from edx_django_utils.cache import TieredCache
@@ -99,4 +99,4 @@ def get_user_timezone_or_last_seen_timezone_or_utc(user):
     try:
         return ZoneInfo(user_timezone)
     except KeyError:
-        return ZoneInfo('UTC')
+        return get_utc_timezone()

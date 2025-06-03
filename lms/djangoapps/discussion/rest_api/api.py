@@ -11,7 +11,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, Iterable, List, Literal, Optional, Set, Tuple
 from urllib.parse import urlencode, urlunparse
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -403,7 +403,7 @@ def get_courseware_topics(
     courseware_topics = []
     existing_topic_ids = set()
 
-    now = datetime.now(ZoneInfo("UTC"))
+    now = datetime.now(get_utc_timezone())
 
     discussion_xblocks = get_accessible_discussion_xblocks(course, request.user)
     xblocks_by_category = defaultdict(list)

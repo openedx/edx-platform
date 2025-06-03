@@ -7,7 +7,7 @@ import pytest
 
 from django.http.response import Http404
 from itertools import product
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.tests.factories import UserFactory
@@ -90,7 +90,7 @@ class TestUtilFunctions(ModuleStoreTestCase):
         """
         Tests time_ago string
         """
-        current_datetime = datetime.datetime.now(ZoneInfo("UTC"))
+        current_datetime = datetime.datetime.now(get_utc_timezone())
         assert "Today" == get_time_ago(current_datetime)
         assert "1d" == get_time_ago(current_datetime - datetime.timedelta(days=1))
         assert "1w" == get_time_ago(current_datetime - datetime.timedelta(days=7))

@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from pyquery import PyQuery as pq
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls
@@ -652,14 +652,14 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             category='chapter',
             display_name="Chapter",
             publish_item=True,
-            start=datetime.datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
+            start=datetime.datetime(2015, 3, 1, tzinfo=get_utc_timezone()),
         )
         sequential = BlockFactory.create(
             parent=chapter,
             category='sequential',
             display_name="Lesson",
             publish_item=True,
-            start=datetime.datetime(2015, 3, 1, tzinfo=ZoneInfo("UTC")),
+            start=datetime.datetime(2015, 3, 1, tzinfo=get_utc_timezone()),
             metadata={'graded': True, 'format': 'Homework'},
         )
         vertical = BlockFactory.create(
@@ -667,7 +667,7 @@ class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTes
             category='vertical',
             display_name='Subsection',
             publish_item=True,
-            start=datetime.datetime(2015, 4, 1, tzinfo=ZoneInfo("UTC")),
+            start=datetime.datetime(2015, 4, 1, tzinfo=get_utc_timezone()),
         )
         for i in range(10):
             problem = BlockFactory.create(

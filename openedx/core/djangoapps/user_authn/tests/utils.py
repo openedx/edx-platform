@@ -6,7 +6,7 @@ from enum import Enum
 from unittest.mock import patch
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from oauth2_provider import models as dot_models
 from rest_framework import status
@@ -42,7 +42,7 @@ def utcnow():
     """
     Helper function to return the current UTC time localized to the UTC timezone.
     """
-    return datetime.now(ZoneInfo("UTC"))
+    return datetime.now(get_utc_timezone())
 
 
 @ddt.ddt

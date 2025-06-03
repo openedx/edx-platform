@@ -6,7 +6,7 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import TestCase
@@ -176,7 +176,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         assert VerificationDeadline.deadline_for_course(self.course.id) is None
 
         # Generate the expected data
-        now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(get_utc_timezone())
         verification_deadline = now + timedelta(days=1)
         expiration_datetime = now
         response, expected = self._get_update_response_and_expected_data(expiration_datetime, verification_deadline)
@@ -195,8 +195,8 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         """
         Verify the API does not allow the verification deadline to be set before the course mode upgrade deadlines.
         """
-        expiration_datetime = datetime.now(ZoneInfo("UTC"))
-        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=ZoneInfo("UTC"))
+        expiration_datetime = datetime.now(get_utc_timezone())
+        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=get_utc_timezone())
         response, __ = self._get_update_response_and_expected_data(expiration_datetime, verification_deadline)
         assert response.status_code == 400
 
@@ -212,7 +212,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
 
          This accounts for the verified professional mode, which requires verification but should never expire.
         """
-        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=ZoneInfo("UTC"))
+        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=get_utc_timezone())
         response, __ = self._get_update_response_and_expected_data(None, verification_deadline)
 
         assert response.status_code == 200
@@ -222,7 +222,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         """
         Verify that verification deadlines can be removed through the API.
         """
-        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=ZoneInfo("UTC"))
+        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=get_utc_timezone())
         response, __ = self._get_update_response_and_expected_data(None, verification_deadline)
         assert VerificationDeadline.deadline_for_course(self.course.id) == verification_deadline
 
@@ -247,7 +247,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         When the course's verification deadline is set and an update request doesn't
         include it, we should take no action on it.
         """
-        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=ZoneInfo("UTC"))
+        verification_deadline = datetime(year=1915, month=5, day=7, tzinfo=get_utc_timezone())
         response, __ = self._get_update_response_and_expected_data(None, verification_deadline)
         assert VerificationDeadline.deadline_for_course(self.course.id) == verification_deadline
 
@@ -273,7 +273,7 @@ class CourseRetrieveUpdateViewTests(CourseApiViewTestMixin, ModuleStoreTestCase)
         Verify that course mode upgrade deadlines can be removed through the API.
         """
         # First create a deadline
-        upgrade_deadline = datetime.now(ZoneInfo("UTC")) + timedelta(days=1)
+        upgrade_deadline = datetime.now(get_utc_timezone()) + timedelta(days=1)
         response, __ = self._get_update_response_and_expected_data(upgrade_deadline, None)
         assert response.status_code == 200
         verified_mode = CourseMode.verified_mode_for_course(self.course.id)

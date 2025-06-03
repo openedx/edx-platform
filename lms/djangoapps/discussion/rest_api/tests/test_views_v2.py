@@ -23,10 +23,10 @@ from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.discussion.django_comment_client.tests.mixins import MockForumApiMixin
 from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
 from rest_framework import status
 from rest_framework.parsers import JSONParser
 from rest_framework.test import APIClient, APITestCase
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
@@ -94,7 +94,7 @@ class DiscussionAPIViewTestMixin(ForumsEnableMixin, ForumMockUtilsMixin, UrlRese
             org="x",
             course="y",
             run="z",
-            start=datetime.now(UTC),
+            start=datetime.now(get_utc_timezone()),
             discussion_topics={"Test Topic": {"id": "test_topic"}}
         )
         self.password = "Password1234"

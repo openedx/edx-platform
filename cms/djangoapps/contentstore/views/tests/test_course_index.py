@@ -9,7 +9,7 @@ from unittest import mock, skip
 
 import ddt
 import lxml
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test.utils import override_settings
@@ -348,7 +348,7 @@ class TestCourseIndexArchived(CourseTestCase):
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
-    NOW = datetime.datetime.now(ZoneInfo("UTC"))
+    NOW = datetime.datetime.now(get_utc_timezone())
     DAY = datetime.timedelta(days=1)
     YESTERDAY = NOW - DAY
     TOMORROW = NOW + DAY
@@ -741,7 +741,7 @@ class TestCourseReIndex(CourseTestCase):
 
         super().setUp()
 
-        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=ZoneInfo("UTC"))
+        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=get_utc_timezone())
         modulestore().update_item(self.course, self.user.id)
 
         self.chapter = BlockFactory.create(

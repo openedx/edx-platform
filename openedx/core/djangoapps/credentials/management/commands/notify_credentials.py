@@ -17,7 +17,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from openedx.core.djangoapps.credentials.models import NotifyCredentialsConfig
 from openedx.core.djangoapps.credentials.tasks.v1.tasks import handle_notify_credentials
@@ -32,7 +32,7 @@ log = logging.getLogger(__name__)
 def parsetime(timestr):
     dt = dateutil.parser.parse(timestr)
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+        dt = dt.replace(tzinfo=get_utc_timezone())
     return dt
 
 

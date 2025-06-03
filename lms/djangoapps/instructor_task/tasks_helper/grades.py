@@ -16,7 +16,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from lazy import lazy
 from opaque_keys.edx.keys import UsageKey
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from six.moves import zip_longest
 
 from common.djangoapps.course_modes.models import CourseMode
@@ -301,7 +301,7 @@ class InMemoryReportMixin:
         """
         Creates and uploads a CSV for the given headers and rows.
         """
-        date = datetime.now(ZoneInfo("UTC"))
+        date = datetime.now(get_utc_timezone())
         upload_csv_to_report_store(
             [success_headers] + success_rows,
             self.context.upload_filename,
@@ -389,7 +389,7 @@ class TemporaryFileReportMixin:
         """
         Uploads success and error csv files to report store
         """
-        date = datetime.now(ZoneInfo("UTC"))
+        date = datetime.now(get_utc_timezone())
 
         success_file.seek(0)
         upload_csv_file_to_report_store(
@@ -966,7 +966,7 @@ class ProblemResponses:
         all student answers to a given problem, and store using a `ReportStore`.
         """
         start_time = time()
-        start_date = datetime.now(ZoneInfo("UTC"))
+        start_date = datetime.now(get_utc_timezone())
         num_reports = 1
         task_progress = TaskProgress(action_name, num_reports, start_time)
         current_step = {'step': 'Calculating students answers to problem'}

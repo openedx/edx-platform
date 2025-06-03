@@ -7,7 +7,7 @@ from unittest import mock
 from uuid import uuid4
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.test.client import RequestFactory
 from opaque_keys.edx.keys import UsageKey
 from openedx_events.data import EventsMetadata
@@ -47,8 +47,8 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
     satisfied. But if student grade is less than and deadline is passed then
     user will be marked as failed.
     """
-    VALID_DUE_DATE = datetime.now(ZoneInfo("UTC")) + timedelta(days=20)
-    EXPIRED_DUE_DATE = datetime.now(ZoneInfo("UTC")) - timedelta(days=20)
+    VALID_DUE_DATE = datetime.now(get_utc_timezone()) + timedelta(days=20)
+    EXPIRED_DUE_DATE = datetime.now(get_utc_timezone()) - timedelta(days=20)
 
     DATES = {
         'valid': VALID_DUE_DATE,

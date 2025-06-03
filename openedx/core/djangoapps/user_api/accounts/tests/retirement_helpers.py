@@ -6,7 +6,7 @@ Helpers for testing retirement functionality
 import datetime
 
 import pytest
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.test import TestCase
 from social_django.models import UserSocialAuth
 
@@ -67,7 +67,7 @@ def create_retirement_status(user, state=None, create_datetime=None):
     Assumes that retirement states have been setup before calling.
     """
     if create_datetime is None:
-        create_datetime = datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=8)
+        create_datetime = datetime.datetime.now(get_utc_timezone()) - datetime.timedelta(days=8)
 
     retirement = UserRetirementStatus.create_retirement(user)
     if state:

@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import ddt
 import pytest
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -188,7 +188,7 @@ def _create_course_run(self_paced=True, start_day_offset=-1):
 
     Both audit and verified `CourseMode` objects will be created for the course run.
     """
-    now = datetime.datetime.now(ZoneInfo("UTC"))
+    now = datetime.datetime.now(get_utc_timezone())
     start = now + datetime.timedelta(days=start_day_offset)
     course = CourseFactory.create(start=start, self_paced=self_paced)
 

@@ -8,7 +8,7 @@ from django.conf import settings
 from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
@@ -190,7 +190,7 @@ class HomePageCoursesViewTest(CourseTestCase):
             display_name="Course (Demo)",
             id=archived_course_key,
             org=archived_course_key.org,
-            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=ZoneInfo("UTC")),
+            end=(datetime.now() - timedelta(days=365)).replace(tzinfo=get_utc_timezone()),
         )
         active_course_key = self.store.make_course_key("sample-org", "sample-number", "sample-run")
         CourseOverviewFactory.create(

@@ -4,7 +4,7 @@
 import datetime
 import logging
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
@@ -78,7 +78,7 @@ class CreditProviderCallbackSerializer(serializers.Serializer):  # pylint:disabl
             log.warning(msg)
             raise serializers.ValidationError(msg)
 
-        elapsed = (datetime.datetime.now(ZoneInfo("UTC")) - date_time).total_seconds()
+        elapsed = (datetime.datetime.now(get_utc_timezone()) - date_time).total_seconds()
         if elapsed > settings.CREDIT_PROVIDER_TIMESTAMP_EXPIRATION:
             msg = f'[{value}] is too far in the past (over [{elapsed}] seconds).'
             log.warning(msg)

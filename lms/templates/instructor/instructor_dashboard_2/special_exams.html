@@ -2,7 +2,7 @@
 <%!
 from django.utils.translation import gettext as _
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 %>
 <div class="proctoring-wrapper">
   % if section_data.get('mfe_view_url'):

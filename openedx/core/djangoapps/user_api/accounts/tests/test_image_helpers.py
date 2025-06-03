@@ -8,7 +8,7 @@ import hashlib
 from unittest.mock import patch
 
 from django.test import TestCase
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
@@ -16,7 +16,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from ..image_helpers import get_profile_image_urls_for_user
 
 TEST_SIZES = {'full': 50, 'small': 10}
-TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=ZoneInfo("UTC"))
+TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=get_utc_timezone())
 
 
 @patch.dict('django.conf.settings.PROFILE_IMAGE_SIZES_MAP', TEST_SIZES, clear=True)

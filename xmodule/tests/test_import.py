@@ -11,7 +11,7 @@ from fs.osfs import OSFS
 from lxml import etree
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
@@ -332,7 +332,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         assert child.due is None
 
         # Check that the child hasn't started yet
-        assert datetime.datetime.now(ZoneInfo("UTC")) <= child.start
+        assert datetime.datetime.now(get_utc_timezone()) <= child.start
 
     def override_metadata_check(self, block, child, course_due, child_due):
         """

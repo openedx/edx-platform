@@ -8,7 +8,7 @@ import json
 import logging
 from copy import deepcopy
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib import messages
@@ -190,7 +190,7 @@ def create_ccx(request, course, ccx=None):
     ccx.save()
 
     # Make sure start/due are overridden for entire course
-    start = TODAY().replace(tzinfo=ZoneInfo("UTC"))
+    start = TODAY().replace(tzinfo=get_utc_timezone())
     override_field_for_ccx(ccx, course, 'start', start)
     override_field_for_ccx(ccx, course, 'due', None)
 

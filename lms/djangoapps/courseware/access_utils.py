@@ -9,7 +9,7 @@ from logging import getLogger
 from crum import get_current_request
 from django.conf import settings
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomerUser
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseBetaTesterRole
@@ -141,7 +141,7 @@ def check_start_date(user, days_early_for_beta, start, course_key, display_error
             return ACCESS_GRANTED
 
         if now is None:
-            now = datetime.now(ZoneInfo("UTC"))
+            now = datetime.now(get_utc_timezone())
         effective_start = adjust_start_date(user, days_early_for_beta, start, course_key)
 
         should_grant_access = now > effective_start

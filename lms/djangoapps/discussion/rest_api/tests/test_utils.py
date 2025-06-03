@@ -6,7 +6,7 @@ import unittest
 from datetime import datetime, timedelta
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -37,8 +37,8 @@ class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
 
         self.course = CourseFactory.create()
-        self.course.discussion_blackouts = [datetime.now(ZoneInfo("UTC")) - timedelta(days=3),
-                                            datetime.now(ZoneInfo("UTC")) + timedelta(days=3)]
+        self.course.discussion_blackouts = [datetime.now(get_utc_timezone()) - timedelta(days=3),
+                                            datetime.now(get_utc_timezone()) + timedelta(days=3)]
         configuration = DiscussionsConfiguration.get(self.course.id)
         configuration.posting_restrictions = PostingRestriction.SCHEDULED
         configuration.save()
@@ -177,7 +177,7 @@ class TestBlackoutDates(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStore
         Returns:
             list: List of date range tuples.
         """
-        now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(get_utc_timezone())
         date_ranges = [
             (now - timedelta(days=14), now + timedelta(days=23)),
         ]
@@ -228,7 +228,7 @@ class TestBlackoutDates(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStore
         Assertion:
             Posting should be allowed.
         """
-        now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(get_utc_timezone())
         date_ranges = [
             (now + timedelta(days=6), now + timedelta(days=23)),
         ]

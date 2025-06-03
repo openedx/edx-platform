@@ -8,7 +8,7 @@ from unittest import TestCase
 from unittest import mock
 
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -63,7 +63,7 @@ class ScrapeVideoThumbnailsTestCase(CourseTestCase):
         super().setUp()
         course_ids = [str(self.course.id)]
         profiles = ['youtube']
-        created = datetime.now(ZoneInfo("UTC"))
+        created = datetime.now(get_utc_timezone())
         previous_uploads = [
             {
                 'edx_video_id': 'test1',

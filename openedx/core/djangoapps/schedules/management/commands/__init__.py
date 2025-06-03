@@ -5,7 +5,7 @@ Base management command for sending emails
 
 import datetime
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 
@@ -46,7 +46,7 @@ class SendEmailBaseCommand(PrefixedDebugLoggerMixin, BaseCommand):  # lint-amnes
 
         current_date = datetime.datetime(
             *[int(x) for x in options['date'].split('-')],
-            tzinfo=ZoneInfo("UTC")
+            tzinfo=get_utc_timezone()
         )
         self.log_debug('Current date = %s', current_date.isoformat())
 

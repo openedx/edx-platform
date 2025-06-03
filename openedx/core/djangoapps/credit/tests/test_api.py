@@ -9,7 +9,7 @@ from unittest import mock
 import pytest
 import ddt
 import httpretty
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core import mail
 from django.db import connection
@@ -400,7 +400,7 @@ class CreditRequirementApiTests(CreditApiTestBase):
         CreditEligibility.objects.create(
             course=credit_course,
             username="staff",
-            deadline=datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(days=1)
+            deadline=datetime.datetime.now(get_utc_timezone()) - datetime.timedelta(days=1)
         )
 
         # The user should NOT be eligible for credit
@@ -960,7 +960,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
         # Validate the timestamp
         assert 'timestamp' in parameters
         parsed_date = from_timestamp(parameters['timestamp'])
-        assert parsed_date < datetime.datetime.now(ZoneInfo("UTC"))
+        assert parsed_date < datetime.datetime.now(get_utc_timezone())
 
         # Validate course information
         assert parameters['course_org'] == self.course_key.org

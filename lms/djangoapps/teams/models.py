@@ -6,7 +6,7 @@ Django models related to teams functionality.
 from datetime import datetime
 from uuid import uuid4
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
@@ -101,7 +101,7 @@ def handle_activity(user, post, original_author_id=None):
 
 
 def utc_now():
-    return datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
+    return datetime.utcnow().replace(tzinfo=get_utc_timezone())
 
 
 class CourseTeam(models.Model):
@@ -286,7 +286,7 @@ class CourseTeamMembership(models.Model):
         if self.pk is None:
             should_reset_team_size = True
         if not self.last_activity_at:
-            self.last_activity_at = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
+            self.last_activity_at = datetime.utcnow().replace(tzinfo=get_utc_timezone())
         super().save(*args, **kwargs)
         if should_reset_team_size:
             self.team.reset_team_size()
@@ -345,7 +345,7 @@ class CourseTeamMembership(models.Model):
         # information.
         except ObjectDoesNotExist:
             return
-        now = datetime.utcnow().replace(tzinfo=ZoneInfo("UTC"))
+        now = datetime.utcnow().replace(tzinfo=get_utc_timezone())
         membership.last_activity_at = now
         membership.team.last_activity_at = now
         membership.team.save()

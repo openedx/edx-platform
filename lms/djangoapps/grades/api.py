@@ -6,7 +6,7 @@ Python APIs exposed by the grades app to other in-process apps.
 
 from datetime import datetime
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -126,7 +126,7 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
         course_id=str(course_key),
         usage_id=str(usage_key),
         only_if_higher=False,
-        modified=datetime.now().replace(tzinfo=ZoneInfo("UTC")),  # Not used when score_deleted=True
+        modified=datetime.now().replace(tzinfo=get_utc_timezone()),  # Not used when score_deleted=True
         score_deleted=True,
         score_db_table=constants.ScoreDatabaseTableEnum.overrides
     )

@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from waffle import get_waffle_flag_model  # pylint: disable=invalid-django-waffle-import
 
 from common.djangoapps.student.models import CourseEnrollment
@@ -187,7 +187,7 @@ def get_start_end_date(cadence_type):
     start_date = end_date - datetime.timedelta(days=1, minutes=15)
     if cadence_type == EmailCadence.WEEKLY:
         start_date = start_date - datetime.timedelta(days=6)
-    return start_date.replace(tzinfo=ZoneInfo("UTC")), end_date.replace(tzinfo=ZoneInfo("UTC"))
+    return start_date.replace(tzinfo=get_utc_timezone()), end_date.replace(tzinfo=get_utc_timezone())
 
 
 def get_course_info(course_key):
@@ -203,7 +203,7 @@ def get_time_ago(datetime_obj):
     """
     Returns time_ago for datetime instance
     """
-    current_date = datetime.datetime.now(ZoneInfo("UTC"))
+    current_date = datetime.datetime.now(get_utc_timezone())
     days_diff = (current_date - datetime_obj).days
     if days_diff == 0:
         return _("Today")

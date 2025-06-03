@@ -10,7 +10,7 @@ import datetime
 import logging
 
 import crum
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from web_fragments.fragment import Fragment
@@ -88,7 +88,7 @@ class ContentTypeGatingPartition(UserPartition):
             return None
 
         expiration_datetime = verified_mode.expiration_datetime
-        if expiration_datetime and expiration_datetime < datetime.datetime.now(ZoneInfo("UTC")):
+        if expiration_datetime and expiration_datetime < datetime.datetime.now(get_utc_timezone()):
             ecommerce_checkout_link = None
         else:
             ecommerce_checkout_link = self._get_checkout_link(user, verified_mode.sku, str(course_key))

@@ -4,7 +4,7 @@ Tests for the instructor_task app's REST API v1 views.
 import datetime
 import json
 from uuid import uuid4
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from celery.states import REVOKED
 import ddt
@@ -227,7 +227,7 @@ class TestScheduledBulkEmailAPIViews(APITestCase, ModuleStoreTestCase):
         self._create_scheduled_course_emails_for_course(self.course1.id, self.instructor_course1, SCHEDULED, 1)
         task = InstructorTask.objects.get(course_id=self.course1.id)
         task_schedule = InstructorTaskSchedule.objects.get(task=task)
-        schedule_datetime = datetime.datetime(3000, 6, 1, 17, 15, 0, tzinfo=ZoneInfo("UTC"))
+        schedule_datetime = datetime.datetime(3000, 6, 1, 17, 15, 0, tzinfo=get_utc_timezone())
         data = {
             "schedule": schedule_datetime.strftime('%Y-%m-%dT%H:%M:%SZ'),
             "browser_timezone": "UTC"

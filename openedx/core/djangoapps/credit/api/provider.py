@@ -7,7 +7,7 @@ import datetime
 import logging
 import uuid
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.db import transaction
 from edx_proctoring.api import get_last_exam_completion_date
 
@@ -296,7 +296,7 @@ def create_credit_request(course_key, provider_id, username):
 
     parameters = {
         "request_uuid": credit_request.uuid,
-        "timestamp": to_timestamp(datetime.datetime.now(ZoneInfo("UTC"))),
+        "timestamp": to_timestamp(datetime.datetime.now(get_utc_timezone())),
         "course_org": course_key.org,
         "course_num": course_key.course,
         "course_run": course_key.run,

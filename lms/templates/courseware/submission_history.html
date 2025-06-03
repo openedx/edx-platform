@@ -1,6 +1,6 @@
 <%page expression_filter="h"/>
 <% import json
-from zoneinfo import ZoneInfo %>
+from openedx.core.lib.time_zone_utils import get_utc_timezone %>
 <h3>${username} > ${course_id} > ${location}</h3>
 
 % for i, (entry, score) in enumerate(zip(history_entries, scores)):

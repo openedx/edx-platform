@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.test import RequestFactory, TestCase
 from freezegun import freeze_time
 
@@ -21,7 +21,7 @@ class TestIcsGeneration(TestCase):
     def setUp(self):
         super().setUp()
 
-        freezer = freeze_time(datetime(2013, 10, 3, 8, 24, 55, tzinfo=ZoneInfo("UTC")))
+        freezer = freeze_time(datetime(2013, 10, 3, 8, 24, 55, tzinfo=get_utc_timezone()))
         self.addCleanup(freezer.stop)
         freezer.start()
 
@@ -103,7 +103,7 @@ END:VCALENDAR
 
     def test_generate_ics_for_user_course(self):
         """ Tests that a simple sample set of course assignments is generated correctly """
-        now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(get_utc_timezone())
         day1 = now + timedelta(1)
         day2 = now + timedelta(1)
 

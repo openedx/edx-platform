@@ -8,9 +8,9 @@ from django.test.utils import override_settings
 from eventtracking import tracker
 from eventtracking.django import DjangoTracker
 from freezegun import freeze_time
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
-FROZEN_TIME = datetime(2013, 10, 3, 8, 24, 55, tzinfo=ZoneInfo("UTC"))
+FROZEN_TIME = datetime(2013, 10, 3, 8, 24, 55, tzinfo=get_utc_timezone())
 IN_MEMORY_BACKEND_CONFIG = {
     'mem': {
         'ENGINE': 'common.djangoapps.track.tests.InMemoryBackend'

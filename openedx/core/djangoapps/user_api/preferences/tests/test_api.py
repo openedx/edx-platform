@@ -12,7 +12,7 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.test.utils import override_settings
 from django.urls import reverse
 from pytz import common_timezones
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.time_zone_utils import get_display_time_zone
@@ -371,7 +371,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
         profile = UserProfile.objects.get(user=user)
-        year_of_birth = datetime.datetime.now(ZoneInfo("UTC")).year - age
+        year_of_birth = datetime.datetime.now(get_utc_timezone()).year - age
         profile.year_of_birth = year_of_birth
         profile.save()
 

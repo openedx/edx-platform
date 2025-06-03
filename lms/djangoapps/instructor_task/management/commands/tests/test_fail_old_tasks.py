@@ -6,7 +6,7 @@ Tests for failing old tasks
 from datetime import datetime
 import pytest
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from celery.states import FAILURE
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -51,7 +51,7 @@ class TestFailOldQueueingTasksCommand(InstructorTaskTestCase):
         Override each task's "created" date
         """
         for task in self.tasks:
-            task.created = datetime.strptime(created_date, "%Y-%m-%d").replace(tzinfo=ZoneInfo("UTC"))
+            task.created = datetime.strptime(created_date, "%Y-%m-%d").replace(tzinfo=get_utc_timezone())
             task.save()
 
     def get_tasks(self):

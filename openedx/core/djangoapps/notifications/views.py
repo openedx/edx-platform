@@ -10,7 +10,7 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.generics import UpdateAPIView
@@ -290,7 +290,7 @@ class NotificationListAPIView(generics.ListAPIView):
         """
         Override the get_queryset method to filter the queryset by app name, request.user and created
         """
-        expiry_date = datetime.now(ZoneInfo("UTC")) - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
+        expiry_date = datetime.now(get_utc_timezone()) - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         app_name = self.request.query_params.get('app_name')
 
         if self.request.query_params.get('tray_opened'):
@@ -422,7 +422,7 @@ class NotificationReadAPIView(APIView):
         - 404: Not Found status code if the notification was not found.
         """
         notification_id = request.data.get('notification_id', None)
-        read_at = datetime.now(ZoneInfo("UTC"))
+        read_at = datetime.now(get_utc_timezone())
 
         if notification_id:
             notification = get_object_or_404(Notification, pk=notification_id, user=request.user)

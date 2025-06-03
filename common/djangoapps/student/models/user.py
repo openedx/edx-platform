@@ -52,7 +52,7 @@ from edx_django_utils.cache import RequestCache
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField, LearningContextKeyField
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from user_util import user_util
 
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
@@ -454,7 +454,7 @@ class UserProfile(models.Model):
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
     # Optional demographic data we started capturing from Fall 2012
-    this_year = datetime.now(ZoneInfo("UTC")).year
+    this_year = datetime.now(get_utc_timezone()).year
     VALID_YEARS = list(range(this_year, this_year - 120, -1))
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
@@ -570,7 +570,7 @@ class UserProfile(models.Model):
     def age(self):
         """ Convenience method that returns the age given a year_of_birth. """
         year_of_birth = self.year_of_birth
-        year = datetime.now(ZoneInfo("UTC")).year
+        year = datetime.now(get_utc_timezone()).year
         if year_of_birth is not None:
             return self._calculate_age(year, year_of_birth)
 
@@ -800,7 +800,7 @@ def user_post_save_callback(sender, **kwargs):
                 'username': user.username,
                 'name': profile.name,
                 'age': profile.age or -1,
-                'yearOfBirth': profile.year_of_birth or datetime.now(ZoneInfo("UTC")).year,
+                'yearOfBirth': profile.year_of_birth or datetime.now(get_utc_timezone()).year,
                 'education': profile.level_of_education_display,
                 'address': profile.mailing_address,
                 'gender': profile.gender_display,
@@ -984,7 +984,7 @@ class LoginFailures(models.Model):
             if not record.lockout_until:
                 return False
 
-            now = datetime.now(ZoneInfo("UTC"))
+            now = datetime.now(get_utc_timezone())
             until = record.lockout_until
             is_locked_out = until and now < until
 
@@ -1005,7 +1005,7 @@ class LoginFailures(models.Model):
         if record.failure_count >= max_failures_allowed:
             # yes, then store when this account is locked out until
             lockout_period_secs = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
-            record.lockout_until = datetime.now(ZoneInfo("UTC")) + timedelta(seconds=lockout_period_secs)
+            record.lockout_until = datetime.now(get_utc_timezone()) + timedelta(seconds=lockout_period_secs)
 
         record.save()
 

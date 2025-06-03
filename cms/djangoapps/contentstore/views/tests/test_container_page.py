@@ -12,7 +12,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from urllib.parse import quote
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 import cms.djangoapps.contentstore.views.component as views
 from cms.djangoapps.contentstore import toggles
@@ -41,8 +41,8 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         self.video = self._create_block(self.child_vertical, "video", "My Video")
         self.store = modulestore()
 
-        past = datetime.datetime(1970, 1, 1, tzinfo=ZoneInfo("UTC"))
-        future = datetime.datetime.now(ZoneInfo("UTC")) + datetime.timedelta(days=1)
+        past = datetime.datetime(1970, 1, 1, tzinfo=get_utc_timezone())
+        future = datetime.datetime.now(get_utc_timezone()) + datetime.timedelta(days=1)
         self.released_private_vertical = self._create_block(
             parent=self.sequential, category='vertical', display_name='Released Private Unit',
             start=past)

@@ -8,7 +8,7 @@ import unittest
 from datetime import datetime, timedelta
 import pytest
 import ddt
-from zoneinfo import ZoneInfo
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
@@ -30,7 +30,7 @@ class AssetStoreTestData:
     """
     Shared data for constructing test assets.
     """
-    now = datetime.now(ZoneInfo("UTC"))
+    now = datetime.now(get_utc_timezone())
     user_id = 144
     user_id_long = int(user_id)
 
@@ -131,7 +131,7 @@ class TestMongoAssetMetadataStorage(TestCase):
         """
         Make a single test asset metadata.
         """
-        now = datetime.now(ZoneInfo("UTC"))
+        now = datetime.now(get_utc_timezone())
         return AssetMetadata(
             asset_loc, internal_name='EKMND332DDBK',
             pathname='pictures/historical', contenttype='image/jpeg',
@@ -322,13 +322,13 @@ class TestMongoAssetMetadataStorage(TestCase):
         ('curr_version', 'v1.01'),
         ('prev_version', 'v1.0'),
         ('edited_by', 'Mork'),
-        ('edited_on', datetime(1969, 1, 1, tzinfo=ZoneInfo("UTC"))),
+        ('edited_on', datetime(1969, 1, 1, tzinfo=get_utc_timezone())),
     )
 
     DISALLOWED_ATTRS = (
         ('asset_id', 'IAmBogus'),
         ('created_by', 'Smith'),
-        ('created_on', datetime.now(ZoneInfo("UTC"))),
+        ('created_on', datetime.now(get_utc_timezone())),
     )
 
     UNKNOWN_ATTRS = (
