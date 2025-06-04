@@ -623,7 +623,9 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
                 if request.user.is_anonymous:
                     view = PUBLIC_VIEW
 
-                context = {'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)}
+                context = {
+                    'specific_masquerade': is_masquerading_as_specific_student(request.user, usage_key.course_key)
+                }
                 return Response(sequence.get_metadata(view=view, context=context))
 
 
