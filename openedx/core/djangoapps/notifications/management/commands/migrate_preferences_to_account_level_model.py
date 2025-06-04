@@ -1,208 +1,237 @@
-"""
-Migration command for course level notification preferences to account level preferences.
-"""
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Iterator
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandParser
 from django.db import transaction
 
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, NotificationPreference
+from openedx.core.djangoapps.notifications.utils import aggregate_notification_configs
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_BATCH_SIZE = 1000  # Process 1000 users at a time
 
 class Command(BaseCommand):
     """
-     Preference migration command.
+    Migrates course-level notification preferences to account-level notification preferences.
 
-    Invoke with:
-        python manage.py [lms|cms] migrate_preferences_to_account_level ...
-
-    Key optimizations:
-    - Pre-fetch existing preferences to avoid conflicts
-    - Use set operations for deduplication
-    - Minimize database queries with efficient batching
-    - Better memory management with generator pattern
-    - Enhanced error handling and progress reporting
+    This command processes users in batches, aggregates their course-level preferences,
+    and creates new account-level preferences. It includes a dry-run mode.
+    Existing account-level preferences for a processed user will be deleted before
+    new ones are created to ensure idempotency.
     """
+    help = "Migrates course-level notification preferences to account-level preferences for all relevant users."
 
-    BATCH_SIZE = 10000  # Increased for better throughput
-    CHUNK_SIZE = 1000  # Process preferences in smaller chunks
-
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--dry-run',
-            action='store_true',
-            help='Show what would be migrated without making changes'
-        )
+    def add_arguments(self, parser: CommandParser):
         parser.add_argument(
             '--batch-size',
             type=int,
-            default=self.BATCH_SIZE,
-            help=f'Batch size for bulk operations (default: {self.BATCH_SIZE})'
+            default=DEFAULT_BATCH_SIZE,
+            help=f"The number of users to process in each batch. Default: {DEFAULT_BATCH_SIZE}"
+        )
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            help="Simulate the migration without making any database changes."
         )
 
-    def handle(self, *args, **options):
-        dry_run = options.get('dry_run', False)
-        batch_size = options.get('batch_size', self.BATCH_SIZE)
+    def _get_user_ids_to_process(self, batch_size: int) -> Iterator[int]:
+        """
+        Yields all distinct user IDs with course notification preferences, in batches.
+        """
+        logger.info("Fetching all distinct user IDs with course notification preferences...")
+        # Use iterator with chunk_size for memory efficiency when fetching distinct user IDs
+        user_id_queryset = CourseNotificationPreference.objects.values_list('user_id', flat=True).distinct().order_by('user_id')
+        for user_id in user_id_queryset.iterator(chunk_size=batch_size): # Django's iterator handles DB-side iteration
+            yield user_id
 
-        if dry_run:
-            logger.info("DRY RUN MODE - No changes will be made")
 
-        # Get total count for progress tracking
-        total_course_prefs = CourseNotificationPreference.objects.count()
-        logger.info("Starting migration of %d course-level preferences", total_course_prefs)
+    def _create_preference_object(
+        self,
+        user_id: int,
+        app_name: str,
+        notification_type: str,
+        values: Dict[str, Any]
+    ) -> NotificationPreference:
+        """
+        Helper function to create a NotificationPreference instance.
+        """
+        return NotificationPreference(
+            user_id=user_id,
+            app=app_name,
+            type=notification_type,
+            web=values.get('web'),
+            email=values.get('email'),
+            push=values.get('push'),
+            email_cadence=values.get('email_cadence', EmailCadence.DAILY) # Ensure using .value for Enum
+        )
 
-        # Pre-fetch existing account-level preferences to avoid conflicts
-        existing_prefs = self._get_existing_preferences()
-        logger.info("Found %d existing account-level preferences", len(existing_prefs))
+    def _process_user_preferences(self, user_id: int) -> List[NotificationPreference]:
+        """
+        Processes preferences for a single user.
+        Returns a list of NotificationPreference objects to be created.
+        """
+        new_account_preferences: List[NotificationPreference] = []
 
-        processed_count = 0
-        created_count = 0
+        # Fetch all course preferences for the user
+        course_preferences_configs = list(
+            CourseNotificationPreference.objects
+            .filter(user_id=user_id)
+            .values_list('notification_preference_config', flat=True)
+        )
 
-        # Process in chunks to manage memory
-        for chunk in self._get_preference_chunks():
-            new_preferences = list(self._generate_account_preferences(chunk, existing_prefs))
+        if not course_preferences_configs:
+            logger.debug(f"No course preferences found for user {user_id}. Skipping.") # Changed to debug as it's normal
+            return new_account_preferences
 
-            if new_preferences and not dry_run:
-                created_batch = self._bulk_create_preferences(new_preferences, batch_size)
-                created_count += created_batch
-            elif dry_run:
-                created_count += len(new_preferences)
-                logger.info("DRY RUN: Would create %d preferences from this chunk", len(new_preferences))
+        aggregated_data = aggregate_notification_configs(course_preferences_configs)
 
-            processed_count += len(chunk)
-
-            if processed_count % (self.CHUNK_SIZE * 5) == 0:
-                logger.info("Progress: %d/%d course preferences processed, %d account preferences created",
-                            processed_count, total_course_prefs, created_count)
-
-        logger.info("Migration complete: processed %d course preferences, created %d account preferences",
-                    processed_count, created_count)
-
-    def _get_existing_preferences(self) -> set:
-        """Pre-fetch existing preferences to avoid conflicts efficiently."""
-        existing = NotificationPreference.objects.values_list(
-            'user_id', 'type', 'app'
-        ).iterator(chunk_size=self.BATCH_SIZE)
-
-        return set(existing)
-
-    def _get_preference_chunks(self):
-        """Generator that yields chunks of CourseNotificationPreference objects."""
-        queryset = CourseNotificationPreference.objects.only(
-            'user_id', 'notification_preference_config'
-        ).iterator(chunk_size=self.CHUNK_SIZE)
-
-        chunk = []
-        for pref in queryset:
-            chunk.append(pref)
-            if len(chunk) >= self.CHUNK_SIZE:
-                yield chunk
-                chunk = []
-
-        if chunk:
-            yield chunk
-
-    def _generate_account_preferences(self, course_prefs: List, existing_prefs: set):
-        """Generate NotificationPreference instances from course preferences."""
-        seen_in_batch = set()  # Track duplicates within current batch
-
-        for pref in course_prefs:
-            config = pref.notification_preference_config or {}
-
-            # Ensure config is a dictionary
-            if not isinstance(config, dict):
+        for app_name, app_config in aggregated_data.items():
+            if not isinstance(app_config, dict):
+                logger.warning(
+                    f"Malformed app_config for app '{app_name}' for user {user_id}. Expected dict, got {type(app_config)}. Skipping app."
+                )
                 continue
 
-            for app_name, app_config in config.items():
-                if not isinstance(app_config, dict):
-                    continue
-
-                notif_types = app_config.get('notification_types', {})
-                if not isinstance(notif_types, dict):
-                    continue
-
-                for notification_type, values in notif_types.items():
-                    # Skip if values is None or not a dict (malformed data)
-                    if values is None or not isinstance(values, dict):
-                        continue
-
-                    # Handle core notification types expansion
-                    types_to_process = self._expand_notification_types(
-                        notification_type, app_config
-                    )
-
-                    for final_type in types_to_process:
-                        pref_key = (pref.user_id, final_type, app_name)
-
-                        # Skip if already exists or seen in this batch
-                        if pref_key in existing_prefs or pref_key in seen_in_batch:
-                            continue
-
-                        seen_in_batch.add(pref_key)
-
-                        yield NotificationPreference(
-                            user_id=pref.user_id,
-                            type=final_type,
-                            app=app_name,
-                            web=values.get('web', True),
-                            email=values.get('email', False),
-                            push=values.get('push', False),
-                            email_cadence=values.get('email_cadence', 'Daily'),
-                        )
-
-    def _expand_notification_types(self, notification_type: str, app_config: Dict[str, Any]) -> List[str]:
-        """Expand core notification types or return single type."""
-        if notification_type == 'core':
-            return app_config.get('core_notification_types', [])
-        return [notification_type]
-
-    def _bulk_create_preferences(self, preferences: List[NotificationPreference], batch_size: int) -> int:
-        """Bulk create preferences with optimized error handling."""
-        if not preferences:
-            return 0
-
-        created_count = 0
-
-        # Process in batches to avoid memory issues
-        for i in range(0, len(preferences), batch_size):
-            batch = preferences[i:i + batch_size]
-
-            try:
-                with transaction.atomic():
-                    created_objects = NotificationPreference.objects.bulk_create(
-                        batch,
-                        batch_size=batch_size,
-                        ignore_conflicts=True
-                    )
-                    batch_created = len(created_objects) if hasattr(created_objects, '__len__') else len(batch)
-                    created_count += batch_created
-
-            except Exception as e:  # pylint: disable=broad-except
-                logger.error("Bulk create failed for batch of %d items: %s", len(batch), str(e))
-                # Try individual inserts as fallback
-                created_count += self._fallback_individual_create(batch)
-
-        return created_count
-
-    def _fallback_individual_create(self, preferences: List[NotificationPreference]) -> int:
-        """Fallback to individual creation if bulk_create fails."""
-        created_count = 0
-
-        for pref in preferences:
-            try:
-                pref.save()
-                created_count += 1
-            except Exception as e:  # pylint: disable=broad-except
+            notif_types = app_config.get('notification_types', {})
+            if not isinstance(notif_types, dict):
                 logger.warning(
-                    "Failed to create individual preference for user %d: %s",
-                    pref.user_id, str(e)
+                    f"Malformed 'notification_types' for app '{app_name}' for user {user_id}. Expected dict, got {type(notif_types)}. Skipping notification_types."
+                )
+                continue
+
+            # Handle regular notification types
+            for notification_type, values in notif_types.items():
+                if notification_type == 'core':  # 'core' key might hold default values for core_notification_types
+                    continue
+                if values is None or not isinstance(values, dict):
+                    logger.warning(
+                        f"Skipping malformed notification type data for '{notification_type}' in app '{app_name}' for user {user_id}."
+                    )
+                    continue
+                new_account_preferences.append(
+                    self._create_preference_object(user_id, app_name, notification_type, values)
                 )
 
+            # Handle core notification types
+            core_types_list = app_config.get('core_notification_types', [])
+            if not isinstance(core_types_list, list):
+                logger.warning(
+                    f"Malformed 'core_notification_types' for app '{app_name}' for user {user_id}. Expected list, got {type(core_types_list)}. Skipping core_notification_types."
+                )
+                continue
+
+            core_values = notif_types.get('core', {})
+            if not isinstance(core_values, dict):
+                logger.warning(
+                    f"Malformed values for 'core' notification types in app '{app_name}' for user {user_id}. Expected dict, got {type(core_values)}. Using empty defaults."
+                )
+                core_values = {}
+
+            for core_type_name in core_types_list:
+                if core_type_name is None or not isinstance(core_type_name, str):
+                    logger.warning(
+                        f"Skipping malformed core_type_name: '{core_type_name}' in app '{app_name}' for user {user_id}."
+                    )
+                    continue
+                new_account_preferences.append(
+                    self._create_preference_object(user_id, app_name, core_type_name, core_values)
+                )
+
+        if new_account_preferences:
+            logger.debug(f"User {user_id}: Aggregated {len(course_preferences_configs)} course preferences into {len(new_account_preferences)} account preferences.")
+        else:
+            logger.debug(f"User {user_id}: No account preferences generated from {len(course_preferences_configs)} course preferences.")
+
+        return new_account_preferences
+
+
+    def handle(self, *args: Any, **options: Any):
+        dry_run = options['dry_run']
+        batch_size = options['batch_size']
+
+        if dry_run:
+            logger.info(self.style.WARNING("Performing a DRY RUN. No changes will be made to the database."))
+
+        user_id_iterator = self._get_user_ids_to_process(batch_size)
+
+        preferences_batch_to_create: List[NotificationPreference] = []
+        processed_users_in_batch = 0
+        total_users_processed = 0
+        total_preferences_created = 0
+
+        for user_id in user_id_iterator:
+            try:
+                with transaction.atomic():
+                    user_new_preferences = self._process_user_preferences(user_id)
+
+                    if user_new_preferences:
+                        if not dry_run:
+                            deleted_count, _ = NotificationPreference.objects.filter(user_id=user_id).delete()
+                            if deleted_count > 0:
+                                logger.debug(f"User {user_id}: Deleted {deleted_count} existing account-level preferences.")
+                        else:
+                            # In dry-run, we just note that deletion would occur if applicable.
+                            # A more accurate dry-run might query the count of existing preferences.
+                            logger.debug(f"[DRY RUN] User {user_id}: Would check and delete existing account-level preferences if any.")
+
+                        preferences_batch_to_create.extend(user_new_preferences)
+
+                processed_users_in_batch += 1
+                total_users_processed += 1
+
+                if processed_users_in_batch >= batch_size:
+                    if preferences_batch_to_create:
+                        if not dry_run:
+                            NotificationPreference.objects.bulk_create(preferences_batch_to_create)
+                            logger.info(
+                                self.style.SUCCESS(
+                                    f"Successfully created {len(preferences_batch_to_create)} account-level preferences "
+                                    f"for {processed_users_in_batch} users in this batch."
+                                )
+                            )
+                        else:
+                            logger.info(
+                                f"[DRY RUN] Would create {len(preferences_batch_to_create)} account-level preferences "
+                                f"for {processed_users_in_batch} users in this batch."
+                            )
+                        total_preferences_created += len(preferences_batch_to_create)
+                        preferences_batch_to_create = []
+                    else:
+                         logger.info(f"No preferences to create for the latest batch of {processed_users_in_batch} users.")
+                    processed_users_in_batch = 0
+
+                if total_users_processed > 0 and total_users_processed % (batch_size * 5) == 0: # Log progress every 5 batches or so
+                     logger.info(f"PROGRESS: Total users processed so far: {total_users_processed}. Total preferences {'would be' if dry_run else ''} created: {total_preferences_created}")
+
+            except Exception as e:
+                logger.error(f"Failed to process preferences for user {user_id}: {e}", exc_info=True)
+                # This user's transaction will be rolled back.
+                # The script will continue with the next user.
+
+        # Process any remaining preferences in the last batch
+        if preferences_batch_to_create:
+            if not dry_run:
+                NotificationPreference.objects.bulk_create(preferences_batch_to_create)
+                logger.info(
+                    self.style.SUCCESS(
+                        f"Successfully created {len(preferences_batch_to_create)} account-level preferences "
+                        f"for the final {processed_users_in_batch} users."
+                    )
+                )
+            else:
+                logger.info(
+                    f"[DRY RUN] Would create {len(preferences_batch_to_create)} account-level preferences "
+                    f"for the final {processed_users_in_batch} users."
+                )
+            total_preferences_created += len(preferences_batch_to_create)
+
         logger.info(
-            "Fallback creation completed: %d/%d preferences created",
-            created_count, len(preferences)
+            self.style.SUCCESS(
+                f"Migration complete. Processed {total_users_processed} users. "
+                f"{'Would have created' if dry_run else 'Created'} a total of {total_preferences_created} account-level preferences."
+            )
         )
-        return created_count
+        if dry_run:
+            logger.info(self.style.WARNING("DRY RUN finished. No actual changes were made."))

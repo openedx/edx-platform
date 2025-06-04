@@ -279,6 +279,7 @@ class SyncDiscussionTopicsView(APIView):
             async_topics=False
         )
 
+
         return Response({
             "status": "success",
             "message": "Discussion topics synced successfully."

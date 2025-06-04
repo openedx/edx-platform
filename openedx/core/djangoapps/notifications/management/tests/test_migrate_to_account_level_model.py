@@ -1,505 +1,432 @@
-# pylint: disable=protected-access
-"""
- Test module for the migrate_preferences_to_account_level_model management command.
-"""
+import json
+from unittest.mock import Mock, patch, call
 from io import StringIO
-from unittest.mock import Mock, call, patch
 
-from django.core.management import call_command
 from django.test import TestCase
+from django.core.management import call_command
+from django.contrib.auth.models import User
+from django.db import transaction
 
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
+from openedx.core.djangoapps.notifications.models import (
+    CourseNotificationPreference,
+    NotificationPreference
+)
 from openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model import Command
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
-
-MODULE_PATH = 'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model'
 
 
-class MigratePreferencesToAccountLevelTest(TestCase):
-    """Test suite for the migrate_preferences_to_account_level_model management command."""
+class MigrateNotificationPreferencesTestCase(TestCase):
+    """Test cases for the migrate_preferences_to_account_level_model management command."""
 
     def setUp(self):
-        """Set up test fixtures."""
-        self.command = Command()
-        self.command.BATCH_SIZE = 100  # Smaller batch size for testing
-        self.command.CHUNK_SIZE = 50
+        """Set up test data."""
+        self.user1 = User.objects.create_user(username='user1', email='user1@example.com')
+        self.user2 = User.objects.create_user(username='user2', email='user2@example.com')
+        self.user3 = User.objects.create_user(username='user3', email='user3@example.com')
 
-        # Mock logger to capture log messages
-        self.logger_patcher = patch(f'{MODULE_PATH}.logger')
-        self.mock_logger = self.logger_patcher.start()
-
-    def tearDown(self):
-        """Clean up patches."""
-        self.logger_patcher.stop()
-
-    def _create_mock_course_preference(self, user_id, config):
-        """Helper to create mock CourseNotificationPreference."""
-        mock_pref = Mock(spec=CourseNotificationPreference)
-        mock_pref.user_id = user_id
-        mock_pref.notification_preference_config = config
-        return mock_pref
-
-    def _create_sample_config(self):
-        """Create sample notification preference configuration."""
-        return {
-            'discussion': {
-                'notification_types': {
-                    'new_comment': {
-                        'web': True,
-                        'email': True,
-                        'push': False,
-                        'email_cadence': 'Daily'
+        # Sample notification preference config
+        self.sample_config = {
+            "grading": {
+                "enabled": True,
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
                     },
-                    'core': {
-                        'web': True,
-                        'email': False,
-                        'push': True,
-                        'email_cadence': 'Weekly'
+                    "ora_grade_assigned": {
+                        "web": True,
+                        "push": False,
+                        "email": True,
+                        "email_cadence": "Daily"
                     }
                 },
-                'core_notification_types': ['new_post', 'post_edited']
+                "core_notification_types": ["grade_assigned", "grade_updated"]
+            },
+            "discussion": {
+                "enabled": True,
+                "notification_types": {
+                    "core": {
+                        "web": False,
+                        "push": True,
+                        "email": False,
+                        "email_cadence": "Weekly"
+                    },
+                    "new_post": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Immediately"
+                    }
+                },
+                "core_notification_types": ["new_response", "new_comment"]
+            }
+        }
+
+    def tearDown(self):
+        """Clean up test data."""
+        CourseNotificationPreference.objects.all().delete()
+        NotificationPreference.objects.all().delete()
+        User.objects.all().delete()
+
+    def test_get_user_ids_to_process(self):
+        """Test that _get_user_ids_to_process returns correct user IDs."""
+        # Create course preferences for users
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=self.sample_config
+        )
+        CourseNotificationPreference.objects.create(
+            user=self.user2,
+            course_id='course-v1:Test+Course+2',
+            notification_preference_config=self.sample_config
+        )
+
+        command = Command()
+        user_ids = list(command._get_user_ids_to_process(batch_size=10))
+
+        self.assertEqual(len(user_ids), 2)
+        self.assertIn(self.user1.id, user_ids)
+        self.assertIn(self.user2.id, user_ids)
+
+    def test_create_preference_object(self):
+        """Test that _create_preference_object creates correct NotificationPreference instance."""
+        command = Command()
+        values = {
+            'web': True,
+            'push': False,
+            'email': True,
+            'email_cadence': 'Weekly'
+        }
+
+        preference = command._create_preference_object(
+            user_id=self.user1.id,
+            app_name='grading',
+            notification_type='ora_grade_assigned',
+            values=values
+        )
+
+        self.assertEqual(preference.user_id, self.user1.id)
+        self.assertEqual(preference.app, 'grading')
+        self.assertEqual(preference.type, 'ora_grade_assigned')
+        self.assertTrue(preference.web)
+        self.assertFalse(preference.push)
+        self.assertTrue(preference.email)
+        self.assertEqual(preference.email_cadence, 'Weekly')
+
+    def test_create_preference_object_with_defaults(self):
+        """Test _create_preference_object with missing values uses defaults."""
+        command = Command()
+        values = {'web': True}  # Missing other values
+
+        preference = command._create_preference_object(
+            user_id=self.user1.id,
+            app_name='grading',
+            notification_type='test_type',
+            values=values
+        )
+
+        self.assertTrue(preference.web)
+        self.assertIsNone(preference.push)
+        self.assertIsNone(preference.email)
+        self.assertEqual(preference.email_cadence, EmailCadence.DAILY)
+
+    @patch(
+        'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.aggregate_notification_configs')
+    def test_process_user_preferences_success(self, mock_aggregate):
+        """Test successful processing of user preferences."""
+        # Setup
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=self.sample_config
+        )
+
+        mock_aggregate.return_value = {
+            'grading': {
+                'notification_types': {
+                    'core': {'web': True, 'push': True, 'email': True, 'email_cadence': 'Daily'},
+                    'grade_assigned': {'web': True, 'push': False, 'email': True, 'email_cadence': 'Daily'}
+                },
+                'core_notification_types': ['grade_updated']
+            }
+        }
+
+        command = Command()
+        preferences = command._process_user_preferences(self.user1.id)
+
+        self.assertEqual(len(preferences), 2)  # grade_assigned + grade_updated
+
+        # Check grade_assigned preference
+        grade_assigned_pref = next(p for p in preferences if p.type == 'grade_assigned')
+        self.assertEqual(grade_assigned_pref.app, 'grading')
+        self.assertTrue(grade_assigned_pref.web)
+        self.assertFalse(grade_assigned_pref.push)
+        self.assertTrue(grade_assigned_pref.email)
+
+        # Check core notification type
+        grade_updated_pref = next(p for p in preferences if p.type == 'grade_updated')
+        self.assertEqual(grade_updated_pref.app, 'grading')
+        self.assertTrue(grade_updated_pref.web)
+        self.assertTrue(grade_updated_pref.push)
+        self.assertTrue(grade_updated_pref.email)
+
+    @patch(
+        'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.aggregate_notification_configs')
+    def test_process_user_preferences_no_course_preferences(self, mock_aggregate):
+        """Test processing user with no course preferences."""
+        command = Command()
+        preferences = command._process_user_preferences(self.user1.id)
+
+        self.assertEqual(len(preferences), 0)
+        mock_aggregate.assert_not_called()
+
+    @patch(
+        'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.aggregate_notification_configs')
+    def test_process_user_preferences_malformed_data(self, mock_aggregate):
+        """Test handling of malformed notification config data."""
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=self.sample_config
+        )
+
+        # Mock malformed data
+        mock_aggregate.return_value = {
+            'grading': 'invalid_string',  # Should be dict
+            'discussion': {
+                'notification_types': 'invalid_string',  # Should be dict
+                'core_notification_types': []
             },
             'updates': {
                 'notification_types': {
-                    'course_update': {
-                        'web': False,
-                        'email': True,
-                        'push': True,
-                        'email_cadence': 'Immediate'
-                    }
-                }
+                    'core': {'web': True, 'push': True, 'email': True},
+                    'invalid_type': None  # Invalid notification type data
+                },
+                'core_notification_types': 'invalid_string'  # Should be list
             }
         }
 
-    @patch(f'{MODULE_PATH}.CourseNotificationPreference')
-    @patch(f'{MODULE_PATH}.NotificationPreference')
-    def test_handle_successful_migration(self, mock_notif_pref_model, mock_course_pref_model):
-        """Test successful migration flow."""
-        # Setup mock data
-        sample_config = self._create_sample_config()
-        mock_course_pref = self._create_mock_course_preference(1, sample_config)
+        command = Command()
+        with self.assertLogs(level='WARNING') as log:
+            preferences = command._process_user_preferences(self.user1.id)
 
-        # Mock CourseNotificationPreference queryset
-        mock_course_pref_model.objects.count.return_value = 1
-        mock_course_pref_model.objects.only.return_value.iterator.return_value = [mock_course_pref]
+        self.assertEqual(len(preferences), 0)
+        self.assertIn('Malformed app_config', log.output[0])
 
-        # Mock NotificationPreference queryset
-        mock_notif_pref_model.objects.values_list.return_value.iterator.return_value = []
-        mock_notif_pref_model.objects.bulk_create.return_value = [Mock() for _ in range(4)]
-
-        # Execute command
-        self.command.handle()
-
-        # Verify CourseNotificationPreference was queried correctly
-        mock_course_pref_model.objects.only.assert_called_once_with('user_id', 'notification_preference_config')
-        mock_course_pref_model.objects.count.assert_called_once()
-
-        # Verify NotificationPreference bulk_create was called
-        self.assertTrue(mock_notif_pref_model.objects.bulk_create.called)
-
-        # Verify logging
-        self.mock_logger.info.assert_any_call("Starting migration of %d course-level preferences", 1)
-        self.mock_logger.info.assert_any_call(
-            "Migration complete: processed %d course preferences, created %d account preferences", 1, 4)
-
-    @patch(f'{MODULE_PATH}.CourseNotificationPreference')
-    @patch(f'{MODULE_PATH}.NotificationPreference')
-    def test_dry_run_mode(self, mock_notif_pref_model, mock_course_pref_model):
-        """Test dry run mode doesn't create any records."""
-        sample_config = self._create_sample_config()
-        mock_course_pref = self._create_mock_course_preference(1, sample_config)
-
-        mock_course_pref_model.objects.count.return_value = 1
-        mock_course_pref_model.objects.only.return_value.iterator.return_value = [mock_course_pref]
-        mock_notif_pref_model.objects.values_list.return_value.iterator.return_value = []
-
-        # Execute with dry_run=True
-        self.command.handle(dry_run=True)
-
-        # Verify no bulk_create was called
-        mock_notif_pref_model.objects.bulk_create.assert_not_called()
-
-        # Verify dry run logging
-        self.mock_logger.info.assert_any_call("DRY RUN MODE - No changes will be made")
-
-    def test_get_existing_preferences(self):
-        """Test _get_existing_preferences method."""
-        with patch(f'{MODULE_PATH}.NotificationPreference') as mock_model:
-            # Mock the values_list iterator
-            mock_iterator = Mock()
-            mock_iterator.__iter__ = Mock(return_value=iter([
-                (1, 'new_comment', 'discussion'),
-                (2, 'course_update', 'updates')
-            ]))
-            mock_model.objects.values_list.return_value.iterator.return_value = mock_iterator
-
-            result = self.command._get_existing_preferences()
-
-            # Verify correct method calls
-            mock_model.objects.values_list.assert_called_once_with('user_id', 'type', 'app')
-
-            # Verify result is a set with expected values
-            expected = {(1, 'new_comment', 'discussion'), (2, 'course_update', 'updates')}
-            self.assertEqual(result, expected)
-
-    def test_get_preference_chunks(self):
-        """Test _get_preference_chunks method."""
-        mock_prefs = [Mock() for _ in range(125)]  # 125 items to test chunking
-
-        with patch(f'{MODULE_PATH}.CourseNotificationPreference') as mock_model:
-            mock_model.objects.only.return_value.iterator.return_value = iter(mock_prefs)
-
-            chunks = list(self.command._get_preference_chunks())
-
-            # Should have 3 chunks: 50, 50, 25
-            self.assertEqual(len(chunks), 3)
-            self.assertEqual(len(chunks[0]), 50)
-            self.assertEqual(len(chunks[1]), 50)
-            self.assertEqual(len(chunks[2]), 25)
-
-    def test_expand_notification_types_core(self):
-        """Test _expand_notification_types with core type."""
-        app_config = {'core_notification_types': ['type1', 'type2', 'type3']}
-
-        result = self.command._expand_notification_types('core', app_config)
-
-        self.assertEqual(result, ['type1', 'type2', 'type3'])
-
-    def test_expand_notification_types_regular(self):
-        """Test _expand_notification_types with regular type."""
-        app_config = {'core_notification_types': ['type1', 'type2']}
-
-        result = self.command._expand_notification_types('regular_type', app_config)
-
-        self.assertEqual(result, ['regular_type'])
-
-    def test_expand_notification_types_core_empty(self):
-        """Test _expand_notification_types with empty core types."""
-        app_config = {}
-
-        result = self.command._expand_notification_types('core', app_config)
-
-        self.assertEqual(result, [])
-
-    def test_generate_account_preferences(self):
-        """Test _generate_account_preferences method."""
-        sample_config = self._create_sample_config()
-        course_prefs = [self._create_mock_course_preference(1, sample_config)]
-        existing_prefs = {(1, 'existing_type', 'existing_app')}
-
-        with patch(f'{MODULE_PATH}.NotificationPreference') as mock_notif_pref:
-            # Mock the NotificationPreference constructor to return distinguishable objects
-            mock_instances = []
-
-            def side_effect(**kwargs):
-                instance = Mock()
-                for key, value in kwargs.items():
-                    setattr(instance, key, value)
-                mock_instances.append(instance)
-                return instance
-
-            mock_notif_pref.side_effect = side_effect
-
-            result = list(self.command._generate_account_preferences(course_prefs, existing_prefs))
-
-            # Should generate 4 preferences:
-            # - discussion/new_comment
-            # - discussion/new_post (from core expansion)
-            # - discussion/post_edited (from core expansion)
-            # - updates/course_update
-            self.assertEqual(len(result), 4)
-
-            # Verify some specific attributes
-            types_created = {(pref.user_id, pref.type, pref.app) for pref in result}
-            expected_types = {
-                (1, 'new_comment', 'discussion'),
-                (1, 'new_post', 'discussion'),
-                (1, 'post_edited', 'discussion'),
-                (1, 'course_update', 'updates')
-            }
-            self.assertEqual(types_created, expected_types)
-
-    def test_generate_account_preferences_with_duplicates(self):
-        """Test _generate_account_preferences skips existing preferences."""
-        sample_config = self._create_sample_config()
-        course_prefs = [self._create_mock_course_preference(1, sample_config)]
-        existing_prefs = {(1, 'new_comment', 'discussion'), (1, 'new_post', 'discussion')}
-
-        with patch(f'{MODULE_PATH}.NotificationPreference') as mock_notif_pref:
-            mock_instances = []
-
-            def side_effect(**kwargs):
-                instance = Mock()
-                for key, value in kwargs.items():
-                    setattr(instance, key, value)
-                mock_instances.append(instance)
-                return instance
-
-            mock_notif_pref.side_effect = side_effect
-
-            result = list(self.command._generate_account_preferences(course_prefs, existing_prefs))
-
-            # Should only generate 2 preferences (skipping the 2 existing ones)
-            self.assertEqual(len(result), 2)
-
-            types_created = {(pref.user_id, pref.type, pref.app) for pref in result}
-            expected_types = {
-                (1, 'post_edited', 'discussion'),
-                (1, 'course_update', 'updates')
-            }
-            self.assertEqual(types_created, expected_types)
-
-    def test_generate_account_preferences_empty_config(self):
-        """Test _generate_account_preferences with empty config."""
-        course_prefs = [self._create_mock_course_preference(1, {})]
-        existing_prefs = set()
-
-        result = list(self.command._generate_account_preferences(course_prefs, existing_prefs))
-
-        self.assertEqual(len(result), 0)
-
-    def test_generate_account_preferences_none_config(self):
-        """Test _generate_account_preferences with None config."""
-        course_prefs = [self._create_mock_course_preference(1, None)]
-        existing_prefs = set()
-
-        # This should not raise any exceptions
-        result = list(self.command._generate_account_preferences(course_prefs, existing_prefs))
-
-        self.assertEqual(len(result), 0)
-
-    def test_generate_account_preferences_non_dict_config(self):
-        """Test _generate_account_preferences with non-dict config."""
-        course_prefs = [self._create_mock_course_preference(1, "not_a_dict")]
-        existing_prefs = set()
-
-        # This should not raise any exceptions
-        result = list(self.command._generate_account_preferences(course_prefs, existing_prefs))
-
-        self.assertEqual(len(result), 0)
-
-    @patch(f'{MODULE_PATH}.transaction')
-    @patch(f'{MODULE_PATH}.NotificationPreference')
-    def test_bulk_create_preferences_success(self, mock_notif_pref_model, mock_transaction):
-        """Test successful bulk_create_preferences."""
-        mock_preferences = [Mock() for _ in range(5)]
-        mock_notif_pref_model.objects.bulk_create.return_value = mock_preferences
-
-        result = self.command._bulk_create_preferences(mock_preferences, 100)
-
-        self.assertEqual(result, 5)
-        mock_notif_pref_model.objects.bulk_create.assert_called_once_with(
-            mock_preferences, batch_size=100, ignore_conflicts=True
+    @patch('openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.logger')
+    def test_handle_dry_run_mode(self, mock_logger):
+        """Test command execution in dry-run mode."""
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=self.sample_config
         )
 
-    @patch(f'{MODULE_PATH}.transaction')
-    @patch(f'{MODULE_PATH}.NotificationPreference')
-    def test_bulk_create_preferences_with_exception(self, mock_notif_pref_model, mock_transaction):
-        """Test bulk_create_preferences with exception and fallback."""
-        mock_preferences = [Mock(user_id=i) for i in range(3)]
+        with patch.object(Command, '_process_user_preferences') as mock_process:
+            mock_process.return_value = [
+                NotificationPreference(
+                    user_id=self.user1.id,
+                    app='grading',
+                    type='test_type',
+                    web=True,
+                    push=False,
+                    email=True,
+                    email_cadence='Daily'
+                )
+            ]
 
-        # Make bulk_create raise an exception
-        mock_notif_pref_model.objects.bulk_create.side_effect = Exception("Database error")
+            call_command('migrate_preferences_to_account_level_model', '--dry-run', '--batch-size=1')
 
-        # Mock individual save operations
-        for pref in mock_preferences:
-            pref.save.return_value = None
+        # Check that no actual database changes were made
+        self.assertEqual(NotificationPreference.objects.count(), 0)
 
-        with patch.object(self.command, '_fallback_individual_create', return_value=2) as mock_fallback:
-            result = self.command._bulk_create_preferences(mock_preferences, 100)
+        # Verify dry-run logging
+        mock_logger.info.assert_any_call(
+            'Performing a DRY RUN. No changes will be made to the database.'
+        )
 
-            # Should have called fallback
-            mock_fallback.assert_called_once_with(mock_preferences)
-            self.assertEqual(result, 2)
+    def test_handle_normal_execution(self):
+        """Test normal command execution without dry-run."""
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=self.sample_config
+        )
 
-            # Should have logged the error
-            self.mock_logger.error.assert_called_once()
+        # Create existing account preferences to test deletion
+        NotificationPreference.objects.create(
+            user=self.user1,
+            app='old_app',
+            type='old_type',
+            web=True,
+            push=False,
+            email=False,
+            email_cadence='Daily'
+        )
 
-    def test_fallback_individual_create_success(self):
-        """Test _fallback_individual_create with successful saves."""
-        mock_preferences = [Mock(user_id=i) for i in range(3)]
-        for pref in mock_preferences:
-            pref.save.return_value = None
+        with patch.object(Command, '_process_user_preferences') as mock_process:
+            mock_process.return_value = [
+                NotificationPreference(
+                    user_id=self.user1.id,
+                    app='grading',
+                    type='test_type',
+                    web=True,
+                    push=False,
+                    email=True,
+                    email_cadence='Daily'
+                )
+            ]
 
-        result = self.command._fallback_individual_create(mock_preferences)
+            call_command('migrate_preferences_to_account_level_model', '--batch-size=1')
 
-        self.assertEqual(result, 3)
-        for pref in mock_preferences:
-            pref.save.assert_called_once()
-
-    def test_fallback_individual_create_with_failures(self):
-        """Test _fallback_individual_create with some failures."""
-        mock_preferences = [Mock(user_id=i) for i in range(3)]
-
-        # Make the second preference fail
-        mock_preferences[0].save.return_value = None
-        mock_preferences[1].save.side_effect = Exception("Save failed")
-        mock_preferences[2].save.return_value = None
-
-        result = self.command._fallback_individual_create(mock_preferences)
-
-        self.assertEqual(result, 2)  # 2 successful saves
-        self.mock_logger.warning.assert_called_once()
-
-    def test_bulk_create_preferences_empty_list(self):
-        """Test _bulk_create_preferences with empty list."""
-        result = self.command._bulk_create_preferences([], 100)
-        self.assertEqual(result, 0)
+        # Verify old preferences were deleted and new ones created
+        self.assertEqual(NotificationPreference.objects.count(), 1)
+        new_pref = NotificationPreference.objects.first()
+        self.assertEqual(new_pref.app, 'grading')
+        self.assertEqual(new_pref.type, 'test_type')
 
     @patch(
-        f'{MODULE_PATH}.CourseNotificationPreference')
-    @patch(f'{MODULE_PATH}.NotificationPreference')
-    def test_handle_with_custom_batch_size(self, mock_notif_pref_model, mock_course_pref_model):
-        """Test handle method with custom batch size."""
-        sample_config = self._create_sample_config()
-        mock_course_pref = self._create_mock_course_preference(1, sample_config)
+        'openedx.core.djangoapps.notifications.management.commands.migrate_notification_preferences.transaction.atomic')
+    def migrate_preferences_to_account_level_model(self, mock_atomic):
+        """Test that users are processed in batches correctly."""
+        # Mock atomic to avoid transaction issues during testing
+        mock_atomic.return_value.__enter__ = Mock()
+        mock_atomic.return_value.__exit__ = Mock(return_value=None)
 
-        mock_course_pref_model.objects.count.return_value = 1
-        mock_course_pref_model.objects.only.return_value.iterator.return_value = [mock_course_pref]
-        mock_notif_pref_model.objects.values_list.return_value.iterator.return_value = []
-        mock_notif_pref_model.objects.bulk_create.return_value = [Mock() for _ in range(4)]
+        # Create course preferences for multiple users
+        for i, user in enumerate([self.user1, self.user2, self.user3]):
+            CourseNotificationPreference.objects.create(
+                user=user,
+                course_id=f'course-v1:Test+Course+{i}',
+                notification_preference_config=self.sample_config
+            )
 
-        # Execute with custom batch size
-        self.command.handle(batch_size=500)
+        with patch.object(Command, '_process_user_preferences') as mock_process:
+            mock_process.return_value = [
+                NotificationPreference(
+                    user_id=1,
+                    app='grading',
+                    type='test_type',
+                    web=True,
+                    push=False,
+                    email=True,
+                    email_cadence='Daily'
+                )
+            ]
 
-        # Verify bulk_create was called with custom batch size
-        args, kwargs = mock_notif_pref_model.objects.bulk_create.call_args
-        self.assertEqual(kwargs['batch_size'], 500)
+            call_command('migrate_notification_preferences', '--batch-size=2')
 
-    def test_add_arguments(self):
-        """Test add_arguments method."""
-        parser = Mock()
-        self.command.add_arguments(parser)
+        # Verify all users were processed
+        self.assertEqual(mock_process.call_count, 3)
 
-        # Verify parser.add_argument was called for each expected argument
-        expected_calls = [
-            call('--dry-run', action='store_true', help='Show what would be migrated without making changes'),
-            call('--batch-size', type=int, default=self.command.BATCH_SIZE,
-                 help=f'Batch size for bulk operations (default: {self.command.BATCH_SIZE})'),
-        ]
-        parser.add_argument.assert_has_calls(expected_calls, any_order=True)
+    @patch('openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.logger')
+    def test_handle_user_processing_error(self, mock_logger):
+        """Test error handling when processing individual users."""
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=self.sample_config
+        )
 
-    @patch(f'{MODULE_PATH}.CourseNotificationPreference')
-    @patch(f'{MODULE_PATH}.NotificationPreference')
-    def test_integration_with_call_command(self, mock_notif_pref_model, mock_course_pref_model):
-        """Test integration using Django's call_command."""
-        sample_config = self._create_sample_config()
-        mock_course_pref = self._create_mock_course_preference(1, sample_config)
+        with patch.object(Command, '_process_user_preferences') as mock_process:
+            mock_process.side_effect = Exception("Processing error")
 
-        mock_course_pref_model.objects.count.return_value = 1
-        mock_course_pref_model.objects.only.return_value.iterator.return_value = [mock_course_pref]
-        mock_notif_pref_model.objects.values_list.return_value.iterator.return_value = []
-        mock_notif_pref_model.objects.bulk_create.return_value = [Mock() for _ in range(4)]
+            call_command('migrate_preferences_to_account_level_model', '--batch-size=1')
 
-        # Use StringIO to capture output
-        out = StringIO()
+        # Verify error was logged
+        mock_logger.error.assert_called_once()
+        self.assertIn("Failed to process preferences", str(mock_logger.error.call_args))
 
-        # This should not raise any exceptions
-        call_command('migrate_preferences_to_account_level_model', '--dry-run', stdout=out)
+    def test_command_arguments(self):
+        """Test that command arguments are handled correctly."""
+        command = Command()
+        parser = command.create_parser('test', 'migrate_preferences_to_account_level_model')
 
-        # Verify dry run logging was called
-        self.mock_logger.info.assert_any_call("DRY RUN MODE - No changes will be made")
+        # Test default arguments
+        options = parser.parse_args([])
+        self.assertEqual(options.batch_size, 1000)
+        self.assertFalse(options.dry_run)
 
+        # Test custom arguments
+        options = parser.parse_args(['--batch-size', '500', '--dry-run'])
+        self.assertEqual(options.batch_size, 500)
+        self.assertTrue(options.dry_run)
 
-class MigratePreferencesToAccountLevelEdgeCasesTest(TestCase):
-    """Test edge cases and error conditions."""
+    @patch(
+        'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.aggregate_notification_configs')
+    def test_process_user_preferences_with_core_types(self, mock_aggregate):
+        """Test processing of core notification types specifically."""
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=self.sample_config
+        )
 
-    def setUp(self):
-        self.command = Command()
-        self.command.BATCH_SIZE = 10
-        self.command.CHUNK_SIZE = 5
-
-    def test_malformed_notification_config(self):
-        """Test handling of malformed notification configuration."""
-        malformed_configs = [
-            {'app': {'notification_types': None}},  # None notification_types
-            {'app': {'notification_types': {}}},  # Empty notification_types
-            {'app': {}},  # Missing notification_types
-            {'app': {'notification_types': {'type': None}}},  # None values
-            {'app': {'notification_types': {'type': 'string'}}},  # Non-dict values
-            {'app': 'not_a_dict'},  # Non-dict app_config
-            None,  # None config
-        ]
-
-        for i, config in enumerate(malformed_configs):
-            with self.subTest(config=config, test_case=i):
-                mock_pref = Mock()
-                mock_pref.user_id = 1
-                mock_pref.notification_preference_config = config
-
-                # This should not raise any exceptions
-                try:
-                    result = list(self.command._generate_account_preferences([mock_pref], set()))
-                    # Should handle gracefully without creating preferences
-                    self.assertEqual(len(result), 0,
-                                     f"Expected 0 preferences for malformed config {config}, got {len(result)}")
-                except Exception as e:  # pylint: disable=broad-except
-                    self.fail(f"Failed to handle malformed config {config}: {e}")
-
-    def test_valid_notification_config_still_works(self):
-        """Test that valid configurations still work after malformed config fixes."""
-        valid_config = {
+        mock_aggregate.return_value = {
             'discussion': {
                 'notification_types': {
-                    'new_comment': {
-                        'web': True,
-                        'email': False,
-                        'push': True,
-                        'email_cadence': 'Daily'
-                    }
-                }
+                    'core': {'web': False, 'push': True, 'email': False, 'email_cadence': 'Weekly'}
+                },
+                'core_notification_types': ['new_response', 'new_comment', None, 123]  # Include invalid types
             }
         }
 
-        mock_pref = Mock()
-        mock_pref.user_id = 1
-        mock_pref.notification_preference_config = valid_config
+        command = Command()
+        with self.assertLogs(level='WARNING') as log:
+            preferences = command._process_user_preferences(self.user1.id)
 
-        with patch(f'{MODULE_PATH}.NotificationPreference') as mock_notif_pref:
-            mock_instance = Mock()
-            mock_notif_pref.return_value = mock_instance
+        # Should create 2 valid core preferences (ignoring None and 123)
+        valid_prefs = [p for p in preferences if p.type in ['new_response', 'new_comment']]
+        self.assertEqual(len(valid_prefs), 2)
 
-            result = list(self.command._generate_account_preferences([mock_pref], set()))
+        # Check that invalid core types were logged as warnings
+        warning_logs = [log for log in log.output if 'Skipping malformed core_type_name' in log]
+        self.assertEqual(len(warning_logs), 2)
 
-            # Should create one preference
-            self.assertEqual(len(result), 1)
-            mock_notif_pref.assert_called_once_with(
-                user_id=1,
-                type='new_comment',
-                app='discussion',
-                web=True,
-                email=False,
-                push=True,
-                email_cadence='Daily'
+    def test_progress_logging(self):
+        """Test that progress is logged at appropriate intervals."""
+        # Create enough users to trigger progress logging
+        users = []
+        for i in range(10):
+            user = User.objects.create_user(username=f'userX{i}', email=f'userx{i}@example.com')
+            users.append(user)
+            CourseNotificationPreference.objects.create(
+                user=user,
+                course_id=f'course-v1:Test+Course+{i}',
+                notification_preference_config=self.sample_config
             )
 
-    def test_missing_preference_values(self):
-        """Test handling of missing preference values with defaults."""
-        config = {
-            'discussion': {
-                'notification_types': {
-                    'new_comment': {}  # Empty values, should use defaults
-                }
-            }
-        }
+        with patch.object(Command, '_process_user_preferences') as mock_process:
+            mock_process.return_value = []
 
-        mock_pref = Mock()
-        mock_pref.user_id = 1
-        mock_pref.notification_preference_config = config
+            with patch(
+                'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.logger') as mock_logger:
+                call_command('migrate_preferences_to_account_level_model', '--batch-size=1')
 
-        with patch(f'{MODULE_PATH}.NotificationPreference') as mock_notif_pref:
-            mock_instance = Mock()
-            mock_notif_pref.return_value = mock_instance
+                # Check that progress was logged (every 5 batches)
+                progress_calls = [call for call in mock_logger.info.call_args_list
+                                  if 'PROGRESS:' in str(call)]
+                self.assertGreater(len(progress_calls), 0)
 
-            result = list(self.command._generate_account_preferences([mock_pref], set()))
+    def test_empty_batch_handling(self):
+        """Test handling when no preferences need to be created."""
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=self.sample_config
+        )
 
-            # Should create one preference with default values
-            self.assertEqual(len(result), 1)
-            mock_notif_pref.assert_called_once_with(
-                user_id=1,
-                type='new_comment',
-                app='discussion',
-                web=True,  # Default
-                email=False,  # Default
-                push=False,  # Default
-                email_cadence='Daily'  # Default
-            )
+        with patch.object(Command, '_process_user_preferences') as mock_process:
+            mock_process.return_value = []  # No preferences to create
+
+            with patch(
+                'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.logger') as mock_logger:
+                call_command('migrate_preferences_to_account_level_model', '--batch-size=1')
+
+                # Should log that no preferences were created
+                no_prefs_calls = [call for call in mock_logger.info.call_args_list
+                                  if 'No preferences to create' in str(call)]
+                self.assertEqual(len(no_prefs_calls), 1)
