@@ -320,7 +320,7 @@ FEATURES = {
     # .. toggle_default: False
     # .. toggle_description: Set to True to enable Custom Courses for edX, a feature that is more commonly known as
     #   CCX. Documentation for configuring and using this feature is available at
-    #   https://edx.readthedocs.io/projects/open-edx-ca/en/latest/set_up_course/custom_courses.html
+    #   https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/enable_ccx.html
     # .. toggle_warning: When set to true, 'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider' will
     #    be added to MODULESTORE_FIELD_OVERRIDE_PROVIDERS
     # .. toggle_use_cases: opt_in, circuit_breaker
@@ -633,7 +633,7 @@ FEATURES = {
     # .. toggle_description: Set to True to enable course certificates on your instance of Open edX.
     # .. toggle_warning: You must enable this feature flag in both Studio and the LMS and complete the configuration tasks
     #   described here:
-    #   https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/enable_certificates.html  pylint: disable=line-too-long,useless-suppression
+    #   https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/enable_certificates.html  pylint: disable=line-too-long,useless-suppression
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-03-13
     # .. toggle_target_removal_date: None
@@ -706,7 +706,7 @@ FEATURES = {
     #    and applications.
     # .. toggle_warning: After enabling this feature flag there are multiple steps involved to configure edX
     #    as LTI provider. Full guide is available here:
-    #    https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/lti/index.html
+    #    https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/lti/index.html
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-04-24
     # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/7689
@@ -1626,10 +1626,6 @@ OPTIMIZELY_FULLSTACK_SDK_KEY = None
 ######################## HOTJAR ###########################
 HOTJAR_SITE_ID = 00000
 
-######################## ALGOLIA SEARCH ###########################
-ALGOLIA_APP_ID = None
-ALGOLIA_SEARCH_API_KEY = None
-
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 
@@ -2061,8 +2057,7 @@ LOCALE_PATHS = Derived(_make_locale_paths)
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Guidelines for translators
-TRANSLATORS_GUIDE = 'https://edx.readthedocs.org/projects/edx-developer-guide/en/latest/' \
-                    'conventions/internationalization/i18n_translators_guide.html'
+TRANSLATORS_GUIDE = 'https://docs.openedx.org/en/latest/translators/index.html'
 
 #################################### AWS #######################################
 # The number of seconds that a generated URL is valid for.
@@ -2403,7 +2398,6 @@ base_vendor_js = [
     'js/vendor/url.min.js',
     'common/js/vendor/underscore.js',
     'common/js/vendor/underscore.string.js',
-    'common/js/vendor/picturefill.js',
 
     # Make some edX UI Toolkit utilities available in the global "edx" namespace
     'edx-ui-toolkit/js/utils/global-loader.js',
@@ -2813,14 +2807,6 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
-
-# .. setting_name: WEBPACK_CONFIG_PATH
-# .. setting_default: "webpack.prod.config.js"
-# .. setting_description: Path to the Webpack configuration file. Used by Paver scripts.
-# .. setting_warning: This Django setting is DEPRECATED! Starting in Sumac, Webpack will no longer
-#   use Django settings. Please set the WEBPACK_CONFIG_PATH environment variable instead. For details,
-#   see: https://github.com/openedx/edx-platform/issues/31895
-WEBPACK_CONFIG_PATH = os.environ.get('WEBPACK_CONFIG_PATH', 'webpack.prod.config.js')
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
@@ -3377,6 +3363,9 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.components",
     "openedx_learning.apps.authoring.contents",
     "openedx_learning.apps.authoring.publishing",
+    "openedx_learning.apps.authoring.units",
+    "openedx_learning.apps.authoring.subsections",
+    "openedx_learning.apps.authoring.sections",
 ]
 
 
@@ -4783,6 +4772,7 @@ DATA_CONSENT_SHARE_CACHE_TIMEOUT = 8 * 60 * 60  # 8 hours
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 ENTERPRISE_TAGLINE = ''
+TRANSCRIPT_LANG_CACHE_TIMEOUT = 60 * 60 * 24  # 24 hours
 
 ############## Settings for Course Enrollment Modes ######################
 # The min_price key refers to the minimum price allowed for an instance
@@ -4919,13 +4909,6 @@ OPTIONAL_FIELD_API_RATELIMIT = '10/h'
 ##### PASSWORD RESET RATE LIMIT SETTINGS #####
 PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
-
-
-#### BRAZE API SETTINGS ####
-
-EDX_BRAZE_API_KEY = None
-EDX_BRAZE_API_SERVER = None
-BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
@@ -5080,49 +5063,70 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
 EXAMS_DASHBOARD_MICROFRONTEND_URL = None
+
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy.
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the password reset flow.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-12-03
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
 ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
+
 # .. toggle_name: ENABLE_AUTHN_REGISTER_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy on Authn MFE's registration.
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the registration flow if their frequency exceeds a threshold.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-25
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
 ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
-HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
+# .. setting_name: HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 3.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_REGISTER_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3.0
 
 # .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
+# .. toggle_description: When enabled, the login flow detects vulnerable passwords
+#   and prompts users to change their password if their frequency exceeds a threshold.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
 ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
-HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
+# .. setting_name: HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 3.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3.0
 
 # .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the login flow if their frequency exceeds a threshold. Passwords are assessed by calling the
+#   Pwned Passwords service using a k-anonymity method that does not expose the password. The
+#   service tells us whether the password has been seen in any data breaches, and if so, how
+#   often. This count is converted to a "frequency" by taking the logarithm base 10. The login flow
+#   can reject all vulnerable passwords, or only passwords with a frequency above a configured
+#   threshold. In existing deployments, the threshold should be set high and tightened
+#   gradually in order to avoid large spikes in password resets and support requests. For example,
+#   setting ``HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD`` to 5 would reject logins when the
+#   password has been seen 100,000 or more times in the Pwned Passwords dataset. The goal should be
+#   to gradually reduce this to 0, meaning even a single occurrence will cause a rejection. (The
+#   threshold can take any real-number value.)
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
 ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
-HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
+# .. setting_name: HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 5.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5.0
 
 # .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
 # .. toggle_implementation: DjangoSetting
@@ -5270,16 +5274,16 @@ SHOW_ACCOUNT_ACTIVATION_CTA = False
 ################# Documentation links for course apps #################
 
 # pylint: disable=line-too-long
-CALCULATOR_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/calculator.html"
-DISCUSSIONS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_components/create_discussion.html"
-EDXNOTES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/exercises_tools/notes.html"
-PROGRESS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html?highlight=progress#hiding-or-showing-the-wiki-or-progress-pages"
-TEAMS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features/teams/teams_setup.html"
-TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/textbooks.html"
-WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
-CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
-COURSE_BULK_EMAIL_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_live_course/bulk_email.html"
-ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#configuring-course-level-open-response-assessment-settings"
+CALCULATOR_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/add_calculator.html"
+DISCUSSIONS_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_discussions.html"
+EDXNOTES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/enable_notes.html"
+PROGRESS_HELP_URL = "https://docs.openedx.org/en/latest/educators/references/data/progress_page.html"
+TEAMS_HELP_URL = "https://docs.openedx.org/en/latest/educators/navigation/advanced_features.html#use-teams-in-your-course"
+TEXTBOOKS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_textbooks.html"
+WIKI_HELP_URL = "https://docs.openedx.org/en/latest/educators/concepts/communication/about_course_wiki.html"
+CUSTOM_PAGES_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/manage_custom_page.html"
+COURSE_BULK_EMAIL_HELP_URL = "https://docs.openedx.org/en/latest/educators/references/communication/bulk_email.html"
+ORA_SETTINGS_HELP_URL = "https://docs.openedx.org/en/latest/educators/how-tos/course_development/exercise_tools/Manage_ORA_Assignment.html"
 
 ################# Bulk Course Email Settings #################
 # If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
@@ -5406,6 +5410,7 @@ NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
+NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
 
 ############## NUDGE EMAILS ###############
 # .. setting_name: DISABLED_ORGS_FOR_PROGRAM_NUDGE
@@ -5438,7 +5443,7 @@ def _should_send_learning_badge_events(settings):
 #    Each topic configuration dictionary contains
 #    * `enabled`: a toggle denoting whether the event will be published to the topic. These should be annotated
 #       according to
-#       https://edx.readthedocs.io/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
+#       https://docs.openedx.org/projects/edx-toggles/en/latest/how_to/documenting_new_feature_toggles.html
 #    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
 #    Note: The topic names should not include environment prefix as it will be dynamically added based on
 #    EVENT_BUS_TOPIC_PREFIX setting.
@@ -5551,15 +5556,6 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 # .. setting_default: empty dictionary
 # .. setting_description: Dictionary with additional information that you want to share in the report.
 SURVEY_REPORT_EXTRA_DATA = {}
-
-
-# .. setting_name: DISABLED_COUNTRIES
-# .. setting_default: []
-# .. setting_description: List of country codes that should be disabled
-# .. for now it wil impact country listing in auth flow and user profile.
-# .. eg ['US', 'CA']
-DISABLED_COUNTRIES = []
-
 
 LMS_COMM_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 

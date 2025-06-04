@@ -9,7 +9,7 @@ import unittest
 import ddt
 from lxml import etree
 
-from xmodule.capa.tests.helpers import test_capa_system
+from xmodule.capa.tests.helpers import mock_capa_system
 from xmodule.capa.util import (
     compare_with_tolerance,
     contextualize_text,
@@ -25,7 +25,7 @@ class UtilTest(unittest.TestCase):
 
     def setUp(self):
         super(UtilTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.system = test_capa_system()
+        self.system = mock_capa_system()
 
     def test_compare_with_tolerance(self):  # lint-amnesty, pylint: disable=too-many-statements
         # Test default tolerance '0.001%' (it is relative)
@@ -145,7 +145,7 @@ class UtilTest(unittest.TestCase):
         Test for markup removal with nh3.
         """
         assert remove_markup('The <mark>Truth</mark> is <em>Out There</em> & you need to <strong>find</strong> it') ==\
-               'The Truth is Out There &amp; you need to find it'
+            'The Truth is Out There &amp; you need to find it'
 
     @ddt.data(
         'When the root level failš the whole hierarchy won’t work anymore.',

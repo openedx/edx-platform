@@ -10,6 +10,7 @@ from mimetypes import guess_type
 import re
 
 from attrs import frozen, Factory
+from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _
@@ -23,9 +24,15 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.xml_block import XmlMixin
+from xmodule.video_block.transcripts_utils import Transcript, build_components_import_path
+from edxval.api import (
+    create_external_video,
+    create_or_update_video_transcript,
+)
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException, fetch_customizable_fields
+from cms.lib.xblock.upstream_sync import UpstreamLink, UpstreamLinkException
+from cms.lib.xblock.upstream_sync_block import fetch_customizable_fields_from_block
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 import openedx.core.djangoapps.content_tagging.api as content_tagging_api
@@ -74,6 +81,22 @@ def is_unit(xblock, parent_xblock=None):
         parent_category = parent_xblock.category if parent_xblock else None
         return parent_category == 'sequential'
     return False
+
+
+def is_library_content(xblock):
+    """
+    Returns true if the specified xblock is library content.
+    """
+    return xblock.category == 'library_content'
+
+
+def get_parent_if_split_test(xblock):
+    """
+    Returns the parent of the specified xblock if it is a split test, otherwise returns None.
+    """
+    parent_xblock = get_parent_xblock(xblock)
+    if parent_xblock and parent_xblock.category == 'split_test':
+        return parent_xblock
 
 
 def xblock_has_own_studio_page(xblock, parent_xblock=None):
@@ -274,8 +297,16 @@ def _insert_static_files_into_downstream_xblock(
         course_key=downstream_xblock.context_key,
         staged_content_id=staged_content_id,
         static_files=static_files,
-        usage_key=downstream_xblock.scope_ids.usage_id,
+        usage_key=downstream_xblock.usage_key,
     )
+    # FIXME: This code shouldn't have any special cases for specific block types like video
+    # in the future.
+    if downstream_xblock.usage_key.block_type == 'video':
+        _import_transcripts(
+            downstream_xblock,
+            staged_content_id=staged_content_id,
+            static_files=static_files,
+        )
 
     # Rewrite the OLX's static asset references to point to the new
     # locations for those assets. See _import_files_into_course for more
@@ -284,7 +315,8 @@ def _insert_static_files_into_downstream_xblock(
     if hasattr(downstream_xblock, "data") and substitutions:
         data_with_substitutions = downstream_xblock.data
         for old_static_ref, new_static_ref in substitutions.items():
-            data_with_substitutions = data_with_substitutions.replace(
+            data_with_substitutions = _replace_strings(
+                data_with_substitutions,
                 old_static_ref,
                 new_static_ref,
             )
@@ -292,6 +324,26 @@ def _insert_static_files_into_downstream_xblock(
         if store is not None:
             store.update_item(downstream_xblock, request.user.id)
     return notices
+
+
+def _replace_strings(obj: dict | list | str, old_str: str, new_str: str):
+    """
+    Replacing any instances of the given `old_str` string with `new_str` in any strings found in the the given object.
+
+    Returns the updated object.
+    """
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            obj[key] = _replace_strings(value, old_str, new_str)
+
+    elif isinstance(obj, list):
+        for index, item in enumerate(obj):
+            obj[index] = _replace_strings(item, old_str, new_str)
+
+    elif isinstance(obj, str):
+        return obj.replace(old_str, new_str)
+
+    return obj
 
 
 def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> tuple[XBlock | None, StaticFileNotices]:
@@ -307,8 +359,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
     """
     from cms.djangoapps.contentstore.views.preview import _load_preview_block
 
-    if not content_staging_api:
-        raise RuntimeError("The required content_staging app is not installed")
     user_clipboard = content_staging_api.get_user_clipboard(request.user.id)
     if not user_clipboard:
         # Clipboard is empty or expired/error/loading
@@ -331,6 +381,13 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             tags=user_clipboard.content.tags,
         )
 
+        usage_key = new_xblock.usage_key
+        if usage_key.block_type == 'video':
+            # The edx_video_id must always be new so as not
+            # to interfere with the data of the copied block
+            new_xblock.edx_video_id = create_external_video(display_name='external video')
+            store.update_item(new_xblock, request.user.id)
+
         notices = _insert_static_files_into_downstream_xblock(new_xblock, user_clipboard.content.id, request)
 
     return new_xblock, notices
@@ -349,8 +406,6 @@ def import_static_assets_for_library_sync(downstream_xblock: XBlock, lib_block: 
     """
     if not lib_block.runtime.get_block_assets(lib_block, fetch_asset_data=False):
         return StaticFileNotices()
-    if not content_staging_api:
-        raise RuntimeError("The required content_staging app is not installed")
     staged_content = content_staging_api.stage_xblock_temporarily(lib_block, request.user.id, LIBRARY_SYNC_PURPOSE)
     if not staged_content:
         # expired/error/loading
@@ -359,6 +414,14 @@ def import_static_assets_for_library_sync(downstream_xblock: XBlock, lib_block: 
     store = modulestore()
     try:
         with store.bulk_operations(downstream_xblock.context_key):
+            # FIXME: This code shouldn't have any special cases for specific block types like video
+            # in the future.
+            if downstream_xblock.usage_key.block_type == 'video' and not downstream_xblock.edx_video_id:
+                # If the `downstream_xblock` is a new created block, we need to create
+                # a new `edx_video_id` to import the transcripts.
+                downstream_xblock.edx_video_id = create_external_video(display_name='external video')
+                store.update_item(downstream_xblock, request.user.id)
+
             # Now handle static files that need to go into Files & Uploads.
             # If the required files already exist, nothing will happen besides updating the olx.
             notices = _insert_static_files_into_downstream_xblock(downstream_xblock, staged_content.id, request)
@@ -375,7 +438,7 @@ def _fetch_and_set_upstream_link(
     user: User
 ):
     """
-    Fetch and set upstream link for the given xblock. This function handles following cases:
+    Fetch and set upstream link for the given xblock which is being pasted. This function handles following cases:
     * the xblock is copied from a v2 library; the library block is set as upstream.
     * the xblock is copied from a course; no upstream is set, only copied_from_block is set.
     * the xblock is copied from a course where the source block was imported from a library; the original libary block
@@ -384,7 +447,7 @@ def _fetch_and_set_upstream_link(
     # Try to link the pasted block (downstream) to the copied block (upstream).
     temp_xblock.upstream = copied_from_block
     try:
-        UpstreamLink.get_for_block(temp_xblock)
+        upstream_link = UpstreamLink.get_for_block(temp_xblock)
     except UpstreamLinkException:
         # Usually this will fail. For example, if the copied block is a modulestore course block, it can't be an
         # upstream. That's fine! Instead, we store a reference to where this block was copied from, in the
@@ -415,7 +478,8 @@ def _fetch_and_set_upstream_link(
         # later wants to restore it, it will restore to the value that the field had when the block was pasted. Of
         # course, if the author later syncs updates from a *future* published upstream version, then that will fetch
         # new values from the published upstream content.
-        fetch_customizable_fields(upstream=temp_xblock, downstream=temp_xblock, user=user)
+        if isinstance(upstream_link.upstream_key, UsageKey):  # only if upstream is a block, not a container
+            fetch_customizable_fields_from_block(downstream=temp_xblock, user=user, upstream=temp_xblock)
 
 
 def _import_xml_node_to_parent(
@@ -501,11 +565,11 @@ def _import_xml_node_to_parent(
 
     if xblock_class.has_children and temp_xblock.children:
         raise NotImplementedError("We don't yet support pasting XBlocks with children")
-    temp_xblock.parent = parent_key
     if copied_from_block:
         _fetch_and_set_upstream_link(copied_from_block, copied_from_version_num, temp_xblock, user)
     # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
     new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
+    new_xblock.parent = parent_key
     parent_xblock.children.append(new_xblock.location)
     store.update_item(parent_xblock, user.id)
 
@@ -630,8 +694,8 @@ def _import_file_into_course(
     # we're not going to attempt to change.
     if clipboard_file_path.startswith('static/'):
         # If it's in this form, it came from a library and assumes component-local assets
-        file_path = clipboard_file_path.lstrip('static/')
-        import_path = f"components/{usage_key.block_type}/{usage_key.block_id}/{file_path}"
+        file_path = clipboard_file_path.removeprefix('static/')
+        import_path = build_components_import_path(usage_key, file_path)
         filename = pathlib.Path(file_path).name
         new_key = course_key.make_asset_key("asset", import_path.replace("/", "_"))
     else:
@@ -672,6 +736,50 @@ def _import_file_into_course(
         return False, {}
 
 
+def _import_transcripts(
+    block: XBlock,
+    staged_content_id: int,
+    static_files: list[content_staging_api.StagedContentFileData],
+):
+    """
+    Adds transcripts to VAL using the new edx_video_id.
+    """
+    for file_data_obj in static_files:
+        clipboard_file_path = file_data_obj.filename
+        data = content_staging_api.get_staged_content_static_file_data(
+            staged_content_id,
+            clipboard_file_path
+        )
+        if data is None:
+            raise NotFoundError(file_data_obj.source_key)
+
+        if clipboard_file_path.startswith('static/'):
+            # If it's in this form, it came from a library and assumes component-local assets
+            file_path = clipboard_file_path.removeprefix('static/')
+        else:
+            # Otherwise it came from a course...
+            file_path = clipboard_file_path
+
+        filename = pathlib.Path(file_path).name
+
+        language_code = next((k for k, v in block.transcripts.items() if v == filename), None)
+        if language_code:
+            sjson_subs = Transcript.convert(
+                content=data,
+                input_format=Transcript.SRT,
+                output_format=Transcript.SJSON
+            ).encode()
+            create_or_update_video_transcript(
+                video_id=block.edx_video_id,
+                language_code=language_code,
+                metadata={
+                    'file_format': Transcript.SJSON,
+                    'language_code': language_code
+                },
+                file_data=ContentFile(sjson_subs),
+            )
+
+
 def is_item_in_course_tree(item):
     """
     Check that the item is in the course tree.
@@ -705,3 +813,26 @@ def _get_usage_key_from_node(node, parent_id: str) -> UsageKey | None:
         )
 
     return usage_key
+
+
+def concat_static_file_notices(notices: list[StaticFileNotices]) -> StaticFileNotices:
+    """Combines multiple static file notices into a single object
+
+    Args:
+        notices: list of StaticFileNotices
+
+    Returns:
+        Single StaticFileNotices
+    """
+    new_files = []
+    conflicting_files = []
+    error_files = []
+    for notice in notices:
+        new_files.extend(notice.new_files)
+        conflicting_files.extend(notice.conflicting_files)
+        error_files.extend(notice.error_files)
+    return StaticFileNotices(
+        new_files=list(set(new_files)),
+        conflicting_files=list(set(conflicting_files)),
+        error_files=list(set(error_files)),
+    )

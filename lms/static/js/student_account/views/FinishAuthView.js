@@ -68,7 +68,9 @@
                 this.purchaseWorkflow = queryParams.purchaseWorkflow;
                 if (queryParams.next) {
                     // Ensure that the next URL is internal for security reasons
+                    this.updateTaskDescription(gettext("query param next is provide"));
                     if (!window.isExternal(queryParams.next)) {
+                        this.updateTaskDescription(gettext("query param next is internal"));
                         this.nextUrl = queryParams.next;
                     }
                 }
@@ -135,6 +137,7 @@
                         The track selection page would allow the user to select the course mode
                         ("verified", "honor", etc.) -- or, if the only course mode was "honor",
                         it would redirect the user to the dashboard. */
+                        this.updateTaskDescription(gettext("course mode param is not provided"));
                         redirectUrl = this.appendPurchaseWorkflow(this.urls.trackSelection + courseId + '/');
                     } else if (this.courseMode === 'honor' || this.courseMode === 'audit') {
                         /* The newer version of the course details page allows the user
@@ -142,6 +145,7 @@
                         chosen "honor", we send them immediately to the next URL
                         rather than the payment flow.  The user may decide to upgrade
                         from the dashboard later. */
+                        this.updateTaskDescription(gettext("course mode param is provided"));
                     } else {
                         /* If the user selected any other kind of course mode, send them
                         to the payment/verification flow. */
@@ -160,6 +164,7 @@
                     shoppingCartInterface.addCourseToCart(this.courseId);
                 } else {
                     // Otherwise, redirect the user to the next page.
+                    this.updateTaskDescription(gettext(" redirect the user to the next page"));
                     this.redirect(redirectUrl);
                 }
             },

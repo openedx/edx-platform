@@ -16,6 +16,8 @@ from .factory import BlockStructureFactory
 from .models import BlockStructureModel
 from .transformer_registry import TransformerRegistry
 
+from edx_django_utils import monitoring
+
 logger = getLogger(__name__)  # pylint: disable=C0103
 
 
@@ -134,8 +136,17 @@ class BlockStructureStore:
         to the cache.
         """
         cache_key = self._encode_root_cache_key(bs_model)
-        self._cache.set(cache_key, serialized_data, timeout=config.cache_timeout_in_seconds())
-        logger.info("BlockStructure: Added to cache; %s, size: %d", bs_model, len(serialized_data))
+        total_bytes_in_one_mb = 1024 * 1024
+        data_size_in_bytes = len(serialized_data)
+        data_size_in_mbs = round(data_size_in_bytes / total_bytes_in_one_mb, 2)
+        if data_size_in_bytes < total_bytes_in_one_mb * 2:
+            self._cache.set(cache_key, serialized_data, timeout=config.cache_timeout_in_seconds())
+            logger.info("BlockStructure: Added to cache; %s, size: %.2fMB", bs_model, data_size_in_mbs)
+        else:
+            # .. custom_attribute_name: blockstorestructure_size_in_mbs
+            # .. custom_attribute_description: contains the data chunk size in MBs. The size on which
+            #   the memcached client failed to store value in cache.
+            monitoring.set_custom_attribute('blockstorestructure_size_in_mbs', data_size_in_mbs)
 
     def _get_from_cache(self, bs_model):
         """

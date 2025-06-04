@@ -21,17 +21,18 @@ TASK_COMPLETE_EMAIL_TIMEOUT = 60
 
 @shared_task(bind=True)
 @set_code_owner_attribute
-def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail_url, olx_validation_text=None):
+def send_task_complete_email(self, task_name, task_state_text, dest_addr, detail_url,
+                             olx_validation_text=None, is_course_optimizer_task=False):
     """
     Sending an email to the users when an async task completes.
     """
     retries = self.request.retries
-
     context = {
         'task_name': task_name,
         'task_status': task_state_text,
         'detail_url': detail_url,
         'olx_validation_errors': {},
+        'is_course_optimizer_task': is_course_optimizer_task,
     }
     if olx_validation_text:
         try:

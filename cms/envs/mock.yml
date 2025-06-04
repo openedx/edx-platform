@@ -52,7 +52,6 @@ BLOCK_STRUCTURES_SETTINGS:
   TASK_DEFAULT_RETRY_DELAY: 30
   TASK_MAX_RETRIES: 5
 BRANCH_IO_KEY: test_BRANCH_IO_KEY
-BRAZE_COURSE_ENROLLMENT_CANVAS_ID: test_canvas_id
 BUGS_EMAIL: bugs@example.com
 BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@courseupdates.localhost
 BULK_EMAIL_LOG_SENT_EMAILS: true
@@ -329,8 +328,6 @@ ECOMMERCE_API_SIGNING_KEY: test_secret_key
 ECOMMERCE_API_URL: https://ecommerce.localhost/api/v2/
 ECOMMERCE_PUBLIC_URL_ROOT: https://ecommerce.localhost
 EDXMKTG_USER_INFO_COOKIE_NAME: user-info
-EDX_BRAZE_API_KEY: test_braze_key
-EDX_BRAZE_API_SERVER: https://braze.com
 EDX_REST_API_CLIENT_NAME: edxapp-cms
 ELASTIC_SEARCH_CONFIG:
 - host: test.amazonaws.com
@@ -419,7 +416,6 @@ FEATURES:
   ENABLE_DISCUSSION_SERVICE: true
   ENABLE_EDXNOTES: true
   ENABLE_ENTERPRISE_INTEGRATION: true
-  ENABLE_EXAM_SETTINGS_HTML_VIEW: true
   ENABLE_EXPORT_GIT: true
   ENABLE_FEEDBACK_SUBMISSION: true
   ENABLE_FINANCIAL_ASSISTANCE_FORM: true
@@ -458,7 +454,6 @@ FEATURES:
   LTI_1P3_ENABLED: true
   MILESTONES_APP: true
   PREVENT_CONCURRENT_LOGINS: true
-  PREVIEW_LMS_BASE: preview.courses.localhost
   SEGMENT_IO_LMS: true
   SEPARATE_VERIFICATION_FROM_PAYMENT: true
   SHOW_FOOTER_LANGUAGE_SELECTOR: true
@@ -504,7 +499,6 @@ IDA_LOGOUT_URI_LIST:
 - https://discovery.localhost/logout/
 - https://commerce-coordinator.localhost/logout/
 ID_VERIFICATION_SUPPORT_LINK: https://support.localhost/hc/en-us/articles/206503858-How-do-I-complete-photo-verification-
-JS_ENV_EXTRA_CONFIG: {}
 JWT_AUTH:
   JWT_AUDIENCE: test_jwt_audience
   JWT_AUTH_COOKIE_HEADER_PAYLOAD: jwt-cookie-header-payload

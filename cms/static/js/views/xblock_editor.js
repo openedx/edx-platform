@@ -78,7 +78,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
                     el: metadataEditor,
                     collection: new MetadataCollection(models)
                 });
-                if (xblock.setMetadataEditor) {
+                if (xblock && xblock.setMetadataEditor) {
                     xblock.setMetadataEditor(metadataView);
                 }
             }
@@ -125,10 +125,11 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
         /**
              * Returns the metadata that has changed in the editor. This is a combination of the metadata
              * modified in the "Settings" editor, as well as any custom metadata provided by the component.
+             * Set `replaceNullWithDefault` to true to replace null values with the default values.
              */
-        getChangedMetadata: function() {
+        getChangedMetadata: function(replaceNullWithDefault = false) {
             var metadataEditor = this.getMetadataEditor();
-            return _.extend(metadataEditor.getModifiedMetadataValues(), this.getCustomMetadata());
+            return _.extend(metadataEditor.getModifiedMetadataValues(replaceNullWithDefault), this.getCustomMetadata());
         },
 
         /**

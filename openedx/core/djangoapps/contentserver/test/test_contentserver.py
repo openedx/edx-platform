@@ -102,6 +102,11 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
 
+        # Special case: python_lib.zip
+        cls.pylib_asset = cls.course_key.make_asset_key('asset', 'python_lib.zip')
+        cls.url_pylib = '/' + str(cls.pylib_asset)
+        cls.contentstore.set_attr(cls.pylib_asset, 'locked', False)
+
     def setUp(self):
         """
         Create user and login.
@@ -207,6 +212,83 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         self.client.login(username=self.staff_usr, password=self.TEST_PASSWORD)
         resp = self.client.get(self.url_locked)
         assert resp.status_code == 200
+
+    def test_python_lib_zip_staff(self):
+        """
+        Test that staff can download python_lib.zip.
+        """
+        self.client.login(username=self.staff_usr, password=self.TEST_PASSWORD)
+        resp = self.client.get(self.url_pylib)
+        assert resp.status_code == 200
+        assert resp['Cache-Control'] == 'private, no-cache, no-store'
+
+    def test_python_lib_zip_not_staff(self):
+        """
+        Test that python_lib.zip cannot be downloaded by non-staff by default.
+        """
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
+        resp = self.client.get(self.url_pylib)
+        assert resp.status_code == 403
+        # We should be sending a no-cache header, but the contentserver
+        # currently doesn't set caching headers for "unauthorized" responses. So
+        # this test allows either in order to make the transition easier if we
+        # fix that.
+        assert 'Cache-Control' not in resp or resp['Cache-Control'] == 'private, no-cache, no-store'
+
+    @patch(
+        'openedx.core.djangoapps.contentserver.views.COURSE_CODE_LIBRARY_DOWNLOAD_ALLOWED.is_enabled',
+        return_value=True,
+    )
+    def test_python_lib_zip_not_staff_but_course_allows_it(self, mock_download_allowed_flag):
+        """
+        Test that python_lib.zip can be downloaded by non-staff when flag enabled.
+        """
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
+        resp = self.client.get(self.url_pylib)
+        assert resp.status_code == 200
+        assert resp['Cache-Control'] == 'private, no-cache, no-store'
+
+        mock_download_allowed_flag.assert_called_once_with(self.course_key)
+
+    @patch(
+        'openedx.core.djangoapps.contentserver.views.COURSE_CODE_LIBRARY_DOWNLOAD_ALLOWED.is_enabled',
+        return_value=True,
+    )
+    @patch(
+        'openedx.core.djangoapps.contentserver.views.is_content_locked',
+        return_value=True,
+    )
+    def test_python_lib_zip_can_be_locked(self, mock_is_locked, mock_download_allowed_flag):
+        """
+        Even when python_lib.zip download is broadly allowed, it can be locked.
+        """
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
+        resp = self.client.get(self.url_pylib)
+        assert resp.status_code == 403
+        assert 'Cache-Control' not in resp or resp['Cache-Control'] == 'private, no-cache, no-store'
+
+        assert mock_is_locked.call_count == 2  # for auth check, then caching check
+        mock_download_allowed_flag.assert_called_once_with(self.course_key)
+
+    @ddt.data(True, False)
+    def test_python_lib_zip_uses_studio_read_check(self, allow):
+        """
+        Specifically check that python_lib.zip is gated on studio read access.
+
+        Ideally this test would actually check access for a course team member
+        who is *not* site staff/superuser, but that would require more
+        complicated setup.
+        """
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
+        with patch('openedx.core.djangoapps.contentserver.views.has_studio_read_access', return_value=allow):
+            resp = self.client.get(self.url_pylib)
+
+        if allow:
+            assert resp.status_code == 200
+            assert resp['Cache-Control'] == 'private, no-cache, no-store'
+        else:
+            assert resp.status_code == 403
+            assert 'Cache-Control' not in resp or resp['Cache-Control'] == 'private, no-cache, no-store'
 
     def test_range_request_full_file(self):
         """

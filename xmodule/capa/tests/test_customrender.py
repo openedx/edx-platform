@@ -6,7 +6,7 @@ import xml.sax.saxutils as saxutils
 from lxml import etree
 
 from xmodule.capa import customrender
-from xmodule.capa.tests.helpers import test_capa_system
+from xmodule.capa.tests.helpers import mock_capa_system
 
 # just a handy shortcut
 lookup_tag = customrender.registry.get_class_for_tag
@@ -28,8 +28,9 @@ class HelperTest(unittest.TestCase):
     '''
     Make sure that our helper function works!
     '''
+
     def check(self, d):
-        xml = etree.XML(test_capa_system().render_template('blah', d))
+        xml = etree.XML(mock_capa_system().render_template('blah', d))
         assert d == extract_context(xml)
 
     def test_extract_context(self):
@@ -49,7 +50,7 @@ class SolutionRenderTest(unittest.TestCase):
         xml_str = """<solution id="solution_12">{s}</solution>""".format(s=solution)
         element = etree.fromstring(xml_str)
 
-        renderer = lookup_tag('solution')(test_capa_system(), element)
+        renderer = lookup_tag('solution')(mock_capa_system(), element)
 
         assert renderer.id == 'solution_12'
 
@@ -68,7 +69,7 @@ class MathRenderTest(unittest.TestCase):
         xml_str = """<math>{tex}</math>""".format(tex=latex_in)
         element = etree.fromstring(xml_str)
 
-        renderer = lookup_tag('math')(test_capa_system(), element)
+        renderer = lookup_tag('math')(mock_capa_system(), element)
 
         assert renderer.mathstr == mathjax_out
 

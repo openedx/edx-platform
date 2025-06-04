@@ -80,7 +80,6 @@
 .xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section .wrapper-handouts,
 .xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section .branding,
 .xmodule_display.xmodule_VideoBlock .video .wrapper-video-bottom-section .wrapper-transcript-feedback {
-    flex: 1;
     margin-top: var(--baseline, 20px);
     padding-right: var(--baseline, 20px);
     vertical-align: top;
@@ -107,6 +106,8 @@
 }
 
 .xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .wrapper-download-transcripts .list-download-transcripts .transcript-option {
+    display: flex;
+    align-items: center;
     margin: 0;
 }
 
@@ -114,6 +115,7 @@
 .xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .wrapper-download-transcripts .list-download-transcripts .transcript-option a.btn-link {
     font-size: 16px !important;
     font-weight: unset;
+    padding-left: 4px;
 }
 
 .xmodule_display.xmodule_VideoBlock .video .wrapper-downloads .branding {
@@ -525,9 +527,9 @@
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li.is-active .speed-option,
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container .menu li.is-active .control-lang {
-    border-left: calc(var(--baseline, 20px) / 10) solid #0ea6ec;
+    border-left: calc(var(--baseline, 20px) / 10) solid #90d7f9;
     font-weight: var(--font-bold, 700);
-    color: #0ea6ec;
+    color: #90d7f9;
 }
 
 .xmodule_display.xmodule_VideoBlock .video .video-wrapper .video-controls .secondary-controls .menu-container.is-opened .menu {

@@ -103,7 +103,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         Returns expected dashboard demographic message with link to Insights.
         """
         return 'For analytics about your course, go to <a href="http://example.com/courses/{}" ' \
-               'rel="noopener" target="_blank">Example</a>.'.format(str(self.course.id))
+               'rel="noopener" target="_blank">Example<span class="sr-only">Opens in a new tab</span>' \
+               '</a>.'.format(str(self.course.id))
 
     def test_instructor_tab(self):
         """

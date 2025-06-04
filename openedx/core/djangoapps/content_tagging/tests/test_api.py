@@ -5,8 +5,8 @@ import tempfile
 import ddt
 from django.test.testcases import TestCase
 from fs.osfs import OSFS
-from opaque_keys.edx.keys import CourseKey, UsageKey, LibraryCollectionKey
-from opaque_keys.edx.locator import LibraryLocatorV2
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator, LibraryContainerLocator
 from openedx_tagging.core.tagging.models import ObjectTag
 from organizations.models import Organization
 from .test_objecttag_export_helpers import TestGetAllObjectTagsMixin, TaggedCourseMixin
@@ -381,7 +381,7 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
             self._test_copy_object_tags(src_key, dst_key, expected_tags)
 
     def test_tag_collection(self):
-        collection_key = LibraryCollectionKey.from_string("lib-collection:orgA:libX:1")
+        collection_key = LibraryCollectionLocator.from_string("lib-collection:orgA:libX:1")
 
         api.tag_object(
             object_id=str(collection_key),
@@ -393,6 +393,23 @@ class TestAPIObjectTags(TestGetAllObjectTagsMixin, TestCase):
             object_tags, taxonomies = api.get_all_object_tags(collection_key)
 
         assert object_tags == {'lib-collection:orgA:libX:1': {3: ['Tag 3.1']}}
+        assert taxonomies == {
+            self.taxonomy_3.id: self.taxonomy_3,
+        }
+
+    def test_tag_container(self):
+        unit_key = LibraryContainerLocator.from_string('lct:orgA:libX:unit:unit1')
+
+        api.tag_object(
+            object_id=str(unit_key),
+            taxonomy=self.taxonomy_3,
+            tags=["Tag 3.1"],
+        )
+
+        with self.assertNumQueries(1):
+            object_tags, taxonomies = api.get_all_object_tags(unit_key)
+
+        assert object_tags == {'lct:orgA:libX:unit:unit1': {3: ['Tag 3.1']}}
         assert taxonomies == {
             self.taxonomy_3.id: self.taxonomy_3,
         }

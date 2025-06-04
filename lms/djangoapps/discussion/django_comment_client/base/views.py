@@ -584,7 +584,7 @@ def create_thread(request, course_id, commentable_id):
 
     if follow:
         cc_user = cc.User.from_django_user(user)
-        cc_user.follow(thread)
+        cc_user.follow(thread, course_id)
         thread_followed.send(sender=None, user=user, post=thread)
 
     data = thread.to_dict()
@@ -673,7 +673,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         parent_id=parent_id,
         body=sanitize_body(post["body"]),
     )
-    comment.save()
+    comment.save(params={"course_id": str(course_key)})
 
     comment_created.send(sender=None, user=user, post=comment)
 
@@ -715,7 +715,7 @@ def delete_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     thread = cc.Thread.find(thread_id)
-    thread.delete()
+    thread.delete(course_id=course_id)
     thread_deleted.send(sender=None, user=request.user, post=thread)
 
     track_thread_deleted_event(request, course, thread)
@@ -736,7 +736,7 @@ def update_comment(request, course_id, comment_id):
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
     comment.body = sanitize_body(request.POST["body"])
-    comment.save()
+    comment.save(params={"course_id": course_id})
 
     comment_edited.send(sender=None, user=request.user, post=comment)
 
@@ -762,7 +762,7 @@ def endorse_comment(request, course_id, comment_id):
     endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
     comment.endorsed = endorsed
     comment.endorsement_user_id = user.id
-    comment.save()
+    comment.save(params={"course_id": course_id})
     comment_endorsed.send(sender=None, user=user, post=comment)
     track_forum_response_mark_event(request, course, comment, endorsed)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
@@ -781,7 +781,7 @@ def openclose_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     close_thread = request.POST.get('closed', 'false').lower() == 'true'
     thread.closed = close_thread
-    thread.save()
+    thread.save(params={"course_id": course_id})
 
     track_thread_lock_unlock_event(request, course, thread, None, close_thread)
     return JsonResponse({
@@ -814,7 +814,7 @@ def delete_comment(request, course_id, comment_id):
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
     comment = cc.Comment.find(comment_id)
-    comment.delete()
+    comment.delete(course_id=course_id)
     comment_deleted.send(sender=None, user=request.user, post=comment)
     track_comment_deleted_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
@@ -828,12 +828,12 @@ def _vote_or_unvote(request, course_id, obj, value='up', undo_vote=False):
     course = get_course_with_access(request.user, 'load', course_key)
     user = cc.User.from_django_user(request.user)
     if undo_vote:
-        user.unvote(obj)
+        user.unvote(obj, course_id)
         # TODO(smarnach): Determine the value of the vote that is undone.  Currently, you can
         # only cast upvotes in the user interface, so it is assumed that the vote value is 'up'.
         # (People could theoretically downvote by handcrafting AJAX requests.)
     else:
-        user.vote(obj, value)
+        user.vote(obj, value, course_id)
     thread_voted.send(sender=None, user=request.user, post=obj)
     track_voted_event(request, course, obj, value, undo_vote)
     return JsonResponse(prepare_content(obj.to_dict(), course_key))
@@ -899,7 +899,7 @@ def flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
-    thread.flagAbuse(user, thread)
+    thread.flagAbuse(user, thread, course_id)
     track_discussion_reported_event(request, course, thread)
     thread_flagged.send(sender='flag_abuse_for_thread', user=request.user, post=thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
@@ -921,7 +921,7 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
         has_permission(request.user, 'openclose_thread', course_key) or
         has_access(request.user, 'staff', course)
     )
-    thread.unFlagAbuse(user, thread, remove_all)
+    thread.unFlagAbuse(user, thread, remove_all, course_id)
     track_discussion_unreported_event(request, course, thread)
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -938,7 +938,7 @@ def flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     course = get_course_by_id(course_key)
     comment = cc.Comment.find(comment_id)
-    comment.flagAbuse(user, comment)
+    comment.flagAbuse(user, comment, course_id)
     track_discussion_reported_event(request, course, comment)
     comment_flagged.send(sender='flag_abuse_for_comment', user=request.user, post=comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
@@ -960,7 +960,7 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
         has_access(request.user, 'staff', course)
     )
     comment = cc.Comment.find(comment_id)
-    comment.unFlagAbuse(user, comment, remove_all)
+    comment.unFlagAbuse(user, comment, remove_all, course_id)
     track_discussion_unreported_event(request, course, comment)
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
@@ -976,7 +976,7 @@ def pin_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.pin(user, thread_id)
+    thread.pin(user, thread_id, course_id)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -992,7 +992,7 @@ def un_pin_thread(request, course_id, thread_id):
     course_key = CourseKey.from_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    thread.un_pin(user, thread_id)
+    thread.un_pin(user, thread_id, course_id)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -1005,7 +1005,7 @@ def follow_thread(request, course_id, thread_id):  # lint-amnesty, pylint: disab
     course_key = CourseKey.from_string(course_id)
     course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
-    user.follow(thread)
+    user.follow(thread, course_id=course_id)
     thread_followed.send(sender=None, user=request.user, post=thread)
     track_thread_followed_event(request, course, thread, True)
     return JsonResponse({})
@@ -1021,7 +1021,7 @@ def follow_commentable(request, course_id, commentable_id):  # lint-amnesty, pyl
     """
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
-    user.follow(commentable)
+    user.follow(commentable, course_id=course_id)
     return JsonResponse({})
 
 
@@ -1037,7 +1037,7 @@ def unfollow_thread(request, course_id, thread_id):  # lint-amnesty, pylint: dis
     course = get_course_by_id(course_key)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
-    user.unfollow(thread)
+    user.unfollow(thread, course_id=course_id)
     thread_unfollowed.send(sender=None, user=request.user, post=thread)
     track_thread_followed_event(request, course, thread, False)
     return JsonResponse({})
@@ -1053,7 +1053,7 @@ def unfollow_commentable(request, course_id, commentable_id):  # lint-amnesty, p
     """
     user = cc.User.from_django_user(request.user)
     commentable = cc.Commentable.find(commentable_id)
-    user.unfollow(commentable)
+    user.unfollow(commentable, course_id=course_id)
     return JsonResponse({})
 
 

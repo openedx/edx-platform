@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 from django.views.generic import View
 from rest_framework.generics import GenericAPIView
 
+from common.djangoapps.track import segment
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import UserPasswordToggleHistory
 from common.djangoapps.util.json_request import JsonResponse
@@ -76,11 +77,13 @@ class ManageUserDetailView(GenericAPIView):
                 user=user, comment=comment, created_by=request.user, disabled=True
             )
             retire_dot_oauth2_models(user)
+            segment.identify(user.id, {'is_disabled': 'true'})
         else:
             user.set_password(generate_password(length=25))
             UserPasswordToggleHistory.objects.create(
                 user=user, comment=comment, created_by=request.user, disabled=False
             )
+            segment.identify(user.id, {'is_disabled': 'false'})
         user.save()
 
         if user.has_usable_password():
