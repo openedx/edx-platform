@@ -3,7 +3,7 @@ Comprehensive Theming support for Django's collectstatic functionality.
 See https://docs.djangoproject.com/en/1.8/ref/contrib/staticfiles/
 """
 
-
+import logging
 import os.path
 import posixpath
 import re
@@ -22,6 +22,9 @@ from openedx.core.djangoapps.theming.helpers import (
     get_themes,
     is_comprehensive_theming_enabled
 )
+
+
+log = logging.getLogger(__name__)
 
 
 class ThemeMixin:
@@ -297,6 +300,11 @@ class ThemePipelineMixin(PipelineMixin):
 
         super_class = super()
         if hasattr(super_class, 'post_process'):
+            log.info(
+                "Calling super_class.post_process for following paths \n%s\nOptions\n%s",
+                paths.copy(),
+                options
+            )
             yield from super_class.post_process(paths.copy(), dry_run, **options)
 
     @staticmethod
