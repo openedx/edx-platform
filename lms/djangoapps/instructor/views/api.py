@@ -2733,10 +2733,13 @@ class ExportOra2DataView(DeveloperErrorViewMixin, APIView):
         """
         course_key = CourseKey.from_string(course_id)
         report_type = _('ORA data')
-        task_api.submit_export_ora2_data(request, course_key)
-        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
 
-        return Response({"status": success_status})
+        try:
+            task_api.submit_export_ora2_data(request, course_key)
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            return Response({"status": success_status})
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
+            return JsonResponse({"error": str(err)}, status=400)
 
 
 @transaction.non_atomic_requests
