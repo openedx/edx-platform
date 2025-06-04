@@ -4,6 +4,7 @@ Helper functions for the accounts API.
 
 
 import hashlib
+import logging
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -19,6 +20,7 @@ PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are conver
 
 _PROFILE_IMAGE_SIZES = list(settings.PROFILE_IMAGE_SIZES_MAP.values())
 
+log = logging.getLogger(__name__)
 
 def get_profile_image_storage():
     """
@@ -150,13 +152,22 @@ def set_has_profile_image(username, is_uploaded, upload_dt=None):
         UserNotFound: no user with username `username` exists.
     """
     if is_uploaded and upload_dt is None:  # lint-amnesty, pylint: disable=no-else-raise
+        log.info("No upload datetime was supplied for user %s", username)
         raise ValueError("No upload datetime was supplied.")
     elif not is_uploaded:
         upload_dt = None
     try:
         profile = UserProfile.objects.get(user__username=username)
     except ObjectDoesNotExist:
+        log.info("User with username %s not found", username)
         raise UserNotFound()  # lint-amnesty, pylint: disable=raise-missing-from
 
+    log.info("Setting profile_image_uploaded_at for user %s to %s", username, upload_dt)
+    log.info("Value of profile_image_uploaded_at for user %s BEFORE change: %s",
+             username, profile.profile_image_uploaded_at)
     profile.profile_image_uploaded_at = upload_dt
+    log.info("Value of profile_image_uploaded_at for user %s AFTER change and PRE save: %s",
+             username, profile.profile_image_uploaded_at)
     profile.save()
+    log.info("Value of profile_image_uploaded_at for user %s POST save: %s",
+             username, profile.profile_image_uploaded_at)

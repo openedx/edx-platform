@@ -7,6 +7,7 @@ import binascii
 from collections import namedtuple
 from contextlib import closing
 from io import BytesIO
+import logging
 
 import piexif
 from django.conf import settings
@@ -38,6 +39,7 @@ IMAGE_TYPES = {
     ),
 }
 
+log = logging.getLogger(__name__)
 
 def create_profile_images(image_file, profile_image_names):
     """
@@ -71,6 +73,7 @@ def create_profile_images(image_file, profile_image_names):
         exif = _get_corrected_exif(scaled, original)
         with closing(_create_image_file(scaled, exif)) as scaled_image_file:
             storage.save(name, scaled_image_file)
+            log.info("Saved profile image '%s' for user.", name)
 
 
 def remove_profile_images(profile_image_names):

@@ -155,7 +155,9 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
                 )
 
             # generate profile pic and thumbnails and store them
+            log.info("Starting generating profile images for user %s", username)
             profile_image_names = get_profile_image_names(username)
+            log.info("Starting creating profile images for user %s", username)
             create_profile_images(uploaded_file, profile_image_names)
 
             # update the user account to reflect that a profile image is available.
