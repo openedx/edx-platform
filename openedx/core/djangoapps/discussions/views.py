@@ -6,7 +6,6 @@ from typing import Dict
 import edx_api_doc_tools as apidocs
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -21,7 +20,7 @@ from .config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from .models import AVAILABLE_PROVIDER_MAP, DiscussionsConfiguration, Features, Provider
 from .permissions import IsStaffOrCourseTeam, check_course_permissions
 from .serializers import DiscussionsConfigurationSerializer, DiscussionsProvidersSerializer
-from .tasks import update_unit_discussion_state_from_discussion_blocks
+from .tasks import update_discussions_settings_from_course_task
 
 
 class DiscussionsConfigurationSettingsView(APIView):
@@ -272,13 +271,7 @@ class SyncDiscussionTopicsView(APIView):
         Returns:
             Response: modified course configuration data
         """
-        update_unit_discussion_state_from_discussion_blocks(
-            course_key=CourseKey.from_string(course_key_string),
-            user_id=request.user.id,
-            force=True,
-            async_topics=False
-        )
-
+        update_discussions_settings_from_course_task(course_key_string)
         return Response({
             "status": "success",
             "message": "Discussion topics synced successfully."

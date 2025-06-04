@@ -12,7 +12,6 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
-from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -853,7 +852,7 @@ class SyncDiscussionTopicsViewTests(ModuleStoreTestCase, APITestCase):
         IsStaffOrCourseTeam.has_permission = self.original_has_permission
         super().tearDown()
 
-    @patch('openedx.core.djangoapps.discussions.views.update_unit_discussion_state_from_discussion_blocks')
+    @patch('openedx.core.djangoapps.discussions.views.update_discussions_settings_from_course_task')
     def test_sync_discussion_topics_staff_user(self, mock_update):
         """
         Test that staff users can sync discussion topics
@@ -863,14 +862,9 @@ class SyncDiscussionTopicsViewTests(ModuleStoreTestCase, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
-        mock_update.assert_called_once_with(
-            course_key=CourseKey.from_string(self.course_key_string),
-            user_id=self.staff_user.id,
-            force=True,
-            async_topics=False
-        )
+        mock_update.assert_called_once_with(self.course_key_string)
 
-    @patch('openedx.core.djangoapps.discussions.views.update_unit_discussion_state_from_discussion_blocks')
+    @patch('openedx.core.djangoapps.discussions.views.update_discussions_settings_from_course_task')
     def test_sync_discussion_topics_course_team(self, mock_update):
         """
         Test that course team members can sync discussion topics
