@@ -21,13 +21,14 @@ from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
     get_notification_content
 )
+
+from openedx.core.djangoapps.notifications.email.tasks import send_immediate_cadence_email
 from openedx.core.djangoapps.notifications.config.waffle import (
-    ENABLE_ACCOUNT_LEVEL_PREFERENCES,
     ENABLE_NOTIFICATION_GROUPING,
     ENABLE_NOTIFICATIONS,
+    ENABLE_ACCOUNT_LEVEL_PREFERENCES,
     ENABLE_PUSH_NOTIFICATIONS
 )
-from openedx.core.djangoapps.notifications.email.tasks import send_immediate_cadence_email
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.grouping_notifications import (
