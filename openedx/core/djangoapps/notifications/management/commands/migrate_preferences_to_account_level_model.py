@@ -1,3 +1,6 @@
+"""
+Command to migrate course-level notification preferences to account-level preferences.
+"""
 import logging
 from typing import Dict, List, Any, Iterator
 
@@ -10,7 +13,8 @@ from openedx.core.djangoapps.notifications.utils import aggregate_notification_c
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_BATCH_SIZE = 1000  # Process 1000 users at a time
+DEFAULT_BATCH_SIZE = 1000
+
 
 class Command(BaseCommand):
     """
@@ -41,18 +45,18 @@ class Command(BaseCommand):
         Yields all distinct user IDs with course notification preferences, in batches.
         """
         logger.info("Fetching all distinct user IDs with course notification preferences...")
-        # Use iterator with chunk_size for memory efficiency when fetching distinct user IDs
-        user_id_queryset = CourseNotificationPreference.objects.values_list('user_id', flat=True).distinct().order_by('user_id')
-        for user_id in user_id_queryset.iterator(chunk_size=batch_size): # Django's iterator handles DB-side iteration
-            yield user_id
-
+        user_id_queryset = (CourseNotificationPreference
+                            .objects.values_list('user_id', flat=True)
+                            .distinct()
+                            .order_by('user_id'))
+        yield from user_id_queryset.iterator(chunk_size=batch_size)
 
     def _create_preference_object(
-        self,
-        user_id: int,
-        app_name: str,
-        notification_type: str,
-        values: Dict[str, Any]
+            self,
+            user_id: int,
+            app_name: str,
+            notification_type: str,
+            values: Dict[str, Any]
     ) -> NotificationPreference:
         """
         Helper function to create a NotificationPreference instance.
@@ -64,7 +68,7 @@ class Command(BaseCommand):
             web=values.get('web'),
             email=values.get('email'),
             push=values.get('push'),
-            email_cadence=values.get('email_cadence', EmailCadence.DAILY) # Ensure using .value for Enum
+            email_cadence=values.get('email_cadence', EmailCadence.DAILY)
         )
 
     def _process_user_preferences(self, user_id: int) -> List[NotificationPreference]:
@@ -82,7 +86,7 @@ class Command(BaseCommand):
         )
 
         if not course_preferences_configs:
-            logger.debug(f"No course preferences found for user {user_id}. Skipping.") # Changed to debug as it's normal
+            logger.debug(f"No course preferences found for user {user_id}. Skipping.")
             return new_account_preferences
 
         aggregated_data = aggregate_notification_configs(course_preferences_configs)
@@ -90,14 +94,16 @@ class Command(BaseCommand):
         for app_name, app_config in aggregated_data.items():
             if not isinstance(app_config, dict):
                 logger.warning(
-                    f"Malformed app_config for app '{app_name}' for user {user_id}. Expected dict, got {type(app_config)}. Skipping app."
+                    f"Malformed app_config for app '{app_name}' for user {user_id}. "
+                    f"Expected dict, got {type(app_config)}. Skipping app."
                 )
                 continue
 
             notif_types = app_config.get('notification_types', {})
             if not isinstance(notif_types, dict):
                 logger.warning(
-                    f"Malformed 'notification_types' for app '{app_name}' for user {user_id}. Expected dict, got {type(notif_types)}. Skipping notification_types."
+                    f"Malformed 'notification_types' for app '{app_name}' for user {user_id}. Expected dict, "
+                    f"got {type(notif_types)}. Skipping notification_types."
                 )
                 continue
 
@@ -107,7 +113,8 @@ class Command(BaseCommand):
                     continue
                 if values is None or not isinstance(values, dict):
                     logger.warning(
-                        f"Skipping malformed notification type data for '{notification_type}' in app '{app_name}' for user {user_id}."
+                        f"Skipping malformed notification type data for '{notification_type}' "
+                        f"in app '{app_name}' for user {user_id}."
                     )
                     continue
                 new_account_preferences.append(
@@ -118,14 +125,16 @@ class Command(BaseCommand):
             core_types_list = app_config.get('core_notification_types', [])
             if not isinstance(core_types_list, list):
                 logger.warning(
-                    f"Malformed 'core_notification_types' for app '{app_name}' for user {user_id}. Expected list, got {type(core_types_list)}. Skipping core_notification_types."
+                    f"Malformed 'core_notification_types' for app '{app_name}' for user {user_id}. "
+                    f"Expected list, got {type(core_types_list)}. Skipping core_notification_types."
                 )
                 continue
 
             core_values = notif_types.get('core', {})
             if not isinstance(core_values, dict):
                 logger.warning(
-                    f"Malformed values for 'core' notification types in app '{app_name}' for user {user_id}. Expected dict, got {type(core_values)}. Using empty defaults."
+                    f"Malformed values for 'core' notification types in app '{app_name}' for user {user_id}. "
+                    f"Expected dict, got {type(core_values)}. Using empty defaults."
                 )
                 core_values = {}
 
@@ -140,12 +149,13 @@ class Command(BaseCommand):
                 )
 
         if new_account_preferences:
-            logger.debug(f"User {user_id}: Aggregated {len(course_preferences_configs)} course preferences into {len(new_account_preferences)} account preferences.")
+            logger.debug(f"User {user_id}: Aggregated {len(course_preferences_configs)} course preferences "
+                         f"into {len(new_account_preferences)} account preferences.")
         else:
-            logger.debug(f"User {user_id}: No account preferences generated from {len(course_preferences_configs)} course preferences.")
+            logger.debug(f"User {user_id}: No account preferences generated from {len(course_preferences_configs)} "
+                         f"course preferences.")
 
         return new_account_preferences
-
 
     def handle(self, *args: Any, **options: Any):
         dry_run = options['dry_run']
@@ -170,11 +180,8 @@ class Command(BaseCommand):
                         if not dry_run:
                             deleted_count, _ = NotificationPreference.objects.filter(user_id=user_id).delete()
                             if deleted_count > 0:
-                                logger.debug(f"User {user_id}: Deleted {deleted_count} existing account-level preferences.")
-                        else:
-                            # In dry-run, we just note that deletion would occur if applicable.
-                            # A more accurate dry-run might query the count of existing preferences.
-                            logger.debug(f"[DRY RUN] User {user_id}: Would check and delete existing account-level preferences if any.")
+                                logger.debug(f"User {user_id}: Deleted {deleted_count} existing "
+                                             f"account-level preferences.")
 
                         preferences_batch_to_create.extend(user_new_preferences)
 
@@ -187,25 +194,24 @@ class Command(BaseCommand):
                             NotificationPreference.objects.bulk_create(preferences_batch_to_create)
                             logger.info(
                                 self.style.SUCCESS(
-                                    f"Successfully created {len(preferences_batch_to_create)} account-level preferences "
-                                    f"for {processed_users_in_batch} users in this batch."
+                                    f"Successfully created {len(preferences_batch_to_create)} account-level "
+                                    f"preferences for {processed_users_in_batch} users in this batch."
                                 )
                             )
-                        else:
-                            logger.info(
-                                f"[DRY RUN] Would create {len(preferences_batch_to_create)} account-level preferences "
-                                f"for {processed_users_in_batch} users in this batch."
-                            )
+
                         total_preferences_created += len(preferences_batch_to_create)
                         preferences_batch_to_create = []
                     else:
-                         logger.info(f"No preferences to create for the latest batch of {processed_users_in_batch} users.")
+                        logger.info(f"No preferences to create for the latest "
+                                    f"batch of {processed_users_in_batch} users.")
                     processed_users_in_batch = 0
 
-                if total_users_processed > 0 and total_users_processed % (batch_size * 5) == 0: # Log progress every 5 batches or so
-                     logger.info(f"PROGRESS: Total users processed so far: {total_users_processed}. Total preferences {'would be' if dry_run else ''} created: {total_preferences_created}")
+                if total_users_processed > 0 and total_users_processed % (batch_size * 5) == 0:
+                    logger.info(f"PROGRESS: Total users processed so far: {total_users_processed}. "
+                                f"Total preferences {'would be' if dry_run else ''} "
+                                f"created: {total_preferences_created}")
 
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-except
                 logger.error(f"Failed to process preferences for user {user_id}: {e}", exc_info=True)
                 # This user's transaction will be rolled back.
                 # The script will continue with the next user.
@@ -220,17 +226,13 @@ class Command(BaseCommand):
                         f"for the final {processed_users_in_batch} users."
                     )
                 )
-            else:
-                logger.info(
-                    f"[DRY RUN] Would create {len(preferences_batch_to_create)} account-level preferences "
-                    f"for the final {processed_users_in_batch} users."
-                )
             total_preferences_created += len(preferences_batch_to_create)
 
         logger.info(
             self.style.SUCCESS(
                 f"Migration complete. Processed {total_users_processed} users. "
-                f"{'Would have created' if dry_run else 'Created'} a total of {total_preferences_created} account-level preferences."
+                f"{'Would have created' if dry_run else 'Created'} a total of {total_preferences_created} "
+                f"account-level preferences."
             )
         )
         if dry_run:

@@ -1,11 +1,12 @@
-import json
-from unittest.mock import Mock, patch, call
-from io import StringIO
+# pylint: disable = W0212
+"""
+Test for account level migration command
+"""
+from unittest.mock import Mock, patch
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.core.management import call_command
-from django.contrib.auth.models import User
-from django.db import transaction
 
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.models import (
@@ -13,6 +14,9 @@ from openedx.core.djangoapps.notifications.models import (
     NotificationPreference
 )
 from openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model import Command
+
+User = get_user_model()
+COMMAND_MODULE = 'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model'
 
 
 class MigrateNotificationPreferencesTestCase(TestCase):
@@ -133,8 +137,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         self.assertIsNone(preference.email)
         self.assertEqual(preference.email_cadence, EmailCadence.DAILY)
 
-    @patch(
-        'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.aggregate_notification_configs')
+    @patch(f'{COMMAND_MODULE}.aggregate_notification_configs')
     def test_process_user_preferences_success(self, mock_aggregate):
         """Test successful processing of user preferences."""
         # Setup
@@ -173,8 +176,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         self.assertTrue(grade_updated_pref.push)
         self.assertTrue(grade_updated_pref.email)
 
-    @patch(
-        'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.aggregate_notification_configs')
+    @patch(f'{COMMAND_MODULE}.aggregate_notification_configs')
     def test_process_user_preferences_no_course_preferences(self, mock_aggregate):
         """Test processing user with no course preferences."""
         command = Command()
@@ -183,8 +185,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         self.assertEqual(len(preferences), 0)
         mock_aggregate.assert_not_called()
 
-    @patch(
-        'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.aggregate_notification_configs')
+    @patch(f'{COMMAND_MODULE}.aggregate_notification_configs')
     def test_process_user_preferences_malformed_data(self, mock_aggregate):
         """Test handling of malformed notification config data."""
         CourseNotificationPreference.objects.create(
@@ -216,7 +217,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         self.assertEqual(len(preferences), 0)
         self.assertIn('Malformed app_config', log.output[0])
 
-    @patch('openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.logger')
+    @patch(f'{COMMAND_MODULE}.logger')
     def test_handle_dry_run_mode(self, mock_logger):
         """Test command execution in dry-run mode."""
         CourseNotificationPreference.objects.create(
@@ -288,8 +289,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         self.assertEqual(new_pref.app, 'grading')
         self.assertEqual(new_pref.type, 'test_type')
 
-    @patch(
-        'openedx.core.djangoapps.notifications.management.commands.migrate_notification_preferences.transaction.atomic')
+    @patch(f'{COMMAND_MODULE}.transaction.atomic')
     def migrate_preferences_to_account_level_model(self, mock_atomic):
         """Test that users are processed in batches correctly."""
         # Mock atomic to avoid transaction issues during testing
@@ -322,7 +322,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         # Verify all users were processed
         self.assertEqual(mock_process.call_count, 3)
 
-    @patch('openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.logger')
+    @patch(f'{COMMAND_MODULE}.logger')
     def test_handle_user_processing_error(self, mock_logger):
         """Test error handling when processing individual users."""
         CourseNotificationPreference.objects.create(
@@ -355,8 +355,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         self.assertEqual(options.batch_size, 500)
         self.assertTrue(options.dry_run)
 
-    @patch(
-        'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.aggregate_notification_configs')
+    @patch(f'{COMMAND_MODULE}.aggregate_notification_configs')
     def test_process_user_preferences_with_core_types(self, mock_aggregate):
         """Test processing of core notification types specifically."""
         CourseNotificationPreference.objects.create(
@@ -402,8 +401,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         with patch.object(Command, '_process_user_preferences') as mock_process:
             mock_process.return_value = []
 
-            with patch(
-                'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.logger') as mock_logger:
+            with patch(f'{COMMAND_MODULE}.logger') as mock_logger:
                 call_command('migrate_preferences_to_account_level_model', '--batch-size=1')
 
                 # Check that progress was logged (every 5 batches)
@@ -422,8 +420,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         with patch.object(Command, '_process_user_preferences') as mock_process:
             mock_process.return_value = []  # No preferences to create
 
-            with patch(
-                'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model.logger') as mock_logger:
+            with patch(f'{COMMAND_MODULE}.logger') as mock_logger:
                 call_command('migrate_preferences_to_account_level_model', '--batch-size=1')
 
                 # Should log that no preferences were created
