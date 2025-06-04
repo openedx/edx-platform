@@ -72,6 +72,7 @@ from opaque_keys.edx.locator import (
     LibraryLocator,
     LocalId,
 )
+from openedx.core.lib.cache_utils import request_cached
 from path import Path as path
 from pytz import UTC
 from xblock.core import XBlock
@@ -1096,6 +1097,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         result = self._load_items(structure_entry, [root], depth, **kwargs)
         return result[0]
 
+    @request_cached()
     def get_course(self, course_id, depth=0, **kwargs):
         """
         Gets the course block for the course identified by the locator
