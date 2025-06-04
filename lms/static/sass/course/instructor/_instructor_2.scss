@@ -711,13 +711,12 @@
       display: block;
       position: absolute;
       top: ($baseline/2);
-
-      @include left(-9999em);
-
+      left: -9999em;
       padding: ($baseline/2);
       width: 50%;
       background-color: $light-gray3;
       box-shadow: 2px 2px 3px $shadow;
+      z-index: 1;
 
       .hint-caret {
         display: block;
