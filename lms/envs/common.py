@@ -3284,6 +3284,9 @@ INSTALLED_APPS = [
     # Course Goals
     'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
+    # Search
+    'openedx.core.djangoapps.content.search',
+
     # Tagging
     'openedx_tagging.core.tagging.apps.TaggingConfig',
     'openedx.core.djangoapps.content_tagging',
