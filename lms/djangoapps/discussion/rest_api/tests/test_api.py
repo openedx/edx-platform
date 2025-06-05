@@ -77,6 +77,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
+    FORUM_ROLE_GROUP_MODERATOR,
     Role
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
@@ -885,6 +886,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                 FORUM_ROLE_MODERATOR,
                 FORUM_ROLE_COMMUNITY_TA,
                 FORUM_ROLE_STUDENT,
+                FORUM_ROLE_GROUP_MODERATOR,
             ],
             [True, False]
         )
@@ -897,7 +899,8 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
         _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
         self.get_thread_list([], course=cohort_course)
         actual_has_group = "group_id" in httpretty.last_request().querystring  # lint-amnesty, pylint: disable=no-member
-        expected_has_group = (course_is_cohorted and role_name == FORUM_ROLE_STUDENT)
+        expected_has_group = (course_is_cohorted and
+                              role_name in (FORUM_ROLE_STUDENT, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR))
         assert actual_has_group == expected_has_group
 
     def test_pagination(self):
@@ -1787,10 +1790,10 @@ class GetUserCommentsTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedMod
 
         if page in (1, 2):
             assert response.data["pagination"]["next"] is not None
-            assert f"page={page+1}" in response.data["pagination"]["next"]
+            assert f"page={page + 1}" in response.data["pagination"]["next"]
         if page in (2, 3):
             assert response.data["pagination"]["previous"] is not None
-            assert f"page={page-1}" in response.data["pagination"]["previous"]
+            assert f"page={page - 1}" in response.data["pagination"]["previous"]
         if page == 1:
             assert response.data["pagination"]["previous"] is None
         if page == 3:
@@ -2150,18 +2153,6 @@ class CreateThreadTest(
         assert cs_request.method == 'POST'
         assert parsed_body(cs_request) == {'source_type': ['thread'], 'source_id': ['test_id']}
 
-    def test_abuse_flagged(self):
-        self.register_post_thread_response({"id": "test_id", "username": self.user.username})
-        self.register_thread_flag_response("test_id")
-        data = self.minimal_data.copy()
-        data["abuse_flagged"] = "True"
-        result = create_thread(self.request, data)
-        assert result['abuse_flagged'] is True
-        cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/threads/test_id/abuse_flag'  # lint-amnesty, pylint: disable=no-member
-        assert cs_request.method == 'PUT'
-        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)]}
-
     def test_course_id_missing(self):
         with pytest.raises(ValidationError) as assertion:
             create_thread(self.request, {})
@@ -2510,18 +2501,6 @@ class CreateCommentTest(
         except ValidationError:
             assert expected_error
 
-    def test_abuse_flagged(self):
-        self.register_post_comment_response({"id": "test_comment", "username": self.user.username}, "test_thread")
-        self.register_comment_flag_response("test_comment")
-        data = self.minimal_data.copy()
-        data["abuse_flagged"] = "True"
-        result = create_comment(self.request, data)
-        assert result['abuse_flagged'] is True
-        cs_request = httpretty.last_request()
-        assert urlparse(cs_request.path).path == '/api/v1/comments/test_comment/abuse_flag'  # lint-amnesty, pylint: disable=no-member
-        assert cs_request.method == 'PUT'
-        assert parsed_body(cs_request) == {'user_id': [str(self.user.id)]}
-
     def test_thread_id_missing(self):
         with pytest.raises(ValidationError) as assertion:
             create_comment(self.request, {})
@@ -2833,231 +2812,6 @@ class UpdateThreadTest(
             assert event_data['id'] == 'test_thread'
             assert event_data['followed'] == new_following
             assert event_data['user_forums_roles'] == ['Student']
-
-    @ddt.data(*itertools.product([True, False], [True, False]))
-    @ddt.unpack
-    @mock.patch("eventtracking.tracker.emit")
-    def test_voted(self, current_vote_status, new_vote_status, mock_emit):
-        """
-        Test attempts to edit the "voted" field.
-
-        current_vote_status indicates whether the thread should be upvoted at
-        the start of the test. new_vote_status indicates the value for the
-        "voted" field in the update. If current_vote_status and new_vote_status
-        are the same, no update should be made. Otherwise, a vote should be PUT
-        or DELETEd according to the new_vote_status value.
-        """
-        #setup
-        user1, request1 = self.create_user_with_request()
-
-        if current_vote_status:
-            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
-        self.register_thread_votes_response("test_thread")
-        self.register_thread()
-        data = {"voted": new_vote_status}
-        result = update_thread(request1, "test_thread", data)
-        assert result['voted'] == new_vote_status
-        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
-        votes_url = "/api/v1/threads/test_thread/votes"
-        if current_vote_status == new_vote_status:
-            assert last_request_path != votes_url
-        else:
-            assert last_request_path == votes_url
-            assert httpretty.last_request().method == ('PUT' if new_vote_status else 'DELETE')
-            actual_request_data = (
-                parsed_body(httpretty.last_request()) if new_vote_status else
-                parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
-            )
-            actual_request_data.pop("request_id", None)
-            expected_request_data = {"user_id": [str(user1.id)]}
-            if new_vote_status:
-                expected_request_data["value"] = ["up"]
-            assert actual_request_data == expected_request_data
-
-            event_name, event_data = mock_emit.call_args[0]
-            assert event_name == 'edx.forum.thread.voted'
-            assert event_data == {
-                'undo_vote': (not new_vote_status),
-                'url': '',
-                'target_username': self.user.username,
-                'vote_value': 'up',
-                'user_forums_roles': [FORUM_ROLE_STUDENT],
-                'user_course_roles': [],
-                'commentable_id': 'original_topic',
-                'id': 'test_thread'
-            }
-
-    @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
-    @ddt.unpack
-    def test_vote_count(self, current_vote_status, first_vote, second_vote):
-        """
-        Tests vote_count increases and decreases correctly from the same user
-        """
-        #setup
-        starting_vote_count = 0
-        user, request = self.create_user_with_request()
-        if current_vote_status:
-            self.register_get_user_response(user, upvoted_ids=["test_thread"])
-            starting_vote_count = 1
-        self.register_thread_votes_response("test_thread")
-        self.register_thread(overrides={"votes": {"up_count": starting_vote_count}})
-
-        #first vote
-        data = {"voted": first_vote}
-        result = update_thread(request, "test_thread", data)
-        self.register_thread(overrides={"voted": first_vote})
-        assert result['vote_count'] == (1 if first_vote else 0)
-
-        #second vote
-        data = {"voted": second_vote}
-        result = update_thread(request, "test_thread", data)
-        assert result['vote_count'] == (1 if second_vote else 0)
-
-    @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
-    @ddt.unpack
-    def test_vote_count_two_users(
-            self,
-            current_user1_vote,
-            current_user2_vote,
-            user1_vote,
-            user2_vote
-    ):
-        """
-        Tests vote_count increases and decreases correctly from different users
-        """
-        #setup
-        user1, request1 = self.create_user_with_request()
-        user2, request2 = self.create_user_with_request()
-
-        vote_count = 0
-        if current_user1_vote:
-            self.register_get_user_response(user1, upvoted_ids=["test_thread"])
-            vote_count += 1
-        if current_user2_vote:
-            self.register_get_user_response(user2, upvoted_ids=["test_thread"])
-            vote_count += 1
-
-        for (current_vote, user_vote, request) in \
-                [(current_user1_vote, user1_vote, request1),
-                 (current_user2_vote, user2_vote, request2)]:
-
-            self.register_thread_votes_response("test_thread")
-            self.register_thread(overrides={"votes": {"up_count": vote_count}})
-
-            data = {"voted": user_vote}
-            result = update_thread(request, "test_thread", data)
-            if current_vote == user_vote:
-                assert result['vote_count'] == vote_count
-            elif user_vote:
-                vote_count += 1
-                assert result['vote_count'] == vote_count
-                self.register_get_user_response(self.user, upvoted_ids=["test_thread"])
-            else:
-                vote_count -= 1
-                assert result['vote_count'] == vote_count
-                self.register_get_user_response(self.user, upvoted_ids=[])
-
-    @ddt.data(*itertools.product([True, False], [True, False]))
-    @ddt.unpack
-    @mock.patch("eventtracking.tracker.emit")
-    def test_abuse_flagged(self, old_flagged, new_flagged, mock_emit):
-        """
-        Test attempts to edit the "abuse_flagged" field.
-
-        old_flagged indicates whether the thread should be flagged at the start
-        of the test. new_flagged indicates the value for the "abuse_flagged"
-        field in the update. If old_flagged and new_flagged are the same, no
-        update should be made. Otherwise, a PUT should be made to the flag or
-        or unflag endpoint according to the new_flagged value.
-        """
-        self.register_get_user_response(self.user)
-        self.register_thread_flag_response("test_thread")
-        self.register_thread({"abuse_flaggers": [str(self.user.id)] if old_flagged else []})
-        data = {"abuse_flagged": new_flagged}
-        result = update_thread(self.request, "test_thread", data)
-        assert result['abuse_flagged'] == new_flagged
-        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
-        flag_url = "/api/v1/threads/test_thread/abuse_flag"
-        unflag_url = "/api/v1/threads/test_thread/abuse_unflag"
-        if old_flagged == new_flagged:
-            assert last_request_path != flag_url
-            assert last_request_path != unflag_url
-        else:
-            assert last_request_path == (flag_url if new_flagged else unflag_url)
-            assert httpretty.last_request().method == 'PUT'
-            assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
-
-            expected_event_name = 'edx.forum.thread.reported' if new_flagged else 'edx.forum.thread.unreported'
-            expected_event_data = {
-                'body': 'Original body',
-                'id': 'test_thread',
-                'content_type': 'Post',
-                'commentable_id': 'original_topic',
-                'url': '',
-                'user_course_roles': [],
-                'user_forums_roles': [FORUM_ROLE_STUDENT],
-                'target_username': self.user.username,
-                'title_truncated': False,
-                'title': 'Original Title',
-                'thread_type': 'discussion',
-                'group_id': None,
-                'truncated': False,
-            }
-            if not new_flagged:
-                expected_event_data['reported_status_cleared'] = False
-
-            actual_event_name, actual_event_data = mock_emit.call_args[0]
-            self.assertEqual(actual_event_name, expected_event_name)
-            self.assertEqual(actual_event_data, expected_event_data)
-
-    @ddt.data(
-        (False, True),
-        (True, True),
-    )
-    @ddt.unpack
-    @mock.patch("eventtracking.tracker.emit")
-    def test_thread_un_abuse_flag_for_moderator_role(self, is_author, remove_all, mock_emit):
-        """
-        Test un-abuse flag for moderator role.
-
-        When moderator unflags a reported thread, it should
-        pass the "all" flag to the api. This will indicate
-        to the api to clear all abuse_flaggers, and mark the
-        thread as unreported.
-        """
-        _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
-        self.register_get_user_response(self.user)
-        self.register_thread_flag_response("test_thread")
-        self.register_thread({"abuse_flaggers": ["11"], "user_id": str(self.user.id) if is_author else "12"})
-        data = {"abuse_flagged": False}
-        update_thread(self.request, "test_thread", data)
-        assert httpretty.last_request().method == 'PUT'
-        query_params = {'user_id': [str(self.user.id)]}
-        if remove_all:
-            query_params.update({'all': ['True']})
-        assert parsed_body(httpretty.last_request()) == query_params
-
-        expected_event_name = 'edx.forum.thread.unreported'
-        expected_event_data = {
-            'body': 'Original body',
-            'id': 'test_thread',
-            'content_type': 'Post',
-            'commentable_id': 'original_topic',
-            'url': '',
-            'user_course_roles': [],
-            'user_forums_roles': [FORUM_ROLE_STUDENT, FORUM_ROLE_ADMINISTRATOR],
-            'target_username': self.user.username,
-            'title_truncated': False,
-            'title': 'Original Title',
-            'reported_status_cleared': False,
-            'thread_type': 'discussion',
-            'group_id': None,
-            'truncated': False,
-        }
-
-        actual_event_name, actual_event_data = mock_emit.call_args[0]
-        self.assertEqual(actual_event_name, expected_event_name)
-        self.assertEqual(actual_event_data, expected_event_data)
 
     def test_invalid_field(self):
         self.register_thread()
@@ -3441,224 +3195,6 @@ class UpdateCommentTest(
         except ValidationError as err:
             assert expected_error
             assert err.message_dict == {'endorsed': ['This field is not editable.']}
-
-    @ddt.data(*itertools.product([True, False], [True, False]))
-    @ddt.unpack
-    @mock.patch("eventtracking.tracker.emit")
-    def test_voted(self, current_vote_status, new_vote_status, mock_emit):
-        """
-        Test attempts to edit the "voted" field.
-
-        current_vote_status indicates whether the comment should be upvoted at
-        the start of the test. new_vote_status indicates the value for the
-        "voted" field in the update. If current_vote_status and new_vote_status
-        are the same, no update should be made. Otherwise, a vote should be PUT
-        or DELETEd according to the new_vote_status value.
-        """
-        vote_count = 0
-        user1, request1 = self.create_user_with_request()
-        if current_vote_status:
-            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
-            vote_count = 1
-        self.register_comment_votes_response("test_comment")
-        self.register_comment(overrides={"votes": {"up_count": vote_count}})
-        data = {"voted": new_vote_status}
-        result = update_comment(request1, "test_comment", data)
-        assert result['vote_count'] == (1 if new_vote_status else 0)
-        assert result['voted'] == new_vote_status
-        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
-        votes_url = "/api/v1/comments/test_comment/votes"
-        if current_vote_status == new_vote_status:
-            assert last_request_path != votes_url
-        else:
-            assert last_request_path == votes_url
-            assert httpretty.last_request().method == ('PUT' if new_vote_status else 'DELETE')
-            actual_request_data = (
-                parsed_body(httpretty.last_request()) if new_vote_status else
-                parse_qs(urlparse(httpretty.last_request().path).query)  # lint-amnesty, pylint: disable=no-member
-            )
-            actual_request_data.pop("request_id", None)
-            expected_request_data = {"user_id": [str(user1.id)]}
-            if new_vote_status:
-                expected_request_data["value"] = ["up"]
-            assert actual_request_data == expected_request_data
-
-            event_name, event_data = mock_emit.call_args[0]
-            assert event_name == 'edx.forum.response.voted'
-
-            assert event_data == {
-                'undo_vote': (not new_vote_status),
-                'url': '',
-                'target_username': self.user.username,
-                'vote_value': 'up',
-                'user_forums_roles': [FORUM_ROLE_STUDENT],
-                'user_course_roles': [],
-                'commentable_id': 'dummy',
-                'id': 'test_comment'
-            }
-
-    @ddt.data(*itertools.product([True, False], [True, False], [True, False]))
-    @ddt.unpack
-    def test_vote_count(self, current_vote_status, first_vote, second_vote):
-        """
-        Tests vote_count increases and decreases correctly from the same user
-        """
-        #setup
-        starting_vote_count = 0
-        user1, request1 = self.create_user_with_request()
-        if current_vote_status:
-            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
-            starting_vote_count = 1
-        self.register_comment_votes_response("test_comment")
-        self.register_comment(overrides={"votes": {"up_count": starting_vote_count}})
-
-        #first vote
-        data = {"voted": first_vote}
-        result = update_comment(request1, "test_comment", data)
-        self.register_comment(overrides={"voted": first_vote})
-        assert result['vote_count'] == (1 if first_vote else 0)
-
-        #second vote
-        data = {"voted": second_vote}
-        result = update_comment(request1, "test_comment", data)
-        assert result['vote_count'] == (1 if second_vote else 0)
-
-    @ddt.data(*itertools.product([True, False], [True, False], [True, False], [True, False]))
-    @ddt.unpack
-    def test_vote_count_two_users(
-            self,
-            current_user1_vote,
-            current_user2_vote,
-            user1_vote,
-            user2_vote
-    ):
-        """
-        Tests vote_count increases and decreases correctly from different users
-        """
-        user1, request1 = self.create_user_with_request()
-        user2, request2 = self.create_user_with_request()
-
-        vote_count = 0
-        if current_user1_vote:
-            self.register_get_user_response(user1, upvoted_ids=["test_comment"])
-            vote_count += 1
-        if current_user2_vote:
-            self.register_get_user_response(user2, upvoted_ids=["test_comment"])
-            vote_count += 1
-
-        for (current_vote, user_vote, request) in \
-                [(current_user1_vote, user1_vote, request1),
-                 (current_user2_vote, user2_vote, request2)]:
-
-            self.register_comment_votes_response("test_comment")
-            self.register_comment(overrides={"votes": {"up_count": vote_count}})
-
-            data = {"voted": user_vote}
-            result = update_comment(request, "test_comment", data)
-            if current_vote == user_vote:
-                assert result['vote_count'] == vote_count
-            elif user_vote:
-                vote_count += 1
-                assert result['vote_count'] == vote_count
-                self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
-            else:
-                vote_count -= 1
-                assert result['vote_count'] == vote_count
-                self.register_get_user_response(self.user, upvoted_ids=[])
-
-    @ddt.data(*itertools.product([True, False], [True, False]))
-    @ddt.unpack
-    @mock.patch("eventtracking.tracker.emit")
-    def test_abuse_flagged(self, old_flagged, new_flagged, mock_emit):
-        """
-        Test attempts to edit the "abuse_flagged" field.
-
-        old_flagged indicates whether the comment should be flagged at the start
-        of the test. new_flagged indicates the value for the "abuse_flagged"
-        field in the update. If old_flagged and new_flagged are the same, no
-        update should be made. Otherwise, a PUT should be made to the flag or
-        or unflag endpoint according to the new_flagged value.
-        """
-        self.register_get_user_response(self.user)
-        self.register_comment_flag_response("test_comment")
-        self.register_comment({"abuse_flaggers": [str(self.user.id)] if old_flagged else []})
-        data = {"abuse_flagged": new_flagged}
-        result = update_comment(self.request, "test_comment", data)
-        assert result['abuse_flagged'] == new_flagged
-        last_request_path = urlparse(httpretty.last_request().path).path  # lint-amnesty, pylint: disable=no-member
-        flag_url = "/api/v1/comments/test_comment/abuse_flag"
-        unflag_url = "/api/v1/comments/test_comment/abuse_unflag"
-        if old_flagged == new_flagged:
-            assert last_request_path != flag_url
-            assert last_request_path != unflag_url
-        else:
-            assert last_request_path == (flag_url if new_flagged else unflag_url)
-            assert httpretty.last_request().method == 'PUT'
-            assert parsed_body(httpretty.last_request()) == {'user_id': [str(self.user.id)]}
-
-            expected_event_name = 'edx.forum.response.reported' if new_flagged else 'edx.forum.response.unreported'
-            expected_event_data = {
-                'body': 'Original body',
-                'id': 'test_comment',
-                'content_type': 'Response',
-                'commentable_id': 'dummy',
-                'url': '',
-                'truncated': False,
-                'user_course_roles': [],
-                'user_forums_roles': [FORUM_ROLE_STUDENT],
-                'target_username': self.user.username,
-            }
-            if not new_flagged:
-                expected_event_data['reported_status_cleared'] = False
-
-            actual_event_name, actual_event_data = mock_emit.call_args[0]
-            self.assertEqual(actual_event_name, expected_event_name)
-            self.assertEqual(actual_event_data, expected_event_data)
-
-    @ddt.data(
-        (False, True),
-        (True, True),
-    )
-    @ddt.unpack
-    @mock.patch("eventtracking.tracker.emit")
-    def test_comment_un_abuse_flag_for_moderator_role(self, is_author, remove_all, mock_emit):
-        """
-        Test un-abuse flag for moderator role.
-
-        When moderator unflags a reported comment, it should
-        pass the "all" flag to the api. This will indicate
-        to the api to clear all abuse_flaggers, and mark the
-        comment as unreported.
-        """
-        _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_ADMINISTRATOR)
-        self.register_get_user_response(self.user)
-        self.register_comment_flag_response("test_comment")
-        self.register_comment({"abuse_flaggers": ["11"], "user_id": str(self.user.id) if is_author else "12"})
-        data = {"abuse_flagged": False}
-        update_comment(self.request, "test_comment", data)
-        assert httpretty.last_request().method == 'PUT'
-        query_params = {'user_id': [str(self.user.id)]}
-        if remove_all:
-            query_params.update({'all': ['True']})
-        assert parsed_body(httpretty.last_request()) == query_params
-
-        expected_event_name = 'edx.forum.response.unreported'
-        expected_event_data = {
-            'body': 'Original body',
-            'id': 'test_comment',
-            'content_type': 'Response',
-            'commentable_id': 'dummy',
-            'truncated': False,
-            'url': '',
-            'user_course_roles': [],
-            'user_forums_roles': [FORUM_ROLE_STUDENT, FORUM_ROLE_ADMINISTRATOR],
-            'target_username': self.user.username,
-            'reported_status_cleared': False,
-        }
-
-        actual_event_name, actual_event_data = mock_emit.call_args[0]
-        self.assertEqual(actual_event_name, expected_event_name)
-        self.assertEqual(actual_event_data, expected_event_data)
 
     @ddt.data(
         FORUM_ROLE_ADMINISTRATOR,

@@ -5,6 +5,7 @@ Test app view logic
 import itertools
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
+from unittest.mock import Mock, patch
 
 import ddt
 from django.core.exceptions import ValidationError
@@ -13,20 +14,16 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from rest_framework import status
 from rest_framework.test import APITestCase
+
+from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import CourseUserType, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from ..config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
-
-from ..models import (
-    AVAILABLE_PROVIDER_MAP,
-    DEFAULT_CONFIG_ENABLED,
-    Provider,
-    get_default_provider_type,
-)
+from ..models import AVAILABLE_PROVIDER_MAP, DEFAULT_CONFIG_ENABLED, Provider, get_default_provider_type
+from ..permissions import IsStaffOrCourseTeam
 
 DATA_LEGACY_COHORTS = {
     'divided_inline_discussions': [],
@@ -830,3 +827,86 @@ class PIISettingsAPITests(DataTest):
             response_data = self.get()
             # the GET should pull back the same data as the POST
             assert response_data == data
+
+
+class SyncDiscussionTopicsViewTests(ModuleStoreTestCase, APITestCase):
+    """
+    Tests for SyncDiscussionTopicsView
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+        self.course_key_string = str(self.course.id)
+        self.staff_user = UserFactory.create(is_staff=True)
+        self.instructor_user = UserFactory.create()
+        self.student_user = UserFactory.create()
+        self.url = reverse('sync-discussion-topics', kwargs={'course_key_string': self.course_key_string})
+
+        # Mock the permission class for course team checking
+        self.original_has_permission = IsStaffOrCourseTeam.has_permission
+        IsStaffOrCourseTeam.has_permission = Mock(return_value=True)
+
+    def tearDown(self):
+        # Restore original permission method
+        IsStaffOrCourseTeam.has_permission = self.original_has_permission
+        super().tearDown()
+
+    @patch('openedx.core.djangoapps.discussions.views.update_discussions_settings_from_course_task')
+    def test_sync_discussion_topics_staff_user(self, mock_update):
+        """
+        Test that staff users can sync discussion topics
+        """
+        self.client.force_authenticate(user=self.staff_user)
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        mock_update.assert_called_once_with(self.course_key_string)
+
+    @patch('openedx.core.djangoapps.discussions.views.update_discussions_settings_from_course_task')
+    def test_sync_discussion_topics_course_team(self, mock_update):
+        """
+        Test that course team members can sync discussion topics
+        """
+        self.client.force_authenticate(user=self.instructor_user)
+
+        # Mock the course team permission check
+        IsStaffOrCourseTeam.has_permission = Mock(return_value=True)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        mock_update.assert_called_once()
+
+    def test_sync_discussion_topics_unauthorized(self):
+        """
+        Test that unauthorized users cannot sync discussion topics
+        """
+        # Don't authenticate the request
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_sync_discussion_topics_forbidden(self):
+        """
+        Test that authenticated but unauthorized users cannot sync discussion topics
+        """
+        self.client.force_authenticate(user=self.student_user)
+
+        # Mock the course team permission check to return False
+        IsStaffOrCourseTeam.has_permission = Mock(return_value=False)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_invalid_http_method(self):
+        """
+        Test that only POST method is allowed
+        """
+        self.client.force_authenticate(user=self.staff_user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

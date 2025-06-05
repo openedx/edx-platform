@@ -2,9 +2,11 @@
 Test CRUD for authorization.
 """
 
-
 import copy
 
+from edx_toggles.toggles.testutils import override_waffle_flag
+
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_url
 from common.djangoapps.student import auth
@@ -64,10 +66,15 @@ class TestCourseAccess(ModuleStoreTestCase):
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)  # pylint: disable=non-parent-method-called
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_TEAM, True)
     def test_get_all_users(self):
         """
         Test getting all authors for a course where their permissions run the gamut of allowed group
         types.
+
+        TODO: Replace the call to the legacy course_team_handler with a call to the course team REST API.
+        The legacy page will be removed, but we still want to the test these behaviors.
+        Part of https://github.com/openedx/edx-platform/issues/36275.
         """
         # first check the course creator.has explicit access (don't use has_access as is_staff
         # will trump the actual test)
