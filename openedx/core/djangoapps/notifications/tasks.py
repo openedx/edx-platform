@@ -178,7 +178,12 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         preferences = list(preferences)
 
         if default_web_config:
-            preferences = create_notification_pref_if_not_exists(batch_user_ids, preferences, course_key)
+            if account_level_pref_enabled:
+                preferences = create_account_notification_pref_if_not_exists(
+                    batch_user_ids, preferences, notification_type
+                )
+            else:
+                preferences = create_notification_pref_if_not_exists(batch_user_ids, preferences, course_key)
 
         if not preferences:
             continue
@@ -197,7 +202,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                 preference.get_app_config(app_name).get('enabled', False)
             ):
                 notification_preferences = preference.get_channels_for_notification_type(app_name, notification_type)
-                email_enabled = 'email' in preference.get_channels_for_notification_type(app_name, notification_type)
+                email_enabled = 'email' in notification_preferences
                 email_cadence = preference.get_email_cadence_for_notification_type(app_name, notification_type)
                 new_notification = Notification(
                     user_id=user_id,
@@ -334,7 +339,6 @@ def _get_channel_default(is_core: bool, notification_type: str, channel: str) ->
 def create_notification_pref_if_not_exists(user_ids: List, preferences: List, course_id: CourseKey):
     """
     Create notification preference if not exist.
-    Here
     """
     new_preferences = []
 
@@ -348,5 +352,26 @@ def create_notification_pref_if_not_exists(user_ids: List, preferences: List, co
         # ignoring conflicts because it is possible that preference is already created by another process
         # conflicts may arise because of constraint on user_id and course_id fields in model
         CourseNotificationPreference.objects.bulk_create(new_preferences, ignore_conflicts=True)
+        preferences = preferences + new_preferences
+    return preferences
+
+
+def create_account_notification_pref_if_not_exists(user_ids: List, preferences: List, notification_type: str):
+    """
+    Create account level notification preference if not exist.
+    """
+    new_preferences = []
+
+    for user_id in user_ids:
+        if not any(preference.user_id == int(user_id) for preference in preferences):
+            new_preferences.append(_create_notification_preference(
+                user_id=int(user_id),
+                notification_type=notification_type,
+
+            ))
+    if new_preferences:
+        # ignoring conflicts because it is possible that preference is already created by another process
+        # conflicts may arise because of constraint on user_id and course_id fields in model
+        NotificationPreference.objects.bulk_create(new_preferences, ignore_conflicts=True)
         preferences = preferences + new_preferences
     return preferences
