@@ -121,7 +121,7 @@ class ContainerMetadata(PublishableItem):
             container=container,
         )
         container_type = ContainerType(container_key.container_type)
-        published_by = ""
+        published_by = None
         if last_publish_log and last_publish_log.published_by:
             published_by = last_publish_log.published_by.username
 
