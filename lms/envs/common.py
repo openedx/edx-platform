@@ -1614,6 +1614,13 @@ GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 GOOGLE_ANALYTICS_TRACKING_ID = None
 GOOGLE_ANALYTICS_4_ID = None
 
+################### GOOGLE TAG MANAGER ##################
+# .. setting_name: GOOGLE_TAG_MANAGER_ID
+# .. setting_default: None
+# .. setting_description: The container ID for Google Tag Manager,
+# .. e.g., "GTM-XXXXXX".
+GOOGLE_TAG_MANAGER_ID = None
+
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
 
