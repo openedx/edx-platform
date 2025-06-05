@@ -3290,7 +3290,7 @@ INSTALLED_APPS = [
     # Tagging
     'openedx_tagging.core.tagging.apps.TaggingConfig',
     'openedx.core.djangoapps.content_tagging',
-    
+
     # Search
     'openedx.core.djangoapps.content.search',
 
