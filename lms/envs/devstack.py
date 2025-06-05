@@ -127,6 +127,7 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
+ENTERPRISE_ACCESS_INTERNAL_ROOT_URL = 'http://enterprise-access.app:18270'
 
 # Disable JavaScript compression in development
 PIPELINE['JS_COMPRESSOR'] = None
