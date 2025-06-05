@@ -2763,11 +2763,13 @@ class ExportOra2SubmissionFilesView(DeveloperErrorViewMixin, APIView):
         Returns a JSON response indicating the export task has been started.
         """
         course_key = CourseKey.from_string(course_id)
-        task_api.submit_export_ora2_submission_files(request, course_key)
-
-        return Response({
-            "status": _("Attachments archive is being created.")
-        })
+        try:
+            task_api.submit_export_ora2_submission_files(request, course_key)
+            return Response({
+                "status": _("Attachments archive is being created.")
+            })
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
+            return JsonResponse({"error": str(err)}, status=400)
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
