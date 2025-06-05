@@ -920,6 +920,97 @@ class ContentLibraryContainersTest(ContentLibrariesRestApiTest):
         self._set_library_block_fields(self.html_block_usage_key, {"data": block_olx, "metadata": {}})
         self._validate_calls_of_html_block(container_update_event_receiver)
 
+    def test_call_container_update_signal_when_update_unit(self) -> None:
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+        self._update_container(self.unit1.container_key, 'New Unit Display Name')
+
+        assert container_update_event_receiver.call_count == 3
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    container_key=self.unit1.container_key,
+                )
+            },
+            container_update_event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    container_key=self.subsection1.container_key,
+                )
+            },
+            container_update_event_receiver.call_args_list[1].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    container_key=self.subsection2.container_key,
+                )
+            },
+            container_update_event_receiver.call_args_list[2].kwargs,
+        )
+
+    def test_call_container_update_signal_when_update_subsection(self) -> None:
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+        self._update_container(self.subsection1.container_key, 'New Subsection Display Name')
+
+        assert container_update_event_receiver.call_count == 3
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    container_key=self.subsection1.container_key,
+                )
+            },
+            container_update_event_receiver.call_args_list[0].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    container_key=self.section1.container_key,
+                )
+            },
+            container_update_event_receiver.call_args_list[1].kwargs,
+        )
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    container_key=self.section2.container_key,
+                )
+            },
+            container_update_event_receiver.call_args_list[2].kwargs,
+        )
+
+    def test_call_container_update_signal_when_update_section(self) -> None:
+        container_update_event_receiver = mock.Mock()
+        LIBRARY_CONTAINER_UPDATED.connect(container_update_event_receiver)
+        self._update_container(self.section1.container_key, 'New Section Display Name')
+
+        assert container_update_event_receiver.call_count == 1
+        self.assertDictContainsSubset(
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    container_key=self.section1.container_key,
+                )
+            },
+            container_update_event_receiver.call_args_list[0].kwargs,
+        )
+
     def test_call_object_changed_signal_when_remove_component(self) -> None:
         html_block_1 = self._add_block_to_library(
             self.lib1.library_key, "html", "html3",
