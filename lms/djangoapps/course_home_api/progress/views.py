@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_home_api.progress.serializers import ProgressTabSerializer
-from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active, calculate_course_grade_including_invisible_grades_is_enabled
 from lms.djangoapps.courseware.access import has_access, has_ccx_coach_role
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers import start_date
@@ -206,8 +206,9 @@ class ProgressTabView(RetrieveAPIView):
         collected_block_structure = get_block_structure_manager(course_key).get_collected()
         course_grade = CourseGradeFactory().read(student, collected_block_structure=collected_block_structure)
 
-        # recalculate course grade from visible grades (stored grade was calculated over all grades, visible or not)
-        course_grade.update(visible_grades_only=True, has_staff_access=is_staff)
+        if not calculate_course_grade_including_invisible_grades_is_enabled(course_key):
+            # recalculate course grade from visible grades (stored grade was calculated over all grades, visible or not)
+            course_grade.update(visible_grades_only=True, has_staff_access=is_staff)
 
         # Get has_scheduled_content data
         transformers = BlockStructureTransformers()
