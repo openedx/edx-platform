@@ -34,6 +34,7 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from common.djangoapps.course_modes.models import CourseMode
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
@@ -270,6 +271,28 @@ class CertificateManager:
         if only_active:
             certificates = [certificate for certificate in certificates if certificate.get('is_active', False)]
         return certificates
+
+    @staticmethod
+    def get_course_modes(course):
+        """
+        Retrieve certificate modes for the given course,
+        including expired modes but excluding audit mode.
+        """
+        course_modes = [
+            mode.slug for mode in CourseMode.modes_for_course(
+                course=course, include_expired=True
+            ) if mode.slug != CourseMode.AUDIT
+        ]
+        return course_modes
+
+    @staticmethod
+    def is_enabled(course):
+        """
+        Is enabled when there is at least one course mode for the given course,
+        including expired modes but excluding audit mode
+        """
+        course_modes = CertificateManager.get_course_modes(course)
+        return len(course_modes) > 0
 
     @staticmethod
     def remove_certificate(request, store, course, certificate_id):
