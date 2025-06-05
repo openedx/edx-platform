@@ -17,10 +17,11 @@ from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
 from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
-    get_notification_content
+    get_notification_content, COURSE_NOTIFICATION_TYPES, COURSE_NOTIFICATION_APPS
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email.tasks import send_immediate_cadence_email
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS, \
+    ENABLE_ACCOUNT_LEVEL_PREFERENCES
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.grouping_notifications import (
@@ -30,10 +31,9 @@ from openedx.core.djangoapps.notifications.grouping_notifications import (
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
-    get_course_notification_preference_config_version
+    get_course_notification_preference_config_version, NotificationPreference
 )
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
-
 
 logger = get_task_logger(__name__)
 
@@ -130,6 +130,8 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     if not is_notification_valid(notification_type, context):
         raise ValidationError(f"Notification is not valid {app_name} {notification_type} {context}")
 
+    account_level_pref_enabled = ENABLE_ACCOUNT_LEVEL_PREFERENCES.is_enabled()
+
     user_ids = list(set(user_ids))
     batch_size = settings.NOTIFICATION_CREATION_BATCH_SIZE
     group_by_id = context.pop('group_by_id', '')
@@ -156,14 +158,23 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         logger.debug(f'After applying filters, sending notifications to {len(batch_user_ids)} users in {course_key}')
 
         existing_notifications = (
-            get_user_existing_notifications(batch_user_ids, notification_type, group_by_id, course_key))\
+            get_user_existing_notifications(batch_user_ids, notification_type, group_by_id, course_key)) \
             if grouping_enabled else {}
 
         # check if what is preferences of user and make decision to send notification or not
-        preferences = CourseNotificationPreference.objects.filter(
-            user_id__in=batch_user_ids,
-            course_id=course_key,
-        )
+        if account_level_pref_enabled:
+            preferences = CourseNotificationPreference.objects.filter(
+                user_id__in=batch_user_ids,
+                app=app_name,
+                type=notification_type
+
+            )
+        else:
+            preferences = CourseNotificationPreference.objects.filter(
+                user_id__in=batch_user_ids,
+                course_id=course_key,
+            )
+
         preferences = list(preferences)
 
         if default_web_config:
@@ -175,7 +186,10 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
         notifications = []
         for preference in preferences:
             user_id = preference.user_id
-            preference = update_user_preference(preference, user_id, course_key)
+            if not account_level_pref_enabled:
+                preference = update_user_preference(preference, user_id, course_key)
+            else:
+                update_account_user_preference(user_id)
 
             if (
                 preference and
@@ -245,9 +259,82 @@ def update_user_preference(preference: CourseNotificationPreference, user_id, co
     return preference
 
 
+def update_account_user_preference(user_id: int) -> None:
+    notification_types = set(COURSE_NOTIFICATION_TYPES.keys())
+
+    # Get existing notification types for the user
+    existing_types = set(
+        NotificationPreference.objects
+        .filter(user_id=user_id, type__in=notification_types)
+        .values_list('type', flat=True)
+    )
+
+    # Find missing notification types
+    missing_types = notification_types - existing_types
+
+    if not missing_types:
+        return
+
+    # Create new preferences for missing types
+    new_preferences = [
+        _create_notification_preference(user_id, notification_type)
+        for notification_type in missing_types
+    ]
+
+    # Bulk create all new preferences
+    NotificationPreference.objects.bulk_create(new_preferences)
+    return
+
+
+def _create_notification_preference(user_id: int, notification_type: str) -> NotificationPreference:
+    """
+    Create a single notification preference with appropriate defaults.
+
+    Args:
+        user_id: ID of the user
+        notification_type: Type of notification
+
+    Returns:
+        NotificationPreference instance
+    """
+    notification_config = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
+    is_core = notification_config.get('is_core', False)
+    app = COURSE_NOTIFICATION_TYPES[notification_type]['notification_app']
+    return NotificationPreference(
+        user_id=user_id,
+        type=notification_type,
+        app=app,
+        web=_get_channel_default(is_core, notification_type, 'web'),
+        push=_get_channel_default(is_core, notification_type, 'push'),
+        email=_get_channel_default(is_core, notification_type, 'email'),
+        email_cadence=EmailCadence.IMMEDIATELY,
+        is_active=True,  # Changed from empty string to boolean
+    )
+
+
+def _get_channel_default(is_core: bool, notification_type: str, channel: str) -> bool:
+    """
+    Get the default value for a notification channel.
+
+    Args:
+        is_core: Whether this is a core notification
+        notification_type: Type of notification
+        channel: Channel name (web, push, email)
+
+    Returns:
+        Default boolean value for the channel
+    """
+    if is_core:
+        notification_app = COURSE_NOTIFICATION_TYPES[notification_type]['notification_app']
+        return COURSE_NOTIFICATION_APPS[notification_app][f'core_{channel}']
+
+    return COURSE_NOTIFICATION_TYPES[notification_type][channel]
+
+
 def create_notification_pref_if_not_exists(user_ids: List, preferences: List, course_id: CourseKey):
     """
     Create notification preference if not exist.
+    Here
     """
     new_preferences = []
 

@@ -12,7 +12,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangoapps.notifications.base_notification import (
     NotificationAppManager,
     NotificationPreferenceSyncManager,
-    get_notification_content
+    get_notification_content, COURSE_NOTIFICATION_APPS
 )
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
@@ -129,6 +129,7 @@ class NotificationPreference(TimeStampedModel):
     """
     Model to store notification preferences for users at account level
     """
+
     class EmailCadenceChoices(models.TextChoices):
         DAILY = 'Daily'
         WEEKLY = 'Weekly'
@@ -146,6 +147,39 @@ class NotificationPreference(TimeStampedModel):
     email = models.BooleanField(default=False, null=False, blank=False)
     email_cadence = models.CharField(max_length=64, choices=EmailCadenceChoices.choices, null=False, blank=False)
     is_active = models.BooleanField(default=True)
+
+    def is_enabled_for_any_channel(self) -> bool:
+        """
+        Returns True if the notification preference is enabled for any channel.
+        """
+        return self.web or self.push or self.email
+
+    def get_app_config(self, app_name):
+        """
+        Returns the app config for the given app name.
+        """
+        return COURSE_NOTIFICATION_APPS[app_name]
+
+    def get_channels_for_notification_type(self):
+        """
+        Returns the channels for the given app name and notification type.
+        Sample Response:
+        ['web', 'push']
+        """
+        channels = []
+        if self.web:
+            channels.append('web')
+        if self.push:
+            channels.append('push')
+        if self.email:
+            channels.append('email')
+        return channels
+
+    def get_email_cadence_for_notification_type(self):
+        """
+        Returns the email cadence for the notification type.
+        """
+        return self.email_cadence
 
 
 class CourseNotificationPreference(TimeStampedModel):
