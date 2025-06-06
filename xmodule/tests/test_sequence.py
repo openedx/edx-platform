@@ -573,3 +573,4 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert metadata["next_url"] == "next_url"
         assert metadata["prev_url"] == "prev_url"
 
+
