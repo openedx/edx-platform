@@ -5,12 +5,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from organizations.models import Organization
 from openedx_learning.api.authoring_models import LearningPackage
 from unittest.mock import patch
+import uuid
+from user_tasks.models import UserTaskStatus
 
 from cms.djangoapps.import_from_modulestore.data import ImportStatus
-from cms.djangoapps.import_from_modulestore.tasks import (
-    import_staged_content_to_library_task,
-    save_legacy_content_to_staged_content_task,
-)
+from cms.djangoapps.import_from_modulestore.tasks import import_to_library_task
 from openedx.core.djangoapps.content_libraries import api as content_libraries_api
 from openedx.core.djangoapps.content_libraries.api import ContentLibrary
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -59,26 +58,37 @@ class TestSaveCourseSectionsToStagedContentTask(ImportCourseToLibraryMixin):
     Test cases for save_course_sections_to_staged_content_task.
     """
 
-    def test_save_legacy_content_to_staged_content_task(self):
+    @patch('cms.djangoapps.import_from_modulestore.models.Import.set_status')
+    def test_save_legacy_content_to_staged_content_task(self, mock_set_status):
         """
         End-to-end test for save_legacy_content_to_staged_content_task.
         """
         course_chapters_to_import = [self.chapter, self.chapter2]
-        save_legacy_content_to_staged_content_task(self.import_event.uuid)
+        import_to_library_task(
+            self.import_event.pk,
+            course_chapters_to_import,
+            self.content_library.learning_package.id,
+            self.user.id,
+        )
 
         self.import_event.refresh_from_db()
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(course_chapters_to_import))
-        self.assertEqual(self.import_event.status, ImportStatus.STAGED)
+        mock_set_status.assert_called_once_with(ImportStatus.STAGED)
 
-    def test_old_staged_content_deletion_before_save_new(self):
+    @patch('cms.djangoapps.import_from_modulestore.models.Import.clean_related_staged_content')
+    def test_old_staged_content_deletion_before_save_new(self, mock_clean_related_staged_content):
         """ Checking that repeated saving of the same content does not create duplicates. """
         course_chapters_to_import = [self.chapter, self.chapter2]
 
-        save_legacy_content_to_staged_content_task(self.import_event.uuid)
+        import_to_library_task(
+            self.import_event.pk,
+            course_chapters_to_import,
+            self.content_library.learning_package.id,
+            self.user.id,
+        )
 
-        self.assertEqual(self.import_event.staged_content_for_import.count(), len(course_chapters_to_import))
-
-        save_legacy_content_to_staged_content_task(self.import_event.uuid)
+        mock_clean_related_staged_content.assert_called_once()
+        self.import_event.refresh_from_db()
 
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(course_chapters_to_import))
 
@@ -97,15 +107,12 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         library_learning_package = LearningPackage.objects.get(id=self.library.learning_package_id)
         self.assertEqual(library_learning_package.content_set.count(), 0)
         expected_imported_xblocks = [self.problem, self.problem2, self.video, self.video2]
-        save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
-        import_staged_content_to_library_task(
+        import_to_library_task(
+            self.import_event.pk,
             [str(self.chapter.location), str(self.chapter2.location)],
-            self.import_event.uuid,
             self.content_library.learning_package.id,
             self.user.id,
-            'component',
-            override=True
         )
 
         self.import_event.refresh_from_db()
@@ -122,16 +129,13 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
     def test_import_library_block_not_found(self, mock_import_from_staged_content):
         """ Test that if a block is not found in the staged content, it is not imported. """
         non_existent_usage_ids = ['block-v1:edX+Demo+2023+type@vertical+block@12345']
-        save_legacy_content_to_staged_content_task(self.import_event.uuid)
         with self.allow_transaction_exception():
             with self.assertRaises(ObjectDoesNotExist):
-                import_staged_content_to_library_task(
+                import_to_library_task(
+                    self.import_event.pk,
                     non_existent_usage_ids,
-                    str(self.import_event.uuid),
                     self.content_library.learning_package.id,
                     self.user.id,
-                    'component',
-                    override=True,
                 )
                 mock_import_from_staged_content.assert_not_called()
 
@@ -142,19 +146,22 @@ class TestImportLibraryFromStagedContentTask(ImportCourseToLibraryMixin):
         """
         chapters_to_import = [self.chapter, self.chapter2]
         expected_imported_xblocks = [self.problem, self.video]
-        save_legacy_content_to_staged_content_task(self.import_event.uuid)
 
+        import_to_library_task(
+            self.import_event.pk,
+            [str(self.chapter.location)],
+            self.content_library.learning_package.id,
+            self.user.id,
+        )
         self.import_event.refresh_from_db()
         self.assertEqual(self.import_event.staged_content_for_import.count(), len(chapters_to_import))
         self.assertEqual(self.import_event.status, ImportStatus.STAGED)
 
-        import_staged_content_to_library_task(
+        import_to_library_task(
+            self.import_event.pk,
             [str(self.chapter.location)],
-            str(self.import_event.uuid),
             self.content_library.learning_package.id,
             self.user.id,
-            'component',
-            override=True,
         )
 
         for xblock in expected_imported_xblocks:
