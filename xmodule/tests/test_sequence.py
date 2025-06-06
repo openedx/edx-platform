@@ -495,10 +495,10 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         fragment = Mock()
 
         # Mock `_render_student_view_for_blocks`
-        self.sequence_3_1._render_student_view_for_blocks = Mock(return_value="rendered_blocks") # pylint: disable=protected-access
+        self.sequence_3_1._render_student_view_for_blocks = Mock(return_value="rendered_blocks")  # pylint: disable=protected-access
 
         # Call `_get_render_metadata` with prerequisites met
-        metadata = self.sequence_3_1._get_render_metadata( # pylint: disable=protected-access
+        metadata = self.sequence_3_1._get_render_metadata(  # pylint: disable=protected-access
             context, children, prereq_met=True, prereq_meta_info={}, fragment=fragment
         )
 
@@ -529,7 +529,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         }
 
         # Call `_get_render_metadata` with prerequisites not met
-        metadata = self.sequence_3_1._get_render_metadata( # pylint: disable=protected-access
+        metadata = self.sequence_3_1._get_render_metadata(  # pylint: disable=protected-access
             context, children, prereq_met=False, prereq_meta_info=prereq_meta_info
         )
 
@@ -561,10 +561,10 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         fragment = Mock()
 
         # Mock `_render_student_view_for_blocks`
-        self.sequence_3_1._render_student_view_for_blocks = Mock(return_value="rendered_blocks") # pylint: disable=protected-access
+        self.sequence_3_1._render_student_view_for_blocks = Mock(return_value="rendered_blocks")  # pylint: disable=protected-access
 
         # Call `_get_render_metadata` with prerequisites met
-        metadata = self.sequence_3_1._get_render_metadata( # pylint: disable=protected-access
+        metadata = self.sequence_3_1._get_render_metadata(  # pylint: disable=protected-access
             context, children, prereq_met=True, prereq_meta_info={}, fragment=fragment
         )
 
