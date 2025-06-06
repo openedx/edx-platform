@@ -7,12 +7,12 @@ from datetime import datetime
 from uuid import uuid4
 
 import factory
-import pytz
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from factory.django import DjangoModelFactory
 
 from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 
-LAST_ACTIVITY_AT = datetime(2015, 8, 15, 0, 0, 0, tzinfo=pytz.utc)
+LAST_ACTIVITY_AT = datetime(2015, 8, 15, 0, 0, 0, tzinfo=get_utc_timezone())
 
 
 class CourseTeamFactory(DjangoModelFactory):
