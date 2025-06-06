@@ -2913,3 +2913,9 @@ SOCIAL_MEDIA_LOGO_URLS = {
     'linkedin': 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png',
     'facebook': 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png',
 }
+
+# .. setting_name: DEFAULT_ORG_LOGO_URL
+# .. setting_default: organization_logos/_placeholder.png  # FIXME: change to correct placeholder
+# .. setting_description: The default logo URL for organizations that do not have a logo set.
+# .. setting_warning: This URL is used as a placeholder for organizations that do not have a logo set.
+DEFAULT_ORG_LOGO_URL = 'organization_logos/_placeholder.png'  # FIXME: change to correct placeholder
