@@ -198,7 +198,6 @@ VIDEO_SOURCE_PORT = 8777
 ################### Make tests faster
 # http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.SHA1PasswordHasher",
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
