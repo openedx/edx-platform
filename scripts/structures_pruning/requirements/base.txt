@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-click==8.1.8
+click==8.2.1
     # via
     #   -r scripts/structures_pruning/requirements/base.in
     #   click-log
@@ -12,7 +12,7 @@ click-log==0.4.0
     # via -r scripts/structures_pruning/requirements/base.in
 dnspython==2.7.0
     # via pymongo
-edx-opaque-keys==2.11.0
+edx-opaque-keys==3.0.0
     # via -r scripts/structures_pruning/requirements/base.in
 pbr==6.1.1
     # via stevedore
@@ -23,7 +23,7 @@ pymongo==4.4.0
     #   edx-opaque-keys
 stevedore==5.4.1
     # via edx-opaque-keys
-typing-extensions==4.12.2
+typing-extensions==4.14.0
     # via edx-opaque-keys
 
 # The following packages are considered to be unsafe in a requirements file:

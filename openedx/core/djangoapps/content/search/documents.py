@@ -8,7 +8,7 @@ from hashlib import blake2b
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
-from opaque_keys.edx.keys import LearningContextKey, UsageKey, OpaqueKey
+from opaque_keys.edx.keys import ContainerKey, LearningContextKey, UsageKey, OpaqueKey
 from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryContainerLocator
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Collection
@@ -67,10 +67,20 @@ class Fields:
     collections = "collections"
     collections_display_name = "display_name"
     collections_key = "key"
+    # Containers (dictionaries) that this object belongs to.
+    units = "units"
+    subsections = "subsections"
+    sections = "sections"
+    containers_display_name = "display_name"
+    containers_key = "key"
+
+    sections_display_name = "display_name"
+    sections_key = "key"
 
     # The "content" field is a dictionary of arbitrary data, depending on the block_type.
     # It comes from each XBlock's index_dictionary() method (if present) plus some processing.
     # Text (html) blocks have an "html_content" key in here, capa has "capa_content" and "problem_types", and so on.
+    # Containers store their list of child usage keys here.
     content = "content"
 
     # Collections use this field to communicate how many entities/components they contain.
@@ -87,7 +97,13 @@ class Fields:
     published = "published"
     published_display_name = "display_name"
     published_description = "description"
+    published_content = "content"
     published_num_children = "num_children"
+
+    # List of children keys
+    child_usage_keys = "child_usage_keys"
+    # List of children display names
+    child_display_names = "child_display_names"
 
     # Note: new fields or values can be added at any time, but if they need to be indexed for filtering or keyword
     # search, the index configuration will need to be changed, which is only done as part of the 'reindex_studio'
@@ -212,6 +228,8 @@ def _fields_from_block(block) -> dict:
         Fields.access_id: _meili_access_id_from_context_key(block.usage_key.context_key),
         Fields.breadcrumbs: [],
     }
+    if hasattr(block, "edited_on"):
+        block_data[Fields.modified] = block.edited_on.timestamp()
     # Get the breadcrumbs (course, section, subsection, etc.):
     if block.usage_key.context_key.is_course:  # Getting parent is not yet implemented in Learning Core (for libraries).
         cur_block = block
@@ -242,130 +260,6 @@ def _fields_from_block(block) -> dict:
     except Exception as err:  # pylint: disable=broad-except
         log.exception(f"Failed to process index_dictionary for {block.usage_key}: {err}")
     return block_data
-
-
-def _tags_for_content_object(object_id: OpaqueKey) -> dict:
-    """
-    Given an XBlock, course, library, etc., get the tag data for its index doc.
-
-    See the comments above on "Field.tags" for an explanation of the format.
-
-    e.g. for something tagged "Difficulty: Hard" and "Location: Vancouver" this
-    would return:
-        {
-            "tags": {
-                "taxonomy": ["Location", "Difficulty"],
-                "level0": ["Location > North America", "Difficulty > Hard"],
-                "level1": ["Location > North America > Canada"],
-                "level2": ["Location > North America > Canada > Vancouver"],
-            }
-        }
-
-    Note: despite what you might expect, because this is only used for the
-    filtering/refinement UI, it's fine if this is a one-way transformation.
-    It's not necessary to be able to re-construct the exact tag IDs nor taxonomy
-    IDs from this data that's stored in the search index. It's just a bunch of
-    strings in a particular format that the frontend knows how to render to
-    support hierarchical refinement by tag.
-    """
-    # Note that we could improve performance for indexing many components from the same library/course,
-    # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
-    # tags for each component separately.
-    all_tags = tagging_api.get_object_tags(str(object_id)).all()
-    if not all_tags:
-        # Clear out tags in the index when unselecting all tags for the block, otherwise
-        # it would remain the last value if a cleared Fields.tags field is not included
-        return {Fields.tags: {}}
-    result = {
-        Fields.tags_taxonomy: [],
-        Fields.tags_level0: [],
-        # ... other levels added as needed
-    }
-    for obj_tag in all_tags:
-        # Add the taxonomy name:
-        if obj_tag.taxonomy.name not in result[Fields.tags_taxonomy]:
-            result[Fields.tags_taxonomy].append(obj_tag.taxonomy.name)
-        # Taxonomy name plus each level of tags, in a list: # e.g. ["Location", "North America", "Canada", "Vancouver"]
-        parts = [obj_tag.taxonomy.name] + obj_tag.get_lineage()
-        parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator.
-        # Now we build each level (tags.level0, tags.level1, etc.) as applicable.
-        # We have a hard-coded limit of 4 levels of tags for now (see Fields.tags above).
-        # A tag like "Difficulty: Hard" will only result in one level (tags.level0)
-        # But a tag like "Location: North America > Canada > Vancouver" would result in three levels (tags.level0:
-        #   "North America", tags.level1: "North America > Canada", tags.level2: "North America > Canada > Vancouver")
-        # See the comments above on "Field.tags" for an explanation of why we use this format (basically it's the format
-        # required by the Instantsearch frontend).
-        for level in range(4):
-            # We use '>' as a separator because it's the default for the Instantsearch frontend library, and our
-            # preferred separator (\t) used in the database is ignored by Meilisearch since it's whitespace.
-            new_value = " > ".join(parts[0:level + 2])
-            if f"level{level}" not in result:
-                result[f"level{level}"] = [new_value]
-            elif new_value not in result[f"level{level}"]:
-                result[f"level{level}"].append(new_value)
-            if len(parts) == level + 2:
-                break  # We have all the levels for this tag now (e.g. parts=["Difficulty", "Hard"] -> need level0 only)
-
-    return {Fields.tags: result}
-
-
-def _collections_for_content_object(object_id: OpaqueKey) -> dict:
-    """
-    Given an XBlock, course, library, etc., get the collections for its index doc.
-
-    e.g. for something in Collections "COL_A" and "COL_B", this would return:
-        {
-            "collections":  {
-                "display_name": ["Collection A", "Collection B"],
-                "key": ["COL_A", "COL_B"],
-            }
-        }
-
-    If the object is in no collections, returns:
-        {
-            "collections":  {
-                "display_name": [],
-                "key": [],
-            },
-        }
-
-    """
-    result = {
-        Fields.collections: {
-            Fields.collections_display_name: [],
-            Fields.collections_key: [],
-        }
-    }
-
-    # Gather the collections associated with this object
-    collections = None
-    try:
-        if isinstance(object_id, UsageKey):
-            component = lib_api.get_component_from_usage_key(object_id)
-            collections = authoring_api.get_entity_collections(
-                component.learning_package_id,
-                component.key,
-            )
-        elif isinstance(object_id, LibraryContainerLocator):
-            container = lib_api.get_container_from_key(object_id)
-            collections = authoring_api.get_entity_collections(
-                container.publishable_entity.learning_package_id,
-                container.key,
-            )
-        else:
-            log.warning(f"Unexpected key type for {object_id}")
-
-    except ObjectDoesNotExist:
-        log.warning(f"No library item found for {object_id}")
-
-    if not collections:
-        return result
-
-    for collection in collections:
-        result[Fields.collections][Fields.collections_display_name].append(collection.title)
-        result[Fields.collections][Fields.collections_key].append(collection.key)
-
-    return result
 
 
 def _published_data_from_block(block_published) -> dict:
@@ -437,41 +331,6 @@ def searchable_doc_for_library_block(xblock_metadata: lib_api.LibraryXBlockMetad
     return doc
 
 
-def searchable_doc_tags(key: OpaqueKey) -> dict:
-    """
-    Generate a dictionary document suitable for ingestion into a search engine
-    like Meilisearch or Elasticsearch, with the tags data for the given content object.
-    """
-    doc = searchable_doc_for_key(key)
-    doc.update(_tags_for_content_object(key))
-
-    return doc
-
-
-def searchable_doc_collections(opaque_key: OpaqueKey) -> dict:
-    """
-    Generate a dictionary document suitable for ingestion into a search engine
-    like Meilisearch or Elasticsearch, with the collections data for the given content object.
-    """
-    doc = searchable_doc_for_key(opaque_key)
-    doc.update(_collections_for_content_object(opaque_key))
-
-    return doc
-
-
-def searchable_doc_tags_for_collection(
-    collection_key: LibraryCollectionLocator
-) -> dict:
-    """
-    Generate a dictionary document suitable for ingestion into a search engine
-    like Meilisearch or Elasticsearch, with the tags data for the given library collection.
-    """
-    doc = searchable_doc_for_key(collection_key)
-    doc.update(_tags_for_content_object(collection_key))
-
-    return doc
-
-
 def searchable_doc_for_course_block(block) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
@@ -486,6 +345,176 @@ def searchable_doc_for_course_block(block) -> dict:
     doc.update(_fields_from_block(block))
 
     return doc
+
+
+def searchable_doc_tags(object_id: OpaqueKey) -> dict:
+    """
+    Given an XBlock, course, library, etc., get the tag data for its index doc.
+
+    See the comments above on "Field.tags" for an explanation of the format.
+
+    e.g. for something tagged "Difficulty: Hard" and "Location: Vancouver" this
+    would return:
+        {
+            "tags": {
+                "taxonomy": ["Location", "Difficulty"],
+                "level0": ["Location > North America", "Difficulty > Hard"],
+                "level1": ["Location > North America > Canada"],
+                "level2": ["Location > North America > Canada > Vancouver"],
+            }
+        }
+
+    Note: despite what you might expect, because this is only used for the
+    filtering/refinement UI, it's fine if this is a one-way transformation.
+    It's not necessary to be able to re-construct the exact tag IDs nor taxonomy
+    IDs from this data that's stored in the search index. It's just a bunch of
+    strings in a particular format that the frontend knows how to render to
+    support hierarchical refinement by tag.
+    """
+    # Note that we could improve performance for indexing many components from the same library/course,
+    # if we used get_all_object_tags() to load all the tags for the library in a single query rather than loading the
+    # tags for each component separately.
+    all_tags = tagging_api.get_object_tags(str(object_id)).all()
+    if not all_tags:
+        # Clear out tags in the index when unselecting all tags for the block, otherwise
+        # it would remain the last value if a cleared Fields.tags field is not included
+        return {Fields.tags: {}}
+    result = {
+        Fields.tags_taxonomy: [],
+        Fields.tags_level0: [],
+        # ... other levels added as needed
+    }
+    for obj_tag in all_tags:
+        # Add the taxonomy name:
+        if obj_tag.taxonomy.name not in result[Fields.tags_taxonomy]:
+            result[Fields.tags_taxonomy].append(obj_tag.taxonomy.name)
+        # Taxonomy name plus each level of tags, in a list: # e.g. ["Location", "North America", "Canada", "Vancouver"]
+        parts = [obj_tag.taxonomy.name] + obj_tag.get_lineage()
+        parts = [part.replace(" > ", " _ ") for part in parts]  # Escape our separator.
+        # Now we build each level (tags.level0, tags.level1, etc.) as applicable.
+        # We have a hard-coded limit of 4 levels of tags for now (see Fields.tags above).
+        # A tag like "Difficulty: Hard" will only result in one level (tags.level0)
+        # But a tag like "Location: North America > Canada > Vancouver" would result in three levels (tags.level0:
+        #   "North America", tags.level1: "North America > Canada", tags.level2: "North America > Canada > Vancouver")
+        # See the comments above on "Field.tags" for an explanation of why we use this format (basically it's the format
+        # required by the Instantsearch frontend).
+        for level in range(4):
+            # We use '>' as a separator because it's the default for the Instantsearch frontend library, and our
+            # preferred separator (\t) used in the database is ignored by Meilisearch since it's whitespace.
+            new_value = " > ".join(parts[0:level + 2])
+            if f"level{level}" not in result:
+                result[f"level{level}"] = [new_value]
+            elif new_value not in result[f"level{level}"]:
+                result[f"level{level}"].append(new_value)
+            if len(parts) == level + 2:
+                break  # We have all the levels for this tag now (e.g. parts=["Difficulty", "Hard"] -> need level0 only)
+
+    return {Fields.tags: result}
+
+
+def searchable_doc_collections(object_id: OpaqueKey) -> dict:
+    """
+    Given an XBlock, course, library, etc., get the collections for its index doc.
+
+    e.g. for something in Collections "COL_A" and "COL_B", this would return:
+        {
+            "collections":  {
+                "display_name": ["Collection A", "Collection B"],
+                "key": ["COL_A", "COL_B"],
+            }
+        }
+
+    If the object is in no collections, returns:
+        {
+            "collections":  {
+                "display_name": [],
+                "key": [],
+            },
+        }
+
+    """
+    result = {
+        Fields.collections: {
+            Fields.collections_display_name: [],
+            Fields.collections_key: [],
+        }
+    }
+
+    # Gather the collections associated with this object
+    collections = None
+    try:
+        if isinstance(object_id, UsageKey):
+            component = lib_api.get_component_from_usage_key(object_id)
+            collections = authoring_api.get_entity_collections(
+                component.learning_package_id,
+                component.key,
+            ).values('key', 'title')
+        elif isinstance(object_id, LibraryContainerLocator):
+            container = lib_api.get_container(object_id, include_collections=True)
+            collections = container.collections
+        else:
+            log.warning(f"Unexpected key type for {object_id}")
+
+    except ObjectDoesNotExist:
+        log.warning(f"No library item found for {object_id}")
+
+    if not collections:
+        return result
+
+    for collection in collections:
+        result[Fields.collections][Fields.collections_display_name].append(collection["title"])
+        result[Fields.collections][Fields.collections_key].append(collection["key"])
+
+    return result
+
+
+def searchable_doc_containers(object_id: OpaqueKey, container_type: str) -> dict:
+    """
+    Given an XBlock, course, library, etc., get the containers that it is part of for its index doc.
+
+    e.g. for something in Units "UNIT_A" and "UNIT_B", this would return:
+        {
+            "units":  {
+                "display_name": ["Unit A", "Unit B"],
+                "key": ["UNIT_A", "UNIT_B"],
+            }
+        }
+
+    If the object is in no containers, returns:
+        {
+            "sections":  {
+                "display_name": [],
+                "key": [],
+            },
+        }
+    """
+    container_field = getattr(Fields, container_type)
+    result = {
+        container_field: {
+            Fields.containers_display_name: [],
+            Fields.containers_key: [],
+        }
+    }
+
+    # Gather the units associated with this object
+    containers = None
+    try:
+        if isinstance(object_id, OpaqueKey):
+            containers = lib_api.get_containers_contains_item(object_id)
+        else:
+            log.warning(f"Unexpected key type for {object_id}")
+
+    except ObjectDoesNotExist:
+        log.warning(f"No library item found for {object_id}")
+
+    if not containers:
+        return result
+
+    for container in containers:
+        result[container_field][Fields.containers_display_name].append(container.display_name)
+        result[container_field][Fields.containers_key].append(str(container.container_key))
+
+    return result
 
 
 def searchable_doc_for_collection(
@@ -523,7 +552,7 @@ def searchable_doc_for_collection(
         ).count()
 
         doc.update({
-            Fields.context_key: str(collection_key.library_key),
+            Fields.context_key: str(collection_key.context_key),
             Fields.org: str(collection_key.org),
             Fields.usage_key: str(collection_key),
             Fields.block_id: collection.key,
@@ -536,7 +565,7 @@ def searchable_doc_for_collection(
             Fields.published: {
                 Fields.published_num_children: published_num_children,
             },
-            Fields.access_id: _meili_access_id_from_context_key(collection_key.library_key),
+            Fields.access_id: _meili_access_id_from_context_key(collection_key.context_key),
             Fields.breadcrumbs: [{"display_name": collection.learning_package.title}],
         })
 
@@ -549,7 +578,7 @@ def searchable_doc_for_collection(
 
 
 def searchable_doc_for_container(
-    container_key: LibraryContainerLocator,
+    container_key: ContainerKey,
 ) -> dict:
     """
     Generate a dictionary document suitable for ingestion into a search engine
@@ -562,7 +591,7 @@ def searchable_doc_for_container(
     """
     doc = {
         Fields.id: meili_id_from_opaque_key(container_key),
-        Fields.context_key: str(container_key.library_key),
+        Fields.context_key: str(container_key.context_key),
         Fields.org: str(container_key.org),
         # In the future, this may be either course_container or library_container
         Fields.type: DocType.library_container,
@@ -570,39 +599,74 @@ def searchable_doc_for_container(
         Fields.block_type: container_key.container_type,
         Fields.usage_key: str(container_key),  # Field name isn't exact but this is the closest match
         Fields.block_id: container_key.container_id,  # Field name isn't exact but this is the closest match
-        Fields.access_id: _meili_access_id_from_context_key(container_key.library_key),
+        Fields.access_id: _meili_access_id_from_context_key(container_key.context_key),
         Fields.publish_status: PublishStatus.never,
+        Fields.last_published: None,
     }
 
     try:
         container = lib_api.get_container(container_key)
     except lib_api.ContentLibraryContainerNotFound:
         # Container not found, so we can only return the base doc
+        log.error(f"Container {container_key} not found")
         return doc
 
-    draft_num_children = lib_api.get_container_children_count(container_key, published=False)
+    draft_children = lib_api.get_container_children(
+        container_key,
+        published=False,
+    )
     publish_status = PublishStatus.published
     if container.last_published is None:
         publish_status = PublishStatus.never
     elif container.has_unpublished_changes:
         publish_status = PublishStatus.modified
 
+    container_type = lib_api.ContainerType(container_key.container_type)
+
+    def get_child_keys(children) -> list[str]:
+        match container_type:
+            case lib_api.ContainerType.Unit:
+                return [
+                    str(child.usage_key)
+                    for child in children
+                ]
+            case lib_api.ContainerType.Subsection | lib_api.ContainerType.Section:
+                return [
+                    str(child.container_key)
+                    for child in children
+                ]
+
+    def get_child_names(children) -> list[str]:
+        return [child.display_name for child in children]
+
     doc.update({
         Fields.display_name: container.display_name,
         Fields.created: container.created.timestamp(),
         Fields.modified: container.modified.timestamp(),
-        Fields.num_children: draft_num_children,
+        Fields.num_children: len(draft_children),
+        Fields.content: {
+            Fields.child_usage_keys: get_child_keys(draft_children),
+            Fields.child_display_names: get_child_names(draft_children),
+        },
         Fields.publish_status: publish_status,
+        Fields.last_published: container.last_published.timestamp() if container.last_published else None,
     })
-    library = lib_api.get_library(container_key.library_key)
+    library = lib_api.get_library(container_key.context_key)
     if library:
         doc[Fields.breadcrumbs] = [{"display_name": library.title}]
 
     if container.published_version_num is not None:
-        published_num_children = lib_api.get_container_children_count(container_key, published=True)
+        published_children = lib_api.get_container_children(
+            container_key,
+            published=True,
+        )
         doc[Fields.published] = {
-            # Fields.published_display_name: container_published.title, TODO: set the published title
-            Fields.published_num_children: published_num_children,
+            Fields.published_display_name: container.published_display_name,
+            Fields.published_num_children: len(published_children),
+            Fields.published_content: {
+                Fields.child_usage_keys: get_child_keys(published_children),
+                Fields.child_display_names: get_child_names(published_children),
+            },
         }
 
     return doc

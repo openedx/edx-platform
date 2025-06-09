@@ -46,7 +46,7 @@ urlpatterns = [
     path('mark_student_can_skip_entrance_exam', api.MarkStudentCanSkipEntranceExam.as_view(),
          name='mark_student_can_skip_entrance_exam'),
     path('list_instructor_tasks', api.ListInstructorTasks.as_view(), name='list_instructor_tasks'),
-    path('list_background_email_tasks', api.list_background_email_tasks, name='list_background_email_tasks'),
+    path('list_background_email_tasks', api.ListBackgroundEmailTasks.as_view(), name='list_background_email_tasks'),
     path('list_email_content', api.ListEmailContent.as_view(), name='list_email_content'),
     path('list_forum_members', api.list_forum_members, name='list_forum_members'),
     path('update_forum_role_membership', api.update_forum_role_membership, name='update_forum_role_membership'),
@@ -61,12 +61,12 @@ urlpatterns = [
 
     # Grade downloads...
     path('list_report_downloads', api.ListReportDownloads.as_view(), name='list_report_downloads'),
-    path('calculate_grades_csv', api.calculate_grades_csv, name='calculate_grades_csv'),
-    path('problem_grade_report', api.problem_grade_report, name='problem_grade_report'),
+    path('calculate_grades_csv', api.CalculateGradesCsvView.as_view(), name='calculate_grades_csv'),
+    path('problem_grade_report', api.ProblemGradeReport.as_view(), name='problem_grade_report'),
 
     # Reports..
     path('get_course_survey_results', api.GetCourseSurveyResults.as_view(), name='get_course_survey_results'),
-    path('export_ora2_data', api.export_ora2_data, name='export_ora2_data'),
+    path('export_ora2_data', api.ExportOra2DataView.as_view(), name='export_ora2_data'),
     path('export_ora2_summary', api.export_ora2_summary, name='export_ora2_summary'),
 
     path('export_ora2_submission_files', api.export_ora2_submission_files,

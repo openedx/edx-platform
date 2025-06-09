@@ -82,6 +82,16 @@ CONTAINER_TEMPLATES = [
     "edit-title-button", "edit-upstream-alert",
 ]
 
+DEFAULT_ADVANCED_MODULES = [
+    'google-calendar',
+    'google-document',
+    'lti_consumer',
+    'poll',
+    'split_test',
+    'survey',
+    'word_cloud',
+]
+
 
 def _advanced_component_types(show_unsupported):
     """
@@ -360,14 +370,14 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
 
         #If using new problem editor, we select problem type inside the editor
         # because of this, we only show one problem.
-        if category == 'problem' and use_new_problem_editor():
+        if category == 'problem' and use_new_problem_editor(courselike.context_key):
             templates_for_category = [
                 template for template in templates_for_category if template['boilerplate_name'] == 'blank_common.yaml'
             ]
 
         # Add any advanced problem types. Note that these are different xblocks being stored as Advanced Problems,
         # currently not supported in libraries .
-        if category == 'problem' and not library and not use_new_problem_editor():
+        if category == 'problem' and not library and not use_new_problem_editor(courselike.context_key):
             disabled_block_names = [block.name for block in disabled_xblocks()]
             advanced_problem_types = [advanced_problem_type for advanced_problem_type in ADVANCED_PROBLEM_TYPES
                                       if advanced_problem_type['component'] not in disabled_block_names]
@@ -445,7 +455,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # These modules should be specified as a list of strings, where the strings
     # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
     # enabled for the course.
-    course_advanced_keys = courselike.advanced_modules
+    course_advanced_keys = list(dict.fromkeys(courselike.advanced_modules + DEFAULT_ADVANCED_MODULES))
     advanced_component_templates = {
         "type": "advanced",
         "templates": [],

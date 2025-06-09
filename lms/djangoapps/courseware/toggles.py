@@ -169,28 +169,12 @@ ENABLE_COURSE_DISCOVERY_DEFAULT_LANGUAGE_FILTER = WaffleSwitch(
 )
 
 
-def courseware_mfe_is_active() -> bool:
-    """
-    Should we serve the Learning MFE as the canonical courseware experience?
-    """
-    from lms.djangoapps.courseware.access_utils import in_preview_mode  # avoid a circular import
-
-    # We only use legacy views for the Studio "preview mode" feature these days, while everyone else gets the MFE
-    return not in_preview_mode()
-
-
 def course_exit_page_is_active(course_key):
-    return (
-        courseware_mfe_is_active() and
-        COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE.is_enabled(course_key)
-    )
+    return COURSEWARE_MICROFRONTEND_COURSE_EXIT_PAGE.is_enabled(course_key)
 
 
 def courseware_mfe_progress_milestones_are_active(course_key):
-    return (
-        courseware_mfe_is_active() and
-        COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key)
-    )
+    return COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES.is_enabled(course_key)
 
 
 def streak_celebration_is_active(course_key):

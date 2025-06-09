@@ -226,7 +226,7 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
                     "version_synced": 5,
                     "version_available": None,
                     "version_declined": None,
-                    "error_message": "Linked library item was not found in the system",
+                    "error_message": "Linked upstream library block was not found in the system",
                     "ready_to_sync": False,
                 },
                 "user_partition_info": expected_user_partition_info,
@@ -236,7 +236,8 @@ class ContainerVerticalViewTest(BaseXBlockContainer):
             },
         ]
         self.maxDiff = None
-        self.assertEqual(response.data["children"], expected_response)
+        # Using json() shows meaningful diff in case of error
+        self.assertEqual(response.json()["children"], expected_response)
 
     def test_not_valid_usage_key_string(self):
         """

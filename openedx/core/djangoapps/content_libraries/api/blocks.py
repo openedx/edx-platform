@@ -6,7 +6,6 @@ These methods don't enforce permissions (only the REST APIs do).
 from __future__ import annotations
 import logging
 import mimetypes
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 from uuid import uuid4
@@ -48,7 +47,6 @@ from openedx.core.djangoapps.xblock.api import (
 from openedx.core.types import User as UserType
 
 from ..models import ContentLibrary
-from ..permissions import CAN_EDIT_THIS_CONTENT_LIBRARY
 from .exceptions import (
     BlockLimitReachedError,
     ContentLibraryBlockNotFound,
@@ -56,20 +54,18 @@ from .exceptions import (
     InvalidNameError,
     LibraryBlockAlreadyExists,
 )
+from .block_metadata import LibraryXBlockMetadata, LibraryXBlockStaticFile
 from .containers import (
     create_container,
     get_container,
-    get_containers_contains_component,
+    get_containers_contains_item,
     update_container_children,
     ContainerMetadata,
     ContainerType,
 )
-from .libraries import (
-    library_collection_locator,
-    library_component_usage_key,
-    require_permission_for_library_key,
-    PublishableItem,
-)
+from .collections import library_collection_locator
+from .libraries import PublishableItem
+from .. import tasks
 
 # This content_libraries API is sometimes imported in the LMS (should we prevent that?), but the content_staging app
 # cannot be. For now we only need this one type import at module scope, so only import it during type checks.
@@ -81,9 +77,6 @@ log = logging.getLogger(__name__)
 
 # The public API is only the following symbols:
 __all__ = [
-    # Models
-    "LibraryXBlockMetadata",
-    "LibraryXBlockStaticFile",
     # API methods
     "get_library_components",
     "get_library_block",
@@ -100,63 +93,6 @@ __all__ = [
     "delete_library_block_static_asset_file",
     "publish_component_changes",
 ]
-
-
-@dataclass(frozen=True, kw_only=True)
-class LibraryXBlockMetadata(PublishableItem):
-    """
-    Class that represents the metadata about an XBlock in a content library.
-    """
-    usage_key: LibraryUsageLocatorV2
-
-    @classmethod
-    def from_component(cls, library_key, component, associated_collections=None):
-        """
-        Construct a LibraryXBlockMetadata from a Component object.
-        """
-        last_publish_log = component.versioning.last_publish_log
-
-        published_by = None
-        if last_publish_log and last_publish_log.published_by:
-            published_by = last_publish_log.published_by.username
-
-        draft = component.versioning.draft
-        published = component.versioning.published
-        last_draft_created = draft.created if draft else None
-        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
-
-        return cls(
-            usage_key=library_component_usage_key(
-                library_key,
-                component,
-            ),
-            display_name=draft.title,
-            created=component.created,
-            modified=draft.created,
-            draft_version_num=draft.version_num,
-            published_version_num=published.version_num if published else None,
-            last_published=None if last_publish_log is None else last_publish_log.published_at,
-            published_by=published_by,
-            last_draft_created=last_draft_created,
-            last_draft_created_by=last_draft_created_by,
-            has_unpublished_changes=component.versioning.has_unpublished_changes,
-            collections=associated_collections or [],
-        )
-
-
-@dataclass(frozen=True)
-class LibraryXBlockStaticFile:
-    """
-    Class that represents a static file in a content library, associated with
-    a particular XBlock.
-    """
-    # File path e.g. "diagram.png"
-    # In some rare cases it might contain a folder part, e.g. "en/track1.srt"
-    path: str
-    # Publicly accessible URL where the file can be downloaded
-    url: str
-    # Size in bytes
-    size: int
 
 
 def get_library_components(
@@ -293,7 +229,7 @@ def set_library_block_olx(usage_key: LibraryUsageLocatorV2, new_olx_str: str) ->
 
     # For each container, trigger LIBRARY_CONTAINER_UPDATED signal and set background=True to trigger
     # container indexing asynchronously.
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
@@ -557,7 +493,7 @@ def _import_staged_block_as_container(
             title=title,
             user_id=user.id,
         )
-        new_child_keys: list[UsageKeyV2] = []
+        new_child_keys: list[LibraryUsageLocatorV2] = []
         for child_node in olx_node:
             try:
                 child_metadata = _import_staged_block(
@@ -639,16 +575,19 @@ def get_or_create_olx_media_type(block_type: str) -> MediaType:
     )
 
 
-def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=True) -> None:
+def delete_library_block(
+    usage_key: LibraryUsageLocatorV2,
+    user_id: int | None = None,
+) -> None:
     """
     Delete the specified block from this library (soft delete).
     """
     component = get_component_from_usage_key(usage_key)
     library_key = usage_key.context_key
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
 
-    authoring_api.soft_delete_draft(component.pk)
+    authoring_api.soft_delete_draft(component.pk, deleted_by=user_id)
 
     LIBRARY_BLOCK_DELETED.send_event(
         library_block=LibraryBlockData(
@@ -685,7 +624,7 @@ def delete_library_block(usage_key: LibraryUsageLocatorV2, remove_from_parent=Tr
         )
 
 
-def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
+def restore_library_block(usage_key: LibraryUsageLocatorV2, user_id: int | None = None) -> None:
     """
     Restore the specified library block.
     """
@@ -694,7 +633,11 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     affected_collections = authoring_api.get_entity_collections(component.learning_package_id, component.key)
 
     # Set draft version back to the latest available component version id.
-    authoring_api.set_draft_version(component.pk, component.versioning.latest.pk)
+    authoring_api.set_draft_version(
+        component.pk,
+        component.versioning.latest.pk,
+        set_by=user_id,
+    )
 
     LIBRARY_BLOCK_CREATED.send_event(
         library_block=LibraryBlockData(
@@ -703,11 +646,11 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
         )
     )
 
-    # Add tags and collections back to index
+    # Add tags, collections and units back to index
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
             object_id=str(usage_key),
-            changes=["collections", "tags"],
+            changes=["collections", "tags", "units"],
         ),
     )
 
@@ -730,7 +673,7 @@ def restore_library_block(usage_key: LibraryUsageLocatorV2) -> None:
     # container indexing asynchronously.
     #
     # To update the components count in containers
-    affected_containers = get_containers_contains_component(usage_key)
+    affected_containers = get_containers_contains_item(usage_key)
     for container in affected_containers:
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
@@ -884,25 +827,21 @@ def publish_component_changes(usage_key: LibraryUsageLocatorV2, user: UserType):
     """
     Publish all pending changes in a single component.
     """
-    content_library = require_permission_for_library_key(
-        usage_key.lib_key,
-        user,
-        CAN_EDIT_THIS_CONTENT_LIBRARY
-    )
-    learning_package = content_library.learning_package
-
-    assert learning_package
     component = get_component_from_usage_key(usage_key)
-    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(
-        entity__key=component.key
+    library_key = usage_key.context_key
+    content_library = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
+    learning_package = content_library.learning_package
+    assert learning_package
+    # The core publishing API is based on draft objects, so find the draft that corresponds to this component:
+    drafts_to_publish = authoring_api.get_all_drafts(learning_package.id).filter(entity__key=component.key)
+    # Publish the component and update anything that needs to be updated (e.g. search index):
+    publish_log = authoring_api.publish_from_drafts(
+        learning_package.id, draft_qset=drafts_to_publish, published_by=user.id,
     )
-    authoring_api.publish_from_drafts(learning_package.id, draft_qset=drafts_to_publish, published_by=user.id)
-    LIBRARY_BLOCK_UPDATED.send_event(
-        library_block=LibraryBlockData(
-            library_key=usage_key.lib_key,
-            usage_key=usage_key,
-        )
-    )
+    # Since this is a single component, it should be safe to process synchronously and in-process:
+    tasks.send_events_after_publish(publish_log.pk, str(library_key))
+    # IF this is found to be a performance issue, we could instead make it async where necessary:
+    # tasks.wait_for_post_publish_events(publish_log, library_key=library_key)
 
 
 def _component_exists(usage_key: UsageKeyV2) -> bool:
