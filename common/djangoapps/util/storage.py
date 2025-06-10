@@ -6,12 +6,13 @@ from django.core.files.storage import default_storage, storages
 from django.utils.module_loading import import_string
 
 
-def resolve_storage_backend(storage_key: str, options: Optional[dict] = None):
+def resolve_storage_backend(storage_key: str, legacy_setting_key: str, options: Optional[dict] = None):
     """
     Configures and returns a Django `Storage` instance, compatible with both Django 4 and Django 5.
     Params:
-        storage_key = The key name saved in Django settings.
-        options = Kwargs for the storage class
+        storage_key = The key name saved in Django storages settings.
+        legacy_setting_key = The key name saved in Django settings.
+        options = Kwargs for the storage class.
     Returns:
         An instance of the configured storage backend.
     Raises:
@@ -25,7 +26,7 @@ def resolve_storage_backend(storage_key: str, options: Optional[dict] = None):
         ensuring backward compatibility with both Django 4 and Django 5 storage settings.
     """
 
-    storage_path = getattr(settings, storage_key, None)
+    storage_path = getattr(settings, legacy_setting_key, None)
     storages_config = getattr(settings, 'STORAGES', {})
 
     if options is None:
@@ -54,7 +55,7 @@ def resolve_storage_backend(storage_key: str, options: Optional[dict] = None):
         # If no storage settings are defined anywhere, use the default storage
         return default_storage
 
-    # Use case 4: Import storage_path manually
+    # Use case 4: Legacy settings
     # Fallback to import the storage_path (Obtained from django settings) manually
     StorageClass = import_string(storage_path)
     return StorageClass(**options)
