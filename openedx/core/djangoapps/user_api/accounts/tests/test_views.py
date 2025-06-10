@@ -413,7 +413,8 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         self._verify_profile_image_data(data, has_profile_image)
         assert self.user.username == data['username']
 
-    def _verify_full_account_response(self, response, requires_parental_consent=False, has_profile_image=True, year_of_birth=2000):
+    def _verify_full_account_response(self, response, requires_parental_consent=False,
+                                      has_profile_image=True, year_of_birth=2000):
         """
         Verify that all account fields are returned (even those that are not shareable).
         """
