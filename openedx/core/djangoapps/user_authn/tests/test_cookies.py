@@ -26,6 +26,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
 TEST_PROFILE_IMAGE_UPLOAD_DT = datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
 
+
 class CookieTests(TestCase):
     def setUp(self):
         super().setUp()
