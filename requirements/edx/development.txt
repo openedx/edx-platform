@@ -21,7 +21,7 @@ aiohappyeyeballs==2.6.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   aiohttp
-aiohttp==3.12.8
+aiohttp==3.12.11
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -57,8 +57,9 @@ annotated-types==0.7.0
     #   pydantic
 anyio==4.9.0
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   httpcore
+    #   httpx
     #   starlette
 appdirs==1.4.4
     # via
@@ -140,7 +141,7 @@ boto==2.49.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-boto3==1.38.29
+boto3==1.38.33
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -148,7 +149,7 @@ boto3==1.38.29
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.38.29
+botocore==1.38.33
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -271,7 +272,7 @@ code-annotations==2.3.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
-codejail-includes==1.0.0
+codejail-includes==2.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -287,7 +288,7 @@ crowdsourcehinter-xblock==0.8
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-cryptography==45.0.3
+cryptography==45.0.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -358,7 +359,6 @@ django==4.2.22
     #   django-push-notifications
     #   django-sekizai
     #   django-ses
-    #   django-simple-history
     #   django-statici18n
     #   django-storages
     #   django-stubs
@@ -554,7 +554,7 @@ django-ses==4.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-simple-history==3.8.0
+django-simple-history==3.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -788,7 +788,7 @@ edx-opaque-keys[django]==3.0.0
     #   openedx-filters
     #   ora2
     #   xblocks-contrib
-edx-organizations==6.13.0
+edx-organizations==7.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -899,14 +899,14 @@ filelock==3.18.0
     #   snowflake-connector-python
     #   tox
     #   virtualenv
-firebase-admin==6.8.0
+firebase-admin==6.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-ace
 freezegun==1.5.2
     # via -r requirements/edx/testing.txt
-frozenlist==1.6.2
+frozenlist==1.7.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -957,7 +957,7 @@ google-api-python-client==2.171.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   firebase-admin
-google-auth==2.40.2
+google-auth==2.40.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1009,13 +1009,13 @@ grimp==3.9
     # via
     #   -r requirements/edx/testing.txt
     #   import-linter
-grpcio==1.72.1
+grpcio==1.73.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.72.1
+grpcio-status==1.73.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1024,22 +1024,34 @@ gunicorn==23.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-h11==0.14.0
+h11==0.16.0
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   httpcore
     #   uvicorn
+h2==4.2.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   httpx
 help-tokens==3.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+hpack==4.1.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   h2
 html5lib==1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-httpcore==0.16.3
+httpcore==1.0.9
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   httpx
 httplib2==0.22.0
@@ -1050,10 +1062,16 @@ httplib2==0.22.0
     #   google-auth-httplib2
 httpretty==1.1.4
     # via -r requirements/edx/testing.txt
-httpx==0.23.3
+httpx[http2]==0.28.1
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   pact-python
+    #   firebase-admin
+hyperframe==6.1.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
+    #   h2
 icalendar==6.3.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1063,9 +1081,9 @@ idna==3.10
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   anyio
+    #   httpx
     #   optimizely-sdk
     #   requests
-    #   rfc3986
     #   snowflake-connector-python
     #   yarl
 imagesize==1.4.1
@@ -1353,7 +1371,7 @@ openedx-django-pyfs==3.8.0
     #   lti-consumer-xblock
     #   xblock
     #   xblocks-contrib
-openedx-django-require==2.1.0
+openedx-django-require==3.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1413,7 +1431,7 @@ packaging==25.0
     #   snowflake-connector-python
     #   sphinx
     #   tox
-pact-python==2.0.1
+pact-python==1.6.0
     # via -r requirements/edx/testing.txt
 paramiko==3.5.1
     # via
@@ -1485,7 +1503,7 @@ prompt-toolkit==3.0.51
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   click-repl
-propcache==0.3.1
+propcache==0.3.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1805,7 +1823,7 @@ regex==2024.11.6
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   nltk
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1841,10 +1859,6 @@ requests-oauthlib==2.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   social-auth-core
-rfc3986[idna2008]==1.5.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   httpx
 roman-numerals-py==3.1.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1907,7 +1921,6 @@ six==1.17.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
-    #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
     #   edx-auth-backends
@@ -1938,10 +1951,9 @@ smmap==5.0.2
     #   gitdb
 sniffio==1.3.1
     # via
+    #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   anyio
-    #   httpcore
-    #   httpx
 snowballstemmer==3.0.1
     # via
     #   -r requirements/edx/doc.txt
@@ -2083,7 +2095,7 @@ tinycss2==1.4.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   bleach
-tomlkit==0.13.2
+tomlkit==0.13.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2286,12 +2298,12 @@ xss-utils==0.8.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-yarl==1.20.0
+yarl==1.20.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   aiohttp
-zipp==3.22.0
+zipp==3.23.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

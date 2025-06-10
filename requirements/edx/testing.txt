@@ -12,7 +12,7 @@ aiohappyeyeballs==2.6.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-aiohttp==3.12.8
+aiohttp==3.12.11
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -37,7 +37,8 @@ annotated-types==0.7.0
     #   pydantic
 anyio==4.9.0
     # via
-    #   httpcore
+    #   -r requirements/edx/base.txt
+    #   httpx
     #   starlette
 appdirs==1.4.4
     # via
@@ -101,14 +102,14 @@ bleach[css]==6.2.0
     #   xblock-poll
 boto==2.49.0
     # via -r requirements/edx/base.txt
-boto3==1.38.29
+boto3==1.38.33
     # via
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
     #   snowflake-connector-python
-botocore==1.38.29
+botocore==1.38.33
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -205,7 +206,7 @@ code-annotations==2.3.0
     #   edx-enterprise
     #   edx-lint
     #   edx-toggles
-codejail-includes==1.0.0
+codejail-includes==2.0.0
     # via -r requirements/edx/base.txt
 colorama==0.4.6
     # via tox
@@ -215,7 +216,7 @@ coverage[toml]==7.8.2
     #   pytest-cov
 crowdsourcehinter-xblock==0.8
     # via -r requirements/edx/base.txt
-cryptography==45.0.3
+cryptography==45.0.4
     # via
     #   -r requirements/edx/base.txt
     #   django-fernet-fields-v2
@@ -273,7 +274,6 @@ django==4.2.22
     #   django-push-notifications
     #   django-sekizai
     #   django-ses
-    #   django-simple-history
     #   django-statici18n
     #   django-storages
     #   django-user-tasks
@@ -432,7 +432,7 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==4.4.0
     # via -r requirements/edx/base.txt
-django-simple-history==3.8.0
+django-simple-history==3.1.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -608,7 +608,7 @@ edx-opaque-keys[django]==3.0.0
     #   openedx-filters
     #   ora2
     #   xblocks-contrib
-edx-organizations==6.13.0
+edx-organizations==7.1.0
     # via -r requirements/edx/base.txt
 edx-proctoring==5.2.0
     # via
@@ -692,13 +692,13 @@ filelock==3.18.0
     #   snowflake-connector-python
     #   tox
     #   virtualenv
-firebase-admin==6.8.0
+firebase-admin==6.9.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-ace
 freezegun==1.5.2
     # via -r requirements/edx/testing.in
-frozenlist==1.6.2
+frozenlist==1.7.0
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -733,7 +733,7 @@ google-api-python-client==2.171.0
     # via
     #   -r requirements/edx/base.txt
     #   firebase-admin
-google-auth==2.40.2
+google-auth==2.40.3
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
@@ -775,29 +775,40 @@ googleapis-common-protos==1.70.0
     #   grpcio-status
 grimp==3.9
     # via import-linter
-grpcio==1.72.1
+grpcio==1.73.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.72.1
+grpcio-status==1.73.0
     # via
     #   -r requirements/edx/base.txt
     #   google-api-core
 gunicorn==23.0.0
     # via -r requirements/edx/base.txt
-h11==0.14.0
+h11==0.16.0
     # via
+    #   -r requirements/edx/base.txt
     #   httpcore
     #   uvicorn
+h2==4.2.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   httpx
 help-tokens==3.2.0
     # via -r requirements/edx/base.txt
+hpack==4.1.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   h2
 html5lib==1.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-httpcore==0.16.3
-    # via httpx
+httpcore==1.0.9
+    # via
+    #   -r requirements/edx/base.txt
+    #   httpx
 httplib2==0.22.0
     # via
     #   -r requirements/edx/base.txt
@@ -805,17 +816,23 @@ httplib2==0.22.0
     #   google-auth-httplib2
 httpretty==1.1.4
     # via -r requirements/edx/testing.in
-httpx==0.23.3
-    # via pact-python
+httpx[http2]==0.28.1
+    # via
+    #   -r requirements/edx/base.txt
+    #   firebase-admin
+hyperframe==6.1.0
+    # via
+    #   -r requirements/edx/base.txt
+    #   h2
 icalendar==6.3.1
     # via -r requirements/edx/base.txt
 idna==3.10
     # via
     #   -r requirements/edx/base.txt
     #   anyio
+    #   httpx
     #   optimizely-sdk
     #   requests
-    #   rfc3986
     #   snowflake-connector-python
     #   yarl
 import-linter==2.3
@@ -1028,7 +1045,7 @@ openedx-django-pyfs==3.8.0
     #   lti-consumer-xblock
     #   xblock
     #   xblocks-contrib
-openedx-django-require==2.1.0
+openedx-django-require==3.0.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==3.1.1
     # via -r requirements/edx/base.txt
@@ -1068,7 +1085,7 @@ packaging==25.0
     #   pytest
     #   snowflake-connector-python
     #   tox
-pact-python==2.0.1
+pact-python==1.6.0
     # via -r requirements/edx/testing.in
 paramiko==3.5.1
     # via
@@ -1124,7 +1141,7 @@ prompt-toolkit==3.0.51
     # via
     #   -r requirements/edx/base.txt
     #   click-repl
-propcache==0.3.1
+propcache==0.3.2
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
@@ -1373,7 +1390,7 @@ regex==2024.11.6
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
@@ -1405,8 +1422,6 @@ requests-oauthlib==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-rfc3986[idna2008]==1.5.0
-    # via httpx
 rpds-py==0.25.1
     # via
     #   -r requirements/edx/base.txt
@@ -1453,7 +1468,6 @@ six==1.17.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-    #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
     #   edx-auth-backends
@@ -1477,9 +1491,8 @@ slumber==0.7.1
     #   edx-enterprise
 sniffio==1.3.1
     # via
+    #   -r requirements/edx/base.txt
     #   anyio
-    #   httpcore
-    #   httpx
 snowflake-connector-python==3.15.0
     # via
     #   -r requirements/edx/base.txt
@@ -1544,7 +1557,7 @@ tinycss2==1.4.0
     # via
     #   -r requirements/edx/base.txt
     #   bleach
-tomlkit==0.13.2
+tomlkit==0.13.3
     # via
     #   -r requirements/edx/base.txt
     #   pylint
@@ -1690,11 +1703,11 @@ xmlsec==1.3.14
     #   python3-saml
 xss-utils==0.8.0
     # via -r requirements/edx/base.txt
-yarl==1.20.0
+yarl==1.20.1
     # via
     #   -r requirements/edx/base.txt
     #   aiohttp
-zipp==3.22.0
+zipp==3.23.0
     # via
     #   -r requirements/edx/base.txt
     #   importlib-metadata
