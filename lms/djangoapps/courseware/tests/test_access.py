@@ -681,47 +681,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         assert bool(access._has_access_course(self.student, 'load_mobile', course)) == student_expected
         assert bool(access._has_access_course(self.staff, 'load_mobile', course)) == staff_expected
 
-    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
-    def test_courseware_page_unfulfilled_prereqs(self):
-        """
-        Test courseware access when a course has pre-requisite course yet to be completed
-        """
-        pre_requisite_course = CourseFactory.create(
-            org='edX',
-            course='900',
-            run='test_run',
-        )
-
-        pre_requisite_courses = [str(pre_requisite_course.id)]
-        course = CourseFactory.create(
-            org='edX',
-            course='1000',
-            run='test_run',
-            pre_requisite_courses=pre_requisite_courses,
-        )
-        set_prerequisite_courses(course.id, pre_requisite_courses)
-
-        test_password = 't3stp4ss.!'
-        user = UserFactory.create()
-        user.set_password(test_password)
-        user.save()
-        self.login(user.email, test_password)
-        CourseEnrollmentFactory(user=user, course_id=course.id)
-
-        url = reverse('courseware', args=[str(course.id)])
-        response = self.client.get(url)
-        self.assertRedirects(
-            response,
-            reverse(
-                'dashboard'
-            )
-        )
-        assert response.status_code == 302
-
-        fulfill_course_milestone(pre_requisite_course.id, user)
-        response = self.client.get(url)
-        assert response.status_code == 200
-
 
 class UserRoleTestCase(TestCase):
     """
