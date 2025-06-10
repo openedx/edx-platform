@@ -341,7 +341,7 @@ AWS_BUCKET_ACL = AWS_DEFAULT_ACL
 
 # Change to S3Boto3 if we haven't specified another default storage AND we have specified AWS creds.
 if (not _YAML_TOKENS.get('DEFAULT_FILE_STORAGE')) and AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STORAGES["default"]["BACKEND"] = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # The normal database user does not have enough permissions to run migrations.
 # Migrations are run with separate credentials, given as DB_MIGRATION_*
