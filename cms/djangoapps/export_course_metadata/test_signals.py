@@ -64,7 +64,7 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
     )
     def test_resolve_default_storage(self):
         """ Ensure the default storage is invoked, even if course export storage is configured """
-        storage = resolve_storage_backend("default")
+        storage = resolve_storage_backend(storage_key="default", legacy_setting_key="default")
         self.assertEqual(storage.__class__.__name__, "FileSystemStorage")
 
     @override_settings(
@@ -74,7 +74,10 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
     )
     def test_resolve_happy_path_storage(self):
         """ Make sure that the correct course export storage is being used """
-        storage = resolve_storage_backend("COURSE_METADATA_EXPORT_STORAGE")
+        storage = resolve_storage_backend(
+            storage_key="course_metadata_export_storage",
+            legacy_setting_key="COURSE_METADATA_EXPORT_STORAGE"
+        )
         self.assertEqual(storage.__class__.__name__, "CourseMetadataExportS3Storage")
         self.assertEqual(storage.bucket_name, "bucket_name_test")
 
@@ -84,14 +87,17 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
         del settings.DEFAULT_FILE_STORAGE
         del settings.COURSE_METADATA_EXPORT_STORAGE
         del settings.COURSE_METADATA_EXPORT_BUCKET
-        storage = resolve_storage_backend("COURSE_METADATA_EXPORT_STORAGE")
+        storage = resolve_storage_backend(
+            storage_key="course_metadata_export_storage",
+            legacy_setting_key="COURSE_METADATA_EXPORT_STORAGE"
+        )
         self.assertEqual(storage.__class__.__name__, "FileSystemStorage")
 
     @override_settings(
         COURSE_METADATA_EXPORT_STORAGE=None,
         COURSE_METADATA_EXPORT_BUCKET="bucket_name_test",
         STORAGES={
-            'COURSE_METADATA_EXPORT_STORAGE': {
+            'course_metadata_export_storage': {
                 'BACKEND': 'cms.djangoapps.export_course_metadata.storage.CourseMetadataExportS3Storage',
                 'OPTIONS': {}
             }
@@ -99,13 +105,16 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
     )
     def test_resolve_storage_using_django5_settings(self):
         """ Simulating a Django 4 environment using Django 5 Storages configuration """
-        storage = resolve_storage_backend("COURSE_METADATA_EXPORT_STORAGE")
+        storage = resolve_storage_backend(
+            storage_key="course_metadata_export_storage",
+            legacy_setting_key="COURSE_METADATA_EXPORT_STORAGE"
+        )
         self.assertEqual(storage.__class__.__name__, "CourseMetadataExportS3Storage")
         self.assertEqual(storage.bucket_name, "bucket_name_test")
 
     @override_settings(
         STORAGES={
-            'COURSE_METADATA_EXPORT_STORAGE': {
+            'course_metadata_export_storage': {
                 'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
                 'OPTIONS': {
                     'bucket_name': 'bucket_name_test'
@@ -117,6 +126,9 @@ class TestExportCourseMetadata(SharedModuleStoreTestCase):
         """ Ensure we call the storage class with the correct parameters and Django 5 setup """
         del settings.COURSE_METADATA_EXPORT_STORAGE
         del settings.COURSE_METADATA_EXPORT_BUCKET
-        storage = resolve_storage_backend("COURSE_METADATA_EXPORT_STORAGE")
+        storage = resolve_storage_backend(
+            storage_key="course_metadata_export_storage",
+            legacy_setting_key="COURSE_METADATA_EXPORT_STORAGE"
+        )
         self.assertEqual(storage.__class__.__name__, S3Boto3Storage.__name__)
         self.assertEqual(storage.bucket_name, "bucket_name_test")

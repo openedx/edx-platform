@@ -17,4 +17,7 @@ class CourseMetadataExportS3Storage(S3Boto3Storage):  # pylint: disable=abstract
         bucket = settings.COURSE_METADATA_EXPORT_BUCKET
         super().__init__(bucket_name=bucket, custom_domain=None, querystring_auth=True)
 
-course_metadata_export_storage = resolve_storage_backend("COURSE_METADATA_EXPORT_STORAGE")
+course_metadata_export_storage = resolve_storage_backend(
+    storage_key="course_metadata_export",
+    legacy_setting_key="COURSE_METADATA_EXPORT_STORAGE"
+)
