@@ -49,3 +49,15 @@ ENABLE_ORA_GRADE_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora
 # .. toggle_warning: When the flag is ON, Notifications Grouping feature is enabled.
 # .. toggle_tickets: INF-1472
 ENABLE_NOTIFICATION_GROUPING = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification_grouping', __name__)
+
+
+# .. toggle_name: notifications.enable_account_level_preferences
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable account level preferences for notifications
+# .. toggle_use_cases: temporary, open_edx
+# .. toggle_creation_date: 2025-04-29
+# .. toggle_target_removal_date: 2025-07-29
+# .. toggle_warning: When the flag is ON, account level preferences for notifications are enabled.
+# .. toggle_tickets: INF-1472
+ENABLE_ACCOUNT_LEVEL_PREFERENCES = WaffleFlag(f'{WAFFLE_NAMESPACE}.enable_account_level_preferences', __name__)
