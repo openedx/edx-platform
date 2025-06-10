@@ -282,7 +282,7 @@ def update_account_user_preference(user_id: int) -> None:
 
     # Create new preferences for missing types
     new_preferences = [
-        _create_notification_preference(user_id, notification_type)
+        create_notification_preference(user_id, notification_type)
         for notification_type in missing_types
     ]
 
@@ -291,7 +291,7 @@ def update_account_user_preference(user_id: int) -> None:
     return
 
 
-def _create_notification_preference(user_id: int, notification_type: str) -> NotificationPreference:
+def create_notification_preference(user_id: int, notification_type: str) -> NotificationPreference:
     """
     Create a single notification preference with appropriate defaults.
 
@@ -364,7 +364,7 @@ def create_account_notification_pref_if_not_exists(user_ids: List, preferences: 
 
     for user_id in user_ids:
         if not any(preference.user_id == int(user_id) for preference in preferences):
-            new_preferences.append(_create_notification_preference(
+            new_preferences.append(create_notification_preference(
                 user_id=int(user_id),
                 notification_type=notification_type,
 
