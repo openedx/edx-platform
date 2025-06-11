@@ -35,17 +35,13 @@
                     context: this
                 }).fail(function(jqXHR) {
                     var responseData = JSON.parse(jqXHR.responseText);
-                    if (jqXHR.status === ErrorStatuses.forbidden && responseData.user_message_url) {
-                        // Check if we've been blocked from the course
-                        // because of country access rules.
-                        // If so, redirect to a page explaining to the user
-                        // why they were blocked.
-                        this.redirect(responseData.user_message_url);
+                    if (jqXHR.status === ErrorStatuses.forbidden) {
+                        if (responseData.user_message_url) {
+                            this.redirect(responseData.user_message_url);
+                        } else {
+                            this.showMessage(responseData);
+                        }
                     } else if (jqXHR.status === ErrorStatuses.badRequest) {
-                        // Show the error message for bad requests (invalid enrollment data)
-                        this.showMessage(responseData);
-                    } else if (jqXHR.status === ErrorStatuses.forbidden) {
-                        // Show the error message for forbidden requests (Enrollment not allowed)
                         this.showMessage(responseData);
                     } else {
                         // Otherwise, redirect the user to the next page.
@@ -93,10 +89,10 @@
                 messageDiv.innerHTML = `
                   <div class="page-banner w-75 has-actions">
                     <div class="alert alert-warning" role="alert">
-                      <div class="row">
+                      <div class="row w-100">
                         <div class="col d-flex align-items-center">
                           <span class="icon icon-alert fa fa-warning me-2" aria-hidden="true"></span>
-                          <span class="message-content">${textContent}</span>
+                          <span class="message-content" style="min-width: 0; overflow-wrap: anywhere;">${textContent}</span>
                         </div>
                          <div class="nav-actions mt-3 flex-row-reverse d-none">
                           <button type="button" class="action-primary" id="enrollment-redirect-btn">${buttonText}</button>
