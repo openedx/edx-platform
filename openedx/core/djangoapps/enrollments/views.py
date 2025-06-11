@@ -29,7 +29,7 @@ from rest_framework.views import APIView  # lint-amnesty, pylint: disable=wrong-
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.auth import user_has_role
-from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, User
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, EnrollmentNotAllowed, User
 from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
@@ -874,6 +874,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
         except InvalidEnrollmentAttribute as error:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": str(error),
+                    "localizedMessage": str(error),
+                }
+            )
+        except EnrollmentNotAllowed as error:
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
                 data={
                     "message": str(error),
                     "localizedMessage": str(error),
