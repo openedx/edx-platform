@@ -19,8 +19,7 @@ from lxml import etree
 from lxml.etree import _ElementTree as XmlTree
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import (
-    CourseLocator, BlockUsageLocator,
-    LibraryLocator, LibraryUsageLocator,
+    CourseLocator, LibraryLocator,
     LibraryLocatorV2, LibraryUsageLocatorV2, LibraryContainerLocator
 )
 from openedx_learning.api import authoring as authoring_api
@@ -110,7 +109,7 @@ def migrate_from_modulestore(
     set_code_owner_attribute_from_module(__name__)
 
     status: UserTaskStatus = self.status
-    status.set_state(MigrationStep.VALIDATING_INPUT)
+    status.set_state(MigrationStep.VALIDATING_INPUT.value)
     try:
         source = ModulestoreSource.objects.get(pk=source_pk)
         target_package = LearningPackage.objects.get(pk=target_package_pk)
@@ -139,7 +138,7 @@ def migrate_from_modulestore(
     )
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.CANCELLING_OLD)
+    status.set_state(MigrationStep.CANCELLING_OLD.value)
     # In order to prevent a user from accidentally starting a bunch of identical import tasks...
     migrations_to_cancel = ModulestoreMigration.objects.filter(
         # get all Migration tasks by this user with the same source and target
@@ -172,7 +171,7 @@ def migrate_from_modulestore(
         return
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.STAGING)
+    status.set_state(MigrationStep.STAGING.value)
     staged_content = staging_api.stage_xblock_temporarily(
         block=legacy_root,
         user_id=status.user.pk,
@@ -181,7 +180,7 @@ def migrate_from_modulestore(
     migration.staged_content = staged_content
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.PARSING)
+    status.set_state(MigrationStep.PARSING.value)
     parser = etree.XMLParser(strip_cdata=False)
     try:
         root_node = etree.fromstring(staged_content.olx, parser=parser)
@@ -189,7 +188,7 @@ def migrate_from_modulestore(
         status.fail(f"Failed to parse source OLX (from staged content with id = {staged_content.id}): {exc}")
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.IMPORTING_ASSETS)
+    status.set_state(MigrationStep.IMPORTING_ASSETS.value)
     content_by_filename: dict[str, int] = {}
     now = datetime.now(tz=timezone.utc)
     for staged_content_file_data in staging_api.get_staged_content_static_files(staged_content.id):
@@ -212,7 +211,7 @@ def migrate_from_modulestore(
         ).id
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.IMPORTING_STRUCTURE)
+    status.set_state(MigrationStep.IMPORTING_STRUCTURE.value)
     with authoring_api.bulk_draft_changes_for(migration.target.id) as change_log:
         root_migrated_node = _migrate_node(
             content_by_filename=content_by_filename,
@@ -228,11 +227,19 @@ def migrate_from_modulestore(
     migration.change_log = change_log
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.UNSTAGING)
+    status.set_state(MigrationStep.UNSTAGING.value)
     staged_content.delete()
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.MAPPING_OLD_TO_NEW)
+    # @@TODO We currently do the mapping in bulk in order to reduce the number of DB queries.
+    #        But, as a user, it means that there are no artifacts (ModulestoreBlockMigrations)
+    #        to be shown as the structure is being imported, which takes can take several minutes.
+    #        Would be better to, instead, create each ModulestoreBlockSource and
+    #        ModulestoreBlockMigration as we create its PublisahbleEntity(Version)? If
+    #        we did this, we'd want to make sure that the objects are actually visible
+    #        to the user mid-import (via django admin, or the library interface, or even just as
+    #        as a "progress bar" field in the REST API), otherwise this would be pointless.
+    status.set_state(MigrationStep.MAPPING_OLD_TO_NEW.value)
     block_source_keys_to_target_vers = dict(root_migrated_node.all_source_to_target_pairs())
     ModulestoreBlockSource.objects.bulk_create(
         [
@@ -247,23 +254,27 @@ def migrate_from_modulestore(
     block_source_keys_to_sources: dict[UsageKey, ModulestoreBlockSource] = {
         block_source.key: block_source for block_source in source.blocks.all()
     }
-    block_target_pks_to_change_log_record_pks: dict[int, int] = dict(
-        change_log.records.values_list("target_entity_id", "id")
-    )
+    # @@TODO We get an error when we try to use the change_log, because it hasn't
+    #        been saved yet. Until we fix this, we won't be able to set
+    #        ModuleBlockMigration.change_log_record.
+    # block_target_pks_to_change_log_record_pks: dict[int, int] = dict(
+    #     change_log.records.values_list("target_entity_id", "id")
+    # )
     block_migrations = ModulestoreBlockMigration.objects.bulk_create(
         [
             ModulestoreBlockMigration(
                 overall_migration=migration,
                 source=block_source_keys_to_sources[block_source_key],
                 target_id=block_target_ver.entity_id,
-                change_log_record_id=block_target_pks_to_change_log_record_pks[block_target_ver.entity_id],
+                # @@TODO See above
+                # change_log_record_id=block_target_pks_to_change_log_record_pks[block_target_ver.entity_id],
             )
             for block_source_key, block_target_ver in block_source_keys_to_target_vers.items()
         ],
     )
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.FORWARDING)
+    status.set_state(MigrationStep.FORWARDING.value)
     if forward_source_to_target:
         block_sources_to_block_migrations = {
             block_migration.source: block_migration for block_migration in block_migrations
@@ -274,9 +285,12 @@ def migrate_from_modulestore(
         source.forwarded_by = migration
     status.increment_completed_steps()
 
-    status.set_state(MigrationStep.POPULATING_COLLECTION)
+    status.set_state(MigrationStep.POPULATING_COLLECTION.value)
     if target_collection:
-        block_target_pks = list(block_target_pks_to_change_log_record_pks.keys())
+        # @@TODO This dict (block_target_pks_to_change_log_record_pks) was based on the change_log calculation
+        #        above which is commented out. In order to add to target_collection, we either need to fix the
+        #        change_log query above, or we need to calculate these target_pks some other way
+        block_target_pks: list[int] = []  # list(block_target_pks_to_change_log_record_pks.keys())
         authoring_api.add_to_collection(
             learning_package_id=target_package_pk,
             key=target_collection.key,
@@ -293,7 +307,7 @@ class _MigratedNode:
 
     Note that target_version can equal None even when there migrated children.
     This happens, particularly, if the node is above the requested composition level
-    but has descendents which are at or below said level.
+    but has descendents which are at or below sad level.
     """
     source_to_target: tuple[UsageKey, PublishableEntityVersion] | None
     children: list[_MigratedNode]
@@ -488,7 +502,7 @@ def _migrate_component(
     try:
         component = authoring_api.get_components(target_package_id).get(
             component_type=component_type,
-            local_key=source_key.block_id,
+            local_key=target_key.block_id,
         )
         component_existed = True
     except Component.DoesNotExist:
@@ -516,7 +530,9 @@ def _migrate_component(
             continue
         new_path = f"static/{filename}"
         try:
-            authoring_api.create_component_version_content(component_version.pk, content_pk, key=filename)
+            authoring_api.create_component_version_content(component_version.pk, content_pk, key=new_path)
+        # @@TODO is there a way to determine content already exists that doesn't run the risk
+        #        of swallowing other, unexpected IntegrityErrors?
         except IntegrityError:
             pass  # Content already exists
     return component_version.publishable_entity_version
@@ -535,11 +551,13 @@ def _slugify_source_usage_key(key: UsageKey) -> str:
 
     @@TODO -- Is this good enough? Conflicts are technically possible if a user has manually
     formatted the key this way, but that seems super unlikely to happen by accident, right ... ?
+    Conflicts are also technically posssible for
     """
-    if isinstance(key, LibraryUsageLocator):
-        return f"{key.org}.{key.library_key}.{key.block_id}"
-    elif isinstance(key, BlockUsageLocator):
-        return f"{key.org}.{key.course}.{key.run}.{key.block_id}"
+    context_key = key.course_key
+    if isinstance(context_key, LibraryLocator):
+        return f"{context_key.org}__{context_key.library}__{key.block_id}"
+    elif isinstance(context_key, CourseKey):
+        return f"{context_key.org}__{context_key.course}__{context_key.run}__{key.block_id}"
     else:
         raise ValueError(
             f"Unexpected source usage key: {key}. Expected legacy course or library usage locator."

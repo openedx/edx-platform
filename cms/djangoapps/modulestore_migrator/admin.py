@@ -36,17 +36,18 @@ class StartMigrationTaskForm(ActionForm):
 
 def task_status_details(obj: ModulestoreMigration) -> str:
     """
-    Return details about the status of the migration, falling back to `task_status.state` if no details.
+    Return the state and, if available, details of the status of the migration.
     """
+    details: str | None = None
     if obj.task_status.state == UserTaskStatus.FAILED:
         # Calling fail(msg) from a task should automatically generates an "Error" artifact with that msg.
         # https://django-user-tasks.readthedocs.io/en/latest/user_tasks.html#user_tasks.models.UserTaskStatus.fail
         if error_artifacts := obj.task_status.artifacts.filter(name="Error"):
             if error_text := error_artifacts.order_by("-created").first().text:
-                return error_text
+                details = error_text
     elif obj.task_status.state == UserTaskStatus.SUCCEEDED:
-        return f"Successfully migrated {obj.block_migrations.count()} blocks"
-    return obj.task_status.state
+        details = f"Migrated {obj.block_migrations.count()} blocks"
+    return f"{obj.task_status.state}: {details}" if details else obj.task_status.state
 
 
 migration_admin_fields = (
@@ -71,6 +72,7 @@ class ModulestoreMigrationInline(admin.TabularInline):
     fk_name = "source"
     show_change_link = True
     readonly_fields = migration_admin_fields  # type: ignore[assignment]
+    ordering = ("-task_status__created",)
 
     def has_add_permission(self, _request, _obj):
         return False
@@ -112,9 +114,7 @@ class ModulestoreSourceAdmin(admin.ModelAdmin):
         Start a migration for each selected source
         """
         form = StartMigrationTaskForm(request.POST)
-        if not form.is_valid():
-            # @@TODO Better messaging of form errors
-            messages.add_message(request, messages.ERROR, f"Invalid action params: {form.errors}")
+        form.is_valid()
         target_key_string = form.cleaned_data['target_key']
         if not target_key_string:
             messages.add_message(request, messages.ERROR, "Target key is required")
