@@ -1,7 +1,9 @@
 """
 Defines the URL routes for this app.
 """
+from django.conf import settings
 from django.urls import path, re_path, include
+from django.views.generic import RedirectView
 from rest_framework import routers
 
 from . import views as user_api_views
@@ -12,6 +14,7 @@ USER_API_ROUTER.register(r'users', user_api_views.UserViewSet)
 USER_API_ROUTER.register(r'user_prefs', user_api_views.UserPreferenceViewSet)
 
 urlpatterns = [
+    re_path(r'^account(?:/settings)?/?$', RedirectView.as_view(url=settings.ACCOUNT_MICROFRONTEND_URL)),
     path('user_api/v1/', include(USER_API_ROUTER.urls)),
     re_path(
         fr'^user_api/v1/preferences/(?P<pref_key>{UserPreference.KEY_REGEX})/users/$',
