@@ -11,6 +11,7 @@ from django.db import models
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryCollectionLocator, LibraryLocatorV2
+from user_tasks.models import UserTaskStatus
 
 from openedx.core.types.http import AuthenticatedHttpRequest
 
@@ -33,41 +34,61 @@ class StartMigrationTaskForm(ActionForm):
     )
 
 
+def task_status_details(obj: ModulestoreMigration) -> str:
+    """
+    Return details about the status of the migration, falling back to `task_status.state` if no details.
+    """
+    if obj.task_status.state == UserTaskStatus.FAILED:
+        # Calling fail(msg) from a task should automatically generates an "Error" artifact with that msg.
+        # https://django-user-tasks.readthedocs.io/en/latest/user_tasks.html#user_tasks.models.UserTaskStatus.fail
+        if error_artifacts := obj.task_status.artifacts.filter(name="Error"):
+            if error_text := error_artifacts.order_by("-created").first().text:
+                return error_text
+    elif obj.task_status.state == UserTaskStatus.SUCCEEDED:
+        return f"Successfully migrated {obj.block_migrations.count()} blocks"
+    return obj.task_status.state
+
+
+migration_admin_fields = (
+    "target",
+    "target_collection",
+    "task_status",
+    # The next line works, but django-stubs incorrectly thinks that these should all be strings,
+    # so we will need to use type:ignore below.
+    task_status_details,
+    "composition_level",
+    "replace_existing",
+    "change_log",
+    "staged_content",
+)
+
+
 class ModulestoreMigrationInline(admin.TabularInline):
     """
-    Readonly table within the ModulestoreSource; each row is a Migration from this Source
+    Readonly table within the ModulestoreSource page; each row is a Migration from this Source.
     """
     model = ModulestoreMigration
     fk_name = "source"
-    readonly_fields = (
-        "target",
-        "target_collection",
-        "task_status",
-        "composition_level",
-        "replace_existing",
-        "change_log",
-        "staged_content",
-    )
-    list_display = (
-        "id",
-        "target",
-        "target_collection",
-        "task_status",
-        "task_status__state",
-        "composition_level",
-        "replace_existing",
-        "change_log",
-        "staged_content",
-    )
+    show_change_link = True
+    readonly_fields = migration_admin_fields  # type: ignore[assignment]
+
+    def has_add_permission(self, _request, _obj):
+        return False
 
 
 class ModulestoreBlockSourceInline(admin.TabularInline):
+    """
+    Readonly table within the ModulestoreSource page; each row is a BlockSource.
+    """
     model = ModulestoreBlockSource
     fk_name = "overall_source"
     readonly_fields = (
         "key",
         "forwarded_by"
     )
+
+    def has_add_permission(self, _request, _obj):
+        return False
 
 
 @admin.register(ModulestoreSource)
@@ -158,30 +179,6 @@ class ModulestoreMigrationAdmin(admin.ModelAdmin):
     """
     Readonly admin page for viewing Migrations
     """
-    readonly_fields = (
-        "source",
-        "target",
-        "target_collection",
-        "task_status",
-        "task_state",
-        "composition_level",
-        "replace_existing",
-        "change_log",
-        "staged_content",
-    )
-    list_display = (
-        "id",
-        "source",
-        "target",
-        "target_collection",
-        "task_status",
-        "task_state",
-        "composition_level",
-        "replace_existing",
-        "change_log",
-        "staged_content",
-    )
+    readonly_fields = ("source", *migration_admin_fields)  # type: ignore[assignment]
+    list_display = ("id", "source", *migration_admin_fields)  # type: ignore[assignment]
     inlines = [ModulestoreBlockMigrationInline]
-
-    def task_state(self, obj: ModulestoreMigration):
-        return obj.task_status.state if obj.task_status else "(No status)"
