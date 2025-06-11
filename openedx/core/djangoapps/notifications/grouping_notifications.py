@@ -1,11 +1,9 @@
 """
 Notification grouping utilities for notifications
 """
-import datetime
 from abc import ABC, abstractmethod
+from datetime import datetime, timezone
 from typing import Dict, Type, Union
-
-from pytz import utc
 
 from openedx.core.djangoapps.notifications.base_notification import COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.models import Notification
@@ -120,7 +118,7 @@ def group_user_notifications(new_notification: Notification, old_notification: N
         old_notification.content_url = new_notification.content_url
         old_notification.last_read = None
         old_notification.last_seen = None
-        old_notification.created = utc.localize(datetime.datetime.now())
+        old_notification.created = datetime.now(timezone.utc)
         old_notification.save()
 
 

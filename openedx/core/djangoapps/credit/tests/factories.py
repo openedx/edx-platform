@@ -7,7 +7,7 @@ import uuid
 
 import factory
 from factory.fuzzy import FuzzyText
-import pytz
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 
 from openedx.core.djangoapps.credit.models import (
@@ -80,7 +80,7 @@ class CreditRequestFactory(factory.django.DjangoModelFactory):
 
             obj.parameters = json.dumps({
                 "request_uuid": obj.uuid,
-                "timestamp": to_timestamp(datetime.datetime.now(pytz.UTC)),
+                "timestamp": to_timestamp(datetime.datetime.now(get_utc_timezone())),
                 "course_org": course_key.org,
                 "course_num": course_key.course,
                 "course_run": course_key.run,

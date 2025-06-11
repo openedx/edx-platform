@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import ddt
 import pytest
-import pytz
+from openedx.core.lib.time_zone_utils import get_utc_timezone
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
@@ -220,7 +220,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             "earned_graded": 6.0,
             "possible_graded": 8.0,
             "visible_blocks": self.block_records,
-            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=pytz.UTC),
+            "first_attempted": datetime(2000, 1, 1, 12, 30, 45, tzinfo=get_utc_timezone()),
         }
         self.user = UserFactory(id=self.params['user_id'])
 
@@ -389,7 +389,7 @@ class PersistentCourseGradesTest(GradesModelTestCase):
                 minute=53,
                 second=24,
                 microsecond=354741,
-                tzinfo=pytz.UTC,
+                tzinfo=get_utc_timezone(),
             ),
             "percent_grade": 77.7,
             "letter_grade": "Great job",
