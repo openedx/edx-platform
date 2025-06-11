@@ -194,7 +194,7 @@ class BasketsView(APIView):
             DetailResponse: The response with the error message and status code.
         """
         log.exception(log_message, str(exception))
-        error_msg = f"{log_message.format(str(exception))} for user {user.username} in course {course_id}: {str(exception)}"
+        error_msg = f"{log_message.format(str(exception))} for user {user.username} in course {course_id}: {str(exception)}"  # lint-amnesty, pylint: disable=line-too-long
         return DetailResponse(error_msg, status=status_code)
 
 
