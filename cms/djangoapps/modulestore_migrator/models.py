@@ -196,7 +196,7 @@ class ModulestoreBlockMigration(TimeStampedModel):
     def __str__(self):
         return (
             f"{self.__class__.__name__} #{self.pk}: "
-            f"{self.source_key} → {self.target}"
+            f"{self.source.key} → {self.target}"
         )
 
     def __repr__(self):
