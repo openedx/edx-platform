@@ -35,9 +35,15 @@ class ModulestoreSource(models.Model):
     forwarded_by = models.ForeignKey(
         'modulestore_migrator.ModulestoreMigration',
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         help_text=_('If set, the system will forward references of this source over to the target of this migration')
     )
+
+    def __str__(self):
+        return f"{self.__class__.__name__}('{self.key}')"
+
+    __repr__ = __str__
 
 
 class ModulestoreMigration(models.Model):
@@ -108,10 +114,17 @@ class ModulestoreMigration(models.Model):
     )
 
     def __str__(self):
-        return f'{self.__class__.__name__} #{self.pk}: {self.source_key} → {self.target}'
+        return (
+            f"{self.__class__.__name__} #{self.pk}: "
+            f"{self.source.key} → {self.target_collection or self.target}"
+        )
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(pk={self.pk}, source_key='{self.source_key}', target='{self.target}')"
+        return (
+            f"{self.__class__.__name__}("
+            f"id={self.id}, source='{self.source}',"
+            f"target='{self.target_collection or self.target}')"
+        )
 
 
 class ModulestoreBlockSource(TimeStampedModel):
@@ -135,6 +148,11 @@ class ModulestoreBlockSource(TimeStampedModel):
             'If set, the system will forward references of this block source over to the target of this block migration'
         ),
     )
+
+    def __str__(self):
+        return f"{self.__class__.__name__}('{self.key}')"
+
+    __repr__ = __str__
 
 
 class ModulestoreBlockMigration(TimeStampedModel):
@@ -176,4 +194,14 @@ class ModulestoreBlockMigration(TimeStampedModel):
         ]
 
     def __str__(self):
-        return f'{self.source.source_key} → {self.target}'
+        return (
+            f"{self.__class__.__name__} #{self.pk}: "
+            f"{self.source_key} → {self.target}"
+        )
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}("
+            f"id={self.id}, source='{self.source}',"
+            f"target='{self.target}')"
+        )
