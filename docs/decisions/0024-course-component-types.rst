@@ -1,5 +1,5 @@
 Course Component Types Page
-###################
+###########################
 
 **Status**: Proposed
 **Date**: 2025‑06‑02
@@ -45,7 +45,7 @@ Domain Models
 Both models live in the existing app ``common.djangoapps.xblock_django``. A unique constraint ``(course_key, content_block)`` prevents duplicates.
 
 Bootstrap and migration
-==========================
+=======================
 
 * Created json with a list of default blocks. (The list of blocks and data about them can be viewed here_) (All other blocks will be marked as experimental during migration)
 * Created a migration that fills in the records in `ComponentType` according to the specified json and creates records for each course in CourseComponentType for the included blocks.
@@ -66,7 +66,7 @@ Runtime APIs
      - Purpose
    * - ``/api/course_component_types/v1/<course_id>/``
      - GET
-     - Return **all enabled block types** for a course. Supports ``?block_type=common|advanced|external`` filter.
+     - Return **all enabled block types** for a course. Supports ``?component_type=common|advanced|external`` filter.
    * - ``/api/course_component_types/v1/<course_id>/``
      - POST
      - Add a new block to the course. The request body must contain ``slug`` (entry‑point name). If the block is enabled globally, it will be enabled for the course. If the block is not enabled globally, it shouldn't be added to the course.
@@ -78,7 +78,7 @@ Runtime APIs
      - Persist author edits to block‑specific configuration fields (dynamic schema) and store to ``CourseComponentType`` as JSON.
 
 
-Serializers source immutable metadata from ``BlockConfig``, then layer per‑course overrides from ``CourseComponentType``.
+Serializers source immutable metadata from ``ComponentType``, then layer per‑course overrides from ``CourseComponentType``.
 
 New mixin
 =========
@@ -86,7 +86,7 @@ New mixin
 * **``StudioConfigurableXBlockMixin``** Adds and lists the configuration fields of the block. These fields are also added to the non_editable_fields of the block so that they cannot be changed from the edit form on the unit page. The list of configuration fields can be overridden in the child classes of the corresponding blocks. The mixin also adds default values for metadata fields such as title, subtitle, description, and documentation links. At the same time, it provides an interface for obtaining the values of these fields, as they can be overwritten by the administrator in BlockConfig (shown in the diagram).
 
 Waffle Flag `...enable_course_component_types_page`
-===========================================
+===================================================
 
 .. list-table:: Waffle Flag ``...enable_course_component_types_page``
    :header-rows: 1
