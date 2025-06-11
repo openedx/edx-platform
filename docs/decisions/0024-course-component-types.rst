@@ -64,16 +64,16 @@ Runtime APIs
    * - Endpoint
      - Method
      - Purpose
-   * - ``/api/сourse_сomponent_types/v1/<course_id>/``
+   * - ``/api/course_component_types/v1/<course_id>/``
      - GET
      - Return **all enabled block types** for a course. Supports ``?block_type=common|advanced|external`` filter.
-   * - ``/api/сourse_сomponent_types/v1/<course_id>/``
+   * - ``/api/course_component_types/v1/<course_id>/``
      - POST
      - Add a new block to the course. The request body must contain ``slug`` (entry‑point name). If the block is enabled globally, it will be enabled for the course. If the block is not enabled globally, it shouldn't be added to the course.
    * - ``/xblock/<usage_key>/<view_name>`` (configurable_fields_info|metadata_info)
      - GET
      - **XBlock Info Handler** (*Fig. 3*) to return ``metadata``(``title``, ``subtitle``, ``description`` etc.) or data about ``configurable_fields`` like a field name, type, value, help etc.
-   * - ``/api/сourse_сomponent_types/v1/<course_id>/<slug>/``
+   * - ``/api/course_component_types/v1/<course_id>/<slug>/``
      - POST
      - Persist author edits to block‑specific configuration fields (dynamic schema) and store to ``CourseComponentType`` as JSON.
 
@@ -85,10 +85,10 @@ New mixin
 
 * **``StudioConfigurableXBlockMixin``** Adds and lists the configuration fields of the block. These fields are also added to the non_editable_fields of the block so that they cannot be changed from the edit form on the unit page. The list of configuration fields can be overridden in the child classes of the corresponding blocks. The mixin also adds default values for metadata fields such as title, subtitle, description, and documentation links. At the same time, it provides an interface for obtaining the values of these fields, as they can be overwritten by the administrator in BlockConfig (shown in the diagram).
 
-Waffle Flag `...enable_сourse_сomponent_types_page`
+Waffle Flag `...enable_course_component_types_page`
 ===========================================
 
-.. list-table:: Waffle Flag ``...enable_сourse_сomponent_types_page``
+.. list-table:: Waffle Flag ``...enable_course_component_types_page``
    :header-rows: 1
 
    * - Flag state
@@ -130,16 +130,16 @@ References
 
 * **Figure 1** – *Course Component Types page*.
 
-.. image:: images/сourse_сomponent_types_page_design.png
+.. image:: images/course_component_types_page_design.png
     :alt: Course Component Types page
 
 * **Figure 2** – *Course Component Types API*.
 
-.. image:: images/сourse_сomponent_types_api_diagram.png
+.. image:: images/course_component_types_api_diagram.png
     :alt: Course Component Types API
 
 
 * **Figure 3** – *Interaction diagram of the content block’s sidebar tabs*.
-.. image:: images/сourse_сomponent_types_system_diagram.png
+.. image:: images/course_component_types_system_diagram.png
     :alt: Interaction diagram of the content block’s sidebar tabs
 
