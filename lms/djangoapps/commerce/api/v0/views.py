@@ -150,20 +150,27 @@ class BasketsView(APIView):
                     announcement=course_announcement
                 )
             log.info(msg)
+
             try:
                 self._enroll(course_key, user, default_enrollment_mode.slug)
-            # InvalidEnrollmentAttribute exception is the final exception
-            # after the PreventEnrollment one, that is why we catch it here
             except InvalidEnrollmentAttribute as e:
-                log.exception("Invalid enrollment attribute: %s", str(e))
-                error_msg = f"Invalid enrollment data for user {user.username} in course {course_id}: {str(e)}"
-                return DetailResponse(error_msg, status=HTTP_400_BAD_REQUEST)
-
-            # EnrollmentNotAllowed exception is raised when the user is not allowed to enroll in the course
+                # Exception handling for InvalidEnrollmentAttribute
+                return self._handle_enrollment_error(
+                    e,
+                    user,
+                    course_id,
+                    "Invalid enrollment attribute ",
+                    HTTP_400_BAD_REQUEST
+                )
             except EnrollmentNotAllowed as e:
-                log.exception("Enrollment not allowed: %s", str(e))
-                error_msg = f"Enrollment not allowed for user {user.username} in course {course_id}: {str(e)}"
-                return DetailResponse(error_msg, status=HTTP_403_FORBIDDEN)
+                # Exception handling for EnrollmentNotAllowed
+                return self._handle_enrollment_error(
+                    e,
+                    user,
+                    course_id,
+                    "Enrollment not allowed ",
+                    HTTP_403_FORBIDDEN
+                )
 
             mode = CourseMode.AUDIT if audit_mode else CourseMode.HONOR  # lint-amnesty, pylint: disable=unused-variable
             self._handle_marketing_opt_in(request, course_key, user)
@@ -172,6 +179,23 @@ class BasketsView(APIView):
             msg = Messages.NO_DEFAULT_ENROLLMENT_MODE.format(course_id=course_id)
             return DetailResponse(msg, status=HTTP_406_NOT_ACCEPTABLE)
 
+    def _handle_enrollment_error(self, exception, user, course_id, log_message, status_code):
+        """
+        Helper function to handle enrollment exceptions.
+
+        Args:
+            exception (Exception): The exception raised.
+            user (User): The user attempting to enroll.
+            course_id (str): The course ID.
+            log_message (str): The log message template.
+            status_code (int): The HTTP status code to return.
+
+        Returns:
+            DetailResponse: The response with the error message and status code.
+        """
+        log.exception(log_message, str(exception))
+        error_msg = f"{log_message.format(str(exception))} for user {user.username} in course {course_id}: {str(exception)}"
+        return DetailResponse(error_msg, status=status_code)
 
 class BasketOrderView(APIView):
     """
