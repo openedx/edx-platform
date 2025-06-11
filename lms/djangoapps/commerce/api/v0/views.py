@@ -197,6 +197,7 @@ class BasketsView(APIView):
         error_msg = f"{log_message.format(str(exception))} for user {user.username} in course {course_id}: {str(exception)}"
         return DetailResponse(error_msg, status=status_code)
 
+
 class BasketOrderView(APIView):
     """
     Retrieve the order associated with a basket.
