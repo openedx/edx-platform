@@ -1,7 +1,7 @@
 """
 API for migration from modulestore to learning core
 """
-from opaque_keys.edx.locator import LibraryLocatorV2, LibraryCollectionLocator
+from opaque_keys.edx.locator import LibraryLocatorV2
 from opaque_keys.edx.keys import LearningContextKey
 from openedx_learning.api.authoring import get_collection
 
@@ -19,10 +19,11 @@ __all__ = (
 
 
 def start_migration_to_library(
-    *
-    source_key: LearningContextKey,
-    target_key: LibraryLocatorV2 | LibraryCollectionLocator,
+    *,
     user: AuthUser,
+    source_key: LearningContextKey,
+    target_library_key: LibraryLocatorV2,
+    target_collection_slug: str | None = None,
     composition_level: CompositionLevel,
     replace_existing: bool,
     forward_source_to_target: bool,  # @@TODO - Set to False for now. Explain this better.
@@ -31,16 +32,15 @@ def start_migration_to_library(
     Import a course or legacy library into a V2 library (or, a collection within a V2 library).
     """
     source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
-    target_library = get_library(
-        target_key.lib_key if isinstance(target_key, LibraryCollectionLocator) else target_key
-    )
+    target_library = get_library(target_library_key)
     if not (target_package_id := target_library.learning_package_id):
         raise ValueError(
-            f"Cannot import {source_key} into library at {target_key} because the "
+            f"Cannot import {source_key} into library at {target_library_key} because the "
             "library is not connected to a learning package"
         )
-    if isinstance(target_key, LibraryCollectionLocator):
-        target_collection_id = get_collection(target_package_id, target_key.collection_id).id
+    target_collection_id = None
+    if target_collection_slug:
+        target_collection_id = get_collection(target_package_id, target_collection_slug).id
     tasks.migrate_from_modulestore.delay(
         user_id=user.id,
         source_pk=source.id,
