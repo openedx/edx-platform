@@ -696,10 +696,6 @@ def user_profile_pre_save_callback(sender, **kwargs):
     """
     user_profile = kwargs['instance']
 
-    # Remove profile images for users who require parental consent
-    if user_profile.requires_parental_consent() and user_profile.has_profile_image:
-        user_profile.profile_image_uploaded_at = None
-
     # Cache "old" field values on the model instance so that they can be
     # retrieved in the post_save callback when we emit an event with new and
     # old field values.
