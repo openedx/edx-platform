@@ -2742,22 +2742,35 @@ class ExportOra2DataView(DeveloperErrorViewMixin, APIView):
             return JsonResponse({"error": str(err)}, status=400)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def export_ora2_summary(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ExportOra2SummaryView(DeveloperErrorViewMixin, APIView):
     """
-    Pushes a Celery task which will aggregate a summary students' progress in ora2 tasks for a course into a .csv
+    Pushes a Celery task which will aggregate a summary of students' progress in ora2 tasks for a course into a .csv
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('ORA summary')
-    task_api.submit_export_ora2_summary(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    def post(self, request, course_id):
+        """
+        Initiates a Celery task to generate an ORA summary report for the specified course.
+
+        Args:
+            request: The HTTP request object
+            course_id: The string representation of the course key
+
+        Returns:
+            Response: A JSON response with a status message indicating the report generation has started
+        """
+        course_key = CourseKey.from_string(course_id)
+        report_type = _('ORA summary')
+        try:
+            task_api.submit_export_ora2_summary(request, course_key)
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            return Response({"status": success_status})
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
+            return JsonResponse({"error": str(err)}, status=400)
 
 
 @transaction.non_atomic_requests
