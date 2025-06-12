@@ -29,6 +29,21 @@ from openedx.core.lib.hash_utils import create_hash256
 
 from .lti import LTI_PARAMS_KEY, LTIAuthBackend
 from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
+from edx_toggles.toggles import SettingToggle
+
+# .. toggle_name: FEATURES['USE_LATEST_SAML_CONFIG']
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: When enabled, the system uses the latest enabled SAML configuration with
+#    the same slug when authenticating users. When disabled, the system uses the directly
+#    referenced configuration. This is a temporary rollout toggle to get us to the
+#    enabled state.
+# .. toggle_warning: Disabling this may affect authentication for users if providers have
+#    been updated with newer configurations.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-06-10
+# .. toggle_target_removal_date: 2025-09-01
+USE_LATEST_SAML_CONFIG = SettingToggle("USE_LATEST_SAML_CONFIG", default=False, module_name=__name__)
 
 log = logging.getLogger(__name__)
 
@@ -880,12 +895,31 @@ class SAMLProviderConfig(ProviderConfig):
         conf['x509certMulti'] = {'signing': public_keys}
         conf['x509cert'] = ''
         conf['url'] = sso_url
+        # This block determines which SAML configuration should be used during authentication
+        if self.saml_configuration:
+            direct_config = self.saml_configuration
+            conf['saml_sp_configuration'] = direct_config
+            if USE_LATEST_SAML_CONFIG.is_enabled():
+                try:
+                    slug = self.saml_configuration.slug
+                    latest_config = SAMLConfiguration.objects.filter(
+                        slug=slug, enabled=True).order_by('-change_date').first()
+                    if latest_config:
+                        log.info(
+                            "SAML using latest config (toggle ON): provider=%s, slug=%s, direct_id=%s, latest_id=%s",
+                            self.slug, slug, direct_config.id, latest_config.id
+                        )
+                        conf['saml_sp_configuration'] = latest_config
+                except Exception as e:
+                    log.exception("Error finding latest SAML config for slug %s: %s",
+                                  self.saml_configuration.slug, e)
+            else:
+                log.info("SAML using direct config (toggle OFF): provider=%s, slug=%s, direct_id=%s",
+                         self.slug, direct_config.slug, direct_config.id)
+        else:
+            conf['saml_sp_configuration'] = SAMLConfiguration.current(self.site.id, 'default')
 
-        # Add SAMLConfiguration appropriate for this IdP
-        conf['saml_sp_configuration'] = (
-            self.saml_configuration or
-            SAMLConfiguration.current(self.site.id, 'default')
-        )
+        # Create and return the appropriate IdP class with the configuration
         idp_class = get_saml_idp_class(self.identity_provider_type)
         return idp_class(self.slug, **conf)
 
@@ -1050,3 +1084,5 @@ class AppleMigrationUserIdInfo(models.Model):
         app_label = "third_party_auth"
         verbose_name = "Apple User Id Migration Info"
         verbose_name_plural = verbose_name
+
+
