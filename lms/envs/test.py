@@ -676,3 +676,5 @@ TOKEN_SIGNING = {
         ]
     }''',
 }
+
+CATALOG_MICROFRONTEND_URL = "http://catalog-mfe"
