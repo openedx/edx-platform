@@ -24,7 +24,7 @@ from common.djangoapps.student.api import is_user_enrolled_in_course
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.branding import api as branding_api
 from lms.djangoapps.certificates.config import AUTO_CERTIFICATE_GENERATION as _AUTO_CERTIFICATE_GENERATION
-from lms.djangoapps.certificates.data import CertificateStatuses
+from lms.djangoapps.certificates.data import CertificateStatuses, GeneratedCertificateData
 from lms.djangoapps.certificates.generation_handler import generate_certificate_task as _generate_certificate_task
 from lms.djangoapps.certificates.generation_handler import is_on_certificate_allowlist as _is_on_certificate_allowlist
 from lms.djangoapps.certificates.models import (
@@ -32,6 +32,7 @@ from lms.djangoapps.certificates.models import (
     CertificateDateOverride,
     CertificateGenerationConfiguration,
     CertificateGenerationCourseSetting,
+    CertificateGenerationHistory,
     CertificateInvalidation,
     CertificateTemplate,
     CertificateTemplateAsset,
@@ -133,15 +134,16 @@ def get_certificate_for_user(username, course_key, format_results=True):
         A dict containing information about the certificate or, optionally,
         the GeneratedCertificate object itself.
     """
-    try:
-        cert = GeneratedCertificate.eligible_certificates.get(user__username=username, course_id=course_key)
-    except GeneratedCertificate.DoesNotExist:
+
+    cert = GeneratedCertificate.eligible_certificates.filter(user__username=username, course_id=course_key).first()
+
+    if cert is None:
         return None
 
     if format_results:
         return _format_certificate_for_user(username, cert)
-    else:
-        return cert
+
+    return cert
 
 
 def get_certificate_for_user_id(user, course_id):
@@ -719,16 +721,44 @@ def create_certificate_invalidation_entry(certificate, user_requesting_invalidat
     return certificate_invalidation
 
 
-def get_certificate_invalidation_entry(certificate):
+def get_certificate_invalidation_entry(generated_certificate, invalidated_by=None, notes=None, active=None):
     """
-    Retrieves and returns an certificate invalidation entry for a given certificate id.
+    Retrieve a certificate invalidation entry for a specified certificate.
+
+    Optionally filter the invalidation entry by who invalidated it, notes, and whether the invalidation is active.
+
+    Args:
+        generated_certificate (GeneratedCertificate): The certificate to find the invalidation entry for.
+        invalidated_by (User, optional): User who invalidated the certificate. Defaults to None.
+        notes (str, optional): Notes associated with the invalidation. Defaults to None.
+        active (bool, optional): Whether the invalidation entry is currently active. Defaults to None.
+
+    Returns:
+        CertificateInvalidationEntry or None: The matching invalidation entry if found, else None.
     """
-    log.info(f"Attempting to retrieve certificate invalidation entry for certificate with id {certificate.id}.")
-    try:
-        certificate_invalidation_entry = CertificateInvalidation.objects.get(generated_certificate=certificate)
-    except ObjectDoesNotExist:
-        log.warning(f"No certificate invalidation found linked to certificate with id {certificate.id}.")
-        return None
+    log.info(
+        f"Attempting to retrieve certificate invalidation entry "
+        f"for certificate with id {generated_certificate.id}."
+    )
+
+    cert_filter_args = {
+        "generated_certificate": generated_certificate
+    }
+
+    if invalidated_by is not None:
+        cert_filter_args["invalidated_by"] = invalidated_by
+
+    if notes is not None:
+        cert_filter_args["notes"] = notes
+
+    if active is not None:
+        cert_filter_args["active"] = active
+
+    certificate_invalidation_entry = CertificateInvalidation.objects.filter(**cert_filter_args).first()
+
+    # If object does not exist, add a warning to the logs
+    if certificate_invalidation_entry is None:
+        log.warning(f"No certificate invalidation found linked to certificate with id {generated_certificate.id}.")
 
     return certificate_invalidation_entry
 
@@ -949,3 +979,173 @@ def clear_pii_from_certificate_records_for_user(user):
         None
     """
     GeneratedCertificate.objects.filter(user=user).update(name="")
+
+
+def get_cert_history_for_course_id(course_id):
+    """
+    Retrieve all certificate generation history records for the current course.
+    """
+    return CertificateGenerationHistory.objects.filter(course_id=course_id)
+
+
+def get_cert_generation_config():
+    """
+    Return whether certificate generation is currently enabled.
+    """
+    return CertificateGenerationConfiguration.current().enabled
+
+
+def set_cert_generation_config(enabled=True):
+    """
+    Enables or disables the CertificateGenerationConfiguration.
+    """
+    config = CertificateGenerationConfiguration.objects.create(enabled=enabled)
+
+    return config
+
+
+def get_certificate_generation_history(course_id=None, generated_by=None, instructor_task=None, is_regeneration=None):
+    """
+    Retrieves the queryset of CertificateGenerationHistory records filtered by the given arguments
+    """
+    cert_filter_args = {}
+
+    if course_id is not None:
+        cert_filter_args["course_id"] = course_id
+
+    if generated_by is not None:
+        cert_filter_args["generated_by"] = generated_by
+
+    if instructor_task is not None:
+        cert_filter_args["instructor_task"] = instructor_task
+
+    if is_regeneration is not None:
+        cert_filter_args["is_regeneration"] = is_regeneration
+
+    res = CertificateGenerationHistory.objects.filter(**cert_filter_args)
+
+    return res
+
+
+def create_or_update_cert_gen_history(course_id, generated_by, instructor_task, is_regeneration):
+    """
+    Creates or updates a certificate generation history record.
+    """
+    cert_history, _ = CertificateGenerationHistory.objects.update_or_create(
+        course_id=course_id,
+        generated_by=generated_by,
+        instructor_task=instructor_task,
+        is_regeneration=is_regeneration
+    )
+
+    return cert_history
+
+
+def create_or_update_eligible_cert_for_user(user, course_id, status):
+    """
+    Create or update an eligible GeneratedCertificate for a user in a course.
+    """
+    cert, created = GeneratedCertificate.eligible_certificates.update_or_create(
+        user=user,
+        course_id=course_id,
+        status=status
+    )
+
+    return cert, created
+
+
+def get_certificate_invalidations_for_course_key(course_key):
+    """
+    Returns all certificate invalidations for the specified course.
+    """
+    return CertificateInvalidation.get_certificate_invalidations(course_key)
+
+
+def get_certs_for_course_id_given_users(course_id, users):
+    """
+    Fetches all generated certificates for a given course and a list of users.
+    """
+    return GeneratedCertificate.objects.filter(course_id=course_id, user__in=users)
+
+
+def get_course_ids_for_username(username):
+    """
+    Returns a list of course IDs for which the given user has generated certificates.
+    """
+    course_ids_with_certificates = GeneratedCertificate.objects.filter(
+        user__username=username
+    ).values_list('course_id', flat=True)
+    return course_ids_with_certificates
+
+
+def get_generated_certificate(user, course_id):
+    """
+    Return the GeneratedCertificateData for the given user and course ID.
+    """
+    try:
+        cert = GeneratedCertificate.objects.get(user=user, course_id=course_id)
+        return GeneratedCertificateData(
+            user=cert.user,
+            course_id=cert.course_id
+        )
+    except GeneratedCertificate.DoesNotExist:
+        return None
+
+
+def create_generated_certificate(cert_args):
+    """
+    Create a GeneratedCertificate object with the provided arguments.
+    """
+    required_fields = {"user", "course_id"}
+    if not all(field in cert_args for field in required_fields):
+        raise ValueError(f"Missing required fields: {required_fields - cert_args.keys()}")
+    return GeneratedCertificate.objects.create(**cert_args)
+
+
+def get_eligible_certificate(user, course_id):
+    """
+    Retrieves the eligible certificate for the current user and course.
+    """
+    try:
+        return GeneratedCertificate.eligible_certificates.get(
+            user=user.id,
+            course_id=course_id
+        )
+    except GeneratedCertificate.DoesNotExist:
+        return None
+
+
+def get_eligible_available_certificates(user):
+    """
+    Returns all eligible and available certificates for the user.
+    """
+    return GeneratedCertificate.eligible_available_certificates.filter(user=user)
+
+
+def get_eligible_certs_for_course_id_status(course_id, status):
+    """
+    Return all eligible certificates for the specified course ID and status.
+    """
+    return GeneratedCertificate.eligible_certificates.filter(
+        course_id=course_id,
+        status=status
+    )
+
+
+def get_unique_statuses(course_key):
+    """
+    Return the list of unique certificate statuses for the specified course ID.
+    """
+    return GeneratedCertificate.get_unique_statuses(course_key=course_key)
+
+
+def get_course_mode_constant(mode_type):
+    """
+    Return the corresponding course mode constant for a given mode string.
+    """
+
+    mode_map = {
+        "verified": GeneratedCertificate.CourseMode.VERIFIED
+    }
+
+    return mode_map[mode_type.lower()]
