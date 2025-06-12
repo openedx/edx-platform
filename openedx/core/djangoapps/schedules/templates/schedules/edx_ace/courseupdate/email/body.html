@@ -1,6 +1,8 @@
-{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% extends 'schedules/edx_ace/courseupdate/email/base_body.html' %}
+
 {% load i18n %}
 {% load django_markup %}
+{% load static %}
 
 {% block preview_text %}
     {% filter force_escape %}
@@ -11,38 +13,123 @@
 {% endblock %}
 
 {% block content %}
-<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+<table width="100%"  style="margin-bottom: 30px;" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+     <style>
+   .course-text{
+    span{
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+   }
+  </style>
+{% if route_enabled %}
     <tr>
         <td>
             <p>
-                {% blocktrans trimmed asvar tmsg %}
-                    We hope you're enjoying {start_strong}{course_name}{end_strong}!
-                    We want to let you know what you can look forward to in week {week_num}:
-                {% endblocktrans %}
-                {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe week_num=week_num|force_escape|safe %}
-                <ul>
-                    {% for highlight in week_highlights %}
-                        <li>{{ highlight }}</li>
-                    {% endfor %}
-                </ul>
-            </p>
-            <p>
                 {% filter force_escape %}
-                {% blocktrans trimmed %}
-                    With self-paced courses, you learn on your own schedule.
-                    We encourage you to spend time with the course each week.
-                    Your focused attention will pay off in the end!
-                {% endblocktrans %}
+                    {% blocktrans %}This is a routed Account Activation email for {{ routed_profile_name }} ({{ routed_user_email }}): {{ routed_profile_name }}{% endblocktrans %}
                 {% endfilter %}
+                <br />
             </p>
-
-            {% filter force_escape %}
-                {% blocktrans asvar course_cta_text %}Resume your course now{% endblocktrans %}
-            {% endfilter %}
-            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
-
-            {% include "ace_common/edx_ace/common/upsell_cta.html"%}
         </td>
     </tr>
+{% endif %}
+<tr>
+    <td>
+        <img 
+            src="{{ self_paced_banner_url }}"
+            style="margin-bottom: 16px; width: 600px;" 
+            width= "600"
+            height="265"
+            alt="{% trans 'Welcome to edX. It’s time for your next career move' as tmsg %}{{ tmsg | force_escape }}"
+        />
+    </td>
+</tr>
+<tr>
+  <td>
+    <p style="margin-top: 16px; color: #1F453D; font-family: Arial; font-size: 30px; font-weight: 700; line-height: 36px; margin-left: 30px;">
+      {% trans "We hope you’re enjoying Introduction to Data Science with Python!" as tmsg %}{{ tmsg | force_escape }}
+    </p>
+    <p style="margin-top: 16px; color: #000000; font-family: Arial; font-size: 16px; font-weight: 400; line-height: 24px; margin-left: 30px;">
+      {% trans "We want to let you know what you can look forward to in week two: " as tmsg %}{{ tmsg | force_escape }}
+    </p>
+    <ul style="margin-bottom: 16px; list-style: disc;">
+        <li>
+            <p>
+            {% trans "Learn kNN regression" as tmsg %}{{ tmsg | force_escape }}
+            </p>
+        </li>
+        <li>
+            <p>
+            {% trans "Learn linear regression" as tmsg %}{{ tmsg | force_escape }}
+            </p>
+        </li>
+        <li>
+            <p>
+            {% trans "Find out how to choose which model you want" as tmsg %}{{ tmsg | force_escape }}
+            </p>
+        </li>
+    </ul>                       
+  </td>  
+</tr>
+<tr style="height: 32px;">
+    <td style="padding-top: 1rem;" class="course-text">
+         {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Resume your course {% endblocktrans %}
+            {% endfilter %}
+            {% include "schedules/edx_ace/courseupdate/email/return_to_course_cta.html" with course_cta_text=course_cta_text%}
+    </td>
+</tr>
+<tr>
+  <td style="height: 32px; line-height: 32px; font-size: 1px;">
+    &nbsp;
+  </td>
+</tr>
+
+<tr style="background-color: #F3F1ED;">
+    <td>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 540px; border-radius: 8px;" bgcolor="#F3F1ED" class="goals-engage-table" align="left">     
+            <!-- Row 1: Image and title -->
+                <!--[if mso]>
+                    <tr>                             
+                                    <td style="width: 400px; color: #1F453D; font-size: 16px; font-family: Arial, Helvetica, sans-serif; font-weight: 400; line-height: 24px; width: 100%;">
+                                        <p style="padding: 20px 30px; margin-left: 30px">
+                                            <strong>
+                                            {% trans "Your focused attention will pay off in the end!" as tmsg %}{{ tmsg | force_escape }}
+                                            </strong>
+                                            {% trans "With self-paced courses, you learn on your own schedule. It’s a good idea to spend time with the course each week and check in with your goals often." as tmsg %}{{ tmsg | force_escape }}
+                                        </p>
+                                    </td>
+                                    <td width="120" style="width: 120px; padding: 0; margin: 0; vertical-align: top;">
+                                        <img src="{{ self_paced_cloud_url }}"
+                                        alt="Message Icon"
+                                        width="120"
+                                        height="158"
+                                        style="display: block; border: 0; margin: 0; padding: 0; width: 120px; height: 158px; max-width: 120px !important; max-height: 158px !important;" />
+                                    </td>
+                    </tr>
+                <![endif]-->
+                <!--[if !mso]><!-->     
+                    <tr>              
+                        <td style="width: 400px; color: #1F453D; font-size: 16px; font-family: Arial, sans-serif; font-weight: 400; line-height: 24px;">
+                            <p style="padding: 20px 30px; margin: 0px;">
+                            <strong> {% trans "Your focused attention will pay off in the end! " as tmsg %}{{ tmsg | force_escape }} </strong>
+                            {% trans "With self-paced courses, you learn on your own schedule. It’s a good idea to spend time with the course each week and check in with your goals often." as tmsg %}{{ tmsg | force_escape }}
+                            </p>
+                        </td>
+                        <td style="padding: 0; margin: 0;" align="left" valign="top">
+                            <img src="{{ self_paced_cloud_url }}" alt="Message Icon" style="display: block; border: 0; margin: 0; padding: 0; width: 120px; height: 158px; margin-top: -40px;">
+                        </td>
+                    </tr>
+                <!--<![endif]-->
+          </table>                   
+    </td>
+</tr>
 </table>
 {% endblock %}
+
+{% block footer%}
+{%include 'schedules/edx_ace/courseupdate/email/footer.html'%}
+{% endblock%}
