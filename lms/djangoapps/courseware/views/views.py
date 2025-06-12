@@ -68,6 +68,7 @@ from common.djangoapps.util.course import course_location_from_key
 from common.djangoapps.util.db import outer_atomic
 from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
 from common.djangoapps.util.views import ensure_valid_course_key, ensure_valid_usage_key
+from lms.djangoapps.branding import toggles as branding_toggles
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.data import CertificateStatuses
@@ -143,6 +144,7 @@ from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 from openedx.features.course_experience import course_home_url
 from openedx.features.course_experience.url_helpers import (
+    get_catalog_mfe_course_about_url,
     get_courseware_url,
     get_learning_mfe_home_url,
     is_request_from_learning_mfe
@@ -801,6 +803,10 @@ def course_about(request, course_id):  # pylint: disable=too-many-statements
     # If user needs to be redirected to course home then redirect
     if _course_home_redirect_enabled():
         return redirect(course_home_url(course_key))
+
+    # If the course about page is being rendered in the MFE, redirect to the MFE.
+    if branding_toggles.catalog_mfe_enabled() and branding_toggles.use_new_course_about_page():
+        return redirect(get_catalog_mfe_course_about_url(course_key), permanent=True)
 
     with modulestore().bulk_operations(course_key):
         permission = get_permission_for_course_about()
