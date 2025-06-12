@@ -557,7 +557,19 @@ class SequenceBlock(
                 'This section is a prerequisite. You must complete this section in order to unlock additional content.'
             )
 
-        blocks = self._render_student_view_for_blocks(context, children, fragment, view) if prereq_met else []
+        if prereq_met:
+            blocks = self._render_student_view_for_blocks(context, children, fragment, view)
+        else:
+            blocks = []
+            for child in children:
+                usage_id = child.scope_ids.usage_id
+                blocks.append({
+                    'id': str(usage_id),
+                    'type': child.scope_ids.block_type,
+                    'display_name': child.display_name_with_default,
+                    'is_gated': True,  # Mark as blocked
+                    'content': '',  # Real content not included
+                })
 
         params = {
             'items': blocks,
