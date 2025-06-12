@@ -421,10 +421,8 @@ django-storages==1.14.6
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-django-user-tasks==3.3.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+django-user-tasks==3.4.1
+    # via -r requirements/edx/base.txt
 django-waffle==4.2.0
     # via
     #   -r requirements/edx/base.txt
@@ -547,7 +545,7 @@ edx-drf-extensions==10.6.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==6.0.3
+edx-enterprise==6.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
