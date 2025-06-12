@@ -127,7 +127,7 @@ BULK_EMAIL_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
 BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
 CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-CSRF_TRUSTED_ORIGINS = Derived(lambda settings: settings.CSRF_TRUSTED_ORIGINS_WITH_SCHEME)
+CSRF_TRUSTED_ORIGINS = Derived(lambda settings: settings.CSRF_TRUSTED_ORIGINS)
 DEFAULT_ENTERPRISE_API_URL = Derived(
     lambda settings: (
         None if settings.LMS_INTERNAL_ROOT_URL is None
@@ -257,7 +257,6 @@ for feature, value in _YAML_TOKENS.get('FEATURES', {}).items():
 ALLOWED_HOSTS = [
     "*",
     _YAML_TOKENS.get('LMS_BASE'),
-    FEATURES['PREVIEW_LMS_BASE'],
 ]
 
 # Cache used for location mapping -- called many times with the same key/value
@@ -325,14 +324,6 @@ if FEATURES['ENABLE_CORS_HEADERS'] or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COO
     CORS_ORIGIN_ALLOW_ALL = _YAML_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
     CORS_ALLOW_INSECURE = _YAML_TOKENS.get('CORS_ALLOW_INSECURE', False)
     CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = _YAML_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
-
-# PREVIEW DOMAIN must be present in HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS for the preview to show draft changes
-if 'PREVIEW_LMS_BASE' in FEATURES and FEATURES['PREVIEW_LMS_BASE'] != '':
-    PREVIEW_DOMAIN = FEATURES['PREVIEW_LMS_BASE'].split(':')[0]
-    # update dictionary with preview domain regex
-    HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS.update({
-        PREVIEW_DOMAIN: 'draft-preferred'
-    })
 
 ############### Mixed Related(Secure/Not-Secure) Items ##########
 LMS_SEGMENT_KEY = _YAML_TOKENS.get('SEGMENT_KEY')

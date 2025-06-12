@@ -29,6 +29,7 @@ from lms.djangoapps.edxnotes.plugins import EdxNotesTab
 from lms.lib.utils import get_parent_unit
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangolib.markup import Text
+from openedx.features.course_experience.url_helpers import get_courseware_url
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -256,16 +257,8 @@ def get_block_context(course, block):
         course = block.get_parent()
         block_dict['index'] = get_index(block_dict['location'], course.children)
     elif block.category == 'vertical':
-        section = block.get_parent()
-        chapter = section.get_parent()
-        # Position starts from 1, that's why we add 1.
-        position = get_index(str(block.location), section.children) + 1
-        block_dict['url'] = reverse('courseware_position', kwargs={
-            'course_id': str(course.id),
-            'chapter': chapter.url_name,
-            'section': section.url_name,
-            'position': position,
-        })
+        # Use the MFE-aware URL generator instead of always using the legacy URL format
+        block_dict['url'] = get_courseware_url(block.location)
     if block.category in ('chapter', 'sequential'):
         block_dict['children'] = [str(child) for child in block.children]
 

@@ -11,29 +11,20 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 
-import crum
-import hashlib  # lint-amnesty, pylint: disable=wrong-import-order
-import json  # lint-amnesty, pylint: disable=wrong-import-order
-import logging  # lint-amnesty, pylint: disable=wrong-import-order
-import uuid  # lint-amnesty, pylint: disable=wrong-import-order
-from datetime import datetime, timedelta  # lint-amnesty, pylint: disable=wrong-import-order
-from functools import total_ordering  # lint-amnesty, pylint: disable=wrong-import-order
-from importlib import import_module  # lint-amnesty, pylint: disable=wrong-import-order
+import hashlib
+import json
+import logging
+import uuid
+from datetime import datetime, timedelta
+from functools import total_ordering
+from importlib import import_module
 from urllib.parse import urlencode
 
-from .course_enrollment import (
-    ALLOWEDTOENROLL_TO_ENROLLED,
-    CourseEnrollment,
-    CourseEnrollmentAllowed,
-    CourseOverview,
-    ManualEnrollmentAudit,
-    segment
-)
-
+import crum
 from config_models.models import ConfigurationModel
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import get_user_model
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -64,6 +55,16 @@ from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.toggles import ENTRANCE_EXAMS
 
+from .course_enrollment import (
+    ALLOWEDTOENROLL_TO_ENROLLED,
+    CourseEnrollment,
+    CourseEnrollmentAllowed,
+    CourseOverview,
+    ManualEnrollmentAudit,
+    segment
+)
+
+User = get_user_model()
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
@@ -72,6 +73,7 @@ IS_MARKETABLE = 'is_marketable'
 
 USER_LOGGED_IN_EVENT_NAME = 'edx.user.login'
 USER_LOGGED_OUT_EVENT_NAME = 'edx.user.logout'
+USER_STREAK_UPDATED_EVENT_NAME = "edx.user.celebration.streak_updated"
 
 
 class AnonymousUserId(models.Model):
@@ -693,10 +695,6 @@ def user_profile_pre_save_callback(sender, **kwargs):
     Ensure consistency of a user profile before saving it.
     """
     user_profile = kwargs['instance']
-
-    # Remove profile images for users who require parental consent
-    if user_profile.requires_parental_consent() and user_profile.has_profile_image:
-        user_profile.profile_image_uploaded_at = None
 
     # Cache "old" field values on the model instance so that they can be
     # retrieved in the post_save callback when we emit an event with new and
@@ -1769,7 +1767,7 @@ class UserCelebration(TimeStampedModel):
                 # Celebrate if we didn't already celebrate today
                 streak_length_to_celebrate = streak_length
 
-        return last_day_of_streak, streak_length, streak_length_to_celebrate
+        return last_day_of_streak, streak_length, streak_length_to_celebrate, already_updated_streak_today
 
     def _update_streak(self, last_day_of_streak, streak_length):
         """ Update the celebration with the new streak data """
@@ -1780,6 +1778,32 @@ class UserCelebration(TimeStampedModel):
             self.longest_ever_streak = max(self.longest_ever_streak, streak_length)
 
             self.save()
+
+    def _emit_streak_update_event(self, user: User, course_id: str, current_streak_length: int) -> None:
+        """
+        Emits a server-side event using the event tracking library with details about the learner's current streak. The
+        course run ID is included to enable tracking of progress trends over time.
+
+        Args:
+            user (User): The user whose streak is being updated.
+            course_id (str): The course run ID the learner is currently engaged with.
+            current_streak_length (int): The number of consecutive days the user has been active.
+        """
+        context = {
+            "user_id": user.id,
+            "course_id": course_id,
+        }
+        data = {
+            "user_id": user.id,
+            "current_course_id": course_id,
+            "current_streak_length": current_streak_length,
+        }
+
+        with tracker.get_tracker().context(USER_STREAK_UPDATED_EVENT_NAME, context):
+            tracker.emit(
+                USER_STREAK_UPDATED_EVENT_NAME,
+                data,
+            )
 
     @classmethod
     def _get_celebration(cls, user, course_key):
@@ -1795,30 +1819,46 @@ class UserCelebration(TimeStampedModel):
 
     @classmethod
     def perform_streak_updates(cls, user, course_key, browser_timezone=None):
-        """ Determine if the user should see a streak celebration and
-            return the length of the streak the user should celebrate.
-            Also update the streak data that is stored in the database."""
+        """
+        Determine if the user should see a streak celebration and return the length of the streak the user should
+        celebrate.
+
+        Additionally, we record any updates to the current streak in the database and emit a server side
+        event about the update.
+
+        Args:
+            user (User): The user whose streak is being updated.
+            course_key (CourseLocator): The Course Run key of the course the user is currently engaged with when
+                recording the streak update.
+            browser_timezone (str): String representing the current time zone set from a user's web browser.
+                May be null.
+
+        Returns:
+            streak_length_to_celebrate (int): A number representing how many days in a row a learner has been actively
+                engaging in learning content in the courseware.
+        """
         # importing here to avoid a circular import
         from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_student
-        if not user or user.is_anonymous:
-            return None
-
-        if is_masquerading_as_specific_student(user, course_key):
+        if (
+            not user
+            or user.is_anonymous
+            or is_masquerading_as_specific_student(user, course_key)
+        ):
             return None
 
         celebration = cls._get_celebration(user, course_key)
-
         if not celebration:
             return None
 
         today = cls._get_now(browser_timezone).date()
-
         # pylint: disable=protected-access
-        last_day_of_streak, streak_length, streak_length_to_celebrate = \
+        last_day_of_streak, streak_length, streak_length_to_celebrate, already_updated_streak_today = \
             celebration._calculate_streak_updates(today)
         # pylint: enable=protected-access
 
-        cls._update_streak(celebration, last_day_of_streak, streak_length)
+        if not already_updated_streak_today:
+            cls._update_streak(celebration, last_day_of_streak, streak_length)
+            cls._emit_streak_update_event(celebration, user, str(course_key), streak_length)
 
         return streak_length_to_celebrate
 

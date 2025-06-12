@@ -1,7 +1,6 @@
 """
 Models for the course to library import app.
 """
-
 import uuid as uuid_tools
 
 from django.contrib.auth import get_user_model
