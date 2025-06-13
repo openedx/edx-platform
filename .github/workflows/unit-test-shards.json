@@ -238,7 +238,7 @@
       "cms/djangoapps/cms_user_tasks/",
       "cms/djangoapps/course_creators/",
       "cms/djangoapps/export_course_metadata/",
-      "cms/djangoapps/import_from_modulestore/",
+      "cms/djangoapps/modulestore_migrator/",
       "cms/djangoapps/maintenance/",
       "cms/djangoapps/models/",
       "cms/djangoapps/pipeline_js/",
