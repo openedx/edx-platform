@@ -271,8 +271,8 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
 
     @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
     @override_settings(LOGO_URL_PNG='https://www.logo.png')
-    @override_settings(SELF_PACED_BANNER_URL = '')
-    @override_settings(SELF_PACED_CLOUD_URL = '')
+    @override_settings(SELF_PACED_BANNER_URL='')
+    @override_settings(SELF_PACED_CLOUD_URL='')
     def test_schedule_context(self):
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
