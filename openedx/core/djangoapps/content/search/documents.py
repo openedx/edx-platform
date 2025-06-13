@@ -630,7 +630,7 @@ def searchable_doc_for_container(
                     str(child.usage_key)
                     for child in children
                 ]
-            case lib_api.ContainerType.Subsection | lib_api.ContainerType.Section:
+            case lib_api.ContainerType.Subsection | lib_api.ContainerType.Section | lib_api.ContainerType.OutlineRoot:
                 return [
                     str(child.container_key)
                     for child in children

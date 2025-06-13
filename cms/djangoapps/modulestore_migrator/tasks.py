@@ -358,7 +358,7 @@ def _migrate_node(
         container_type = ContainerType.from_source_olx_tag(source_node.tag)
     except ValueError:
         container_type = None
-        if source_node.tag in {"course", "library"}:
+        if source_node.tag == "library":
             should_migrate_node = False
             should_migrate_children = True
         else:
