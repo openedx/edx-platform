@@ -987,7 +987,7 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.0
     # via -r requirements/edx/base.txt
-openedx-learning==0.26.0
+-e git+https://github.com/openedx/openedx-learning.git@lc-course-prototype#egg=openedx-learning
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
