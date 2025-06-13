@@ -78,7 +78,7 @@ def store_uploaded_file(
         file_storage = DefaultStorage()
         # If a file already exists with the supplied name, file_storage will make the filename unique.
         stored_file_name = file_storage.save(stored_file_name, uploaded_file)
-        if is_private and settings.DEFAULT_FILE_STORAGE == 'storages.backends.s3boto3.S3Boto3Storage':
+        if is_private and settings.STORAGES["default"]["BACKEND"] == 'storages.backends.s3boto3.S3Boto3Storage':
             S3Boto3Storage().connection.meta.client.put_object_acl(
                 ACL='private',
                 Bucket=settings.AWS_STORAGE_BUCKET_NAME,
