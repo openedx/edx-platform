@@ -41,7 +41,7 @@ def start_migration_to_library(
     target_collection_id = None
     if target_collection_slug:
         target_collection_id = get_collection(target_package_id, target_collection_slug).id
-    tasks.migrate_from_modulestore.delay(
+    return tasks.migrate_from_modulestore.delay(
         user_id=user.id,
         source_pk=source.id,
         target_package_pk=target_package_id,
