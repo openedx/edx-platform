@@ -3,9 +3,9 @@ Course to Library Import API v0 URLs.
 """
 
 from rest_framework.routers import SimpleRouter
-# from .views import ImportViewSet  # @@TODO - re-anble this once API is fixed
+from .views import ImportViewSet
 
 ROUTER = SimpleRouter()
-# ROUTER.register(r'imports', ImportViewSet)
+ROUTER.register(r'imports', ImportViewSet)
 
 urlpatterns = ROUTER.urls
