@@ -29,6 +29,7 @@ from .common import *
 from lms.envs.test import (  # pylint: disable=wrong-import-order, disable=unused-import
     ACCOUNT_MICROFRONTEND_URL,
     COMPREHENSIVE_THEME_DIRS,  # unimport:skip
+    DEFAULT_FILE_STORAGE,
     ECOMMERCE_API_URL,
     ENABLE_COMPREHENSIVE_THEMING,
     JWT_AUTH,
@@ -90,7 +91,7 @@ STATICFILES_DIRS += [
 # If we don't add these settings, then Django templates that can't
 # find pipelined assets will raise a ValueError.
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
-STORAGES['staticfiles']['BACKEND'] = "pipeline.storage.NonPackagingPipelineStorage"
+STATICFILES_STORAGE = "pipeline.storage.NonPackagingPipelineStorage"
 STATIC_URL = "/static/"
 
 # Update module store settings per defaults for tests

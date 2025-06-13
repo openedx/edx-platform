@@ -2356,6 +2356,7 @@ PIPELINE = {
     'UGLIFYJS_BINARY': 'node_modules/.bin/uglifyjs',
 }
 
+STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 STATICFILES_STORAGE_KWARGS = {}
 
 # List of finder classes that know how to find static files in various locations.
@@ -5203,14 +5204,7 @@ VIDEO_UPLOAD_PIPELINE = {
 }
 
 ############### Settings for django file storage ##################
-STORAGES = {
-    "default": {
-        "BACKEND": 'django.core.files.storage.FileSystemStorage'
-    },
-    "staticfiles": {
-        "BACKEND": 'openedx.core.storage.ProductionStorage'
-    }
-}
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 ### Proctoring configuration (redirct URLs and keys shared between systems) ####
 PROCTORING_BACKENDS = {
