@@ -74,28 +74,25 @@ class BulkEnableDisableDiscussionsTestCase(ModuleStoreTestCase):
         """
         self.enable_disable_discussions_for_all_units(True)
 
-    def enable_disable_discussions_for_all_units(self, enable_disable):
+    def enable_disable_discussions_for_all_units(self, is_enabled):
         """
         Test that the API successfully enables/disables discussions for all units.
         """
         data = {
-            "discussion_enabled": enable_disable
+            "discussion_enabled": is_enabled
         }
         response = self.client.put(self.url, data=json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         print(response_data)
-        self.assertEqual(response_data['updated_and_republished'], 0 if enable_disable else 2)
+        self.assertEqual(response_data['updated_and_republished'], 0 if is_enabled else 2)
 
         # Check that all verticals now have discussion_enabled set to the expected value
         with self.store.bulk_operations(self.course_key):
-            course = self.store.get_course(self.course_key)
-            for chapter in course.get_children():
-                for sequential in chapter.get_children():
-                    for vertical in sequential.get_children():
-                        if vertical.category == "vertical":
-                            self.assertEqual(vertical.discussion_enabled, enable_disable)
-        
+            verticals = self.store.get_items(self.course_key, qualifiers={'block_type': 'vertical'})
+            for vertical in verticals:
+                self.assertEqual(vertical.discussion_enabled, is_enabled)
+
     def test_permission_denied_for_non_staff(self):
         """
         Test that non-staff users are denied access to the API.
