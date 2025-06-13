@@ -28,7 +28,6 @@ DATABASES = {
 
 # Use RequireJS optimized storage
 STATICFILES_STORAGE = f"{OptimizedCachedRequireJsStorage.__module__}.{OptimizedCachedRequireJsStorage.__name__}"
-STORAGES['staticfiles']['BACKEND'] = STATICFILES_STORAGE
 
 # Revert to the default set of finders as we don't want to dynamically pick up files from the pipeline
 STATICFILES_FINDERS = [
