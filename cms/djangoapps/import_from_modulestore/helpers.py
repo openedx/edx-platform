@@ -65,15 +65,13 @@ class ImportClient:
         block_usage_key_to_import: str,
         target_learning_package: 'LearningPackage',
         staged_content: 'StagedContent',
-        composition_level: str,
-        override: bool = False,
     ):
         self.import_event = import_event
         self.block_usage_key_to_import = block_usage_key_to_import
         self.learning_package = target_learning_package
         self.staged_content = staged_content
-        self.composition_level = composition_level
-        self.override = override
+        self.composition_level = self.import_event.composition_level
+        self.override = self.import_event.override
 
         self.user_id = import_event.user_id
         self.content_library = target_learning_package.contentlibrary
@@ -90,7 +88,7 @@ class ImportClient:
         if block_to_import is None:
             return []
 
-        return self._process_import(self.block_usage_key_to_import, block_to_import)
+        return self._import_complicated_child(block_to_import, self.block_usage_key_to_import)
 
     def _process_import(self, usage_key_string, block_to_import) -> list[PublishableVersionWithMapping]:
         """
@@ -378,8 +376,6 @@ def import_from_staged_content(
     usage_key_string: str,
     target_learning_package: 'LearningPackage',
     staged_content: 'StagedContent',
-    composition_level: str,
-    override: bool = False,
 ) -> list[PublishableVersionWithMapping]:
     """
     Import staged content to a library from staged content.
@@ -391,8 +387,6 @@ def import_from_staged_content(
         usage_key_string,
         target_learning_package,
         staged_content,
-        composition_level,
-        override,
     )
     return import_client.import_from_staged_content()
 
@@ -461,6 +455,6 @@ def cancel_incomplete_old_imports(import_event: Import) -> None:
         target_change=import_event.target_change,
         source_key=import_event.source_key,
         staged_content_for_import__isnull=False
-    ).exclude(uuid=import_event.uuid)
+    ).exclude(pk=import_event.pk)
     for incomplete_import in incomplete_user_imports_with_same_target:
         incomplete_import.set_status(ImportStatus.CANCELED)
