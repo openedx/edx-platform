@@ -4,7 +4,7 @@ Storage backend for course metadata export.
 
 
 from django.conf import settings
-from django.core.files.storage import get_storage_class
+from common.djangoapps.util.storage import resolve_storage_backend
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
@@ -17,4 +17,7 @@ class CourseMetadataExportS3Storage(S3Boto3Storage):  # pylint: disable=abstract
         bucket = settings.COURSE_METADATA_EXPORT_BUCKET
         super().__init__(bucket_name=bucket, custom_domain=None, querystring_auth=True)
 
-course_metadata_export_storage = get_storage_class(settings.COURSE_METADATA_EXPORT_STORAGE)()
+course_metadata_export_storage = resolve_storage_backend(
+    storage_key="course_metadata_export",
+    legacy_setting_key="COURSE_METADATA_EXPORT_STORAGE"
+)
