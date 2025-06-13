@@ -25,6 +25,7 @@ LAST_SESSION_SAVE_TIME_KEYNAME = 'SessionInactivityTimeout:last_session_save_tim
 
 LOG = logging.getLogger(__name__)
 
+
 class SessionInactivityTimeout(MiddlewareMixin):
     """
     Middleware class to keep track of activity on a given session
