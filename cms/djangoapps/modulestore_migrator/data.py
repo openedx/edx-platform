@@ -21,6 +21,7 @@ class CompositionLevel(Enum):
     Unit = ContainerType.Unit.value
     Subsection = ContainerType.Subsection.value
     Section = ContainerType.Section.value
+    OutlineRoot = ContainerType.OutlineRoot.value
 
     @property
     def is_container(self) -> bool:
