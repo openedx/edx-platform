@@ -65,7 +65,7 @@ class ThemeFilesFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstract-me
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage
 
-    def find(self, path, all=False):  # pylint: disable=redefined-builtin
+    def find(self, path, find_all=False, **kwargs):  # pylint: disable=redefined-builtin
         """
         Looks for files in the theme directories.
         """
@@ -79,7 +79,7 @@ class ThemeFilesFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstract-me
             path = "/".join(path.split("/")[1:])
             match = self.find_in_theme(theme.theme_dir_name, path)
             if match:
-                if not all:
+                if not find_all:
                     return match
                 matches.append(match)
         return matches

@@ -37,7 +37,7 @@ class TestThemeFinders(TestCase):
         themes_dir = settings.COMPREHENSIVE_THEME_DIRS[1]
 
         asset = "test-theme/images/logo.png"
-        matches = self.finder.find(asset, all=True)
+        matches = self.finder.find(asset, True)
 
         # Make sure only first match was returned
         assert 1 == len(matches)
