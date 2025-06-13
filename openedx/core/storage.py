@@ -5,8 +5,10 @@ Django storage backends for Open edX.
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import StaticFilesStorage
-from django.core.files.storage import get_storage_class, FileSystemStorage
+from django.core.files.storage import FileSystemStorage
 from django.utils.deconstruct import deconstructible
+from django.utils.module_loading import import_string
+from django.core.exceptions import ImproperlyConfigured
 from functools import lru_cache
 from pipeline.storage import NonPackagingMixin
 from require.storage import OptimizedFilesMixin
@@ -111,4 +113,8 @@ def get_storage(storage_class=None, **kwargs):
     the storage implementation makes http requests when instantiated, for
     example.
     """
-    return get_storage_class(storage_class)(**kwargs)
+    try:
+        storage_cls = import_string(storage_class or settings.DEFAULT_FILE_STORAGE)
+    except ImportError as e:
+        raise ImproperlyConfigured(f"Could not find backend {storage_class!r}: {e}") from e
+    return storage_cls(**kwargs)
