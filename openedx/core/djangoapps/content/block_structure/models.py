@@ -13,10 +13,10 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import ContentFile
 from django.db import models, transaction
 
+from common.djangoapps.util.storage import resolve_storage_backend
 from model_utils.models import TimeStampedModel
 
 from openedx.core.djangoapps.xmodule_django.models import UsageKeyWithRunField
-from openedx.core.storage import get_storage
 
 from . import config
 from .exceptions import BlockStructureNotFound
@@ -73,7 +73,7 @@ def _bs_model_storage():
     # .. setting_default: None
     # .. setting_description: Specifies the storage used for storage-backed block structure cache.
     #   For more information, check https://github.com/openedx/edx-platform/pull/14571.
-    storage_class = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS')
+    # storage_class = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS')
 
     # .. setting_name: BLOCK_STRUCTURES_SETTINGS['STORAGE_KWARGS']
     # .. setting_default: {}
@@ -83,7 +83,12 @@ def _bs_model_storage():
     # .. setting_warnings: Depends on `BLOCK_STRUCTURES_SETTINGS['STORAGE_CLASS']`
     storage_kwargs = settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_KWARGS', {})
 
-    return get_storage(storage_class, **storage_kwargs)
+    return resolve_storage_backend(
+        storage_key="block_structures_settings",
+        legacy_setting_key="BLOCK_STRUCTURES_SETTINGS",
+        legacy_sec_setting_key="STORAGE_CLASS",
+        options=storage_kwargs
+    )
 
 
 class CustomizableFileField(models.FileField):
