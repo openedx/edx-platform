@@ -21,10 +21,9 @@ interface, as well.
 
 import os
 from collections import OrderedDict
-
+from django import VERSION
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
-
 from openedx.core.djangoapps.theming.helpers import get_themes
 from openedx.core.djangoapps.theming.storage import ThemeStorage
 
@@ -65,10 +64,16 @@ class ThemeFilesFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstract-me
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage
 
-    def find(self, path, find_all=False, **kwargs):  # pylint: disable=redefined-builtin
+    def find(self, path, *args, **kwargs):  # pylint: disable=redefined-builtin
         """
         Looks for files in the theme directories.
         """
+        if VERSION >= (5, 2):
+            find_all = kwargs.get('find_all', False)
+        else:
+            # Django < 5.2 passes as positional
+            find_all = args[0] if args else False
+
         matches = []
         theme_dir_name = path.split("/", 1)[0]
 
