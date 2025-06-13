@@ -1724,7 +1724,7 @@ def bulk_enable_disable_discussions(request, course_key_string):
         # Validate the course key
         course_key = CourseKey.from_string(course_key_string)
     except InvalidKeyError:
-        return HttpResponseBadRequest("Invalid course key format")
+        return JsonResponseBadRequest({"error": "Invalid course key format"})
 
     user = request.user
 
@@ -1733,10 +1733,10 @@ def bulk_enable_disable_discussions(request, course_key_string):
         raise PermissionDenied()
 
     if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
-        return HttpResponseBadRequest("Only supports json requests")
-   
+        return JsonResponseBadRequest({"error": "Only supports json requests"})
+
     if 'discussion_enabled' not in request.json:
-        return HttpResponseBadRequest("Missing 'discussion_enabled' field in request body")
+        return JsonResponseBadRequest({"error": "Missing 'discussion_enabled' field in request body"})
     discussion_enabled = request.json['discussion_enabled']
     log.info(
         "User %s is attempting to %s discussions for all verticals in course %s",
@@ -1744,30 +1744,26 @@ def bulk_enable_disable_discussions(request, course_key_string):
         "enable" if discussion_enabled else "disable",
         course_key
     )
+
     if request.method == 'PUT':
         try:
             store = modulestore()
             changed = 0
             with store.bulk_operations(course_key):
-                course = store.get_course(course_key)
-                for chapter in course.get_children():
-                    for sequential in chapter.get_children():
-                        for vertical in sequential.get_children():
-                            if vertical.category == "vertical":
-                                if vertical.discussion_enabled != discussion_enabled:
-                                    vertical.discussion_enabled = discussion_enabled
-                                    store.update_item(vertical, user.id)
+                verticals = store.get_items(course_key, qualifiers={'block_type': 'vertical'})
+                for vertical in verticals:
+                    if vertical.discussion_enabled != discussion_enabled:
+                        vertical.discussion_enabled = discussion_enabled
+                        store.update_item(vertical, user.id)
 
-                                    if store.has_published_version(vertical):
-                                        store.publish(vertical.location, user.id)
-                                    changed += 1
+                        if store.has_published_version(vertical):
+                            store.publish(vertical.location, user.id)
+                        changed += 1
             return JsonResponse({"updated_and_republished": changed})
         except Exception as e:  # lint-amnesty, pylint: disable=broad-except
-            log.exception(str(e))
-            return JsonResponseBadRequest(
-                "Failed to save",
-                content_type="text/plain"
-            )
+            log.exception("Exception occurred while enabling/disabling discussion: %s", str(e))
+            return JsonResponseBadRequest({"error": str(e)})
+
 
 def are_content_experiments_enabled(course):
     """
