@@ -145,12 +145,6 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-# Avoid having to run collectstatic before the unit test suite
-# If we don't add these settings, then Django templates that can't
-# find pipelined assets will raise a ValueError.
-# http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
-STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
-
 # Don't use compression during tests
 PIPELINE['JS_COMPRESSOR'] = None
 
@@ -295,7 +289,14 @@ ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
 ])
 
 ############################ STATIC FILES #############################
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": 'django.core.files.storage.FileSystemStorage'
+    },
+    "staticfiles": {
+        "BACKEND": 'pipeline.storage.NonPackagingPipelineStorage'
+    }
+}
 MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/uploads/"
 STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
