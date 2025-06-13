@@ -39,7 +39,7 @@ def parse_args():
     lms.add_argument(
         '--settings',
         help="Which django settings module to use under lms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
-             "environment variable will be used if it is set, otherwise it will default to lms.envs.devstack_docker")
+             "environment variable will be used if it is set, otherwise it will default to lms.envs.devstack")
     lms.add_argument(
         '--service-variant',
         choices=['lms', 'lms-xml', 'lms-preview'],
@@ -48,7 +48,7 @@ def parse_args():
     lms.set_defaults(
         help_string=lms.format_help(),
         settings_base='lms/envs',
-        default_settings='lms.envs.devstack_docker',
+        default_settings='lms.envs.devstack',
     )
 
     cms = subparsers.add_parser(
@@ -60,12 +60,12 @@ def parse_args():
     cms.add_argument(
         '--settings',
         help="Which django settings module to use under cms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
-             "environment variable will be used if it is set, otherwise it will default to cms.envs.devstack_docker")
+             "environment variable will be used if it is set, otherwise it will default to cms.envs.devstack")
     cms.add_argument('-h', '--help', action='store_true', help='show this help message and exit')
     cms.set_defaults(
         help_string=cms.format_help(),
         settings_base='cms/envs',
-        default_settings='cms.envs.devstack_docker',
+        default_settings='cms.envs.devstack',
         service_variant='cms',
     )
 
