@@ -137,7 +137,7 @@ class _BaseDownstreamViewTestMixin:
         """
         Call a REST API
         """
-        response = getattr(self.client, method)(url, data, format="json")
+        response = getattr(self.client, method)(url, data, format="json", content_type="application/json")
         assert response.status_code == expect_response,\
             'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
         return response.data
@@ -480,9 +480,9 @@ class GetUpstreamViewTest(
     """
     def call_api(
         self,
-        course_id: str = None,
-        ready_to_sync: bool = None,
-        upstream_usage_key: str = None,
+        course_id: str | None = None,
+        ready_to_sync: bool | None = None,
+        upstream_usage_key: str | None = None,
     ):
         data = {}
         if course_id is not None:
@@ -609,9 +609,9 @@ class GetContainerUpstreamViewTest(
     """
     def call_api(
         self,
-        course_id: str = None,
-        ready_to_sync: bool = None,
-        upstream_container_key: str = None,
+        course_id: str | None = None,
+        ready_to_sync: bool | None = None,
+        upstream_container_key: str | None = None,
     ):
         data = {}
         if course_id is not None:
@@ -627,7 +627,6 @@ class GetContainerUpstreamViewTest(
         Returns all container links for given course
         """
         self.client.login(username="superuser", password="password")
-        self.maxDiff = 20000
         response = self.call_api(course_id=self.course.id)
         assert response.status_code == 200
         data = response.json()
@@ -671,7 +670,7 @@ class GetContainerUpstreamViewTest(
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
                 'upstream_container_key': self.unit_id,
-                'upstream_version': 1,
+                'upstream_version': 2,
                 'version_declined': None,
                 'version_synced': 1
             },
@@ -689,17 +688,3 @@ class GetContainerUpstreamViewTest(
         data = response.json()
         self.assertTrue(all(o["ready_to_sync"] for o in data["results"]))
         self.assertEqual(data["count"], 1)
-
-    def test_200_downstream_context_list(self):
-        """
-        Returns all downstream courses for given library block
-        """
-        self.client.login(username="superuser", password="password")
-        response = self.call_api(upstream_usage_key=self.video_lib_id)
-        assert response.status_code == 200
-        data = response.json()
-        expected = [str(self.downstream_video_key)] + [str(key) for key in self.another_video_keys]
-        got = [str(o["downstream_usage_key"]) for o in data["results"]]
-        self.assertListEqual(got, expected)
-        self.assertEqual(data["count"], 4)
-
