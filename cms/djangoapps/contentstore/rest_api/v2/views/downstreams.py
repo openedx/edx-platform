@@ -378,7 +378,7 @@ class DownstreamContainerListView(DeveloperErrorViewMixin, APIView):
         course_key_string = request.GET.get('course_id')
         ready_to_sync = request.GET.get('ready_to_sync')
         upstream_container_key = request.GET.get('upstream_container_key')
-        link_filter: dict[str, CourseKey | UsageKey | bool] = {}
+        link_filter: dict[str, CourseKey | LibraryContainerLocator | bool] = {}
         paginator = DownstreamListPaginator()
         if course_key_string:
             try:
