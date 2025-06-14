@@ -37,6 +37,7 @@ from xmodule.capa.tests.response_xml_factory import (
     SymbolicResponseXMLFactory,
     TrueFalseResponseXMLFactory
 )
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 from xmodule.capa.util import convert_files_to_filenames
 from xmodule.capa.xqueue_interface import dateformat
 
@@ -108,6 +109,7 @@ class ResponseTest(unittest.TestCase):
         return str(rand.randint(0, 1e9))
 
 
+@use_unsafe_codejail()
 class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = MultipleChoiceResponseXMLFactory
 
@@ -375,6 +377,7 @@ class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-class-docst
             assert correct_map.get_correctness('1_2_1') == expected_correctness
 
 
+@use_unsafe_codejail()
 class OptionResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = OptionResponseXMLFactory
 
@@ -422,6 +425,7 @@ class OptionResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_property('1_2_1', 'answervariable') == '$a'
 
 
+@use_unsafe_codejail()
 class FormulaResponseTest(ResponseTest):
     """
     Test the FormulaResponse class
@@ -571,6 +575,7 @@ class FormulaResponseTest(ResponseTest):
         assert not list(problem.responders.values())[0].validate_answer('3*y+2*x')
 
 
+@use_unsafe_codejail()
 class StringResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = StringResponseXMLFactory
 
@@ -1124,6 +1129,7 @@ class CodeResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
                 assert output[answer_id]['msg'] == 'Invalid grader reply. Please contact the course staff.'
 
 
+@use_unsafe_codejail()
 class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = ChoiceResponseXMLFactory
 
@@ -1292,6 +1298,7 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         self.assert_grade(problem, ['choice_1', 'choice_3'], 'incorrect')
 
 
+@use_unsafe_codejail()
 class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = NumericalResponseXMLFactory
 
@@ -1680,6 +1687,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         assert not responder.validate_answer('fish')
 
 
+@use_unsafe_codejail()
 class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstring
     xml_factory_class = CustomResponseXMLFactory
 
@@ -2399,6 +2407,7 @@ class CustomResponseTest(ResponseTest):  # pylint: disable=missing-class-docstri
         assert correct_map.get_msg('1_2_11') == '11'
 
 
+@use_unsafe_codejail()
 class SchematicResponseTest(ResponseTest):
     """
     Class containing setup and tests for Schematic responsetype.
@@ -2488,6 +2497,7 @@ class AnnotationResponseTest(ResponseTest):  # lint-amnesty, pylint: disable=mis
             assert expected_points == actual_points, ('%s should have %d points' % (answer_id, expected_points))
 
 
+@use_unsafe_codejail()
 class ChoiceTextResponseTest(ResponseTest):
     """
     Class containing setup and tests for ChoiceText responsetype.
