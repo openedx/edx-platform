@@ -66,7 +66,8 @@ edx-celeryutils
 edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
-edx-codejail
+# Codejail 4 brings important safety improvements (no unsafe mode by default)
+edx-codejail>=4.0.0
 # edx-django-utils 5.14.1 adds FrontendMonitoringMiddleware
 edx-django-utils>=5.14.1             # Utilities for cache, monitoring, and plugins
 edx-drf-extensions
