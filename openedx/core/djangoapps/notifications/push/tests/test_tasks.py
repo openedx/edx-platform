@@ -45,7 +45,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
         mock_ace_send.assert_called_once()
         message_sent = mock_ace_send.call_args[0][0]
         assert message_sent.options['emails'] == [self.user_1.email, self.user_2.email]
-        assert message_sent.options['braze_campaign'] == 'new_comment'
+        assert message_sent.options['notification_type'] == 'new_comment'
 
     @mock.patch('openedx.core.djangoapps.notifications.push.tasks.ace.send')
     def test_send_ace_msg_no_sender(self, mock_ace_send):

@@ -40,6 +40,7 @@ from openedx.core.djangoapps.notifications.models import (
 from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_push_channel
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
 
+
 logger = get_task_logger(__name__)
 
 
@@ -202,7 +203,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                     course_id=course_key,
                     web='web' in notification_preferences,
                     email=email_enabled,
-                    push = push_notification,
+                    push=push_notification,
                     group_by_id=group_by_id,
                 )
                 if email_enabled and (email_cadence == EmailCadence.IMMEDIATELY):
@@ -233,6 +234,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             generated_notification.content, sender_id=sender_id
         )
         send_ace_msg_to_push_channel(push_notification_audience, generated_notification, sender_id)
+
 
 def is_notification_valid(notification_type, context):
     """
