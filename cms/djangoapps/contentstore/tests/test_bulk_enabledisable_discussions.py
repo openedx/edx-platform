@@ -3,15 +3,14 @@ Test the enable/disable discussions for all units API endpoint.
 """
 import json
 
-from django.test import RequestFactory
 from django.urls import reverse
-
-from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from common.djangoapps.student.tests.factories import UserFactory
-from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 class BulkEnableDisableDiscussionsTestCase(ModuleStoreTestCase):
     """
@@ -23,13 +22,13 @@ class BulkEnableDisableDiscussionsTestCase(ModuleStoreTestCase):
         self.user = UserFactory(is_staff=True, is_superuser=True)
         self.user.set_password(self.user_password)
         self.user.save()
-        
+
         self.course_key = CourseKey.from_string("course-v1:edx+TestX+2025")
 
         self.url = reverse('bulk_enable_disable_discussions', args=[str(self.course_key)])
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=self.user_password)
-        
+
         # Create a test course
         self.course = CourseFactory.create(
             org=self.course_key.org,
@@ -101,11 +100,11 @@ class BulkEnableDisableDiscussionsTestCase(ModuleStoreTestCase):
         non_staff_user = UserFactory(is_staff=False, is_superuser=False)
         non_staff_user.set_password(self.user_password)
         non_staff_user.save()
-        
+
         # Create a new client for the non-staff user
         non_staff_client = AjaxEnabledTestClient()
         non_staff_client.login(username=non_staff_user.username, password=self.user_password)
-        
+
         response = non_staff_client.put(self.url, content_type='application/json')
         self.assertEqual(response.status_code, 403)
 
