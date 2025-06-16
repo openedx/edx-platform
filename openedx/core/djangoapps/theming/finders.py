@@ -78,6 +78,7 @@ class ThemeFilesFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstract-me
         theme_dir_name = path.split("/", 1)[0]
 
         themes = {t.theme_dir_name: t for t in get_themes()}
+
         # if path is prefixed by theme name then search in the corresponding storage other wise search all storages.
         if theme_dir_name in themes:
             theme = themes[theme_dir_name]
