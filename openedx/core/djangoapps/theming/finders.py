@@ -21,7 +21,6 @@ interface, as well.
 
 import os
 from collections import OrderedDict
-from django import VERSION
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import BaseFinder
 from openedx.core.djangoapps.theming.helpers import get_themes
