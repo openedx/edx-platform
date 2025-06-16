@@ -68,10 +68,11 @@ class ThemeFilesFinder(BaseFinder):  # lint-amnesty, pylint: disable=abstract-me
         """
         Looks for files in the theme directories.
         """
-        if VERSION >= (5, 2):
+        if 'all' in kwargs:
+            find_all = kwargs.get('all', False)
+        elif 'find_all' in kwargs:
             find_all = kwargs.get('find_all', False)
         else:
-            # Django < 5.2 passes as positional
             find_all = args[0] if args else False
 
         matches = []
