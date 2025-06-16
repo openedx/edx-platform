@@ -60,7 +60,8 @@ class CourseGradingModel:
                     "min_count": 0,
                     "drop_count": 0,
                     "short_label": None,
-                    "weight": 0
+                    "weight": 0,
+                    "color": None,
                     }
 
     @staticmethod
@@ -321,7 +322,8 @@ class CourseGradingModel:
                   "min_count": int(json_grader.get('min_count', 0)),
                   "drop_count": int(json_grader.get('drop_count', 0)),
                   "short_label": json_grader.get('short_label', None),
-                  "weight": float(json_grader.get('weight', 0)) / 100.0
+                  "weight": float(json_grader.get('weight', 0)) / 100.0,
+                  "color": json_grader.get('color', None),
                   }
 
         return result
@@ -338,6 +340,7 @@ class CourseGradingModel:
             "drop_count": grader.get('drop_count', 0),
             "short_label": grader.get('short_label', ""),
             "weight": grader.get('weight', 0) * 100,
+            "color": grader.get('color', None),
         }
 
 
