@@ -368,7 +368,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
             with override_waffle_flag(ENABLE_PUSH_NOTIFICATIONS, active=True):
-                with self.assertNumQueries(16):
+                with self.assertNumQueries(15):
                     send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                        context, "http://test.url")
 
