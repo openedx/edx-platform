@@ -20,8 +20,11 @@ from openedx.core.djangoapps.notifications.base_notification import (
     get_notification_content, COURSE_NOTIFICATION_TYPES, COURSE_NOTIFICATION_APPS
 )
 from openedx.core.djangoapps.notifications.email.tasks import send_immediate_cadence_email
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS, \
+from openedx.core.djangoapps.notifications.config.waffle import (
+    ENABLE_NOTIFICATION_GROUPING,
+    ENABLE_NOTIFICATIONS,
     ENABLE_ACCOUNT_LEVEL_PREFERENCES
+)
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.grouping_notifications import (
@@ -163,7 +166,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
         # check if what is preferences of user and make decision to send notification or not
         if account_level_pref_enabled:
-            preferences = CourseNotificationPreference.objects.filter(
+            preferences = NotificationPreference.objects.filter(
                 user_id__in=batch_user_ids,
                 app=app_name,
                 type=notification_type
@@ -176,7 +179,6 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             )
 
         preferences = list(preferences)
-
         if default_web_config:
             if account_level_pref_enabled:
                 preferences = create_account_notification_pref_if_not_exists(
@@ -193,8 +195,6 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
             user_id = preference.user_id
             if not account_level_pref_enabled:
                 preference = update_user_preference(preference, user_id, course_key)
-            else:
-                update_account_user_preference(user_id)
 
             if (
                 preference and
@@ -265,6 +265,7 @@ def update_user_preference(preference: CourseNotificationPreference, user_id, co
 
 
 def update_account_user_preference(user_id: int) -> None:
+    return
     notification_types = set(COURSE_NOTIFICATION_TYPES.keys())
 
     # Get existing notification types for the user
@@ -305,6 +306,9 @@ def create_notification_preference(user_id: int, notification_type: str) -> Noti
     notification_config = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
     is_core = notification_config.get('is_core', False)
     app = COURSE_NOTIFICATION_TYPES[notification_type]['notification_app']
+    email_cadence = notification_config.get('email_cadence', EmailCadence.DAILY)
+    if is_core:
+        email_cadence = COURSE_NOTIFICATION_APPS[app]['core_email_cadence']
     return NotificationPreference(
         user_id=user_id,
         type=notification_type,
@@ -312,8 +316,7 @@ def create_notification_preference(user_id: int, notification_type: str) -> Noti
         web=_get_channel_default(is_core, notification_type, 'web'),
         push=_get_channel_default(is_core, notification_type, 'push'),
         email=_get_channel_default(is_core, notification_type, 'email'),
-        email_cadence=EmailCadence.IMMEDIATELY,
-        is_active=True,  # Changed from empty string to boolean
+        email_cadence=email_cadence,
     )
 
 

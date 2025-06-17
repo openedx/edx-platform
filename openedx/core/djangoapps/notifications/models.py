@@ -148,7 +148,7 @@ class NotificationPreference(TimeStampedModel):
     email_cadence = models.CharField(max_length=64, choices=EmailCadenceChoices.choices, null=False, blank=False)
     is_active = models.BooleanField(default=True)
 
-    def is_enabled_for_any_channel(self) -> bool:
+    def is_enabled_for_any_channel(self, *args, **kwargs) -> bool:
         """
         Returns True if the notification preference is enabled for any channel.
         """
@@ -160,7 +160,7 @@ class NotificationPreference(TimeStampedModel):
         """
         return COURSE_NOTIFICATION_APPS[app_name]
 
-    def get_channels_for_notification_type(self):
+    def get_channels_for_notification_type(self, *args, **kwargs) -> list:
         """
         Returns the channels for the given app name and notification type.
         Sample Response:
@@ -175,7 +175,7 @@ class NotificationPreference(TimeStampedModel):
             channels.append('email')
         return channels
 
-    def get_email_cadence_for_notification_type(self):
+    def get_email_cadence_for_notification_type(self, *args, **kwargs) -> str:
         """
         Returns the email cadence for the notification type.
         """
