@@ -37,6 +37,25 @@ class ContainerType(Enum):
     Section = "section"
 
     @property
+    def container_model_classes(self) -> tuple[type[Container], type[ContainerVersion]]:
+        """
+        Get the container, containerversion subclasses associated with this type.
+        @@TODO Is this what we want, a hard mapping between container_types and Container classes?
+          * If so, then expand on this pattern, so that all ContainerType logic is contained within
+            this class, and get rid of the match-case statements that are all over the content_libraries
+            app.
+          * If not, then figure out what to do instead.
+        """
+        match self:
+            case self.Unit:
+                return (Unit, UnitVersion)
+            case self.Subsection:
+                return (Subsection, SubsectionVersion)
+            case self.Section:
+                return (Section, SectionVersion)
+        raise TypeError(f"unexpected ContainerType: {self!r}")
+
+    @property
     def olx_tag(self) -> str:
         """
         Canonical XML tag to use when representing this container as OLX.
