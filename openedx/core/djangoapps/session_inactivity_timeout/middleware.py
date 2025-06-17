@@ -38,10 +38,24 @@ class SessionInactivityTimeout(MiddlewareMixin):
             #Can't log out if not logged in
             return
 
+        # .. setting_name: SESSION_INACTIVITY_TIMEOUT_IN_SECONDS
+        # .. setting_default: None
+        # .. setting_description:  Used for maintaining session inactivity up to n hours
+        # .. setting_warning:  Keep in sync with SESSION_COOKIE_AGE and SESSION_SAVE_FREQUENCY_SECONDS
         timeout_in_seconds = getattr(settings, "SESSION_INACTIVITY_TIMEOUT_IN_SECONDS", None)
 
         # Do we have this feature enabled?
         if timeout_in_seconds:
+            # .. setting_name: SESSION_SAVE_FREQUENCY_SECONDS
+            # .. setting_default: 900
+            # .. setting_description: How often to allow a full session save (in seconds).
+            #   This controls how frequently the session ID might change
+            #   A user could be inactive for almost SESSION_SAVE_FREQUENCY_SECONDS but since their session 
+            #   isn't being saved during that time, their last activity timestamp isn't being updated.
+            #   When they hit the inactivity timeout, it will be based on the last saved activity time
+            #   So the effective timeout could be as short as: SESSION_INACTIVITY_TIMEOUT_IN_SECONDS - SESSION_SAVE_FREQUENCY_SECONDS
+            #   This means users might be logged out earlier than expected in some edge cases.
+            # .. setting_warning:  Used in sync with SESSION_INACTIVITY_TIMEOUT_IN_SECONDS
             frequency_time_in_seconds = getattr(settings, "SESSION_SAVE_FREQUENCY_SECONDS", 900)
             # what time is it now?
             utc_now = datetime.utcnow()
