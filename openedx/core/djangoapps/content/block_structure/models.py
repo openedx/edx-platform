@@ -86,7 +86,7 @@ def _bs_model_storage():
     return resolve_storage_backend(
         storage_key="block_structures_settings",
         legacy_setting_key="BLOCK_STRUCTURES_SETTINGS",
-        legacy_sec_setting_key="STORAGE_CLASS",
+        legacy_sec_setting_keys=["STORAGE_CLASS"],
         options=storage_kwargs
     )
 
