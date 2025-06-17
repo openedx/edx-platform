@@ -655,25 +655,6 @@ class InlineDiscussionContextTestCase(
             assert response.content.decode("utf-8") == views.TEAM_PERMISSION_MESSAGE
 
 
-class AllowPlusOrMinusOneInt(int):
-    """
-    A workaround for the fact that assertNumQueries doesn't let you
-    specify a range or any tolerance. An 'int' that is 'equal to' its value,
-    but also its value +/- 1
-    """
-
-    def __init__(self, value):
-        super().__init__()
-        self.value = value
-        self.values = (value, value - 1, value + 1)
-
-    def __eq__(self, other):
-        return other in self.values
-
-    def __repr__(self):
-        return f"({self.value} +/- 1)"
-
-
 class UserProfileDiscussionGroupIdTestCase(
     CohortedTestCase, CohortedTopicGroupIdTestMixinV2, ForumViewsUtilsMixin
 ):  # lint-amnesty, pylint: disable=missing-class-docstring

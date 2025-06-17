@@ -104,10 +104,10 @@ def perform_request(method, url, data_or_params=None, raw=False,
 
 
 def clean_forum_params(params):
-    """Convert string booleans to actual booleans and remove None values from forum parameters."""
+    """Convert string booleans to actual booleans and remove None values and empty lists from forum parameters."""
     result = {}
     for k, v in params.items():
-        if v is not None:
+        if v is not None and v != []:
             if isinstance(v, str):
                 if v.lower() == 'true':
                     result[k] = True

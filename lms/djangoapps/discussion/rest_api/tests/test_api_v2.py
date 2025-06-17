@@ -1148,7 +1148,7 @@ class GetThreadListTest(
             "sort_key": "activity",
             "page": 1,
             "per_page": 1,
-            "commentable_ids": "topic_x,topic_meow",
+            "commentable_ids": ["topic_x", "topic_meow"],
         }
         self.check_mock_called_with(
             "get_user_threads",

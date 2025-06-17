@@ -244,6 +244,13 @@ class NonCohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
 
 
 class GroupIdAssertionMixinV2:
+    """
+    Provides assertion methods for testing group_id functionality in forum v2.
+
+    This mixin contains helper methods to verify that the comments service is called
+    with the correct group_id parameters and that responses contain the expected
+    group information.
+    """
     def _get_params_last_call(self, function_name):
         """
         Returns the data or params dict that `mock_request` was called with.
@@ -287,7 +294,7 @@ class GroupIdAssertionMixinV2:
 class CohortedTopicGroupIdTestMixinV2(GroupIdAssertionMixinV2):
     """
     Provides test cases to verify that views pass the correct `group_id` to
-    the comments service when requesting content in cohorted discussions.
+    the comments service when requesting content in cohorted discussions for forum v2.
     """
     def call_view(self, commentable_id, user, group_id, pass_group_id=True):
         """
@@ -368,7 +375,7 @@ class CohortedTopicGroupIdTestMixinV2(GroupIdAssertionMixinV2):
 class NonCohortedTopicGroupIdTestMixinV2(GroupIdAssertionMixinV2):
     """
     Provides test cases to verify that views pass the correct `group_id` to
-    the comments service when requesting content in non-cohorted discussions.
+    the comments service when requesting content in non-cohorted discussions for forum v2.
     """
     def call_view(self, commentable_id, user, group_id, pass_group_id=True):
         """

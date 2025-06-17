@@ -215,7 +215,7 @@ class User(models.Model):
         course_key = utils.get_course_key(course_id)
 
         if is_forum_v2_enabled(course_key):
-            group_ids = [retrieve_params['group_id']] if 'group_id' in retrieve_params else None
+            group_ids = [retrieve_params['group_id']] if 'group_id' in retrieve_params else []
             is_complete = retrieve_params['complete']
             params = utils.clean_forum_params({
                 "user_id": self.attributes["id"],
