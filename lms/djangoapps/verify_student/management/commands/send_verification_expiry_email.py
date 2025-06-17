@@ -188,7 +188,7 @@ class Command(BaseCommand):
             return True
 
         site = Site.objects.get_current()
-        account_base_url = settings.ACCOUNT_MICROFRONTEND_URL.rstrip('/')
+        account_base_url = (settings.ACCOUNT_MICROFRONTEND_URL or "").rstrip('/')
         message_context = get_base_template_context(site)
         message_context.update({
             'platform_name': settings.PLATFORM_NAME,
