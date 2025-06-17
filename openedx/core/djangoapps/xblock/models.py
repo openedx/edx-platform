@@ -1,6 +1,8 @@
 """Models for XBlock runtime."""
+from django.db import models
 from jsonfield.fields import JSONField
 from openedx_learning.api.authoring_models import PublishableEntityVersionMixin
+from opaque_keys.edx.django.models import CourseKeyField
 
 
 class XBlockVersionFieldData(PublishableEntityVersionMixin):
@@ -29,3 +31,13 @@ class XBlockVersionFieldData(PublishableEntityVersionMixin):
 
     def __str__(self):
         return f"Field data for {self.publishable_entity_version}"
+
+
+class LearningCoreCourseStructure(models.Model):
+    course_key = CourseKeyField(max_length=255)
+    structure = models.BinaryField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint("course_key", name="xblock_lccs_uniq_course_key")
+        ]

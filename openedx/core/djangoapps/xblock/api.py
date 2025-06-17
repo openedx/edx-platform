@@ -13,6 +13,7 @@ from datetime import datetime
 import logging
 import threading
 
+import bson.tz_util
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -330,3 +331,277 @@ def get_handler_url(
     # can be called by the XBlock from python as well and in that case we don't
     # have access to the request.
     return site_root_url + path
+
+
+from django.template.defaultfilters import filesizeformat
+from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore import BlockData
+from xmodule.modulestore.split_mongo import BlockKey
+from datetime import datetime, timezone
+import bson
+from bson.codec_options import CodecOptions
+import zlib
+
+from .models import LearningCoreCourseStructure
+
+def get_structure_for_course(course_key: CourseKey):
+    """Just gets the published version for now, need to update to do both branches later"""
+    lccs = LearningCoreCourseStructure.objects.get(course_key=course_key)
+    uncompressed_data = zlib.decompress(lccs.structure)
+    return bson.decode(uncompressed_data, codec_options=CodecOptions(tz_aware=True))
+
+def update_learning_core_course(course_key: CourseKey):
+    """
+    This is going to write to LearningCoreCourseStructure.
+
+    Pass 0 of this: just push hardcoded data into the shim
+
+    """
+    writer = LearningCoreCourseShimWriter()
+    structure = writer.make_structure()
+
+    import pprint
+
+    #encoded = bson.encode(structure)
+    #decoded = bson.decode(encoded)
+
+    with open("lc_struct.txt", "w") as struct_file:
+        printer = pprint.PrettyPrinter(indent=2, stream=struct_file)
+        # printer.pprint(decoded)
+        printer.pprint(structure)
+
+    # Structure doc is so repetitive that we get a 4-5X reduction in file size
+    num_blocks = len(structure['blocks'])
+    encoded_structure = zlib.compress(bson.encode(structure, codec_options=CodecOptions(tz_aware=True)))
+
+    lccs, _created = LearningCoreCourseStructure.objects.get_or_create(course_key=course_key)
+    lccs.structure = encoded_structure
+    lccs.save()
+
+    log.info(f"Updated Learning Core Structure (for Split) on course {course_key}.")
+    log.info(f"Structure size: {filesizeformat(len(encoded_structure))} for {num_blocks} blocks.")
+
+
+import pytz
+
+class LearningCoreCourseShimWriter:
+    def __init__(self):
+        self.structure_obj_id = bson.ObjectId()
+
+        # Can't use stdlib's timezone.utc, because of various comparisons we
+        # need to make (can't mix offset types)
+        self.edited_on = datetime.now(tz=timezone.utc)
+        self.user_id = -1  # This is "the system did it"
+
+    def make_structure(self):
+        structure = self.base_structure()
+        course_entry = self.course_block_entry()
+
+        structure['blocks'].append(course_entry)
+        structure['blocks'].extend(self.non_child_blocks())
+        chapter_1 = self.base_block_entry("chapter", "cf67a98624214ef1ac158378ee103f8c")
+        chapter_1['definition'] = bson.ObjectId('68508b48bd8f1408c3839ded')
+        chapter_1['fields'] = {
+            'children': [
+                ['sequential', '153b0bbfafa545239df5ee11c12f6c9b']
+            ],
+            'display_name': 'First Section',
+        }
+        structure['blocks'].append(chapter_1)
+        seq_1 = self.base_block_entry('sequential', '153b0bbfafa545239df5ee11c12f6c9b')
+        seq_1['fields'] = {
+            'children': [
+                ['vertical', 'e3af9b9bbd144102862d30067d7cf4fb'],
+            ],
+            'display_name': 'First Subsection',
+        }
+        seq_1['definition'] = bson.ObjectId('68508b56bd8f1408c3839df2')
+        structure['blocks'].append(seq_1)
+
+        vertical_1 = self.base_block_entry('vertical', 'e3af9b9bbd144102862d30067d7cf4fb')
+        vertical_1['fields'] = {
+            'children': [
+                ['problem', '2f14f0bd726d488cb9221b60cb735183']
+            ],
+            'display_name': 'Check Your Understanding',
+        }
+        vertical_1['definition'] = bson.ObjectId('68508b97bd8f1408c3839dfd'),
+        structure['blocks'].append(vertical_1)
+
+        problem_1 = self.base_block_entry('problem', '2f14f0bd726d488cb9221b60cb735183')
+        problem_1['fields'] = {
+            'children': [],
+            'display_name': 'This is an LC Problem!',
+            'markdown_edited': False,
+            'rerandomize': 'never',
+            'show_reset_button': False,
+            'showanswer': 'finished',
+            'weight': 1.0
+        }
+        problem_1['definition'] = bson.ObjectId('68508bd6bd8f1408c3839e01')
+        structure['blocks'].append(problem_1)
+
+        return structure
+
+    def base_structure(self):
+        doc_id = bson.ObjectId()
+
+        return {
+            '_id': doc_id,
+            'blocks': [],
+            'schema_version': 1,  # LOL
+
+            'root': ['course', 'course'],  # Root is always the CourseBlock
+            'edited_by': self.user_id,
+            'edited_on': self.edited_on,
+
+            # We're always going to be the "first" version for now, from Split's
+            # perspective.
+            'previous_version': None,
+            'original_version': doc_id
+        }
+
+    def course_block_entry(self):
+        entry = self.base_block_entry('course', 'course')
+        entry['fields'] = {
+            'allow_anonymous': True,
+            'allow_anonymous_to_peers': False,
+            'cert_html_view_enabled': True,
+            'children': [
+                ['chapter', 'cf67a98624214ef1ac158378ee103f8c']
+            ],
+            'discussion_blackouts': [],
+            'discussion_topics': {'General': {'id': 'course'}},
+            'discussions_settings': {
+                'enable_graded_units': False,
+                'enable_in_context': True,
+                'openedx': { 'group_at_subsection': False},
+                'posting_restrictions': 'disabled',
+                'provider_type': 'openedx',
+                'unit_level_visibility': True
+            },
+            'display_name': 'Just a Demo Course',
+            'end': None,
+            'language': 'en',
+
+            ## HARDCODED START DATE
+            'start': datetime(2020, 1, 1, 0, 0, tzinfo=timezone.utc),
+            'static_asset_path': 'course',
+            'tabs': [
+                {
+                    'course_staff_only': False,
+                    'name': 'Course',
+                    'type': 'courseware'
+                },
+                {
+                    'course_staff_only': False,
+                    'name': 'Progress',
+                    'type': 'progress'
+                },
+                {
+                    'course_staff_only': False,
+                    'name': 'Dates',
+                    'type': 'dates'
+                },
+                {
+                    'course_staff_only': False,
+                    'name': 'Discussion',
+                    'type': 'discussion'
+                },
+                {
+                    'course_staff_only': False,
+                    'is_hidden': True,
+                    'name': 'Wiki',
+                    'type': 'wiki'
+                },
+                {
+                    'course_staff_only': False,
+                    'name': 'Textbooks',
+                    'type': 'textbooks'
+                }
+            ],
+            'xml_attributes': {
+                'filename': [ 'course/2025-02-24.xml', 'course/2025-02-24.xml']
+            },
+        }
+        entry['definition'] = bson.ObjectId('68508b38bd8f1408c3839dc1')
+        return entry
+
+    def base_block_entry(self, block_type: str, block_id: str, definition=None):
+        return {
+            'asides': {},  # We are *so* not doing asides in this prototype
+            'block_id': block_id,
+            'block_type': block_type,
+            'defaults': {},
+            'fields': {'children': []},  # Even blocks without children are written this way.
+            'definition': definition or bson.ObjectId(),
+            'edit_info': self.base_edit_info()
+        }
+
+
+    def base_edit_info(self):
+        return {
+            'edited_by': self.user_id,
+            'edited_on': self.edited_on,
+
+            # This is v1 libraries data that we're faking
+            'original_usage': None,
+            'original_usage_vesion': None,
+
+            # Edit history, all of which we're faking
+            'previous_version': None,
+            'source_version': self.structure_obj_id,
+            'update_version': self.structure_obj_id,
+        }
+
+    def non_child_blocks(self):
+        from bson import ObjectId
+        """These are all the random blocks that are not connected to the course root"""
+        # def: ObjectId('67ddbd4880aff2c029322017')
+        overview = self.base_block_entry('about', 'overview', ObjectId('67ddbd4880aff2c029322017'))
+
+        # def: ObjectId('68508b10bd8f1408c3839dbe')
+        updates = self.base_block_entry('course_info', 'updates', ObjectId('68508b10bd8f1408c3839dbe'))
+
+        # def: ObjectId('68508b38bd8f1408c3839dc4')
+        title = self.base_block_entry('about', 'title', ObjectId('68508b38bd8f1408c3839dc4'))
+
+        # def: ObjectId('68508b39bd8f1408c3839dc7')
+        subtitle = self.base_block_entry('about', 'subtitle', ObjectId('68508b39bd8f1408c3839dc7'))
+
+        # def: ObjectId('68508b39bd8f1408c3839dca')
+        duration = self.base_block_entry('about', 'duration', ObjectId('68508b39bd8f1408c3839dca'))
+
+        # def: ObjectId('68508b3abd8f1408c3839dcd')
+        description = self.base_block_entry('about', 'description', ObjectId('68508b3abd8f1408c3839dcd'))
+
+        # def: ObjectId('68508b3abd8f1408c3839dd0')
+        short_description = self.base_block_entry('about', 'short_description', ObjectId('68508b3abd8f1408c3839dd0'))
+
+        # I have so many questions about entrance exams...
+
+        # def: ObjectId('68508b3cbd8f1408c3839dd6')
+        entrance_exam_enabled = self.base_block_entry('about', 'entrance_exam_enabled', ObjectId('68508b3cbd8f1408c3839dd6'))
+
+        # def: ObjectId('68508b3cbd8f1408c3839dd9')
+        entrance_exam_id = self.base_block_entry('about', 'entrance_exam_id', ObjectId('68508b3cbd8f1408c3839dd9'))
+
+        # def: ObjectId('68508b3dbd8f1408c3839ddc')
+        entrance_exam_minimum_score_pct = self.base_block_entry('about', 'entrance_exam_minimum_score_pct', ObjectId('68508b3dbd8f1408c3839ddc'))
+
+        # def: ObjectId('68508b3ebd8f1408c3839ddf')
+        about_sidebar_html = self.base_block_entry('about', 'about_sidebar_html', ObjectId('68508b3ebd8f1408c3839ddf'))
+
+        return [
+            overview,
+            updates,
+            title,
+            subtitle,
+            duration,
+            description,
+            short_description,
+            entrance_exam_enabled,
+            entrance_exam_id,
+            entrance_exam_minimum_score_pct,
+            about_sidebar_html,
+        ]
