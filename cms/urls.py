@@ -201,6 +201,9 @@ urlpatterns = oauth2_urlpatterns + [
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
     re_path(fr'api/youtube/courses/{COURSELIKE_KEY_PATTERN}/edx-video-ids$',
             contentstore_views.get_course_youtube_edx_videos_ids, name='youtube_edx_video_ids'),
+    re_path(fr'^api/courses/{settings.COURSE_KEY_PATTERN}/bulk_enable_disable_discussions$',
+            contentstore_views.bulk_enable_disable_discussions,
+            name='bulk_enable_disable_discussions'),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:
