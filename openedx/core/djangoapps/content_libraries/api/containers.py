@@ -23,7 +23,18 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
+from openedx_learning.api.authoring_models import (
+    Component,
+    ComponentVersion,
+    Container,
+    ContainerVersion,
+    Unit,
+    UnitVersion,
+    Subsection,
+    SubsectionVersion,
+    Section,
+    SectionVersion,
+)
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
