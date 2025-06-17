@@ -51,8 +51,7 @@ from .documents import (
     searchable_doc_for_library_block,
     searchable_doc_for_key,
     searchable_doc_tags,
-    searchable_doc_tags_for_collection,
-    searchable_doc_units,
+    searchable_doc_containers,
 )
 
 log = logging.getLogger(__name__)
@@ -452,7 +451,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     doc.update(searchable_doc_for_library_block(metadata))
                     doc.update(searchable_doc_tags(metadata.usage_key))
                     doc.update(searchable_doc_collections(metadata.usage_key))
-                    doc.update(searchable_doc_units(metadata.usage_key))
+                    doc.update(searchable_doc_containers(metadata.usage_key, "units"))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing library component {component}: {err}")
@@ -471,7 +470,7 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                 try:
                     collection_key = lib_api.library_collection_locator(library_key, collection.key)
                     doc = searchable_doc_for_collection(collection_key, collection=collection)
-                    doc.update(searchable_doc_tags_for_collection(collection_key))
+                    doc.update(searchable_doc_tags(collection_key))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing collection {collection}: {err}")
@@ -497,6 +496,12 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                     doc = searchable_doc_for_container(container_key)
                     doc.update(searchable_doc_tags(container_key))
                     doc.update(searchable_doc_collections(container_key))
+                    container_type = lib_api.ContainerType(container_key.container_type)
+                    match container_type:
+                        case lib_api.ContainerType.Unit:
+                            doc.update(searchable_doc_containers(container_key, "subsections"))
+                        case lib_api.ContainerType.Subsection:
+                            doc.update(searchable_doc_containers(container_key, "sections"))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing container {container.key}: {err}")
@@ -696,7 +701,7 @@ def upsert_library_collection_index_doc(collection_key: LibraryCollectionLocator
     If the Collection is not found or disabled (i.e. soft-deleted), then delete it from the search index.
     """
     doc = searchable_doc_for_collection(collection_key)
-    update_components = False
+    update_items = False
 
     # Soft-deleted/disabled collections are removed from the index
     # and their components updated.
@@ -755,7 +760,8 @@ def update_library_components_collections(
                 library_key,
                 component,
             )
-            doc = searchable_doc_collections(usage_key)
+            doc = searchable_doc_for_key(usage_key)
+            doc.update(searchable_doc_collections(usage_key))
             docs.append(doc)
 
         log.info(
@@ -790,7 +796,8 @@ def update_library_containers_collections(
                 library_key,
                 container,
             )
-            doc = searchable_doc_collections(container_key)
+            doc = searchable_doc_for_key(container_key)
+            doc.update(searchable_doc_collections(container_key))
             docs.append(doc)
 
         log.info(
@@ -855,21 +862,12 @@ def upsert_item_collections_index_docs(opaque_key: OpaqueKey):
     _update_index_docs([doc])
 
 
-def upsert_item_units_index_docs(opaque_key: OpaqueKey):
+def upsert_item_containers_index_docs(opaque_key: OpaqueKey, container_type: str):
     """
-    Updates the units data in documents for the given Course/Library block
+    Updates the containers (units/subsections/sections) data in documents for the given Course/Library block
     """
     doc = {Fields.id: meili_id_from_opaque_key(opaque_key)}
-    doc.update(searchable_doc_units(opaque_key))
-    _update_index_docs([doc])
-
-
-def upsert_collection_tags_index_docs(collection_key: LibraryCollectionLocator):
-    """
-    Updates the tags data in documents for the given library collection
-    """
-
-    doc = searchable_doc_tags_for_collection(collection_key)
+    doc.update(searchable_doc_containers(opaque_key, container_type))
     _update_index_docs([doc])
 
 

@@ -4,7 +4,7 @@
 #
 #    make upgrade
 #
-click==8.2.0
+click==8.2.1
     # via
     #   -r scripts/structures_pruning/requirements/base.in
     #   click-log
@@ -23,7 +23,7 @@ pymongo==4.4.0
     #   edx-opaque-keys
 stevedore==5.4.1
     # via edx-opaque-keys
-typing-extensions==4.13.2
+typing-extensions==4.14.0
     # via edx-opaque-keys
 
 # The following packages are considered to be unsafe in a requirements file:

@@ -21,7 +21,7 @@ certifi==2025.4.26
     # via requests
 charset-normalizer==3.4.2
     # via requests
-click==8.2.0
+click==8.1.8
     # via
     #   click-option-group
     #   semgrep
@@ -47,7 +47,7 @@ idna==3.10
     # via requests
 importlib-metadata==7.1.0
     # via opentelemetry-api
-jsonschema==4.23.0
+jsonschema==4.24.0
     # via semgrep
 jsonschema-specifications==2025.4.1
     # via jsonschema
@@ -89,7 +89,7 @@ packaging==25.0
     # via semgrep
 peewee==3.18.1
     # via semgrep
-protobuf==4.25.7
+protobuf==4.25.8
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
@@ -105,19 +105,19 @@ requests==2.32.3
     #   semgrep
 rich==13.5.3
     # via semgrep
-rpds-py==0.25.0
+rpds-py==0.25.1
     # via
     #   jsonschema
     #   referencing
-ruamel-yaml==0.18.10
+ruamel-yaml==0.18.12
     # via semgrep
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
-semgrep==1.121.0
+semgrep==1.123.0
     # via -r requirements/edx/semgrep.in
 tomli==2.0.2
     # via semgrep
-typing-extensions==4.13.2
+typing-extensions==4.14.0
     # via
     #   opentelemetry-sdk
     #   referencing
@@ -133,7 +133,7 @@ wrapt==1.17.2
     # via
     #   deprecated
     #   opentelemetry-instrumentation
-zipp==3.21.0
+zipp==3.22.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
