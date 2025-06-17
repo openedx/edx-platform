@@ -473,7 +473,7 @@ def _migrate_container(
         ],
         created=created_at,
         created_by=created_by,
-        container_version_cls=ContainerVersion,
+        container_version_cls=container_type.container_model_classes[1],
     ).publishable_entity_version
 
 
