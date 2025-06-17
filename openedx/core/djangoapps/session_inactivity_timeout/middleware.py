@@ -42,7 +42,7 @@ class SessionInactivityTimeout(MiddlewareMixin):
 
         # Do we have this feature enabled?
         if timeout_in_seconds:
-            frequency_time_in_seconds = getattr(settings, "SESSION_SAVE_FREQUENCY_SECONDS", 60)
+            frequency_time_in_seconds = getattr(settings, "SESSION_SAVE_FREQUENCY_SECONDS", 900)
             # what time is it now?
             utc_now = datetime.utcnow()
 
