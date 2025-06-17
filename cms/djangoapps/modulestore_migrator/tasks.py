@@ -358,7 +358,7 @@ def _migrate_node(
         container_type = ContainerType.from_source_olx_tag(source_node.tag)
     except ValueError:
         container_type = None
-        if source_node.tag in {"course", "library"}:
+        if source_node.tag == "library":
             should_migrate_node = False
             should_migrate_children = True
         else:
@@ -473,7 +473,7 @@ def _migrate_container(
         ],
         created=created_at,
         created_by=created_by,
-        container_version_cls=ContainerVersion,
+        container_version_cls=container_type.container_model_classes[1],
     ).publishable_entity_version
 
 
