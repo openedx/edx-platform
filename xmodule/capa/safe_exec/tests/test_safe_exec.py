@@ -24,8 +24,10 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.capa.safe_exec import safe_exec, update_hash
 from xmodule.capa.safe_exec.remote_exec import is_codejail_in_darklaunch, is_codejail_rest_service_enabled
 from xmodule.capa.safe_exec.safe_exec import emsg_normalizers, normalize_error_message
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 
 
+@use_unsafe_codejail()
 class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_set_values(self):
         g = {}
@@ -530,6 +532,7 @@ class DictCache(object):
         self.cache[key] = value
 
 
+@use_unsafe_codejail()
 class TestSafeExecCaching(unittest.TestCase):
     """Test that caching works on safe_exec."""
 
@@ -654,6 +657,7 @@ class TestUpdateHash(unittest.TestCase):
         assert h1 == h2
 
 
+@use_unsafe_codejail()
 class TestRealProblems(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
     def test_802x(self):
         code = textwrap.dedent("""\
