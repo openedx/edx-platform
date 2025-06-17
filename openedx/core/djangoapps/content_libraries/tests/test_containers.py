@@ -667,6 +667,9 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 unit_4["id"],
             ]
         )
+
+        # TODO -- remove this when containers publish their children:
+        # https://github.com/openedx/openedx-learning/pull/307
         # Removing the unit with components because the components (children of children) are not published.
         # If the unit is kept, the subsection continues to have changes even after it is published.
         self._remove_container_children(
@@ -675,6 +678,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 self.unit_with_components["id"],
             ]
         )
+        # /TODO
 
         # At first everything is unpublished:
         self._verify_publish_state(
@@ -739,6 +743,9 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 subsection_4["id"],
             ]
         )
+
+        # TODO -- remove this when containers publish their children:
+        # https://github.com/openedx/openedx-learning/pull/307
         # Removing the subsection with units because the units (children of children) are not published.
         # If the subsection is kept, the section continues to have changes even after it is published.
         self._remove_container_children(
@@ -747,6 +754,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
                 self.subsection_with_units["id"],
             ]
         )
+        # /TODO
 
         # At first everything is unpublished:
         self._verify_publish_state(
