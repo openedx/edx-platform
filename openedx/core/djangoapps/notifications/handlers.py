@@ -72,7 +72,6 @@ def create_user_account_preferences(sender, instance, created, **kwargs):  # pyl
     """
     Initialize a new User Tour when a new user is created.
     """
-    return
     preferences = []
     if created:
         try:

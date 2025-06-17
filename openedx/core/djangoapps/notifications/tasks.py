@@ -265,9 +265,10 @@ def update_user_preference(preference: CourseNotificationPreference, user_id, co
 
 
 def update_account_user_preference(user_id: int) -> None:
-    return
+    """
+    Update account level user preferences to ensure all notification types are present.
+    """
     notification_types = set(COURSE_NOTIFICATION_TYPES.keys())
-
     # Get existing notification types for the user
     existing_types = set(
         NotificationPreference.objects
