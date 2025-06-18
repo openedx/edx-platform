@@ -363,6 +363,7 @@ class MongoPersistenceBackend:
 
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
                     log.error(f"course_context: {course_context} and {course_context.course}")
+                    # Reminder: course_context includes the branch information
                     if course_context and course_context.course.startswith('LC'):
                         from openedx.core.djangoapps.xblock.api import get_structure_for_course
                         log.info("WE'RE IN LEARNING CORE!!!")

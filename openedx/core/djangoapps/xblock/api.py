@@ -425,7 +425,7 @@ class LearningCoreCourseShimWriter:
             ],
             'display_name': 'Check Your Understanding',
         }
-        vertical_1['definition'] = bson.ObjectId('68508b97bd8f1408c3839dfd'),
+        vertical_1['definition'] = bson.ObjectId('68508b97bd8f1408c3839dfd')
         structure['blocks'].append(vertical_1)
 
         problem_1 = self.base_block_entry('problem', '2f14f0bd726d488cb9221b60cb735183')
