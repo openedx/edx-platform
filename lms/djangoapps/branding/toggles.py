@@ -24,7 +24,7 @@ def catalog_mfe_enabled():
 # .. toggle_default: False
 # .. toggle_description: Set to True to enable the new catalog page.
 # .. toggle_creation_date: 2025-05-15
-# .. toggle_target_removal_date: None
+# .. toggle_target_removal_date: 2025-11-01
 # .. toggle_use_cases: open_edx
 ENABLE_NEW_CATALOG_PAGE = WaffleFlag(f'{WAFFLE_FLAG_NAMESPACE}.use_new_catalog_page', __name__)
 
