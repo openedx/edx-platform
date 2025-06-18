@@ -887,7 +887,7 @@ FEATURES = {
     # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the catalog.
     # .. toggle_use_cases: temporary, open_edx
     # .. toggle_creation_date: 2025-05-15
-    # .. toggle_target_removal_date: None
+    # .. toggle_target_removal_date: 2025-11-01
     'ENABLE_CATALOG_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_CATALOG_MFE", False),
 
     ### ORA Feature Flags ###
