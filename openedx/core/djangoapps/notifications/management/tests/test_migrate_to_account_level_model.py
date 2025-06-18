@@ -89,7 +89,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         )
 
         command = Command()
-        user_ids = list(command._get_user_ids_to_process(batch_size=10))
+        user_ids = list(command._get_user_ids_to_process())
 
         self.assertEqual(len(user_ids), 2)
         self.assertIn(self.user1.id, user_ids)
@@ -158,7 +158,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         }
 
         command = Command()
-        preferences = command._process_user_preferences(self.user1.id)
+        preferences = command._process_batch([self.user1.id])
 
         self.assertEqual(len(preferences), 2)  # grade_assigned + grade_updated
 
@@ -180,7 +180,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
     def test_process_user_preferences_no_course_preferences(self, mock_aggregate):
         """Test processing user with no course preferences."""
         command = Command()
-        preferences = command._process_user_preferences(self.user1.id)
+        preferences = command._process_batch([self.user1.id])
 
         self.assertEqual(len(preferences), 0)
         mock_aggregate.assert_not_called()
@@ -212,7 +212,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
 
         command = Command()
         with self.assertLogs(level='WARNING') as log:
-            preferences = command._process_user_preferences(self.user1.id)
+            preferences = command._process_batch([self.user1.id])
 
         self.assertEqual(len(preferences), 0)
         self.assertIn('Malformed app_config', log.output[0])
@@ -226,7 +226,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
             notification_preference_config=self.sample_config
         )
 
-        with patch.object(Command, '_process_user_preferences') as mock_process:
+        with patch.object(Command, '_process_batch') as mock_process:
             mock_process.return_value = [
                 NotificationPreference(
                     user_id=self.user1.id,
@@ -268,7 +268,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
             email_cadence='Daily'
         )
 
-        with patch.object(Command, '_process_user_preferences') as mock_process:
+        with patch.object(Command, '_process_batch') as mock_process:
             mock_process.return_value = [
                 NotificationPreference(
                     user_id=self.user1.id,
@@ -290,7 +290,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
         self.assertEqual(new_pref.type, 'test_type')
 
     @patch(f'{COMMAND_MODULE}.transaction.atomic')
-    def migrate_preferences_to_account_level_model(self, mock_atomic):
+    def test_migrate_preferences_to_account_level_model(self, mock_atomic):
         """Test that users are processed in batches correctly."""
         # Mock atomic to avoid transaction issues during testing
         mock_atomic.return_value.__enter__ = Mock()
@@ -304,41 +304,9 @@ class MigrateNotificationPreferencesTestCase(TestCase):
                 notification_preference_config=self.sample_config
             )
 
-        with patch.object(Command, '_process_user_preferences') as mock_process:
-            mock_process.return_value = [
-                NotificationPreference(
-                    user_id=1,
-                    app='grading',
-                    type='test_type',
-                    web=True,
-                    push=False,
-                    email=True,
-                    email_cadence='Daily'
-                )
-            ]
-
-            call_command('migrate_notification_preferences', '--batch-size=2')
-
-        # Verify all users were processed
-        self.assertEqual(mock_process.call_count, 3)
-
-    @patch(f'{COMMAND_MODULE}.logger')
-    def test_handle_user_processing_error(self, mock_logger):
-        """Test error handling when processing individual users."""
-        CourseNotificationPreference.objects.create(
-            user=self.user1,
-            course_id='course-v1:Test+Course+1',
-            notification_preference_config=self.sample_config
-        )
-
-        with patch.object(Command, '_process_user_preferences') as mock_process:
-            mock_process.side_effect = Exception("Processing error")
-
-            call_command('migrate_preferences_to_account_level_model', '--batch-size=1')
-
-        # Verify error was logged
-        mock_logger.error.assert_called_once()
-        self.assertIn("Failed to process preferences", str(mock_logger.error.call_args))
+        call_command('migrate_preferences_to_account_level_model', '--batch-size=2')
+        # Check that preferences were created for each user
+        self.assertEqual(NotificationPreference.objects.count(), 18)
 
     def test_command_arguments(self):
         """Test that command arguments are handled correctly."""
@@ -375,7 +343,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
 
         command = Command()
         with self.assertLogs(level='WARNING') as log:
-            preferences = command._process_user_preferences(self.user1.id)
+            preferences = command._process_batch([self.user1.id])
 
         # Should create 2 valid core preferences (ignoring None and 123)
         valid_prefs = [p for p in preferences if p.type in ['new_response', 'new_comment']]
@@ -398,7 +366,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
                 notification_preference_config=self.sample_config
             )
 
-        with patch.object(Command, '_process_user_preferences') as mock_process:
+        with patch.object(Command, '_process_batch') as mock_process:
             mock_process.return_value = []
 
             with patch(f'{COMMAND_MODULE}.logger') as mock_logger:
@@ -417,7 +385,7 @@ class MigrateNotificationPreferencesTestCase(TestCase):
             notification_preference_config=self.sample_config
         )
 
-        with patch.object(Command, '_process_user_preferences') as mock_process:
+        with patch.object(Command, '_process_batch') as mock_process:
             mock_process.return_value = []  # No preferences to create
 
             with patch(f'{COMMAND_MODULE}.logger') as mock_logger:

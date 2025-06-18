@@ -3,6 +3,7 @@ Command to migrate course-level notification preferences to account-level prefer
 """
 import logging
 from typing import Dict, List, Any, Iterator
+from collections import defaultdict
 
 from django.core.management.base import BaseCommand, CommandParser
 from django.db import transaction
@@ -40,19 +41,21 @@ class Command(BaseCommand):
             help="Simulate the migration without making any database changes."
         )
 
-    def _get_user_ids_to_process(self, batch_size: int) -> Iterator[int]:
+    @staticmethod
+    def _get_user_ids_to_process() -> Iterator[int]:
         """
-        Yields all distinct user IDs with course notification preferences, in batches.
+        Yields all distinct user IDs with course notification preferences.
         """
         logger.info("Fetching all distinct user IDs with course notification preferences...")
         user_id_queryset = (CourseNotificationPreference
-                            .objects.values_list('user_id', flat=True)
-                            .distinct()
-                            .order_by('user_id'))
-        yield from user_id_queryset.iterator(chunk_size=batch_size)
+                            .objects
+                            .values_list('user_id', flat=True)
+                            .distinct())
+        # The iterator with chunk_size is memory efficient for fetching the IDs themselves.
+        yield from user_id_queryset.iterator()
 
+    @staticmethod
     def _create_preference_object(
-        self,
         user_id: int,
         app_name: str,
         notification_type: str,
@@ -71,19 +74,16 @@ class Command(BaseCommand):
             email_cadence=values.get('email_cadence', EmailCadence.DAILY)
         )
 
-    def _process_user_preferences(self, user_id: int) -> List[NotificationPreference]:
+    def _create_preferences_from_configs(
+        self,
+        user_id: int,
+        course_preferences_configs: List[Dict]
+    ) -> List[NotificationPreference]:
         """
-        Processes preferences for a single user.
+        Processes a list of preference configs for a single user.
         Returns a list of NotificationPreference objects to be created.
         """
         new_account_preferences: List[NotificationPreference] = []
-
-        # Fetch all course preferences for the user
-        course_preferences_configs = list(
-            CourseNotificationPreference.objects
-            .filter(user_id=user_id)
-            .values_list('notification_preference_config', flat=True)
-        )
 
         if not course_preferences_configs:
             logger.debug(f"No course preferences found for user {user_id}. Skipping.")
@@ -147,15 +147,36 @@ class Command(BaseCommand):
                 new_account_preferences.append(
                     self._create_preference_object(user_id, app_name, core_type_name, core_values)
                 )
-
-        if new_account_preferences:
-            logger.debug(f"User {user_id}: Aggregated {len(course_preferences_configs)} course preferences "
-                         f"into {len(new_account_preferences)} account preferences.")
-        else:
-            logger.debug(f"User {user_id}: No account preferences generated from {len(course_preferences_configs)} "
-                         f"course preferences.")
-
         return new_account_preferences
+
+    def _process_batch(self, user_ids: List[int]) -> List[NotificationPreference]:
+        """
+        Fetches all preferences for a batch of users and processes them.
+        """
+        all_new_preferences: List[NotificationPreference] = []
+
+        # 1. Fetch all preference data for the batch in a single query.
+        course_prefs = CourseNotificationPreference.objects.filter(
+            user_id__in=user_ids
+        ).values('user_id', 'notification_preference_config')
+
+        # 2. Group the fetched data by user_id in memory.
+        prefs_by_user = defaultdict(list)
+        for pref in course_prefs:
+            prefs_by_user[pref['user_id']].append(pref['notification_preference_config'])
+
+        # 3. Process each user's grouped data.
+        for user_id, configs in prefs_by_user.items():
+            user_new_preferences = self._create_preferences_from_configs(user_id, configs)
+            if user_new_preferences:
+                all_new_preferences.extend(user_new_preferences)
+                logger.debug(f"User {user_id}: Aggregated {len(configs)} course preferences "
+                             f"into {len(user_new_preferences)} account preferences.")
+            else:
+                logger.debug(f"User {user_id}: No account preferences generated from {len(configs)} "
+                             f"course preferences.")
+
+        return all_new_preferences
 
     def handle(self, *args: Any, **options: Any):
         dry_run = options['dry_run']
@@ -163,66 +184,73 @@ class Command(BaseCommand):
 
         if dry_run:
             logger.info(self.style.WARNING("Performing a DRY RUN. No changes will be made to the database."))
+        else:
+            # Clear all existing preferences once at the beginning.
+            # This is more efficient and safer than deleting per-user.
+            NotificationPreference.objects.all().delete()
+            logger.info('Cleared all existing account-level notification preferences.')
 
-        user_id_iterator = self._get_user_ids_to_process(batch_size)
+        user_id_iterator = self._get_user_ids_to_process()
 
-        preferences_batch_to_create: List[NotificationPreference] = []
-        processed_users_in_batch = 0
+        user_id_batch: List[int] = []
         total_users_processed = 0
         total_preferences_created = 0
-        if not dry_run:
-            NotificationPreference.objects.all().delete()  # Clear existing account-level preferences
-            logger.info('Cleared existing account-level notification preferences.')
+
         for user_id in user_id_iterator:
-            try:
-                with transaction.atomic():
-                    user_new_preferences = self._process_user_preferences(user_id)
+            user_id_batch.append(user_id)
 
-                    if user_new_preferences:
-                        preferences_batch_to_create.extend(user_new_preferences)
+            if len(user_id_batch) >= batch_size:
+                try:
+                    with transaction.atomic():
+                        # Process the entire batch of users
+                        preferences_to_create = self._process_batch(user_id_batch)
 
-                processed_users_in_batch += 1
-                total_users_processed += 1
+                        if preferences_to_create:
+                            if not dry_run:
+                                NotificationPreference.objects.bulk_create(preferences_to_create)
 
-                if processed_users_in_batch >= batch_size:
-                    if preferences_batch_to_create:
-                        if not dry_run:
-                            NotificationPreference.objects.bulk_create(preferences_batch_to_create)
+                            total_preferences_created += len(preferences_to_create)
                             logger.info(
                                 self.style.SUCCESS(
-                                    f"Successfully created {len(preferences_batch_to_create)} account-level "
-                                    f"preferences for {processed_users_in_batch} users in this batch."
+                                    f"Batch complete. {'Would create' if dry_run else 'Created'} "
+                                    f"{len(preferences_to_create)} preferences for {len(user_id_batch)} users."
                                 )
                             )
+                        else:
+                            logger.info(f"Batch complete. No preferences to create for {len(user_id_batch)} users.")
 
-                        total_preferences_created += len(preferences_batch_to_create)
-                        preferences_batch_to_create = []
-                    else:
-                        logger.info(f"No preferences to create for the latest "
-                                    f"batch of {processed_users_in_batch} users.")
-                    processed_users_in_batch = 0
+                        total_users_processed += len(user_id_batch)
+                        user_id_batch = []  # Reset the batch
+
+                except Exception as e:  # pylint: disable=broad-except
+                    logger.error(f"Failed to process batch containing users {user_id_batch}: {e}", exc_info=True)
+                    # The transaction for the whole batch will be rolled back.
+                    # Clear the batch to continue with the next set of users.
+                    user_id_batch = []
 
                 if total_users_processed > 0 and total_users_processed % (batch_size * 5) == 0:
                     logger.info(f"PROGRESS: Total users processed so far: {total_users_processed}. "
                                 f"Total preferences {'would be' if dry_run else ''} "
                                 f"created: {total_preferences_created}")
 
+        # Process any remaining users in the last, smaller batch
+        if user_id_batch:
+            try:
+                with transaction.atomic():
+                    preferences_to_create = self._process_batch(user_id_batch)
+                    if preferences_to_create:
+                        if not dry_run:
+                            NotificationPreference.objects.bulk_create(preferences_to_create)
+                        total_preferences_created += len(preferences_to_create)
+                        logger.info(
+                            self.style.SUCCESS(
+                                f"Final batch complete. {'Would create' if dry_run else 'Created'} "
+                                f"{len(preferences_to_create)} preferences for {len(user_id_batch)} users."
+                            )
+                        )
+                    total_users_processed += len(user_id_batch)
             except Exception as e:  # pylint: disable=broad-except
-                logger.error(f"Failed to process preferences for user {user_id}: {e}", exc_info=True)
-                # This user's transaction will be rolled back.
-                # The script will continue with the next user.
-
-        # Process any remaining preferences in the last batch
-        if preferences_batch_to_create:
-            if not dry_run:
-                NotificationPreference.objects.bulk_create(preferences_batch_to_create)
-                logger.info(
-                    self.style.SUCCESS(
-                        f"Successfully created {len(preferences_batch_to_create)} account-level preferences "
-                        f"for the final {processed_users_in_batch} users."
-                    )
-                )
-            total_preferences_created += len(preferences_batch_to_create)
+                logger.error(f"Failed to process final batch of users {user_id_batch}: {e}", exc_info=True)
 
         logger.info(
             self.style.SUCCESS(
