@@ -52,11 +52,11 @@ class Command(BaseCommand):
         yield from user_id_queryset.iterator(chunk_size=batch_size)
 
     def _create_preference_object(
-            self,
-            user_id: int,
-            app_name: str,
-            notification_type: str,
-            values: Dict[str, Any]
+        self,
+        user_id: int,
+        app_name: str,
+        notification_type: str,
+        values: Dict[str, Any]
     ) -> NotificationPreference:
         """
         Helper function to create a NotificationPreference instance.
@@ -109,7 +109,7 @@ class Command(BaseCommand):
 
             # Handle regular notification types
             for notification_type, values in notif_types.items():
-                if notification_type == 'core':  # 'core' key might hold default values for core_notification_types
+                if notification_type == 'core':
                     continue
                 if values is None or not isinstance(values, dict):
                     logger.warning(
@@ -170,19 +170,15 @@ class Command(BaseCommand):
         processed_users_in_batch = 0
         total_users_processed = 0
         total_preferences_created = 0
-
+        if not dry_run:
+            NotificationPreference.objects.all().delete()  # Clear existing account-level preferences
+            logger.info('Cleared existing account-level notification preferences.')
         for user_id in user_id_iterator:
             try:
                 with transaction.atomic():
                     user_new_preferences = self._process_user_preferences(user_id)
 
                     if user_new_preferences:
-                        if not dry_run:
-                            deleted_count, _ = NotificationPreference.objects.filter(user_id=user_id).delete()
-                            if deleted_count > 0:
-                                logger.debug(f"User {user_id}: Deleted {deleted_count} existing "
-                                             f"account-level preferences.")
-
                         preferences_batch_to_create.extend(user_new_preferences)
 
                 processed_users_in_batch += 1
