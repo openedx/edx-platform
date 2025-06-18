@@ -40,6 +40,7 @@ from lms.djangoapps.courseware.courses import (
     get_course_about_section,
     get_course_with_access,
     get_permission_for_course_about,
+    get_studio_url,
 )
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
@@ -91,13 +92,13 @@ class CoursewareMeta:
 
     def __init__(self, course_key, request, username=''):
         self.request = request
-        self.overview = course_detail(
+        self.course_overview = course_detail(
             self.request,
             username or self.request.user.username,
             course_key,
         )
 
-        original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
+        original_user_is_staff = has_access(self.request.user, 'staff', self.course_overview).has_access
         self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
         self.course = get_course_by_id(self.course_key)
@@ -107,13 +108,13 @@ class CoursewareMeta:
             staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
-        self.overview.bind_course_for_student(self.request)
+        self.course_overview.bind_course_for_student(self.request)
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
         self.ecomm_service = EcommerceService()
 
     def __getattr__(self, name):
-        return getattr(self.overview, name)
+        return getattr(self.course_overview, name)
 
     @property
     def enrollment(self):
@@ -130,11 +131,11 @@ class CoursewareMeta:
 
     @property
     def access_expiration(self):
-        return get_access_expiration_data(self.effective_user, self.overview)
+        return get_access_expiration_data(self.effective_user, self.course_overview)
 
     @property
     def offer(self):
-        return generate_offer_data(self.effective_user, self.overview)
+        return generate_offer_data(self.effective_user, self.course_overview)
 
     @property
     def content_type_gating_enabled(self):
@@ -157,8 +158,8 @@ class CoursewareMeta:
         Return whether edxnotes is enabled and visible.
         """
         return {
-            'enabled': is_feature_enabled(self.overview, self.effective_user),
-            'visible': self.overview.edxnotes_visibility,
+            'enabled': is_feature_enabled(self.course_overview, self.effective_user),
+            'visible': self.course_overview.edxnotes_visibility,
         }
 
     @property
@@ -231,12 +232,12 @@ class CoursewareMeta:
         """
         return {
             'entrance_exam_current_score': get_entrance_exam_score(
-                self.course_grade, get_entrance_exam_usage_key(self.overview),
+                self.course_grade, get_entrance_exam_usage_key(self.course_overview),
             ),
-            'entrance_exam_enabled': course_has_entrance_exam(self.overview),
-            'entrance_exam_id': self.overview.entrance_exam_id,
-            'entrance_exam_minimum_score_pct': self.overview.entrance_exam_minimum_score_pct,
-            'entrance_exam_passed': user_has_passed_entrance_exam(self.effective_user, self.overview),
+            'entrance_exam_enabled': course_has_entrance_exam(self.course_overview),
+            'entrance_exam_id': self.course_overview.entrance_exam_id,
+            'entrance_exam_minimum_score_pct': self.course_overview.entrance_exam_minimum_score_pct,
+            'entrance_exam_passed': user_has_passed_entrance_exam(self.effective_user, self.course_overview),
         }
 
     @property
@@ -288,7 +289,7 @@ class CoursewareMeta:
                 get_certificate_url(course_id=self.course_key, uuid=user_certificate.verify_uuid)
             )
             return linkedin_config.add_to_profile_url(
-                self.overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
+                self.course_overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
             )
 
     @property
@@ -472,21 +473,21 @@ class CoursewareMeta:
         """
         Returns a list of course image URLs.
         """
-        return self.overview.image_urls
+        return self.course_overview.image_urls
 
     @property
     def start_date_is_still_default(self):
         """
         Returns a boolean indicating whether the course start date is still the default value.
         """
-        return self.overview.start_date_is_still_default
+        return self.course_overview.start_date_is_still_default
 
     @property
     def advertised_start(self):
         """
         Returns the advertised start date of the course.
         """
-        return self.overview.advertised_start
+        return self.course_overview.advertised_start
 
     @property
     def course_price(self):
@@ -518,6 +519,43 @@ class CoursewareMeta:
         if ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled():
             return get_course_about_section(self.request, self.course, "about_sidebar_html")
         return None
+
+    @property
+    def studio_url(self):
+        """
+        Returns the URL to the course in Studio.
+        """
+        if self.request.user.is_authenticated and self.request.user.is_staff:
+            return get_studio_url(self.course, 'settings/details')
+        return None
+
+    @property
+    def is_cosmetic_price_enabled(self):
+        """
+        Returns a boolean indicating whether the cosmetic price feature is enabled.
+        """
+        return settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE', False)
+
+    @property
+    def overview(self):
+        """
+        Returns the overview HTML content for the course.
+        """
+        return get_course_about_section(self.request, self.course, "overview")
+
+    @property
+    def ocw_links(self):
+        """
+        Returns a list of OpenCourseWare links for the course.
+        """
+        return get_course_about_section(self.request, self.course, "ocw_links")
+
+    @property
+    def prerequisites(self):
+        """
+        Returns a list of prerequisite courses for the course.
+        """
+        return self.course_overview.pre_requisite_courses
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
@@ -611,6 +649,18 @@ class CoursewareInformation(RetrieveAPIView):
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
         * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
+        * content_type_gating_enabled: Whether the content type gating is enabled for the course
+        * show_calculator: Whether the calculator should be shown in the course details page
+        * can_access_proctored_exams: Whether the user is eligible to access proctored exams
+        * notes: An object containing note settings for the course
+            * enabled: Boolean indicating whether edxnotes feature is enabled for the course
+            * visible: Boolean indicating whether notes are visible in the course
+        * marketing_url: The marketing URL for the course
+        * studio_url: The URL to the course in Studio, if the user is staff
+        * is_cosmetic_price_enabled: Boolean indicating whether the cosmetic price feature is enabled
+        * overview: The overview HTML content for the course
+        * ocw_links: A list of OpenCourseWare links for the course
+        * prerequisites: A list of prerequisite courses for the course
 
     **Parameters:**
 
