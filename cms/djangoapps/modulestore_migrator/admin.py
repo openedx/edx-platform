@@ -27,10 +27,11 @@ class StartMigrationTaskForm(ActionForm):
     """
     Params for start_migration_task admin adtion, displayed next the "Go" button.
     """
-    target_key = forms.CharField(label="Target library or collection key:", required=False)
-    replace_existing = forms.BooleanField(label="Replace existing content", required=False)
+    target_key = forms.CharField(label="Target library or collection key →", required=False)
+    replace_existing = forms.BooleanField(label="Replace existing content? →", required=False)
+    forward_to_target = forms.BooleanField(label="Forward references? →", required=False)
     composition_level = forms.ChoiceField(
-        label="Aggregate up to:", choices=CompositionLevel.supported_choices, required=False
+        label="Aggregate up to →", choices=CompositionLevel.supported_choices, required=False
     )
 
 
@@ -86,7 +87,7 @@ class ModulestoreBlockSourceInline(admin.TabularInline):
     fk_name = "overall_source"
     readonly_fields = (
         "key",
-        "forwarded_by"
+        "forwarded"
     )
 
     def has_add_permission(self, _request, _obj):
@@ -98,8 +99,8 @@ class ModulestoreSourceAdmin(admin.ModelAdmin):
     """
     Admin interface for source legacy libraries and courses.
     """
-    readonly_fields = ("forwarded_by",)
-    list_display = ("id", "key", "forwarded_by")
+    readonly_fields = ("forwarded",)
+    list_display = ("id", "key", "forwarded")
     actions = ["start_migration_task"]
     action_form = StartMigrationTaskForm
     inlines = [ModulestoreMigrationInline, ModulestoreBlockSourceInline]
@@ -142,7 +143,7 @@ class ModulestoreSourceAdmin(admin.ModelAdmin):
                     target_collection_slug=target_collection_slug,
                     composition_level=form.cleaned_data['composition_level'],
                     replace_existing=form.cleaned_data['replace_existing'],
-                    forward_source_to_target=False,
+                    forward_source_to_target=form.cleaned_data['forward_to_target'],
                 )
             except Exception as exc:  # pylint: disable=broad-except
                 message = f"Failed to start migration {source.key} -> {target_key_string}"
