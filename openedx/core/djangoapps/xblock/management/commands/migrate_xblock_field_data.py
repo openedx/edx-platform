@@ -73,8 +73,8 @@ class Command(BaseCommand):
             components = Component.objects.select_related('learning_package').filter(filters).order_by('pk')
             total_count = components.count()
             self.stdout.write(f"Found {total_count} Components to process")
-        except Exception as e:
-            raise CommandError(f"Failed to query Components: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            raise CommandError(f"Failed to query Components: {e}") from e
 
         if options['dry_run']:
             self.stdout.write(self.style.WARNING("DRY RUN - No changes will be made"))
@@ -127,7 +127,9 @@ class Command(BaseCommand):
                                         publishable_entity_version_id__in=versions_to_clear
                                     ).delete()
                                     if deleted_count > 0:
-                                        log.info("Deleted %d field data records for %s due to --force", deleted_count, key)
+                                        log.info(
+                                            "Deleted %d field data records for %s due to --force", deleted_count, key
+                                        )
 
                     for version in (LatestVersion.PUBLISHED, LatestVersion.DRAFT):
                         if options['dry_run']:
@@ -145,14 +147,14 @@ class Command(BaseCommand):
                         except NoSuchUsage:
                             # This is expected if a component doesn't have a draft or published version.
                             pass
-                        except Exception as e:
+                        except Exception as e:  # pylint: disable=broad-exception-caught
                             errors += 1
                             log.exception("Error processing %s version %s: %s", key, version.name, e)
                             self.stdout.write(
                                 self.style.ERROR(f"Error on {key} v{version.name}: {e}")
                             )
 
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     errors += 1
                     error_key_str = key or f"Component PK {component.pk}"
                     log.exception("Error processing %s: %s", error_key_str, e)

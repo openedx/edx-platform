@@ -354,4 +354,3 @@ class BlockFieldsView(APIView):
         if hasattr(block, "data"):
             block_dict["data"] = block.data
         return Response(block_dict)
-
