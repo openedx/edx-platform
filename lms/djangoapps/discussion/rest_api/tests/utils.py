@@ -675,7 +675,7 @@ class ForumMockUtilsMixin(MockForumApiMixin):
         self.set_mock_return_value('update_username', body)
 
     def register_subscribed_threads_response(self, user, threads, page, num_pages):
-        self.set_mock_return_value('get_user_subscriptions', {
+        self.set_mock_return_value('get_user_threads', {
             "collection": threads,
             "page": page,
             "num_pages": num_pages,
