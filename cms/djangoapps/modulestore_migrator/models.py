@@ -30,14 +30,15 @@ class ModulestoreSource(models.Model):
     key = LearningContextKeyField(
         max_length=255,
         unique=True,
-        help_text=_('Key of the content source (a course or a legacy library)')
+        help_text=_('Key of the content source (a course or a legacy library)'),
     )
-    forwarded_by = models.ForeignKey(
+    forwarded = models.OneToOneField(
         'modulestore_migrator.ModulestoreMigration',
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        help_text=_('If set, the system will forward references of this source over to the target of this migration')
+        help_text=_('If set, the system will forward references of this source over to the target of this migration'),
+        related_name="forwards",
     )
 
     def __str__(self):
@@ -57,7 +58,7 @@ class ModulestoreMigration(models.Model):
     * Each Migration is tied to a single UserTaskStatus, which connects it to a user and
       contains the progress of the import.
     * A single ModulestoreSource may very well have multiple ModulestoreMigrations; however,
-      at most one of them with be the "authoritative" migration, as indicated by `forwarded_by`.
+      at most one of them with be the "authoritative" migration, as indicated by `forwarded`.
     """
 
     ## MIGRATION SPECIFICATION
@@ -140,14 +141,16 @@ class ModulestoreBlockSource(TimeStampedModel):
         max_length=255,
         help_text=_('Original usage key of the XBlock that has been imported.'),
     )
-    forwarded_by = models.ForeignKey(
+    forwarded = models.OneToOneField(
         'modulestore_migrator.ModulestoreBlockMigration',
         null=True,
         on_delete=models.SET_NULL,
         help_text=_(
             'If set, the system will forward references of this block source over to the target of this block migration'
         ),
+        related_name="forwards",
     )
+    unique_together = [("overall_source", "key")]
 
     def __str__(self):
         return f"{self.__class__.__name__}('{self.key}')"
@@ -163,8 +166,8 @@ class ModulestoreBlockMigration(TimeStampedModel):
 
     Note:
     * A single ModulestoreBlockSource may very well have multiple ModulestoreBlockMigrations; however,
-      at most one of them with be the "authoritative" migration, as indicated by `forwarded_by`.
-      This will coincide with the `overall_migration` being pointed to by `forwarded_by` as well.
+      at most one of them with be the "authoritative" migration, as indicated by `forwarded`.
+      This will coincide with the `overall_migration` being pointed to by `forwarded` as well.
     """
     overall_migration = models.ForeignKey(
         ModulestoreMigration,

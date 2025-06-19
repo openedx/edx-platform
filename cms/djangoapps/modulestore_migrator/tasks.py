@@ -260,7 +260,8 @@ def migrate_from_modulestore(
     # block_target_pks_to_change_log_record_pks: dict[int, int] = dict(
     #     change_log.records.values_list("target_entity_id", "id")
     # )
-    block_migrations = ModulestoreBlockMigration.objects.bulk_create(
+    #block_migrations = ModulestoreBlockMigration.objects.bulk_create(
+    ModulestoreBlockMigration.objects.bulk_create(
         [
             ModulestoreBlockMigration(
                 overall_migration=migration,
@@ -272,6 +273,7 @@ def migrate_from_modulestore(
             for block_source_key, block_target_ver in block_source_keys_to_target_vers.items()
         ],
     )
+    block_migrations = ModulestoreBlockMigration.objects.filter(overall_migration=migration)
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.FORWARDING.value)
@@ -280,9 +282,11 @@ def migrate_from_modulestore(
             block_migration.source: block_migration for block_migration in block_migrations
         }
         for block_source, block_migration in block_sources_to_block_migrations.items():
-            block_source.forwarded_by = block_migration
-        ModulestoreBlockSource.objects.bulk_update(block_sources_to_block_migrations.keys(), ["forwarded_by"])
-        source.forwarded_by = migration
+            block_source.forwarded = block_migration
+            block_source.save()
+        # ModulestoreBlockSource.objects.bulk_update(block_sources_to_block_migrations.keys(), ["forwarded"])
+        source.forwarded = migration
+        source.save()
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.POPULATING_COLLECTION.value)
