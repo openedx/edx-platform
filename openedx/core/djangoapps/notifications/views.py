@@ -599,7 +599,7 @@ class AggregatedNotificationPreferences(APIView):
                 'status': 'error',
                 'message': 'No active notification preferences found'
             }, status=status.HTTP_404_NOT_FOUND)
-        notification_configs = notification_preferences
+        notification_configs = notification_preferences.values_list('notification_preference_config', flat=True)
         notification_configs = aggregate_notification_configs(
             notification_configs
         )
