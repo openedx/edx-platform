@@ -169,8 +169,6 @@ class User(models.Model):
         params.update(query_params)
         course_key = utils.get_course_key(self.attributes.get("course_id"))
         if is_forum_v2_enabled(course_key):
-            if user_id := params.get("user_id"):
-                params["user_id"] = str(user_id)
             if page := params.get("page"):
                 params["page"] = int(page)
             if per_page := params.get("per_page"):
@@ -179,7 +177,11 @@ class User(models.Model):
                 params["count_flagged"] = str_to_bool(count_flagged)
             if not params.get("course_id"):
                 params["course_id"] = str(course_key)
-            response = forum_api.get_user_threads(**params)
+
+            user_id = params.pop("user_id", None)
+            if "text" in params:
+                params.pop("text")
+            response = forum_api.get_user_subscriptions(user_id, str(course_key), params)
         else:
             response = utils.perform_request(
                 'get',
