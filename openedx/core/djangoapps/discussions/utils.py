@@ -17,6 +17,8 @@ from xmodule.course_block import CourseBlock  # lint-amnesty, pylint: disable=wr
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID, Group  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx_user_groups.toggles import is_user_groups_enabled
+
 
 log = logging.getLogger(__name__)
 
@@ -106,6 +108,8 @@ def available_division_schemes(course_key: CourseKey) -> List[str]:
         available_schemes.append(CourseDiscussionSettings.COHORT)
     if enrollment_track_group_count(course_key) > 1:
         available_schemes.append(CourseDiscussionSettings.ENROLLMENT_TRACK)
+    if is_user_groups_enabled(course_key):
+        available_schemes.append(CourseDiscussionSettings.USER_GROUP)
     return available_schemes
 
 
