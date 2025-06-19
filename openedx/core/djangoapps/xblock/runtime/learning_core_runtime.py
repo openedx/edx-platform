@@ -206,7 +206,7 @@ class LearningCoreFieldData(FieldData):
                 content=content_fields,
                 settings=settings_fields,
             )
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             # This method may be triggered while loading an XBlock, so we don't want to raise an error.
             log.exception(
                 "Failed to save field data for component version %s: %s",
@@ -272,8 +272,6 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
 
             if xml_node.get("url_name", None):
                 log.warning("XBlock at %s should not specify an old-style url_name attribute.", usage_key)
-
-
 
             if hasattr(block_class, 'parse_xml_new_runtime'):
                 # This is a (former) XModule with messy XML parsing code; let its parse_xml() method continue to work

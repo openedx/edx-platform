@@ -1,6 +1,6 @@
 """Models for XBlock runtime."""
 from jsonfield.fields import JSONField
-from openedx_learning.apps.authoring.publishing.models.publishable_entity import PublishableEntityVersionMixin
+from openedx_learning.api.authoring_models import PublishableEntityVersionMixin
 
 
 class XBlockVersionFieldData(PublishableEntityVersionMixin):

@@ -64,18 +64,22 @@ class XBlockVersionFieldDataAdmin(ReadOnlyModelAdmin):
         except AttributeError:
             return "N/A"
 
+    @admin.display(description="Publishable Entity Version")
     def publishable_entity_version_link(self, obj):
         """Link to the related publishable entity version in admin."""
         admin_url = reverse('admin:oel_components_componentversion_change', args=[obj.publishable_entity_version.pk])
         return format_html('<a href="{}">{}</a>', admin_url, obj.publishable_entity_version)
-    publishable_entity_version_link.short_description = "Publishable Entity Version"
 
+    @admin.display(description="Component")
     def component_link(self, obj):
         """Link to the related component in admin."""
-        admin_url = reverse('admin:oel_components_component_change', args=[obj.publishable_entity_version.componentversion.component.pk])
+        admin_url = reverse(
+            "admin:oel_components_component_change",
+            args=[obj.publishable_entity_version.componentversion.component.pk],
+        )
         return format_html('<a href="{}">{}</a>', admin_url, obj.publishable_entity_version.componentversion.component)
-    component_link.short_description = "Component"
 
+    @admin.display(description="Content Fields")
     def content_display(self, obj):
         """Display formatted content fields."""
         if not obj.content:
@@ -85,8 +89,8 @@ class XBlockVersionFieldDataAdmin(ReadOnlyModelAdmin):
             '<pre style="max-height: 600px; overflow-y: auto; white-space: pre-wrap;">{}</pre>',
             json.dumps(obj.content, indent=2),
         )
-    content_display.short_description = "Content Fields"
 
+    @admin.display(description="Settings Fields")
     def settings_display(self, obj):
         """Display formatted settings fields."""
         if not obj.settings:
@@ -96,4 +100,3 @@ class XBlockVersionFieldDataAdmin(ReadOnlyModelAdmin):
             '<pre style="max-height: 600px; overflow-y: auto; white-space: pre-wrap;">{}</pre>',
             json.dumps(obj.settings, indent=2),
         )
-    settings_display.short_description = "Settings Fields"
