@@ -3,6 +3,8 @@ Base setup for Notification Apps and Types.
 """
 from django.utils.translation import gettext_lazy as _
 
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFY_ALL_LEARNERS
+
 from .email_notifications import EmailCadence
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
@@ -229,6 +231,25 @@ COURSE_NOTIFICATION_TYPES = {
         },
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
+    },
+    'new_instructor_all_learners_post': {
+        'notification_app': 'discussion',
+        'name': 'new_instructor_all_learners_post',
+        'is_core': False,
+        'info': '',
+        'web': True,
+        'email': False,
+        'email_cadence': EmailCadence.DAILY,
+        'push': False,
+        'non_editable': [],
+        'content_template': _('<{p}>Your instructor posted <{strong}>{post_title}</{strong}></{p}>'),
+        'grouped_content_template': '',
+        'content_context': {
+            'post_title': 'Post title',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
+        'waffle_flag': ENABLE_NOTIFY_ALL_LEARNERS
     },
 }
 

@@ -45,7 +45,8 @@ from .serializers import (
 from .utils import (
     aggregate_notification_configs,
     filter_out_visible_preferences_by_course_ids,
-    get_show_notifications_tray
+    get_show_notifications_tray,
+    remove_disabled_flagged_notifications
 )
 
 
@@ -603,13 +604,21 @@ class AggregatedNotificationPreferences(APIView):
         notification_configs = aggregate_notification_configs(
             notification_configs
         )
+        course_ids = notification_preferences.values_list('course_id', flat=True)
+
         filter_out_visible_preferences_by_course_ids(
             request.user,
             notification_configs,
-            notification_preferences.values_list('course_id', flat=True),
+            course_ids,
         )
+
         notification_preferences_viewed_event(request)
         notification_configs = add_info_to_notification_config(notification_configs)
+        remove_disabled_flagged_notifications(
+            notification_configs,
+            course_ids
+        )
+
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved',

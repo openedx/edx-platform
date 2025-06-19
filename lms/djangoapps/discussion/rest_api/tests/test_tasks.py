@@ -29,7 +29,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     CourseDiscussionSettings
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -190,11 +190,16 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
         """
 
     @ddt.data(
-        ('new_question_post',),
-        ('new_discussion_post',),
+        ('new_question_post', False),
+        ('new_discussion_post', False),
+        ('new_discussion_post', True),
     )
     @ddt.unpack
-    def test_notification_is_send_to_all_enrollments(self, notification_type):
+    @mock.patch('lms.djangoapps.discussion.rest_api.utils.can_user_notify_all_learners', return_value=True)
+    @override_waffle_flag(ENABLE_NOTIFY_ALL_LEARNERS, active=True)
+    def test_notification_is_send_to_all_enrollments(
+        self, notification_type, notify_all_learners, mock_notify_all_learners
+    ):
         """
         Tests notification is sent to all users if course is not cohorted
         """
@@ -207,10 +212,11 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
         thread = self._create_thread(thread_type=thread_type)
         handler = mock.Mock()
         COURSE_NOTIFICATION_REQUESTED.connect(handler)
-        send_thread_created_notification(thread['id'], str(self.course.id), self.author.id)
+        send_thread_created_notification(thread['id'], str(self.course.id), self.author.id, notify_all_learners)
         self.assertEqual(handler.call_count, 1)
         course_notification_data = handler.call_args[1]['course_notification_data']
-        assert notification_type == course_notification_data.notification_type
+        assert course_notification_data.notification_type == 'new_instructor_all_learners_post' if notify_all_learners \
+            else notification_type
         notification_audience_filters = {}
         assert notification_audience_filters == course_notification_data.audience_filters
 

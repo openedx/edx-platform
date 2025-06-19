@@ -5,11 +5,15 @@ import copy
 import unittest
 
 import pytest
+from unittest.mock import patch
+
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFY_ALL_LEARNERS
 from openedx.core.djangoapps.django_comment_common.models import assign_role, FORUM_ROLE_MODERATOR
 from openedx.core.djangoapps.notifications.utils import aggregate_notification_configs, \
-    filter_out_visible_preferences_by_course_ids
+    filter_out_visible_preferences_by_course_ids, remove_disabled_flagged_notifications
 
 
 class TestAggregateNotificationConfigs(unittest.TestCase):
@@ -311,7 +315,10 @@ class TestVisibilityFilter(unittest.TestCase):
                     'core': {'web': True, 'push': True, 'email': True, 'email_cadence': 'Daily'},
                     'content_reported': {'web': True, 'push': True, 'email': True, 'email_cadence': 'Daily'},
                     'new_question_post': {'web': False, 'push': False, 'email': False, 'email_cadence': 'Daily'},
-                    'new_discussion_post': {'web': False, 'push': False, 'email': False, 'email_cadence': 'Daily'}
+                    'new_discussion_post': {'web': False, 'push': False, 'email': False, 'email_cadence': 'Daily'},
+                    'new_instructor_all_learners_post': {
+                        'web': True, 'push': False, 'email': False, 'email_cadence': 'Daily'
+                    }
                 },
                 'core_notification_types': [
                     'new_response', 'comment_on_followed_post',
@@ -344,3 +351,23 @@ class TestVisibilityFilter(unittest.TestCase):
         )
         assign_role(self.course_key, self.user, FORUM_ROLE_MODERATOR)
         assert updated_preferences == self.mock_preferences
+
+    @patch.object(ENABLE_NOTIFY_ALL_LEARNERS, 'is_enabled')
+    def test_visibility_of_flagged_notifications(self, mock_is_enabled):
+        """
+        Test that the preferences are filtered out correctly when the waffle flag is enabled and disabled.
+        """
+        course_keys = [CourseKey.from_string(self.course_key)]
+
+        for flag_state in [True, False]:
+            mock_is_enabled.return_value = flag_state
+
+            updated_preferences = remove_disabled_flagged_notifications(
+                copy.deepcopy(self.mock_preferences),
+                course_keys
+            )
+
+            if flag_state:
+                assert "new_instructor_all_learners_post" in updated_preferences["discussion"]["notification_types"]
+            else:
+                assert "new_instructor_all_learners_post" not in updated_preferences["discussion"]["notification_types"]
