@@ -323,6 +323,7 @@ def reverification_info(statuses):
             reverifications[status].sort(key=lambda x: x.date)
     return reverifications
 
+
 @pluggable_override('OVERRIDE_GET_CREDIT_BUTTON_HREF')
 def get_credit_button_href(course_key):
     """
