@@ -25,6 +25,7 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx_filters.content_authoring.filters import LMSPageURLRequested
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -194,7 +195,9 @@ def _assets_json(request, course_key):
     '''
     request_options = _parse_request_to_dictionary(request)
 
-    filter_parameters = {}
+    filter_parameters = {
+        'user_language': UserPreference.get_value(request.user, 'pref-lang') or 'en',
+    }
 
     if request_options['requested_asset_type']:
         filters_are_invalid_error = _get_error_if_invalid_parameters(request_options['requested_asset_type'])
