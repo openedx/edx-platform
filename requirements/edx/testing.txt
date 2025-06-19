@@ -530,7 +530,7 @@ edx-celeryutils==1.4.0
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
     #   super-csv
-edx-codejail==3.5.2
+edx-codejail==4.0.0
     # via -r requirements/edx/base.txt
 edx-completion==4.9
     # via -r requirements/edx/base.txt
@@ -570,7 +570,7 @@ edx-drf-extensions==10.6.0
     #   edx-when
     #   edxval
     #   openedx-learning
-edx-enterprise==6.2.4
+edx-enterprise==6.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
