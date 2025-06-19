@@ -92,6 +92,7 @@ def send_ace_message(goal, session_id):
 
     message_context.update({
         'email': user.email,
+        'user_name': user.username,
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
         'course_name': course_name,
         'course_id': str(goal.course_key),
@@ -103,6 +104,8 @@ def send_ace_message(goal, session_id):
         'omit_unsubscribe_link': True,
         'courses_url': getattr(settings, 'ACE_EMAIL_COURSES_URL', None),
         'programs_url': getattr(settings, 'ACE_EMAIL_PROGRAMS_URL', None),
+        'goal_reminder_banner_url': settings.GOAL_REMINDER_BANNER_URL,
+        'goal_reminder_profile_url': settings.GOAL_REMINDER_PROFILE_URL,
     })
 
     options = {
