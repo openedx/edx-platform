@@ -21,6 +21,7 @@ from social_core.backends.oauth import OAuthAuth
 from social_core.backends.saml import SAMLAuth
 from social_core.exceptions import SocialAuthBaseException
 from social_core.utils import module_member
+from edx_django_utils.monitoring import set_custom_attribute
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
@@ -29,6 +30,21 @@ from openedx.core.lib.hash_utils import create_hash256
 
 from .lti import LTI_PARAMS_KEY, LTIAuthBackend
 from .saml import STANDARD_SAML_PROVIDER_KEY, get_saml_idp_choices, get_saml_idp_class
+from edx_toggles.toggles import SettingToggle
+
+# .. toggle_name: FEATURES['USE_LATEST_SAML_CONFIG']
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: When enabled, the system uses the latest enabled SAML configuration with
+#    the same slug when authenticating users. When disabled, the system uses the directly
+#    referenced configuration. This is a temporary rollout toggle to get us to the
+#    enabled state.
+# .. toggle_warning: Disabling this may affect authentication for users if providers have
+#    been updated with newer configurations.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-06-10
+# .. toggle_target_removal_date: 2025-09-01
+USE_LATEST_SAML_CONFIG = SettingToggle("USE_LATEST_SAML_CONFIG", default=False, module_name=__name__)
 
 log = logging.getLogger(__name__)
 
@@ -759,6 +775,10 @@ class SAMLProviderConfig(ProviderConfig):
         )
     )
     archived = models.BooleanField(default=False)
+    # Ideally we would have stored the SAMLConfiguration keys of site_id and slug, rather than
+    # pointing to a specific record which may no longer be current when we try to use it. This
+    # has been compensated for elsewhere by retrieving the site_id and slug from the stored row,
+    # and using it to get the current (latest) row instead.
     saml_configuration = models.ForeignKey(
         SAMLConfiguration,
         on_delete=models.SET_NULL,
@@ -880,12 +900,34 @@ class SAMLProviderConfig(ProviderConfig):
         conf['x509certMulti'] = {'signing': public_keys}
         conf['x509cert'] = ''
         conf['url'] = sso_url
+        # This block determines which SAML configuration should be used during authentication
+        if self.saml_configuration:
+            direct_config = self.saml_configuration
+            conf['saml_sp_configuration'] = direct_config
+            # .. custom_attribute_name: saml_config.use_latest_toggle_enabled
+            # .. custom_attribute_description: True if USE_LATEST_SAML_CONFIG is enabled; false otherwise.
+            set_custom_attribute('saml_config.use_latest_toggle_enabled', USE_LATEST_SAML_CONFIG.is_enabled())
+            if USE_LATEST_SAML_CONFIG.is_enabled():
+                try:
+                    slug = self.saml_configuration.slug
+                    site_id = self.saml_configuration.site_id
+                    latest_config = SAMLConfiguration.current(self.saml_configuration.site_id, self.saml_configuration.slug)
+                    if latest_config:
+                        # .. custom_attribute_name: saml_config.using
+                        # .. custom_attribute_description: Describes which config is being used: direct (from db), latest,
+                        #     or default.
+                        set_custom_attribute('saml_config.using', 'latest')
+                        conf['saml_sp_configuration'] = latest_config
+                except Exception as e:
+                    log.exception("Error finding latest SAML config for slug %s, site_id %s: %s",
+                                  self.saml_configuration.slug, self.saml_configuration.site_id, e)
+            else:
+                set_custom_attribute('saml_config.using', 'default')
+        else:
+            conf['saml_sp_configuration'] = SAMLConfiguration.current(self.site.id, 'default')
+            set_custom_attribute('saml_config.using', 'default')
 
-        # Add SAMLConfiguration appropriate for this IdP
-        conf['saml_sp_configuration'] = (
-            self.saml_configuration or
-            SAMLConfiguration.current(self.site.id, 'default')
-        )
+        # Create and return the appropriate IdP class with the configuration
         idp_class = get_saml_idp_class(self.identity_provider_type)
         return idp_class(self.slug, **conf)
 
