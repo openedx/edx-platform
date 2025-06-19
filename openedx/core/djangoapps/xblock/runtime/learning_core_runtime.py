@@ -124,8 +124,9 @@ class LearningCoreFieldData(FieldData):
 
         Returns:
             True if the value was changed.
-            False if the value was already set to the same value.
+            False if the field was already set to the same value.
         """
+        self._check_field(block, name)
         usage_key = block.scope_ids.usage_id
 
         # Check to see if we're just setting the same value. If so, return
