@@ -37,9 +37,11 @@
 <tr>
   <td>
     <p style="margin-top: 16px; color: #1F453D; font-family: Arial; font-size: 30px; font-weight: 700; line-height: 36px; margin-left: 30px; margin-right: 30px;">
-      {% blocktrans with user_name=user_name %}
-        You’re almost there, {{ user_name }}!
-      {% endblocktrans %}
+      {% filter force_escape %}
+        {% blocktrans with user_name=user_name %}
+            You’re almost there, {{ user_name }}!
+        {% endblocktrans %}
+      {% endfilter %}
     </p>
     <p style="margin-top: 16px; color: #000000; font-family: Arial; font-size: 16px; font-weight: 400; line-height: 24px; margin-left: 30px; margin-right: 30px;">
         {% filter force_escape %}
