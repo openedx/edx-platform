@@ -311,7 +311,9 @@ class MongoContentStore(ContentStore):
             md5: An md5 hash of the asset content
         '''
         query = query_for_course(course_key, 'asset' if not get_thumbnails else 'thumbnail')
+        user_language = 'en'
         if filter_params:
+            user_language = filter_params.pop('user_language', 'en')
             query.update(filter_params)
 
         # Count total matching documents
@@ -335,7 +337,9 @@ class MongoContentStore(ContentStore):
                     'thumbnail_location': 1,
                     'md5': 1
                 })
-                cursor = cursor.sort('displayname', sort['displayname']).collation({'locale': 'en', 'strength': 2})
+                cursor = cursor.sort('displayname', sort['displayname']).collation(
+                    {'locale': user_language, 'strength': 2}
+                )
             else:
                 # Apply simple sorting
                 sort_list = list(sort.items())
