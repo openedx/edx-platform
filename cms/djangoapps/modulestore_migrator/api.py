@@ -26,7 +26,7 @@ def start_migration_to_library(
     target_collection_slug: str | None = None,
     composition_level: CompositionLevel,
     replace_existing: bool,
-    forward_source_to_target: bool,  # @@TODO - Set to False for now. Explain this better.
+    forward_source_to_target: bool,
 ) -> None:
     """
     Import a course or legacy library into a V2 library (or, a collection within a V2 library).
