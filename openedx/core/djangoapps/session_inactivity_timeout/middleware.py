@@ -19,8 +19,9 @@ import logging
 from django.conf import settings
 from django.contrib import auth
 from django.utils.deprecation import MiddlewareMixin
+from edx_django_utils import monitoring as monitoring_utils
 
-LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch'
+LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch_str'
 LAST_SESSION_SAVE_TIME_KEYNAME = 'SessionInactivityTimeout:last_session_save_time'
 
 LOG = logging.getLogger(__name__)
@@ -40,23 +41,23 @@ class SessionInactivityTimeout(MiddlewareMixin):
 
         # .. setting_name: SESSION_INACTIVITY_TIMEOUT_IN_SECONDS
         # .. setting_default: None
-        # .. setting_description:  Used for maintaining session inactivity up to n hours
-        # .. setting_warning:  Keep in sync with SESSION_COOKIE_AGE and SESSION_SAVE_FREQUENCY_SECONDS
+        # .. setting_description: If set, this is used to end the session when there is no activity for N seconds.
+        # .. setting_warning:  Keep in sync with SESSION_COOKIE_AGE and must be larger than SESSION_ACTIVITY_SAVE_DELAY_SECONDS.
         timeout_in_seconds = getattr(settings, "SESSION_INACTIVITY_TIMEOUT_IN_SECONDS", None)
 
         # Do we have this feature enabled?
         if timeout_in_seconds:
-            # .. setting_name: SESSION_SAVE_FREQUENCY_SECONDS
-            # .. setting_default: 900
+            # .. setting_name: SESSION_ACTIVITY_SAVE_DELAY_SECONDS
+            # .. setting_default: 15 minutes (in seconds)
             # .. setting_description: How often to allow a full session save (in seconds).
-            #   This controls how frequently the session ID might change
-            #   A user could be inactive for almost SESSION_SAVE_FREQUENCY_SECONDS but since their session 
+            #   This controls how frequently the session ID might change.
+            #   A user could be inactive for almost SESSION_ACTIVITY_SAVE_DELAY_SECONDS but since their session 
             #   isn't being saved during that time, their last activity timestamp isn't being updated.
-            #   When they hit the inactivity timeout, it will be based on the last saved activity time
-            #   So the effective timeout could be as short as: SESSION_INACTIVITY_TIMEOUT_IN_SECONDS - SESSION_SAVE_FREQUENCY_SECONDS
+            #   When they hit the inactivity timeout, it will be based on the last saved activity time.
+            #   So the effective timeout could be as short as: SESSION_INACTIVITY_TIMEOUT_IN_SECONDS - SESSION_ACTIVITY_SAVE_DELAY_SECONDS.
             #   This means users might be logged out earlier than expected in some edge cases.
-            # .. setting_warning:  Used in sync with SESSION_INACTIVITY_TIMEOUT_IN_SECONDS
-            frequency_time_in_seconds = getattr(settings, "SESSION_SAVE_FREQUENCY_SECONDS", 900)
+            # .. setting_warning:  Must be smaller than SESSION_INACTIVITY_TIMEOUT_IN_SECONDS.
+            frequency_time_in_seconds = getattr(settings, "SESSION_ACTIVITY_SAVE_DELAY_SECONDS", 900)
             # what time is it now?
             utc_now = datetime.utcnow()
 
@@ -80,10 +81,13 @@ class SessionInactivityTimeout(MiddlewareMixin):
                         auth.logout(request)
                         return
                 except (ValueError, TypeError) as e:
+                    LOG.debug("Parsing last touch time failed: %s", e)
                     # If parsing fails, treat as if no timestamp exists
                     pass
             else:
-                LOG.info("No previous activity timestamp found (first login)")
+                # Enable NR tracing for this view based on course
+                monitoring_utils.set_custom_attribute('session_inactivity.first_login', True)
+                LOG.debug("No previous activity timestamp found (first login)")
 
             # Store activity timestamp
             request.session[LAST_TOUCH_KEYNAME] = utc_now.isoformat()
@@ -92,11 +96,13 @@ class SessionInactivityTimeout(MiddlewareMixin):
             last_save = request.session.get(LAST_SESSION_SAVE_TIME_KEYNAME)
             current_time = datetime.utcnow().isoformat()
 
+            monitoring_utils.set_custom_attribute('session_inactivity.activity_seen', current_time)
             if not last_save or (
                 datetime.fromisoformat(last_save) + timedelta(seconds=frequency_time_in_seconds) < datetime.utcnow()
             ):
                 # Allow a full session save periodically
                 request.session[LAST_SESSION_SAVE_TIME_KEYNAME] = current_time
+                monitoring_utils.set_custom_attribute('session_inactivity.session_extended', True)
                 # Don't set modified=was_modified here! Let Django save the session
             else:
                 # Only prevent saving in this branch
