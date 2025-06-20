@@ -55,7 +55,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
         cache.clear()
 
         # Enable the certificate generation feature
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
 
     def test_visible_only_to_global_staff(self):
         # Instructors don't see the certificates section
@@ -68,7 +68,7 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
 
     def test_visible_only_when_feature_flag_enabled(self):
         # Disable the feature flag
-        certs_api.set_cert_generation_config(enabled=False)
+        certs_api.set_certificate_generation_config(enabled=False)
         cache.clear()
 
         # Now even global staff can't see the certificates section
@@ -226,7 +226,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Enable certificate generation
         cache.clear()
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
 
     @ddt.data('enable_certificate_generation')
     def test_allow_only_global_staff(self, url_name):
@@ -419,7 +419,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
 
         # Enable certificate generation
         cache.clear()
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
 
     def test_certificate_exception_added_successfully(self):
@@ -738,7 +738,7 @@ class GenerateCertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Enable certificate generation
         cache.clear()
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
 
     def test_generate_certificate_exceptions_all_students(self):

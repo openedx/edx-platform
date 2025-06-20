@@ -198,7 +198,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # This is used to generate example certificates
     # and enable self-generated certificates for a course.
     # Note: This is hidden for all CCXs
-    certs_enabled = certs_api.get_cert_generation_config() and not hasattr(course_key, 'ccx')
+    certs_enabled = certs_api.is_certificate_generation_enabled() and not hasattr(course_key, 'ccx')
     certs_instructor_enabled = settings.FEATURES.get('ENABLE_CERTIFICATES_INSTRUCTOR_MANAGE', False)
 
     if certs_enabled and (access['admin'] or (access['instructor'] and certs_instructor_enabled)):
@@ -235,7 +235,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
         kwargs={'course_id': str(course_key)}
     )
 
-    certificate_invalidations = certs_api.get_certificate_invalidations_for_course_key(course_key)
+    certificate_invalidations = certs_api.get_cert_invalidations_for_course(course_key)
 
     context = {
         'course': course,
@@ -360,7 +360,7 @@ def _section_certificates(course):
     instructor_generation_enabled = settings.FEATURES.get('CERTIFICATES_INSTRUCTOR_GENERATION', False)
     certificate_statuses_with_count = {
         certificate['status']: certificate['count']
-        for certificate in certs_api.get_unique_statuses(course.id)
+        for certificate in certs_api.get_unique_certificate_statuses(course.id)
     }
 
     return {

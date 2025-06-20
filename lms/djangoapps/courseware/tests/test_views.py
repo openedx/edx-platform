@@ -1350,7 +1350,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         self.assertNotContains(resp, 'Request Certificate')
 
         # Enable the feature, but do not enable it for this course
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
 
         resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
@@ -1375,7 +1375,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
 
         # Enable the feature, but do not enable it for this course
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
 
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
@@ -1406,7 +1406,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         )
 
         # Enable the feature, but do not enable it for this course
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
 
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
@@ -1496,7 +1496,7 @@ class ProgressPageTests(ProgressPageBaseTests):
     @ddt.unpack
     def test_show_certificate_request_button(self, course_mode, user_verified):
         """Verify that the Request Certificate is not displayed in audit mode."""
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
         certs_api.set_cert_generation_enabled(self.course.id, True)
         CourseEnrollment.enroll(self.user, self.course.id, mode=course_mode)
         with patch(
@@ -1762,7 +1762,7 @@ class ProgressPageTests(ProgressPageBaseTests):
         Verify if the learner is not ID Verified, and the certs are not yet generated,
         but the learner is eligible, the get_cert_data would return cert status Unverified
         """
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
         certs_api.set_cert_generation_enabled(self.course.id, True)
         with patch.dict(settings.FEATURES, ENABLE_CERTIFICATES_IDV_REQUIREMENT=enable_cert_idv_requirement):
             with patch(
@@ -1802,7 +1802,7 @@ class ProgressPageTests(ProgressPageBaseTests):
             status=CertificateStatuses.downloadable,
             mode=mode
         )
-        certs_api.set_cert_generation_config(enabled=True)
+        certs_api.set_certificate_generation_config(enabled=True)
         certs_api.set_cert_generation_enabled(self.course.id, True)
         return generated_certificate
 

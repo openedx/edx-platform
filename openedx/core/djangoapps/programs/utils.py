@@ -340,7 +340,7 @@ class ProgramProgressMeter:
         Returns a dict of {uuid_string: available_datetime}
         """
         # Query for all user certs up front, for performance reasons (rather than querying per course run).
-        user_certificates = certificate_api.get_eligible_available_certificates(user=self.user)
+        user_certificates = certificate_api.get_eligible_and_available_certificates(user=self.user)
         certificates_by_run = {cert.course_id: cert for cert in user_certificates}
 
         completed = {}

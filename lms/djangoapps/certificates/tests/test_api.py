@@ -46,7 +46,7 @@ from lms.djangoapps.certificates.api import (
     get_certificate_invalidation_entry,
     get_certificate_url,
     get_certificates_for_user,
-    get_course_ids_for_username,
+    get_course_ids_from_certs_for_user,
     get_certificates_for_user_by_course_keys,
     has_self_generated_certificates_enabled,
     is_certificate_invalidated,
@@ -1271,7 +1271,7 @@ class CertificatesLearnerRetirementFunctionality(ModuleStoreTestCase):
 
 class GetCourseIdsForUsernameTests(TestCase):
     """
-    Test suite for the `get_course_ids_for_username` function.
+    Test suite for the `get_course_ids_from_certs_for_user` function.
     """
 
     def setUp(self):
@@ -1295,7 +1295,7 @@ class GetCourseIdsForUsernameTests(TestCase):
         Verifies that both course keys created in setUp are returned when the
         user's username is passed to the function.
         """
-        course_ids = list(get_course_ids_for_username(self.user))
+        course_ids = get_course_ids_from_certs_for_user(self.user)
 
         self.assertIn(self.course_key_1, course_ids)
         self.assertIn(self.course_key_2, course_ids)
@@ -1308,5 +1308,5 @@ class GetCourseIdsForUsernameTests(TestCase):
         Uses a non-existent username to ensure that the function does not raise
         errors and returns an empty list as expected.
         """
-        course_ids = list(get_course_ids_for_username("nonexistentuser"))
+        course_ids = get_course_ids_from_certs_for_user("nonexistentuser")
         self.assertEqual(course_ids, [])

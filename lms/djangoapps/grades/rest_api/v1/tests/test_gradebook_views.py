@@ -37,7 +37,7 @@ from common.djangoapps.student.tests.factories import StaffFactory
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.api import (
     get_certificate_for_user_id,
-    create_or_update_eligible_cert_for_user
+    create_or_update_eligible_certificate_for_user
 )
 from lms.djangoapps.grades.config.waffle import BULK_MANAGEMENT, WRITABLE_GRADEBOOK
 from lms.djangoapps.grades.constants import GradeOverrideFeatureEnum
@@ -1827,7 +1827,7 @@ class GradebookBulkUpdateViewTest(GradebookViewTestBase):
                 "course_id": self.course.id,
                 "status": CertificateStatuses.downloadable,
             }
-            create_or_update_eligible_cert_for_user(**cert_args)
+            create_or_update_eligible_certificate_for_user(**cert_args)
             self.login_staff()
             post_data = [
                 {
