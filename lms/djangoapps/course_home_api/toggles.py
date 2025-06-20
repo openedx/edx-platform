@@ -51,6 +51,21 @@ COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT = CourseWaffleFlag(
 )
 
 
+# Waffle flag to calculate course grade including invisible grades
+#
+# .. toggle_name: course_home.calculate_course_grade_including_invisible_grades
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This toggle controls whether the course grade calculation includes invisible grades.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2025-06-03
+# .. toggle_target_removal_date: None
+COURSE_HOME_CALCULATE_COURSE_GRADE_INCLUDING_INVISIBLE_GRADES = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.calculate_course_grade_including_invisible_grades', __name__
+)
+
+
+
 def course_home_mfe_progress_tab_is_active(course_key):
     # Avoiding a circular dependency
     from .models import DisableProgressPageStackedConfig
@@ -73,3 +88,10 @@ def send_course_progress_analytics_for_student_is_enabled(course_key):
     Returns True if the course completion analytics feature is enabled for a given course.
     """
     return COURSE_HOME_SEND_COURSE_PROGRESS_ANALYTICS_FOR_STUDENT.is_enabled(course_key)
+
+
+def calculate_course_grade_including_invisible_grades_is_enabled(course_key):
+    """
+    Returns True if the course grade calculation including invisible grades is enabled for a given course.
+    """
+    return COURSE_HOME_CALCULATE_COURSE_GRADE_INCLUDING_INVISIBLE_GRADES.is_enabled(course_key)
