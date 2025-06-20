@@ -419,13 +419,13 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             expect_response
         )
 
-    def _remove_container_components(
+    def _remove_container_children(
         self,
         container_key: ContainerKey | str,
         children_ids: list[str],
         expect_response=200,
     ):
-        """ Remove container components"""
+        """ Remove container children"""
         return self._api(
             'delete',
             URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
@@ -433,13 +433,13 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
             expect_response
         )
 
-    def _patch_container_components(
+    def _patch_container_children(
         self,
         container_key: ContainerKey | str,
         children_ids: list[str],
         expect_response=200,
     ):
-        """ Update container components"""
+        """ Update container children"""
         return self._api(
             'patch',
             URL_LIB_CONTAINER_CHILDREN.format(container_key=container_key),
