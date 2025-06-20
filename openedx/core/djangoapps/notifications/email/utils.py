@@ -97,13 +97,14 @@ def create_email_template_context(username):
         'channel': 'email',
         'value': False
     }
+    account_base_url = (settings.ACCOUNT_MICROFRONTEND_URL or "").rstrip('/')
     return {
         "platform_name": settings.PLATFORM_NAME,
         "mailing_address": settings.CONTACT_MAILING_ADDRESS,
         "logo_url": get_logo_url_for_email(),
         "logo_notification_cadence_url": settings.NOTIFICATION_DIGEST_LOGO,
         "social_media": social_media_info,
-        "notification_settings_url": f"{settings.ACCOUNT_MICROFRONTEND_URL}/#notifications",
+        "notification_settings_url": f"{account_base_url}/#notifications",
         "unsubscribe_url": get_unsubscribe_link(username, patch)
     }
 

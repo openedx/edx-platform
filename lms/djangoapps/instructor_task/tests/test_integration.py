@@ -22,6 +22,7 @@ from django.urls import reverse
 
 from xmodule.capa.responsetypes import StudentInputError
 from xmodule.capa.tests.response_xml_factory import CodeResponseXMLFactory, CustomResponseXMLFactory
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 from lms.djangoapps.courseware.model_data import StudentModule
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.instructor_task.api import (
@@ -71,6 +72,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
 
 @ddt.ddt
 @override_settings(RATELIMIT_ENABLE=False)
+@use_unsafe_codejail()
 class TestRescoringTask(TestIntegrationTask):
     """
     Integration-style tests for rescoring problems in a background task.

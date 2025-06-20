@@ -304,6 +304,7 @@ def update_container(
     container_type = ContainerType(container_key.container_type)
 
     version: ContainerVersion
+    affected_containers: list[ContainerMetadata] = []
 
     match container_type:
         case ContainerType.Unit:
@@ -313,6 +314,7 @@ def update_container(
                 created=created,
                 created_by=user_id,
             )
+            affected_containers = get_containers_contains_item(container_key)
         case ContainerType.Subsection:
             version = authoring_api.create_next_subsection_version(
                 container.subsection,
@@ -320,6 +322,7 @@ def update_container(
                 created=created,
                 created_by=user_id,
             )
+            affected_containers = get_containers_contains_item(container_key)
         case ContainerType.Section:
             version = authoring_api.create_next_section_version(
                 container.section,
@@ -327,14 +330,27 @@ def update_container(
                 created=created,
                 created_by=user_id,
             )
+
+            # The `affected_containers` are not obtained, because the sections are
+            # not contained in any container.
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
+    # Send event related to the updated container
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
         )
     )
+
+    # Send events related to the containers that contains the updated container.
+    # This is to update the children display names used in the section/subsection previews.
+    for affected_container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                container_key=affected_container.container_key,
+            )
+        )
 
     return ContainerMetadata.from_container(library_key, version.container)
 
