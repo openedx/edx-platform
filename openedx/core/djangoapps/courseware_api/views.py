@@ -25,15 +25,23 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
-from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode, get_course_prices
 from common.djangoapps.util.views import expose_header
 from lms.djangoapps.edxnotes.helpers import is_feature_enabled
 from lms.djangoapps.certificates.api import get_certificate_url
 from lms.djangoapps.certificates.models import GeneratedCertificate
+from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_goals.api import get_course_goal
 from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access_utils import check_public_access
+from lms.djangoapps.courseware.courses import (
+    get_course_about_section,
+    get_course_with_access,
+    get_permission_for_course_about,
+    get_studio_url,
+)
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.entrance_exams import course_has_entrance_exam, user_has_passed_entrance_exam
@@ -43,19 +51,24 @@ from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_non_audit_enrollment,
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
+from lms.djangoapps.courseware.permissions import VIEW_COURSEWARE
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
-from lms.djangoapps.courseware.toggles import course_exit_page_is_active
+from lms.djangoapps.courseware.toggles import course_exit_page_is_active, course_is_invitation_only
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
+from lms.djangoapps.instructor.enrollment import uses_shib
+from common.djangoapps.util.milestones_helpers import get_prerequisite_courses_display
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
+from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.access import get_access_expiration_data
 from openedx.features.discounts.utils import generate_offer_data
@@ -63,6 +76,10 @@ from common.djangoapps.student.models import (
     CourseEnrollment,
     CourseEnrollmentCelebration,
     LinkedInAddToProfileConfiguration
+)
+from xmodule.course_block import (
+    COURSE_VISIBILITY_PUBLIC,
+    COURSE_VISIBILITY_PUBLIC_OUTLINE,
 )
 
 from .serializers import CourseInfoSerializer
@@ -75,13 +92,13 @@ class CoursewareMeta:
 
     def __init__(self, course_key, request, username=''):
         self.request = request
-        self.overview = course_detail(
+        self.course_overview = course_detail(
             self.request,
             username or self.request.user.username,
             course_key,
         )
 
-        original_user_is_staff = has_access(self.request.user, 'staff', self.overview).has_access
+        original_user_is_staff = has_access(self.request.user, 'staff', self.course_overview).has_access
         self.original_user_is_global_staff = self.request.user.is_staff
         self.course_key = course_key
         self.course = get_course_by_id(self.course_key)
@@ -91,12 +108,13 @@ class CoursewareMeta:
             staff_access=original_user_is_staff,
         )
         self.request.user = self.effective_user
-        self.overview.bind_course_for_student(self.request)
+        self.course_overview.bind_course_for_student(self.request)
         self.enrollment_object = CourseEnrollment.get_enrollment(self.effective_user, self.course_key,
                                                                  select_related=['celebration', 'user__celebration'])
+        self.ecomm_service = EcommerceService()
 
     def __getattr__(self, name):
-        return getattr(self.overview, name)
+        return getattr(self.course_overview, name)
 
     @property
     def enrollment(self):
@@ -113,11 +131,11 @@ class CoursewareMeta:
 
     @property
     def access_expiration(self):
-        return get_access_expiration_data(self.effective_user, self.overview)
+        return get_access_expiration_data(self.effective_user, self.course_overview)
 
     @property
     def offer(self):
-        return generate_offer_data(self.effective_user, self.overview)
+        return generate_offer_data(self.effective_user, self.course_overview)
 
     @property
     def content_type_gating_enabled(self):
@@ -140,8 +158,8 @@ class CoursewareMeta:
         Return whether edxnotes is enabled and visible.
         """
         return {
-            'enabled': is_feature_enabled(self.overview, self.effective_user),
-            'visible': self.overview.edxnotes_visibility,
+            'enabled': is_feature_enabled(self.course_overview, self.effective_user),
+            'visible': self.course_overview.edxnotes_visibility,
         }
 
     @property
@@ -214,12 +232,12 @@ class CoursewareMeta:
         """
         return {
             'entrance_exam_current_score': get_entrance_exam_score(
-                self.course_grade, get_entrance_exam_usage_key(self.overview),
+                self.course_grade, get_entrance_exam_usage_key(self.course_overview),
             ),
-            'entrance_exam_enabled': course_has_entrance_exam(self.overview),
-            'entrance_exam_id': self.overview.entrance_exam_id,
-            'entrance_exam_minimum_score_pct': self.overview.entrance_exam_minimum_score_pct,
-            'entrance_exam_passed': user_has_passed_entrance_exam(self.effective_user, self.overview),
+            'entrance_exam_enabled': course_has_entrance_exam(self.course_overview),
+            'entrance_exam_id': self.course_overview.entrance_exam_id,
+            'entrance_exam_minimum_score_pct': self.course_overview.entrance_exam_minimum_score_pct,
+            'entrance_exam_passed': user_has_passed_entrance_exam(self.effective_user, self.course_overview),
         }
 
     @property
@@ -271,7 +289,7 @@ class CoursewareMeta:
                 get_certificate_url(course_id=self.course_key, uuid=user_certificate.verify_uuid)
             )
             return linkedin_config.add_to_profile_url(
-                self.overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
+                self.course_overview.display_name, user_certificate.mode, cert_url, certificate=user_certificate,
             )
 
     @property
@@ -369,6 +387,176 @@ class CoursewareMeta:
         """
         return getattr(settings, 'LEARNING_ASSISTANT_AVAILABLE', False)
 
+    @property
+    def show_courseware_link(self):
+        """
+        Returns a boolean representing whether the courseware link should be shown in the course details page.
+        """
+        with modulestore().bulk_operations(self.course_key):
+            permission = get_permission_for_course_about()
+            course_with_access = get_course_with_access(self.request.user, permission, self.course_key)
+            return bool(
+                self.request.user.has_perm(VIEW_COURSEWARE, course_with_access)
+                or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
+            )
+
+    @property
+    def is_course_full(self):
+        """
+        Returns a boolean representing whether the course is full.
+        """
+        return CourseEnrollment.objects.is_course_full(self.course)
+
+    @property
+    def can_enroll(self):
+        """
+        Returns a boolean representing whether the user can enroll in the course.
+        """
+        return bool(self.request.user.has_perm(ENROLL_IN_COURSE, self.course))
+
+    @property
+    def invitation_only(self):
+        """
+        Returns a boolean representing whether the course is invitation only.
+        """
+        return course_is_invitation_only(self.course)
+
+    @property
+    def is_shib_course(self):
+        """
+        Returns a boolean representing whether the course is a Shibboleth course.
+        """
+        return uses_shib(self.course)
+
+    @property
+    def allow_anonymous(self):
+        """
+        Returns a boolean representing whether the course allows anonymous access.
+        """
+        return bool(check_public_access(self.course, [COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE]))
+
+    @property
+    def ecommerce_checkout(self):
+        """
+        Returns a boolean representing whether the course has an ecommerce checkout.
+        """
+        return self.ecomm_service.is_enabled(self.request.user)
+
+    @property
+    def single_paid_mode(self):
+        """
+        Returns a dict representing the single paid mode for the course, if it exists.
+        """
+        modes = CourseMode.modes_for_course_dict(self.course_key)
+        single_paid_mode = {}
+        if self.ecommerce_checkout:
+            if len(modes) == 1 and list(modes.values())[0].min_price:
+                single_paid_mode = list(modes.values())[0]
+            else:
+                # have professional ignore other modes for historical reasons
+                single_paid_mode = modes.get(CourseMode.PROFESSIONAL)
+        return single_paid_mode
+
+    @property
+    def ecommerce_checkout_link(self):
+        """
+        Returns the ecommerce checkout link for the course.
+        """
+        if self.single_paid_mode and self.single_paid_mode.sku:
+            return self.ecomm_service.get_checkout_page_url(
+                self.single_paid_mode.sku, course_run_keys=[self.course_key]
+            )
+        return None
+
+    @property
+    def course_image_urls(self):
+        """
+        Returns a list of course image URLs.
+        """
+        return self.course_overview.image_urls
+
+    @property
+    def start_date_is_still_default(self):
+        """
+        Returns a boolean indicating whether the course start date is still the default value.
+        """
+        return self.course_overview.start_date_is_still_default
+
+    @property
+    def advertised_start(self):
+        """
+        Returns the advertised start date of the course.
+        """
+        return self.course_overview.advertised_start
+
+    @property
+    def course_price(self):
+        """
+        Returns the course price, formatted with the currency symbol.
+        """
+        _, course_price = get_course_prices(self.course)
+        return course_price
+
+    @property
+    def pre_requisite_courses(self):
+        """
+        Returns a list of pre-requisite courses for the course.
+        """
+        return get_prerequisite_courses_display(self.course)
+
+    @property
+    def sidebar_html_enabled(self):
+        """
+        Returns a boolean indicating whether the sidebar HTML is enabled for the course.
+        """
+        return ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
+
+    @property
+    def course_about_section_html(self):
+        """
+        Returns the HTML content for the course about section.
+        """
+        if ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled():
+            return get_course_about_section(self.request, self.course, "about_sidebar_html")
+        return None
+
+    @property
+    def studio_url(self):
+        """
+        Returns the URL to the course in Studio.
+        """
+        if self.request.user.is_authenticated and self.request.user.is_staff:
+            return get_studio_url(self.course, 'settings/details')
+        return None
+
+    @property
+    def is_cosmetic_price_enabled(self):
+        """
+        Returns a boolean indicating whether the cosmetic price feature is enabled.
+        """
+        return settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE', False)
+
+    @property
+    def overview(self):
+        """
+        Returns the overview HTML content for the course.
+        """
+        return get_course_about_section(self.request, self.course, "overview")
+
+    @property
+    def ocw_links(self):
+        """
+        Returns a list of OpenCourseWare links for the course.
+        """
+        return get_course_about_section(self.request, self.course, "ocw_links")
+
+    @property
+    def prerequisites(self):
+        """
+        Returns a list of prerequisite courses for the course.
+        """
+        return self.course_overview.pre_requisite_courses
+
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CoursewareInformation(RetrieveAPIView):
@@ -461,6 +649,18 @@ class CoursewareInformation(RetrieveAPIView):
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
         * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
+        * content_type_gating_enabled: Whether the content type gating is enabled for the course
+        * show_calculator: Whether the calculator should be shown in the course details page
+        * can_access_proctored_exams: Whether the user is eligible to access proctored exams
+        * notes: An object containing note settings for the course
+            * enabled: Boolean indicating whether edxnotes feature is enabled for the course
+            * visible: Boolean indicating whether notes are visible in the course
+        * marketing_url: The marketing URL for the course
+        * studio_url: The URL to the course in Studio, if the user is staff
+        * is_cosmetic_price_enabled: Boolean indicating whether the cosmetic price feature is enabled
+        * overview: The overview HTML content for the course
+        * ocw_links: A list of OpenCourseWare links for the course
+        * prerequisites: A list of prerequisite courses for the course
 
     **Parameters:**
 
