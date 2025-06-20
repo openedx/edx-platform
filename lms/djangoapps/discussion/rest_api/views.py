@@ -26,7 +26,10 @@ from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
-from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
+from lms.djangoapps.discussion.django_comment_client.utils import (
+    get_group_id_for_comments_service,
+    get_user_group_ids_for_user_from_cache,
+)
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
@@ -751,6 +754,8 @@ class LearnerThreadView(APIView):
         except ValueError:
             pass
 
+        user_group_ids = get_user_group_ids_for_user_from_cache(request.user, course_key)
+
         query_params = {
             "page": page_num,
             "per_page": threads_per_page,
@@ -760,6 +765,7 @@ class LearnerThreadView(APIView):
             "count_flagged": count_flagged,
             "thread_type": thread_type,
             "sort_key": order_by,
+            "user_group_ids": user_group_ids,
         }
         if post_status:
             if post_status not in ['flagged', 'unanswered', 'unread', 'unresponded']:
