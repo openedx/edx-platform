@@ -1062,7 +1062,8 @@ def create_or_update_certificate_generation_history(course_id, generated_by, ins
         course_id (CourseKey): The unique identifier for the course run.
         generated_by (User): The user (typically an instructor or admin) who initiated the certificate generation.
         instructor_task (str): A descriptor or task identifier for the instructor-related task.
-        is_regeneration (bool): A flag indicating whether the certificate is being regenerated (True) or newly generated (False).
+        is_regeneration (bool): A flag indicating whether the certificate is being
+        regenerated (True) or newly generated (False).
 
     Returns:
         CertificateGenerationHistory: The created or updated CertificateGenerationHistory instance.
