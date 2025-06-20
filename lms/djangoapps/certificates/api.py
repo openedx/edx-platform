@@ -992,33 +992,60 @@ def clear_pii_from_certificate_records_for_user(user):
 
 def get_cert_history_for_course_id(course_id):
     """
-    Retrieve all certificate generation history records for the current course.
+    Retrieve all certificate generation history records for the specified course.
+
+    Args:
+        course_id (CourseLocator | CourseKey): The unique identifier for the course.
+
+    Returns:
+        QuerySet[CertificateGenerationHistory]: A queryset of all certificate generation history records
+        associated with the specified course.
     """
     return CertificateGenerationHistory.objects.filter(course_id=course_id)
 
 
-def get_cert_generation_config():
+def is_certificate_generation_enabled():
     """
-    Return whether certificate generation is currently enabled.
+    Checks if certificate generation is currently enabled.
+
+    This function queries the `CertificateGenerationConfiguration` model to retrieve the
+    current configuration and returns whether certificate generation is enabled or not.
+
+    Returns:
+        bool: True if certificate generation is enabled, False otherwise.
     """
     return CertificateGenerationConfiguration.current().enabled
 
 
-def set_cert_generation_config(enabled=True):
+def set_certificate_generation_config(enabled=True):
     """
-    Enables or disables the CertificateGenerationConfiguration.
-    """
-    config = CertificateGenerationConfiguration.objects.create(enabled=enabled)
+    Configures the certificate generation settings.
 
-    return config
+    Args:
+        enabled (bool): If True, enables certificate generation; if False, disables it. Default is True.
+
+    Returns:
+        CertificateGenerationConfiguration: The created or updated certificate generation configuration object.
+    """
+    return CertificateGenerationConfiguration.objects.create(enabled=enabled)
 
 
 def get_certificate_generation_history(course_id=None, generated_by=None, instructor_task=None, is_regeneration=None):
     """
-    Retrieves the queryset of CertificateGenerationHistory records filtered by the given arguments
+    Retrieves a queryset of `CertificateGenerationHistory` records, filtered by the provided criteria.
+
+    Args:
+        course_id (Optional[CourseKey]): The unique ID of the course (if filtering by course).
+        generated_by (Optional[User]): The user who generated the certificate (if filtering by user).
+        instructor_task (Optional[bool]): Whether the certificate generation was triggered by an instructor task.
+        is_regeneration (Optional[bool]): Whether the certificate was regenerated.
+
+    Returns:
+        QuerySet[CertificateGenerationHistory]: A queryset of filtered `CertificateGenerationHistory` records.
     """
     cert_filter_args = {}
 
+    # Only add the filter if the corresponding argument is provided
     if course_id is not None:
         cert_filter_args["course_id"] = course_id
 
@@ -1036,11 +1063,20 @@ def get_certificate_generation_history(course_id=None, generated_by=None, instru
     return res
 
 
-def create_or_update_cert_gen_history(course_id, generated_by, instructor_task, is_regeneration):
+def create_or_update_certificate_generation_history(course_id, generated_by, instructor_task, is_regeneration):
     """
-    Creates or updates a certificate generation history record.
+    Creates a new certificate generation history record or updates an existing one.
+
+    Args:
+        course_id (CourseKey): The unique identifier for the course run.
+        generated_by (User): The user (typically an instructor or admin) who initiated the certificate generation.
+        instructor_task (str): A descriptor or task identifier for the instructor-related task.
+        is_regeneration (bool): A flag indicating whether the certificate is being regenerated (True) or newly generated (False).
+
+    Returns:
+        CertificateGenerationHistory: The created or updated CertificateGenerationHistory instance.
     """
-    cert_history, _ = CertificateGenerationHistory.objects.update_or_create(
+    cert_history, created = CertificateGenerationHistory.objects.update_or_create(
         course_id=course_id,
         generated_by=generated_by,
         instructor_task=instructor_task,
@@ -1050,10 +1086,21 @@ def create_or_update_cert_gen_history(course_id, generated_by, instructor_task, 
     return cert_history
 
 
-def create_or_update_eligible_cert_for_user(user, course_id, status):
+def create_or_update_eligible_certificate_for_user(user, course_id, status):
     """
-    Create or update an eligible GeneratedCertificate for a user in a course.
+    Create or update an eligible GeneratedCertificate for a user in a specific course.
+
+    Args:
+        user (User): The user for whom the certificate is being created or updated.
+        course_id (CourseKey): The unique identifier for the course the certificate applies to.
+        status (str): The status of the certificate (e.g., "downloadable", "issued").
+
+    Returns:
+        tuple: A tuple containing:
+            - `GeneratedCertificate`: The created or updated certificate.
+            - `bool`: A boolean indicating whether the certificate was created (True) or updated (False).
     """
+
     cert, created = GeneratedCertificate.eligible_certificates.update_or_create(
         user=user,
         course_id=course_id,
@@ -1063,33 +1110,61 @@ def create_or_update_eligible_cert_for_user(user, course_id, status):
     return cert, created
 
 
-def get_certificate_invalidations_for_course_key(course_key):
+def get_cert_invalidations_for_course(course_key):
     """
-    Returns all certificate invalidations for the specified course.
+    Retrieves all certificate invalidations associated with the specified course.
+
+    Args:
+        course_key (CourseKey): The unique identifier for the course run.
+
+    Returns:
+        QuerySet[CertificateInvalidation]: A queryset containing all invalidations for the specified course.
     """
     return CertificateInvalidation.get_certificate_invalidations(course_key)
 
 
-def get_certs_for_course_id_given_users(course_id, users):
+def get_certificates_for_course_and_users(course_id, users):
     """
-    Fetches all generated certificates for a given course and a list of users.
+    Retrieves all GeneratedCertificate records for a specific course and a list of users.
+
+    Args:
+        course_id (CourseKey): The unique identifier for the course run.
+        users (Iterable[User]): A list or queryset of User instances to filter certificates by.
+
+    Returns:
+        QuerySet[GeneratedCertificate]: A queryset containing the matching certificate records.
     """
     return GeneratedCertificate.objects.filter(course_id=course_id, user__in=users)
 
 
-def get_course_ids_for_username(username):
+def get_course_ids_from_certs_for_user(username):
     """
-    Returns a list of course IDs for which the given user has generated certificates.
+    Retrieves a list of course IDs for which the given user has generated certificates.
+
+    Args:
+        username (str): The username of the user whose course IDs are being retrieved.
+
+    Returns:
+        list: A list of course IDs for which the user has generated certificates.
+              If no certificates are found, an empty list is returned.
     """
     course_ids_with_certificates = GeneratedCertificate.objects.filter(
         user__username=username
     ).values_list('course_id', flat=True)
-    return course_ids_with_certificates
+
+    return list(course_ids_with_certificates)
 
 
 def get_generated_certificate(user, course_id):
     """
-    Return the GeneratedCertificateData for the given user and course ID.
+    Retrieves the GeneratedCertificateData for the given user and course.
+
+    Args:
+        user (User): The user for whom the certificate is being fetched.
+        course_id (CourseKey): The unique identifier for the course.
+
+    Returns:
+        Optional[GeneratedCertificateData]: A `GeneratedCertificateData` object if found, otherwise None.
     """
     try:
         cert = GeneratedCertificate.objects.get(user=user, course_id=course_id)
@@ -1103,17 +1178,39 @@ def get_generated_certificate(user, course_id):
 
 def create_generated_certificate(cert_args):
     """
-    Create a GeneratedCertificate object with the provided arguments.
+    Creates a new `GeneratedCertificate` object using the provided arguments.
+
+    Args:
+        cert_args (dict): A dictionary containing the certificate's attributes, such as
+        "user", "course_id", "status", etc.
+
+    Returns:
+        GeneratedCertificate: The newly created `GeneratedCertificate` object.
+
+    Raises:
+        ValueError: If any required fields ("user", "course_id") are missing from `cert_args`.
     """
+
     required_fields = {"user", "course_id"}
+
+    # Check if all required fields are present
     if not all(field in cert_args for field in required_fields):
         raise ValueError(f"Missing required fields: {required_fields - cert_args.keys()}")
+
+    # Create and return the GeneratedCertificate object
     return GeneratedCertificate.objects.create(**cert_args)
 
 
 def get_eligible_certificate(user, course_id):
     """
-    Retrieves the eligible certificate for the current user and course.
+    Retrieves the eligible GeneratedCertificate for a given user and course.
+
+    Args:
+        user (User): The user object for whom the certificate is being retrieved.
+        course_id (CourseKey): The unique identifier for the course run.
+
+    Returns:
+        GeneratedCertificate or None: The eligible certificate instance if one exists; otherwise, None.
     """
     try:
         return GeneratedCertificate.eligible_certificates.get(
@@ -1124,37 +1221,47 @@ def get_eligible_certificate(user, course_id):
         return None
 
 
-def get_eligible_available_certificates(user):
+def get_eligible_and_available_certificates(user):
     """
-    Returns all eligible and available certificates for the user.
+    Retrieves all eligible and available certificates for the specified user.
+
+    Args:
+        user (User): The user whose eligible and available certificates are being retrieved.
+
+    Returns:
+        QuerySet[GeneratedCertificate]: A queryset containing all eligible and available certificates
+        for the specified user.
     """
     return GeneratedCertificate.eligible_available_certificates.filter(user=user)
 
 
-def get_eligible_certs_for_course_id_status(course_id, status):
+def get_certificates_by_course_and_status(course_id, status):
     """
-    Return all eligible certificates for the specified course ID and status.
+    Retrieves all eligible certificates for a specific course and status.
+
+    Args:
+        course_id (CourseKey): The unique identifier for the course run.
+        status (str): The status of the certificates to filter by (e.g., "downloadable", "issued").
+
+    Returns:
+        QuerySet[GeneratedCertificate]: A queryset containing the eligible certificates
+        matching the provided course ID and status.
     """
+
     return GeneratedCertificate.eligible_certificates.filter(
         course_id=course_id,
         status=status
     )
 
 
-def get_unique_statuses(course_key):
+def get_unique_certificate_statuses(course_key):
     """
-    Return the list of unique certificate statuses for the specified course ID.
+    Retrieves the unique certificate statuses for the specified course.
+
+    Args:
+        course_key (CourseKey): The unique identifier for the course run.
+
+    Returns:
+        QuerySet[str]: A queryset containing the unique certificate statuses for the specified course.
     """
     return GeneratedCertificate.get_unique_statuses(course_key=course_key)
-
-
-def get_course_mode_constant(mode_type):
-    """
-    Return the corresponding course mode constant for a given mode string.
-    """
-
-    mode_map = {
-        "verified": GeneratedCertificate.CourseMode.VERIFIED
-    }
-
-    return mode_map[mode_type.lower()]

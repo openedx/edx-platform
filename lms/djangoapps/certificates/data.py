@@ -132,10 +132,7 @@ class GeneratedCertificateData:
     download_url: str = ""
     error_reason: str = ""
 
-    # This can be added for mode validation if needed
-    MODES = ['verified', 'honor', 'audit', 'professional', 'no-id-professional', 'masters',
-             'executive-education', 'paid-executive-education', 'paid-bootcamp']
-
+    @classmethod
     def validate_mode(self):
         if self.mode not in self.MODES:
             raise ValueError(f"Invalid mode: {self.mode}")

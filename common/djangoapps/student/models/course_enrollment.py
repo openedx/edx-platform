@@ -181,9 +181,8 @@ class CourseEnrollmentQuerySet(models.QuerySet):
         """
         Retrieve the list of course IDs for which the given user has earned certificates.
         """
-        from lms.djangoapps.certificates.api import get_course_ids_for_username
-
-        return get_course_ids_for_username(username)
+        from lms.djangoapps.certificates.api import get_course_ids_from_certs_for_user
+        return get_course_ids_from_certs_for_user(username)
 
 
 class CourseEnrollmentManager(models.Manager):

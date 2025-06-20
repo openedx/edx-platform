@@ -127,14 +127,18 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
 
     def test_issued_certificates_basic(self):
         """
-        Test that the `issued_certificates` function returns correct aggregated data
+        Test that the `issued_certificates` function returns the correct aggregated data
         for a single downloadable certificate.
 
-        Creates a downloadable certificate for a user and verifies that the result:
-        - Is a list with one item
-        - Contains the expected course ID
-        - Includes the correct total count of issued certificates
-        - Includes the 'report_run_date' field
+        This test:
+        - Creates a downloadable certificate for a user.
+        - Verifies that the function returns a list with a single item.
+        - Confirms that the returned certificate contains the expected course ID.
+        - Ensures that the total count of issued certificates is correct.
+        - Verifies that the 'report_run_date' field is present in the result.
+
+        The test ensures that the `issued_certificates` function behaves as expected
+        for a single downloadable certificate scenario.
         """
         cert_args = {
             "user": UserFactory(),
