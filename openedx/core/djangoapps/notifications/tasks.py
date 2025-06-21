@@ -19,19 +19,25 @@ from openedx.core.djangoapps.notifications.base_notification import (
     get_default_values_of_preference,
     get_notification_content
 )
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.email.tasks import send_immediate_cadence_email
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
+from openedx.core.djangoapps.notifications.config.waffle import (
+    ENABLE_NOTIFICATION_GROUPING,
+    ENABLE_NOTIFICATIONS,
+    ENABLE_PUSH_NOTIFICATIONS
+)
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.grouping_notifications import (
+    NotificationRegistry,
     get_user_existing_notifications,
-    group_user_notifications, NotificationRegistry,
+    group_user_notifications
 )
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
     get_course_notification_preference_config_version
 )
+from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_push_channel
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
 
 
@@ -123,6 +129,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     """
     Send notifications to the users.
     """
+    # pylint: disable=too-many-statements
     course_key = CourseKey.from_string(course_key)
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
         return
@@ -136,12 +143,13 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     grouping_function = NotificationRegistry.get_grouper(notification_type)
     waffle_flag_enabled = ENABLE_NOTIFICATION_GROUPING.is_enabled(course_key)
     grouping_enabled = waffle_flag_enabled and group_by_id and grouping_function is not None
-    notifications_generated = False
-    notification_content = ''
+    generated_notification = None
     sender_id = context.pop('sender_id', None)
     default_web_config = get_default_values_of_preference(app_name, notification_type).get('web', False)
     generated_notification_audience = []
     email_notification_mapping = {}
+    push_notification_audience = []
+    is_push_notification_enabled = ENABLE_PUSH_NOTIFICATIONS.is_enabled(course_key)
 
     if group_by_id and not grouping_enabled:
         logger.info(
@@ -185,6 +193,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                 notification_preferences = preference.get_channels_for_notification_type(app_name, notification_type)
                 email_enabled = 'email' in preference.get_channels_for_notification_type(app_name, notification_type)
                 email_cadence = preference.get_email_cadence_for_notification_type(app_name, notification_type)
+                push_notification = is_push_notification_enabled and 'push' in notification_preferences
                 new_notification = Notification(
                     user_id=user_id,
                     app_name=app_name,
@@ -194,34 +203,37 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
                     course_id=course_key,
                     web='web' in notification_preferences,
                     email=email_enabled,
+                    push=push_notification,
                     group_by_id=group_by_id,
                 )
                 if email_enabled and (email_cadence == EmailCadence.IMMEDIATELY):
                     email_notification_mapping[user_id] = new_notification
 
+                if push_notification:
+                    push_notification_audience.append(user_id)
+
                 if grouping_enabled and existing_notifications.get(user_id, None):
                     group_user_notifications(new_notification, existing_notifications[user_id])
-                    if not notifications_generated:
-                        notifications_generated = True
-                        notification_content = new_notification.content
+                    if not generated_notification:
+                        generated_notification = new_notification
                 else:
                     notifications.append(new_notification)
                 generated_notification_audience.append(user_id)
 
         # send notification to users but use bulk_create
         notification_objects = Notification.objects.bulk_create(notifications)
-        if notification_objects and not notifications_generated:
-            notifications_generated = True
-            notification_content = notification_objects[0].content
+        if notification_objects and not generated_notification:
+            generated_notification = notification_objects[0]
 
     if email_notification_mapping:
         send_immediate_cadence_email(email_notification_mapping, course_key)
 
-    if notifications_generated:
+    if generated_notification:
         notification_generated_event(
             generated_notification_audience, app_name, notification_type, course_key, content_url,
-            notification_content, sender_id=sender_id
+            generated_notification.content, sender_id=sender_id
         )
+        send_ace_msg_to_push_channel(push_notification_audience, generated_notification, sender_id)
 
 
 def is_notification_valid(notification_type, context):
