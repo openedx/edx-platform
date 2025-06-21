@@ -56,5 +56,5 @@ ENABLE_NOTIFICATION_GROUPING = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_noti
 # .. toggle_description: Waffle flag to enable push Notifications feature on mobile devices
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2025-05-13
-# .. toggle_warning: When the flag is ON, Notifications will go through using braze on mobile devices.
+# .. toggle_warning: When the flag is ON, Notifications will go through ace push channels.
 ENABLE_PUSH_NOTIFICATIONS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_push_notifications', __name__)
