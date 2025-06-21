@@ -339,10 +339,11 @@ from xmodule.modulestore import BlockData
 from xmodule.modulestore.split_mongo import BlockKey
 from datetime import datetime, timezone
 import bson
+from bson import ObjectId
 from bson.codec_options import CodecOptions
 import zlib
 
-from .models import LearningCoreCourseStructure
+from .models import LearningCoreCourseStructure, XBlockVersionFieldData
 
 def get_structure_for_course(course_key: CourseKey):
     """Just gets the published version for now, need to update to do both branches later"""
@@ -357,17 +358,13 @@ def update_learning_core_course(course_key: CourseKey):
     Pass 0 of this: just push hardcoded data into the shim
 
     """
-    writer = LearningCoreCourseShimWriter()
+    writer = LearningCoreCourseShimWriter(course_key)
     structure = writer.make_structure()
 
     import pprint
 
-    #encoded = bson.encode(structure)
-    #decoded = bson.decode(encoded)
-
     with open("lc_struct.txt", "w") as struct_file:
         printer = pprint.PrettyPrinter(indent=2, stream=struct_file)
-        # printer.pprint(decoded)
         printer.pprint(structure)
 
     # Structure doc is so repetitive that we get a 4-5X reduction in file size
@@ -382,14 +379,70 @@ def update_learning_core_course(course_key: CourseKey):
     log.info(f"Structure size: {filesizeformat(len(encoded_structure))} for {num_blocks} blocks.")
 
 
-import pytz
+def base_edit_info(
+    user_id: int=-1,
+    edited_on: datetime=None,
+    source_version: ObjectId=None,
+    update_version: ObjectId=None,
+) -> dict:
+    return {
+        'edited_by': user_id,
+        'edited_on': edited_on or datetime.now(tz=timezone.utc),
+
+        # This is v1 libraries data that we're faking
+        'original_usage': None,
+        'original_usage_vesion': None,
+
+        # Edit history, all of which we're faking
+        'previous_version': None,
+        'source_version': source_version or ObjectId(),
+        'update_version': update_version or ObjectId(),
+    }
+
+
+def create_container_definition(container_type: str) -> dict:
+    """
+    This is the definition doc for most containers (vertical/sequential/chapter)
+
+    For the most part, containers don't actually put much in their definition
+    documents. The CourseBlock is an exception, and will have a bunch of its own
+    metadata to add.
+    """
+    return {
+        '_id': ObjectId(),
+
+    }
+
+def get_definition_doc(xb_field_data: XBlockVersionFieldData):
+    # a lot of logic to get the block type here. Maybe just pass it in?
+
+    return {
+        '_id': ObjectId(xb_field_data.definition_object_id),
+        'block_type': None,
+        'fields': xb_field_data.content,
+        'edit_info': {
+            'edited_by': xb_field_data.publishable_entity_version.created_by_id,
+            'edited_on': xb_field_data.publishable_entity_version.created,
+
+            # These are supposed to be the ObjectIds of the structure docs that
+            # represent the last time this block was edited and the original
+            # version at the time of creation. It's actually a common occurrence
+            # for these values to get pruned in Split, so we're making dummy
+            # ObjectIds--i.e. we're making it look like this was created a while
+            # ago and the versions for both the original creation and last
+            # update are no longer available.
+            'previous_version': ObjectId(),
+            'original_version': ObjectId(),
+        },
+        'schema_version': 1,
+    }
+
 
 class LearningCoreCourseShimWriter:
-    def __init__(self):
+    def __init__(self, course_key: CourseKey):
+        self.course_key = course_key
         self.structure_obj_id = bson.ObjectId()
 
-        # Can't use stdlib's timezone.utc, because of various comparisons we
-        # need to make (can't mix offset types)
         self.edited_on = datetime.now(tz=timezone.utc)
         self.user_id = -1  # This is "the system did it"
 

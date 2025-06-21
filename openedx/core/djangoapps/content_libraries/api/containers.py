@@ -52,6 +52,9 @@ __all__ = [
     "update_container_children",
     "get_containers_contains_item",
     "publish_container_changes",
+
+    # Hacky XBlock data-for-containers
+    "create_xblock_field_data_for_container",
 ]
 
 log = logging.getLogger(__name__)
@@ -325,6 +328,8 @@ def create_container(
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
+    create_xblock_field_data_for_container(_initial_version)
+
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
@@ -388,6 +393,11 @@ def update_container(
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
+    # Let's add some XBlock data onto the container we just made...
+    ## Dave version.entity_list.entitylistrow_set.all()
+
+    create_xblock_field_data_for_container(version)
+
     # Send event related to the updated container
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
@@ -405,6 +415,49 @@ def update_container(
         )
 
     return ContainerMetadata.from_container(library_key, version.container)
+
+
+from openedx.core.djangoapps.xblock.models import XBlockVersionFieldData
+
+def create_xblock_field_data_for_container(version: ContainerVersion):
+    entity = version.publishable_entity_version.entity
+
+    # If this PublishableEntity isn't associated with an Learning Core backed
+    # XBlock, then we can't write anything. Note: This is going to be an edge
+    # case later, when we want to add an existing container to a container that
+    # was imported from a course.
+    if not hasattr(entity, 'block'):
+        log.error("No Block detected???")
+        return
+
+    usage_key = entity.block.key
+
+    # Generic values for all container types
+    content_scoped_fields = {}
+    settings_scoped_fields = {
+        'display_name': version.publishable_entity_version.title
+    }
+    children = []
+
+    # Things specific to the course root...
+    if usage_key.block_type == "course":
+        course_key = usage_key.course_key
+        content_scoped_fields['license'] = None
+        content_scoped_fields['wiki_slug'] = f'{course_key.org}.{course_key.course}.{course_key.run}'
+
+    for child_entity_row in version.entity_list.entitylistrow_set.select_related('entity__block').all():
+        child_usage_key = child_entity_row.entity.block.key
+        children.append(
+            [child_usage_key.block_type, child_usage_key.block_id]
+        )
+
+    field_data = XBlockVersionFieldData.objects.create(
+        pk=version.pk,
+        content=content_scoped_fields,
+        settings=settings_scoped_fields,
+        children=children,
+    )
+    log.info(f"Wrote XBlock Data for Container: {version}: {field_data}")
 
 
 def delete_container(
