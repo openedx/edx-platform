@@ -71,6 +71,10 @@ class LearningCoreLearningContext(models.Model):
 
 
 class Block(models.Model):
-    learning_context = models.ForeignKey(LearningCoreLearningContext, on_delete=models.CASCADE)
+    learning_context = models.ForeignKey(
+        LearningCoreLearningContext,
+        on_delete=models.CASCADE,
+        related_name="blocks",
+    )
     key = UsageKeyField(max_length=255, unique=True)
     entity = models.OneToOneField(PublishableEntity, on_delete=models.RESTRICT)

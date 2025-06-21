@@ -343,7 +343,12 @@ from bson import ObjectId
 from bson.codec_options import CodecOptions
 import zlib
 
-from .models import LearningCoreCourseStructure, XBlockVersionFieldData
+from .models import (
+    Block,
+    LearningCoreCourseStructure,
+    LearningCoreLearningContext,
+    XBlockVersionFieldData,
+)
 
 def get_structure_for_course(course_key: CourseKey):
     """Just gets the published version for now, need to update to do both branches later"""
@@ -413,8 +418,13 @@ def create_container_definition(container_type: str) -> dict:
 
     }
 
-def get_definition_doc(xb_field_data: XBlockVersionFieldData):
+def get_definition_doc(def_id: ObjectId):
     # a lot of logic to get the block type here. Maybe just pass it in?
+
+    try:
+        xb_field_data = XBlockVersionFieldData.objects.get(definition_object_id=str(def_id))
+    except XBlockVersionFieldData.DoesNotExist:
+        return None
 
     return {
         '_id': ObjectId(xb_field_data.definition_object_id),
@@ -448,51 +458,29 @@ class LearningCoreCourseShimWriter:
 
     def make_structure(self):
         structure = self.base_structure()
-        course_entry = self.course_block_entry()
 
-        structure['blocks'].append(course_entry)
+        context = LearningCoreLearningContext.objects.get(key=self.course_key)
+        blocks = (
+            context.blocks
+                   .select_related(
+                       'entity__published__version__xblockversionfielddata',
+                       'entity__draft__version__xblockversionfielddata',
+                    )
+        )
+        for block in blocks:
+            field_data = block.entity.published.version.xblockversionfielddata
+            block_entry = self.base_block_entry(
+                block.key.block_type,
+                block.key.block_id,
+                ObjectId(field_data.definition_object_id),
+            )
+            block_entry['fields'].update(field_data.settings)
+            if field_data.children:
+                block_entry['fields']['children'] = field_data.children
+
+            structure['blocks'].append(block_entry)
+
         structure['blocks'].extend(self.non_child_blocks())
-        chapter_1 = self.base_block_entry("chapter", "cf67a98624214ef1ac158378ee103f8c")
-        chapter_1['definition'] = bson.ObjectId('68508b48bd8f1408c3839ded')
-        chapter_1['fields'] = {
-            'children': [
-                ['sequential', '153b0bbfafa545239df5ee11c12f6c9b']
-            ],
-            'display_name': 'First Section',
-        }
-        structure['blocks'].append(chapter_1)
-        seq_1 = self.base_block_entry('sequential', '153b0bbfafa545239df5ee11c12f6c9b')
-        seq_1['fields'] = {
-            'children': [
-                ['vertical', 'e3af9b9bbd144102862d30067d7cf4fb'],
-            ],
-            'display_name': 'First Subsection',
-        }
-        seq_1['definition'] = bson.ObjectId('68508b56bd8f1408c3839df2')
-        structure['blocks'].append(seq_1)
-
-        vertical_1 = self.base_block_entry('vertical', 'e3af9b9bbd144102862d30067d7cf4fb')
-        vertical_1['fields'] = {
-            'children': [
-                ['problem', '2f14f0bd726d488cb9221b60cb735183']
-            ],
-            'display_name': 'Check Your Understanding',
-        }
-        vertical_1['definition'] = bson.ObjectId('68508b97bd8f1408c3839dfd')
-        structure['blocks'].append(vertical_1)
-
-        problem_1 = self.base_block_entry('problem', '2f14f0bd726d488cb9221b60cb735183')
-        problem_1['fields'] = {
-            'children': [],
-            'display_name': 'This is an LC Problem!',
-            'markdown_edited': False,
-            'rerandomize': 'never',
-            'show_reset_button': False,
-            'showanswer': 'finished',
-            'weight': 1.0
-        }
-        problem_1['definition'] = bson.ObjectId('68508bd6bd8f1408c3839e01')
-        structure['blocks'].append(problem_1)
 
         return structure
 
@@ -514,83 +502,16 @@ class LearningCoreCourseShimWriter:
             'original_version': doc_id
         }
 
-    def course_block_entry(self):
-        entry = self.base_block_entry('course', 'course')
-        entry['fields'] = {
-            'allow_anonymous': True,
-            'allow_anonymous_to_peers': False,
-            'cert_html_view_enabled': True,
-            'children': [
-                ['chapter', 'cf67a98624214ef1ac158378ee103f8c']
-            ],
-            'discussion_blackouts': [],
-            'discussion_topics': {'General': {'id': 'course'}},
-            'discussions_settings': {
-                'enable_graded_units': False,
-                'enable_in_context': True,
-                'openedx': { 'group_at_subsection': False},
-                'posting_restrictions': 'disabled',
-                'provider_type': 'openedx',
-                'unit_level_visibility': True
-            },
-            'display_name': 'Just a Demo Course',
-            'end': None,
-            'language': 'en',
-
-            ## HARDCODED START DATE
-            'start': datetime(2020, 1, 1, 0, 0, tzinfo=timezone.utc),
-            'static_asset_path': 'course',
-            'tabs': [
-                {
-                    'course_staff_only': False,
-                    'name': 'Course',
-                    'type': 'courseware'
-                },
-                {
-                    'course_staff_only': False,
-                    'name': 'Progress',
-                    'type': 'progress'
-                },
-                {
-                    'course_staff_only': False,
-                    'name': 'Dates',
-                    'type': 'dates'
-                },
-                {
-                    'course_staff_only': False,
-                    'name': 'Discussion',
-                    'type': 'discussion'
-                },
-                {
-                    'course_staff_only': False,
-                    'is_hidden': True,
-                    'name': 'Wiki',
-                    'type': 'wiki'
-                },
-                {
-                    'course_staff_only': False,
-                    'name': 'Textbooks',
-                    'type': 'textbooks'
-                }
-            ],
-            'xml_attributes': {
-                'filename': [ 'course/2025-02-24.xml', 'course/2025-02-24.xml']
-            },
-        }
-        entry['definition'] = bson.ObjectId('68508b38bd8f1408c3839dc1')
-        return entry
-
-    def base_block_entry(self, block_type: str, block_id: str, definition=None):
+    def base_block_entry(self, block_type: str, block_id: str, definition_object_id: ObjectId):
         return {
             'asides': {},  # We are *so* not doing asides in this prototype
             'block_id': block_id,
             'block_type': block_type,
             'defaults': {},
             'fields': {'children': []},  # Even blocks without children are written this way.
-            'definition': definition or bson.ObjectId(),
+            'definition': definition_object_id,
             'edit_info': self.base_edit_info()
         }
-
 
     def base_edit_info(self):
         return {

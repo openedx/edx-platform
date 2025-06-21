@@ -444,6 +444,9 @@ def create_xblock_field_data_for_container(version: ContainerVersion):
         course_key = usage_key.course_key
         content_scoped_fields['license'] = None
         content_scoped_fields['wiki_slug'] = f'{course_key.org}.{course_key.course}.{course_key.run}'
+        settings_scoped_fields.update(
+            _course_block_entry(usage_key)
+        )
 
     for child_entity_row in version.entity_list.entitylistrow_set.select_related('entity__block').all():
         child_usage_key = child_entity_row.entity.block.key
@@ -458,6 +461,66 @@ def create_xblock_field_data_for_container(version: ContainerVersion):
         children=children,
     )
     log.info(f"Wrote XBlock Data for Container: {version}: {field_data}")
+
+
+def _course_block_entry(usage_key):
+    return {
+        'allow_anonymous': True,
+        'allow_anonymous_to_peers': False,
+        'cert_html_view_enabled': True,
+        'discussion_blackouts': [],
+        'discussion_topics': {'General': {'id': 'course'}},
+        'discussions_settings': {
+            'enable_graded_units': False,
+            'enable_in_context': True,
+            'openedx': { 'group_at_subsection': False},
+            'posting_restrictions': 'disabled',
+            'provider_type': 'openedx',
+            'unit_level_visibility': True
+        },
+        'end': None,
+        'language': 'en',
+
+        ## HARDCODED START DATE
+        'start': datetime(2020, 1, 1, 0, 0, tzinfo=timezone.utc),
+        'static_asset_path': 'course',
+        'tabs': [
+            {
+                'course_staff_only': False,
+                'name': 'Course',
+                'type': 'courseware'
+            },
+            {
+                'course_staff_only': False,
+                'name': 'Progress',
+                'type': 'progress'
+            },
+            {
+                'course_staff_only': False,
+                'name': 'Dates',
+                'type': 'dates'
+            },
+            {
+                'course_staff_only': False,
+                'name': 'Discussion',
+                'type': 'discussion'
+            },
+            {
+                'course_staff_only': False,
+                'is_hidden': True,
+                'name': 'Wiki',
+                'type': 'wiki'
+            },
+            {
+                'course_staff_only': False,
+                'name': 'Textbooks',
+                'type': 'textbooks'
+            }
+        ],
+        'xml_attributes': {
+            'filename': [ f'course/{usage_key.run}.xml', f'course/{usage_key.run}.xml']
+        }
+    }
 
 
 def delete_container(

@@ -364,7 +364,7 @@ class MongoPersistenceBackend:
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
                     log.error(f"course_context: {course_context} and {course_context.course}")
                     # Reminder: course_context includes the branch information
-                    if False and course_context and course_context.course.startswith('LC') and course_context.branch == 'published':
+                    if True: # and course_context and course_context.course.startswith('LC') and course_context.branch == 'published':
                         from openedx.core.djangoapps.xblock.api import get_structure_for_course
                         log.info("WE'RE IN LEARNING CORE!!!")
                         doc = get_structure_for_course(course_context)
@@ -564,9 +564,14 @@ class MongoPersistenceBackend:
         """
         Get the definition from the persistence mechanism whose id is the given key
         """
+        from openedx.core.djangoapps.xblock.api import get_definition_doc
+
         log.info(f"Fetching Definition: {key}")
         with TIMER.timer("get_definition", course_context) as tagger:
-            definition = self.definitions.find_one({'_id': key})
+            definition = get_definition_doc(key)
+            if not definition:
+                # This fallback exists for the random standalone blocks that courses expect
+                definition = self.definitions.find_one({'_id': key})
             tagger.measure("fields", len(definition['fields']))
             tagger.tag(block_type=definition['block_type'])
             return definition
