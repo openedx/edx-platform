@@ -64,6 +64,39 @@ class ContainerType(Enum):
     Unit = "unit"
     Subsection = "subsection"
     Section = "section"
+    OutlineRoot = "outline_root"
+
+    @property
+    def container_model_classes(self) -> tuple[type[Container], type[ContainerVersion]]:
+        """
+        Get the container, containerversion subclasses associated with this type.
+
+        @@TODO Is this what we want, a hard mapping between container_types and Container classes?
+          * If so, then expand on this pattern, so that all ContainerType logic is contained within
+            this class, and get rid of the match-case statements that are all over the content_libraries
+            app.
+          * If not, then figure out what to do instead.
+        """
+        from openedx_learning.api.authoring_models import (
+            Unit,
+            UnitVersion,
+            Subsection,
+            SubsectionVersion,
+            Section,
+            SectionVersion,
+            OutlineRoot,
+            OutlineRootVersion,
+        )
+        match self:
+            case self.Unit:
+                return (Unit, UnitVersion)
+            case self.Subsection:
+                return (Subsection, SubsectionVersion)
+            case self.Section:
+                return (Section, SectionVersion)
+            case self.OutlineRoot:
+                return (OutlineRoot, OutlineRootVersion)
+        raise TypeError(f"unexpected ContainerType: {self!r}")
 
     @property
     def olx_tag(self) -> str:
@@ -83,6 +116,8 @@ class ContainerType(Enum):
                 return "sequential"
             case self.Section:
                 return "chapter"
+            case self.OutlineRoot:
+                return "course"
         raise TypeError(f"unexpected ContainerType: {self!r}")
 
     @classmethod
@@ -165,6 +200,8 @@ def library_container_locator(
         container_type = ContainerType.Subsection
     elif hasattr(container, 'section'):
         container_type = ContainerType.Section
+    elif hasattr(container, 'outlineroot'):
+        container_type = ContainerType.OutlineRoot
 
     assert container_type is not None
 
@@ -277,6 +314,14 @@ def create_container(
                 created=created,
                 created_by=user_id,
             )
+        case ContainerType.OutlineRoot:
+            container, _initial_version = authoring_api.create_outline_root_and_version(
+                content_library.learning_package_id,
+                key=slug,
+                title=title,
+                created=created,
+                created_by=user_id,
+            )
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
@@ -330,8 +375,15 @@ def update_container(
                 created=created,
                 created_by=user_id,
             )
-
-            # The `affected_containers` are not obtained, because the sections are
+            affected_containers = get_containers_contains_item(container_key)
+        case ContainerType.OutlineRoot:
+            version = authoring_api.create_next_outline_root_version(
+                container.outlineroot,
+                title=display_name,
+                created=created,
+                created_by=user_id,
+            )
+            # The `affected_containers` are not obtained, because the outline_roots are
             # not contained in any container.
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
@@ -541,6 +593,23 @@ def update_container_children(
             new_version = authoring_api.create_next_section_version(
                 container.section,
                 subsections=subsections,  # type: ignore[arg-type]
+                created=created,
+                created_by=user_id,
+                entities_action=entities_action,
+            )
+
+            for key in children_ids:
+                CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                    content_object=ContentObjectChangedData(
+                        object_id=str(key),
+                        changes=["sections"],
+                    ),
+                )
+        case ContainerType.OutlineRoot:
+            subsections = [_get_container_from_key(key).outlineroot for key in children_ids]  # type: ignore[arg-type]
+            new_version = authoring_api.create_next_outline_root_version(
+                container.outlineroot,
+                sections=sections,  # type: ignore[arg-type]
                 created=created,
                 created_by=user_id,
                 entities_action=entities_action,
