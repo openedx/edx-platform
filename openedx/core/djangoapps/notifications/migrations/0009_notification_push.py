@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0007_alter_notification_group_by_id'),
+        ('notifications', '0008_notificationpreference'),
     ]
 
     operations = [
