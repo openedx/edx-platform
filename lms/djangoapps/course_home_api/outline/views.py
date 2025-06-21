@@ -35,6 +35,8 @@ from lms.djangoapps.course_home_api.outline.serializers import (
     OutlineTabSerializer,
 )
 from lms.djangoapps.course_home_api.utils import get_course_or_403
+from lms.djangoapps.course_home_api.tasks import collect_progress_for_user_in_course
+from lms.djangoapps.course_home_api.toggles import send_course_progress_analytics_for_student_is_enabled
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section
@@ -365,6 +367,9 @@ class OutlineTabView(RetrieveAPIView):
         context['enable_links'] = show_enrolled or allow_public
         context['enrollment'] = enrollment
         serializer = self.get_serializer_class()(data, context=context)
+
+        if send_course_progress_analytics_for_student_is_enabled(course_key) and not user_is_masquerading:
+            collect_progress_for_user_in_course.delay(course_key_string, request.user.id)
 
         return Response(serializer.data)
 

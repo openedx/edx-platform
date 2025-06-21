@@ -4,7 +4,6 @@
 # WARNING: Do not use this in production -- it contains randomized and
 # nonsensical values.
 
-
 ACCOUNT_MICROFRONTEND_URL: null
 ACE_CHANNEL_BRAZE_API_KEY: '[encrypted]'
 ACE_CHANNEL_BRAZE_APP_ID: hello
@@ -619,7 +618,6 @@ FEATURES:
   NOTICES_SNOOZE_COUNT_LIMIT: 5
   NOTICES_SNOOZE_HOURS: 5
   PREVENT_CONCURRENT_LOGINS: true
-  PREVIEW_LMS_BASE: preview-deploy_host
   SEND_LEARNING_CERTIFICATE_LIFECYCLE_EVENTS_TO_BUS: true
   SEPARATE_VERIFICATION_FROM_PAYMENT: true
   SHOW_FOOTER_LANGUAGE_SELECTOR: true
@@ -1070,6 +1068,7 @@ SEARCH_COURSEWARE_CONTENT_LOG_PARAMS: true
 SECRET_KEY: test_secret_key
 SECURITY_PAGE_URL: hello
 SEGMENT_KEY: null
+SEND_ACTIVATION_EMAIL_URL: 'https://courses.example.edx.org/api/send_account_activation_email'
 SEND_CERTIFICATE_CREATED_SIGNAL: true
 SEND_CERTIFICATE_REVOKED_SIGNAL: true
 SERVER_EMAIL: devops@example.com

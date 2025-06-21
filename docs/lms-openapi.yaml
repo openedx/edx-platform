@@ -8890,10 +8890,35 @@ paths:
       parameters: []
       responses:
         '200':
-          description: ''
+          description: 'JSON serialized list of the providers linked to this user.'
       tags:
       - third_party_auth
-    parameters: []
+    delete:
+      operationId: third_party_auth_v0_users_delete
+      summary: Delete given social auth record for a user.
+      description: Allows deleting the given social auth record if it exists for a specified user.
+      parameters:
+      - name: uid
+        in: query
+        description: UID of the social auth record to delete.
+        required: true
+        type: string
+      responses:
+        '204':
+          description: 'No content returned if delete operation successful.'
+      tags:
+      - third_party_auth
+    parameters:
+    - name: username
+      in: query
+      description: Username of user. One of 'email' or 'username'. If both are provided, the username will be ignored.
+      required: false
+      type: string
+    - name: email
+      in: query
+      description: Email of user. One of 'email' or 'username'. If both are provided, the username will be ignored.
+      required: false
+      type: string
   /third_party_auth/v0/users/{username}:
     get:
       operationId: third_party_auth_v0_users_read

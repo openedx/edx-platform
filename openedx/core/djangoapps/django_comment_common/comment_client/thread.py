@@ -199,91 +199,49 @@ class Thread(models.Model):
         self._update_from_response(response)
 
     def flagAbuse(self, user, voteable, course_id=None):
-        if voteable.type == 'thread':
-            url = _url_for_flag_abuse_thread(voteable.id)
-        else:
-            raise utils.CommentClientRequestError("Can only flag/unflag threads or comments")
+        if voteable.type != 'thread':
+            raise utils.CommentClientRequestError("Can only flag threads")
+
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            response = forum_api.update_thread_flag(voteable.id, "flag", user_id=user.id, course_id=str(course_key))
-        else:
-            params = {'user_id': user.id}
-            response = utils.perform_request(
-                'put',
-                url,
-                params,
-                metric_action='thread.abuse.flagged',
-                metric_tags=self._metric_tags
-            )
+        response = forum_api.update_thread_flag(
+            thread_id=voteable.id,
+            action="flag",
+            user_id=str(user.id),
+            course_id=str(course_key)
+        )
         voteable._update_from_response(response)
 
     def unFlagAbuse(self, user, voteable, removeAll, course_id=None):
-        if voteable.type == 'thread':
-            url = _url_for_unflag_abuse_thread(voteable.id)
-        else:
-            raise utils.CommentClientRequestError("Can only flag/unflag for threads or comments")
-        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            response = forum_api.update_thread_flag(
-                thread_id=voteable.id,
-                action="unflag",
-                user_id=user.id,
-                update_all=bool(removeAll),
-                course_id=str(course_key)
-            )
-        else:
-            params = {'user_id': user.id}
-            #if you're an admin, when you unflag, remove ALL flags
-            if removeAll:
-                params['all'] = True
+        if voteable.type != 'thread':
+            raise utils.CommentClientRequestError("Can only unflag threads")
 
-            response = utils.perform_request(
-                'put',
-                url,
-                params,
-                metric_tags=self._metric_tags,
-                metric_action='thread.abuse.unflagged'
-            )
+        course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
+        response = forum_api.update_thread_flag(
+            thread_id=voteable.id,
+            action="unflag",
+            user_id=user.id,
+            update_all=bool(removeAll),
+            course_id=str(course_key)
+        )
+
         voteable._update_from_response(response)
 
     def pin(self, user, thread_id, course_id=None):
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            response = forum_api.pin_thread(
-                user_id=user.id,
-                thread_id=thread_id,
-                course_id=str(course_key)
-            )
-        else:
-            url = _url_for_pin_thread(thread_id)
-            params = {'user_id': user.id}
-            response = utils.perform_request(
-                'put',
-                url,
-                params,
-                metric_tags=self._metric_tags,
-                metric_action='thread.pin'
-            )
+        response = forum_api.pin_thread(
+            user_id=user.id,
+            thread_id=thread_id,
+            course_id=str(course_key)
+        )
         self._update_from_response(response)
 
-    def un_pin(self, user, thread_id, course_id):
+    def un_pin(self, user, thread_id, course_id=None):
         course_key = utils.get_course_key(self.attributes.get("course_id") or course_id)
-        if is_forum_v2_enabled(course_key):
-            response = forum_api.unpin_thread(
-                user_id=user.id,
-                thread_id=thread_id,
-                course_id=str(course_key)
-            )
-        else:
-            url = _url_for_un_pin_thread(thread_id)
-            params = {'user_id': user.id}
-            response = utils.perform_request(
-                'put',
-                url,
-                params,
-                metric_tags=self._metric_tags,
-                metric_action='thread.unpin'
-            )
+        response = forum_api.unpin_thread(
+            user_id=user.id,
+            thread_id=thread_id,
+            course_id=str(course_key)
+        )
         self._update_from_response(response)
 
 
