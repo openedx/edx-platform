@@ -13,6 +13,7 @@ from datetime import datetime
 import logging
 import threading
 
+import bson.tz_util
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -330,3 +331,251 @@ def get_handler_url(
     # can be called by the XBlock from python as well and in that case we don't
     # have access to the request.
     return site_root_url + path
+
+
+from django.template.defaultfilters import filesizeformat
+from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore import BlockData
+from xmodule.modulestore.split_mongo import BlockKey
+from datetime import datetime, timezone
+import bson
+from bson import ObjectId
+from bson.codec_options import CodecOptions
+import zlib
+
+from .models import (
+    Block,
+    LearningCoreCourseStructure,
+    LearningCoreLearningContext,
+    XBlockVersionFieldData,
+)
+
+def get_structure_for_course(course_key: CourseKey):
+    """Just gets the published version for now, need to update to do both branches later"""
+    lccs = LearningCoreCourseStructure.objects.get(course_key=course_key)
+    uncompressed_data = zlib.decompress(lccs.structure)
+    return bson.decode(uncompressed_data, codec_options=CodecOptions(tz_aware=True))
+
+def update_learning_core_course(course_key: CourseKey):
+    """
+    This is going to write to LearningCoreCourseStructure.
+
+    Pass 0 of this: just push hardcoded data into the shim
+
+    """
+    writer = LearningCoreCourseShimWriter(course_key)
+    structure = writer.make_structure()
+
+    import pprint
+
+    with open("lc_struct.txt", "w") as struct_file:
+        printer = pprint.PrettyPrinter(indent=2, stream=struct_file)
+        printer.pprint(structure)
+
+    # Structure doc is so repetitive that we get a 4-5X reduction in file size
+    num_blocks = len(structure['blocks'])
+    encoded_structure = zlib.compress(bson.encode(structure, codec_options=CodecOptions(tz_aware=True)))
+
+    lccs, _created = LearningCoreCourseStructure.objects.get_or_create(course_key=course_key)
+    lccs.structure = encoded_structure
+    lccs.save()
+
+    log.info(f"Updated Learning Core Structure (for Split) on course {course_key}.")
+    log.info(f"Structure size: {filesizeformat(len(encoded_structure))} for {num_blocks} blocks.")
+
+
+def base_edit_info(
+    user_id: int=-1,
+    edited_on: datetime=None,
+    source_version: ObjectId=None,
+    update_version: ObjectId=None,
+) -> dict:
+    return {
+        'edited_by': user_id,
+        'edited_on': edited_on or datetime.now(tz=timezone.utc),
+
+        # This is v1 libraries data that we're faking
+        'original_usage': None,
+        'original_usage_vesion': None,
+
+        # Edit history, all of which we're faking
+        'previous_version': None,
+        'source_version': source_version or ObjectId(),
+        'update_version': update_version or ObjectId(),
+    }
+
+
+def create_container_definition(container_type: str) -> dict:
+    """
+    This is the definition doc for most containers (vertical/sequential/chapter)
+
+    For the most part, containers don't actually put much in their definition
+    documents. The CourseBlock is an exception, and will have a bunch of its own
+    metadata to add.
+    """
+    return {
+        '_id': ObjectId(),
+
+    }
+
+def get_definition_doc(def_id: ObjectId):
+    # a lot of logic to get the block type here. Maybe just pass it in?
+
+    try:
+        xb_field_data = XBlockVersionFieldData.objects.get(definition_object_id=str(def_id))
+    except XBlockVersionFieldData.DoesNotExist:
+        return None
+
+    return {
+        '_id': ObjectId(xb_field_data.definition_object_id),
+        'block_type': None,
+        'fields': xb_field_data.content,
+        'edit_info': {
+            'edited_by': xb_field_data.publishable_entity_version.created_by_id,
+            'edited_on': xb_field_data.publishable_entity_version.created,
+
+            # These are supposed to be the ObjectIds of the structure docs that
+            # represent the last time this block was edited and the original
+            # version at the time of creation. It's actually a common occurrence
+            # for these values to get pruned in Split, so we're making dummy
+            # ObjectIds--i.e. we're making it look like this was created a while
+            # ago and the versions for both the original creation and last
+            # update are no longer available.
+            'previous_version': ObjectId(),
+            'original_version': ObjectId(),
+        },
+        'schema_version': 1,
+    }
+
+
+class LearningCoreCourseShimWriter:
+    def __init__(self, course_key: CourseKey):
+        self.course_key = course_key
+        self.structure_obj_id = bson.ObjectId()
+
+        self.edited_on = datetime.now(tz=timezone.utc)
+        self.user_id = -1  # This is "the system did it"
+
+    def make_structure(self):
+        structure = self.base_structure()
+
+        context = LearningCoreLearningContext.objects.get(key=self.course_key)
+        blocks = (
+            context.blocks
+                   .select_related(
+                       'entity__published__version__xblockversionfielddata',
+                       'entity__draft__version__xblockversionfielddata',
+                    )
+        )
+        for block in blocks:
+            field_data = block.entity.published.version.xblockversionfielddata
+            block_entry = self.base_block_entry(
+                block.key.block_type,
+                block.key.block_id,
+                ObjectId(field_data.definition_object_id),
+            )
+            block_entry['fields'].update(field_data.settings)
+            if field_data.children:
+                block_entry['fields']['children'] = field_data.children
+
+            structure['blocks'].append(block_entry)
+
+        structure['blocks'].extend(self.non_child_blocks())
+
+        return structure
+
+    def base_structure(self):
+        doc_id = bson.ObjectId()
+
+        return {
+            '_id': doc_id,
+            'blocks': [],
+            'schema_version': 1,  # LOL
+
+            'root': ['course', 'course'],  # Root is always the CourseBlock
+            'edited_by': self.user_id,
+            'edited_on': self.edited_on,
+
+            # We're always going to be the "first" version for now, from Split's
+            # perspective.
+            'previous_version': None,
+            'original_version': doc_id
+        }
+
+    def base_block_entry(self, block_type: str, block_id: str, definition_object_id: ObjectId):
+        return {
+            'asides': {},  # We are *so* not doing asides in this prototype
+            'block_id': block_id,
+            'block_type': block_type,
+            'defaults': {},
+            'fields': {'children': []},  # Even blocks without children are written this way.
+            'definition': definition_object_id,
+            'edit_info': self.base_edit_info()
+        }
+
+    def base_edit_info(self):
+        return {
+            'edited_by': self.user_id,
+            'edited_on': self.edited_on,
+
+            # This is v1 libraries data that we're faking
+            'original_usage': None,
+            'original_usage_vesion': None,
+
+            # Edit history, all of which we're faking
+            'previous_version': None,
+            'source_version': self.structure_obj_id,
+            'update_version': self.structure_obj_id,
+        }
+
+    def non_child_blocks(self):
+        from bson import ObjectId
+        """These are all the random blocks that are not connected to the course root"""
+        # def: ObjectId('67ddbd4880aff2c029322017')
+        overview = self.base_block_entry('about', 'overview', ObjectId('67ddbd4880aff2c029322017'))
+
+        # def: ObjectId('68508b10bd8f1408c3839dbe')
+        updates = self.base_block_entry('course_info', 'updates', ObjectId('68508b10bd8f1408c3839dbe'))
+
+        # def: ObjectId('68508b38bd8f1408c3839dc4')
+        title = self.base_block_entry('about', 'title', ObjectId('68508b38bd8f1408c3839dc4'))
+
+        # def: ObjectId('68508b39bd8f1408c3839dc7')
+        subtitle = self.base_block_entry('about', 'subtitle', ObjectId('68508b39bd8f1408c3839dc7'))
+
+        # def: ObjectId('68508b39bd8f1408c3839dca')
+        duration = self.base_block_entry('about', 'duration', ObjectId('68508b39bd8f1408c3839dca'))
+
+        # def: ObjectId('68508b3abd8f1408c3839dcd')
+        description = self.base_block_entry('about', 'description', ObjectId('68508b3abd8f1408c3839dcd'))
+
+        # def: ObjectId('68508b3abd8f1408c3839dd0')
+        short_description = self.base_block_entry('about', 'short_description', ObjectId('68508b3abd8f1408c3839dd0'))
+
+        # I have so many questions about entrance exams...
+
+        # def: ObjectId('68508b3cbd8f1408c3839dd6')
+        entrance_exam_enabled = self.base_block_entry('about', 'entrance_exam_enabled', ObjectId('68508b3cbd8f1408c3839dd6'))
+
+        # def: ObjectId('68508b3cbd8f1408c3839dd9')
+        entrance_exam_id = self.base_block_entry('about', 'entrance_exam_id', ObjectId('68508b3cbd8f1408c3839dd9'))
+
+        # def: ObjectId('68508b3dbd8f1408c3839ddc')
+        entrance_exam_minimum_score_pct = self.base_block_entry('about', 'entrance_exam_minimum_score_pct', ObjectId('68508b3dbd8f1408c3839ddc'))
+
+        # def: ObjectId('68508b3ebd8f1408c3839ddf')
+        about_sidebar_html = self.base_block_entry('about', 'about_sidebar_html', ObjectId('68508b3ebd8f1408c3839ddf'))
+
+        return [
+            overview,
+            updates,
+            title,
+            subtitle,
+            duration,
+            description,
+            short_description,
+            entrance_exam_enabled,
+            entrance_exam_id,
+            entrance_exam_minimum_score_pct,
+            about_sidebar_html,
+        ]

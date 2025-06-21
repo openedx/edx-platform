@@ -37,6 +37,8 @@ from openedx.core.djangoapps.content_libraries.api import ContainerType
 from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.content_staging import api as staging_api
+from openedx.core.djangoapps.xblock import models as xblock_models
+
 from xmodule.modulestore import exceptions as modulestore_exceptions
 from xmodule.modulestore.django import modulestore
 
@@ -128,6 +130,7 @@ def migrate_from_modulestore(
             "Source key must reference a course or a legacy library."
         )
         return
+
     migration = ModulestoreMigration.objects.create(
         source=source,
         composition_level=composition_level,
@@ -274,7 +277,23 @@ def migrate_from_modulestore(
         ],
     )
     block_migrations = ModulestoreBlockMigration.objects.filter(overall_migration=migration)
+
+    # Support SplitModuleStore shim from Learning Core
+    learning_context, _created = xblock_models.LearningCoreLearningContext.objects.get_or_create(key=source.key)
+    xblock_models.Block.objects.bulk_create(
+        [
+            xblock_models.Block(
+                learning_context=learning_context,
+                key=block_source_key,
+                entity_id=block_target_ver.entity_id,
+            )
+            for block_source_key, block_target_ver in block_source_keys_to_target_vers.items()
+        ],
+        update_conflicts=True,
+        update_fields=["entity", "learning_context"],
+    )
     status.increment_completed_steps()
+
 
     status.set_state(MigrationStep.FORWARDING.value)
     if forward_source_to_target:
@@ -468,7 +487,7 @@ def _migrate_container(
             entity_id=container.container_pk,
             version_num=container.draft_version_num,
         )
-    return authoring_api.create_next_container_version(
+    next_container_version = authoring_api.create_next_container_version(
         container.container_pk,
         title=title,
         entity_rows=[
@@ -478,7 +497,9 @@ def _migrate_container(
         created=created_at,
         created_by=created_by,
         container_version_cls=container_type.container_model_classes[1],
-    ).publishable_entity_version
+    )
+    libraries_api.create_xblock_field_data_for_container(next_container_version)
+    return next_container_version.publishable_entity_version
 
 
 def _migrate_component(

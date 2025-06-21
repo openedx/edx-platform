@@ -153,6 +153,13 @@ def structure_from_mongo(structure, course_context=None):
         course_context (CourseKey): For metrics gathering, the CourseKey
             for the course that this data is being processed for.
     """
+    import pprint
+
+    #with open("raw_struct.txt", "w") as struct_file:
+    #    struct_file.write(f"Course: {course_context}\n\n")
+    #    printer = pprint.PrettyPrinter(indent=2, stream=struct_file)
+    #    printer.pprint(structure)
+
     with TIMER.timer('structure_from_mongo', course_context) as tagger:
         tagger.measure('blocks', len(structure['blocks']))
 
@@ -163,6 +170,11 @@ def structure_from_mongo(structure, course_context=None):
                 block['fields']['children'] = [BlockKey(*child) for child in block['fields']['children']]
             new_blocks[BlockKey(block['block_type'], block.pop('block_id'))] = BlockData(**block)
         structure['blocks'] = new_blocks
+
+        #with open("struct.txt", "w") as struct_file:
+        #    struct_file.write(f"Course: {course_context}\n\n")
+        #    printer = pprint.PrettyPrinter(indent=2, stream=struct_file)
+        #    printer.pprint(structure)
 
         return structure
 
@@ -341,13 +353,24 @@ class MongoPersistenceBackend:
             cache = CourseStructureCache()
 
             structure = cache.get(key, course_context)
+
+            structure = None  # force cache miss for now
+
             tagger_get_structure.tag(from_cache=str(bool(structure)).lower())
             if not structure:
                 # Always log cache misses, because they are unexpected
                 tagger_get_structure.sample_rate = 1
 
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
-                    doc = self.structures.find_one({'_id': key})
+                    log.error(f"course_context: {course_context} and {course_context.course}")
+                    # Reminder: course_context includes the branch information
+                    if True: # and course_context and course_context.course.startswith('LC') and course_context.branch == 'published':
+                        from openedx.core.djangoapps.xblock.api import get_structure_for_course
+                        log.info("WE'RE IN LEARNING CORE!!!")
+                        doc = get_structure_for_course(course_context)
+                    else:
+                        doc = self.structures.find_one({'_id': key})
+
                     if doc is None:
                         log.warning(
                             "doc was None when attempting to retrieve structure for item with key %s",
@@ -541,8 +564,14 @@ class MongoPersistenceBackend:
         """
         Get the definition from the persistence mechanism whose id is the given key
         """
+        from openedx.core.djangoapps.xblock.api import get_definition_doc
+
+        log.info(f"Fetching Definition: {key}")
         with TIMER.timer("get_definition", course_context) as tagger:
-            definition = self.definitions.find_one({'_id': key})
+            definition = get_definition_doc(key)
+            if not definition:
+                # This fallback exists for the random standalone blocks that courses expect
+                definition = self.definitions.find_one({'_id': key})
             tagger.measure("fields", len(definition['fields']))
             tagger.tag(block_type=definition['block_type'])
             return definition
@@ -551,6 +580,7 @@ class MongoPersistenceBackend:
         """
         Retrieve all definitions listed in `definitions`.
         """
+        log.info(f"Fetching Definitions: {definitions}")
         with TIMER.timer("get_definitions", course_context) as tagger:
             tagger.measure('definitions', len(definitions))
             definitions = self.definitions.find({'_id': {'$in': definitions}})
