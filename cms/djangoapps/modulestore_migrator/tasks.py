@@ -40,6 +40,7 @@ from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
 from openedx.core.djangoapps.content_staging import api as staging_api
 from openedx.core.djangoapps.xblock import models as xblock_models
+from openedx.core.djangoapps.xblock.api import create_xblock_field_data_for_container
 
 from xmodule.modulestore import exceptions as modulestore_exceptions
 from xmodule.modulestore.django import modulestore
@@ -234,7 +235,7 @@ def migrate_from_modulestore(
         static_file
         for staged in [staged_content, *staged_meta_contents]
         for static_file in staging_api.get_staged_content_static_files(staged.id)
-    ] 
+    ]
     for staged_content_file_data in all_static_files:
         old_path = staged_content_file_data.filename
         file_data = staging_api.get_staged_content_static_file_data(staged_content.id, old_path)
@@ -584,7 +585,7 @@ def _migrate_container(
         created_by=created_by,
         container_version_cls=container_type.container_model_classes[1],
     )
-    libraries_api.create_xblock_field_data_for_container(next_container_version)
+    create_xblock_field_data_for_container(next_container_version)
     return next_container_version.publishable_entity_version
 
 
