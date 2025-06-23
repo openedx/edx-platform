@@ -116,7 +116,8 @@ from lms.djangoapps.instructor.views.serializer import (
     StudentAttemptsSerializer,
     UserSerializer,
     UniqueStudentIdentifierSerializer,
-    ProblemResetSerializer
+    ProblemResetSerializer,
+    RescoreEntranceExamSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2199,13 +2200,6 @@ def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable
 
     response_payload['task'] = TASK_SUBMISSION_OK
     return JsonResponse(response_payload)
-
-
-class RescoreEntranceExamSerializer(serializers.Serializer):
-    """Serializer for entrance exam rescoring"""
-    unique_student_identifier = serializers.CharField(required=False, allow_null=True)
-    all_students = serializers.BooleanField(required=False)
-    only_if_higher = serializers.BooleanField(required=False, allow_null=True)
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
