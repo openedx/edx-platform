@@ -461,7 +461,10 @@ class LearningCoreCourseShimWriter:
                     )
         )
         for block in blocks:
-            field_data = block.entity.published.version.xblockversionfielddata
+            entity_version = block.entity.published.version
+            if not hasattr(entity_version, 'xblockversionfielddata'):
+                log.error(f"MISSING XBlockVersionFieldData for {block.key}")
+            field_data = entity_version.xblockversionfielddata
             block_entry = self.base_block_entry(
                 block.key.block_type,
                 block.key.block_id,
