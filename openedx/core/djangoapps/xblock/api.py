@@ -476,8 +476,6 @@ class LearningCoreCourseShimWriter:
 
             structure['blocks'].append(block_entry)
 
-        structure['blocks'].extend(self.non_child_blocks())
-
         return structure
 
     def base_structure(self):
@@ -523,55 +521,3 @@ class LearningCoreCourseShimWriter:
             'source_version': self.structure_obj_id,
             'update_version': self.structure_obj_id,
         }
-
-    def non_child_blocks(self):
-        from bson import ObjectId
-        """These are all the random blocks that are not connected to the course root"""
-        # def: ObjectId('67ddbd4880aff2c029322017')
-        overview = self.base_block_entry('about', 'overview', ObjectId('67ddbd4880aff2c029322017'))
-
-        # def: ObjectId('68508b10bd8f1408c3839dbe')
-        updates = self.base_block_entry('course_info', 'updates', ObjectId('68508b10bd8f1408c3839dbe'))
-
-        # def: ObjectId('68508b38bd8f1408c3839dc4')
-        title = self.base_block_entry('about', 'title', ObjectId('68508b38bd8f1408c3839dc4'))
-
-        # def: ObjectId('68508b39bd8f1408c3839dc7')
-        subtitle = self.base_block_entry('about', 'subtitle', ObjectId('68508b39bd8f1408c3839dc7'))
-
-        # def: ObjectId('68508b39bd8f1408c3839dca')
-        duration = self.base_block_entry('about', 'duration', ObjectId('68508b39bd8f1408c3839dca'))
-
-        # def: ObjectId('68508b3abd8f1408c3839dcd')
-        description = self.base_block_entry('about', 'description', ObjectId('68508b3abd8f1408c3839dcd'))
-
-        # def: ObjectId('68508b3abd8f1408c3839dd0')
-        short_description = self.base_block_entry('about', 'short_description', ObjectId('68508b3abd8f1408c3839dd0'))
-
-        # I have so many questions about entrance exams...
-
-        # def: ObjectId('68508b3cbd8f1408c3839dd6')
-        entrance_exam_enabled = self.base_block_entry('about', 'entrance_exam_enabled', ObjectId('68508b3cbd8f1408c3839dd6'))
-
-        # def: ObjectId('68508b3cbd8f1408c3839dd9')
-        entrance_exam_id = self.base_block_entry('about', 'entrance_exam_id', ObjectId('68508b3cbd8f1408c3839dd9'))
-
-        # def: ObjectId('68508b3dbd8f1408c3839ddc')
-        entrance_exam_minimum_score_pct = self.base_block_entry('about', 'entrance_exam_minimum_score_pct', ObjectId('68508b3dbd8f1408c3839ddc'))
-
-        # def: ObjectId('68508b3ebd8f1408c3839ddf')
-        about_sidebar_html = self.base_block_entry('about', 'about_sidebar_html', ObjectId('68508b3ebd8f1408c3839ddf'))
-
-        return [
-            overview,
-            updates,
-            title,
-            subtitle,
-            duration,
-            description,
-            short_description,
-            entrance_exam_enabled,
-            entrance_exam_id,
-            entrance_exam_minimum_score_pct,
-            about_sidebar_html,
-        ]
