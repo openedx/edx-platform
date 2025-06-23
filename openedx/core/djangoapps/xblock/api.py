@@ -18,7 +18,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, ComponentVersion
+from openedx_learning.api.authoring_models import Component, ComponentVersion, PublishLog
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
@@ -386,6 +386,10 @@ def update_learning_core_course(course_key: CourseKey):
     log.info(f"Updated Learning Core Structure (for Split) on course {course_key}.")
     log.info(f"Structure size: {filesizeformat(len(encoded_structure))} for {num_blocks} blocks.")
 
+    from xmodule.modulestore.django import SignalHandler
+    log.info(f"Emitting course_published signal for {course_key}")
+    SignalHandler.course_published.send_robust(sender=update_learning_core_course, course_key=course_key)
+
 
 @request_cached()
 def learning_core_backend_enabled_for_course(course_key: CourseKey):
@@ -423,6 +427,18 @@ def get_definition_doc(def_id: ObjectId):
         },
         'schema_version': 1,
     }
+
+
+def handle_library_publish(publish_log: PublishLog):
+    affected_course_keys = set(
+        key
+        for key in publish_log.records.values_list('entity__block__learning_context__key', flat=True)
+        if key
+    )
+    log.info(f"Affected Courses to update in LC shim: {affected_course_keys}")
+    for course_key in affected_course_keys:
+        log.info(f"Type of course_key: {type(course_key)}")
+        update_learning_core_course(course_key)
 
 
 class LearningCoreCourseShimWriter:

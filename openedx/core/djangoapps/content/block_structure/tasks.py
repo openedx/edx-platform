@@ -59,6 +59,7 @@ def _update_course_in_cache(self, **kwargs):
     """
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
     """
+    log.info("Inner _update_course_in_cache called.")
     _call_and_retry_if_needed(self, api.update_course_in_cache, **kwargs)
 
 

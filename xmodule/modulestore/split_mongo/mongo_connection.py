@@ -363,9 +363,9 @@ class MongoPersistenceBackend:
                 tagger_get_structure.sample_rate = 1
 
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
-                    log.error(f"course_context: {course_context} and {course_context.course}")
                     # Reminder: course_context includes the branch information
                     from openedx.core.djangoapps.xblock.api import get_structure_for_course, learning_core_backend_enabled_for_course
+
                     if learning_core_backend_enabled_for_course(course_context):
                         log.info(f"Getting Structure doc from Learning Core: {course_context}: {key}")
                         doc = get_structure_for_course(course_context)
