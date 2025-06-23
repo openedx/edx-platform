@@ -342,9 +342,10 @@ import bson
 from bson import ObjectId
 from bson.codec_options import CodecOptions
 import zlib
+from openedx.core.lib.cache_utils import request_cached
+
 
 from .models import (
-    Block,
     LearningCoreCourseStructure,
     LearningCoreLearningContext,
     XBlockVersionFieldData,
@@ -352,9 +353,11 @@ from .models import (
 
 def get_structure_for_course(course_key: CourseKey):
     """Just gets the published version for now, need to update to do both branches later"""
-    lccs = LearningCoreCourseStructure.objects.get(course_key=course_key)
+    lookup_key = course_key.replace(branch=None, version_guid=None)
+    lccs = LearningCoreCourseStructure.objects.get(course_key=lookup_key)
     uncompressed_data = zlib.decompress(lccs.structure)
     return bson.decode(uncompressed_data, codec_options=CodecOptions(tz_aware=True))
+
 
 def update_learning_core_course(course_key: CourseKey):
     """
@@ -384,43 +387,17 @@ def update_learning_core_course(course_key: CourseKey):
     log.info(f"Structure size: {filesizeformat(len(encoded_structure))} for {num_blocks} blocks.")
 
 
-def base_edit_info(
-    user_id: int=-1,
-    edited_on: datetime=None,
-    source_version: ObjectId=None,
-    update_version: ObjectId=None,
-) -> dict:
-    return {
-        'edited_by': user_id,
-        'edited_on': edited_on or datetime.now(tz=timezone.utc),
+@request_cached()
+def learning_core_backend_enabled_for_course(course_key: CourseKey):
+    try:
+        lookup_key = course_key.replace(branch=None, version_guid=None)
+        lc_context = LearningCoreLearningContext.objects.get(key=lookup_key)
+        return lc_context.use_learning_core
+    except LearningCoreLearningContext.DoesNotExist:
+        return False
 
-        # This is v1 libraries data that we're faking
-        'original_usage': None,
-        'original_usage_vesion': None,
-
-        # Edit history, all of which we're faking
-        'previous_version': None,
-        'source_version': source_version or ObjectId(),
-        'update_version': update_version or ObjectId(),
-    }
-
-
-def create_container_definition(container_type: str) -> dict:
-    """
-    This is the definition doc for most containers (vertical/sequential/chapter)
-
-    For the most part, containers don't actually put much in their definition
-    documents. The CourseBlock is an exception, and will have a bunch of its own
-    metadata to add.
-    """
-    return {
-        '_id': ObjectId(),
-
-    }
 
 def get_definition_doc(def_id: ObjectId):
-    # a lot of logic to get the block type here. Maybe just pass it in?
-
     try:
         xb_field_data = XBlockVersionFieldData.objects.get(definition_object_id=str(def_id))
     except XBlockVersionFieldData.DoesNotExist:

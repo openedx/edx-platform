@@ -6,7 +6,14 @@ from django.urls import reverse
 from django.utils.html import format_html
 from openedx_learning.lib.admin_utils import ReadOnlyModelAdmin
 
-from .models import XBlockVersionFieldData
+from .models import XBlockVersionFieldData, LearningCoreLearningContext
+
+@admin.register(LearningCoreLearningContext)
+class LearningCoreLearningContextAdmin(admin.ModelAdmin):
+    list_display = [
+        "key",
+        "use_learning_core",
+    ]
 
 
 @admin.register(XBlockVersionFieldData)

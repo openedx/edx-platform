@@ -22,6 +22,7 @@ from mongodb_proxy import autoretry_read
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 from edx_django_utils import monitoring
 from edx_django_utils.cache import RequestCache
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
 from xmodule.exceptions import HeartbeatFailure
@@ -364,11 +365,12 @@ class MongoPersistenceBackend:
                 with TIMER.timer("get_structure.find_one", course_context) as tagger_find_one:
                     log.error(f"course_context: {course_context} and {course_context.course}")
                     # Reminder: course_context includes the branch information
-                    if True: # and course_context and course_context.course.startswith('LC') and course_context.branch == 'published':
-                        from openedx.core.djangoapps.xblock.api import get_structure_for_course
-                        log.info("WE'RE IN LEARNING CORE!!!")
+                    from openedx.core.djangoapps.xblock.api import get_structure_for_course, learning_core_backend_enabled_for_course
+                    if learning_core_backend_enabled_for_course(course_context):
+                        log.info(f"Getting Structure doc from Learning Core: {course_context}: {key}")
                         doc = get_structure_for_course(course_context)
                     else:
+                        log.info(f"Getting Structure doc from ModuleStore: {course_context}: {key}")
                         doc = self.structures.find_one({'_id': key})
 
                     if doc is None:
@@ -560,18 +562,31 @@ class MongoPersistenceBackend:
             }
             return self.course_index.delete_one(query)
 
-    def get_definition(self, key, course_context=None):
+    def get_definition(self, key, course_context: CourseKey | None=None):
         """
         Get the definition from the persistence mechanism whose id is the given key
         """
-        from openedx.core.djangoapps.xblock.api import get_definition_doc
+        from openedx.core.djangoapps.xblock.api import get_definition_doc, learning_core_backend_enabled_for_course
 
         log.info(f"Fetching Definition: {key}")
         with TIMER.timer("get_definition", course_context) as tagger:
-            definition = get_definition_doc(key)
+            # Note that sometimes course_context comes in with version/branch
+            # information, and sometimes it doesn't. So we can't rely on that to
+            # only enable the LC shim for the published branch. We also can't do
+            # switching from Studio to LMS because Studio needs to build things
+            # off of course publish.
+            definition = None
+            if learning_core_backend_enabled_for_course(course_context):
+                log.info(f"Getting Definition doc from Learning Core: {course_context}: {key}")
+                definition = get_definition_doc(key)
+
             if not definition:
-                # This fallback exists for the random standalone blocks that courses expect
+                # This fallback exists for the random standalone blocks that
+                # courses expect. Change this to an "else" branch when we're
+                # importing those for real.
+                log.info(f"Getting Definition doc from ModuleStore: {course_context}: {key}")
                 definition = self.definitions.find_one({'_id': key})
+
             tagger.measure("fields", len(definition['fields']))
             tagger.tag(block_type=definition['block_type'])
             return definition

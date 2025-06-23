@@ -63,11 +63,13 @@ class LearningCoreCourseStructure(models.Model):
 
 class LearningCoreLearningContext(models.Model):
     key = LearningContextKeyField(max_length=255, unique=True)
-    root = models.ForeignKey('Block', on_delete=models.SET_NULL, null=True)
 
     # This is a way for us to turn off LC as a backend both for rollback
     # purposes, but also to temporarily disable when doing a re-import.
     use_learning_core = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.key)
 
 
 class Block(models.Model):
