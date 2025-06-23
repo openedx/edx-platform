@@ -1,0 +1,91 @@
+{% load django_markup %}
+{% load i18n %}
+<!-- These tags come from the ace_common djangoapp in edx ace -->
+{% load ace %}
+<!-- These tags come from the edx_ace app within the edx_ace repository -->
+{% load acetags %}
+
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+
+{# This is preview text that is visible in the inbox view of many email clients but not visible in the actual #}
+{# email itself. #}
+
+<div lang="{{ LANGUAGE_CODE|default:"en" }}" style="
+display:none;
+font-size:1px;
+line-height:1px;
+max-height:0px;
+max-width:0px;
+opacity:0;
+overflow:hidden;
+visibility:hidden;
+">
+{% block preview_text %}{% endblock %}
+</div>
+
+{% for image_src in channel.tracker_image_sources %}
+<img src="{image_src}" alt="" role="presentation" aria-hidden="true" />
+{% endfor %}
+
+{% google_analytics_tracking_pixel %}
+
+<div bgcolor="#F2F0EF" lang="{{ LANGUAGE_CODE|default:"en" }}" dir="{{ LANGUAGE_BIDI|yesno:"rtl,ltr" }}" style="
+margin: 0;
+padding: 0;
+min-width: 100%;
+">
+  <!-- Hack for outlook 2010, which wants to render everything in Times New Roman -->
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td {font-family: Arial, sans-serif !important;}
+  </style>
+  <![endif]-->
+
+  <!--[if (gte mso 9)|(IE)]>
+  <table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+  <td>
+  <![endif]-->
+
+  <!-- CONTENT -->
+  <table class="content" role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" bgcolor="#fbfaf9" width="100%"
+  {% block table_style %}
+  style="
+  font-family: Arial, sans-serif;
+  font-size: 1em;
+  line-height: 1.5;
+  max-width: 600px;
+  "
+  {% endblock %}
+  >
+    <tr>
+      <!-- HEADER -->
+      <td class="header" style="background-color: #F2F0EF;">
+        {% block header %}{% endblock %}
+      </td>
+    </tr>
+
+    <tr>
+      <!-- MAIN -->
+      <td class="main" bgcolor="#ffffff">
+        {% block content %}{% endblock %}
+      </td>
+    </tr>
+
+    <tr>
+      <!-- FOOTER -->
+      <td class="footer" style="padding: 30px; background-color: #F2F0EF;">
+        {% block footer %}{% endblock %}
+      </td>
+    </tr>
+
+  </table>
+
+<!--[if (gte mso 9)|(IE)]>
+  </td>
+  </tr>
+  </table>
+  <![endif]-->
+
+</div>
