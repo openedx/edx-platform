@@ -48,10 +48,7 @@ class LibraryXBlockMetadata(PublishableItem):
         tags = get_object_tag_counts(str(usage_key), count_implicit=True)
 
         return cls(
-            usage_key=library_component_usage_key(
-                library_key,
-                component,
-            ),
+            usage_key=usage_key,
             display_name=draft.title,
             created=component.created,
             modified=draft.created,
