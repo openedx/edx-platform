@@ -81,17 +81,16 @@ def get_platform_settings():
 @function_trace("get_user_account_confirmation_info")
 def get_user_account_confirmation_info(user):
     """Determine if a user needs to verify their account and related URL info"""
-
-    activation_email_support_link = (
+    send_activation_email_url = (
         configuration_helpers.get_value(
-            "ACTIVATION_EMAIL_SUPPORT_LINK", settings.ACTIVATION_EMAIL_SUPPORT_LINK
+            "SEND_ACTIVATION_EMAIL_URL", settings.SEND_ACTIVATION_EMAIL_URL
         )
         or settings.SUPPORT_SITE_LINK
     )
 
     email_confirmation = {
         "isNeeded": not user.is_active,
-        "sendEmailUrl": activation_email_support_link,
+        "sendEmailUrl": send_activation_email_url,
     }
 
     return email_confirmation
