@@ -13,11 +13,12 @@ from datetime import datetime
 import logging
 import threading
 
+import bson.tz_util
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Component, ComponentVersion
+from openedx_learning.api.authoring_models import Component, ComponentVersion, ContainerVersion, PublishLog
 from opaque_keys.edx.keys import UsageKeyV2
 from opaque_keys.edx.locator import LibraryUsageLocatorV2
 from rest_framework.exceptions import NotFound
@@ -330,3 +331,331 @@ def get_handler_url(
     # can be called by the XBlock from python as well and in that case we don't
     # have access to the request.
     return site_root_url + path
+
+
+from django.template.defaultfilters import filesizeformat
+from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore import BlockData
+from xmodule.modulestore.split_mongo import BlockKey
+from datetime import datetime, timezone
+import bson
+from bson import ObjectId
+from bson.codec_options import CodecOptions
+import zlib
+from openedx.core.lib.cache_utils import request_cached
+
+
+from .models import (
+    LearningCoreCourseStructure,
+    LearningCoreLearningContext,
+    XBlockVersionFieldData,
+)
+
+def get_structure_for_course(course_key: CourseKey):
+    """Just gets the published version for now, need to update to do both branches later"""
+    lookup_key = course_key.replace(branch=None, version_guid=None)
+    lccs = LearningCoreCourseStructure.objects.get(course_key=lookup_key)
+    uncompressed_data = zlib.decompress(lccs.structure)
+    return bson.decode(uncompressed_data, codec_options=CodecOptions(tz_aware=True))
+
+
+def update_learning_core_course(course_key: CourseKey):
+    """
+    This is going to write to LearningCoreCourseStructure.
+
+    Pass 0 of this: just push hardcoded data into the shim
+
+    """
+    writer = LearningCoreCourseShimWriter(course_key)
+    structure = writer.make_structure()
+
+    import pprint
+
+    with open("lc_struct.txt", "w") as struct_file:
+        printer = pprint.PrettyPrinter(indent=2, stream=struct_file)
+        printer.pprint(structure)
+
+    # Structure doc is so repetitive that we get a 4-5X reduction in file size
+    num_blocks = len(structure['blocks'])
+    encoded_structure = zlib.compress(bson.encode(structure, codec_options=CodecOptions(tz_aware=True)))
+
+    lccs, _created = LearningCoreCourseStructure.objects.get_or_create(course_key=course_key)
+    lccs.structure = encoded_structure
+    lccs.save()
+
+    log.info(f"Updated Learning Core Structure (for Split) on course {course_key}.")
+    log.info(f"Structure size: {filesizeformat(len(encoded_structure))} for {num_blocks} blocks.")
+
+    from xmodule.modulestore.django import SignalHandler
+    log.info(f"Emitting course_published signal for {course_key}")
+    SignalHandler.course_published.send_robust(sender=update_learning_core_course, course_key=course_key)
+
+
+@request_cached()
+def learning_core_backend_enabled_for_course(course_key: CourseKey):
+    try:
+        lookup_key = course_key.replace(branch=None, version_guid=None)
+        lc_context = LearningCoreLearningContext.objects.get(key=lookup_key)
+        return lc_context.use_learning_core
+    except LearningCoreLearningContext.DoesNotExist:
+        return False
+
+
+def get_definition_doc(def_id: ObjectId):
+    try:
+        xb_field_data = XBlockVersionFieldData.objects.get(definition_object_id=str(def_id))
+    except XBlockVersionFieldData.DoesNotExist:
+        return None
+
+    return {
+        '_id': ObjectId(xb_field_data.definition_object_id),
+        'block_type': None,
+        'fields': xb_field_data.content,
+        'edit_info': {
+            'edited_by': xb_field_data.publishable_entity_version.created_by_id,
+            'edited_on': xb_field_data.publishable_entity_version.created,
+
+            # These are supposed to be the ObjectIds of the structure docs that
+            # represent the last time this block was edited and the original
+            # version at the time of creation. It's actually a common occurrence
+            # for these values to get pruned in Split, so we're making dummy
+            # ObjectIds--i.e. we're making it look like this was created a while
+            # ago and the versions for both the original creation and last
+            # update are no longer available.
+            'previous_version': ObjectId(),
+            'original_version': ObjectId(),
+        },
+        'schema_version': 1,
+    }
+
+
+def handle_library_publish(publish_log: PublishLog):
+    affected_course_keys = set(
+        key
+        for key in publish_log.records.values_list('entity__block__learning_context__key', flat=True)
+        if key
+    )
+    log.info(f"Affected Courses to update in LC shim: {affected_course_keys}")
+    for course_key in affected_course_keys:
+        log.info(f"Type of course_key: {type(course_key)}")
+        update_learning_core_course(course_key)
+
+
+def create_xblock_field_data_for_container(version: ContainerVersion):
+    # this whole thing should be in xblock.api instead of here.
+
+    log.info("Am I even being called?")
+
+    from openedx.core.djangoapps.xblock.models import Block
+
+    entity = version.publishable_entity_version.entity
+
+    # If this PublishableEntity isn't associated with an Learning Core backed
+    # XBlock, then we can't write anything. Note: This is going to be an edge
+    # case later, when we want to add an existing container to a container that
+    # was imported from a course.
+    if not hasattr(entity, 'block'):
+        log.error("No Block detected???")
+        return
+
+    parent_block = entity.block
+    container_usage_key = parent_block.key
+    course_key = container_usage_key.course_key
+
+    # Generic values for all container types
+    content_scoped_fields = {}
+    settings_scoped_fields = {
+        'display_name': version.publishable_entity_version.title
+    }
+    children = []
+
+    # Things specific to the course root...
+    if container_usage_key.block_type == "course":
+        content_scoped_fields['license'] = None
+        content_scoped_fields['wiki_slug'] = f'{course_key.org}.{course_key.course}.{course_key.run}'
+        settings_scoped_fields.update(
+            _course_block_entry(container_usage_key)
+        )
+
+    for child_entity_row in version.entity_list.entitylistrow_set.select_related('entity__block').all():
+        log.error(f"Iterating children: {child_entity_row.entity}")
+        if not hasattr(child_entity_row.entity, 'block'):
+            # This can happen if we add a new component in a library to a
+            # container that was imported from a course.
+            match(container_usage_key.block_type):
+                case "course":
+                    child_block_type = "chapter"
+                    child_block_id = child_entity_row.entity.key
+                case "chapter":
+                    child_block_type = "sequential"
+                    child_block_id = child_entity_row.entity.key
+                case "sequential":
+                    child_block_type = "vertical"
+                    child_block_id = child_entity_row.entity.key
+                case "vertical":
+                    child_block_type = child_entity_row.entity.component.component_type.name
+                    child_block_id = child_entity_row.entity.component.local_key
+
+            log.info(f"Creating child usage key: {child_usage_key}")
+            child_usage_key = course_key.make_usage_key(child_block_type, child_block_id)
+            child_block = Block.objects.create(
+                learning_context_id=parent_block.learning_context_id,
+                entity=child_entity_row.entity,
+                key=child_usage_key,
+            )
+        else:
+            child_block = child_entity_row.entity.block
+            child_usage_key = child_block.key
+        children.append(
+            [child_usage_key.block_type, child_usage_key.block_id]
+        )
+
+    field_data = XBlockVersionFieldData.objects.create(
+        pk=version.pk,
+        content=content_scoped_fields,
+        settings=settings_scoped_fields,
+        children=children,
+    )
+    log.info(f"Wrote XBlock Data for Container: {version}: {field_data}")
+
+
+def _course_block_entry(usage_key):
+    return {
+        'allow_anonymous': True,
+        'allow_anonymous_to_peers': False,
+        'cert_html_view_enabled': True,
+        'discussion_blackouts': [],
+        'discussion_topics': {'General': {'id': 'course'}},
+        'discussions_settings': {
+            'enable_graded_units': False,
+            'enable_in_context': True,
+            'openedx': { 'group_at_subsection': False},
+            'posting_restrictions': 'disabled',
+            'provider_type': 'openedx',
+            'unit_level_visibility': True
+        },
+        'end': None,
+        'language': 'en',
+
+        ## HARDCODED START DATE
+        'start': datetime(2020, 1, 1, 0, 0, tzinfo=timezone.utc),
+        'static_asset_path': 'course',
+        'tabs': [
+            {
+                'course_staff_only': False,
+                'name': 'Course',
+                'type': 'courseware'
+            },
+            {
+                'course_staff_only': False,
+                'name': 'Progress',
+                'type': 'progress'
+            },
+            {
+                'course_staff_only': False,
+                'name': 'Dates',
+                'type': 'dates'
+            },
+            {
+                'course_staff_only': False,
+                'name': 'Discussion',
+                'type': 'discussion'
+            },
+            {
+                'course_staff_only': False,
+                'is_hidden': True,
+                'name': 'Wiki',
+                'type': 'wiki'
+            },
+            {
+                'course_staff_only': False,
+                'name': 'Textbooks',
+                'type': 'textbooks'
+            }
+        ],
+        'xml_attributes': {
+            'filename': [ f'course/{usage_key.run}.xml', f'course/{usage_key.run}.xml']
+        }
+    }
+
+
+class LearningCoreCourseShimWriter:
+    def __init__(self, course_key: CourseKey):
+        self.course_key = course_key
+        self.structure_obj_id = bson.ObjectId()
+
+        self.edited_on = datetime.now(tz=timezone.utc)
+        self.user_id = -1  # This is "the system did it"
+
+    def make_structure(self):
+        structure = self.base_structure()
+
+        context = LearningCoreLearningContext.objects.get(key=self.course_key)
+        blocks = (
+            context.blocks
+                   .select_related(
+                       'entity__published__version__xblockversionfielddata',
+                       'entity__draft__version__xblockversionfielddata',
+                    )
+        )
+        for block in blocks:
+            entity_version = block.entity.published.version
+            if not hasattr(entity_version, 'xblockversionfielddata'):
+                log.error(f"MISSING XBlockVersionFieldData for {block.key}")
+            field_data = entity_version.xblockversionfielddata
+            block_entry = self.base_block_entry(
+                block.key.block_type,
+                block.key.block_id,
+                ObjectId(field_data.definition_object_id),
+            )
+            block_entry['fields'].update(field_data.settings)
+            if field_data.children:
+                block_entry['fields']['children'] = field_data.children
+
+            structure['blocks'].append(block_entry)
+
+        return structure
+
+    def base_structure(self):
+        doc_id = bson.ObjectId()
+
+        return {
+            '_id': doc_id,
+            'blocks': [],
+            'schema_version': 1,  # LOL
+
+            'root': ['course', 'course'],  # Root is always the CourseBlock
+            'edited_by': self.user_id,
+            'edited_on': self.edited_on,
+
+            # We're always going to be the "first" version for now, from Split's
+            # perspective.
+            'previous_version': None,
+            'original_version': doc_id
+        }
+
+    def base_block_entry(self, block_type: str, block_id: str, definition_object_id: ObjectId):
+        return {
+            'asides': {},  # We are *so* not doing asides in this prototype
+            'block_id': block_id,
+            'block_type': block_type,
+            'defaults': {},
+            'fields': {'children': []},  # Even blocks without children are written this way.
+            'definition': definition_object_id,
+            'edit_info': self.base_edit_info()
+        }
+
+    def base_edit_info(self):
+        return {
+            'edited_by': self.user_id,
+            'edited_on': self.edited_on,
+
+            # This is v1 libraries data that we're faking
+            'original_usage': None,
+            'original_usage_vesion': None,
+
+            # Edit history, all of which we're faking
+            'previous_version': None,
+            'source_version': self.structure_obj_id,
+            'update_version': self.structure_obj_id,
+        }

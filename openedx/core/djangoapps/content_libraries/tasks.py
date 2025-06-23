@@ -124,6 +124,11 @@ def wait_for_post_publish_events(publish_log: PublishLog, library_key: LibraryLo
     up to some reasonable timeout, and then finish anything remaining
     asynchonrously.
     """
+    from openedx.core.djangoapps.xblock.api import handle_library_publish
+
+    # Learning Core Shim code (we really want the publish_log)
+    handle_library_publish(publish_log)
+
     # Update the search index (and anything else) for the affected blocks
     result = send_events_after_publish.apply_async(args=(publish_log.pk, str(library_key)))
     # Try waiting a bit for those post-publish events to be handled:

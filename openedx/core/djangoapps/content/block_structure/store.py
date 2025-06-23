@@ -102,6 +102,8 @@ class BlockStructureStore:
         Returns whether the data in storage for the given key is
         already up-to-date with the version in the given modulestore.
         """
+        return False
+
         try:
             bs_model = self._get_model(root_block_usage_key)
             root_block = modulestore.get_item(root_block_usage_key)
