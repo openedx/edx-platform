@@ -120,8 +120,16 @@ def migrate_from_modulestore(
     except ObjectDoesNotExist as exc:
         status.fail(str(exc))
         return
+
+    course_lc_learning_context = None
     if isinstance(source.key, CourseLocator):
         source_root_usage_key = source.key.make_usage_key('course', 'course')
+
+        # Support SplitModuleStore shim from Learning Core, force it off for now because we need to build it using ModuleStore
+        course_lc_learning_context, _created = xblock_models.LearningCoreLearningContext.objects.get_or_create(key=source.key)
+        course_lc_learning_context.use_learning_core = False
+        course_lc_learning_context.save()
+
     elif isinstance(source.key, LibraryLocator):
         source_root_usage_key = source.key.make_usage_key('library', 'library')
     else:
@@ -278,12 +286,10 @@ def migrate_from_modulestore(
     )
     block_migrations = ModulestoreBlockMigration.objects.filter(overall_migration=migration)
 
-    # Support SplitModuleStore shim from Learning Core
-    learning_context, _created = xblock_models.LearningCoreLearningContext.objects.get_or_create(key=source.key)
     xblock_models.Block.objects.bulk_create(
         [
             xblock_models.Block(
-                learning_context=learning_context,
+                learning_context=course_lc_learning_context,
                 key=block_source_key,
                 entity_id=block_target_ver.entity_id,
             )
@@ -321,6 +327,10 @@ def migrate_from_modulestore(
             created_by=user_id,
         )
     status.increment_completed_steps()
+
+    # Now have it use our Learning Core shim for Split instead of Mongo DB
+    course_lc_learning_context.use_learning_core = True
+    course_lc_learning_context.save()
 
 
 @dataclass(frozen=True)

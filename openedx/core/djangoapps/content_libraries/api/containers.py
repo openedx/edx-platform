@@ -289,12 +289,12 @@ def create_container(
         created = datetime.now(tz=timezone.utc)
 
     container: Container
-    _initial_version: ContainerVersion
+    initial_version: ContainerVersion
 
     # Then try creating the actual container:
     match container_type:
         case ContainerType.Unit:
-            container, _initial_version = authoring_api.create_unit_and_version(
+            container, initial_version = authoring_api.create_unit_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -302,7 +302,7 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.Subsection:
-            container, _initial_version = authoring_api.create_subsection_and_version(
+            container, initial_version = authoring_api.create_subsection_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -310,7 +310,7 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.Section:
-            container, _initial_version = authoring_api.create_section_and_version(
+            container, initial_version = authoring_api.create_section_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -318,7 +318,7 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.OutlineRoot:
-            container, _initial_version = authoring_api.create_outline_root_and_version(
+            container, initial_version = authoring_api.create_outline_root_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -328,7 +328,7 @@ def create_container(
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
-    create_xblock_field_data_for_container(_initial_version)
+    create_xblock_field_data_for_container(initial_version)
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
@@ -394,8 +394,6 @@ def update_container(
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
     # Let's add some XBlock data onto the container we just made...
-    ## Dave version.entity_list.entitylistrow_set.all()
-
     create_xblock_field_data_for_container(version)
 
     # Send event related to the updated container
@@ -420,6 +418,12 @@ def update_container(
 from openedx.core.djangoapps.xblock.models import XBlockVersionFieldData
 
 def create_xblock_field_data_for_container(version: ContainerVersion):
+    # this whole thing should be in xblock.api instead of here.
+
+    log.info("Am I even being called?")
+
+    from openedx.core.djangoapps.xblock.models import Block
+
     entity = version.publishable_entity_version.entity
 
     # If this PublishableEntity isn't associated with an Learning Core backed
@@ -430,7 +434,9 @@ def create_xblock_field_data_for_container(version: ContainerVersion):
         log.error("No Block detected???")
         return
 
-    usage_key = entity.block.key
+    parent_block = entity.block
+    container_usage_key = parent_block.key
+    course_key = container_usage_key.course_key
 
     # Generic values for all container types
     content_scoped_fields = {}
@@ -440,16 +446,42 @@ def create_xblock_field_data_for_container(version: ContainerVersion):
     children = []
 
     # Things specific to the course root...
-    if usage_key.block_type == "course":
-        course_key = usage_key.course_key
+    if container_usage_key.block_type == "course":
         content_scoped_fields['license'] = None
         content_scoped_fields['wiki_slug'] = f'{course_key.org}.{course_key.course}.{course_key.run}'
         settings_scoped_fields.update(
-            _course_block_entry(usage_key)
+            _course_block_entry(container_usage_key)
         )
 
     for child_entity_row in version.entity_list.entitylistrow_set.select_related('entity__block').all():
-        child_usage_key = child_entity_row.entity.block.key
+        log.error(f"Iterating children: {child_entity_row.entity}")
+        if not hasattr(child_entity_row.entity, 'block'):
+            # This can happen if we add a new component in a library to a
+            # container that was imported from a course.
+            match(container_usage_key.block_type):
+                case "course":
+                    child_block_type = "chapter"
+                    child_block_id = child_entity_row.entity.key
+                case "chapter":
+                    child_block_type = "sequential"
+                    child_block_id = child_entity_row.entity.key
+                case "sequential":
+                    child_block_type = "vertical"
+                    child_block_id = child_entity_row.entity.key
+                case "vertical":
+                    child_block_type = child_entity_row.entity.component.component_type.name
+                    child_block_id = child_entity_row.entity.component.local_key
+
+            log.info(f"Creating child usage key: {child_usage_key}")
+            child_usage_key = course_key.make_usage_key(child_block_type, child_block_id)
+            child_block = Block.objects.create(
+                learning_context_id=parent_block.learning_context_id,
+                entity=child_entity_row.entity,
+                key=child_usage_key,
+            )
+        else:
+            child_block = child_entity_row.entity.block
+            child_usage_key = child_block.key
         children.append(
             [child_usage_key.block_type, child_usage_key.block_id]
         )
@@ -740,6 +772,8 @@ def update_container_children(
                 )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
+
+    create_xblock_field_data_for_container(new_version)
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
