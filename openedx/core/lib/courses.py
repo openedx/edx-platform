@@ -41,10 +41,8 @@ def course_image_url(course, image_key='course_image'):
 
 def course_organization_image_url(course):
     """Return the course organization image URL or the default image URL."""
-    default_logo_url = settings.STATIC_URL + settings.DEFAULT_ORG_LOGO_PATH
-
     org = Organization.objects.filter(short_name=course.id.org).first()
-    return org.logo.url if org and org.logo else default_logo_url
+    return org.logo.url if org and org.logo else settings.DEFAULT_ORG_LOGO_URL
 
 
 def create_course_image_thumbnail(course, dimensions):
