@@ -14,7 +14,7 @@ from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.courses import course_image_url, course_organization_image_url
 from xmodule.annotator_mixin import html_to_text  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.library_tools import normalize_key_for_search  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -612,6 +612,7 @@ class CourseAboutSearchIndexer(CoursewareSearchIndexer):
             'course': course_id,
             'content': {},
             'image_url': course_image_url(course),
+            'org_image_url': course_organization_image_url(course),
         }
 
         # load data for all of the 'about' blocks for this course into a dictionary
