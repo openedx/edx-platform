@@ -37,8 +37,10 @@ URL_LIB_BLOCK_PUBLISH = URL_LIB_BLOCK + 'publish/'  # Publish changes from a spe
 URL_LIB_BLOCK_OLX = URL_LIB_BLOCK + 'olx/'  # Get or set the OLX of the specified XBlock
 URL_LIB_BLOCK_ASSETS = URL_LIB_BLOCK + 'assets/'  # List the static asset files of the specified XBlock
 URL_LIB_BLOCK_ASSET_FILE = URL_LIB_BLOCK + 'assets/{file_name}'  # Get, delete, or upload a specific static asset file
+URL_LIB_BLOCK_HIERARCHY = URL_LIB_BLOCK + 'hierarchy/'  # Get a library block's full hierarchy
 URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
 URL_LIB_CONTAINER_CHILDREN = URL_LIB_CONTAINER + 'children/'  # Get, add or delete a component in this container
+URL_LIB_CONTAINER_HIERARCHY = URL_LIB_CONTAINER + 'hierarchy/'  # Get a container's full hierarchy
 URL_LIB_CONTAINER_RESTORE = URL_LIB_CONTAINER + 'restore/'  # Restore a deleted container
 URL_LIB_CONTAINER_COLLECTIONS = URL_LIB_CONTAINER + 'collections/'  # Handle associated collections
 URL_LIB_CONTAINER_PUBLISH = URL_LIB_CONTAINER + 'publish/'  # Publish changes to the specified container + children
@@ -464,6 +466,16 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
     def _publish_container(self, container_key: ContainerKey | str, expect_response=200):
         """ Publish all changes in the specified container + children """
         return self._api('post', URL_LIB_CONTAINER_PUBLISH.format(container_key=container_key), None, expect_response)
+
+    def _get_block_hierarchy(self, block_key, expect_response=200):
+        """ Returns the hierarchy of containers that contain the given block """
+        url = URL_LIB_BLOCK_HIERARCHY.format(block_key=block_key)
+        return self._api('get', url, None, expect_response)
+
+    def _get_container_hierarchy(self, container_key, expect_response=200):
+        """ Returns the hierarchy of containers that contain and are contained by the given container """
+        url = URL_LIB_CONTAINER_HIERARCHY.format(container_key=container_key)
+        return self._api('get', url, None, expect_response)
 
     def _create_collection(
         self,

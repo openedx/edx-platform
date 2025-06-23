@@ -347,3 +347,28 @@ class LibraryContainerPublishView(GenericAPIView):
         # If we need to in the future, we could return a list of all the child containers/components that were
         # auto-published as a result.
         return Response({})
+
+
+@method_decorator(non_atomic_requests, name="dispatch")
+@view_auth_classes()
+class LibraryContainerHierarchy(GenericAPIView):
+    """
+    View to return the full hierarchy of containers that contain and are contained by a library container.
+    """
+    serializer_class = serializers.LibraryObjectHierarchySerializer
+
+    @convert_exceptions
+    @swagger_auto_schema(
+        responses={200: serializers.LibraryObjectHierarchySerializer}
+    )
+    def get(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
+        """
+        Fetches and returns the full container hierarchy for the given library block.
+        """
+        api.require_permission_for_library_key(
+            container_key.lib_key,
+            request.user,
+            permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
+        )
+        hierarchy = api.get_library_object_hierarchy(container_key)
+        return Response(self.serializer_class(hierarchy).data)

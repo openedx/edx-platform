@@ -38,6 +38,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
     def setUp(self) -> None:
         super().setUp()
         self.create_date = datetime(2024, 9, 8, 7, 6, 5, tzinfo=timezone.utc)
+        self.modified_date = datetime(2024, 10, 9, 8, 7, 6, tzinfo=timezone.utc)
         self.lib = self._create_library(
             slug="containers",
             title="Container Test Library",
@@ -99,36 +100,45 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         self.problem_block_2 = self._add_block_to_library(self.lib["id"], "problem", "Problem2", can_stand_alone=False)
         self.html_block_2 = self._add_block_to_library(self.lib["id"], "html", "Html2")
 
-        # Add components to `unit_with_components`
-        self._add_container_children(
-            self.unit_with_components["id"],
-            children_ids=[
-                self.problem_block["id"],
-                self.html_block["id"],
-                self.problem_block_2["id"],
-                self.html_block_2["id"],
-            ],
-        )
-        # Add units to `subsection_with_units`
-        self._add_container_children(
-            self.subsection_with_units["id"],
-            children_ids=[
-                self.unit["id"],
+        with freeze_time(self.modified_date):
+            # Add components to `unit_with_components`
+            self._add_container_children(
                 self.unit_with_components["id"],
-                self.unit_2["id"],
-                self.unit_3["id"],
-            ],
-        )
-        # Add subsections to `section_with_subsections`
-        self._add_container_children(
-            self.section_with_subsections["id"],
-            children_ids=[
-                self.subsection["id"],
+                children_ids=[
+                    self.problem_block["id"],
+                    self.html_block["id"],
+                    self.problem_block_2["id"],
+                    self.html_block_2["id"],
+                ],
+            )
+            # Refetch to update modified dates
+            self.unit_with_components = self._get_container(self.unit_with_components["id"])
+
+            # Add units to `subsection_with_units`
+            self._add_container_children(
                 self.subsection_with_units["id"],
-                self.subsection_2["id"],
-                self.subsection_3["id"],
-            ],
-        )
+                children_ids=[
+                    self.unit["id"],
+                    self.unit_with_components["id"],
+                    self.unit_2["id"],
+                    self.unit_3["id"],
+                ],
+            )
+            # Refetch to update modified dates
+            self.subsection_with_units = self._get_container(self.subsection_with_units["id"])
+
+            # Add subsections to `section_with_subsections`
+            self._add_container_children(
+                self.section_with_subsections["id"],
+                children_ids=[
+                    self.subsection["id"],
+                    self.subsection_with_units["id"],
+                    self.subsection_2["id"],
+                    self.subsection_3["id"],
+                ],
+            )
+            # Refetch to update modified dates
+            self.section_with_subsections = self._get_container(self.section_with_subsections["id"])
 
     @ddt.data(
         ("unit", "u1", "Test Unit"),
@@ -565,6 +575,100 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
 
         # Verify the collections
         assert unit_as_read['collections'] == [{"title": col1.title, "key": col1.key}]
+
+    def test_section_hierarchy(self):
+        hierarchy = self._get_container_hierarchy(self.section_with_subsections["id"])
+        assert hierarchy["object_key"] == self.section_with_subsections["id"]
+        assert hierarchy["components"] == [
+            self.problem_block,
+            self.html_block,
+            self.problem_block_2,
+            self.html_block_2,
+        ]
+        assert hierarchy["units"] == [
+            self.unit,
+            self.unit_with_components,
+            self.unit_2,
+            self.unit_3,
+        ]
+        assert hierarchy["subsections"] == [
+            self.subsection,
+            self.subsection_with_units,
+            self.subsection_2,
+            self.subsection_3,
+        ]
+        assert hierarchy["sections"] == [
+            self.section_with_subsections,
+        ]
+
+    def test_subsection_hierarchy(self):
+        hierarchy = self._get_container_hierarchy(self.subsection_with_units["id"])
+        assert hierarchy["object_key"] == self.subsection_with_units["id"]
+        assert hierarchy["components"] == [
+            self.problem_block,
+            self.html_block,
+            self.problem_block_2,
+            self.html_block_2,
+        ]
+        assert hierarchy["units"] == [
+            self.unit,
+            self.unit_with_components,
+            self.unit_2,
+            self.unit_3,
+        ]
+        assert hierarchy["subsections"] == [
+            self.subsection_with_units,
+        ]
+        assert hierarchy["sections"] == [
+            self.section_with_subsections,
+        ]
+
+    def test_units_hierarchy(self):
+        hierarchy = self._get_container_hierarchy(self.unit_with_components["id"])
+        assert hierarchy["object_key"] == self.unit_with_components["id"]
+        assert hierarchy["components"] == [
+            self.problem_block,
+            self.html_block,
+            self.problem_block_2,
+            self.html_block_2,
+        ]
+        assert hierarchy["units"] == [
+            self.unit_with_components,
+        ]
+        assert hierarchy["subsections"] == [
+            self.subsection_with_units,
+        ]
+        assert hierarchy["sections"] == [
+            self.section_with_subsections,
+        ]
+
+    def test_container_hierarchy_not_found(self):
+        self._get_container_hierarchy(
+            "lct:CL-TEST:containers:section:does-not-exist",
+            expect_response=404,
+        )
+
+    def test_block_hierarchy(self):
+        hierarchy = self._get_block_hierarchy(self.problem_block["id"])
+        assert hierarchy["object_key"] == self.problem_block["id"]
+        assert hierarchy["components"] == [
+            self.problem_block,
+        ]
+        assert hierarchy["units"] == [
+            self.unit_with_components,
+        ]
+        assert hierarchy["subsections"] == [
+            self.subsection_with_units,
+        ]
+        assert hierarchy["sections"] == [
+            self.section_with_subsections,
+        ]
+
+    def test_block_hierarchy_not_found(self):
+        self._get_block_hierarchy(
+            "lb:CL-TEST:problem:does-not-exist",
+            expect_response=404,
+        )
 
     def _verify_publish_state(
         self,

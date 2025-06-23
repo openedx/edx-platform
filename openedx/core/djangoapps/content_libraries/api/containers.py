@@ -3,12 +3,13 @@ API for containers (Sections, Subsections, Units) in Content Libraries
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field as dataclass_field
 from datetime import datetime, timezone
 from enum import Enum
 import logging
 from uuid import uuid4
 
+from django.db.models import QuerySet
 from django.utils.text import slugify
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
@@ -26,6 +27,7 @@ from openedx_events.content_authoring.signals import (
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
+from openedx.core.djangoapps.content_libraries.api.block_metadata import LibraryXBlockMetadata
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
@@ -40,6 +42,7 @@ __all__ = [
     # Models
     "ContainerMetadata",
     "ContainerType",
+    "LibraryObjectHierarchy",
     # API methods
     "get_container",
     "create_container",
@@ -52,6 +55,7 @@ __all__ = [
     "update_container_children",
     "get_containers_contains_item",
     "publish_container_changes",
+    "get_library_object_hierarchy",
 ]
 
 log = logging.getLogger(__name__)
@@ -610,3 +614,186 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
     # Update the search index (and anything else) for the affected container + blocks
     # This is mostly synchronous but may complete some work asynchronously if there are a lot of changes.
     tasks.wait_for_post_publish_events(publish_log, library_key)
+
+
+@dataclass(frozen=True, kw_only=True)
+class LibraryObjectHierarchy:
+    """
+    Describes the full ancestry and descendents of a given library object.
+    """
+    sections: list[ContainerMetadata] = dataclass_field(default_factory=list)
+    subsections: list[ContainerMetadata] = dataclass_field(default_factory=list)
+    units: list[ContainerMetadata] = dataclass_field(default_factory=list)
+    components: list[LibraryXBlockMetadata] = dataclass_field(default_factory=list)
+    object_key: LibraryUsageLocatorV2 | LibraryContainerLocator
+
+    def append(
+        self,
+        level: str,
+        *items: Component | Container | LibraryXBlockMetadata | ContainerMetadata,
+    ) -> None:
+        """
+        Appends the metadata for the given items to the given level of the hierarchy.
+        """
+        for item in items:
+            # Convert item to metadata if needed
+            if level == "components":
+                if isinstance(item, Component):
+                    metadata = LibraryXBlockMetadata.from_component(
+                        self.object_key.context_key,
+                        item,
+                    )
+                else:
+                    assert isinstance(item, LibraryXBlockMetadata)
+                    metadata = item
+
+                self.components.append(metadata)
+                continue
+
+            if isinstance(item, Container):
+                metadata = ContainerMetadata.from_container(
+                    self.object_key.context_key,
+                    item,
+                )
+            else:
+                assert isinstance(item, ContainerMetadata)
+                metadata = item
+
+            if level == 'units':
+                self.units.append(metadata)
+            elif level == 'subsections':
+                self.subsections.append(metadata)
+            elif level == 'sections':
+                self.sections.append(metadata)
+            else:
+                raise TypeError(f"Invalid level: {level}")
+
+    @staticmethod
+    def parent_level(level: str | None) -> str | None:
+        """
+        Returns the name of the parent field above the given level,
+        or None if level is already the top level.
+        """
+        match level:
+            case "components":
+                return "units"
+            case "units":
+                return "subsections"
+            case "subsections":
+                return "sections"
+            case _:
+                return None
+
+    @staticmethod
+    def child_level(level: str | None) -> str | None:
+        """
+        Returns the name of the child field below the given level,
+        or None if level is already the lowest level.
+        """
+        match level:
+            case "sections":
+                return "subsections"
+            case "subsections":
+                return "units"
+            case "units":
+                return "components"
+            case _:
+                return None
+
+    @classmethod
+    def create_from_library_object_key(
+        cls,
+        object_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
+    ):
+        """
+        Returns a LibraryObjectHierarchy populated from the library object represented by the given object_key.
+        """
+        root_items: list[Component] | list[Container]
+        root_level: str
+
+        if isinstance(object_key, LibraryUsageLocatorV2):
+            root_items = [get_component_from_usage_key(object_key)]
+            root_level = "components"
+
+        elif isinstance(object_key, LibraryContainerLocator):
+            root_items = [_get_container_from_key(object_key)]
+            root_level = f"{object_key.container_type}s"
+
+        else:
+            raise TypeError(f"Unexpected '{object_key}': must be LibraryUsageLocatorv2 or LibraryContainerLocator")
+
+        # Fill in root level of hierarchy
+        hierarchy = cls(object_key=object_key)
+        items = root_items
+        hierarchy.append(root_level, *items)
+        level: str | None = root_level
+
+        # Fill in hierarchy up through parents
+        while level := hierarchy.parent_level(level):
+            items = list(_get_containers_with_entities(items).all())
+            hierarchy.append(level, *items)
+
+        # Fill in hierarchy down from root_level.
+        if root_level != 'components':  # Components have no children
+            level = root_level
+            children = getattr(hierarchy, level)
+            while level := hierarchy.child_level(level):
+                children = _get_containers_children(children)
+                hierarchy.append(level, *children)
+
+        return hierarchy
+
+
+def _get_containers_with_entities(
+    entities: list[Container] | list[Component],
+    *,
+    ignore_pinned=False,
+) -> QuerySet[Container]:
+    """
+    Find all draft containers that directly contain the given entities.
+
+    Args:
+        entities: iterable list or queryset of PublishableEntities.
+        ignore_pinned: if true, ignore any pinned references to the entity.
+    """
+    qs = Container.objects.none()
+    for entity in entities:
+        qs = qs.union(authoring_api.get_containers_with_entity(
+            entity.publishable_entity.pk,
+            ignore_pinned=ignore_pinned,
+        ))
+    return qs
+
+
+def _get_containers_children(
+    containers: list[ContainerMetadata],
+    *,
+    published=False,
+) -> list[LibraryXBlockMetadata | ContainerMetadata]:
+    """
+    Find all components or containers directly contained by the given containers.
+
+    Args:
+        containers: iterable list or queryset of Containers of the same type.
+        published: `True` if we want the published version of the children, or
+            `False` for the draft version.
+    """
+    children: list[LibraryXBlockMetadata | ContainerMetadata] = []
+    for container in containers:
+        children.extend(
+            get_container_children(
+                container.container_key,
+                published=published,
+            )
+        )
+
+    return children
+
+
+def get_library_object_hierarchy(
+    object_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
+) -> LibraryObjectHierarchy:
+    """
+    Returns the full ancestry and descendents of the library object with the given object_key.
+    """
+    return LibraryObjectHierarchy.create_from_library_object_key(object_key)

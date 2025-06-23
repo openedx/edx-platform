@@ -64,6 +64,8 @@ urlpatterns = [
             path('restore/', blocks.LibraryBlockRestore.as_view()),
             # Update collections for a given component
             path('collections/', blocks.LibraryBlockCollectionsView.as_view(), name='update-collections'),
+            # Get the full hierarchy that the block belongs to
+            path('hierarchy/', blocks.LibraryBlockHierarchy.as_view()),
             # Get the LTI URL of a specific XBlock
             path('lti/', blocks.LibraryBlockLtiUrlView.as_view(), name='lti-url'),
             # Get the OLX source code of the specified block:
@@ -80,6 +82,8 @@ urlpatterns = [
             path('', containers.LibraryContainerView.as_view()),
             # update components under container
             path('children/', containers.LibraryContainerChildrenView.as_view()),
+            # Get the full hierarchy that the container belongs to
+            path('hierarchy/', containers.LibraryContainerHierarchy.as_view()),
             # Restore a soft-deleted container
             path('restore/', containers.LibraryContainerRestore.as_view()),
             # Update collections for a given container
