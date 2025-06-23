@@ -2913,3 +2913,9 @@ SOCIAL_MEDIA_LOGO_URLS = {
     'linkedin': 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png',
     'facebook': 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png',
 }
+
+# .. setting_name: DEFAULT_ORG_LOGO_URL
+# .. setting_default: Derived(lambda settings: settings.STATIC_URL + 'images/logo.png')
+# .. setting_description: The default logo url for organizations that do not have a logo set.
+# .. setting_warning: This url is used as a placeholder for organizations that do not have a logo set.
+DEFAULT_ORG_LOGO_URL = Derived(lambda settings: settings.STATIC_URL + 'images/logo.png')
