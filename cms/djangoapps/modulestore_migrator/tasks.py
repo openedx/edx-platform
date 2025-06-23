@@ -26,12 +26,14 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
     Collection,
     Component,
-    ContainerVersion,
+    Course,
+    CatalogCourse,
     LearningPackage,
     PublishableEntity,
     PublishableEntityVersion,
 )
 from user_tasks.tasks import UserTask, UserTaskStatus
+from xblock.core import XBlock
 
 from openedx.core.djangoapps.content_libraries.api import ContainerType
 from openedx.core.djangoapps.content_libraries import api as libraries_api
@@ -41,8 +43,9 @@ from openedx.core.djangoapps.xblock import models as xblock_models
 
 from xmodule.modulestore import exceptions as modulestore_exceptions
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.mixed import MixedModuleStore
 
-from .constants import CONTENT_STAGING_PURPOSE_TEMPLATE
+from .constants import CONTENT_STAGING_PURPOSE, CONTENT_STAGING_PURPOSE_META, META_BLOCK_TYPES
 from .data import CompositionLevel
 from .models import ModulestoreSource, ModulestoreMigration, ModulestoreBlockSource, ModulestoreBlockMigration
 
@@ -65,6 +68,7 @@ class MigrationStep(Enum):
     PARSING = 'Parsing staged OLX'
     IMPORTING_ASSETS = 'Importing staged files and resources'
     IMPORTING_STRUCTURE = 'Importing staged content structure'
+    IMPORTING_META = 'Importing course info and other meta-components'
     UNSTAGING = 'Cleaning staged content'
     MAPPING_OLD_TO_NEW = 'Saving map of legacy content to migrated content'
     FORWARDING = 'Forwarding legacy content to migrated content'
@@ -112,6 +116,7 @@ def migrate_from_modulestore(
 
     status: UserTaskStatus = self.status
     status.set_state(MigrationStep.VALIDATING_INPUT.value)
+    comp_level = CompositionLevel(composition_level)
     try:
         source = ModulestoreSource.objects.get(pk=source_pk)
         target_package = LearningPackage.objects.get(pk=target_package_pk)
@@ -172,23 +177,37 @@ def migrate_from_modulestore(
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.LOADING)
+    store: MixedModuleStore = modulestore()
     try:
-        legacy_root = modulestore().get_item(source_root_usage_key)
+        legacy_root = store.get_item(source_root_usage_key)
     except modulestore_exceptions.ItemNotFoundError as exc:
         status.fail(f"Failed to load source item '{source_root_usage_key}' from ModuleStore: {exc}")
         return
     if not legacy_root:
         status.fail(f"Could not find source item '{source_root_usage_key}' in ModuleStore")
         return
+    meta_blocks: list[XBlock] = (
+        store.get_items(source.key, qualifiers={"category": {"$in": META_BLOCK_TYPES}})
+        if comp_level == CompositionLevel.CourseRun
+        else []
+    )
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.STAGING.value)
     staged_content = staging_api.stage_xblock_temporarily(
         block=legacy_root,
         user_id=status.user.pk,
-        purpose=CONTENT_STAGING_PURPOSE_TEMPLATE.format(source_key=source.key),
+        purpose=CONTENT_STAGING_PURPOSE,
     )
     migration.staged_content = staged_content
+    staged_meta_contents = [
+        staging_api.stage_xblock_temporarily(
+            block=meta_block,
+            user_id=status.user.pk,
+            purpose=CONTENT_STAGING_PURPOSE_META,
+        )
+        for meta_block in meta_blocks
+    ]
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.PARSING.value)
@@ -197,12 +216,26 @@ def migrate_from_modulestore(
         root_node = etree.fromstring(staged_content.olx, parser=parser)
     except etree.ParseError as exc:
         status.fail(f"Failed to parse source OLX (from staged content with id = {staged_content.id}): {exc}")
+        return
+    meta_nodes = []
+    for staged_meta_content in staged_meta_contents:
+        meta_parser = etree.XMLParser(strip_cdata=False)
+        try:
+            meta_nodes.append(etree.fromstring(staged_meta_content.olx, parser=meta_parser))
+        except etree.ParseError as exc:
+            status.fail(f"Failed to parse source OLX (from staged content with id = {staged_content.id}): {exc}")
+            return
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.IMPORTING_ASSETS.value)
     content_by_filename: dict[str, int] = {}
     now = datetime.now(tz=timezone.utc)
-    for staged_content_file_data in staging_api.get_staged_content_static_files(staged_content.id):
+    all_static_files: list[staging_api.StagedContentFileData] = [
+        static_file
+        for staged in [staged_content, *staged_meta_contents]
+        for static_file in staging_api.get_staged_content_static_files(staged.id)
+    ] 
+    for staged_content_file_data in all_static_files:
         old_path = staged_content_file_data.filename
         file_data = staging_api.get_staged_content_static_file_data(staged_content.id, old_path)
         if not file_data:
@@ -223,19 +256,37 @@ def migrate_from_modulestore(
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.IMPORTING_STRUCTURE.value)
+    now = datetime.now(timezone.utc)
     with authoring_api.bulk_draft_changes_for(migration.target.id) as change_log:
         root_migrated_node = _migrate_node(
             content_by_filename=content_by_filename,
-            source_context_key=source_root_usage_key.course_key,
+            source_context_key=source.key,
             source_node=root_node,
             target_library_key=target_library.library_key,
             target_package_id=target_package_pk,
             replace_existing=replace_existing,
-            composition_level=CompositionLevel(composition_level),
-            created_at=datetime.now(timezone.utc),
-            created_by=status.user_id,
+            composition_level=comp_level,
+            created_at=now,
+            created_by=user_id,
         )
     migration.change_log = change_log
+    status.increment_completed_steps()
+
+    status.set_state(MigrationStep.IMPORTING_META.value)
+    migrated_meta_nodes: list[_MigratedNode] = [
+        _migrate_node(
+            content_by_filename=content_by_filename,
+            source_context_key=source.key,
+            source_node=meta_node,
+            target_package_id=target_package_pk,
+            target_library_key=target_library.library_key,
+            replace_existing=replace_existing,
+            composition_level=comp_level,
+            created_at=now,
+            created_by=user_id,
+        )
+        for meta_node in meta_nodes
+    ]
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.UNSTAGING.value)
@@ -250,8 +301,15 @@ def migrate_from_modulestore(
     #        we did this, we'd want to make sure that the objects are actually visible
     #        to the user mid-import (via django admin, or the library interface, or even just as
     #        as a "progress bar" field in the REST API), otherwise this would be pointless.
+    migrated_umbrella = _MigratedNode(
+        # This is a block-less pseudo-node representing an umbrella containing both
+        # (a) the outline and (b) all the meta blocks. @@TODO this might be too clever
+        # to leave in the production migrator... revisit.
+        source_to_target=None,
+        children=[root_migrated_node, *migrated_meta_nodes],
+    )
     status.set_state(MigrationStep.MAPPING_OLD_TO_NEW.value)
-    block_source_keys_to_target_vers = dict(root_migrated_node.all_source_to_target_pairs())
+    block_source_keys_to_target_vers = dict(migrated_umbrella.all_source_to_target_pairs())
     ModulestoreBlockSource.objects.bulk_create(
         [
             ModulestoreBlockSource(overall_source=source, key=source_usage_key)
@@ -312,6 +370,24 @@ def migrate_from_modulestore(
         # ModulestoreBlockSource.objects.bulk_update(block_sources_to_block_migrations.keys(), ["forwarded"])
         source.forwarded = migration
         source.save()
+        if comp_level == CompositionLevel.CourseRun:
+            catalog_course, _ = CatalogCourse.objects.get_or_create(
+                org_id=source.key.org,
+                course_id=source.key.course,
+            )
+            try:
+                course = Course.objects.get(catalog_course=catalog_course, run=source.key.run)
+            except Course.DoesNotExist:
+                Course.objects.create(
+                    catalog_course=catalog_course,
+                    run=source.key.run,
+                    learning_package=target_package,
+                    outline_root=root_migrated_node.source_to_target[1].entity.container.outlineroot,
+                )
+            else:
+                course.learning_package = target_package
+                course.outline_root = root_migrated_node.source_to_target[1].entity.container.outlineroot
+                course.save()
     status.increment_completed_steps()
 
     status.set_state(MigrationStep.POPULATING_COLLECTION.value)
