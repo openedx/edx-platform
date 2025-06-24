@@ -885,10 +885,10 @@ FEATURES = {
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
     # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the catalog.
-    # .. toggle_use_cases: temporary, open_edx
+    # .. toggle_use_cases: temporary
     # .. toggle_creation_date: 2025-05-15
     # .. toggle_target_removal_date: 2025-11-01
-    'ENABLE_CATALOG_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_CATALOG_MFE", False),
+    'ENABLE_CATALOG_MICROFRONTEND': False,
 
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']

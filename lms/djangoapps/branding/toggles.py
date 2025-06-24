@@ -11,5 +11,5 @@ def use_catalog_mfe():
     Determine if Catalog MFE is enabled, replacing student_dashboard
     """
     return configuration_helpers.get_value(
-        'ENABLE_CATALOG_MICROFRONTEND', settings.FEATURES.get('ENABLE_CATALOG_MICROFRONTEND')
+        'ENABLE_CATALOG_MICROFRONTEND', settings.FEATURES['ENABLE_CATALOG_MICROFRONTEND']
     )
