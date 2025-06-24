@@ -105,6 +105,7 @@ class GradingPolicySerializer(ReadOnlySerializer):
             'short_label': assignment_policy.get('short_label', ''),
             'type': assignment_policy['type'],
             'weight': assignment_policy['weight'],
+            'color': assignment_policy.get('color', None),
         } for assignment_policy in grading_policy['GRADER']]
 
 
