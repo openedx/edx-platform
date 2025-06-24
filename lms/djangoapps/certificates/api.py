@@ -136,14 +136,7 @@ def get_certificate_for_user(username, course_key, format_results=True):
     """
 
     cert = GeneratedCertificate.eligible_certificates.filter(user__username=username, course_id=course_key).first()
-
-    if cert is None:
-        return None
-
-    if format_results:
-        return _format_certificate_for_user(username, cert)
-
-    return cert
+    return _format_certificate_for_user(username, cert) if cert and format_results else cert
 
 
 def get_certificate_for_user_id(user, course_id):
