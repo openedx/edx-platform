@@ -19,6 +19,11 @@ urlpatterns = [
         name="downstreams_list",
     ),
     re_path(
+        r'^downstream-containers/$',
+        downstreams.DownstreamContainerListView.as_view(),
+        name="container_downstreams_list",
+    ),
+    re_path(
         fr'^downstreams/{settings.USAGE_KEY_PATTERN}$',
         downstreams.DownstreamView.as_view(),
         name="downstream"
