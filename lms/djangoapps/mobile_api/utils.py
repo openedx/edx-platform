@@ -14,6 +14,7 @@ def parsed_version(version):
     """ Converts string X.X.X.Y to int tuple (X, X, X) """
     return tuple(map(int, (version.split(".")[:3])))
 
+
 def get_course_organization_logo(course_key):
     """
     Get organization logo of given course key.

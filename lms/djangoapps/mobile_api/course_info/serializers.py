@@ -91,6 +91,7 @@ class CourseInfoOverviewSerializer(serializers.ModelSerializer):
     def get_org_logo(self, course_overview):
         return get_course_organization_logo(course_overview.id)
 
+
 class MobileCourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     Serializer for the CourseEnrollment object used in the BlocksInfoInCourseView.
