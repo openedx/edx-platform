@@ -41,6 +41,7 @@ from common.djangoapps.util.course import (
 from common.djangoapps.util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
 )
+from lms.djangoapps.branding import toggles
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_feature_enabled
 from lms.djangoapps.commerce.utils import EcommerceService
@@ -71,10 +72,14 @@ logger = logging.getLogger(__name__)
 def get_platform_settings():
     """Get settings used for platform level connections: emails, url routes, etc."""
 
+    course_search_url = marketing_link("COURSES")
+    if toggles.catalog_mfe_enabled() and toggles.use_new_catalog_page():
+        course_search_url = f"{settings.CATALOG_MICROFRONTEND_URL}/courses"
+
     return {
         "supportEmail": settings.DEFAULT_FEEDBACK_EMAIL,
         "billingEmail": settings.PAYMENT_SUPPORT_EMAIL,
-        "courseSearchUrl": marketing_link("COURSES"),
+        "courseSearchUrl": course_search_url,
     }
 
 
