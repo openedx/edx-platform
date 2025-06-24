@@ -531,7 +531,7 @@ def generate_certificates_for_students(request, course_key, student_set=None, sp
         "is_regeneration": False
     }
 
-    create_or_update_certificate_generation_history(**cert_filter_args).save()
+    create_or_update_certificate_generation_history(**cert_filter_args)
 
     return instructor_task
 
@@ -560,7 +560,7 @@ def regenerate_certificates(request, course_key, statuses_to_regenerate):
         "is_regeneration": True
     }
 
-    create_or_update_certificate_generation_history(**cert_filter_args).save()
+    create_or_update_certificate_generation_history(**cert_filter_args)
 
     return instructor_task
 
