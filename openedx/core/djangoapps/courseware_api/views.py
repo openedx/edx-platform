@@ -555,7 +555,7 @@ class CoursewareMeta:
         """
         Returns a list of prerequisite courses for the course.
         """
-        return self.course_overview.pre_requisite_courses
+        return get_course_about_section(self.request, self.course, "prerequisites")
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
