@@ -369,6 +369,7 @@ def delete_container(
     library_key = container_key.lib_key
     container = _get_container_from_key(container_key)
 
+    affected_containers = get_containers_contains_item(container_key)
     affected_collections = authoring_api.get_entity_collections(
         container.publishable_entity.learning_package_id,
         container.key,
@@ -393,6 +394,14 @@ def delete_container(
                     collection_key=collection.key,
                 ),
                 background=True,
+            )
+        )
+    # Send events related to the containers that contains the updated container.
+    # This is to update the children display names used in the section/subsection previews.
+    for affected_container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                container_key=affected_container.container_key,
             )
         )
 
