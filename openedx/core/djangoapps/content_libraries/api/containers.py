@@ -27,6 +27,7 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
 
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
+from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from openedx.core.djangoapps.content.outline_roots import api as outline_root_api
 from openedx.core.djangoapps.xblock.api import create_xblock_field_data_for_container, get_component_from_usage_key
 
@@ -171,6 +172,7 @@ class ContainerMetadata(PublishableItem):
             last_draft_created_by = draft.publishable_entity_version.created_by.username
         else:
             last_draft_created_by = ""
+        tags = get_object_tag_counts(str(container_key), count_implicit=True)
 
         return cls(
             container_key=container_key,
@@ -187,6 +189,7 @@ class ContainerMetadata(PublishableItem):
             last_draft_created=last_draft_created,
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=authoring_api.contains_unpublished_changes(container.pk),
+            tags_count=tags.get(str(container_key), 0),
             collections=associated_collections or [],
         )
 
@@ -427,6 +430,7 @@ def delete_container(
     library_key = container_key.lib_key
     container = _get_container_from_key(container_key)
 
+    affected_containers = get_containers_contains_item(container_key)
     affected_collections = authoring_api.get_entity_collections(
         container.publishable_entity.learning_package_id,
         container.key,
@@ -451,6 +455,14 @@ def delete_container(
                     collection_key=collection.key,
                 ),
                 background=True,
+            )
+        )
+    # Send events related to the containers that contains the updated container.
+    # This is to update the children display names used in the section/subsection previews.
+    for affected_container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                container_key=affected_container.container_key,
             )
         )
 
