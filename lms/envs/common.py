@@ -881,6 +881,15 @@ FEATURES = {
     #   toggle does not have a target removal date.
     'ENABLE_AUTHN_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_AUTHN_MFE", False),
 
+    # .. toggle_name: FEATURES['ENABLE_CATALOG_MICROFRONTEND']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the catalog.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2025-05-15
+    # .. toggle_target_removal_date: 2025-11-01
+    'ENABLE_CATALOG_MICROFRONTEND': False,
+
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
     # .. toggle_implementation: DjangoSetting
