@@ -33,11 +33,8 @@ def start_migration_to_library(
     """
     source, _ = ModulestoreSource.objects.get_or_create(key=source_key)
     target_library = get_library(target_library_key)
-    if not (target_package_id := target_library.learning_package_id):
-        raise ValueError(
-            f"Cannot import {source_key} into library at {target_library_key} because the "
-            "library is not connected to a learning package"
-        )
+    # get_library ensures that the library is connected to a learning package.
+    target_package_id: int = target_library.learning_package_id  # type: ignore[assignment]
     target_collection_id = None
     if target_collection_slug:
         target_collection_id = get_collection(target_package_id, target_collection_slug).id
