@@ -869,9 +869,6 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
     'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
-    # Before anything that looks at cookies, especially the session middleware
-    'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
-
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
