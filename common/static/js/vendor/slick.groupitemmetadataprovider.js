@@ -1,185 +1,121 @@
-(function ($) {
-  /***
-   * Provides item metadata for group (Slick.Group) and totals (Slick.Totals) rows produced by the DataView.
-   * This metadata overrides the default behavior and formatting of those rows so that they appear and function
-   * correctly when processed by the grid.
-   *
-   * This class also acts as a grid plugin providing event handlers to expand & collapse groups.
-   * If "grid.registerPlugin(...)" is not called, expand & collapse will not work.
-   *
-   * @class GroupItemMetadataProvider
-   * @module Data
-   * @namespace Slick.Data
-   * @constructor
-   * @param inputOptions
-   */
-  function GroupItemMetadataProvider(inputOptions) {
-    var _grid;
-    var _defaults = {
-      checkboxSelect: false,
-      checkboxSelectCssClass: "slick-group-select-checkbox",
-      checkboxSelectPlugin: null,
-      groupCssClass: "slick-group",
-      groupTitleCssClass: "slick-group-title",
-      totalsCssClass: "slick-group-totals",
-      groupFocusable: true,
-      totalsFocusable: false,
-      toggleCssClass: "slick-group-toggle",
-      toggleExpandedCssClass: "expanded",
-      toggleCollapsedCssClass: "collapsed",
-      enableExpandCollapse: true,
-      groupFormatter: defaultGroupCellFormatter,
-      totalsFormatter: defaultTotalsCellFormatter,
-      includeHeaderTotals: false
-    };
+"use strict";
+(() => {
+  var __defProp = Object.defineProperty;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: !0, configurable: !0, writable: !0, value }) : obj[key] = value;
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key != "symbol" ? key + "" : key, value);
 
-    var options = $.extend(true, {}, _defaults, inputOptions);
-
-    function getOptions(){
-      return options;
+  // src/slick.groupitemmetadataprovider.ts
+  var keyCode = Slick.keyCode, SlickGroup = Slick.Group, Utils = Slick.Utils, SlickGroupItemMetadataProvider = class {
+    constructor(inputOptions) {
+      __publicField(this, "pluginName", "GroupItemMetadataProvider");
+      __publicField(this, "_grid");
+      __publicField(this, "_options");
+      __publicField(this, "_defaults", {
+        checkboxSelect: !1,
+        checkboxSelectCssClass: "slick-group-select-checkbox",
+        checkboxSelectPlugin: null,
+        groupCssClass: "slick-group",
+        groupTitleCssClass: "slick-group-title",
+        totalsCssClass: "slick-group-totals",
+        groupFocusable: !0,
+        totalsFocusable: !1,
+        toggleCssClass: "slick-group-toggle",
+        toggleExpandedCssClass: "expanded",
+        toggleCollapsedCssClass: "collapsed",
+        enableExpandCollapse: !0,
+        groupFormatter: this.defaultGroupCellFormatter.bind(this),
+        totalsFormatter: this.defaultTotalsCellFormatter.bind(this),
+        includeHeaderTotals: !1
+      });
+      this._options = Utils.extend(!0, {}, this._defaults, inputOptions);
     }
-
-    function setOptions(inputOptions) {
-      $.extend(true, options, inputOptions);
+    /** Getter of SlickGrid DataView object */
+    get dataView() {
+      var _a, _b, _c;
+      return (_c = (_b = (_a = this._grid) == null ? void 0 : _a.getData) == null ? void 0 : _b.call(_a)) != null ? _c : {};
     }
-
-    function defaultGroupCellFormatter(row, cell, value, columnDef, item, grid) {
-      if (!options.enableExpandCollapse) {
+    getOptions() {
+      return this._options;
+    }
+    setOptions(inputOptions) {
+      Utils.extend(!0, this._options, inputOptions);
+    }
+    defaultGroupCellFormatter(_row, _cell, _value, _columnDef, item) {
+      var _a;
+      if (!this._options.enableExpandCollapse)
         return item.title;
-      }
-
-      var indentation = item.level * 15 + "px";
-
-      return (options.checkboxSelect ? '<span class="' + options.checkboxSelectCssClass +
-          ' ' + (item.selectChecked ? 'checked' : 'unchecked') + '"></span>' : '') +
-          "<span class='" + options.toggleCssClass + " " +
-          (item.collapsed ? options.toggleCollapsedCssClass : options.toggleExpandedCssClass) +
-          "' style='margin-left:" + indentation +"'>" +
-          "</span>" +
-          "<span class='" + options.groupTitleCssClass + "' level='" + item.level + "'>" +
-            item.title +
-          "</span>";
+      let indentation = `${item.level * 15}px`, toggleClass = item.collapsed ? this._options.toggleCollapsedCssClass : this._options.toggleExpandedCssClass, containerElm = document.createDocumentFragment();
+      this._options.checkboxSelect && containerElm.appendChild(Utils.createDomElement("span", { className: `${this._options.checkboxSelectCssClass} ${item.selectChecked ? "checked" : "unchecked"}` })), containerElm.appendChild(Utils.createDomElement("span", {
+        className: `${this._options.toggleCssClass} ${toggleClass}`,
+        ariaExpanded: String(!item.collapsed),
+        style: { marginLeft: indentation }
+      }));
+      let groupTitleElm = Utils.createDomElement("span", { className: this._options.groupTitleCssClass || "" });
+      return groupTitleElm.setAttribute("level", item.level), item.title instanceof HTMLElement ? groupTitleElm.appendChild(item.title) : this._grid.applyHtmlCode(groupTitleElm, (_a = item.title) != null ? _a : ""), containerElm.appendChild(groupTitleElm), containerElm;
     }
-
-    function defaultTotalsCellFormatter(row, cell, value, columnDef, item, grid) {
-      return (columnDef.groupTotalsFormatter && columnDef.groupTotalsFormatter(item, columnDef, grid)) || "";
+    defaultTotalsCellFormatter(_row, _cell, _value, columnDef, item, grid) {
+      var _a, _b;
+      return (_b = (_a = columnDef == null ? void 0 : columnDef.groupTotalsFormatter) == null ? void 0 : _a.call(columnDef, item, columnDef, grid)) != null ? _b : "";
     }
-
-
-    function init(grid) {
-      _grid = grid;
-      _grid.onClick.subscribe(handleGridClick);
-      _grid.onKeyDown.subscribe(handleGridKeyDown);
-
+    init(grid) {
+      this._grid = grid, this._grid.onClick.subscribe(this.handleGridClick.bind(this)), this._grid.onKeyDown.subscribe(this.handleGridKeyDown.bind(this));
     }
-
-    function destroy() {
-      if (_grid) {
-        _grid.onClick.unsubscribe(handleGridClick);
-        _grid.onKeyDown.unsubscribe(handleGridKeyDown);
+    destroy() {
+      this._grid && (this._grid.onClick.unsubscribe(this.handleGridClick.bind(this)), this._grid.onKeyDown.unsubscribe(this.handleGridKeyDown.bind(this)));
+    }
+    handleGridClick(e, args) {
+      let target = e.target, item = this._grid.getDataItem(args.row);
+      if (item && item instanceof SlickGroup && target.classList.contains(this._options.toggleCssClass || "") && (this.handleDataViewExpandOrCollapse(item), e.stopImmediatePropagation(), e.preventDefault()), item && item instanceof SlickGroup && target.classList.contains(this._options.checkboxSelectCssClass || "")) {
+        item.selectChecked = !item.selectChecked, target.classList.remove(item.selectChecked ? "unchecked" : "checked"), target.classList.add(item.selectChecked ? "checked" : "unchecked");
+        let rowIndexes = this.dataView.mapItemsToRows(item.rows);
+        item.selectChecked ? this._options.checkboxSelectPlugin.selectRows(rowIndexes) : this._options.checkboxSelectPlugin.deSelectRows(rowIndexes);
       }
     }
-
-    function handleGridClick(e, args) {
-      var $target = $(e.target);
-      var item = this.getDataItem(args.row);
-      if (item && item instanceof Slick.Group && $target.hasClass(options.toggleCssClass)) {
-        var range = _grid.getRenderedRange();
-        this.getData().setRefreshHints({
-          ignoreDiffsBefore: range.top,
-          ignoreDiffsAfter: range.bottom + 1
-        });
-
-        if (item.collapsed) {
-          this.getData().expandGroup(item.groupingKey);
-        } else {
-          this.getData().collapseGroup(item.groupingKey);
-        }
-
-        e.stopImmediatePropagation();
-        e.preventDefault();
-      }
-      if (item && item instanceof Slick.Group && $target.hasClass(options.checkboxSelectCssClass)) {
-        item.selectChecked = !item.selectChecked;
-        $target.removeClass((item.selectChecked ? "unchecked" : "checked"));
-        $target.addClass((item.selectChecked ? "checked" : "unchecked"));
-        // get rowIndexes array
-        var rowIndexes = _grid.getData().mapItemsToRows(item.rows);
-        (item.selectChecked ? options.checkboxSelectPlugin.selectRows : options.checkboxSelectPlugin.deSelectRows)(rowIndexes);
-      }
-    }
-
     // TODO:  add -/+ handling
-    function handleGridKeyDown(e, args) {
-      if (options.enableExpandCollapse && (e.which == Slick.keyCode.SPACE)) {
-        var activeCell = this.getActiveCell();
+    handleGridKeyDown(e) {
+      if (this._options.enableExpandCollapse && e.which === keyCode.SPACE) {
+        let activeCell = this._grid.getActiveCell();
         if (activeCell) {
-          var item = this.getDataItem(activeCell.row);
-          if (item && item instanceof Slick.Group) {
-            var range = _grid.getRenderedRange();
-            this.getData().setRefreshHints({
-              ignoreDiffsBefore: range.top,
-              ignoreDiffsAfter: range.bottom + 1
-            });
-
-            if (item.collapsed) {
-              this.getData().expandGroup(item.groupingKey);
-            } else {
-              this.getData().collapseGroup(item.groupingKey);
-            }
-
-            e.stopImmediatePropagation();
-            e.preventDefault();
-          }
+          let item = this._grid.getDataItem(activeCell.row);
+          item && item instanceof SlickGroup && (this.handleDataViewExpandOrCollapse(item), e.stopImmediatePropagation(), e.preventDefault());
         }
       }
     }
-
-    function getGroupRowMetadata(item) {
-      var groupLevel = item && item.level;
+    handleDataViewExpandOrCollapse(item) {
+      let range = this._grid.getRenderedRange();
+      this.dataView.setRefreshHints({
+        ignoreDiffsBefore: range.top,
+        ignoreDiffsAfter: range.bottom + 1
+      }), item.collapsed ? this.dataView.expandGroup(item.groupingKey) : this.dataView.collapseGroup(item.groupingKey);
+    }
+    getGroupRowMetadata(item, _row, _cell) {
+      let groupLevel = item == null ? void 0 : item.level;
       return {
-        selectable: false,
-        focusable: options.groupFocusable,
-        cssClasses: options.groupCssClass + ' slick-group-level-' + groupLevel,
-        formatter: options.includeHeaderTotals && options.totalsFormatter,
+        selectable: !1,
+        focusable: this._options.groupFocusable,
+        cssClasses: `${this._options.groupCssClass} slick-group-level-${groupLevel}`,
+        formatter: this._options.includeHeaderTotals && this._options.totalsFormatter || void 0,
         columns: {
           0: {
-            colspan: options.includeHeaderTotals?"1":"*",
-            formatter: options.groupFormatter,
+            colspan: this._options.includeHeaderTotals ? "1" : "*",
+            formatter: this._options.groupFormatter,
             editor: null
           }
         }
       };
     }
-
-    function getTotalsRowMetadata(item) {
-      var groupLevel = item && item.group && item.group.level;      
+    getTotalsRowMetadata(item, _row, _cell) {
+      var _a;
+      let groupLevel = (_a = item == null ? void 0 : item.group) == null ? void 0 : _a.level;
       return {
-        selectable: false,
-        focusable: options.totalsFocusable,
-        cssClasses: options.totalsCssClass + ' slick-group-level-' + groupLevel,
-        formatter: options.totalsFormatter,
+        selectable: !1,
+        focusable: this._options.totalsFocusable,
+        cssClasses: `${this._options.totalsCssClass} slick-group-level-${groupLevel}`,
+        formatter: this._options.totalsFormatter,
         editor: null
       };
     }
-
-
-    return {
-      "init": init,
-      "destroy": destroy,
-      "getGroupRowMetadata": getGroupRowMetadata,
-      "getTotalsRowMetadata": getTotalsRowMetadata,
-      "getOptions": getOptions,
-      "setOptions": setOptions
-    };
-  }
-
-  // exports
-  $.extend(true, window, {
-    Slick: {
-      Data: {
-        GroupItemMetadataProvider: GroupItemMetadataProvider
-      }
-    }
-  });
-})(jQuery);
+  };
+  window.Slick && (window.Slick.Data = window.Slick.Data || {}, window.Slick.Data.GroupItemMetadataProvider = SlickGroupItemMetadataProvider);
+})();
+//# sourceMappingURL=slick.groupitemmetadataprovider.js.map
