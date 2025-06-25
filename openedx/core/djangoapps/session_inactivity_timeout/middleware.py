@@ -24,7 +24,7 @@ from edx_django_utils import monitoring as monitoring_utils
 LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch_str'
 LAST_SESSION_SAVE_TIME_KEYNAME = 'SessionInactivityTimeout:last_session_save_time'
 
-LOG = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class SessionInactivityTimeout(MiddlewareMixin):
@@ -48,7 +48,7 @@ class SessionInactivityTimeout(MiddlewareMixin):
         # Do we have this feature enabled?
         if timeout_in_seconds:
             # .. setting_name: SESSION_ACTIVITY_SAVE_DELAY_SECONDS
-            # .. setting_default: 15 minutes (in seconds)
+            # .. setting_default: 900 (15 minutes in seconds)
             # .. setting_description: How often to allow a full session save (in seconds).
             #   This controls how frequently the session ID might change.
             #   A user could be inactive for almost SESSION_ACTIVITY_SAVE_DELAY_SECONDS but since their session 
@@ -68,26 +68,22 @@ class SessionInactivityTimeout(MiddlewareMixin):
             # this key will not be present in the session data
             if last_touch_str:
                 try:
-                    # Convert the ISO string back to a datetime object
                     last_touch = datetime.fromisoformat(last_touch_str)
-
-                    # compute the delta since last time user came to the server
                     time_since_last_activity = utc_now - last_touch
 
                     # did we exceed the timeout limit?
-                    if time_since_last_activity > timedelta(seconds=timeout_in_seconds):
-                        # yes? Then log the user out
+                    has_exceeded_timeout_limit = time_since_last_activity > timedelta(seconds=timeout_in_seconds)
+                    if has_exceeded_timeout_limit:
                         del request.session[LAST_TOUCH_KEYNAME]
                         auth.logout(request)
                         return
                 except (ValueError, TypeError) as e:
-                    LOG.debug("Parsing last touch time failed: %s", e)
+                    log.warning("Parsing last touch time failed: %s", e)
                     # If parsing fails, treat as if no timestamp exists
                     pass
             else:
-                # Enable NR tracing for this view based on course
                 monitoring_utils.set_custom_attribute('session_inactivity.first_login', True)
-                LOG.debug("No previous activity timestamp found (first login)")
+                log.debug("No previous activity timestamp found (first login)")
 
             # Store activity timestamp
             request.session[LAST_TOUCH_KEYNAME] = utc_now.isoformat()
