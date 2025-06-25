@@ -19,6 +19,8 @@ from openedx.core import types
 from openedx.core.djangoapps.content.learning_sequences.api.processors.team_partition_groups \
     import TeamPartitionGroupsOutlineProcessor
 
+from openedx_user_groups.processors.user_group_partition_groups import UserGroupPartitionGroupsOutlineProcessor
+
 from ..data import (
     ContentErrorData,
     CourseLearningSequenceData,
@@ -333,6 +335,7 @@ def _get_user_course_outline_and_processors(course_key: CourseKey,  # lint-amnes
         ('enrollment_track_partitions', EnrollmentTrackPartitionGroupsOutlineProcessor),
         ('cohorts_partitions', CohortPartitionGroupsOutlineProcessor),
         ('teams_partitions', TeamPartitionGroupsOutlineProcessor),
+        ('user_groups_partitions', UserGroupPartitionGroupsOutlineProcessor),
     ]
 
     # Run each OutlineProcessor in order to figure out what items we have to

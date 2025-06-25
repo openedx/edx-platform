@@ -250,24 +250,34 @@ class _MergedGroupAccess:
 
     def get_access_denying_partitions(self, user_groups):
         """
-        Arguments:
-            dict[int: Group]: Given a user, a mapping from user
-                partition IDs to the group to which the user belongs in
-                each partition.
+        Get the partitions that are denying access to the user.
+
+        Args:
+            dict[int: Union[Group, list[Group]]]: Given a user, a mapping from
+                user partition IDs to either a single Group or a list of Groups
+                to which the user belongs in each partition.
 
         Returns:
             list of ints: Which partition is denying access
         """
         denied_access = []
         for partition_id, allowed_group_ids in self.get_allowed_groups().items():
-            # If the user is not assigned to a group for this partition,
+            # If the user is not assigned to any group for this partition,
             # return partition as one that would deny access.
             if partition_id not in user_groups:
                 denied_access.append(partition_id)
+                continue
 
-            # If the user does not belong to one of the allowed groups for this
-            # partition, then return this partition as one that would deny access
-            elif user_groups[partition_id].id not in allowed_group_ids:
+            user_partition_groups = user_groups[partition_id]
+            # Convert single group to list for consistent handling
+            if not isinstance(user_partition_groups, list):
+                user_partition_groups = [user_partition_groups]
+
+            # Check if any of the user's groups in this partition are allowed
+            has_allowed_group = any(group.id in allowed_group_ids for group in user_partition_groups)
+
+            # If none of the user's groups are allowed, deny access
+            if not has_allowed_group:
                 denied_access.append(partition_id)
 
         return denied_access
