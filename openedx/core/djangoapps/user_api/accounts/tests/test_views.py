@@ -12,11 +12,13 @@ from urllib.parse import quote
 import ddt
 import pytz
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from common.djangoapps.student.models import PendingEmailChange, UserProfile
 from common.djangoapps.student.models_api import do_name_change_request, get_pending_name_change
@@ -33,6 +35,7 @@ from openedx.core.djangoapps.user_api.accounts.tests.factories import (
     RetirementStateFactory,
     UserRetirementStatusFactory
 )
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_storage
 from openedx.core.djangoapps.user_api.models import UserPreference, UserRetirementStatus
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -400,17 +403,18 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert data['social_links'] is not None
         assert data['time_zone'] is None
 
-    def _verify_private_account_response(self, response, requires_parental_consent=False):
+    def _verify_private_account_response(self, response, requires_parental_consent=False, has_profile_image=True):
         """
         Verify that only the public fields are returned if a user does not want to share account fields
         """
         data = response.data
         assert 3 == len(data)
         assert PRIVATE_VISIBILITY == data['account_privacy']
-        self._verify_profile_image_data(data, not requires_parental_consent)
+        self._verify_profile_image_data(data, has_profile_image)
         assert self.user.username == data['username']
 
-    def _verify_full_account_response(self, response, requires_parental_consent=False, year_of_birth=2000):
+    def _verify_full_account_response(self, response, requires_parental_consent=False,
+                                      has_profile_image=True, year_of_birth=2000):
         """
         Verify that all account fields are returned (even those that are not shareable).
         """
@@ -423,7 +427,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             UserPreference.get_value(self.user, 'account_privacy')
         )
         assert expected_account_privacy == data['account_privacy']
-        self._verify_profile_image_data(data, not requires_parental_consent)
+        self._verify_profile_image_data(data, has_profile_image)
         assert self.user.username == data['username']
 
         # additional shareable fields (8)
@@ -1156,6 +1160,37 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert "Error thrown when saving account updates: 'bummer'" == error_response.data['developer_message']
         assert error_response.data['user_message'] is None
 
+    def test_profile_image_backend(self):
+        # settings file contains the `VIDEO_IMAGE_SETTINGS` but dont'have STORAGE_CLASS
+        # so it returns the default storage.
+        storage = get_profile_image_storage()
+        storage_class = storage.__class__
+        self.assertEqual(
+            settings.PROFILE_IMAGE_BACKEND['class'],
+            f"{storage_class.__module__}.{storage_class.__name__}",
+        )
+        self.assertEqual(storage.base_url, settings.PROFILE_IMAGE_BACKEND['options']['base_url'])
+
+    @override_settings(PROFILE_IMAGE_BACKEND={
+        'class': 'storages.backends.s3boto3.S3Boto3Storage',
+        'options': {
+            'bucket_name': 'test',
+            'default_acl': 'public',
+            'location': 'abc/def'
+        }
+    })
+    def test_profile_backend_with_params(self):
+        storage = get_profile_image_storage()
+        self.assertIsInstance(storage, S3Boto3Storage)
+        self.assertEqual(storage.bucket_name, "test")
+        self.assertEqual(storage.default_acl, 'public')
+        self.assertEqual(storage.location, "abc/def")
+
+    @override_settings(PROFILE_IMAGE_BACKEND={'class': None, 'options': {}})
+    def test_profile_backend_without_backend(self):
+        storage = get_profile_image_storage()
+        self.assertIsInstance(storage, FileSystemStorage)
+
     @override_settings(PROFILE_IMAGE_BACKEND=TEST_PROFILE_IMAGE_BACKEND)
     def test_convert_relative_profile_url(self):
         """
@@ -1169,6 +1204,37 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
                {'has_image': False,
                 'image_url_full': 'http://testserver/static/default_50.png',
                 'image_url_small': 'http://testserver/static/default_10.png'}
+
+    @override_settings(
+        PROFILE_IMAGE_BACKEND={},
+        STORAGES={
+            'profile_image': {
+                'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+                'OPTIONS': {
+                    'bucket_name': 'profiles',
+                    'default_acl': 'public',
+                    'location': 'profile/images',
+                }
+            }
+        }
+    )
+    def test_profile_backend_with_profile_image_settings(self):
+        """ It will use the storages dict with profile_images backend"""
+        storage = get_profile_image_storage()
+        self.assertIsInstance(storage, S3Boto3Storage)
+        self.assertEqual(storage.bucket_name, "profiles")
+        self.assertEqual(storage.default_acl, 'public')
+        self.assertEqual(storage.location, "profile/images")
+
+    @override_settings(
+        PROFILE_IMAGE_BACKEND={},
+    )
+    def test_profile_backend_with_default_hardcoded_backend(self):
+        """ In case of empty storages scenario uses the hardcoded backend."""
+        del settings.DEFAULT_FILE_STORAGE
+        del settings.STORAGES
+        storage = get_profile_image_storage()
+        self.assertIsInstance(storage, FileSystemStorage)
 
     @ddt.data(
         ("client", "user", True),
@@ -1206,11 +1272,11 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             assert data['requires_parental_consent']
             assert PRIVATE_VISIBILITY == data['account_privacy']
         else:
-            self._verify_private_account_response(response, requires_parental_consent=True)
+            self._verify_private_account_response(response, requires_parental_consent=True, has_profile_image=False)
 
         # Verify that the shared view is still private
         response = self.send_get(client, query_parameters='view=shared')
-        self._verify_private_account_response(response, requires_parental_consent=True)
+        self._verify_private_account_response(response, requires_parental_consent=True, has_profile_image=False)
 
 
 @skip_unless_lms
