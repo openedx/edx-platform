@@ -26,6 +26,7 @@ from openedx_events.content_authoring.signals import (
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
+from openedx.core.djangoapps.content.outline_roots import api as outline_root_api
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
@@ -315,7 +316,7 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.OutlineRoot:
-            container, _initial_version = authoring_api.create_outline_root_and_version(
+            container, _initial_version = outline_roots_api.create_outline_root_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -377,7 +378,7 @@ def update_container(
             )
             affected_containers = get_containers_contains_item(container_key)
         case ContainerType.OutlineRoot:
-            version = authoring_api.create_next_outline_root_version(
+            version = outline_roots_api.create_next_outline_root_version(
                 container.outlineroot,
                 title=display_name,
                 created=created,
@@ -607,7 +608,7 @@ def update_container_children(
                 )
         case ContainerType.OutlineRoot:
             subsections = [_get_container_from_key(key).outlineroot for key in children_ids]  # type: ignore[arg-type]
-            new_version = authoring_api.create_next_outline_root_version(
+            new_version = outline_roots_api.create_next_outline_root_version(
                 container.outlineroot,
                 sections=sections,  # type: ignore[arg-type]
                 created=created,

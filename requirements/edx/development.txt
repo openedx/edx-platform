@@ -1380,7 +1380,7 @@ openedx-forum==0.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
--e git+https://github.com/openedx/openedx-learning.git@lc-course-prototype#egg=openedx-learning
+-e git+https://github.com/kdmccormick/openedx-learning.git@kdmccormick/admin#egg=openedx-learning
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
