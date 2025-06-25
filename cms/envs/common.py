@@ -840,7 +840,6 @@ CSRF_COOKIE_SECURE = False
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 CSRF_TRUSTED_ORIGINS = []
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
@@ -1194,6 +1193,10 @@ COURSE_METADATA_EXPORT_BUCKET = ''
 
 ALTERNATE_WORKER_QUEUES = 'lms'
 
+# .. setting_name: STATIC_URL_BASE
+# .. setting_default: "/static/"
+# .. setting_description: The CMS uses this to construct ``STATIC_URL`` by appending
+#   a slash (if needed) and then ``studio/``.
 STATIC_URL_BASE = '/static/'
 
 X_FRAME_OPTIONS = 'DENY'
@@ -2635,12 +2638,6 @@ REGISTRATION_EXTRA_FIELDS = {
 }
 EDXAPP_PARSE_KEYS = {}
 
-############## NOTIFICATIONS EXPIRY ##############
-NOTIFICATIONS_EXPIRY = 60
-EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
-NOTIFICATION_CREATION_BATCH_SIZE = 76
-NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
-
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
 
@@ -2896,6 +2893,14 @@ LIBRARY_ENABLED_BLOCKS = [
     'word_cloud',
 ]
 
+############## NOTIFICATIONS EXPIRY ##############
+NOTIFICATIONS_EXPIRY = 60
+EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
+NOTIFICATION_CREATION_BATCH_SIZE = 76
+NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
+NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
+
+
 SOCIAL_MEDIA_FOOTER_ACE_URLS = {
     'reddit': 'http://www.reddit.com/r/edx',
     'twitter': 'https://twitter.com/edXOnline',
@@ -2909,3 +2914,9 @@ SOCIAL_MEDIA_LOGO_URLS = {
     'linkedin': 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png',
     'facebook': 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png',
 }
+
+# .. setting_name: DEFAULT_ORG_LOGO_URL
+# .. setting_default: Derived(lambda settings: settings.STATIC_URL + 'images/logo.png')
+# .. setting_description: The default logo url for organizations that do not have a logo set.
+# .. setting_warning: This url is used as a placeholder for organizations that do not have a logo set.
+DEFAULT_ORG_LOGO_URL = Derived(lambda settings: settings.STATIC_URL + 'images/logo.png')
