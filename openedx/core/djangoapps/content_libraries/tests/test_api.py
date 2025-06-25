@@ -313,6 +313,14 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest):
             "unit", 'unit-1', 'Unit 1'
         )
 
+        # Create a subsection container
+        self.subsection1 = api.create_container(
+            self.lib1.library_key,
+            api.ContainerType.Subsection,
+            'subsection-1',
+            'Subsection 1',
+            None,
+        )
         # Create some library blocks in lib2
         self.lib2_problem_block = self._add_block_to_library(
             self.lib2.library_key, "problem", "problem2",
@@ -608,12 +616,19 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest):
             ],
         )
 
+        # Add container under another container
+        api.update_container_children(
+            self.subsection1.container_key,
+            [LibraryContainerLocator.from_string(self.unit1["id"])],
+            None,
+        )
         event_receiver = mock.Mock()
         LIBRARY_COLLECTION_UPDATED.connect(event_receiver)
+        LIBRARY_CONTAINER_UPDATED.connect(event_receiver)
 
         api.delete_container(LibraryContainerLocator.from_string(self.unit1["id"]))
 
-        assert event_receiver.call_count == 1
+        assert event_receiver.call_count == 2
         self.assertDictContainsEntries(
             event_receiver.call_args_list[0].kwargs,
             {
@@ -626,6 +641,17 @@ class ContentLibraryCollectionsTest(ContentLibrariesRestApiTest):
                     ),
                     background=True,
                 ),
+            },
+        )
+        self.assertDictContainsEntries(
+            event_receiver.call_args_list[1].kwargs,
+            {
+                "signal": LIBRARY_CONTAINER_UPDATED,
+                "sender": None,
+                "library_container": LibraryContainerData(
+                    container_key=self.subsection1.container_key,
+                    background=False,
+                )
             },
         )
 
