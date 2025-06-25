@@ -37,7 +37,7 @@ from ..api import (
     render_block_view as _render_block_view,
     get_block_olx,
 )
-from ..utils import validate_secure_token_for_xblock_handler
+from ..utils import get_explicitly_set_fields_by_scope, validate_secure_token_for_xblock_handler
 from .url_converters import VersionConverter
 from .serializers import XBlockOlxSerializer
 
@@ -294,7 +294,7 @@ class BlockFieldsView(APIView):
         # fields except "data".
         block_dict = {
             "display_name": get_block_display_name(block),  # note this is also present in metadata
-            "metadata": self.get_explicitly_set_fields_by_scope(block, Scope.settings),
+            "metadata": get_explicitly_set_fields_by_scope(block, Scope.settings),
         }
         if hasattr(block, "data"):
             block_dict["data"] = block.data
@@ -312,8 +312,8 @@ class BlockFieldsView(APIView):
         data = request.data.get("data")
         metadata = request.data.get("metadata")
 
-        old_metadata = self.get_explicitly_set_fields_by_scope(block, Scope.settings)
-        old_content = self.get_explicitly_set_fields_by_scope(block, Scope.content)
+        old_metadata = get_explicitly_set_fields_by_scope(block, Scope.settings)
+        old_content = get_explicitly_set_fields_by_scope(block, Scope.content)
 
         # only update data if it was passed
         if data is not None:
@@ -349,23 +349,8 @@ class BlockFieldsView(APIView):
         block_dict = {
             "id": str(block.usage_key),
             "display_name": get_block_display_name(block),  # note this is also present in metadata
-            "metadata": self.get_explicitly_set_fields_by_scope(block, Scope.settings),
+            "metadata": get_explicitly_set_fields_by_scope(block, Scope.settings),
         }
         if hasattr(block, "data"):
             block_dict["data"] = block.data
         return Response(block_dict)
-
-    def get_explicitly_set_fields_by_scope(self, block, scope=Scope.content):
-        """
-        Get a dictionary of the fields for the given scope which are set explicitly on the given xblock.
-
-        (Including any set to None.)
-        """
-        result = {}
-        for field in block.fields.values():  # lint-amnesty, pylint: disable=no-member
-            if field.scope == scope and field.is_set_on(block):
-                try:
-                    result[field.name] = field.read_json(block)
-                except TypeError as exc:
-                    raise TypeError(f"Unable to read field {field.name} from block {block.usage_key}") from exc
-        return result

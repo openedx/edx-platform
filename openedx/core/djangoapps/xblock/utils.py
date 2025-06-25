@@ -10,6 +10,7 @@ from uuid import uuid4
 
 import crum
 from django.conf import settings
+from xblock.fields import Scope
 
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 
@@ -186,3 +187,19 @@ def get_auto_latest_version(version: int | LatestVersion) -> int | LatestVersion
             else LatestVersion.PUBLISHED
         )
     return version
+
+
+def get_explicitly_set_fields_by_scope(block, scope=Scope.content):
+    """
+    Get a dictionary of the fields for the given scope which are set explicitly on the given xblock.
+
+    (Including any set to None.)
+    """
+    result = {}
+    for field in block.fields.values():  # lint-amnesty, pylint: disable=no-member
+        if field.scope == scope and field.is_set_on(block):
+            try:
+                result[field.name] = field.read_json(block)
+            except TypeError as exc:
+                raise TypeError(f"Unable to read field {field.name} from block {block.usage_key}") from exc
+    return result

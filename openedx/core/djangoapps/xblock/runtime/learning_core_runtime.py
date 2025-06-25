@@ -6,6 +6,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 from urllib.parse import unquote
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -25,9 +26,13 @@ from openedx.core.djangoapps.xblock.api import get_xblock_app_config
 from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_learning_core
 from openedx.core.lib.xblock_serializer.data import StaticFile
 from ..data import AuthoredDataMode, LatestVersion
-from ..utils import get_auto_latest_version
+from ..models import XBlockVersionFieldData
+from ..utils import get_auto_latest_version, get_explicitly_set_fields_by_scope
 from ..learning_context.manager import get_learning_context_impl
 from .runtime import XBlockRuntime
+
+if TYPE_CHECKING:
+    from openedx_learning.api.authoring_models import PublishableEntityVersionMixin
 
 
 log = logging.getLogger(__name__)
@@ -41,6 +46,9 @@ class LearningCoreFieldData(FieldData):
     Any attempt to read or write fields with other scopes will raise a
     ``NotImplementedError``. This class does NOT support the parent and children
     scopes.
+
+    This class includes optimization for loading field data from the
+    XBlockVersionFieldData model to avoid parsing OLX on every block load.
 
     LearningCoreFieldData should only live for the duration of one request. The
     interaction between LearningCoreXBlockRuntime and LearningCoreFieldData is
@@ -110,9 +118,13 @@ class LearningCoreFieldData(FieldData):
         usage_key = block.scope_ids.usage_id
         return self.field_data[usage_key][name]
 
-    def set(self, block, name, value):
+    def set(self, block, name, value) -> bool:
         """
         Set a field for a block to a value.
+
+        Returns:
+            True if the value was changed.
+            False if the field was already set to the same value.
         """
         self._check_field(block, name)
         usage_key = block.scope_ids.usage_id
@@ -121,10 +133,11 @@ class LearningCoreFieldData(FieldData):
         # without doing anything.
         block_fields = self.field_data[usage_key]
         if (name in block_fields) and (block_fields[name] == value):
-            return
+            return False
 
         block_fields[name] = value
         self.changed.add(usage_key)
+        return True
 
     def has_changes(self, block):
         """
@@ -146,8 +159,11 @@ class LearningCoreFieldData(FieldData):
 
     def _check_field(self, block, name):
         """
-        Given a block and the name of one of its fields, check that we will be
-        able to read/write it.
+        Given a block and the name of one of its fields, check that we will be able to read/write it.
+
+        Raises:
+            KeyError: If the field does not exist for the block.
+            NotImplementedError: if the field exists but its scope is not supported.
         """
         field = self._getfield(block, name)
         if field.scope not in (Scope.content, Scope.settings):
@@ -155,6 +171,47 @@ class LearningCoreFieldData(FieldData):
                 f"Scope {field.scope} (field {name} of {block.scope_ids.usage_id}) "
                 "is unsupported. LearningCoreFieldData only supports the content"
                 " and settings scopes."
+            )
+
+    def load_field_data(self, block: XBlock, field_data: XBlockVersionFieldData):
+        """
+        Populate the block with field data from the database.
+
+        Args:
+            block: The XBlock instance to load data into.
+            field_data: The XBlockVersionFieldData instance containing the field data.
+        """
+        for field_name, value in {**field_data.content, **field_data.settings}.items():
+            try:
+                # Use the `set` method to ensure field validation and scope checks.
+                if self.set(block, field_name, value):
+                    # Also set the value in the block instance.
+                    setattr(block, field_name, value)
+            except (KeyError, NotImplementedError):
+                log.warning("Skipping unsupported field %s for block %s", field_name, block.scope_ids.usage_id)
+
+    def save_field_data(self, block: XBlock, component_version: PublishableEntityVersionMixin):
+        """
+        Persist field data to the database model for future loads.
+
+        Args:
+            block: The XBlock instance to extract field data from.
+            component_version: The version to associate with the field data.
+        """
+        content_fields = get_explicitly_set_fields_by_scope(block, Scope.content)
+        settings_fields = get_explicitly_set_fields_by_scope(block, Scope.settings)
+
+        try:
+            XBlockVersionFieldData.objects.create(
+                publishable_entity_version=component_version.publishable_entity_version,
+                content=content_fields,
+                settings=settings_fields,
+            )
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            # This method may be triggered while loading an XBlock, so we don't want to raise an error.
+            log.exception(
+                "Failed to save field data for component version %s: %s",
+                component_version.pk, e,
             )
 
 
@@ -167,14 +224,18 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
     (eventually) asset storage.
     """
 
+    authored_data_store: LearningCoreFieldData
+
     def get_block(self, usage_key, for_parent=None, *, version: int | LatestVersion = LatestVersion.AUTO):
         """
         Fetch an XBlock from Learning Core data models.
 
-        This method will find the OLX for the content in Learning Core, parse it
-        into an XBlock (with mixins) instance, and properly initialize our
-        internal LearningCoreFieldData instance with the field values from the
-        parsed OLX.
+        This method will try to load the field data from the database.
+
+        If the field data is not found, it will find the OLX for the content in Learning Core, parse it into an XBlock
+        (with mixins) instance, and properly initialize our internal LearningCoreFieldData instance with the field
+        values from the parsed OLX. Then, it will save the current field data from the parsed OLX into the database
+        for future loads.
         """
         # We can do this more efficiently in a single query later, but for now
         # just get it the easy way.
@@ -193,36 +254,46 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
         if component_version is None:
             raise NoSuchUsage(usage_key)
 
-        content = component_version.contents.get(
-            componentversioncontent__key="block.xml"
-        )
-        xml_node = etree.fromstring(content.text)
         block_type = usage_key.block_type
         keys = ScopeIds(self.user_id, block_type, None, usage_key)
-
-        if xml_node.get("url_name", None):
-            log.warning("XBlock at %s should not specify an old-style url_name attribute.", usage_key)
-
         block_class = self.mixologist.mix(self.load_block_type(block_type))
 
-        if hasattr(block_class, 'parse_xml_new_runtime'):
-            # This is a (former) XModule with messy XML parsing code; let its parse_xml() method continue to work
-            # as it currently does in the old runtime, but let this parse_xml_new_runtime() method parse the XML in
-            # a simpler way that's free of tech debt, if defined.
-            # In particular, XmlMixin doesn't play well with this new runtime, so this is mostly about
-            # bypassing that mixin's code.
-            # When a former XModule no longer needs to support the old runtime, its parse_xml_new_runtime method
-            # should be removed and its parse_xml() method should be simplified to just call the super().parse_xml()
-            # plus some minor additional lines of code as needed.
-            block = block_class.parse_xml_new_runtime(xml_node, runtime=self, keys=keys)
-        else:
-            block = block_class.parse_xml(xml_node, runtime=self, keys=keys)
+        # Try to load field data from the database.
+        try:
+            field_data = component_version.publishable_entity_version.xblockversionfielddata  # type: ignore
+            block = self.construct_xblock_from_class(block_class, keys)
+            self.authored_data_store.load_field_data(block, field_data)
+
+        # Retrieve field data from XML and save it to the database.
+        except ObjectDoesNotExist:
+            content = component_version.contents.get(
+                componentversioncontent__key="block.xml"
+            )
+            xml_node = etree.fromstring(content.text)
+
+            if xml_node.get("url_name", None):
+                log.warning("XBlock at %s should not specify an old-style url_name attribute.", usage_key)
+
+            if hasattr(block_class, 'parse_xml_new_runtime'):
+                # This is a (former) XModule with messy XML parsing code; let its parse_xml() method continue to work
+                # as it currently does in the old runtime, but let this parse_xml_new_runtime() method parse the XML in
+                # a simpler way that's free of tech debt, if defined.
+                # In particular, XmlMixin doesn't play well with this new runtime, so this is mostly about
+                # bypassing that mixin's code.
+                # When a former XModule no longer needs to support the old runtime, its parse_xml_new_runtime method
+                # should be removed and its parse_xml() method should be simplified to just call the super().parse_xml()
+                # plus some minor additional lines of code as needed.
+                block = block_class.parse_xml_new_runtime(xml_node, runtime=self, keys=keys)
+            else:
+                block = block_class.parse_xml(xml_node, runtime=self, keys=keys)
+
+            # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
+            block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access
+
+            self.authored_data_store.save_field_data(block, component_version)  # type: ignore
 
         # Store the version request on the block so we can retrieve it when needed for generating handler URLs etc.
         block._runtime_requested_version = version  # pylint: disable=protected-access
-
-        # Update field data with parsed values. We can't call .save() because it will call save_block(), below.
-        block.force_save_fields(block._get_fields_to_save())  # pylint: disable=protected-access
 
         # We've pre-loaded the fields for this block, so the FieldData shouldn't
         # consider these values "changed" in its sense of "you have to persist
@@ -304,7 +375,7 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 text=serialized.olx_str,
                 created=now,
             )
-            authoring_api.create_next_version(
+            new_component_version = authoring_api.create_next_version(
                 component.pk,
                 title=block.display_name,
                 content_to_replace={
@@ -313,6 +384,10 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                 created=now,
                 created_by=self.user.id if self.user else None
             )
+
+            # Create the field data record for the new version.
+            self.authored_data_store.save_field_data(block, new_component_version)
+
         self.authored_data_store.mark_unchanged(block)
 
         # Signal that we've modified this block

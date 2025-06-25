@@ -25,10 +25,10 @@ from openedx_events.content_authoring.signals import (
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
+
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 from openedx.core.djangoapps.content.outline_roots import api as outline_root_api
-
-from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
+from openedx.core.djangoapps.xblock.api import create_xblock_field_data_for_container, get_component_from_usage_key
 
 from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
@@ -53,6 +53,9 @@ __all__ = [
     "update_container_children",
     "get_containers_contains_item",
     "publish_container_changes",
+
+    # Hacky XBlock data-for-containers
+    "create_xblock_field_data_for_container",
 ]
 
 log = logging.getLogger(__name__)
@@ -287,12 +290,12 @@ def create_container(
         created = datetime.now(tz=timezone.utc)
 
     container: Container
-    _initial_version: ContainerVersion
+    initial_version: ContainerVersion
 
     # Then try creating the actual container:
     match container_type:
         case ContainerType.Unit:
-            container, _initial_version = authoring_api.create_unit_and_version(
+            container, initial_version = authoring_api.create_unit_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -300,7 +303,7 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.Subsection:
-            container, _initial_version = authoring_api.create_subsection_and_version(
+            container, initial_version = authoring_api.create_subsection_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -308,7 +311,7 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.Section:
-            container, _initial_version = authoring_api.create_section_and_version(
+            container, initial_version = authoring_api.create_section_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -316,7 +319,7 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.OutlineRoot:
-            container, _initial_version = outline_roots_api.create_outline_root_and_version(
+            container, initial_version = outline_roots_api.create_outline_root_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -325,6 +328,8 @@ def create_container(
             )
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
+
+    create_xblock_field_data_for_container(initial_version)
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
@@ -388,6 +393,9 @@ def update_container(
             # not contained in any container.
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
+
+    # Let's add some XBlock data onto the container we just made...
+    create_xblock_field_data_for_container(version)
 
     # Send event related to the updated container
     LIBRARY_CONTAINER_UPDATED.send_event(
@@ -625,6 +633,8 @@ def update_container_children(
                 )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
+
+    create_xblock_field_data_for_container(new_version)
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(

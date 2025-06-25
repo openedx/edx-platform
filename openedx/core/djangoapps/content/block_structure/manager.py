@@ -153,9 +153,11 @@ class BlockStructureManager:
         """
         A context manager for notifying the store of bulk operations.
         """
+        from xmodule.modulestore import ModuleStoreEnum
         try:
             course_key = self.root_block_usage_key.course_key
         except AttributeError:
             course_key = None
-        with self.modulestore.bulk_operations(course_key):
-            yield
+        with self.modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            with self.modulestore.bulk_operations(course_key):
+                yield

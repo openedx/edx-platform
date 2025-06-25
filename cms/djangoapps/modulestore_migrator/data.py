@@ -23,8 +23,15 @@ class CompositionLevel(Enum):
     Section = ContainerType.Section.value
     OutlineRoot = ContainerType.OutlineRoot.value
 
+    # Import the outline root, as well as the weird meta blocks (about,
+    # course_info, static_tab) that exist as parent-less peers of the outline
+    # root, and get/create the Course instance. Unlike the other
+    # CompositionLevels, this level does not correspond to any particular kind of
+    # publishable entity.
+    CourseRun = "course_run"
+
     @property
-    def is_container(self) -> bool:
+    def is_complex(self) -> bool:
         return self is not self.Component
 
     def is_higher_than(self, other: 'CompositionLevel') -> bool:
