@@ -15,7 +15,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFICATION_GROUPING, ENABLE_ACCOUNT_LEVEL_PREFERENCES
+from ..config.waffle import ENABLE_ACCOUNT_LEVEL_PREFERENCES, ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS
 from ..models import CourseNotificationPreference, Notification, NotificationPreference
 from ..tasks import (
     create_notification_pref_if_not_exists,
