@@ -20,6 +20,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils import monitoring as monitoring_utils
+from edx_django_utils.cache import TieredCache
 
 LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch_str'
 LAST_SESSION_SAVE_TIME_KEYNAME = 'SessionInactivityTimeout:last_session_save_time'
@@ -71,7 +72,6 @@ class SessionInactivityTimeout(MiddlewareMixin):
                     last_touch = datetime.fromisoformat(last_touch_str)
                     time_since_last_activity = utc_now - last_touch
 
-                    # did we exceed the timeout limit?
                     has_exceeded_timeout_limit = time_since_last_activity > timedelta(seconds=timeout_in_seconds)
                     if has_exceeded_timeout_limit:
                         del request.session[LAST_TOUCH_KEYNAME]
@@ -82,24 +82,25 @@ class SessionInactivityTimeout(MiddlewareMixin):
                     # If parsing fails, treat as if no timestamp exists
                     pass
             else:
+                # .. custom_attribute_name: session_inactivity.first_login
+                # .. custom_attribute_description: Tracks when users have no stored activity
+                #   timestamp (first access after login).
                 monitoring_utils.set_custom_attribute('session_inactivity.first_login', True)
                 log.debug("No previous activity timestamp found (first login)")
 
-            # Store activity timestamp
-            request.session[LAST_TOUCH_KEYNAME] = utc_now.isoformat()
-
-            # Periodically allow a full save (every n seconds)
-            last_save = request.session.get(LAST_SESSION_SAVE_TIME_KEYNAME)
+            cached_response = TieredCache.get_cached_response(LAST_SESSION_SAVE_TIME_KEYNAME)
+            last_save = cached_response.value if cached_response.is_found else None
             current_time = datetime.utcnow().isoformat()
 
+            # .. custom_attribute_name: session_inactivity.activity_seen
+            # .. custom_attribute_description: Records the timestamp when user activity is detected.
             monitoring_utils.set_custom_attribute('session_inactivity.activity_seen', current_time)
             if not last_save or (
                 datetime.fromisoformat(last_save) + timedelta(seconds=frequency_time_in_seconds) < datetime.utcnow()
             ):
                 # Allow a full session save periodically
-                request.session[LAST_SESSION_SAVE_TIME_KEYNAME] = current_time
+                TieredCache.set_all_tiers(LAST_SESSION_SAVE_TIME_KEYNAME, current_time, frequency_time_in_seconds)
+                # .. custom_attribute_name: session_inactivity.session_extended
+                # .. custom_attribute_description:  Marks when sessions are extended through the periodic save.
                 monitoring_utils.set_custom_attribute('session_inactivity.session_extended', True)
-                # Don't set modified=was_modified here! Let Django save the session
-            else:
-                # Only prevent saving in this branch
-                request.session.modified = False
+                request.session[LAST_TOUCH_KEYNAME] = utc_now.isoformat()
