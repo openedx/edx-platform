@@ -1400,7 +1400,7 @@ openedx-forum==0.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-learning==0.26.0
+openedx-learning @ git+https://github.com/openedx/openedx-learning.git@refs/pull/333/head
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
