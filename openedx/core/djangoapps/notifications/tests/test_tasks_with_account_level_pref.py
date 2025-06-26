@@ -15,7 +15,7 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFICATION_GROUPING, ENABLE_ACCOUNT_LEVEL_PREFERENCES
+from ..config.waffle import ENABLE_ACCOUNT_LEVEL_PREFERENCES, ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS
 from ..models import CourseNotificationPreference, Notification, NotificationPreference
 from ..tasks import (
     create_notification_pref_if_not_exists,
@@ -386,7 +386,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "replier_name": "Replier Name"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(13):
+            with self.assertNumQueries(12):
                 send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                    context, "http://test.url")
 
