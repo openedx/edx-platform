@@ -75,7 +75,7 @@ def reset_course_deadlines(request):
         log.exception('Error occurred while trying to reset deadlines!')
         raise UnableToResetDeadlines from reset_deadlines_exception
 
-    
+
 @api_view(["POST"])
 @authentication_classes(
     (
