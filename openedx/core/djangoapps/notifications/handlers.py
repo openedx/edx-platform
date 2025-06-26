@@ -5,7 +5,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, ProgrammingError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from openedx_events.learning.signals import (
@@ -81,6 +81,11 @@ def create_user_account_preferences(sender, instance, created, **kwargs):  # pyl
                 NotificationPreference.objects.bulk_create(preferences, ignore_conflicts=True)
         except IntegrityError:
             log.info(f'Account-level CourseNotificationPreference already exists for user {instance.id}')
+        except ProgrammingError as e:
+            # This is here because there is a dependency issue in the migrations where
+            # this signal handler tries to run before the NotificationPreference model is created.
+            # In reality, this should never be hit because migrations will have already run.
+            log.error(f'ProgrammingError encountered while creating user preferences: {e}')
 
 
 @receiver(COURSE_UNENROLLMENT_COMPLETED)
