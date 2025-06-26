@@ -1,3 +1,6 @@
+"""
+Tests for course date signals tasks.
+"""
 from unittest.mock import Mock, patch
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -11,7 +14,10 @@ User = get_user_model()
 
 
 class TestUpdateAssignmentDatesForCourse(TestCase):
-    
+    """
+    Tests for the update_assignment_dates_for_course task.
+    """
+
     def setUp(self):
         self.course_key = CourseKey.from_string('course-v1:edX+DemoX+Demo_Course')
         self.course_key_str = str(self.course_key)
