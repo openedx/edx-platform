@@ -15,7 +15,7 @@ from openedx.core.djangoapps.course_date_signals.handlers import (
 )
 from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 
-from openedx.core.djangoapps.course_date_signals import utils
+from . import utils
 
 
 class SelfPacedDueDatesTests(ModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
