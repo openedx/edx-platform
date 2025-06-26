@@ -11,6 +11,7 @@ from opaque_keys.edx.locator import LibraryLocatorV2
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api
 from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrariesRestApiTest
+from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 
 
@@ -45,6 +46,13 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
             description="Units and more",
         )
         self.lib_key = LibraryLocatorV2.from_string(self.lib["id"])
+
+        self.taxonomy = tagging_api.create_taxonomy('New Taxonomy')
+        tagging_api.set_taxonomy_orgs(self.taxonomy, all_orgs=True)
+        tagging_api.add_tag_to_taxonomy(self.taxonomy, "one")
+        tagging_api.add_tag_to_taxonomy(self.taxonomy, "two")
+        tagging_api.add_tag_to_taxonomy(self.taxonomy, "three")
+        tagging_api.add_tag_to_taxonomy(self.taxonomy, "four")
 
         # Create containers
         with freeze_time(self.create_date):
@@ -553,6 +561,24 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
 
         self.assertDictContainsEntries(new_container_data, expected_data)
 
+    @ddt.data(
+        "unit",
+        "subsection",
+        "section",
+    )
+    def test_tag_containers(self, container_type) -> None:
+        container = getattr(self, container_type)
+
+        assert container["tags_count"] == 0
+        tagging_api.tag_object(
+            container["id"],
+            self.taxonomy,
+            ['one', 'three', 'four'],
+        )
+
+        new_container_data = self._get_container(container["id"])
+        assert new_container_data["tags_count"] == 3
+
     def test_unit_collections(self) -> None:
         # Create a collection
         col1 = api.create_library_collection(
@@ -577,7 +603,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert unit_as_read['collections'] == [{"title": col1.title, "key": col1.key}]
 
     def test_section_hierarchy(self):
-        with self.assertNumQueries(272):
+        with self.assertNumQueries(281):
             hierarchy = self._get_container_hierarchy(self.section_with_subsections["id"])
         assert hierarchy["object_key"] == self.section_with_subsections["id"]
         assert hierarchy["components"] == [
@@ -603,7 +629,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         ]
 
     def test_subsection_hierarchy(self):
-        with self.assertNumQueries(179):
+        with self.assertNumQueries(185):
             hierarchy = self._get_container_hierarchy(self.subsection_with_units["id"])
         assert hierarchy["object_key"] == self.subsection_with_units["id"]
         assert hierarchy["components"] == [
@@ -626,7 +652,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         ]
 
     def test_units_hierarchy(self):
-        with self.assertNumQueries(89):
+        with self.assertNumQueries(92):
             hierarchy = self._get_container_hierarchy(self.unit_with_components["id"])
         assert hierarchy["object_key"] == self.unit_with_components["id"]
         assert hierarchy["components"] == [
@@ -652,7 +678,7 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         )
 
     def test_block_hierarchy(self):
-        with self.assertNumQueries(32):
+        with self.assertNumQueries(35):
             hierarchy = self._get_block_hierarchy(self.problem_block["id"])
         assert hierarchy["object_key"] == self.problem_block["id"]
         assert hierarchy["components"] == [
