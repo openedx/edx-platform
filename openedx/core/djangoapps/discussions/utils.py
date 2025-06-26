@@ -5,6 +5,7 @@ import logging
 from typing import Dict, List, Optional, Tuple
 
 from opaque_keys.edx.keys import CourseKey
+from openedx_user_groups.toggles import is_user_groups_enabled
 
 from lms.djangoapps.courseware.access import has_access
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_names, is_course_cohorted
@@ -106,6 +107,8 @@ def available_division_schemes(course_key: CourseKey) -> List[str]:
         available_schemes.append(CourseDiscussionSettings.COHORT)
     if enrollment_track_group_count(course_key) > 1:
         available_schemes.append(CourseDiscussionSettings.ENROLLMENT_TRACK)
+    if is_user_groups_enabled(course_key):
+        available_schemes.append(CourseDiscussionSettings.USER_GROUP)
     return available_schemes
 
 

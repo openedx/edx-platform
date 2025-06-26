@@ -362,6 +362,7 @@ class ThreadSerializer(_ContentSerializer):
     course_id = serializers.CharField()
     topic_id = serializers.CharField(source="commentable_id", validators=[validate_not_blank])
     group_id = serializers.IntegerField(required=False, allow_null=True)
+    user_group_ids = serializers.ListField(required=False, allow_null=True)
     group_name = serializers.SerializerMethodField()
     type = serializers.ChoiceField(
         source="thread_type",

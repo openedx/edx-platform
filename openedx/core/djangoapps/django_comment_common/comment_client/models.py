@@ -340,6 +340,7 @@ class Model:
             "anonymous_to_peers": request_data.get("anonymous_to_peers", False),
             "commentable_id": request_data.get("commentable_id", "course"),
             "thread_type": request_data.get("thread_type", "discussion"),
+            "user_group_ids": request_data.get("user_group_ids", None),
         }
         if group_id := request_data.get("group_id"):
             params["group_id"] = group_id
