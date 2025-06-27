@@ -44,6 +44,7 @@ from openedx.core.djangoapps.user_api.course_tag.api import BulkCourseTags
 from openedx.core.lib.cache_utils import get_cache
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.partitions.partitions_service import PartitionService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.split_test_block import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -823,6 +824,23 @@ class ProblemResponses:
             path.append(block.display_name)
         return list(reversed(path))
 
+    @staticmethod
+    def resolve_problem_descendants(course_key, usage_key):
+        """
+        Return every usage_key of type 'problem' under any block in the course tree.
+        """
+        store = modulestore()
+        problem_keys = []
+        stack = [usage_key]
+        while stack:
+            current_key = stack.pop()
+            block = store.get_item(current_key)
+            if getattr(block, 'category', '') == 'problem':
+                problem_keys.append(current_key)
+            elif hasattr(block, 'children'):
+                stack.extend(getattr(block, 'children', []))
+        return problem_keys
+
     @classmethod
     def _build_problem_list(cls, course_blocks, root, path=None):
         """
@@ -837,7 +855,14 @@ class ProblemResponses:
             Tuple[str, List[str], UsageKey]: tuple of a block's display name, path, and
                 usage key
         """
-        name = course_blocks.get_xblock_field(root, 'display_name') or root.block_type
+        name = course_blocks.get_xblock_field(root, 'display_name')
+        if not name or name == 'problem':
+            # Fallback: try to get display_name from the modulestore
+            try:
+                block = modulestore().get_item(root)
+                name = getattr(block, 'display_name', None) or root.block_type
+            except ItemNotFoundError:
+                name = root.block_type
         if path is None:
             path = [name]
 
@@ -867,10 +892,14 @@ class ProblemResponses:
                 containing the student data which will be included in the
                 final csv, and the features/keys to include in that CSV.
         """
-        usage_keys = [
-            UsageKey.from_string(usage_key_str).map_into_course(course_key)
-            for usage_key_str in usage_key_str_list
-        ]
+        # Recursively collect all descendant 'problem' usage_keys for each input block,
+        # ensuring all problems are included.
+        expanded_usage_keys = []
+        for usage_key_str in usage_key_str_list:
+            usage_key = UsageKey.from_string(usage_key_str).map_into_course(course_key)
+            expanded_usage_keys.extend(cls.resolve_problem_descendants(course_key, usage_key))
+        usage_keys = expanded_usage_keys
+
         user = get_user_model().objects.get(pk=user_id)
 
         student_data = []
