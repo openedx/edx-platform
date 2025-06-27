@@ -145,16 +145,13 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
         allow_empty=True,
         default=list,
     )
-    sidebar_html_enabled = serializers.BooleanField()
-    course_about_section_html = serializers.CharField(
+    about_sidebar_html = serializers.CharField(
         allow_blank=True,
         allow_null=True,
         default=None,
     )
     display_number_with_default = serializers.CharField()
-    org = serializers.CharField(source='display_org_with_default')
-    studio_url = serializers.CharField()
-    is_cosmetic_price_enabled = serializers.BooleanField(default=False)
+    display_org_with_default = serializers.CharField()
     overview = serializers.CharField(
         allow_blank=True,
         allow_null=True,
