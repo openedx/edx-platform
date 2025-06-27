@@ -26,7 +26,7 @@ NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 13
+COURSE_NOTIFICATION_CONFIG_VERSION = 14
 
 
 def get_course_notification_preference_config():
@@ -123,6 +123,29 @@ class Notification(TimeStampedModel):
         Returns the content for the notification.
         """
         return get_notification_content(self.notification_type, self.content_context)
+
+
+class NotificationPreference(TimeStampedModel):
+    """
+    Model to store notification preferences for users at account level
+    """
+    class EmailCadenceChoices(models.TextChoices):
+        DAILY = 'Daily'
+        WEEKLY = 'Weekly'
+        IMMEDIATELY = 'Immediately'
+
+    class Meta:
+        # Ensures user do not have duplicate preferences.
+        unique_together = ('user', 'app', 'type',)
+
+    user = models.ForeignKey(User, related_name="notification_preference", on_delete=models.CASCADE)
+    type = models.CharField(max_length=128, db_index=True)
+    app = models.CharField(max_length=128, null=False, blank=False, db_index=True)
+    web = models.BooleanField(default=True, null=False, blank=False)
+    push = models.BooleanField(default=False, null=False, blank=False)
+    email = models.BooleanField(default=False, null=False, blank=False)
+    email_cadence = models.CharField(max_length=64, choices=EmailCadenceChoices.choices, null=False, blank=False)
+    is_active = models.BooleanField(default=True)
 
 
 class CourseNotificationPreference(TimeStampedModel):

@@ -49,3 +49,13 @@ ENABLE_ORA_GRADE_NOTIFICATION = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.enable_ora
 # .. toggle_warning: When the flag is ON, Notifications Grouping feature is enabled.
 # .. toggle_tickets: INF-1472
 ENABLE_NOTIFICATION_GROUPING = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification_grouping', __name__)
+
+# .. toggle_name: notifications.post_enable_notify_all_learners
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable the notify all learners on discussion post
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2025-06-11
+# .. toggle_warning: When the flag is ON, notification to all learners feature is enabled on discussion post.
+# .. toggle_tickets: INF-1917
+ENABLE_NOTIFY_ALL_LEARNERS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_post_notify_all_learners', __name__)
