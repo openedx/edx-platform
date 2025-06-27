@@ -41,4 +41,5 @@ def send_ace_msg_to_push_channel(audience_ids, notification_object, sender_id):
     message.options['skip_disable_user_policy'] = True
 
     ace.send(message, limit_to_channels=getattr(settings, 'ACE_PUSH_CHANNELS', []))
-    logger.info('Sent mobile notification for %s to ace push channel.', notification_type)
+    log_msg = 'Sent mobile notification for %s to ace push channel. Audience IDs: %s'
+    logger.info(log_msg, notification_type, audience_ids)
