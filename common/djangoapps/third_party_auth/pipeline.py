@@ -787,6 +787,7 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
 
     This association is done ONLY if the user entered the pipeline belongs to SAML provider.
     """
+    from openedx.features.enterprise_support.api import enterprise_is_enabled
 
     def get_user():
         """
@@ -795,6 +796,7 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
         user_details = {'email': details.get('email')} if details else None
         return get_user_from_email(user_details or {})
 
+    @enterprise_is_enabled()
     def associate_by_email_if_enterprise_user():
         """
         If the learner arriving via SAML is already linked to the enterprise customer linked to the same IdP,
