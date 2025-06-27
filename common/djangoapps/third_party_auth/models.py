@@ -13,6 +13,8 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from organizations.models import Organization
@@ -827,6 +829,41 @@ class SAMLProviderConfig(ProviderConfig):
             return other_settings[name]
         raise KeyError
 
+    def get_current_saml_configuration(self):
+        """
+        Get the current active SAMLConfiguration for this provider.
+        Falls back to the default configuration if none is set or if the
+        current one is outdated.
+        """
+        if self.saml_configuration:
+            # Check if we have the current version
+            try:
+                current_config = SAMLConfiguration.current(self.site_id, self.saml_configuration.slug)
+                if current_config and current_config.id != self.saml_configuration_id:
+                    # Our reference is outdated, update it
+                    log.info(
+                        "SAMLProviderConfig '%s' has outdated SAMLConfiguration reference, updating",
+                        self.slug
+                    )
+                    self.saml_configuration = current_config
+                    self.save()
+                    return current_config
+            except Exception:
+                log.warning("Could not fetch current SAMLConfiguration for provider '%s'", self.slug)
+
+            return self.saml_configuration
+
+        # Fall back to default configuration
+        try:
+            default_config = SAMLConfiguration.current(self.site_id, 'default')
+            if default_config:
+                return default_config
+        except Exception:
+            log.warning("Could not fetch default SAMLConfiguration for site %s", self.site_id)
+
+        # No configuration found at all
+        return None
+
     def get_config(self):
         """
         Return a SAMLIdentityProvider instance for use by SAMLAuthBackend.
@@ -881,11 +918,17 @@ class SAMLProviderConfig(ProviderConfig):
         conf['x509cert'] = ''
         conf['url'] = sso_url
 
-        # Add SAMLConfiguration appropriate for this IdP
-        conf['saml_sp_configuration'] = (
-            self.saml_configuration or
-            SAMLConfiguration.current(self.site.id, 'default')
-        )
+        # Add SAMLConfiguration appropriate for this IdP (updated logic)
+        saml_config = self.get_current_saml_configuration()
+        if not saml_config:
+            log.error(
+                'No SAMLConfiguration found for provider "%s" on site %s. '
+                'Create a SAMLConfiguration or check site configuration.',
+                self.name, self.site_id
+            )
+            raise AuthNotConfigured(provider_name=self.name)
+
+        conf['saml_sp_configuration'] = saml_config
         idp_class = get_saml_idp_class(self.identity_provider_type)
         return idp_class(self.slug, **conf)
 

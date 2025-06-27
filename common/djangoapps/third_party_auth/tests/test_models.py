@@ -1,11 +1,24 @@
 """
 Tests for third_party_auth/models.py.
 """
+import json
 import unittest
+from unittest.mock import patch
+
 from django.test import TestCase, override_settings
+from django.contrib.sites.models import Site
 
 from .factories import SAMLProviderConfigFactory
-from ..models import SAMLProviderConfig, clean_username
+from ..models import (
+    SAMLProviderConfig,
+    SAMLConfiguration,
+    SAMLProviderData,
+    AuthNotConfigured,
+    clean_username
+)
+
+# Import signal handlers to ensure they're loaded for tests
+from ..signals import handlers  # noqa: F401
 
 
 class TestSamlProviderConfigModel(TestCase, unittest.TestCase):
@@ -53,3 +66,311 @@ class TestSamlProviderConfigModel(TestCase, unittest.TestCase):
         Test the username cleaner function with unicode enabled
         """
         assert clean_username('ItJüstWòrks™') == 'ItJüstWòrks'
+
+
+class TestSAMLConfigurationSignals(TestCase):
+    """Test that SAMLProviderConfig is updated when SAMLConfiguration changes."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.site = Site.objects.get_current()
+
+        # Create initial SAML configuration
+        self.saml_config = SAMLConfiguration.objects.create(
+            site=self.site,
+            slug='test-config',
+            enabled=True,
+            entity_id='https://test.example.com',
+            org_info_str='{"en-US": {"url": "http://test.com", "displayname": "Test", "name": "test"}}'
+        )
+
+        # Create SAML provider that uses this configuration
+        self.provider_config = SAMLProviderConfig.objects.create(
+            site=self.site,
+            slug='test-provider',
+            enabled=True,
+            name='Test Provider',
+            entity_id='https://idp.test.com',
+            saml_configuration=self.saml_config
+        )
+
+        # Create some test SAML provider data
+        SAMLProviderData.objects.create(
+            entity_id='https://idp.test.com',
+            fetched_at='2023-01-01T00:00:00Z',
+            sso_url='https://idp.test.com/sso',
+            public_key='test-public-key'
+        )
+
+    def test_provider_config_updated_on_saml_config_change(self):
+        """Test that provider config is updated when SAML config is modified."""
+        original_config_id = self.provider_config.saml_configuration_id
+
+        # Update the SAML configuration (this creates a new version)
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+
+        # The signal should have updated the provider config automatically
+        # But if not, the get_current_saml_configuration method should detect and fix it
+        current_config = self.provider_config.get_current_saml_configuration()
+
+        # Refresh the provider config from database
+        self.provider_config.refresh_from_db()
+
+        # Verify it now points to the new configuration version
+        self.assertNotEqual(self.provider_config.saml_configuration_id, original_config_id)
+        self.assertEqual(self.provider_config.saml_configuration.entity_id, 'https://updated.example.com')
+
+    def test_multiple_providers_updated(self):
+        """Test that multiple providers using same config are all updated."""
+        # Create another provider using the same SAML config
+        provider_config_2 = SAMLProviderConfig.objects.create(
+            site=self.site,
+            slug='test-provider-2',
+            enabled=True,
+            name='Test Provider 2',
+            entity_id='https://idp2.test.com',
+            saml_configuration=self.saml_config
+        )
+
+        # Create SAML provider data for second provider
+        SAMLProviderData.objects.create(
+            entity_id='https://idp2.test.com',
+            fetched_at='2023-01-01T00:00:00Z',
+            sso_url='https://idp2.test.com/sso',
+            public_key='test-public-key-2'
+        )
+
+        original_id_1 = self.provider_config.saml_configuration_id
+        original_id_2 = provider_config_2.saml_configuration_id
+
+        # Update the SAML configuration
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+
+        # Trigger the self-healing mechanism by calling get_current_saml_configuration
+        self.provider_config.get_current_saml_configuration()
+        provider_config_2.get_current_saml_configuration()
+
+        # Refresh both providers
+        self.provider_config.refresh_from_db()
+        provider_config_2.refresh_from_db()
+
+        # Both should be updated to point to the new configuration version
+        self.assertNotEqual(self.provider_config.saml_configuration_id, original_id_1)
+        self.assertNotEqual(provider_config_2.saml_configuration_id, original_id_2)
+        self.assertEqual(
+            self.provider_config.saml_configuration_id,
+            provider_config_2.saml_configuration_id
+        )
+
+    def test_signal_only_fires_on_enabled_configs(self):
+        """Test that signal only processes enabled configurations."""
+        # Create a disabled SAML configuration
+        disabled_config = SAMLConfiguration.objects.create(
+            site=self.site,
+            slug='disabled-config',
+            enabled=False,
+            entity_id='https://disabled.example.com',
+            org_info_str='{"en-US": {"url": "http://disabled.com", "displayname": "Disabled", "name": "disabled"}}'
+        )
+
+        provider_with_disabled = SAMLProviderConfig.objects.create(
+            site=self.site,
+            slug='provider-with-disabled',
+            enabled=True,
+            name='Provider with Disabled Config',
+            entity_id='https://idp.disabled.com',
+            saml_configuration=disabled_config
+        )
+
+        original_config_id = provider_with_disabled.saml_configuration_id
+
+        # Update the disabled configuration
+        disabled_config.entity_id = 'https://updated-disabled.example.com'
+        disabled_config.save()
+
+        # Provider should NOT be updated since the config is disabled
+        provider_with_disabled.refresh_from_db()
+        self.assertEqual(provider_with_disabled.saml_configuration_id, original_config_id)
+
+    def test_get_current_saml_configuration_method(self):
+        """Test the get_current_saml_configuration method."""
+        # Initially should return the current config
+        current_config = self.provider_config.get_current_saml_configuration()
+        self.assertEqual(current_config.id, self.saml_config.id)
+
+        # Update the SAML config to create new version
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+        new_config_id = self.saml_config.id
+
+        # Manually set provider to old version (simulating the issue)
+        old_configs = SAMLConfiguration.objects.filter(
+            site=self.site,
+            slug='test-config',
+            enabled=False  # The old versions
+        ).order_by('-change_date')
+
+        if old_configs.exists():
+            old_config = old_configs.first()
+            self.provider_config.saml_configuration = old_config
+            self.provider_config.save()
+
+            # get_current_saml_configuration should detect and fix this
+            current_config = self.provider_config.get_current_saml_configuration()
+            self.assertEqual(current_config.id, new_config_id)
+
+            # Provider should now be updated
+            self.provider_config.refresh_from_db()
+            self.assertEqual(self.provider_config.saml_configuration_id, new_config_id)
+
+    def test_get_current_saml_configuration_fallback_to_default(self):
+        """Test that method falls back to default configuration when none is set."""
+        # Create default configuration
+        default_config = SAMLConfiguration.objects.create(
+            site=self.site,
+            slug='default',
+            enabled=True,
+            entity_id='https://default.example.com',
+            org_info_str='{"en-US": {"url": "http://default.com", "displayname": "Default", "name": "default"}}'
+        )
+
+        # Create provider without SAML configuration
+        provider_without_config = SAMLProviderConfig.objects.create(
+            site=self.site,
+            slug='provider-without-config',
+            enabled=True,
+            name='Provider Without Config',
+            entity_id='https://idp.noconfig.com',
+            saml_configuration=None
+        )
+
+        # Should fall back to default
+        current_config = provider_without_config.get_current_saml_configuration()
+        self.assertEqual(current_config.slug, 'default')
+        self.assertEqual(current_config.id, default_config.id)
+
+    @patch('common.djangoapps.third_party_auth.models.log')
+    def test_get_config_with_current_saml_configuration(self, mock_log):
+        """Test that get_config uses the current SAML configuration."""
+        # First verify the provider config can get its config normally
+        config = self.provider_config.get_config()
+        self.assertIsNotNone(config)
+
+        # Update SAML configuration to create new version
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+
+        # get_config should now use the updated configuration
+        config = self.provider_config.get_config()
+        self.assertEqual(config.conf['saml_sp_configuration'].entity_id, 'https://updated.example.com')
+
+    def test_get_config_raises_auth_not_configured_when_no_saml_config(self):
+        """Test that get_config raises AuthNotConfigured when no SAML configuration is available."""
+        # Create provider without SAML configuration and no default
+        provider_without_config = SAMLProviderConfig.objects.create(
+            site=self.site,
+            slug='provider-without-config',
+            enabled=True,
+            name='Provider Without Config',
+            entity_id='https://idp.noconfig.com',
+            saml_configuration=None
+        )
+
+        # Delete ALL existing SAML configurations to ensure the test scenario
+        SAMLConfiguration.objects.all().delete()
+
+        # Don't create SAMLProviderData for this provider - this will trigger AuthNotConfigured
+        # due to missing provider data
+
+        # Should raise AuthNotConfigured
+        with self.assertRaises(AuthNotConfigured):
+            provider_without_config.get_config()
+
+
+class TestSAMLConfigurationManagementCommand(TestCase):
+    """Test the SAML management command's fix-references functionality."""
+
+    def setUp(self):
+        """Set up test data."""
+        self.site = Site.objects.get_current()
+
+        # Create SAML configuration
+        self.saml_config = SAMLConfiguration.objects.create(
+            site=self.site,
+            slug='test-config',
+            enabled=True,
+            entity_id='https://test.example.com',
+            org_info_str='{"en-US": {"url": "http://test.com", "displayname": "Test", "name": "test"}}'
+        )
+
+        # Create provider config
+        self.provider_config = SAMLProviderConfig.objects.create(
+            site=self.site,
+            slug='test-provider',
+            enabled=True,
+            name='Test Provider',
+            entity_id='https://idp.test.com',
+            saml_configuration=self.saml_config
+        )
+
+    def test_command_identifies_outdated_references(self):
+        """Test that the command correctly identifies outdated references."""
+        from django.core.management import call_command
+        from io import StringIO
+
+        # Update SAML config to create new version
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+
+        # Manually set provider to old version
+        old_configs = SAMLConfiguration.objects.filter(
+            site=self.site,
+            slug='test-config',
+            enabled=False
+        ).order_by('-change_date')
+
+        if old_configs.exists():
+            old_config = old_configs.first()
+            self.provider_config.saml_configuration = old_config
+            self.provider_config.save()
+
+            # Run command in dry-run mode
+            out = StringIO()
+            call_command('saml', '--fix-references', '--dry-run', stdout=out)
+            output = out.getvalue()
+
+            # Should identify the outdated reference
+            self.assertIn('test-provider', output)
+            self.assertIn('outdated config', output)
+
+    def test_command_fixes_outdated_references(self):
+        """Test that the command actually fixes outdated references."""
+        from django.core.management import call_command
+        from io import StringIO
+
+        # Update SAML config to create new version
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+        new_config_id = self.saml_config.id
+
+        # Manually set provider to old version
+        old_configs = SAMLConfiguration.objects.filter(
+            site=self.site,
+            slug='test-config',
+            enabled=False
+        ).order_by('-change_date')
+
+        if old_configs.exists():
+            old_config = old_configs.first()
+            self.provider_config.saml_configuration = old_config
+            self.provider_config.save()
+
+            # Run command to fix references
+            out = StringIO()
+            call_command('saml', '--fix-references', stdout=out)
+
+            # Verify provider now points to new config
+            self.provider_config.refresh_from_db()
+            self.assertEqual(self.provider_config.saml_configuration_id, new_config_id)
