@@ -286,3 +286,107 @@ class TestIndex(SiteMixin, TestCase):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
         assert self.site_configuration_other.site_values['MKTG_URLS']['ROOT'] in response.content.decode('utf-8')
+
+
+@ddt.ddt
+class TestIndexPageConfig(SiteMixin, TestCase):
+    """Test the index_page_config view"""
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("index_page_config")
+
+    def test_index_page_config_default_response(self):
+        """Test index_page_config returns expected default values"""
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response['Content-Type'] == 'application/json'
+
+        config = json.loads(response.content.decode('utf-8'))
+        assert 'enable_course_sorting_by_start_date' in config
+        assert 'homepage_overlay_html' in config
+        assert 'show_partners' in config
+        assert 'show_homepage_promo_video' in config
+        assert 'homepage_course_max' in config
+        assert 'homepage_promo_video_youtube_id' in config
+
+        # Test default values
+        assert config['show_partners'] is True
+        assert config['show_homepage_promo_video'] is False
+        assert config['homepage_promo_video_youtube_id'] == 'your-youtube-id'
+        assert config['enable_course_sorting_by_start_date'] == settings.FEATURES.get(
+            'ENABLE_COURSE_SORTING_BY_START_DATE'
+        )
+        assert config['homepage_course_max'] == settings.HOMEPAGE_COURSE_MAX
+
+    @ddt.data(
+        ('ENABLE_COURSE_SORTING_BY_START_DATE', True),
+        ('ENABLE_COURSE_SORTING_BY_START_DATE', False),
+        ('homepage_overlay_html', '<p>Test overlay</p>'),
+        ('show_partners', False),
+        ('show_homepage_promo_video', True),
+        ('HOMEPAGE_COURSE_MAX', 5),
+        ('homepage_promo_video_youtube_id', 'test-youtube-id')
+    )
+    @ddt.unpack
+    def test_index_page_config_with_site_configuration(self, key, value):
+        """Test index_page_config returns values from site configuration"""
+        # Configure site with the test value
+        self.use_site(self.site)
+        site_dict = {key: value}
+        self.site_configuration.site_values.update(site_dict)
+        self.site_configuration.save()
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+
+        config = json.loads(response.content.decode('utf-8'))
+
+        # Convert keys to the response format if needed
+        response_key = key
+        if key == 'ENABLE_COURSE_SORTING_BY_START_DATE':
+            response_key = 'enable_course_sorting_by_start_date'
+        elif key == 'HOMEPAGE_COURSE_MAX':
+            response_key = 'homepage_course_max'
+
+        assert config[response_key] == value
+
+    def test_config_falls_back_to_settings(self):
+        """Test that the configuration falls back to settings when not in site configuration"""
+        self.use_site(self.site)
+        self.site_configuration.site_values.clear()
+        self.site_configuration.save()
+
+        with mock.patch.dict(settings.FEATURES, {'ENABLE_COURSE_SORTING_BY_START_DATE': False}):
+            with mock.patch.object(settings, 'HOMEPAGE_COURSE_MAX', 10):
+                response = self.client.get(self.url)
+                config = json.loads(response.content.decode('utf-8'))
+                assert config['enable_course_sorting_by_start_date'] is False
+                assert config['homepage_course_max'] == 10
+
+    @mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_value')
+    def test_all_values_from_config_helpers(self, mock_get_value):
+        """Test that all values come from configuration helpers if available"""
+        # Setup mock to return different values for different keys
+        def side_effect(key, default=None):
+            config_values = {
+                'ENABLE_COURSE_SORTING_BY_START_DATE': True,
+                'homepage_overlay_html': '<h1>Custom Overlay</h1>',
+                'show_partners': False,
+                'show_homepage_promo_video': True,
+                'HOMEPAGE_COURSE_MAX': 7,
+                'homepage_promo_video_youtube_id': 'custom-youtube-id'
+            }
+            return config_values.get(key, default)
+
+        mock_get_value.side_effect = side_effect
+
+        response = self.client.get(self.url)
+        config = json.loads(response.content.decode('utf-8'))
+
+        assert config['enable_course_sorting_by_start_date'] is True
+        assert config['homepage_overlay_html'] == '<h1>Custom Overlay</h1>'
+        assert config['show_partners'] is False
+        assert config['show_homepage_promo_video'] is True
+        assert config['homepage_course_max'] == 7
+        assert config['homepage_promo_video_youtube_id'] == 'custom-youtube-id'
