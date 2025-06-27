@@ -1426,6 +1426,12 @@ class TestNotificationPreferencesView(APITestCase):
                             "push": True,
                             "email_cadence": "Daily"
                         },
+                        "new_instructor_all_learners_post": {
+                            "web": True,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
                         "core": {
                             "web": True,
                             "email": True,
@@ -1538,6 +1544,12 @@ class TestNotificationPreferencesView(APITestCase):
                             "email_cadence": "Daily"
                         },
                         "content_reported": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "new_instructor_all_learners_post": {
                             "web": False,
                             "email": False,
                             "push": False,
