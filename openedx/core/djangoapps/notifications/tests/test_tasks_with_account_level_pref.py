@@ -15,8 +15,8 @@ from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFICATION_GROUPING
-from ..models import CourseNotificationPreference, Notification
+from ..config.waffle import ENABLE_ACCOUNT_LEVEL_PREFERENCES, ENABLE_NOTIFICATION_GROUPING, ENABLE_NOTIFICATIONS
+from ..models import CourseNotificationPreference, Notification, NotificationPreference
 from ..tasks import (
     create_notification_pref_if_not_exists,
     delete_notifications,
@@ -27,6 +27,7 @@ from .utils import create_notification
 
 
 @patch('openedx.core.djangoapps.notifications.models.COURSE_NOTIFICATION_CONFIG_VERSION', 1)
+@override_waffle_flag(ENABLE_ACCOUNT_LEVEL_PREFERENCES, active=True)
 class TestNotificationsTasks(ModuleStoreTestCase):
     """
     Tests for notifications tasks.
@@ -91,6 +92,7 @@ class TestNotificationsTasks(ModuleStoreTestCase):
 
 
 @ddt.ddt
+@override_waffle_flag(ENABLE_ACCOUNT_LEVEL_PREFERENCES, active=True)
 class SendNotificationsTest(ModuleStoreTestCase):
     """
     Tests for send_notifications.
@@ -186,6 +188,15 @@ class SendNotificationsTest(ModuleStoreTestCase):
         app_prefs['notification_types']['core']['email'] = False
         app_prefs['notification_types']['core']['push'] = False
         preference.save()
+        account_preferences, __created = NotificationPreference.objects.get_or_create(
+            user_id=self.user.id,
+            app=app_name,
+            type=notification_type,
+        )
+        account_preferences.web = False
+        account_preferences.email = False
+        account_preferences.push = False
+        account_preferences.save()
 
         send_notifications([self.user.id], str(self.course_1.id), app_name, notification_type, context, content_url)
         self.assertEqual(len(Notification.objects.all()), 0)
@@ -201,6 +212,14 @@ class SendNotificationsTest(ModuleStoreTestCase):
             ['notification_types']['new_discussion_post']['web']
         ) = True
         self.preference_v1.save()
+
+        account_preferences, __created = NotificationPreference.objects.get_or_create(
+            user_id=self.user.id,
+            app='discussion',
+            type='new_discussion_post',
+        )
+        account_preferences.web = True
+        account_preferences.save()
         with patch('openedx.core.djangoapps.notifications.tasks.group_user_notifications') as user_notifications_mock:
             context = {
                 'post_title': 'Test Post',
@@ -228,6 +247,9 @@ class SendNotificationsTest(ModuleStoreTestCase):
             user_notifications_mock.assert_called_once()
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @patch.dict("openedx.core.djangoapps.notifications.tasks.COURSE_NOTIFICATION_APPS", {
+        "discussion": {'enabled': False}
+    })
     @ddt.data(
         ('discussion', 'new_comment_on_response'),  # core notification
         ('discussion', 'new_response'),  # non core notification
@@ -262,6 +284,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
 
 
 @ddt.ddt
+@override_waffle_flag(ENABLE_ACCOUNT_LEVEL_PREFERENCES, active=True)
 class SendBatchNotificationsTest(ModuleStoreTestCase):
     """
     Test that notification and notification preferences are created in batches
@@ -292,9 +315,9 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.data(
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 11, 5),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 13, 8),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 11, 5),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 11, 4),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 13, 6),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 11, 4),
     )
     @ddt.unpack
     def test_notification_is_send_in_batch(self, creation_size, prefs_query_count, notifications_query_count):
@@ -408,6 +431,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         self.assertEqual(len(Notification.objects.all()), generated_count)
 
 
+@override_waffle_flag(ENABLE_ACCOUNT_LEVEL_PREFERENCES, active=True)
 class TestDeleteNotificationTask(ModuleStoreTestCase):
     """
     Tests delete_notification_function
@@ -497,6 +521,13 @@ class NotificationCreationOnChannelsTests(ModuleStoreTestCase):
             course_id=self.course.id,
             config_version=0,
         )
+        self.account_preference, __created = NotificationPreference.objects.get_or_create(
+            user_id=self.user.id,
+            app='discussion',
+            type='new_discussion_post',
+            web=False,
+            email=False,
+        )
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.data(
@@ -527,6 +558,44 @@ class NotificationCreationOnChannelsTests(ModuleStoreTestCase):
             },
         }
         self.preference.save()
+        with patch('openedx.core.djangoapps.notifications.tasks.notification_generated_event') as event_mock:
+            send_notifications(**kwargs)
+            notifications = Notification.objects.all()
+            assert len(notifications) == generated_count
+            if notifications:
+                notification = Notification.objects.all()[0]
+                assert notification.web == web_value
+                assert notification.email == email_value
+
+    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @override_waffle_flag(ENABLE_ACCOUNT_LEVEL_PREFERENCES, active=True)
+    @ddt.data(
+        (False, False, 0),
+        (False, True, 1),
+        (True, False, 1),
+        (True, True, 1),
+    )
+    @ddt.unpack
+    def test_notification_is_created_when_any_channel_is_account_level(self, web_value, email_value, generated_count):
+        """
+        Tests if notification is created if any preference is enabled on account level preferences
+        """
+        app_name = 'discussion'
+        notification_type = 'new_discussion_post'
+        self.account_preference.web = web_value
+        self.account_preference.email = email_value
+        self.account_preference.save()
+        kwargs = {
+            'user_ids': [self.user.id],
+            'course_key': str(self.course.id),
+            'app_name': app_name,
+            'notification_type': notification_type,
+            'content_url': 'https://example.com/',
+            'context': {
+                'post_title': 'Post title',
+                'username': 'user name',
+            },
+        }
         with patch('openedx.core.djangoapps.notifications.tasks.notification_generated_event') as event_mock:
             send_notifications(**kwargs)
             notifications = Notification.objects.all()
