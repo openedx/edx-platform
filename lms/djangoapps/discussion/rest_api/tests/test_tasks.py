@@ -190,35 +190,46 @@ class TestNewThreadCreatedNotification(DiscussionAPIViewTestMixin, ModuleStoreTe
         """
 
     @ddt.data(
-        ('new_question_post', False),
-        ('new_discussion_post', False),
-        ('new_discussion_post', True),
+        ('new_question_post', False, False),
+        ('new_discussion_post', False, False),
+        ('new_discussion_post', True, True),
+        ('new_discussion_post', True, False),
     )
     @ddt.unpack
-    @mock.patch('lms.djangoapps.discussion.rest_api.utils.can_user_notify_all_learners', return_value=True)
-    @override_waffle_flag(ENABLE_NOTIFY_ALL_LEARNERS, active=True)
     def test_notification_is_send_to_all_enrollments(
-        self, notification_type, notify_all_learners, mock_notify_all_learners
+        self, notification_type, notify_all_learners, waffle_flag_enabled
     ):
         """
         Tests notification is sent to all users if course is not cohorted
         """
         self._assign_enrollments()
         thread_type = (
-            "discussion"
-            if notification_type == "new_discussion_post"
-            else ("question" if notification_type == "new_question_post" else "")
+            "discussion" if notification_type == "new_discussion_post" else "question"
         )
-        thread = self._create_thread(thread_type=thread_type)
-        handler = mock.Mock()
-        COURSE_NOTIFICATION_REQUESTED.connect(handler)
-        send_thread_created_notification(thread['id'], str(self.course.id), self.author.id, notify_all_learners)
-        self.assertEqual(handler.call_count, 1)
-        course_notification_data = handler.call_args[1]['course_notification_data']
-        assert course_notification_data.notification_type == 'new_instructor_all_learners_post' if notify_all_learners \
-            else notification_type
-        notification_audience_filters = {}
-        assert notification_audience_filters == course_notification_data.audience_filters
+
+        with override_waffle_flag(ENABLE_NOTIFY_ALL_LEARNERS, active=waffle_flag_enabled):
+            thread = self._create_thread(thread_type=thread_type)
+            handler = mock.Mock()
+            COURSE_NOTIFICATION_REQUESTED.connect(handler)
+
+            send_thread_created_notification(
+                thread['id'],
+                str(self.course.id),
+                self.author.id,
+                notify_all_learners
+            )
+            expected_handler_calls = 0 if notify_all_learners and not waffle_flag_enabled else 1
+            self.assertEqual(handler.call_count, expected_handler_calls)
+
+            if handler.call_count:
+                course_notification_data = handler.call_args[1]['course_notification_data']
+                expected_type = (
+                    'new_instructor_all_learners_post'
+                    if notify_all_learners and waffle_flag_enabled
+                    else notification_type
+                )
+                self.assertEqual(course_notification_data.notification_type, expected_type)
+                self.assertEqual(course_notification_data.audience_filters, {})
 
     @ddt.data(
         ('cohort_1', 'new_question_post'),

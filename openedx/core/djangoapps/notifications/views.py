@@ -26,7 +26,7 @@ from openedx.core.djangoapps.notifications.serializers import add_info_to_notifi
 from openedx.core.djangoapps.user_api.models import UserPreference
 
 from .base_notification import COURSE_NOTIFICATION_APPS
-from .config.waffle import ENABLE_NOTIFICATIONS
+from .config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
 from .events import (
     notification_preference_update_event,
     notification_preferences_viewed_event,
@@ -45,8 +45,7 @@ from .serializers import (
 from .utils import (
     aggregate_notification_configs,
     filter_out_visible_preferences_by_course_ids,
-    get_show_notifications_tray,
-    remove_disabled_flagged_notifications
+    get_show_notifications_tray
 )
 
 
@@ -614,10 +613,12 @@ class AggregatedNotificationPreferences(APIView):
 
         notification_preferences_viewed_event(request)
         notification_configs = add_info_to_notification_config(notification_configs)
-        remove_disabled_flagged_notifications(
-            notification_configs,
-            course_ids
-        )
+
+        discussion_config = notification_configs.get('discussion', {})
+        notification_types = discussion_config.get('notification_types', {})
+
+        if not any(ENABLE_NOTIFY_ALL_LEARNERS.is_enabled(course_key) for course_key in course_ids):
+            notification_types.pop('new_instructor_all_learners_post', None)
 
         return Response({
             'status': 'success',

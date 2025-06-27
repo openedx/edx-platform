@@ -8,7 +8,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -119,44 +119,6 @@ def filter_out_visible_notifications(
     return user_preferences
 
 
-def filter_out_flagged_notifications(
-    user_preferences: dict,
-    waffle_flags: dict,
-    course_id
-) -> dict:
-    """
-    Removes flagged notification types from user preferences
-    only if their waffle flag is disabled for the course.
-    """
-    flagged_types = set(waffle_flags.keys())
-    for user_preferences_app, app_config in user_preferences.items():
-        notification_types = app_config.get('notification_types', {})
-        for notif_type in set(notification_types.keys()) & flagged_types:
-            flag = waffle_flags[notif_type]
-            if not flag.is_enabled(CourseKey.from_string(course_id)):
-                if notif_type in user_preferences[user_preferences_app]['notification_types']:
-                    user_preferences[user_preferences_app]['notification_types'].pop(notif_type)
-
-    return user_preferences
-
-
-@request_cached()
-def get_notification_types_with_waffle_flag() -> Dict[str, str]:
-    """
-    Get notification types with their waffle flag
-
-    :return: List of dictionaries with notification type names and corresponding waffle flag
-    """
-    from .base_notification import COURSE_NOTIFICATION_TYPES
-
-    notification_types_with_flags = {}
-    for notification_type in COURSE_NOTIFICATION_TYPES.values():
-        if notification_type.get('waffle_flag'):
-            notification_types_with_flags[notification_type['name']] = notification_type['waffle_flag']
-
-    return notification_types_with_flags
-
-
 def remove_preferences_with_no_access(preferences: dict, user) -> dict:
     """
     Filter out notifications visible to forum roles from user preferences.
@@ -168,7 +130,6 @@ def remove_preferences_with_no_access(preferences: dict, user) -> dict:
     user_preferences = preferences['notification_preference_config']
     user_forum_roles = get_user_forum_roles(user.id, preferences['course_id'])
     notifications_with_visibility_settings = get_notification_types_with_visibility_settings()
-    notifications_with_waffle_flag = get_notification_types_with_waffle_flag()
     user_course_roles = CourseAccessRole.objects.filter(
         user=user,
         course_id=preferences['course_id']
@@ -181,11 +142,13 @@ def remove_preferences_with_no_access(preferences: dict, user) -> dict:
         user_course_roles
     )
 
-    preferences['notification_preference_config'] = filter_out_flagged_notifications(
-        user_preferences,
-        notifications_with_waffle_flag,
-        course_id=preferences['course_id']
-    )
+    course_key = CourseKey.from_string(preferences['course_id'])
+    discussion_config = user_preferences.get('discussion', {})
+    notification_types = discussion_config.get('notification_types', {})
+
+    if notification_types and not ENABLE_NOTIFY_ALL_LEARNERS.is_enabled(course_key):
+        notification_types.pop('new_instructor_all_learners_post', None)
+
     return preferences
 
 
@@ -328,23 +291,3 @@ def filter_out_visible_preferences_by_course_ids(user, preferences: Dict, course
         forum_roles,
         course_roles
     )
-
-
-def remove_disabled_flagged_notifications(preferences: Dict, course_keys: List[CourseKey]) -> Dict:
-    """
-    Remove notification types from preferences if their corresponding flag is disabled
-    for all given course_ids.
-    """
-    flagged_notifications = get_notification_types_with_waffle_flag()
-
-    for app_name, prefs in preferences.items():
-        notification_types = prefs.get('notification_types', {})
-
-        for notification_type in list(notification_types.keys()):
-            flag = flagged_notifications.get(notification_type)
-            if flag:
-                is_enabled_any = any(flag.is_enabled(course_key) for course_key in course_keys)
-                if not is_enabled_any:
-                    notification_types.pop(notification_type, None)
-
-    return preferences
