@@ -368,6 +368,7 @@ class Model:
             thread_type=request_data.get("thread_type", "discussion"),
             group_id=request_data.get("group_id", None),
             context=request_data.get("context", None),
+            user_group_ids=request_data.get("user_group_ids", None),
         )
         return response
 
