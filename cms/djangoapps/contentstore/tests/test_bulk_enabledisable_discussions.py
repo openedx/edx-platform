@@ -85,7 +85,7 @@ class BulkEnableDisableDiscussionsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         print(response_data)
-        self.assertEqual(response_data['updated_and_republished'], 0 if is_enabled else 2)
+        self.assertEqual(response_data['units_updated_and_republished'], 0 if is_enabled else 2)
 
         # Check that all verticals now have discussion_enabled set to the expected value
         with self.store.bulk_operations(self.course_key):
