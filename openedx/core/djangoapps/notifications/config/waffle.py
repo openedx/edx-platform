@@ -59,3 +59,13 @@ ENABLE_NOTIFICATION_GROUPING = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_noti
 # .. toggle_warning: When the flag is ON, notification to all learners feature is enabled on discussion post.
 # .. toggle_tickets: INF-1917
 ENABLE_NOTIFY_ALL_LEARNERS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_post_notify_all_learners', __name__)
+
+# .. toggle_name: notifications.enable_push_notifications
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Waffle flag to enable push Notifications feature on mobile devices
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-05-27
+# .. toggle_target_removal_date: 2026-05-27
+# .. toggle_warning: When the flag is ON, Notifications will go through ace push channels.
+ENABLE_PUSH_NOTIFICATIONS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_push_notifications', __name__)
