@@ -70,7 +70,7 @@ def course_enrollment_post_save(signal, sender, enrollment, metadata, **kwargs):
 @receiver(post_save, sender=User)
 def create_user_account_preferences(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
-    Initialize a new User Tour when a new user is created.
+    Initialize user notification preferences when new user is created.
     """
     preferences = []
     if created:
