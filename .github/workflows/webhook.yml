@@ -12,6 +12,12 @@ on:
       is-prod:
         required: true
         type: string
+      app_id:
+        required: true
+        type: string
+    secrets:
+      private_key:
+        required: true
   repository_dispatch:
     types: [debug-webhook]
 
@@ -24,8 +30,8 @@ jobs:
         id: app_token
         uses: actions/create-github-app-token@v2
         with:
-          app-id: ${{ vars.EOLITO_BOT_APP_ID }}
-          private-key: ${{ secrets.EOLITO_BOT_PRIVATE_KEY }}
+          app-id: ${{ inputs.app_id || vars.EOLITO_BOT_APP_ID }}
+          private-key: ${{ secrets.private_key || secrets.EOLITO_BOT_PRIVATE_KEY }}
           owner: eol-uchile
           repositories: edx-staging,eol-edx,edx-openuchile
       - name: Define release name
