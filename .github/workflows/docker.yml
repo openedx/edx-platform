@@ -114,3 +114,6 @@ jobs:
       code: ${{ needs.variables.outputs.code }}
       release-name: ${{ needs.variables.outputs.release-name }}
       is-prod: ${{ needs.variables.outputs.is-prod }}
+      app_id: ${{ vars.EOLITO_BOT_APP_ID }}
+    secrets:
+      private_key: ${{ secrets.EOLITO_BOT_PRIVATE_KEY }}
