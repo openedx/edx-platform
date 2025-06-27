@@ -230,6 +230,24 @@ COURSE_NOTIFICATION_TYPES = {
         'email_template': '',
         'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE],
     },
+    'new_instructor_all_learners_post': {
+        'notification_app': 'discussion',
+        'name': 'new_instructor_all_learners_post',
+        'is_core': False,
+        'info': '',
+        'web': True,
+        'email': False,
+        'email_cadence': EmailCadence.DAILY,
+        'push': False,
+        'non_editable': [],
+        'content_template': _('<{p}>Your instructor posted <{strong}>{post_title}</{strong}></{p}>'),
+        'grouped_content_template': '',
+        'content_context': {
+            'post_title': 'Post title',
+        },
+        'email_template': '',
+        'filters': [FILTER_AUDIT_EXPIRED_USERS_WITH_NO_ROLE]
+    },
 }
 
 COURSE_NOTIFICATION_APPS = {

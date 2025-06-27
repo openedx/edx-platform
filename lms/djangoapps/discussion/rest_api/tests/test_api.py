@@ -214,6 +214,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
             'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
             'show_discussions': True,
+            'is_notify_all_learners_enabled': False
         }
 
     @ddt.data(
@@ -1379,7 +1380,9 @@ class CreateThreadTest(
             "read": True,
         })
         self.register_post_thread_response(cs_thread)
-        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+        with self.assert_signal_sent(
+            api, 'thread_created', sender=None, user=self.user, exclude_args=('post', 'notify_all_learners')
+        ):
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data({
             "id": "test_id",
@@ -1445,7 +1448,9 @@ class CreateThreadTest(
 
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
 
-        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+        with self.assert_signal_sent(
+            api, 'thread_created', sender=None, user=self.user, exclude_args=('post', 'notify_all_learners')
+        ):
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data({
             "author_label": "Moderator",
@@ -1517,7 +1522,9 @@ class CreateThreadTest(
             "read": True,
         })
         self.register_post_thread_response(cs_thread)
-        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+        with self.assert_signal_sent(
+            api, 'thread_created', sender=None, user=self.user, exclude_args=('post', 'notify_all_learners')
+        ):
             create_thread(self.request, data)
         event_name, event_data = mock_emit.call_args[0]
         assert event_name == 'edx.forum.thread.created'
