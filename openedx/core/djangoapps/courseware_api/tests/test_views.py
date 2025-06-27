@@ -634,14 +634,18 @@ class CoursewareMetaTestViews(BaseCoursewareTests):
         self.request = RequestFactory().get(self.url)
 
     def create_courseware_meta(self, user=None):
-        """Helper method to create CoursewareMeta instance"""
+        """
+        Helper method to create CoursewareMeta instance
+        """
         user = user or self.user
         self.request.user = user
         return CoursewareMeta(self.course.id, self.request, username=user.username)
 
     @ddt.data(True, False)
     def test_is_course_full_property(self, is_course_full):
-        """Test is_course_full property"""
+        """
+        Test is_course_full property
+        """
         with mock.patch(
             'openedx.core.djangoapps.courseware_api.views.CourseEnrollment.objects.is_course_full'
         ) as mock_is_course_full:
@@ -651,14 +655,18 @@ class CoursewareMetaTestViews(BaseCoursewareTests):
 
     @ddt.data(True, False)
     def test_invitation_only_property(self, invitation_only):
-        """Test invitation_only property"""
+        """
+        Test invitation_only property
+        """
         with override_settings(COURSES_INVITE_ONLY=invitation_only):
             meta = self.create_courseware_meta()
             assert meta.invitation_only is invitation_only
 
     @ddt.data(True, False)
     def test_sidebar_html_enabled_property(self, waffle_enabled):
-        """Test sidebar_html_enabled property with different waffle settings"""
+        """
+        Test sidebar_html_enabled property with different waffle settings
+        """
         with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=waffle_enabled):
             meta = self.create_courseware_meta()
             assert meta.sidebar_html_enabled == waffle_enabled
@@ -667,15 +675,17 @@ class CoursewareMetaTestViews(BaseCoursewareTests):
     @mock.patch(
         'openedx.core.djangoapps.courseware_api.views.get_course_about_section', new_callable=mock.PropertyMock
     )
-    def test_course_about_section_html_property(self, waffle_enabled, mock_get_course_about_section):
-        """Test course_about_section_html property with different waffle settings"""
+    def test_about_sidebar_html_property(self, waffle_enabled, mock_get_course_about_section):
+        """
+        Test about_sidebar_html property with different waffle settings
+        """
         mock_get_course_about_section.return_value = '<div>About Course</div>'
         with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=waffle_enabled):
             meta = self.create_courseware_meta()
             if waffle_enabled:
-                assert meta.course_about_section_html == '<div>About Course</div>'
+                assert meta.about_sidebar_html == '<div>About Course</div>'
             else:
-                assert meta.course_about_section_html is None
+                assert meta.about_sidebar_html is None
 
 
 @ddt.ddt
@@ -690,63 +700,81 @@ class CoursewareMetaAPIResponseTestViews(BaseCoursewareTests):
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
 
     def test_api_returns_show_courseware_link_field(self):
-        """Test that API response contains show_courseware_link field"""
+        """
+        Test that API response contains show_courseware_link field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'show_courseware_link' in response.data
         assert isinstance(response.data['show_courseware_link'], bool)
 
     def test_api_returns_is_course_full_field(self):
-        """Test that API response contains is_course_full field"""
+        """
+        Test that API response contains is_course_full field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'is_course_full' in response.data
         assert isinstance(response.data['is_course_full'], bool)
 
     def test_api_returns_can_enroll_field(self):
-        """Test that API response contains can_enroll field"""
+        """
+        Test that API response contains can_enroll field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'can_enroll' in response.data
         assert isinstance(response.data['can_enroll'], bool)
 
     def test_api_returns_invitation_only_field(self):
-        """Test that API response contains invitation_only field"""
+        """
+        Test that API response contains invitation_only field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'invitation_only' in response.data
         assert isinstance(response.data['invitation_only'], bool)
 
     def test_api_returns_is_shib_course_field(self):
-        """Test that API response contains is_shib_course field"""
+        """
+        Test that API response contains is_shib_course field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'is_shib_course' in response.data
         assert isinstance(response.data['is_shib_course'], bool)
 
     def test_api_returns_allow_anonymous_field(self):
-        """Test that API response contains allow_anonymous field"""
+        """
+        Test that API response contains allow_anonymous field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'allow_anonymous' in response.data
         assert isinstance(response.data['allow_anonymous'], bool)
 
     def test_api_returns_ecommerce_checkout_field(self):
-        """Test that API response contains ecommerce_checkout field"""
+        """
+        Test that API response contains ecommerce_checkout field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'ecommerce_checkout' in response.data
         assert isinstance(response.data['ecommerce_checkout'], bool)
 
     def test_api_returns_single_paid_mode_field(self):
-        """Test that API response contains single_paid_mode field"""
+        """
+        Test that API response contains single_paid_mode field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'single_paid_mode' in response.data
         assert isinstance(response.data['single_paid_mode'], dict)
 
     def test_api_returns_ecommerce_checkout_link_field(self):
-        """Test that API response contains ecommerce_checkout_link field"""
+        """
+        Test that API response contains ecommerce_checkout_link field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'ecommerce_checkout_link' in response.data
@@ -754,21 +782,27 @@ class CoursewareMetaAPIResponseTestViews(BaseCoursewareTests):
         assert isinstance(checkout_link, str) or checkout_link is None
 
     def test_api_returns_course_image_urls_field(self):
-        """Test that API response contains course_image_urls field"""
+        """
+        Test that API response contains course_image_urls field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'course_image_urls' in response.data
         assert isinstance(response.data['course_image_urls'], list)
 
     def test_api_returns_start_date_is_still_default_field(self):
-        """Test that API response contains start_date_is_still_default field"""
+        """
+        Test that API response contains start_date_is_still_default field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'start_date_is_still_default' in response.data
         assert isinstance(response.data['start_date_is_still_default'], bool)
 
     def test_api_returns_advertised_start_field(self):
-        """Test that API response contains advertised_start field"""
+        """
+        Test that API response contains advertised_start field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'advertised_start' in response.data
@@ -776,14 +810,18 @@ class CoursewareMetaAPIResponseTestViews(BaseCoursewareTests):
         assert isinstance(advertised_start, str) or advertised_start is None
 
     def test_api_returns_course_price_field(self):
-        """Test that API response contains course_price field"""
+        """
+        Test that API response contains course_price field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'course_price' in response.data
         assert isinstance(response.data['course_price'], str)
 
     def test_api_returns_pre_requisite_courses_field(self):
-        """Test that API response contains pre_requisite_courses field"""
+        """
+        Test that API response contains pre_requisite_courses field
+        """
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert 'pre_requisite_courses' in response.data
@@ -791,7 +829,9 @@ class CoursewareMetaAPIResponseTestViews(BaseCoursewareTests):
 
     @ddt.data(True, False)
     def test_api_sidebar_html_enabled_with_waffle(self, waffle_enabled):
-        """Test API returns correct sidebar_html_enabled value based on waffle flag"""
+        """
+        Test API returns correct sidebar_html_enabled value based on waffle flag
+        """
         with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=waffle_enabled):
             response = self.client.get(self.url)
             assert response.status_code == 200
@@ -802,17 +842,19 @@ class CoursewareMetaAPIResponseTestViews(BaseCoursewareTests):
     @mock.patch(
         'openedx.core.djangoapps.courseware_api.views.get_course_about_section', new_callable=mock.PropertyMock
     )
-    def test_api_course_about_section_html_with_waffle(self, waffle_enabled, mock_get_course_about_section):
-        """Test API returns correct course_about_section_html value based on waffle flag"""
+    def test_api_about_sidebar_html_with_waffle(self, waffle_enabled, mock_get_course_about_section):
+        """
+        Test API returns correct about_sidebar_html value based on waffle flag
+        """
         with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=waffle_enabled):
             mock_get_course_about_section.return_value = '<div>About Course</div>'
             response = self.client.get(self.url)
             assert response.status_code == 200
-            assert 'course_about_section_html' in response.data
+            assert 'about_sidebar_html' in response.data
             if waffle_enabled:
-                assert response.data['course_about_section_html'] == '<div>About Course</div>'
+                assert response.data['about_sidebar_html'] == '<div>About Course</div>'
             else:
-                assert response.data['course_about_section_html'] is None
+                assert response.data['about_sidebar_html'] is None
 
 
 @ddt.ddt
@@ -830,7 +872,9 @@ class CoursewareMetaIntegrationTestViews(BaseCoursewareTests):
     )
     @ddt.unpack
     def test_enrollment_mode_affects_can_access_proctored_exams(self, enrollment_mode, expected_access):
-        """Test that enrollment mode affects proctored exam access in API response"""
+        """
+        Test that enrollment mode affects proctored exam access in API response
+        """
         CourseEnrollment.enroll(self.user, self.course.id, enrollment_mode)
 
         response = self.client.get(self.url)
@@ -839,7 +883,9 @@ class CoursewareMetaIntegrationTestViews(BaseCoursewareTests):
 
     @mock.patch('openedx.core.djangoapps.courseware_api.views.check_public_access')
     def test_public_course_affects_allow_anonymous(self, mock_check_public_access):
-        """Test that course visibility settings affect allow_anonymous field"""
+        """
+        Test that course visibility settings affect allow_anonymous field
+        """
         mock_check_public_access.return_value = ACCESS_GRANTED
 
         response = self.client.get(self.url)

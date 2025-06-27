@@ -40,7 +40,6 @@ from lms.djangoapps.courseware.courses import (
     get_course_about_section,
     get_course_with_access,
     get_permission_for_course_about,
-    get_studio_url,
 )
 
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
@@ -505,36 +504,13 @@ class CoursewareMeta:
         return get_prerequisite_courses_display(self.course)
 
     @property
-    def sidebar_html_enabled(self):
-        """
-        Returns a boolean indicating whether the sidebar HTML is enabled for the course.
-        """
-        return ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
-
-    @property
-    def course_about_section_html(self):
+    def about_sidebar_html(self):
         """
         Returns the HTML content for the course about section.
         """
         if ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled():
             return get_course_about_section(self.request, self.course, "about_sidebar_html")
         return None
-
-    @property
-    def studio_url(self):
-        """
-        Returns the URL to the course in Studio.
-        """
-        if self.request.user.is_authenticated and self.request.user.is_staff:
-            return get_studio_url(self.course, 'settings/details')
-        return None
-
-    @property
-    def is_cosmetic_price_enabled(self):
-        """
-        Returns a boolean indicating whether the cosmetic price feature is enabled.
-        """
-        return settings.FEATURES.get('ENABLE_COSMETIC_DISPLAY_PRICE', False)
 
     @property
     def overview(self):
@@ -549,13 +525,6 @@ class CoursewareMeta:
         Returns a list of OpenCourseWare links for the course.
         """
         return get_course_about_section(self.request, self.course, "ocw_links")
-
-    @property
-    def prerequisites(self):
-        """
-        Returns a list of prerequisite courses for the course.
-        """
-        return get_course_about_section(self.request, self.course, "prerequisites")
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
@@ -646,9 +615,37 @@ class CoursewareInformation(RetrieveAPIView):
         * certificate_data: data regarding the effective user's certificate for the given course
         * verify_identity_url: URL for a learner to verify their identity. Only returned for learners enrolled in a
             verified mode. Will update to reverify URL if necessary.
+        * verification_status: The verification status of the effective user in the course. Possible values:
+            * 'none': No verification has been created for the user
+            * 'expired': The verification has expired
+            * 'approved': The verification has been approved
+            * 'pending': The verification is pending
+            * 'must_reverify': The user must reverify their identity
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
         * learning_assistant_enabled: Whether the Xpert Learning Assistant is enabled for the requesting user
+        * show_courseware_link: Whether the courseware link should be shown in the course details page
+        * is_course_full: Whether the course is full
+        * can_enroll: Whether the user can enroll in the course
+        * invitation_only: Whether the course is invitation only
+        * is_shib_course: Whether the course is a Shibboleth course
+        * allow_anonymous: Whether the course allows anonymous access
+        * ecommerce_checkout: Whether the course has an ecommerce checkout
+        * single_paid_mode: An object representing the single paid mode for the course, if it exists
+            * sku: (str) The SKU for the single paid mode
+            * name: (str) The name of the single paid mode
+            * min_price: (str) The minimum price for the single paid mode, formatted with the currency symbol
+            * description: (str) The description of the single paid mode
+            * is_discounted: (bool) Whether the single paid mode is discounted
+        * ecommerce_checkout_link: The ecommerce checkout link for the course, if it exists
+        * course_image_urls: A list of course image URLs
+        * start_date_is_still_default: Whether the course start date is still the default value
+        * advertised_start: The advertised start date of the course
+        * course_price: The course price, formatted with the currency symbol
+        * pre_requisite_courses: A list of pre-requisite courses for the course
+        * about_sidebar_html: The HTML content for the course about section, if enabled
+        * display_number_with_default: The course number with the org name, if set
+        * display_org_with_default: The org name with the course number, if set
         * content_type_gating_enabled: Whether the content type gating is enabled for the course
         * show_calculator: Whether the calculator should be shown in the course details page
         * can_access_proctored_exams: Whether the user is eligible to access proctored exams
@@ -656,11 +653,10 @@ class CoursewareInformation(RetrieveAPIView):
             * enabled: Boolean indicating whether edxnotes feature is enabled for the course
             * visible: Boolean indicating whether notes are visible in the course
         * marketing_url: The marketing URL for the course
-        * studio_url: The URL to the course in Studio, if the user is staff
-        * is_cosmetic_price_enabled: Boolean indicating whether the cosmetic price feature is enabled
         * overview: The overview HTML content for the course
         * ocw_links: A list of OpenCourseWare links for the course
         * prerequisites: A list of prerequisite courses for the course
+        * license: The license for the course
 
     **Parameters:**
 
