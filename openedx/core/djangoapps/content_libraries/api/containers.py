@@ -387,6 +387,7 @@ def delete_container(
     library_key = container_key.lib_key
     container = _get_container_from_key(container_key)
 
+    # Fetch related collections and containers before soft-delete
     affected_collections = authoring_api.get_entity_collections(
         container.publishable_entity.learning_package_id,
         container.key,
@@ -457,6 +458,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     )
 
     authoring_api.set_draft_version(container.pk, container.versioning.latest.pk)
+    # Fetch related containers after restore
     affected_containers = get_containers_contains_item(container_key)
     # Get children containers or components to update their index data
     children = get_container_children(
@@ -474,7 +476,7 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     if affected_containers and len(affected_containers) > 0:
         # Update parent key data in index. Eg. `sections` key in index for subsection
         content_changes.append(str(affected_containers[0].container_type.value) + "s")
-    # Add tags and collections back to index
+    # Add tags, collections and parent data back to index
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
             object_id=str(container_key),
