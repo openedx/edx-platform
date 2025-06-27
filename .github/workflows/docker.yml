@@ -114,4 +114,3 @@ jobs:
       code: ${{ needs.variables.outputs.code }}
       release-name: ${{ needs.variables.outputs.release-name }}
       is-prod: ${{ needs.variables.outputs.is-prod }}
-    secrets: inherit
