@@ -318,17 +318,18 @@ class DiscussionNotificationSender:
         self._populate_context_with_ids_for_mobile(context, notification_type)
         self._send_notification([self.creator.id], notification_type, extra_context=context)
 
-    def send_new_thread_created_notification(self):
+    def send_new_thread_created_notification(self, notify_all_learners=False):
         """
         Send notification based on notification_type
         """
         thread_type = self.thread.attributes['thread_type']
-        notification_type = (
+
+        notification_type = "new_instructor_all_learners_post" if notify_all_learners else (
             "new_question_post"
             if thread_type == "question"
             else ("new_discussion_post" if thread_type == "discussion" else "")
         )
-        if notification_type not in ['new_discussion_post', 'new_question_post']:
+        if notification_type not in ['new_discussion_post', 'new_question_post', 'new_instructor_all_learners_post']:
             raise ValueError(f'Invalid notification type {notification_type}')
 
         audience_filters = self._create_cohort_course_audience()
