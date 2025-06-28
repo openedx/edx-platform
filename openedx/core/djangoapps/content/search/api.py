@@ -502,6 +502,8 @@ def rebuild_index(status_cb: Callable[[str], None] | None = None, incremental=Fa
                             doc.update(searchable_doc_containers(container_key, "subsections"))
                         case lib_api.ContainerType.Subsection:
                             doc.update(searchable_doc_containers(container_key, "sections"))
+                        case lib_api.ContainerType.Section:
+                            doc.update(searchable_doc_containers(container_key, "outline_roots"))
                     docs.append(doc)
                 except Exception as err:  # pylint: disable=broad-except
                     status_cb(f"Error indexing container {container.key}: {err}")

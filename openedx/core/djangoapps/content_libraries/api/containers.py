@@ -25,10 +25,10 @@ from openedx_events.content_authoring.signals import (
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
+
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
-
-from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
+from openedx.core.djangoapps.xblock.api import create_xblock_field_data_for_container, get_component_from_usage_key
 
 from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
@@ -53,6 +53,9 @@ __all__ = [
     "update_container_children",
     "get_containers_contains_item",
     "publish_container_changes",
+
+    # Hacky XBlock data-for-containers
+    "create_xblock_field_data_for_container",
 ]
 
 log = logging.getLogger(__name__)
@@ -65,6 +68,39 @@ class ContainerType(Enum):
     Unit = "unit"
     Subsection = "subsection"
     Section = "section"
+    OutlineRoot = "outline_root"
+
+    @property
+    def container_model_classes(self) -> tuple[type[Container], type[ContainerVersion]]:
+        """
+        Get the container, containerversion subclasses associated with this type.
+
+        @@TODO Is this what we want, a hard mapping between container_types and Container classes?
+          * If so, then expand on this pattern, so that all ContainerType logic is contained within
+            this class, and get rid of the match-case statements that are all over the content_libraries
+            app.
+          * If not, then figure out what to do instead.
+        """
+        from openedx_learning.api.authoring_models import (
+            Unit,
+            UnitVersion,
+            Subsection,
+            SubsectionVersion,
+            Section,
+            SectionVersion,
+            OutlineRoot,
+            OutlineRootVersion,
+        )
+        match self:
+            case self.Unit:
+                return (Unit, UnitVersion)
+            case self.Subsection:
+                return (Subsection, SubsectionVersion)
+            case self.Section:
+                return (Section, SectionVersion)
+            case self.OutlineRoot:
+                return (OutlineRoot, OutlineRootVersion)
+        raise TypeError(f"unexpected ContainerType: {self!r}")
 
     @property
     def olx_tag(self) -> str:
@@ -84,6 +120,8 @@ class ContainerType(Enum):
                 return "sequential"
             case self.Section:
                 return "chapter"
+            case self.OutlineRoot:
+                return "course"
         raise TypeError(f"unexpected ContainerType: {self!r}")
 
     @classmethod
@@ -168,6 +206,8 @@ def library_container_locator(
         container_type = ContainerType.Subsection
     elif hasattr(container, 'section'):
         container_type = ContainerType.Section
+    elif hasattr(container, 'outlineroot'):
+        container_type = ContainerType.OutlineRoot
 
     assert container_type is not None
 
@@ -252,12 +292,12 @@ def create_container(
         created = datetime.now(tz=timezone.utc)
 
     container: Container
-    _initial_version: ContainerVersion
+    initial_version: ContainerVersion
 
     # Then try creating the actual container:
     match container_type:
         case ContainerType.Unit:
-            container, _initial_version = authoring_api.create_unit_and_version(
+            container, initial_version = authoring_api.create_unit_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -265,7 +305,7 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.Subsection:
-            container, _initial_version = authoring_api.create_subsection_and_version(
+            container, initial_version = authoring_api.create_subsection_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -273,7 +313,15 @@ def create_container(
                 created_by=user_id,
             )
         case ContainerType.Section:
-            container, _initial_version = authoring_api.create_section_and_version(
+            container, initial_version = authoring_api.create_section_and_version(
+                content_library.learning_package_id,
+                key=slug,
+                title=title,
+                created=created,
+                created_by=user_id,
+            )
+        case ContainerType.OutlineRoot:
+            container, initial_version = authoring_api.create_outline_root_and_version(
                 content_library.learning_package_id,
                 key=slug,
                 title=title,
@@ -282,6 +330,8 @@ def create_container(
             )
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
+
+    create_xblock_field_data_for_container(initial_version)
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
@@ -333,11 +383,21 @@ def update_container(
                 created=created,
                 created_by=user_id,
             )
-
-            # The `affected_containers` are not obtained, because the sections are
+            affected_containers = get_containers_contains_item(container_key)
+        case ContainerType.OutlineRoot:
+            version = authoring_api.create_next_outline_root_version(
+                container.outlineroot,
+                title=display_name,
+                created=created,
+                created_by=user_id,
+            )
+            # The `affected_containers` are not obtained, because the outline_roots are
             # not contained in any container.
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
+
+    # Let's add some XBlock data onto the container we just made...
+    create_xblock_field_data_for_container(version)
 
     # Send event related to the updated container
     LIBRARY_CONTAINER_UPDATED.send_event(
@@ -565,8 +625,27 @@ def update_container_children(
                         changes=["sections"],
                     ),
                 )
+        case ContainerType.OutlineRoot:
+            subsections = [_get_container_from_key(key).outlineroot for key in children_ids]  # type: ignore[arg-type]
+            new_version = authoring_api.create_next_outline_root_version(
+                container.outlineroot,
+                sections=sections,  # type: ignore[arg-type]
+                created=created,
+                created_by=user_id,
+                entities_action=entities_action,
+            )
+
+            for key in children_ids:
+                CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+                    content_object=ContentObjectChangedData(
+                        object_id=str(key),
+                        changes=["sections"],
+                    ),
+                )
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
+
+    create_xblock_field_data_for_container(new_version)
 
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
