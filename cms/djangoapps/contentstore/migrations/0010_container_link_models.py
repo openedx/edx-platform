@@ -10,6 +10,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
+        ('oel_publishing', '0003_containers'),
         ('oel_components', '0003_remove_componentversioncontent_learner_downloadable'),
         ('contentstore', '0009_learningcontextlinksstatus_publishableentitylink'),
     ]

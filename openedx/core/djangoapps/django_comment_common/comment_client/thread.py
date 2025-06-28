@@ -56,42 +56,28 @@ class Thread(models.Model):
             utils.strip_blank(utils.strip_none(query_params))
         )
 
-        if query_params.get('text'):
-            url = cls.url(action='search')
-        else:
-            url = cls.url(action='get_all', params=utils.extract(params, 'commentable_id'))
-            if params.get('commentable_id'):
-                del params['commentable_id']
+        # Convert user_id and author_id to strings if present
+        for field in ['user_id', 'author_id']:
+            if value := params.get(field):
+                params[field] = str(value)
 
-        if is_forum_v2_enabled(utils.get_course_key(query_params['course_id'])):
-            if query_params.get('text'):
-                search_params = utils.strip_none(params)
-                if user_id := search_params.get('user_id'):
-                    search_params['user_id'] = str(user_id)
-                if group_ids := search_params.get('group_ids'):
-                    search_params['group_ids'] = [int(group_id) for group_id in group_ids.split(',')]
-                elif group_id := search_params.get('group_id'):
-                    search_params['group_ids'] = [int(group_id)]
-                    search_params.pop('group_id', None)
-                if commentable_ids := search_params.get('commentable_ids'):
-                    search_params['commentable_ids'] = commentable_ids.split(',')
-                elif commentable_id := search_params.get('commentable_id'):
-                    search_params['commentable_ids'] = [commentable_id]
-                    search_params.pop('commentable_id', None)
-                response = forum_api.search_threads(**search_params)
-            else:
-                if user_id := params.get('user_id'):
-                    params['user_id'] = str(user_id)
-                response = forum_api.get_user_threads(**params)
+        # Handle commentable_ids/commentable_id conversion
+        if commentable_ids := params.get('commentable_ids'):
+            params['commentable_ids'] = commentable_ids.split(',')
+        elif commentable_id := params.get('commentable_id'):
+            params['commentable_ids'] = [commentable_id]
+            params.pop('commentable_id', None)
+
+        params = utils.clean_forum_params(params)
+        if query_params.get('text'):                    # Handle group_ids/group_id conversion
+            if group_ids := params.get('group_ids'):
+                params['group_ids'] = [int(group_id) for group_id in group_ids.split(',')]
+            elif group_id := params.get('group_id'):
+                params['group_ids'] = [int(group_id)]
+                params.pop('group_id', None)
+            response = forum_api.search_threads(**params)
         else:
-            response = utils.perform_request(
-                'get',
-                url,
-                params,
-                metric_tags=['course_id:{}'.format(query_params['course_id'])],
-                metric_action='thread.search',
-                paged_results=True
-            )
+            response = forum_api.get_user_threads(**params)
 
         if query_params.get('text'):
             search_query = query_params['text']
@@ -124,7 +110,6 @@ class Thread(models.Model):
                     total_results=total_results
                 )
             )
-
         return utils.CommentClientPaginatedResult(
             collection=response.get('collection', []),
             page=response.get('page', 1),

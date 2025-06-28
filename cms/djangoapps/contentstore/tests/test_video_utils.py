@@ -12,9 +12,9 @@ import pytz
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.files.storage import get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test.utils import override_settings
+from django.utils.module_loading import import_string
 from edxval.api import create_profile, create_video, get_course_video_image_url, update_video_image
 from storages.backends.s3boto3 import S3Boto3Storage
 
@@ -390,7 +390,7 @@ class S3Boto3TestCase(TestCase):
     def test_video_backend(self):
         self.assertEqual(
             S3Boto3Storage,
-            get_storage_class(
+            import_string(
                 'storages.backends.s3boto3.S3Boto3Storage',
             )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {})).__class__
         )
@@ -401,7 +401,7 @@ class S3Boto3TestCase(TestCase):
             {'bucket_name': 'test', 'default_acl': None, 'location': 'abc/def'}}
     )
     def test_boto3_backend_with_params(self):
-        storage = get_storage_class(
+        storage = import_string(
             settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_CLASS', {})
         )(**settings.VIDEO_IMAGE_SETTINGS.get('STORAGE_KWARGS', {}))
 
