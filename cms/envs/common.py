@@ -1834,8 +1834,10 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.units",
     "openedx_learning.apps.authoring.subsections",
     "openedx_learning.apps.authoring.sections",
-    "openedx_learning.apps.authoring.outline_roots",
-    "openedx_learning.apps.authoring.courses",
+
+    # Learning Core courses prototype
+    'openedx.core.djangoapps.content.outline_roots',
+    'openedx.core.djangoapps.content.courses',
 ]
 
 
