@@ -443,9 +443,6 @@ def handle_library_publish(publish_log: PublishLog):
 
 def create_xblock_field_data_for_container(version: ContainerVersion):
     # this whole thing should be in xblock.api instead of here.
-
-    log.info("Am I even being called?")
-
     from openedx.core.djangoapps.xblock.models import Block
 
     entity = version.publishable_entity_version.entity
@@ -455,7 +452,7 @@ def create_xblock_field_data_for_container(version: ContainerVersion):
     # case later, when we want to add an existing container to a container that
     # was imported from a course.
     if not hasattr(entity, 'block'):
-        log.error("No Block detected???")
+        log.error(f"No Block detected for entity {entity.key}???")
         return
 
     parent_block = entity.block
@@ -478,7 +475,13 @@ def create_xblock_field_data_for_container(version: ContainerVersion):
         )
 
     for child_entity_row in version.entity_list.entitylistrow_set.select_related('entity__block').all():
-        log.error(f"Iterating children: {child_entity_row.entity}")
+        log.info(f"Iterating children: {child_entity_row.entity}")
+
+        # If it's not a container and it doesn't have field data, we won't know what to do with it in the structure doc,
+        # so just skip it. This can happen when you have OLX with no corresponding XBlock class.
+        if not hasattr(child_entity_row.entity, 'container') and not hasattr(child_entity_row.entity, 'xblockfielddata'):
+            continue
+
         if not hasattr(child_entity_row.entity, 'block'):
             # This can happen if we add a new component in a library to a
             # container that was imported from a course.
@@ -506,9 +509,11 @@ def create_xblock_field_data_for_container(version: ContainerVersion):
         else:
             child_block = child_entity_row.entity.block
             child_usage_key = child_block.key
-        children.append(
-            [child_usage_key.block_type, child_usage_key.block_id]
-        )
+
+        if child_usage_key.block_type != "discussion":
+            children.append(
+                [child_usage_key.block_type, child_usage_key.block_id]
+            )
 
     field_data = XBlockVersionFieldData.objects.create(
         pk=version.pk,
@@ -602,6 +607,13 @@ class LearningCoreCourseShimWriter:
             entity_version = block.entity.published.version
             if not hasattr(entity_version, 'xblockversionfielddata'):
                 log.error(f"MISSING XBlockVersionFieldData for {block.key}")
+                continue  # Just give up on this block.
+
+            if block.key.block_type == "discussion":
+                # hacky hacky prototype...
+                log.error(f"Skipping discussion block {block.key} because we don't seem to handle inline discussions right")
+                continue
+
             field_data = entity_version.xblockversionfielddata
             block_entry = self.base_block_entry(
                 block.key.block_type,
@@ -609,8 +621,15 @@ class LearningCoreCourseShimWriter:
                 ObjectId(field_data.definition_object_id),
             )
             block_entry['fields'].update(field_data.settings)
+
+            # This is a hack for when discussion data's already gotten into our saved children, even though we don't
+            # have any field data associated with it.
             if field_data.children:
-                block_entry['fields']['children'] = field_data.children
+                filtered_children = [
+                    entry for entry in field_data.children if entry[0] != "discussion"
+                ]
+                if filtered_children:
+                    block_entry['fields']['children'] = filtered_children
 
             structure['blocks'].append(block_entry)
 
