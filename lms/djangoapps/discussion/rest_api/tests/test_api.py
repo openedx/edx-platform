@@ -21,7 +21,6 @@ from opaque_keys.edx.locator import CourseLocator
 from pytz import UTC
 from rest_framework.exceptions import PermissionDenied
 
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
@@ -48,7 +47,6 @@ from lms.djangoapps.discussion.rest_api.api import (
     get_course_topics,
     get_course_topics_v2,
     get_thread,
-    get_thread_list,
     get_user_comments,
     update_comment,
     update_thread
@@ -77,7 +75,6 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_STUDENT,
-    FORUM_ROLE_GROUP_MODERATOR,
     Role
 )
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
@@ -217,6 +214,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
             'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
             'show_discussions': True,
+            'is_notify_all_learners_enabled': False
         }
 
     @ddt.data(
@@ -696,542 +694,6 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
                 }
             ]
         }
-
-
-@ddt.ddt
-@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
-    """Test for get_thread_list"""
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.course = CourseFactory.create()
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    def setUp(self):
-        super().setUp()
-        httpretty.reset()
-        httpretty.enable()
-        self.addCleanup(httpretty.reset)
-        self.addCleanup(httpretty.disable)
-        self.maxDiff = None  # pylint: disable=invalid-name
-        self.user = UserFactory.create()
-        self.register_get_user_response(self.user)
-        self.request = RequestFactory().get("/test_path")
-        self.request.user = self.user
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-        self.author = UserFactory.create()
-        self.course.cohort_config = {"cohorted": False}
-        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
-        self.cohort = CohortFactory.create(course_id=self.course.id)
-
-    def get_thread_list(
-            self,
-            threads,
-            page=1,
-            page_size=1,
-            num_pages=1,
-            course=None,
-            topic_id_list=None,
-    ):
-        """
-        Register the appropriate comments service response, then call
-        get_thread_list and return the result.
-        """
-        course = course or self.course
-        self.register_get_threads_response(threads, page, num_pages)
-        ret = get_thread_list(self.request, course.id, page, page_size, topic_id_list)
-        return ret
-
-    def test_nonexistent_course(self):
-        with pytest.raises(CourseNotFoundError):
-            get_thread_list(self.request, CourseLocator.from_string("course-v1:non+existent+course"), 1, 1)
-
-    def test_not_enrolled(self):
-        self.request.user = UserFactory.create()
-        with pytest.raises(CourseNotFoundError):
-            self.get_thread_list([])
-
-    def test_discussions_disabled(self):
-        with pytest.raises(DiscussionDisabledError):
-            self.get_thread_list([], course=_discussion_disabled_course_for(self.user))
-
-    def test_empty(self):
-        assert self.get_thread_list(
-            [], num_pages=0
-        ).data == {
-            'pagination': {
-                'next': None,
-                'previous': None,
-                'num_pages': 0,
-                'count': 0
-            },
-            'results': [],
-            'text_search_rewrite': None
-        }
-
-    def test_get_threads_by_topic_id(self):
-        self.get_thread_list([], topic_id_list=["topic_x", "topic_meow"])
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["1"],
-            "commentable_ids": ["topic_x,topic_meow"]
-        })
-
-    def test_basic_query_params(self):
-        self.get_thread_list([], page=6, page_size=14)
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["6"],
-            "per_page": ["14"],
-        })
-
-    def test_thread_content(self):
-        self.course.cohort_config = {"cohorted": True}
-        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
-        source_threads = [
-            make_minimal_cs_thread({
-                "id": "test_thread_id_0",
-                "course_id": str(self.course.id),
-                "commentable_id": "topic_x",
-                "username": self.author.username,
-                "user_id": str(self.author.id),
-                "title": "Test Title",
-                "body": "Test body",
-                "votes": {"up_count": 4},
-                "comments_count": 5,
-                "unread_comments_count": 3,
-                "endorsed": True,
-                "read": True,
-                "created_at": "2015-04-28T00:00:00Z",
-                "updated_at": "2015-04-28T11:11:11Z",
-            }),
-            make_minimal_cs_thread({
-                "id": "test_thread_id_1",
-                "course_id": str(self.course.id),
-                "commentable_id": "topic_y",
-                "group_id": self.cohort.id,
-                "username": self.author.username,
-                "user_id": str(self.author.id),
-                "thread_type": "question",
-                "title": "Another Test Title",
-                "body": "More content",
-                "votes": {"up_count": 9},
-                "comments_count": 18,
-                "created_at": "2015-04-28T22:22:22Z",
-                "updated_at": "2015-04-28T00:33:33Z",
-            })
-        ]
-        expected_threads = [
-            self.expected_thread_data({
-                "id": "test_thread_id_0",
-                "author": self.author.username,
-                "topic_id": "topic_x",
-                "vote_count": 4,
-                "comment_count": 6,
-                "unread_comment_count": 3,
-                "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
-                "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
-                "has_endorsed": True,
-                "read": True,
-                "created_at": "2015-04-28T00:00:00Z",
-                "updated_at": "2015-04-28T11:11:11Z",
-                "abuse_flagged_count": None,
-                "can_delete": False,
-            }),
-            self.expected_thread_data({
-                "id": "test_thread_id_1",
-                "author": self.author.username,
-                "topic_id": "topic_y",
-                "group_id": self.cohort.id,
-                "group_name": self.cohort.name,
-                "type": "question",
-                "title": "Another Test Title",
-                "raw_body": "More content",
-                "preview_body": "More content",
-                "rendered_body": "<p>More content</p>",
-                "vote_count": 9,
-                "comment_count": 19,
-                "created_at": "2015-04-28T22:22:22Z",
-                "updated_at": "2015-04-28T00:33:33Z",
-                "comment_list_url": None,
-                "endorsed_comment_list_url": (
-                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=True"
-                ),
-                "non_endorsed_comment_list_url": (
-                    "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
-                ),
-                "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
-                "abuse_flagged_count": None,
-                "can_delete": False,
-            }),
-        ]
-
-        expected_result = make_paginated_api_response(
-            results=expected_threads, count=2, num_pages=1, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-        assert self.get_thread_list(source_threads).data == expected_result
-
-    @ddt.data(
-        *itertools.product(
-            [
-                FORUM_ROLE_ADMINISTRATOR,
-                FORUM_ROLE_MODERATOR,
-                FORUM_ROLE_COMMUNITY_TA,
-                FORUM_ROLE_STUDENT,
-                FORUM_ROLE_GROUP_MODERATOR,
-            ],
-            [True, False]
-        )
-    )
-    @ddt.unpack
-    def test_request_group(self, role_name, course_is_cohorted):
-        cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
-        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
-        CohortFactory.create(course_id=cohort_course.id, users=[self.user])
-        _assign_role_to_user(user=self.user, course_id=cohort_course.id, role=role_name)
-        self.get_thread_list([], course=cohort_course)
-        actual_has_group = "group_id" in httpretty.last_request().querystring  # lint-amnesty, pylint: disable=no-member
-        expected_has_group = (course_is_cohorted and
-                              role_name in (FORUM_ROLE_STUDENT, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_GROUP_MODERATOR))
-        assert actual_has_group == expected_has_group
-
-    def test_pagination(self):
-        # N.B. Empty thread list is not realistic but convenient for this test
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=3, next_link="http://testserver/test_path?page=2", previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-        assert self.get_thread_list([], page=1, num_pages=3).data == expected_result
-
-        expected_result = make_paginated_api_response(
-            results=[],
-            count=0,
-            num_pages=3,
-            next_link="http://testserver/test_path?page=3",
-            previous_link="http://testserver/test_path?page=1"
-        )
-        expected_result.update({"text_search_rewrite": None})
-        assert self.get_thread_list([], page=2, num_pages=3).data == expected_result
-
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=3, next_link=None, previous_link="http://testserver/test_path?page=2"
-        )
-        expected_result.update({"text_search_rewrite": None})
-        assert self.get_thread_list([], page=3, num_pages=3).data == expected_result
-
-        # Test page past the last one
-        self.register_get_threads_response([], page=3, num_pages=3)
-        with pytest.raises(PageNotFoundError):
-            get_thread_list(self.request, self.course.id, page=4, page_size=10)
-
-    @ddt.data(None, "rewritten search string")
-    def test_text_search(self, text_search_rewrite):
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": text_search_rewrite})
-        self.register_get_threads_search_response([], text_search_rewrite, num_pages=0)
-        assert get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=10,
-            text_search='test search string'
-        ).data == expected_result
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["10"],
-            "text": ["test search string"],
-        })
-
-    def test_filter_threads_by_author(self):
-        thread = make_minimal_cs_thread()
-        self.register_get_threads_response([thread], page=1, num_pages=10)
-        thread_results = get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=10,
-            author=self.user.username,
-        ).data.get('results')
-        assert len(thread_results) == 1
-
-        expected_last_query_params = {
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["10"],
-            "author_id": [str(self.user.id)],
-        }
-
-        self.assert_last_query_params(expected_last_query_params)
-
-    def test_filter_threads_by_missing_author(self):
-        self.register_get_threads_response([make_minimal_cs_thread()], page=1, num_pages=10)
-        results = get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=10,
-            author="a fake and missing username",
-        ).data.get('results')
-        assert len(results) == 0
-
-    @ddt.data('question', 'discussion', None)
-    def test_thread_type(self, thread_type):
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-
-        self.register_get_threads_response([], page=1, num_pages=0)
-        assert get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=10,
-            thread_type=thread_type,
-        ).data == expected_result
-
-        expected_last_query_params = {
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["10"],
-            "thread_type": [thread_type],
-        }
-
-        if thread_type is None:
-            del expected_last_query_params["thread_type"]
-
-        self.assert_last_query_params(expected_last_query_params)
-
-    @ddt.data(True, False, None)
-    def test_flagged(self, flagged_boolean):
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-
-        self.register_get_threads_response([], page=1, num_pages=0)
-        assert get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=10,
-            flagged=flagged_boolean,
-        ).data == expected_result
-
-        expected_last_query_params = {
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["10"],
-            "flagged": [str(flagged_boolean)],
-        }
-
-        if flagged_boolean is None:
-            del expected_last_query_params["flagged"]
-
-        self.assert_last_query_params(expected_last_query_params)
-
-    @ddt.data(
-        FORUM_ROLE_ADMINISTRATOR,
-        FORUM_ROLE_MODERATOR,
-        FORUM_ROLE_COMMUNITY_TA,
-    )
-    def test_flagged_count(self, role):
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-
-        _assign_role_to_user(self.user, self.course.id, role=role)
-
-        self.register_get_threads_response([], page=1, num_pages=0)
-        get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=10,
-            count_flagged=True,
-        )
-
-        expected_last_query_params = {
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "count_flagged": ["True"],
-            "page": ["1"],
-            "per_page": ["10"],
-        }
-
-        self.assert_last_query_params(expected_last_query_params)
-
-    def test_flagged_count_denied(self):
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-
-        _assign_role_to_user(self.user, self.course.id, role=FORUM_ROLE_STUDENT)
-
-        self.register_get_threads_response([], page=1, num_pages=0)
-
-        with pytest.raises(PermissionDenied):
-            get_thread_list(
-                self.request,
-                self.course.id,
-                page=1,
-                page_size=10,
-                count_flagged=True,
-            )
-
-    def test_following(self):
-        self.register_subscribed_threads_response(self.user, [], page=1, num_pages=0)
-        result = get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=11,
-            following=True,
-        ).data
-
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-        assert result == expected_result
-        assert urlparse(
-            httpretty.last_request().path  # lint-amnesty, pylint: disable=no-member
-        ).path == f"/api/v1/users/{self.user.id}/subscribed_threads"
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["11"],
-        })
-
-    @ddt.data("unanswered", "unread")
-    def test_view_query(self, query):
-        self.register_get_threads_response([], page=1, num_pages=0)
-        result = get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=11,
-            view=query,
-        ).data
-
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-        assert result == expected_result
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["11"],
-            query: ["true"],
-        })
-
-    @ddt.data(
-        ("last_activity_at", "activity"),
-        ("comment_count", "comments"),
-        ("vote_count", "votes")
-    )
-    @ddt.unpack
-    def test_order_by_query(self, http_query, cc_query):
-        """
-        Tests the order_by parameter
-
-        Arguments:
-            http_query (str): Query string sent in the http request
-            cc_query (str): Query string used for the comments client service
-        """
-        self.register_get_threads_response([], page=1, num_pages=0)
-        result = get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=11,
-            order_by=http_query,
-        ).data
-
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-        assert result == expected_result
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": [cc_query],
-            "page": ["1"],
-            "per_page": ["11"],
-        })
-
-    def test_order_direction(self):
-        """
-        Only "desc" is supported for order.  Also, since it is simply swallowed,
-        it isn't included in the params.
-        """
-        self.register_get_threads_response([], page=1, num_pages=0)
-        result = get_thread_list(
-            self.request,
-            self.course.id,
-            page=1,
-            page_size=11,
-            order_direction="desc",
-        ).data
-
-        expected_result = make_paginated_api_response(
-            results=[], count=0, num_pages=0, next_link=None, previous_link=None
-        )
-        expected_result.update({"text_search_rewrite": None})
-        assert result == expected_result
-        assert urlparse(httpretty.last_request().path).path == '/api/v1/threads'  # lint-amnesty, pylint: disable=no-member
-        self.assert_last_query_params({
-            "user_id": [str(self.user.id)],
-            "course_id": [str(self.course.id)],
-            "sort_key": ["activity"],
-            "page": ["1"],
-            "per_page": ["11"],
-        })
-
-    def test_invalid_order_direction(self):
-        """
-        Test with invalid order_direction (e.g. "asc")
-        """
-        with pytest.raises(ValidationError) as assertion:
-            self.register_get_threads_response([], page=1, num_pages=0)
-            get_thread_list(           # pylint: disable=expression-not-assigned
-                self.request,
-                self.course.id,
-                page=1,
-                page_size=11,
-                order_direction="asc",
-            ).data
-        assert 'order_direction' in assertion.value.message_dict
 
 
 @ddt.ddt
@@ -1918,7 +1380,9 @@ class CreateThreadTest(
             "read": True,
         })
         self.register_post_thread_response(cs_thread)
-        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+        with self.assert_signal_sent(
+            api, 'thread_created', sender=None, user=self.user, exclude_args=('post', 'notify_all_learners')
+        ):
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data({
             "id": "test_id",
@@ -1984,7 +1448,9 @@ class CreateThreadTest(
 
         _assign_role_to_user(user=self.user, course_id=self.course.id, role=FORUM_ROLE_MODERATOR)
 
-        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+        with self.assert_signal_sent(
+            api, 'thread_created', sender=None, user=self.user, exclude_args=('post', 'notify_all_learners')
+        ):
             actual = create_thread(self.request, self.minimal_data)
         expected = self.expected_thread_data({
             "author_label": "Moderator",
@@ -2056,7 +1522,9 @@ class CreateThreadTest(
             "read": True,
         })
         self.register_post_thread_response(cs_thread)
-        with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
+        with self.assert_signal_sent(
+            api, 'thread_created', sender=None, user=self.user, exclude_args=('post', 'notify_all_learners')
+        ):
             create_thread(self.request, data)
         event_name, event_data = mock_emit.call_args[0]
         assert event_name == 'edx.forum.thread.created'
