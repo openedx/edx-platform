@@ -147,7 +147,7 @@ if not source:
     <%
         body = capture(caller.body)
     %>
-    ${HTML(render_bundle(entry, extension=None, config='DEFAULT', attrs=attrs))}
+    ${HTML(render_bundle({'request': request}, entry, extension=None, config='DEFAULT', attrs=attrs))}
     % if body:
       <script type="text/javascript">
         ${body | n, decode.utf8}
@@ -166,8 +166,8 @@ if not source:
         component as props.
     </%doc>
 
-    ${HTML(render_bundle(component))}
-    ${HTML(render_bundle('ReactRenderer'))}
+    ${HTML(render_bundle({"request": request}, component))}
+    ${HTML(render_bundle({"request": request}, 'ReactRenderer'))}
 
     <div id="${id}"></div>
     <script type="text/javascript">
