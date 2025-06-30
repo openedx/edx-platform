@@ -16,21 +16,19 @@ from pytz import UTC
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.audience_filters import NotificationFilter
 from openedx.core.djangoapps.notifications.base_notification import (
+    COURSE_NOTIFICATION_APPS,
+    COURSE_NOTIFICATION_TYPES,
     get_default_values_of_preference,
-    get_notification_content, COURSE_NOTIFICATION_TYPES, COURSE_NOTIFICATION_APPS
+    get_notification_content
 )
-from openedx.core.djangoapps.notifications.email.tasks import send_immediate_cadence_email
 from openedx.core.djangoapps.notifications.config.waffle import (
-    ENABLE_NOTIFICATION_GROUPING,
-    ENABLE_NOTIFICATIONS,
-    ENABLE_ACCOUNT_LEVEL_PREFERENCES
-)
-from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
-from openedx.core.djangoapps.notifications.config.waffle import (
+    ENABLE_ACCOUNT_LEVEL_PREFERENCES,
     ENABLE_NOTIFICATION_GROUPING,
     ENABLE_NOTIFICATIONS,
     ENABLE_PUSH_NOTIFICATIONS
 )
+from openedx.core.djangoapps.notifications.email.tasks import send_immediate_cadence_email
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.events import notification_generated_event
 from openedx.core.djangoapps.notifications.grouping_notifications import (
     NotificationRegistry,
@@ -40,7 +38,8 @@ from openedx.core.djangoapps.notifications.grouping_notifications import (
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
-    get_course_notification_preference_config_version, NotificationPreference
+    NotificationPreference,
+    get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.notifications.push.tasks import send_ace_msg_to_push_channel
 from openedx.core.djangoapps.notifications.utils import clean_arguments, get_list_in_batches
@@ -207,8 +206,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
 
             if (
                 preference and
-                preference.is_enabled_for_any_channel(app_name, notification_type) and
-                preference.get_app_config(app_name).get('enabled', False)
+                preference.is_enabled_for_any_channel(app_name, notification_type)
             ):
                 notification_preferences = preference.get_channels_for_notification_type(app_name, notification_type)
                 email_enabled = 'email' in notification_preferences

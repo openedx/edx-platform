@@ -12,7 +12,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangoapps.notifications.base_notification import (
     NotificationAppManager,
     NotificationPreferenceSyncManager,
-    get_notification_content, COURSE_NOTIFICATION_APPS
+    get_notification_content
 )
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
@@ -155,12 +155,6 @@ class NotificationPreference(TimeStampedModel):
         """
         return self.web or self.push or self.email
 
-    def get_app_config(self, app_name):
-        """
-        Returns the app config for the given app name.
-        """
-        return COURSE_NOTIFICATION_APPS[app_name]
-
     def get_channels_for_notification_type(self, *args, **kwargs) -> list:
         """
         Returns the channels for the given app name and notification type.
@@ -226,7 +220,7 @@ class CourseNotificationPreference(TimeStampedModel):
                 preferences.config_version = current_config_version
                 preferences.notification_preference_config = new_prefs
                 preferences.save()
-                # pylint: disable-next=broad-except
+            # pylint: disable-next=broad-except
             except Exception as e:
                 log.error(f'Unable to update notification preference to new config. {e}')
         return preferences
