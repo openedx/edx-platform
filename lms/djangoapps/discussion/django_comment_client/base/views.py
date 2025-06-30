@@ -161,7 +161,7 @@ def add_truncated_title_to_event_data(event_data, full_title):
     event_data['title'] = full_title[:TRACKING_MAX_FORUM_TITLE]
 
 
-def track_thread_created_event(request, course, thread, followed, from_mfe_sidebar=False):
+def track_thread_created_event(request, course, thread, followed, from_mfe_sidebar=False, notify_all_learners=False):
     """
     Send analytics event for a newly created thread.
     """
@@ -172,7 +172,10 @@ def track_thread_created_event(request, course, thread, followed, from_mfe_sideb
         'thread_type': thread.thread_type,
         'anonymous': thread.anonymous,
         'anonymous_to_peers': thread.anonymous_to_peers,
-        'options': {'followed': followed},
+        'options': {
+            'followed': followed,
+            'notify_all_learners': notify_all_learners
+        },
         'from_mfe_sidebar': from_mfe_sidebar,
         # There is a stated desire for an 'origin' property that will state
         # whether this thread was created via courseware or the forum.
