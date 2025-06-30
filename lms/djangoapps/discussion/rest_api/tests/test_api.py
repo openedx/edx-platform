@@ -1411,7 +1411,10 @@ class CreateThreadTest(
             'title_truncated': False,
             'anonymous': False,
             'anonymous_to_peers': False,
-            'options': {'followed': False},
+            'options': {
+                'followed': False,
+                'notify_all_learners': False
+            },
             'id': 'test_id',
             'truncated': False,
             'body': 'Test body',
@@ -1500,7 +1503,10 @@ class CreateThreadTest(
                 "title_truncated": False,
                 "anonymous": False,
                 "anonymous_to_peers": False,
-                "options": {"followed": False},
+                "options": {
+                    "followed": False,
+                    "notify_all_learners": False
+                },
                 "id": "test_id",
                 "truncated": False,
                 "body": "Test body",
@@ -1536,7 +1542,10 @@ class CreateThreadTest(
             'title_truncated': True,
             'anonymous': False,
             'anonymous_to_peers': False,
-            'options': {'followed': False},
+            'options': {
+                'followed': False,
+                'notify_all_learners': False
+            },
             'id': 'test_id',
             'truncated': False,
             'body': 'Test body',
