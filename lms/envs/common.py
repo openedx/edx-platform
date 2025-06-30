@@ -881,6 +881,15 @@ FEATURES = {
     #   toggle does not have a target removal date.
     'ENABLE_AUTHN_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_AUTHN_MFE", False),
 
+    # .. toggle_name: FEATURES['ENABLE_CATALOG_MICROFRONTEND']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the catalog.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2025-05-15
+    # .. toggle_target_removal_date: 2025-11-01
+    'ENABLE_CATALOG_MICROFRONTEND': False,
+
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
     # .. toggle_implementation: DjangoSetting
@@ -1911,6 +1920,10 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT_LMS', ENV_ROOT / "staticfiles")
+# .. setting_name: STATIC_URL_BASE
+# .. setting_default: "/static/"
+# .. setting_description: The LMS uses this to construct ``STATIC_URL`` by appending
+#   a slash (if needed).
 STATIC_URL_BASE = '/static/'
 
 STATICFILES_DIRS = [
@@ -2241,9 +2254,6 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.CookieMonitoringMiddleware',
     'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
     'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
-
-    # Before anything that looks at cookies, especially the session middleware
-    'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
     # Monitoring and logging for ignored errors
     'openedx.core.lib.request_utils.IgnoredErrorMiddleware',
@@ -3042,6 +3052,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
 
+    'dal',
+    'dal_select2',
+
     # Tweaked version of django.contrib.staticfiles
     'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
 
@@ -3374,7 +3387,6 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 # end users
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 
 # If setting a cross-domain cookie, it's really important to choose
 # a name for the cookie that is DIFFERENT than the cookies used
@@ -3491,6 +3503,7 @@ SUPPORT_SITE_LINK = ''
 ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
+SEND_ACTIVATION_EMAIL_URL = ''
 LOGIN_ISSUE_SUPPORT_LINK = ''
 
 # .. setting_name: SECURITY_PAGE_URL
@@ -5407,6 +5420,15 @@ NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
+NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
+
+############## SELF PACED EMAIL ##############
+SELF_PACED_BANNER_URL = ""
+SELF_PACED_CLOUD_URL = ""
+
+############## GOAL REMINDER EMAIL ##############
+GOAL_REMINDER_BANNER_URL = ""
+GOAL_REMINDER_PROFILE_URL = ""
 
 ############## NUDGE EMAILS ###############
 # .. setting_name: DISABLED_ORGS_FOR_PROGRAM_NUDGE
