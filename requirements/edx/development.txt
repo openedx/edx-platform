@@ -669,7 +669,7 @@ drf-yasg==1.21.10
     #   -r requirements/edx/testing.txt
     #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.14.0
+edx-ace==1.15.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -879,7 +879,7 @@ enmerkar-underscore==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-enterprise-integrated-channels==0.1.7
+enterprise-integrated-channels==0.1.8
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
