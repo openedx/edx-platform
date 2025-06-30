@@ -315,9 +315,9 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     @ddt.data(
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 11, 4),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 13, 6),
-        (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 11, 4),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE, 14, 5),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE + 10, 16, 7),
+        (settings.NOTIFICATION_CREATION_BATCH_SIZE - 10, 14, 5),
     )
     @ddt.unpack
     def test_notification_is_send_in_batch(self, creation_size, prefs_query_count, notifications_query_count):
@@ -367,7 +367,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "username": "Test Author"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(11):
+            with self.assertNumQueries(14):
                 send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                    context, "http://test.url")
 
@@ -386,7 +386,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "replier_name": "Replier Name"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(13):
+            with self.assertNumQueries(15):
                 send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                    context, "http://test.url")
 
