@@ -843,10 +843,13 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         course_key = xblock.location.course_key
         store = self._verify_modulestore_support(course_key, 'update_item')
         xblock = store.update_item(xblock, user_id, allow_not_found, **kwargs)
+        silence_update = kwargs.get("silence_update")
 
         def send_updated_event():
             # .. event_implemented_name: XBLOCK_UPDATED
             # .. event_type: org.openedx.content_authoring.xblock.updated.v1
+            if silence_update:
+                return
             XBLOCK_UPDATED.send_event(
                 time=datetime.now(timezone.utc),
                 xblock_info=XBlockData(

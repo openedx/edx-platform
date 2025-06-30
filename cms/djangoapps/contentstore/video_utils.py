@@ -4,6 +4,7 @@ Utils related to the videos.
 
 
 import logging
+import isodate
 from urllib.parse import urljoin
 
 import requests
@@ -12,6 +13,7 @@ from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import gettext as _
 from edxval.api import get_course_video_image_url, update_video_image
+from xmodule.modulestore.django import modulestore
 
 # Youtube thumbnail sizes.
 # https://img.youtube.com/vi/{youtube_id}/{thumbnail_quality}.jpg
@@ -135,3 +137,64 @@ def scrape_youtube_thumbnail(course_id, edx_video_id, youtube_id):
         )
         image_file = SimpleUploadedFile(image_filename, thumbnail_content, thumbnail_content_type)
         validate_and_update_video_image(course_id, edx_video_id, image_file, image_filename)
+
+
+def get_youtube_video_duration(youtube_video_id: str) -> float:
+    """
+    Get youtube video duration using google api
+    """
+    API_KEY = settings.YOUTUBE_API_KEY
+
+    url = settings.YOUTUBE.get("METADATA_URL")
+    params = {
+        "part": "contentDetails",
+        "id": youtube_video_id,
+        "key": API_KEY
+    }
+
+    response = requests.get(url, params=params)
+    data = response.json()
+    duration_iso8601 = data["items"][0]["contentDetails"]["duration"]
+    duration = isodate.parse_duration(duration_iso8601)
+    return duration.total_seconds()
+
+
+def process_video_duration(xblock):
+    """
+    Gets video duration and store it
+    """
+    store = modulestore()
+    xblock_category = getattr(xblock, 'category', '')
+    youtube_id = getattr(xblock, 'youtube_id_1_0', None)
+
+    is_youtube_properly_configured = (
+        settings.YOUTUBE_API_KEY and
+        settings.YOUTUBE_API_KEY != "PUT_YOUR_API_KEY_HERE" and
+        settings.YOUTUBE.get("METADATA_URL")
+    )
+
+    if not xblock_category == 'video' or not youtube_id:
+        LOGGER.debug("Skipping video duration process")
+        return
+
+    if not is_youtube_properly_configured:
+        LOGGER.warning("Youtube video is not properly configured")
+        return
+
+    LOGGER.info("Video duration started. Youtube video id %s", youtube_id)
+    duration_video = get_youtube_video_duration(youtube_id)
+    LOGGER.info("Video duration completed: value %s for video id: %s", duration_video, youtube_id)
+
+    with store.bulk_operations(xblock.location.course_key):
+        field = xblock.fields["duration"]
+        if duration_video is None:
+            field.delete_from(xblock)
+        else:
+            try:
+                duration_video = field.from_json(duration_video)
+            except ValueError as verr:
+                LOGGER.warning("duration_video value error %s", verr)
+            field.write_to(xblock, duration_video)
+
+        xblock_updated = store.update_item(xblock, None, silence_update=True)
+        LOGGER.info("Video duration: xblock updated %s", xblock_updated)

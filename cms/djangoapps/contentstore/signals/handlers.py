@@ -50,6 +50,7 @@ from ..models import ComponentLink, ContainerLink
 from ..tasks import (
     create_or_update_upstream_links,
     handle_create_or_update_xblock_upstream_link,
+    handle_create_or_update_xblock_video_duration,
     handle_unlink_upstream_block,
     handle_unlink_upstream_container,
 )
@@ -269,6 +270,7 @@ def create_or_update_upstream_downstream_link_handler(**kwargs):
         return
 
     handle_create_or_update_xblock_upstream_link.delay(str(xblock_info.usage_key))
+    handle_create_or_update_xblock_video_duration.delay(str(xblock_info.usage_key))
 
 
 @receiver(XBLOCK_DELETED)

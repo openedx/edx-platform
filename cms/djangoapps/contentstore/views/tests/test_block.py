@@ -3253,6 +3253,11 @@ class TestXBlockInfo(ItemTest):
 
     def setUp(self):
         super().setUp()
+        handle_create_or_update_xblock_video_duration = patch(
+            'cms.djangoapps.contentstore.signals.handlers.handle_create_or_update_xblock_video_duration'
+        )
+        handle_create_or_update_xblock_video_duration.start()
+        self.addCleanup(handle_create_or_update_xblock_video_duration.stop)
         user_id = self.user.id
         self.chapter = BlockFactory.create(
             parent_location=self.course.location,
