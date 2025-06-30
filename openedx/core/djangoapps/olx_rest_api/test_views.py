@@ -77,7 +77,7 @@ class OlxRestApiTestCase(SharedModuleStoreTestCase):
             blocks[str(self.video_key)]['olx'],
             '<video youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" '
             'display_name="default" youtube_id_0_75="JMD_ifUUfsU" youtube_id_1_0="OEoXaMPEzfM" '
-            'youtube_id_1_25="AKqURZnYqpk" youtube_id_1_5="DYpADpL7jAY"/>\n'
+            'video_duration="63.0" youtube_id_1_25="AKqURZnYqpk" youtube_id_1_5="DYpADpL7jAY"/>\n'
         )
 
     def test_html_with_static_asset(self):

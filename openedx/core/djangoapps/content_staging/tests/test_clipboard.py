@@ -20,6 +20,7 @@ SAMPLE_VIDEO_OLX = """
     <video
         url_name="sample_video"
         display_name="default"
+        video_duration="63.0"
         youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
         youtube_id_0_75="JMD_ifUUfsU"
         youtube_id_1_0="OEoXaMPEzfM"
@@ -197,6 +198,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
                 <video
                     url_name="sample_video"
                     display_name="default"
+                    video_duration="63.0"
                     youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
                     youtube_id_0_75="JMD_ifUUfsU"
                     youtube_id_1_0="OEoXaMPEzfM"
@@ -206,6 +208,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
                 <video
                     url_name="separate_file_video"
                     display_name="default"
+                    video_duration="63.0"
                     youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
                     youtube_id_0_75="JMD_ifUUfsU"
                     youtube_id_1_0="OEoXaMPEzfM"
@@ -215,6 +218,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
                 <video
                     url_name="video_with_end_time"
                     display_name="default"
+                    video_duration="63.0"
                     youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
                     end_time="00:00:10"
                     youtube_id_0_75="JMD_ifUUfsU"
