@@ -1,15 +1,8 @@
-Open edX
---------
+openedx
+-------
 
-This is the root package for Open edX. The intent is that all importable code
-from Open edX will eventually live here, including the code in the lms, cms,
-and common directories.
+This directory (openedx) should contain code that is used by both `LMS <https://github.com/openedx/edx-platform/tree/master/lms>`_ and `CMS <https://github.com/openedx/edx-platform/tree/master/cms>`_. If your code is specific to LMS or CMS, put it in those directories instead.
 
-If you're adding a new Django app, place it in core/djangoapps. If you're adding
-utilities that require Django, place them in core/djangolib.  If you're adding
-code that defines no Django models or views of its own but is widely useful, put it
-in core/lib.
+Like openedx, the directory `common <https://github.com/openedx/edx-platform/tree/master/common>`_ also contains code used by both LMS and CMS. At some point we'll merge the two.
 
-Note: All new code should be created in this package, and the legacy code will
-be moved here gradually. For now the code is not structured like this, and hence
-legacy code will continue to live in a number of different packages.
+Lastly, the directory `xmodule <https://github.com/openedx/edx-platform/tree/master/xmodule>`_ contains legacy core code, also used by both LMS and CMS. We're in the middle of a long process of phasing that code out. Don't add new code there. 

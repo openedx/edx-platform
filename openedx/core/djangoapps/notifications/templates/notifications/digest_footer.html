@@ -1,3 +1,4 @@
+{% load i18n %}
 <table cellpadding="0" cellspacing="0" style="color:black; font-weight:400; font-size:12px;line-height:20px" width="100%">
     <tbody>
         <tr>
@@ -6,7 +7,7 @@
                     <tbody>
                         <tr>
                             <td width="25%" align="left" style="padding: 0">
-                                <img src="{{ logo_url }}" style="width: auto;" height="24" alt="Logo"/></a>
+                                <img src="{{ logo_url }}" style="width: auto;" height="32" alt="Logo"/></a>
                             </td>
                             <td width="75%" align="right" style="padding: 0">
                                 <table>
@@ -30,21 +31,25 @@
         </tr>
         <tr>
             <td>
-                <p style="margin: 1.5rem 0 0 0;">
-                    You are receiving this email because you have subscribed to email digest
-                </p>
-                <p style="margin: 0.625rem 0">
+                <blockquote style="margin: 1rem 0 0;">
+                    {% if footer_email_reason %}
+                        {{ footer_email_reason }}
+                    {% else %}
+                        {% trans "You are receiving this email because you have subscribed to email digest" as tmsg %}{{ tmsg | force_escape }}
+                    {% endif %}
+                </blockquote>
+                <blockquote style="margin: 0.625rem 0">
                     <a href="{{notification_settings_url}}" rel="noopener noreferrer" target="_blank" style="color: black">
-                        Notification Settings
+                        {% trans "Notification Settings" as tmsg %}{{ tmsg | force_escape }}
                     </a>
                     <a href="{{unsubscribe_url}}" rel="noopener noreferrer" target="_blank" style="color: black; margin-left: 1rem">
-                        Unsubscribe from email digest for learning activity
+                        {% trans "Unsubscribe from email digest for learning activity" as tmsg %}{{ tmsg | force_escape }}
                     </a>
-                </p>
-                <p>
-                    &copy; {% now "Y" %} {{ platform_name }}. All Rights Reserved <br/>
+                </blockquote>
+                <blockquote style="margin: 0">
+                    &copy; {% now "Y" %} {{ platform_name }}. {% trans "All rights reserved" as tmsg %}{{ tmsg | force_escape }} <br/>
                     {{ mailing_address }}
-                </p>
+                </blockquote>
             </td>
         </tr>
     </tbody>

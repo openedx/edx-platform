@@ -15,6 +15,7 @@ from openedx.core.djangoapps.notifications.base_notification import (
     get_notification_content
 )
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.user_api.models import UserPreference
 
 User = get_user_model()
@@ -25,7 +26,7 @@ NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 13
+COURSE_NOTIFICATION_CONFIG_VERSION = 14
 
 
 def get_course_notification_preference_config():
@@ -111,7 +112,7 @@ class Notification(TimeStampedModel):
     email = models.BooleanField(default=False, null=False, blank=False)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
-    group_by_id = models.CharField(max_length=42, db_index=True, null=False, default="")
+    group_by_id = models.CharField(max_length=255, db_index=True, null=False, default="")
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
@@ -122,6 +123,29 @@ class Notification(TimeStampedModel):
         Returns the content for the notification.
         """
         return get_notification_content(self.notification_type, self.content_context)
+
+
+class NotificationPreference(TimeStampedModel):
+    """
+    Model to store notification preferences for users at account level
+    """
+    class EmailCadenceChoices(models.TextChoices):
+        DAILY = 'Daily'
+        WEEKLY = 'Weekly'
+        IMMEDIATELY = 'Immediately'
+
+    class Meta:
+        # Ensures user do not have duplicate preferences.
+        unique_together = ('user', 'app', 'type',)
+
+    user = models.ForeignKey(User, related_name="notification_preference", on_delete=models.CASCADE)
+    type = models.CharField(max_length=128, db_index=True)
+    app = models.CharField(max_length=128, null=False, blank=False, db_index=True)
+    web = models.BooleanField(default=True, null=False, blank=False)
+    push = models.BooleanField(default=False, null=False, blank=False)
+    email = models.BooleanField(default=False, null=False, blank=False)
+    email_cadence = models.CharField(max_length=64, choices=EmailCadenceChoices.choices, null=False, blank=False)
+    is_active = models.BooleanField(default=True)
 
 
 class CourseNotificationPreference(TimeStampedModel):
@@ -303,3 +327,19 @@ class CourseNotificationPreference(TimeStampedModel):
         }
         """
         return self.get_notification_types(app_name).get('core', {})
+
+    def is_email_enabled_for_notification_type(self, app_name, notification_type) -> bool:
+        """
+        Returns True if the email is enabled for the given app name and notification type.
+        """
+        if self.is_core(app_name, notification_type):
+            return self.get_core_config(app_name).get('email', False)
+        return self.get_notification_type_config(app_name, notification_type).get('email', False)
+
+    def get_email_cadence_for_notification_type(self, app_name, notification_type) -> str:
+        """
+        Returns the email cadence for the given app name and notification type.
+        """
+        if self.is_core(app_name, notification_type):
+            return self.get_core_config(app_name).get('email_cadence', EmailCadence.NEVER)
+        return self.get_notification_type_config(app_name, notification_type).get('email_cadence', EmailCadence.NEVER)

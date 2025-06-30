@@ -881,6 +881,15 @@ FEATURES = {
     #   toggle does not have a target removal date.
     'ENABLE_AUTHN_MICROFRONTEND': os.environ.get("EDXAPP_ENABLE_AUTHN_MFE", False),
 
+    # .. toggle_name: FEATURES['ENABLE_CATALOG_MICROFRONTEND']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Supports staged rollout of a new micro-frontend-based implementation of the catalog.
+    # .. toggle_use_cases: temporary
+    # .. toggle_creation_date: 2025-05-15
+    # .. toggle_target_removal_date: 2025-11-01
+    'ENABLE_CATALOG_MICROFRONTEND': False,
+
     ### ORA Feature Flags ###
     # .. toggle_name: FEATURES['ENABLE_ORA_ALL_FILE_URLS']
     # .. toggle_implementation: DjangoSetting
@@ -1911,6 +1920,10 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT_LMS', ENV_ROOT / "staticfiles")
+# .. setting_name: STATIC_URL_BASE
+# .. setting_default: "/static/"
+# .. setting_description: The LMS uses this to construct ``STATIC_URL`` by appending
+#   a slash (if needed).
 STATIC_URL_BASE = '/static/'
 
 STATICFILES_DIRS = [
@@ -2241,9 +2254,6 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.CookieMonitoringMiddleware',
     'edx_django_utils.monitoring.DeploymentMonitoringMiddleware',
     'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
-
-    # Before anything that looks at cookies, especially the session middleware
-    'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
 
     # Monitoring and logging for ignored errors
     'openedx.core.lib.request_utils.IgnoredErrorMiddleware',
@@ -3042,6 +3052,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
 
+    'dal',
+    'dal_select2',
+
     # Tweaked version of django.contrib.staticfiles
     'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
 
@@ -3374,7 +3387,6 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 # end users
 CSRF_COOKIE_SECURE = False
 CSRF_TRUSTED_ORIGINS = []
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = []
 
 # If setting a cross-domain cookie, it's really important to choose
 # a name for the cookie that is DIFFERENT than the cookies used
@@ -3491,6 +3503,7 @@ SUPPORT_SITE_LINK = ''
 ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''
+SEND_ACTIVATION_EMAIL_URL = ''
 LOGIN_ISSUE_SUPPORT_LINK = ''
 
 # .. setting_name: SECURITY_PAGE_URL
@@ -5060,49 +5073,70 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
 EXAMS_DASHBOARD_MICROFRONTEND_URL = None
+
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy.
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the password reset flow.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2021-12-03
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-666
 ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY = False
+
 # .. toggle_name: ENABLE_AUTHN_REGISTER_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   HIBP Policy on Authn MFE's registration.
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the registration flow if their frequency exceeds a threshold.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
 # .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-25
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-669
 ENABLE_AUTHN_REGISTER_HIBP_POLICY = False
-HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3
+# .. setting_name: HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 3.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_REGISTER_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD = 3.0
 
 # .. toggle_name: ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
+# .. toggle_description: When enabled, the login flow detects vulnerable passwords
+#   and prompts users to change their password if their frequency exceeds a threshold.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-668
 ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY = False
-HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3
+# .. setting_name: HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 3.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD = 3.0
 
 # .. toggle_name: ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
-# .. toggle_description: When enabled, this toggle activates the use of the password validation
-#   on Authn MFE's login.
-# .. toggle_use_cases: temporary
+# .. toggle_description: When enabled, this toggle prevents the use of known-vulnerable passwords in
+#   the login flow if their frequency exceeds a threshold. Passwords are assessed by calling the
+#   Pwned Passwords service using a k-anonymity method that does not expose the password. The
+#   service tells us whether the password has been seen in any data breaches, and if so, how
+#   often. This count is converted to a "frequency" by taking the logarithm base 10. The login flow
+#   can reject all vulnerable passwords, or only passwords with a frequency above a configured
+#   threshold. In existing deployments, the threshold should be set high and tightened
+#   gradually in order to avoid large spikes in password resets and support requests. For example,
+#   setting ``HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD`` to 5 would reject logins when the
+#   password has been seen 100,000 or more times in the Pwned Passwords dataset. The goal should be
+#   to gradually reduce this to 0, meaning even a single occurrence will cause a rejection. (The
+#   threshold can take any real-number value.)
+# .. toggle_use_cases: open_edx
 # .. toggle_creation_date: 2022-03-29
-# .. toggle_target_removal_date: None
-# .. toggle_tickets: https://openedx.atlassian.net/browse/VAN-667
 ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY = False
-HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5
+# .. setting_name: HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD
+# .. setting_default: 5.0
+# .. setting_description: Log10 threshold in effect for ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY.
+#   See ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY for more details.
+HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD = 5.0
 
 # .. toggle_name: ENABLE_DYNAMIC_REGISTRATION_FIELDS
 # .. toggle_implementation: DjangoSetting
@@ -5386,6 +5420,15 @@ NOTIFICATION_CREATION_BATCH_SIZE = 76
 NOTIFICATIONS_DEFAULT_FROM_EMAIL = "no-reply@example.com"
 NOTIFICATION_TYPE_ICONS = {}
 DEFAULT_NOTIFICATION_ICON_URL = ""
+NOTIFICATION_DIGEST_LOGO = DEFAULT_EMAIL_LOGO_URL
+
+############## SELF PACED EMAIL ##############
+SELF_PACED_BANNER_URL = ""
+SELF_PACED_CLOUD_URL = ""
+
+############## GOAL REMINDER EMAIL ##############
+GOAL_REMINDER_BANNER_URL = ""
+GOAL_REMINDER_PROFILE_URL = ""
 
 ############## NUDGE EMAILS ###############
 # .. setting_name: DISABLED_ORGS_FOR_PROGRAM_NUDGE

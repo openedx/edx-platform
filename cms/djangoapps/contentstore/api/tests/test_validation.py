@@ -103,7 +103,7 @@ class CourseValidationViewTest(SharedModuleStoreTestCase, APITestCase):
                 'has_update': True,
             },
             'certificates': {
-                'is_enabled': True,
+                'is_enabled': False,
                 'is_activated': False,
                 'has_certificate': False,
             },
