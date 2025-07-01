@@ -26,6 +26,7 @@ from openedx_events.content_authoring.signals import (
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
+from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
@@ -132,6 +133,7 @@ class ContainerMetadata(PublishableItem):
             last_draft_created_by = draft.publishable_entity_version.created_by.username
         else:
             last_draft_created_by = ""
+        tags = get_object_tag_counts(str(container_key), count_implicit=True)
 
         return cls(
             container_key=container_key,
@@ -148,6 +150,7 @@ class ContainerMetadata(PublishableItem):
             last_draft_created=last_draft_created,
             last_draft_created_by=last_draft_created_by,
             has_unpublished_changes=authoring_api.contains_unpublished_changes(container.pk),
+            tags_count=tags.get(str(container_key), 0),
             collections=associated_collections or [],
         )
 
@@ -305,6 +308,12 @@ def update_container(
 
     version: ContainerVersion
     affected_containers: list[ContainerMetadata] = []
+    # Get children containers or components to update their index data
+    children = get_container_children(
+        container_key,
+        published=False,
+    )
+    child_key_name = 'container_key'
 
     match container_type:
         case ContainerType.Unit:
@@ -315,6 +324,8 @@ def update_container(
                 created_by=user_id,
             )
             affected_containers = get_containers_contains_item(container_key)
+            # Components have usage_key instead of container_key
+            child_key_name = 'usage_key'
         case ContainerType.Subsection:
             version = authoring_api.create_next_subsection_version(
                 container.subsection,
@@ -351,6 +362,16 @@ def update_container(
                 container_key=affected_container.container_key,
             )
         )
+    # Update children components and containers index data, for example,
+    # All subsections under a section have section key in index that needs to be updated.
+    # So if parent section name has been changed, it needs to be reflected in sections key of children
+    for child in children:
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            content_object=ContentObjectChangedData(
+                object_id=str(getattr(child, child_key_name)),
+                changes=[container_key.container_type + "s"],
+            ),
+        )
 
     return ContainerMetadata.from_container(library_key, version.container)
 
@@ -366,9 +387,16 @@ def delete_container(
     library_key = container_key.lib_key
     container = _get_container_from_key(container_key)
 
+    # Fetch related collections and containers before soft-delete
     affected_collections = authoring_api.get_entity_collections(
         container.publishable_entity.learning_package_id,
         container.key,
+    )
+    affected_containers = get_containers_contains_item(container_key)
+    # Get children containers or components to update their index data
+    children = get_container_children(
+        container_key,
+        published=False,
     )
     authoring_api.soft_delete_draft(container.pk)
 
@@ -392,6 +420,29 @@ def delete_container(
                 background=True,
             )
         )
+    # Send events related to the containers that contains the updated container.
+    # This is to update the children display names used in the section/subsection previews.
+    for affected_container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                container_key=affected_container.container_key,
+            )
+        )
+    container_type = ContainerType(container_key.container_type)
+    key_name = 'container_key'
+    if container_type == ContainerType.Unit:
+        # Components have usage_key instead of container_key
+        key_name = 'usage_key'
+    # Update children components and containers index data, for example,
+    # All subsections under a section have section key in index that needs to be updated.
+    # So if parent section is deleted, it needs to be removed from sections key of children
+    for child in children:
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            content_object=ContentObjectChangedData(
+                object_id=str(getattr(child, key_name)),
+                changes=[container_key.container_type + "s"],
+            ),
+        )
 
 
 def restore_container(container_key: LibraryContainerLocator) -> None:
@@ -407,6 +458,13 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     )
 
     authoring_api.set_draft_version(container.pk, container.versioning.latest.pk)
+    # Fetch related containers after restore
+    affected_containers = get_containers_contains_item(container_key)
+    # Get children containers or components to update their index data
+    children = get_container_children(
+        container_key,
+        published=False,
+    )
 
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
@@ -414,11 +472,15 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
         )
     )
 
-    # Add tags and collections back to index
+    content_changes = ["collections", "tags"]
+    if affected_containers and len(affected_containers) > 0:
+        # Update parent key data in index. Eg. `sections` key in index for subsection
+        content_changes.append(str(affected_containers[0].container_type.value) + "s")
+    # Add tags, collections and parent data back to index
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
             object_id=str(container_key),
-            changes=["collections", "tags"],
+            changes=content_changes,
         ),
     )
 
@@ -434,6 +496,28 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
                     collection_key=collection.key,
                 ),
             )
+        )
+    # Send events related to the containers that contains the updated container.
+    # This is to update the children display names used in the section/subsection previews.
+    for affected_container in affected_containers:
+        LIBRARY_CONTAINER_UPDATED.send_event(
+            library_container=LibraryContainerData(
+                container_key=affected_container.container_key,
+            )
+        )
+    container_type = ContainerType(container_key.container_type)
+    key_name = 'container_key'
+    if container_type == ContainerType.Unit:
+        key_name = 'usage_key'
+    # Update children components and containers index data, for example,
+    # All subsections under a section have section key in index that needs to be updated.
+    # Should restore removed parent section in sections key of children subsections
+    for child in children:
+        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
+            content_object=ContentObjectChangedData(
+                object_id=str(getattr(child, key_name)),
+                changes=[container_key.container_type + "s"],
+            ),
         )
 
 
