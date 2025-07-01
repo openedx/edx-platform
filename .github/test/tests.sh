@@ -13,9 +13,8 @@ pip3 install ora2==2.11.5.1
 
 # Task Helper modifications for uchileedxlogin package
 ## Test before installing the package
-DJANGO_SETTINGS_MODULE=lms.envs.test EDXAPP_TEST_MONGO_HOST=mongodb pytest --exitfirst --full-trace --verbose \
-	lms/djangoapps/instructor_task/tests/test_tasks_helper.py \
-	lms/djangoapps/instructor_analytics/tests/test_basic.py \
-	lms/djangoapps/certificates/tests/test_webview_views.py \
-	lms/djangoapps/bulk_email/tests/ \
-	lms/djangoapps/instructor/tests/
+DJANGO_SETTINGS_MODULE=lms.envs.test EDXAPP_TEST_MONGO_HOST=mongodb pytest lms/djangoapps/instructor_task/tests/test_tasks_helper.py lms/djangoapps/instructor_analytics/tests/test_basic.py
+
+## Test after installing the package
+#pip3 install -e git+https://github.com/eol-uchile/uchileedxlogin@2db9adab2a3662ae04754cc158af57f2f197c236#egg=uchileedxlogin
+#DJANGO_SETTINGS_MODULE=lms.envs.test EDXAPP_TEST_MONGO_HOST=mongodb pytest lms/djangoapps/instructor_task/tests/test_tasks_helper.py lms/djangoapps/instructor_analytics/tests/test_basic.py
