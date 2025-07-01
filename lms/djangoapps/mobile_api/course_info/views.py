@@ -3,7 +3,7 @@ Views for course info API
 """
 
 import logging
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import django
 from django.contrib.auth import get_user_model
@@ -383,8 +383,8 @@ class BlocksInfoInCourseView(BlocksInCourseView):
             response.data.update(course_data)
         return response
 
-    @staticmethod
     def _extend_sequential_info_with_assignment_progress(
+        self,
         requested_user: User,
         course_id: CourseKey,
         blocks_info_data: Dict[str, Dict],
@@ -392,8 +392,11 @@ class BlocksInfoInCourseView(BlocksInCourseView):
         """
         Extends sequential xblock info with assignment's name and progress.
         """
-        subsection_grades = get_assignments_grades(requested_user, course_id, BLOCK_STRUCTURE_CACHE_TIMEOUT)
+        subsection_grades, section_breakdown = (
+            get_assignments_grades(requested_user, course_id, BLOCK_STRUCTURE_CACHE_TIMEOUT)
+        )
         grades_with_locations = {str(grade.location): grade for grade in subsection_grades}
+        id_to_label = self._id_to_label(section_breakdown)
 
         for block_id, block_info in blocks_info_data.items():
             if block_info['type'] == 'sequential':
@@ -403,8 +406,9 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                     points_earned = graded_total.earned if graded_total else 0
                     points_possible = graded_total.possible if graded_total else 0
                     assignment_type = grade.format
+                    label = id_to_label.get(block_id)
                 else:
-                    points_earned, points_possible, assignment_type = 0, 0, None
+                    points_earned, points_possible, assignment_type, label = 0, 0, None, None
 
                 block_info.update(
                     {
@@ -412,9 +416,21 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                             'assignment_type': assignment_type,
                             'num_points_earned': points_earned,
                             'num_points_possible': points_possible,
+                            'label': label,
                         }
                     }
                 )
+
+    @staticmethod
+    def _id_to_label(section_breakdown: List[Dict]) -> Dict[str, str]:
+        """
+        Get `sequential_id` to assignment `label` mapping.
+        """
+        return {
+            section['sequential_id']: section['label']
+            for section in section_breakdown
+            if 'sequential_id' in section and section['sequential_id'] != 'No ID'
+        }
 
 
 @mobile_view()
