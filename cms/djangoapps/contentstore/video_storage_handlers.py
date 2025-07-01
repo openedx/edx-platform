@@ -724,6 +724,7 @@ def get_all_transcript_languages():
     third_party_transcription_languages.update(cielo_fidelity['PREMIUM']['languages'])
     third_party_transcription_languages.update(cielo_fidelity['PROFESSIONAL']['languages'])
 
+    # combines ALL_LANGUAGES with additional languages that should be supported for transcripts
     extended_all_languages = settings.ALL_LANGUAGES + settings.EXTENDED_VIDEO_TRANSCRIPT_LANGUAGES
     all_languages_dict = dict(extended_all_languages, **third_party_transcription_languages)
     # Return combined system settings and 3rd party transcript languages.
