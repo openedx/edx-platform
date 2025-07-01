@@ -2,7 +2,6 @@
 Tests for third_party_auth/models.py.
 """
 import unittest
-from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 from django.contrib.sites.models import Site
@@ -17,7 +16,7 @@ from ..models import (
 )
 
 # Import signal handlers to ensure they're loaded for tests
-from ..signals import handlers  # noqa: F401
+from ..signals import handlers  # noqa: F401 pylint: disable=unused-import
 
 
 class TestSamlProviderConfigModel(TestCase, unittest.TestCase):
