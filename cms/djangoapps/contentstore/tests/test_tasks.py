@@ -189,6 +189,26 @@ class RerunCourseTaskTestCase(CourseTestCase):  # lint-amnesty, pylint: disable=
             country=restricted_country
         )
 
+    def test_success_different_org(self):
+        """
+        The task should clone the OrganizationCourse with a different org.
+        """
+        old_course_key = self.course.id
+        new_course_key = CourseLocator(org='neworg', course=old_course_key.course, run='rerun')
+
+        old_course_id = str(old_course_key)
+        new_course_id = str(new_course_key)
+
+        organization = OrganizationFactory(short_name=old_course_key.org)
+        OrganizationCourse.objects.create(course_id=old_course_id, organization=organization)
+
+        # Run the task!
+        self._rerun_course(old_course_key, new_course_key)
+
+        # Verify the OrganizationCourse is cloned with a different org
+        self.assertEqual(OrganizationCourse.objects.count(), 2)
+        OrganizationCourse.objects.get(course_id=new_course_id, organization__short_name='neworg')
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class RegisterExamsTaskTestCase(CourseTestCase):  # pylint: disable=missing-class-docstring
