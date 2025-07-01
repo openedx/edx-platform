@@ -350,6 +350,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
         notification_app = "discussion"
         notification_type = "new_comment"
         users = self._create_users(20)
+        NotificationPreference.objects.all().delete()
         user_ids = [user.id for user in users]
         context = {
             "post_title": "Test Post",
@@ -357,7 +358,7 @@ class SendBatchNotificationsTest(ModuleStoreTestCase):
             "replier_name": "Replier Name"
         }
         with override_waffle_flag(ENABLE_NOTIFICATIONS, active=True):
-            with self.assertNumQueries(15):
+            with self.assertNumQueries(16):
                 send_notifications(user_ids, str(self.course.id), notification_app, notification_type,
                                    context, "http://test.url")
 
