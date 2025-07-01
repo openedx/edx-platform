@@ -28,11 +28,11 @@ def filter_discussion_xblocks_from_response(response, course_key):
             ]
         # Filtering discussion xblocks keys from blocks
         if isinstance(response.data, ReturnList):
-            filtered_blocks = {
-                value.get('id'): value
+            filtered_blocks = [
+                value
                 for value in response.data
                 if value.get('type') != 'discussion'
-            }
+            ]
         else:
             filtered_blocks = {
                 key: value
@@ -41,17 +41,29 @@ def filter_discussion_xblocks_from_response(response, course_key):
             }
         # Removing reference of discussion xblocks from unit
         # These references needs to be removed because they no longer exist
-        for _, block_data in filtered_blocks.items():
-            for key in ['descendants', 'children']:
-                descendants = block_data.get(key, [])
-                if descendants:
-                    descendants = [
-                        descendant for descendant in descendants
-                        if descendant not in discussion_xblocks
-                    ]
-                    block_data[key] = descendants
         if isinstance(response.data, ReturnList):
-            response.data = filtered_blocks
+            for block_data in filtered_blocks:
+                _put_xblock_descendants(block_data, discussion_xblocks)
+        else:
+            for _, block_data in filtered_blocks.items():
+                _put_xblock_descendants(block_data, discussion_xblocks)
+
+        if isinstance(response.data, ReturnList):
+            response.data = ReturnList(filtered_blocks, serializer=None)
         else:
             response.data['blocks'] = filtered_blocks
     return response
+
+
+def _put_xblock_descendants(block_data, discussion_xblocks):
+    """
+    Put descendants into xblock data if they existed before filtering.
+    """
+    for key in ['descendants', 'children']:
+        descendants = block_data.get(key, [])
+        if descendants:
+            descendants = [
+                descendant for descendant in descendants
+                if descendant not in discussion_xblocks
+            ]
+            block_data[key] = descendants
