@@ -5,15 +5,14 @@ Test for account level migration command
 from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.core.management import call_command
+from django.db.models.signals import post_save
+from django.test import TestCase
 
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
-from openedx.core.djangoapps.notifications.models import (
-    CourseNotificationPreference,
-    NotificationPreference
-)
+from openedx.core.djangoapps.notifications.handlers import create_user_account_preferences
 from openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model import Command
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, NotificationPreference
 
 User = get_user_model()
 COMMAND_MODULE = 'openedx.core.djangoapps.notifications.management.commands.migrate_preferences_to_account_level_model'
@@ -24,6 +23,8 @@ class MigrateNotificationPreferencesTestCase(TestCase):
 
     def setUp(self):
         """Set up test data."""
+        # Disconnect before creating users
+        post_save.disconnect(create_user_account_preferences, sender=User)
         self.user1 = User.objects.create_user(username='user1', email='user1@example.com')
         self.user2 = User.objects.create_user(username='user2', email='user2@example.com')
         self.user3 = User.objects.create_user(username='user3', email='user3@example.com')

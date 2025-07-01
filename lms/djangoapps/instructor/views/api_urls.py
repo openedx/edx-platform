@@ -69,7 +69,7 @@ urlpatterns = [
     path('export_ora2_data', api.ExportOra2DataView.as_view(), name='export_ora2_data'),
     path('export_ora2_summary', api.ExportOra2SummaryView.as_view(), name='export_ora2_summary'),
 
-    path('export_ora2_submission_files', api.export_ora2_submission_files,
+    path('export_ora2_submission_files', api.ExportOra2SubmissionFilesView.as_view(),
          name='export_ora2_submission_files'),
 
     # spoc gradebook
