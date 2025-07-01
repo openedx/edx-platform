@@ -12,7 +12,7 @@ from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangoapps.notifications.base_notification import (
     NotificationAppManager,
     NotificationPreferenceSyncManager,
-    get_notification_content, COURSE_NOTIFICATION_APPS
+    get_notification_content
 )
 from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
