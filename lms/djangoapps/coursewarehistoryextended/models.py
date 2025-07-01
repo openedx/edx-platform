@@ -32,11 +32,16 @@ class StudentModuleHistoryExtended(BaseStudentModuleHistory):
     class Meta:
         app_label = 'coursewarehistoryextended'
         get_latest_by = "created"
-        index_together = ['student_module']
+        indexes = [
+            models.Index(
+                fields=['student_module'],
+                name="student_module_idx"
+            ),
+        ]
 
     id = models.BigAutoField(primary_key=True, serialize=False)  # pylint: disable=invalid-name
 
-    student_module = models.ForeignKey(StudentModule, db_index=True, db_constraint=False, on_delete=models.DO_NOTHING)
+    student_module = models.ForeignKey(StudentModule, db_index=False, db_constraint=False, on_delete=models.DO_NOTHING)
 
     @receiver(post_save, sender=StudentModule)
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument

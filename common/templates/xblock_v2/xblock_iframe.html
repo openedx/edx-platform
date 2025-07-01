@@ -40,6 +40,7 @@
     // The minimal RequireJS configuration required for common LMS and CMS building XBlock types to work:
     require = require || RequireJS.require;
     define = define || RequireJS.define;
+    baseUrl = "";
     (function (require, define) {
         if ('{{ view_name | safe }}' === 'studio_view') {
             // Call `require-config.js` of the CMS
@@ -47,9 +48,10 @@
             script.type = 'text/javascript';
             script.src = "{{ cms_root_url }}/static/studio/cms/js/require-config.js";
             document.head.appendChild(script);
+            baseUrl = "{{ cms_root_url }}/static/studio";
 
             require.config({
-                baseUrl: "{{ cms_root_url }}/static/studio",
+                baseUrl,
                 paths: {
                         accessibility: 'js/src/accessibility_tools',
                         draggabilly: 'js/vendor/draggabilly',
@@ -64,8 +66,9 @@
                 "{{ lms_root_url }}/static/dist{{ oa_manifest.oa_editor_textarea_js }}",
             ]);
         } else {
+            baseUrl = "{{ lms_root_url }}/static/";
             require.config({
-                baseUrl: "{{ lms_root_url }}/static/",
+                baseUrl,
                 paths: {
                     accessibility: 'js/src/accessibility_tools',
                     draggabilly: 'js/vendor/draggabilly',
@@ -273,8 +276,6 @@
             // Check if the XBlock has an initialization function:
             const initFunctionName = element.getAttribute('data-init');
             if (initFunctionName !== null) {
-                // Since this block has an init function, it may need to call handlers:
-                element[HANDLER_URL] = HANDLER_URL_MAP[usageId];
                 // Now proceed with initializing the block's JavaScript:
                 const InitFunction = (window)[initFunctionName];
                 // Does the XBlock HTML contain arguments to pass to the InitFunction?
@@ -293,13 +294,12 @@
                 // to pass 'element' as a jQuery-wrapped DOM element, whereas the LMS
                 // runtime used to pass 'element' as the pure DOM node. In order not to
                 // break backwards compatibility, we would need to maintain that.
-                // However, this is currently disabled as it causes issues (need to
-                // modify the runtime methods like handlerUrl too), and we decided not
-                // to maintain support for legacy studio_view in this runtime.
-                // const isStudioView = element.className.indexOf('studio_view') !== -1;
-                // const passElement = isStudioView && (window as any).$ ? (window as any).$(element) : element;
-                const blockJS = new InitFunction(runtime, element, data) || {};
-                blockJS.element = element;
+                const isStudioView = element.className.indexOf('studio_view') !== -1;
+                const passElement = isStudioView && window.$ ? window.$(element) : element;
+                // Since this block has an init function, it may need to call handlers:
+                passElement[HANDLER_URL] = HANDLER_URL_MAP[usageId];
+                const blockJS = new InitFunction(runtime, passElement, data) || {};
+                blockJS.element = passElement;
 
                 if (['MetadataOnlyEditingDescriptor', 'SequenceDescriptor'].includes(data['xmodule-type'])) {
                     // The xmodule type `MetadataOnlyEditingDescriptor` and `SequenceDescriptor` renders a `<div>` with
@@ -308,7 +308,7 @@
                     // editor using the metadata.
                     require(['{{ cms_root_url }}/static/studio/js/views/xblock_editor.js'], function(XBlockEditorView) {
                         var editorView = new XBlockEditorView({
-                            el: element,
+                            el: passElement,
                             xblock: blockJS,
                         });
                         // To render block using metadata
@@ -327,35 +327,28 @@
                                 </ul>
                             </div>
                         `;
-                        element.innerHTML += xblockActions;
-
-                        const views = editorView.getMetadataEditor().views;
-                        Object.values(views).forEach(view => {
-                            const uniqueId = view.uniqueId;
-                            const input = element.querySelector(`#${uniqueId}`);
-                            if (input) {
-                                input.addEventListener("input", function(event) {
-                                    view.model.setValue(event.target.value);
-                                });
-                            }
-                        });
-
+                        // Check if passElement is a jQuery-wrapped dom element
+                        if (passElement.jquery) {
+                            passElement.append(xblockActions);
+                        } else {
+                            passElement.innerHTML += xblockActions;
+                        }
                         // Adding cancel functionality
-                        $('.cancel-button', element).bind('click', function() {
+                        $('.cancel-button', passElement).bind('click', function() {
                             runtime.notify('cancel', {});
                             event.preventDefault();
                         });
 
                         // Adding save functionality
-                        $('.save-button', element).bind('click', function() {
+                        $('.save-button', passElement).bind('click', function() {
                             //event.preventDefault();
-                            var error_message_div = $('.xblock-editor-error-message', element);
-                            const modifiedData = editorView.getChangedMetadata();
+                            var error_message_div = $('.xblock-editor-error-message', passElement);
+                            const modifiedData = editorView.getChangedMetadata(true);
 
                             error_message_div.html();
                             error_message_div.css('display', 'none');
 
-                            var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
+                            var handlerUrl = runtime.handlerUrl(passElement, 'studio_submit');
 
                             runtime.notify('save', {state: 'start', message: gettext("Saving")});
 
@@ -385,7 +378,6 @@
             if ('{{ view_name | safe }}' === 'studio_view') {
               // Used when rendering the `studio_view`, in order to avoid open a new tab on click cancel or save
               const selectors = [
-                  '.cancel-button',
                   '.save-button',
                   '.action-cancel',
                   '.action-save',
@@ -400,6 +392,24 @@
                           event.preventDefault();
                       });
                   }
+              }
+
+              // This button is used in `StudioEditableXBlockMixin` from the `Xblock` app
+              // That app adds a listener that removes any TinyMCE editors on click cancel.
+              // ref: https://github.com/openedx/XBlock/blob/86eee4b05dffa42b009fab2a9050b73766131b9d/xblock/utils/public/studio_edit.js#L169
+              //
+              // Here that is an issue because we show a confirmation modal when clicking cancel,
+              // if the user stays to edit all TinyMCE editors are no longer there.
+              // 
+              // We uncouple the listener to avoid remove the TinyMCE editors
+              const extraCancelSelector = '.cancel-button';
+              const elements = $(extraCancelSelector).first();
+              if (elements.length) {
+                elements.first().unbind("click");
+                elements.on('click', function() {                    
+                    event.preventDefault();
+                    runtime.notify('cancel', {});
+                });
               }
             }
         }
