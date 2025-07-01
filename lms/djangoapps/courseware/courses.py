@@ -1150,9 +1150,6 @@ def get_assignments_completions(course_key, user):
     """
     course_assignments = get_course_assignments(course_key, user, include_without_due=True)
 
-    # import pdb
-    # pdb.set_trace()
-
     total_assignments_count = 0
     assignments_completed = 0
 
