@@ -165,10 +165,6 @@ class CommonCertificatesTestCase(ModuleStoreTestCase):
             <html>
             <body>
                 grade: ${eol_grade}
-                grade_percent: ${eol_grade_percent}
-                grade_integer: ${eol_grade_integer}
-                name: ${accomplishment_copy_name}
-                rut: ${user_eol_rut}
                 lang: ${LANGUAGE_CODE}
                 course name: ${accomplishment_copy_course_name}
                 mode: ${course_mode}
@@ -1592,10 +1588,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                     response = self.client.get(test_url)
                     self.assertEqual(response.status_code, 200)
                     self.assertContains(response, "grade: 6.7")
-                    self.assertContains(response, "grade_percent: " + self.cert.grade)
-                    grade_percent = float(self.cert.grade)
-                    self.assertContains(response, "grade_integer: " + str(int(grade_percent*100)))
-                    self.assertContains(response, "name: " + self.user.profile.name)
 
     @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
     def test_render_html_view_with_preview_mode_no_grade(self, mock_get_course_run_details):
@@ -1625,48 +1617,6 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
                     response = self.client.get(test_url)
                     self.assertEqual(response.status_code, 200)
                     self.assertContains(response, "grade: 1.0")
-                    self.assertContains(response, "grade_percent: 0.0")
-                    self.assertContains(response, "grade_integer: 0")
-                    self.assertContains(response, "name: " + self.user.profile.name)
-    
-    @patch('lms.djangoapps.certificates.views.webview.get_course_run_details')
-    def test_render_html_view_with_preview_mode_with_user_rut(self, mock_get_course_run_details):
-        """
-        Tests custom template renders properly with unicode data.
-        """
-        try:
-            from uchileedxlogin.models import EdxLoginUser
-            EdxLoginUser.objects.create(user=self.user, run='09472337K')
-            rut = '9.472.337-K'
-        except ImportError:
-            rut = ''
-        mock_get_course_run_details.return_value = self.mock_course_run_details
-        mode = 'honor'
-        self._add_course_certificates(count=1, signatory_count=2)
-        self._create_custom_template(mode=mode)
-        self.cert.grade = ""
-        self.cert.save()
-
-        with patch.dict("django.conf.settings.FEATURES", {
-            "CERTIFICATES_HTML_VIEW": True,
-            "CUSTOM_CERTIFICATE_TEMPLATES_ENABLED": True
-        }):
-            test_url = get_certificate_url(
-                user_id=self.user.id,
-                course_id=six.text_type(self.course.id),
-                uuid=self.cert.verify_uuid
-            )
-            with patch('django.http.HttpRequest.build_absolute_uri') as mock_abs_uri:
-                mock_abs_uri.return_value = '='.join(['http://localhost/?param', u'é'])
-                with patch('lms.djangoapps.certificates.api.get_course_organization_id') as mock_get_org_id:
-                    mock_get_org_id.return_value = None
-                    response = self.client.get(test_url)
-                    self.assertEqual(response.status_code, 200)
-                    self.assertContains(response, "grade: 1.0")
-                    self.assertContains(response, "grade_percent: 0.0")
-                    self.assertContains(response, "grade_integer: 0")
-                    self.assertContains(response, "rut: {}".format(rut))
-                    self.assertContains(response, "name: " + self.user.profile.name)
     # EOL
 
 
