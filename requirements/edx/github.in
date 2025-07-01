@@ -73,7 +73,7 @@
 #
 #   * Organize the URL into one of the two categories below:
 
--e git+https://github.com/openedx/openedx-learning.git@lc-course-prototype#egg=openedx-learning
+-e git+https://github.com/kdmccormick/openedx-learning.git@kdmccormick/admin#egg=openedx-learning
 
 ##############################################################################
 # Release candidates being tested.

@@ -26,8 +26,6 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
     Collection,
     Component,
-    Course,
-    CatalogCourse,
     LearningPackage,
     PublishableEntity,
     PublishableEntityVersion,
@@ -35,6 +33,10 @@ from openedx_learning.api.authoring_models import (
 from user_tasks.tasks import UserTask, UserTaskStatus
 from xblock.core import XBlock
 
+from openedx.core.djangoapps.content.courses.models import (
+    Course,
+    CatalogCourse,
+)
 from openedx.core.djangoapps.content_libraries.api import ContainerType
 from openedx.core.djangoapps.content_libraries import api as libraries_api
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
