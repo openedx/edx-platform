@@ -26,6 +26,7 @@ from openedx_events.content_authoring.signals import (
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
 
+from openedx.core.djangoapps.content.outline_roots import api as outline_roots_api
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from openedx.core.djangoapps.content.outline_roots import api as outline_root_api
@@ -89,6 +90,8 @@ class ContainerType(Enum):
             SubsectionVersion,
             Section,
             SectionVersion,
+        )
+        from openedx.core.djangoapps.content.outline_roots.models import (
             OutlineRoot,
             OutlineRootVersion,
         )
