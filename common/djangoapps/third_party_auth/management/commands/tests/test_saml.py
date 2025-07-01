@@ -101,11 +101,11 @@ class TestSAMLCommand(CacheIsolationTestCase):
         This test would fail with an error if ValueError is raised.
         """
         # Call `saml` command without any argument so that it raises a CommandError
-        with self.assertRaisesMessage(CommandError, "Command can only be used with '--pull' option."):
+        with self.assertRaisesMessage(CommandError, "Command must be used with '--pull' or '--fix-references' option."):
             call_command("saml")
 
         # Call `saml` command without any argument so that it raises a CommandError
-        with self.assertRaisesMessage(CommandError, "Command can only be used with '--pull' option."):
+        with self.assertRaisesMessage(CommandError, "Command must be used with '--pull' or '--fix-references' option."):
             call_command("saml", pull=False)
 
     def test_no_saml_configuration(self):

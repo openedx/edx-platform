@@ -1,1 +1,1 @@
-# Empty __init__.py file for the signals package
+# Signal handlers for third_party_auth app

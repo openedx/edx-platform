@@ -103,7 +103,7 @@ class Command(BaseCommand):
 
                         updated_count += 1
 
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-except
                     self.stderr.write(
                         f"Error processing provider '{provider_config.slug}': {e}"
                     )

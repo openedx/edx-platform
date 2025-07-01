@@ -10,7 +10,7 @@ class ThirdPartyAuthConfig(AppConfig):  # lint-amnesty, pylint: disable=missing-
 
     def ready(self):
         # Import signal handlers to register them
-        from .signals import handlers
+        from .signals import handlers  # noqa: F401 pylint: disable=unused-import
 
         # To override the settings before loading social_django.
         if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
