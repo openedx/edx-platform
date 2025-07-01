@@ -9,6 +9,13 @@ jobs:
     if: github.event.issue.pull_request != '' && contains(github.event.comment.body, '/ff')
     runs-on: ubuntu-latest
     steps:
+      - name: Create GitHub App Token
+        id: app_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.EOLITO_BOT_APP_ID }}
+          private-key: ${{ secrets.EOLITO_BOT_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -16,7 +23,7 @@ jobs:
         id: ff-action
         uses: endre-spotlab/fast-forward-js-action@2.1
         with:
-          GITHUB_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app_token.outputs.token }}
           success_message: 'Success! Fast forwarded source_head to target_base!'
           failure_message: 'Failed! Cannot do fast forward!'
           update_status: true
