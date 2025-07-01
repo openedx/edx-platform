@@ -2741,7 +2741,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             assert student_json['country'] == ''
 
     @ddt.data(True, False)
-    def test_get_students_features_private_fields(self, show_private_fields):
+    def test_get_students_features_private_fields(self, show_private_fields: bool):
         """
         Test that the get_students_features returns the expected private fields
         """
@@ -2817,6 +2817,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 assert student_json['external_user_key'] == external_key_dict[student.username]
             else:
                 assert student_json['external_user_key'] == ''
+
+    def test_get_students_features_without_permissions(self):
+        """ Test that get_students_features returns 403 without credentials. """
+
+        # removed both roles from courses for instructor
+        CourseDataResearcherRole(self.course.id).remove_users(self.instructor)
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        url = reverse('get_students_features', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {})
+        assert response.status_code == 403
 
     def test_get_students_who_may_enroll(self):
         """
