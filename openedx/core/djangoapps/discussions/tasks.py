@@ -201,6 +201,10 @@ def update_unit_discussion_state_from_discussion_blocks(
     """
     store = modulestore()
     course = store.get_course(course_key)
+    # The provider information has been written to both `provider_type` and `provider`.
+    # Both of these serve the same purpose and this is an accident of early development.
+    # The `provider_type` key is now treated as read-only to allow existing values
+    # to be respected while moving to the `provider` key in the future.
     provider = course.discussions_settings.get(
         'provider_type',
         course.discussions_settings.get('provider', None),
