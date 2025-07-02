@@ -56,7 +56,6 @@ from common.djangoapps.student.tests.factories import (
 from common.djangoapps.util.tests.test_date_utils import fake_pgettext, fake_ugettext
 from common.djangoapps.util.url import reload_django_url_config
 from common.djangoapps.util.views import ensure_valid_course_key
-from lms.djangoapps.branding.toggles import ENABLE_NEW_COURSE_ABOUT_PAGE
 from lms.djangoapps.certificates import api as certs_api
 from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
@@ -3972,13 +3971,11 @@ class CourseAboutViewTests(ModuleStoreTestCase):
         self.course = CourseFactory.create()
 
     @ddt.data(
-        (True, True, True),
-        (True, False, False),
-        (False, True, False),
-        (False, False, False),
+        (True, True),
+        (False, False),
     )
     @ddt.unpack
-    def test_course_about_redirect_to_mfe(self, catalog_mfe_enabled, use_new_course_about_page, expected_redirect):
+    def test_course_about_redirect_to_mfe(self, catalog_mfe_enabled, expected_redirect):
         """
         Test that the CourseAboutView redirects to the MFE when appropriate.
         """
@@ -3991,10 +3988,9 @@ class CourseAboutViewTests(ModuleStoreTestCase):
             "CATALOG_MICROFRONTEND_URL": "http://example.com/catalog",
         }
         with override_settings(**new_settings):
-            with override_waffle_flag(ENABLE_NEW_COURSE_ABOUT_PAGE, active=use_new_course_about_page):
-                response = self.client.get(reverse('about_course', args=[str(self.course.id)]))
-                if expected_redirect:
-                    assert response.status_code == 301
-                    assert response.url == "http://example.com/catalog/courses/{}/about".format(self.course.id)
-                else:
-                    assert response.status_code == 200
+            response = self.client.get(reverse('about_course', args=[str(self.course.id)]))
+            if expected_redirect:
+                assert response.status_code == 301
+                assert response.url == "http://example.com/catalog/courses/{}/about".format(self.course.id)
+            else:
+                assert response.status_code == 200
