@@ -708,10 +708,9 @@
     .hint {
       @extend %t-copy-sub2;
 
-      display: block;
+      display: none;
       position: absolute;
       top: ($baseline/2);
-      left: -9999em;
       padding: ($baseline/2);
       width: 50%;
       background-color: $light-gray3;
@@ -735,10 +734,7 @@
     /* ***
      * Ideally we want to handle functionality with JS.
      * This functionality should eventually be moved into CS/JS, and out of here. */
-    .has-hint:hover > .hint {
-      @include left($baseline*10);
-    }
-
+    .has-hint:hover > .hint,
     .has-hint input:focus ~ .hint {
       @include left($baseline*10);
     }
