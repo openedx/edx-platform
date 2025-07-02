@@ -311,7 +311,10 @@ class TestVisibilityFilter(unittest.TestCase):
                     'core': {'web': True, 'push': True, 'email': True, 'email_cadence': 'Daily'},
                     'content_reported': {'web': True, 'push': True, 'email': True, 'email_cadence': 'Daily'},
                     'new_question_post': {'web': False, 'push': False, 'email': False, 'email_cadence': 'Daily'},
-                    'new_discussion_post': {'web': False, 'push': False, 'email': False, 'email_cadence': 'Daily'}
+                    'new_discussion_post': {'web': False, 'push': False, 'email': False, 'email_cadence': 'Daily'},
+                    'new_instructor_all_learners_post': {
+                        'web': True, 'push': False, 'email': False, 'email_cadence': 'Daily'
+                    }
                 },
                 'core_notification_types': [
                     'new_response', 'comment_on_followed_post',

@@ -2124,11 +2124,7 @@ def get_certificates_context(course, user):
         handler_name='certificate_activation_handler',
         course_key=course_key
     )
-    course_modes = [
-        mode.slug for mode in CourseMode.modes_for_course(
-            course_id=course_key, include_expired=True
-        ) if mode.slug != 'audit'
-    ]
+    course_modes = CertificateManager.get_course_modes(course)
 
     has_certificate_modes = len(course_modes) > 0
 

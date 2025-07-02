@@ -40,7 +40,7 @@ urlpatterns = [
     path('override_problem_score', api.override_problem_score, name='override_problem_score'),
     path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
          name='reset_student_attempts_for_entrance_exam'),
-    path('rescore_entrance_exam', api.rescore_entrance_exam, name='rescore_entrance_exam'),
+    path('rescore_entrance_exam', api.RescoreEntranceExamView.as_view(), name='rescore_entrance_exam'),
     path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),
          name='list_entrance_exam_instructor_tasks'),
     path('mark_student_can_skip_entrance_exam', api.MarkStudentCanSkipEntranceExam.as_view(),
@@ -69,7 +69,7 @@ urlpatterns = [
     path('export_ora2_data', api.ExportOra2DataView.as_view(), name='export_ora2_data'),
     path('export_ora2_summary', api.ExportOra2SummaryView.as_view(), name='export_ora2_summary'),
 
-    path('export_ora2_submission_files', api.export_ora2_submission_files,
+    path('export_ora2_submission_files', api.ExportOra2SubmissionFilesView.as_view(),
          name='export_ora2_submission_files'),
 
     # spoc gradebook

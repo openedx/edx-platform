@@ -16,7 +16,7 @@ from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_course_notification_preference_config_version
 )
-from .events import send_user_email_digest_sent_event
+from .events import send_immediate_email_digest_sent_event, send_user_email_digest_sent_event
 from .message_type import EmailNotificationMessageType
 from .utils import (
     add_headers_to_email_message,
@@ -183,3 +183,4 @@ def send_immediate_cadence_email(email_notification_mapping, course_key):
             ).personalize(Recipient(user.id, user.email), language, message_context)
             message = add_headers_to_email_message(message, message_context)
             ace.send(message)
+            send_immediate_email_digest_sent_event(user, EmailCadence.IMMEDIATELY, notification)
