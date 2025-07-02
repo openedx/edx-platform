@@ -35,6 +35,7 @@ class TestThemeFinders(TestCase):
         Verify Theme Finder returns themed assets
         """
         themes_dir = settings.COMPREHENSIVE_THEME_DIRS[1]
+        expected_path = (((((themes_dir / 'test-theme') / 'lms') / 'static') / 'images') / 'logo.png')
 
         asset = "test-theme/images/logo.png"
         matches_test_1 = self.finder.find(asset, True)
@@ -43,15 +44,15 @@ class TestThemeFinders(TestCase):
 
         #1 Make sure only first match was returned
         assert 1 == len(matches_test_1)
-        assert matches_test_1[0] == (((((themes_dir / 'test-theme') / 'lms') / 'static') / 'images') / 'logo.png')
+        assert matches_test_1[0] == expected_path
 
         #2 Make sure only first match was returned
         assert 1 == len(matches_test_2)
-        assert matches_test_2[0] == (((((themes_dir / 'test-theme') / 'lms') / 'static') / 'images') / 'logo.png')
+        assert matches_test_2[0] == expected_path
 
         #3 Make sure only first match was returned
         assert 1 == len(matches_test_3)
-        assert matches_test_3[0] == (((((themes_dir / 'test-theme') / 'lms') / 'static') / 'images') / 'logo.png')
+        assert matches_test_3[0] == expected_path
 
     def test_find_in_theme(self):
         """
