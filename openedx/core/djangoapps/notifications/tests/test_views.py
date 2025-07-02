@@ -1537,6 +1537,8 @@ class TestNotificationPreferencesView(APITestCase):
         """
         Test case: Check if the data is correctly formatted
         """
+
+        self.client.get(self.url)
         NotificationPreference.objects.all().update(
             web=False,
             push=False,
