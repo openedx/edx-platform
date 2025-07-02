@@ -50,7 +50,6 @@ from django.utils.translation import gettext_lazy as _
 
 import lms.envs.common
 
-from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.envs.common import *  # pylint: disable=wildcard-import
 
 from lms.envs.common import (
