@@ -1,14 +1,17 @@
 """
 Python APIs for Course Apps.
 """
+import logging
 from django.contrib.auth import get_user_model
 from opaque_keys.edx.keys import CourseKey
+from edx_django_utils.plugins.plugin_manager import PluginError
 from openedx.core.djangoapps.course_apps.models import CourseAppStatus
 
 from .plugins import CourseAppsPluginManager
 from .signals import COURSE_APP_STATUS_INIT
 
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
@@ -28,16 +31,21 @@ def is_course_app_enabled(course_key: CourseKey, app_id: str) -> bool:
         course_app_status = CourseAppStatus.objects.get(course_key=course_key, app_id=app_id)
         is_enabled = course_app_status.enabled
     except CourseAppStatus.DoesNotExist:
-        course_app = CourseAppsPluginManager.get_plugin(app_id)
-        is_enabled = course_app.is_enabled(course_key)
-        # If the status doesn't exist it means this is an existing course so
-        # dispatch an initialisation signal to make sure the next request is
-        # direct from the database.
-        COURSE_APP_STATUS_INIT.send(
-            sender=app_id,
-            course_key=course_key,
-            is_enabled=is_enabled,
-        )
+        try:
+            course_app = CourseAppsPluginManager.get_plugin(app_id)
+            is_enabled = course_app.is_enabled(course_key)
+
+            # If the status doesn't exist it means this is an existing course so
+            # dispatch an initialisation signal to make sure the next request is
+            # direct from the database.
+            COURSE_APP_STATUS_INIT.send(
+                sender=app_id,
+                course_key=course_key,
+                is_enabled=is_enabled,
+            )
+        except PluginError as e:
+            logger.exception(f"PluginError occurred for app_id='{app_id}' and course_key='{course_key}': {e}")
+            is_enabled = False
     return is_enabled
 
 
