@@ -28,7 +28,8 @@ from openedx.core.djangoapps.notifications.permissions import allow_any_authenti
 from openedx.core.djangoapps.notifications.serializers import add_info_to_notification_config
 from openedx.core.djangoapps.user_api.models import UserPreference
 
-from .base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager, COURSE_NOTIFICATION_TYPES
+from .base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager, COURSE_NOTIFICATION_TYPES, \
+    NotificationTypeManager
 from .config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
 from .events import (
     notification_preference_update_event,
@@ -798,4 +799,62 @@ class NotificationPreferencesView(APIView):
             'status': 'success',
             'message': 'Notification preferences retrieved successfully.',
             'data': structured_preferences
+        }, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        """
+        Handles PUT requests to update notification preferences.
+
+        This method updates the user's notification preferences based on the
+        provided data in the request body. It expects a dictionary with
+        notification types and their settings.
+
+        Returns:
+            Response: A DRF Response object indicating success or failure.
+        """
+        serializer = UserNotificationPreferenceUpdateAllSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                'status': 'error',
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        query_set = NotificationPreference.objects.filter(user_id=request.user.id)
+        if serializer.validated_data['notification_type'] == 'core':
+            __, core_types, __ = NotificationTypeManager().get_notification_app_preference(
+                notification_app=serializer.validated_data['notification_app']
+            )
+            # Add all related core types in query set.
+            query_set.filter(type__in=core_types)
+        else:
+            # In case of non-core add single type that is provided in post data.
+            query_set.filter(
+                user_id=request.user.id,
+                type=serializer.validated_data['notification_type']
+            )
+
+        if serializer.validated_data['notification_channel'] == 'email_cadence':
+            updated_data = {
+                serializer.validated_data['notification_channel']: serializer.validated_data['email_cadence']
+            }
+        else:
+            updated_data = {
+                serializer.validated_data['notification_channel']: serializer.validated_data['value']
+            }
+        query_set.update(
+            **updated_data
+        )
+
+        event_data = {
+            'notification_app': serializer.validated_data['notification_app'],
+            'notification_type': serializer.validated_data['notification_type'],
+            'notification_channel': serializer.validated_data['notification_channel'],
+            'value': serializer.validated_data.get('value'),
+            'email_cadence': serializer.validated_data.get('email_cadence'),
+        }
+        notification_preference_update_event(
+            request.user, [], event_data
+        )
+        return Response({
+            'status': 'success',
+            'message': 'Notification preferences updated successfully.'
         }, status=status.HTTP_200_OK)
