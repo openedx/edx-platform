@@ -358,11 +358,11 @@ class LibraryContainerHierarchy(GenericAPIView):
     """
     View to return the full hierarchy of containers that contain and are contained by a library container.
     """
-    serializer_class = serializers.LibraryObjectHierarchySerializer
+    serializer_class = serializers.ContainerHierarchySerializer
 
     @convert_exceptions
     @swagger_auto_schema(
-        responses={200: serializers.LibraryObjectHierarchySerializer}
+        responses={200: serializers.ContainerHierarchySerializer}
     )
     def get(self, request: RestRequest, container_key: LibraryContainerLocator) -> Response:
         """

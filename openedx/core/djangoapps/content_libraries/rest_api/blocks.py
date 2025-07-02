@@ -364,7 +364,7 @@ class LibraryBlockHierarchy(GenericAPIView):
     """
     View to return the full hierarchy of containers that contain a library block.
     """
-    serializer_class = serializers.LibraryObjectHierarchySerializer
+    serializer_class = serializers.ContainerHierarchySerializer
 
     @convert_exceptions
     def get(self, request, usage_key_str) -> Response:

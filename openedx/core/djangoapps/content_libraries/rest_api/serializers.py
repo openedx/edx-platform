@@ -388,13 +388,22 @@ class ContentLibraryItemCollectionsUpdateSerializer(serializers.Serializer):
     collection_keys = serializers.ListField(child=serializers.CharField(), allow_empty=True)
 
 
-class LibraryObjectHierarchySerializer(serializers.Serializer):
+class ContainerHierarchyMemberSerializer(serializers.Serializer):
+    """
+    Serializer for the members of a hierarchy, which can be either Components or Containers.
+    """
+    id = OpaqueKeySerializer()
+    display_name = serializers.CharField()
+    has_unpublished_changes = serializers.BooleanField()
+
+
+class ContainerHierarchySerializer(serializers.Serializer):
     """
     Serializer which represents the full hierarchy of containers and components that contain and are contained by a
     given library container or library block.
     """
-    sections = serializers.ListField(child=LibraryContainerMetadataSerializer(), allow_empty=True)
-    subsections = serializers.ListField(child=LibraryContainerMetadataSerializer(), allow_empty=True)
-    units = serializers.ListField(child=LibraryContainerMetadataSerializer(), allow_empty=True)
-    components = serializers.ListField(child=LibraryXBlockMetadataSerializer(), allow_empty=True)
+    sections = serializers.ListField(child=ContainerHierarchyMemberSerializer(), allow_empty=True)
+    subsections = serializers.ListField(child=ContainerHierarchyMemberSerializer(), allow_empty=True)
+    units = serializers.ListField(child=ContainerHierarchyMemberSerializer(), allow_empty=True)
+    components = serializers.ListField(child=ContainerHierarchyMemberSerializer(), allow_empty=True)
     object_key = OpaqueKeySerializer()

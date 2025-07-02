@@ -467,6 +467,17 @@ class ContentLibrariesRestApiTest(APITransactionTestCase):
         """ Publish all changes in the specified container + children """
         return self._api('post', URL_LIB_CONTAINER_PUBLISH.format(container_key=container_key), None, expect_response)
 
+    @staticmethod
+    def _hierarchy_member(obj) -> dict:
+        """
+        Returns the subset of metadata fields used by the container hierarchy.
+        """
+        return {
+            "id": obj["id"],
+            "display_name": obj["display_name"],
+            "has_unpublished_changes": obj["has_unpublished_changes"],
+        }
+
     def _get_block_hierarchy(self, block_key, expect_response=200):
         """ Returns the hierarchy of containers that contain the given block """
         url = URL_LIB_BLOCK_HIERARCHY.format(block_key=block_key)

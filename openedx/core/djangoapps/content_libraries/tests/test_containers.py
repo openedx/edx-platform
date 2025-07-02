@@ -603,72 +603,72 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         assert unit_as_read['collections'] == [{"title": col1.title, "key": col1.key}]
 
     def test_section_hierarchy(self):
-        with self.assertNumQueries(225):
+        with self.assertNumQueries(117):
             hierarchy = self._get_container_hierarchy(self.section_with_subsections["id"])
         assert hierarchy["object_key"] == self.section_with_subsections["id"]
         assert hierarchy["components"] == [
-            self.problem_block,
-            self.html_block,
-            self.problem_block_2,
-            self.html_block_2,
+            self._hierarchy_member(self.problem_block),
+            self._hierarchy_member(self.html_block),
+            self._hierarchy_member(self.problem_block_2),
+            self._hierarchy_member(self.html_block_2),
         ]
         assert hierarchy["units"] == [
-            self.unit,
-            self.unit_with_components,
-            self.unit_2,
-            self.unit_3,
+            self._hierarchy_member(self.unit),
+            self._hierarchy_member(self.unit_with_components),
+            self._hierarchy_member(self.unit_2),
+            self._hierarchy_member(self.unit_3),
         ]
         assert hierarchy["subsections"] == [
-            self.subsection,
-            self.subsection_with_units,
-            self.subsection_2,
-            self.subsection_3,
+            self._hierarchy_member(self.subsection),
+            self._hierarchy_member(self.subsection_with_units),
+            self._hierarchy_member(self.subsection_2),
+            self._hierarchy_member(self.subsection_3),
         ]
         assert hierarchy["sections"] == [
-            self.section_with_subsections,
+            self._hierarchy_member(self.section_with_subsections),
         ]
 
     def test_subsection_hierarchy(self):
-        with self.assertNumQueries(147):
+        with self.assertNumQueries(81):
             hierarchy = self._get_container_hierarchy(self.subsection_with_units["id"])
         assert hierarchy["object_key"] == self.subsection_with_units["id"]
         assert hierarchy["components"] == [
-            self.problem_block,
-            self.html_block,
-            self.problem_block_2,
-            self.html_block_2,
+            self._hierarchy_member(self.problem_block),
+            self._hierarchy_member(self.html_block),
+            self._hierarchy_member(self.problem_block_2),
+            self._hierarchy_member(self.html_block_2),
         ]
         assert hierarchy["units"] == [
-            self.unit,
-            self.unit_with_components,
-            self.unit_2,
-            self.unit_3,
+            self._hierarchy_member(self.unit),
+            self._hierarchy_member(self.unit_with_components),
+            self._hierarchy_member(self.unit_2),
+            self._hierarchy_member(self.unit_3),
         ]
         assert hierarchy["subsections"] == [
-            self.subsection_with_units,
+            self._hierarchy_member(self.subsection_with_units),
         ]
         assert hierarchy["sections"] == [
-            self.section_with_subsections,
+            self._hierarchy_member(self.section_with_subsections),
         ]
 
     def test_units_hierarchy(self):
-        with self.assertNumQueries(72):
+        with self.assertNumQueries(48):
             hierarchy = self._get_container_hierarchy(self.unit_with_components["id"])
         assert hierarchy["object_key"] == self.unit_with_components["id"]
         assert hierarchy["components"] == [
-            self.problem_block,
-            self.html_block,
-            self.problem_block_2,
-            self.html_block_2,
+            self._hierarchy_member(self.problem_block),
+            self._hierarchy_member(self.html_block),
+            self._hierarchy_member(self.problem_block_2),
+            self._hierarchy_member(self.html_block_2),
         ]
         assert hierarchy["units"] == [
-            self.unit_with_components,
+            self._hierarchy_member(self.unit_with_components),
         ]
         assert hierarchy["subsections"] == [
-            self.subsection_with_units,
+            self._hierarchy_member(self.subsection_with_units),
         ]
         assert hierarchy["sections"] == [
-            self.section_with_subsections,
+            self._hierarchy_member(self.section_with_subsections),
         ]
 
     def test_container_hierarchy_not_found(self):
@@ -678,20 +678,20 @@ class ContainersTestCase(ContentLibrariesRestApiTest):
         )
 
     def test_block_hierarchy(self):
-        with self.assertNumQueries(29):
+        with self.assertNumQueries(21):
             hierarchy = self._get_block_hierarchy(self.problem_block["id"])
         assert hierarchy["object_key"] == self.problem_block["id"]
         assert hierarchy["components"] == [
-            self.problem_block,
+            self._hierarchy_member(self.problem_block),
         ]
         assert hierarchy["units"] == [
-            self.unit_with_components,
+            self._hierarchy_member(self.unit_with_components),
         ]
         assert hierarchy["subsections"] == [
-            self.subsection_with_units,
+            self._hierarchy_member(self.subsection_with_units),
         ]
         assert hierarchy["sections"] == [
-            self.section_with_subsections,
+            self._hierarchy_member(self.section_with_subsections),
         ]
 
     def test_block_hierarchy_not_found(self):
