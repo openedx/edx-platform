@@ -13,7 +13,6 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.test import TestCase, override_settings
-from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APITestCase
 
@@ -24,7 +23,6 @@ from common.djangoapps.student.tests.factories import (
     UserFactory,
 )
 from common.djangoapps.util.course import get_encoded_course_sharing_utm_params
-from lms.djangoapps.branding.toggles import ENABLE_NEW_CATALOG_PAGE
 from lms.djangoapps.bulk_email.models import Optout
 from lms.djangoapps.learner_home.test_utils import (
     create_test_enrollment,
@@ -102,12 +100,11 @@ class TestGetPlatformSettings(TestCase):
         """
         Test that the catalog link is constructed correctly based on the MFE flags.
         """
-        with override_waffle_flag(ENABLE_NEW_CATALOG_PAGE, active=use_new_catalog_page):
-            features = settings.FEATURES.copy()
-            features['ENABLE_CATALOG_MICROFRONTEND'] = catalog_mfe_enabled
-            with override_settings(FEATURES=features):
-                actual_course_sharing_link = get_platform_settings()["courseSearchUrl"]
-                assert actual_course_sharing_link == expected_catalog_link
+        features = settings.FEATURES.copy()
+        features['ENABLE_CATALOG_MICROFRONTEND'] = catalog_mfe_enabled
+        with override_settings(FEATURES=features):
+            actual_course_sharing_link = get_platform_settings()["courseSearchUrl"]
+            assert actual_course_sharing_link == expected_catalog_link
 
 
 @ddt.ddt
