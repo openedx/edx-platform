@@ -473,12 +473,12 @@ def sync_discussion_settings(course_key, user):
 
         if (
             ENABLE_NEW_STRUCTURE_DISCUSSIONS.is_enabled()
-            and not course.discussions_settings['provider_type'] == Provider.OPEN_EDX
+            and not course.discussions_settings.get('provider_type', None) == Provider.OPEN_EDX
+            and not course.discussions_settings.get('provider', None) == Provider.OPEN_EDX
         ):
             LOGGER.info(f"New structure is enabled, also updating {course_key} to use new provider")
             course.discussions_settings['enable_graded_units'] = False
             course.discussions_settings['unit_level_visibility'] = True
-            course.discussions_settings['provider'] = Provider.OPEN_EDX
             course.discussions_settings['provider_type'] = Provider.OPEN_EDX
             modulestore().update_item(course, user.id)
 
