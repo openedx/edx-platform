@@ -33,7 +33,7 @@ def update_saml_provider_configs_on_configuration_change(sender, instance, creat
         for provider_config in existing_providers:
             # Update the EXISTING provider to point to the new parent configuration
             old_config_id = provider_config.saml_configuration_id
-            
+
             # Use update() instead of save() to avoid creating new ConfigurationModel records
             SAMLProviderConfig.objects.filter(id=provider_config.id).update(
                 saml_configuration_id=instance.id
