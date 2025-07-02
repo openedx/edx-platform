@@ -1671,7 +1671,7 @@ class TestNotificationPreferencesView(APITestCase):
             "email_cadence": "Weekly"
         }
         __, core_types, __ = NotificationTypeManager().get_notification_app_preference('discussion')
-
+        self.client.get(self.url)
         response = self.client.put(self.url, update_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
@@ -1689,7 +1689,7 @@ class TestNotificationPreferencesView(APITestCase):
             "notification_channel": "web",
             "value": True
         }
-
+        self.client.get(self.url)
         response = self.client.put(self.url, update_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
@@ -1709,7 +1709,7 @@ class TestNotificationPreferencesView(APITestCase):
             "notification_channel": "email_cadence",
             "email_cadence": 'Weekly'
         }
-
+        self.client.get(self.url)
         response = self.client.put(self.url, update_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
