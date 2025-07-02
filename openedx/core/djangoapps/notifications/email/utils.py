@@ -23,6 +23,7 @@ from openedx.core.djangoapps.notifications.email_notifications import EmailCaden
 from openedx.core.djangoapps.notifications.events import notification_preference_unsubscribe_event
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
+    NotificationPreference,
     get_course_notification_preference_config_version
 )
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -320,6 +321,60 @@ def filter_notification_with_email_enabled_preferences(notifications, preference
     filtered_notifications = []
     for notification in notifications:
         if notification.notification_type in enabled_course_prefs[notification.course_id]:
+            filtered_notifications.append(notification)
+    filtered_notifications.sort(key=lambda elem: elem.created, reverse=True)
+    return filtered_notifications
+
+
+def create_missing_account_level_preferences(notifications, preferences, user):
+    preferences = list(preferences)
+    notification_types = list(set(
+        (notification.app_name, "core") if COURSE_NOTIFICATION_TYPES[notification.notification_type]["is_core"]
+        else (notification.app_name, notification.notification_type)
+        for notification in notifications
+    ))
+    missing_prefs = []
+    for notification_type in notification_types:
+        if not any([
+            preference.app == notification_type[0] and preference.type == notification_type[1]
+            for preference in preferences
+        ]):
+            if notification_type[1] == "core":
+                app_pref = COURSE_NOTIFICATION_APPS.get(notification_type[0], {})
+                default_pref = {
+                    "notification_app": notification_type[0],
+                    "web": app_pref["core_web"],
+                    "push": app_pref["core_push"],
+                    "email": app_pref["core_email"],
+                    "email_cadence": app_pref["core_email_cadence"]
+                }
+            else:
+                default_pref = COURSE_NOTIFICATION_TYPES.get(notification_type[1], {})
+            missing_prefs.append(
+                NotificationPreference(
+                    user=user, type=notification_type[1], app=notification_type[0], web=default_pref['web'],
+                    push=default_pref['push'], email=default_pref['email'], email_cadence=default_pref['email_cadence'],
+                )
+            )
+    if missing_prefs:
+        created_prefs = NotificationPreference.objects.bulk_create(missing_prefs, ignore_conflicts=True)
+        preferences = preferences + list(created_prefs)
+    return preferences
+
+
+def filter_email_enabled_notifications(notifications, preferences, user, cadence_type=EmailCadence.DAILY):
+    """
+    Filter notifications with email enabled in account level preferences
+    """
+    preferences = create_missing_account_level_preferences(notifications, preferences, user)
+    enabled_course_prefs = [
+        preference.type
+        for preference in preferences
+        if preference.email and preference.email_cadence == cadence_type
+    ]
+    filtered_notifications = []
+    for notification in notifications:
+        if notification.notification_type in enabled_course_prefs:
             filtered_notifications.append(notification)
     filtered_notifications.sort(key=lambda elem: elem.created, reverse=True)
     return filtered_notifications
