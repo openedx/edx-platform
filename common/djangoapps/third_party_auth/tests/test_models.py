@@ -158,6 +158,47 @@ class TestSAMLConfigurationSignals(TestCase):
         with self.assertRaises(AuthNotConfigured):
             provider_without_config.get_config()
 
+    def test_signal_prevents_duplicate_provider_configs(self):
+        """Test that signal handler updates existing records instead of creating duplicates."""
+        # Get initial count of SAMLProviderConfig records
+        initial_provider_count = SAMLProviderConfig.objects.count()
+        
+        # Store original provider config ID
+        original_provider_id = self.provider_config.id
+        original_saml_config_id = self.provider_config.saml_configuration_id
+        
+        # Update the SAML configuration to trigger signal
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()  # This creates a new SAMLConfiguration record
+        
+        # Verify that NO new SAMLProviderConfig was created
+        final_provider_count = SAMLProviderConfig.objects.count()
+        self.assertEqual(
+            initial_provider_count, 
+            final_provider_count,
+            "Signal handler should NOT create new SAMLProviderConfig records"
+        )
+        
+        # Verify the existing provider was updated (not replaced)
+        self.provider_config.refresh_from_db()
+        self.assertEqual(
+            self.provider_config.id, 
+            original_provider_id,
+            "Provider config ID should remain the same (no new record created)"
+        )
+        
+        # Verify the provider now points to the new configuration
+        self.assertNotEqual(
+            self.provider_config.saml_configuration_id,
+            original_saml_config_id,
+            "Provider should point to new SAMLConfiguration ID"
+        )
+        self.assertEqual(
+            self.provider_config.saml_configuration_id,
+            self.saml_config.id,
+            "Provider should point to the updated SAMLConfiguration"
+        )
+
 
 class TestSAMLConfigurationManagementCommand(TestCase):
     """Test the SAML management command's fix-references functionality."""
