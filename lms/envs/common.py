@@ -64,7 +64,6 @@ from enterprise.constants import (
     DEFAULT_ENTERPRISE_ENROLLMENT_INTENTIONS_ROLE,
 )
 
-from openedx.core.constants import COURSE_KEY_REGEX, COURSE_KEY_PATTERN, COURSE_ID_PATTERN
 from openedx.core.lib.derived import Derived
 from openedx.core.release import doc_version
 from openedx.envs.common import *  # pylint: disable=wildcard-import
