@@ -6,9 +6,7 @@ from unittest import mock
 import ddt
 from django.conf import settings
 from django.test import override_settings
-from edx_toggles.toggles.testutils import override_waffle_flag
 
-from lms.djangoapps.branding.toggles import ENABLE_NEW_COURSE_ABOUT_PAGE
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from common.djangoapps.util.course import get_link_for_about_page
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -54,7 +52,8 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
         """
         mock_settings = {
             'FEATURES': {
-                'ENABLE_MKTG_SITE': enable_mktg_site
+                'ENABLE_MKTG_SITE': enable_mktg_site,
+                'ENABLE_CATALOG_MICROFRONTEND': False,
             },
             'SOCIAL_SHARING_SETTINGS': {
                 'CUSTOM_COURSE_URLS': enable_social_sharing
@@ -133,35 +132,22 @@ class TestCourseSharingLinks(ModuleStoreTestCase):
     @ddt.data(
         (
             True,
-            True,
             f'{settings.CATALOG_MICROFRONTEND_URL}/courses/course-v1:test_org+test_number+test_run/about'
         ),
         (
-            True,
-            False,
-            f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'
-        ),
-        (
-            False,
-            True,
-            f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'
-        ),
-        (
-            False,
             False,
             f'{settings.LMS_ROOT_URL}/courses/course-v1:test_org+test_number+test_run/about'
         )
     )
     @ddt.unpack
     def test_sharing_link_with_new_course_about_page(
-        self, catalog_mfe_enabled, use_new_course_about_page, expected_course_sharing_link
+        self, catalog_mfe_enabled, expected_course_sharing_link
     ):
         """
         Verify the method gives correct course sharing url when new course about page is used.
         """
-        with override_waffle_flag(ENABLE_NEW_COURSE_ABOUT_PAGE, active=use_new_course_about_page):
-            features = settings.FEATURES.copy()
-            features['ENABLE_CATALOG_MICROFRONTEND'] = catalog_mfe_enabled
-            with override_settings(FEATURES=features):
-                actual_course_sharing_link = get_link_for_about_page(self.course_overview)
-                assert actual_course_sharing_link == expected_course_sharing_link
+        features = settings.FEATURES.copy()
+        features['ENABLE_CATALOG_MICROFRONTEND'] = catalog_mfe_enabled
+        with override_settings(FEATURES=features):
+            actual_course_sharing_link = get_link_for_about_page(self.course_overview)
+            assert actual_course_sharing_link == expected_course_sharing_link

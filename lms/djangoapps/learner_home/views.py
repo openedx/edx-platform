@@ -73,7 +73,7 @@ def get_platform_settings():
     """Get settings used for platform level connections: emails, url routes, etc."""
 
     course_search_url = marketing_link("COURSES")
-    if toggles.catalog_mfe_enabled() and toggles.use_new_catalog_page():
+    if toggles.use_catalog_mfe():
         course_search_url = f"{settings.CATALOG_MICROFRONTEND_URL}/courses"
 
     return {
