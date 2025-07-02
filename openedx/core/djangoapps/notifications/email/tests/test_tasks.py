@@ -20,7 +20,7 @@ from openedx.core.djangoapps.notifications.email.tasks import (
     send_digest_email_to_user
 )
 from openedx.core.djangoapps.notifications.email.utils import get_start_end_date
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, NotificationPreference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -364,6 +364,7 @@ class TestPreferences(ModuleStoreTestCase):
         assert not mock_func.called
 
 
+@override_waffle_flag(ENABLE_ACCOUNT_LEVEL_PREFERENCES, True)
 @ddt.ddt
 class TestAccountPreferences(ModuleStoreTestCase):
     """
@@ -376,7 +377,8 @@ class TestAccountPreferences(ModuleStoreTestCase):
         super().setUp()
         self.user = UserFactory()
         self.course = CourseFactory.create(display_name='test course', run="Testing_course")
-        self.preference = CourseNotificationPreference.objects.create(user=self.user, course_id=self.course.id)
+        self.preference, _ = NotificationPreference.objects.get_or_create(user=self.user, app="discussion",
+                                                                          type="new_discussion_post")
         created_date = datetime.datetime.now() - datetime.timedelta(hours=23)
         create_notification(self.user, self.course.id, notification_type='new_discussion_post', created=created_date)
 
@@ -386,10 +388,8 @@ class TestAccountPreferences(ModuleStoreTestCase):
         Tests email is send for digest notification preference
         """
         start_date, end_date = get_start_end_date(EmailCadence.DAILY)
-        config = self.preference.notification_preference_config
-        types = config['discussion']['notification_types']
-        types['new_discussion_post']['email_cadence'] = EmailCadence.DAILY
-        types['new_discussion_post']['email'] = True
+        self.preference.email = True
+        self.preference.email_cadence = EmailCadence.DAILY
         self.preference.save()
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
@@ -402,10 +402,8 @@ class TestAccountPreferences(ModuleStoreTestCase):
         Tests email is sent iff preference value is True
         """
         start_date, end_date = get_start_end_date(EmailCadence.DAILY)
-        config = self.preference.notification_preference_config
-        types = config['discussion']['notification_types']
-        types['new_discussion_post']['email_cadence'] = EmailCadence.DAILY
-        types['new_discussion_post']['email'] = pref_value
+        self.preference.email = pref_value
+        self.preference.email_cadence = EmailCadence.DAILY
         self.preference.save()
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)
@@ -417,9 +415,8 @@ class TestAccountPreferences(ModuleStoreTestCase):
         Tests email is not send if digest notification preference doesnot match
         """
         start_date, end_date = get_start_end_date(EmailCadence.DAILY)
-        config = self.preference.notification_preference_config
-        types = config['discussion']['notification_types']
-        types['new_discussion_post']['email_cadence'] = EmailCadence.WEEKLY
+        self.preference.email = True
+        self.preference.email_cadence = EmailCadence.WEEKLY
         self.preference.save()
         with override_waffle_flag(ENABLE_EMAIL_NOTIFICATIONS, True):
             send_digest_email_to_user(self.user, EmailCadence.DAILY, start_date, end_date)

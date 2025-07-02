@@ -327,6 +327,9 @@ def filter_notification_with_email_enabled_preferences(notifications, preference
 
 
 def create_missing_account_level_preferences(notifications, preferences, user):
+    """
+    Creates missing account level preferences for notifications
+    """
     preferences = list(preferences)
     notification_types = list(set(
         (notification.app_name, "core") if COURSE_NOTIFICATION_TYPES[notification.notification_type]["is_core"]
@@ -335,10 +338,10 @@ def create_missing_account_level_preferences(notifications, preferences, user):
     ))
     missing_prefs = []
     for notification_type in notification_types:
-        if not any([
+        if not any(
             preference.app == notification_type[0] and preference.type == notification_type[1]
             for preference in preferences
-        ]):
+        ):
             if notification_type[1] == "core":
                 app_pref = COURSE_NOTIFICATION_APPS.get(notification_type[0], {})
                 default_pref = {
