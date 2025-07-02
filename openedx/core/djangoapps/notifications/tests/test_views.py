@@ -1676,8 +1676,8 @@ class TestNotificationPreferencesView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
         cadence_set = NotificationPreference.objects.filter(type__in=core_types).values_list('email_cadence', flat=True)
-        self.assertEqual(len(set(cadence_set)),1)
-        self.assertTrue('Weekly' in set(cadence_set))
+        self.assertEqual(len(set(cadence_set)), 1)
+        self.assertIn('Weekly', set(cadence_set))
 
     def test_update_preferences(self):
         """
@@ -1695,10 +1695,9 @@ class TestNotificationPreferencesView(APITestCase):
         self.assertEqual(response.data['status'], 'success')
         preference = NotificationPreference.objects.get(
             type='new_discussion_post',
-            user__id= self.user.id
+            user__id=self.user.id
         )
         self.assertEqual(preference.web, True)
-
 
     def test_update_preferences_non_core_email(self):
         """
