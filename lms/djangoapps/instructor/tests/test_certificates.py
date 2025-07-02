@@ -381,6 +381,51 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         assert (res_json['message'] ==
                 'Please select certificate statuses from the list only.')
 
+    def test_certificate_task_api_with_generation(self):
+        """
+        Test certificates task api endpoint returns success status when called with
+        valid course key and mode.
+        """
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, data={'mode': 'generate'})
+
+        assert response.status_code == 200
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert res_json['message'] is not None
+        assert res_json['task_id'] is not None
+
+    def test_certificate_task_api_with_regeneration(self):
+        """
+        Test certificate task api is successful when accessed with 'certificate_statuses'
+        present in GeneratedCertificate table.
+        """
+
+        # Create a generated Certificate of some user with status 'downloadable'
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+
+        # Login the client and access the url with 'certificate_statuses'
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, data={'mode': 'regenerate', 'certificate_statuses': [CertificateStatuses.downloadable]})
+
+        # Assert 200 status code in response
+        assert response.status_code == 200
+        res_json = json.loads(response.content.decode('utf-8'))
+
+        # Assert request is successful
+        assert res_json['success']
+
+        # Assert success message
+        assert res_json['message'] ==\
+               'Certificate regeneration task has been started.' \
+               ' You can view the status of the generation task in the "Pending Tasks" section.'
+
 
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt

@@ -3372,6 +3372,56 @@ class MarkStudentCanSkipEntranceExam(APIView):
         }
         return JsonResponse(response_payload)
 
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CertificateTask(DeveloperErrorViewMixin, APIView):
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = None
+    statuses_serializer = CertificateStatusesSerializer
+    http_method_names = ['post']
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        response_payload = {}
+
+        if request.POST.get('mode') == 'generate':
+            """
+             Generating certificates for all students enrolled in given course.
+            """
+            self.permission_name = permissions.START_CERTIFICATE_GENERATION
+            course_key = CourseKey.from_string(course_id)
+            task = task_api.generate_certificates_for_students(request, course_key)
+            message = _('Certificate generation task for all students of this course has been started. '
+                        'You can view the status of the generation task in the "Pending Tasks" section.')
+            response_payload = {
+                'message': message,
+                'task_id': task.task_id
+            }
+
+        if request.POST.get('mode') == 'regenerate':
+            """
+            certificate_statuses 'certificate_statuses' in POST data.
+            """
+            self.permission_name = permissions.START_CERTIFICATE_REGENERATION
+            course_key = CourseKey.from_string(course_id)
+            serializer = self.statuses_serializer(data=request.data)
+
+            if not serializer.is_valid():
+                return JsonResponse(
+                    {'message': _('Please select certificate statuses from the list only.')},
+                    status=400
+                )
+
+            certificates_statuses = serializer.validated_data['certificate_statuses']
+            task_api.regenerate_certificates(request, course_key, certificates_statuses)
+            response_payload = {
+                'message': _('Certificate regeneration task has been started. '
+                             'You can view the status of the generation task in the "Pending Tasks" section.'),
+                'success': True
+            }
+
+        return JsonResponse(response_payload)
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')

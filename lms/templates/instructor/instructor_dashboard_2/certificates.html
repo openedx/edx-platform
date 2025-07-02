@@ -84,7 +84,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 
     <div class="start-certificate-generation">
         <h3 class="hd hd-3">${_("Generate Certificates")}</h3>
-        <form id="certificates-generating-form" method="post" action="${section_data['urls']['start_certificate_generation']}">
+        <form id="certificates-generating-form" method="post" action="${section_data['urls']['certificate_task']}">
             % if section_data['html_cert_enabled'] and section_data['active_certificate'] is None:
                 <p>${_("Course certificate generation requires an activated web certificate configuration.")}</p>
                 <input type="button" id="disabled-btn-start-generating-certificates" class="is-disabled" aria-disabled="true" value="${_('Generate Certificates')}"/>
@@ -92,7 +92,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
                 <p class="under-heading">
                     ${_("When you are ready to generate certificates for your course, click Generate Certificates. You do not need to do this if you have set the certificate mode to on-demand generation.")}
                 </p>
-                <input type="button" class="btn-blue" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_generation']}"/>
+                <input type="button" class="btn-blue" id="btn-start-generating-certificates" value="${_('Generate Certificates')}" data-endpoint="${section_data['urls']['certificate_task']}"/>
             %endif
         </form>
         <div class="certificate-generation-status"></div>
@@ -115,7 +115,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
     <hr>
     <div class="start-certificate-regeneration">
         <h3 class="hd hd-3">${_("Regenerate Certificates")}</h3>
-        <form id="certificate-regenerating-form" method="post" action="${section_data['urls']['start_certificate_regeneration']}">
+        <form id="certificate-regenerating-form" method="post" action="${section_data['urls']['certificate_task']}">
             <p class="under-heading">
                 ${_('To regenerate certificates for your course, choose the learners who will receive regenerated certificates and click Regenerate Certificates.')}
             </p>
@@ -152,7 +152,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
                     </label>
                 </div>
             </fieldset>
-            <input type="button" class="btn-blue" id="btn-start-regenerating-certificates" value="${_('Regenerate Certificates')}" data-endpoint="${section_data['urls']['start_certificate_regeneration']}"/>
+            <input type="button" class="btn-blue" id="btn-start-regenerating-certificates" value="${_('Regenerate Certificates')}" data-endpoint="${section_data['urls']['certificate_task']}"/>
         </form>
         <div class="certificate-regeneration-status"></div>
     </div>
