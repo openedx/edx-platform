@@ -388,7 +388,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         """
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, data={'mode': 'generate'})
+        response = self.client.post(url, data={'api_action': 'generate'})
 
         assert response.status_code == 200
         res_json = json.loads(response.content.decode('utf-8'))
@@ -412,7 +412,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         # Login the client and access the url with 'certificate_statuses'
         self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
         url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, data={'mode': 'regenerate', 'certificate_statuses': [CertificateStatuses.downloadable]})
+        response = self.client.post(url, data={'api_action': 'regenerate', 'certificate_statuses': [CertificateStatuses.downloadable]})
 
         # Assert 200 status code in response
         assert response.status_code == 200
