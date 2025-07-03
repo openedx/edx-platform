@@ -873,7 +873,8 @@ class SAMLProviderConfig(ProviderConfig):
                     set_custom_attribute('saml_config.using', 'default')
                 return default_config
         except Exception:  # pylint: disable=broad-except
-            log.warning("Could not fetch default SAMLConfiguration for site %s", self.site_id)
+            if ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled():
+                set_custom_attribute('saml_config.default_fetch_error', f'site_id={self.site_id}')
 
         # No configuration found at all
         if ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled():
@@ -937,9 +938,9 @@ class SAMLProviderConfig(ProviderConfig):
         # Add SAMLConfiguration appropriate for this IdP
         saml_config = self.get_current_saml_configuration()
         if not saml_config:
-            log.error(
-                'No SAMLConfiguration found for provider "%s" on site %s.',
-                self.name, self.site_id
+            set_custom_attribute(
+                'saml_config.missing_for_provider',
+                f'provider={self.name},site_id={self.site_id}'
             )
             raise AuthNotConfigured(provider_name=self.name)
 

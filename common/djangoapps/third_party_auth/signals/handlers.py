@@ -25,7 +25,11 @@ def update_saml_provider_configs_on_configuration_change(sender, instance, creat
     if not ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled():
         # .. custom_attribute_name: saml_config.signal_behavior
         # .. custom_attribute_description: Tracks whether signal handler is active or disabled by toggle.
-        set_custom_attribute('saml_config.signal_behavior', 'disabled_by_toggle')
+        #    When disabled, includes details about the legacy behavior and which config was ignored.
+        set_custom_attribute(
+            'saml_config.signal_behavior', 
+            f'disabled_by_toggle:slug={instance.slug},id={instance.id},site_id={instance.site_id}'
+        )
         return
 
     try:
