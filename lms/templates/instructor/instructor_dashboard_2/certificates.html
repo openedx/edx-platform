@@ -85,6 +85,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
     <div class="start-certificate-generation">
         <h3 class="hd hd-3">${_("Generate Certificates")}</h3>
         <form id="certificates-generating-form" method="post" action="${section_data['urls']['certificate_task']}">
+            <input type="hidden" name="api_action" value="generate" />
             % if section_data['html_cert_enabled'] and section_data['active_certificate'] is None:
                 <p>${_("Course certificate generation requires an activated web certificate configuration.")}</p>
                 <input type="button" id="disabled-btn-start-generating-certificates" class="is-disabled" aria-disabled="true" value="${_('Generate Certificates')}"/>
@@ -116,6 +117,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
     <div class="start-certificate-regeneration">
         <h3 class="hd hd-3">${_("Regenerate Certificates")}</h3>
         <form id="certificate-regenerating-form" method="post" action="${section_data['urls']['certificate_task']}">
+            <input type="hidden" name="api_action" value="regenerate" />
             <p class="under-heading">
                 ${_('To regenerate certificates for your course, choose the learners who will receive regenerated certificates and click Regenerate Certificates.')}
             </p>
