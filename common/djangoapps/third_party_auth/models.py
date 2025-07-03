@@ -15,6 +15,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from edx_django_utils.monitoring import set_custom_attribute
+from edx_toggles.toggles import SettingToggle
 from organizations.models import Organization
 from social_core.backends.base import BaseAuth
 from social_core.backends.oauth import OAuthAuth
@@ -36,6 +38,26 @@ REGISTRATION_FORM_FIELD_BLACKLIST = [
     'name',
     'username'
 ]
+
+# .. toggle_name: ENABLE_SAML_CONFIG_SIGNAL_HANDLERS
+# .. toggle_implementation: SettingToggle
+# .. toggle_default: False
+# .. toggle_description: Controls whether SAML configuration signal handlers are active.
+#    When enabled (True), signal handlers will automatically update SAMLProviderConfig
+#    references when SAMLConfiguration is updated, preventing duplicate child records.
+#    When disabled (False), the system uses the legacy behavior where child configs
+#    may point to outdated parent configurations.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2025-07-03
+# .. toggle_target_removal_date: 2026-01-01
+# .. toggle_warning: Disabling this toggle may result in SAMLProviderConfig instances
+#    pointing to outdated SAMLConfiguration records. Use the management command
+#    'saml --fix-references' to fix outdated references when the toggle is disabled.
+ENABLE_SAML_CONFIG_SIGNAL_HANDLERS = SettingToggle(
+    "ENABLE_SAML_CONFIG_SIGNAL_HANDLERS",
+    default=False,
+    module_name=__name__
+)
 
 
 # A dictionary of {name: class} entries for each python-social-auth backend available.
@@ -832,22 +854,30 @@ class SAMLProviderConfig(ProviderConfig):
         Get the current active SAMLConfiguration for this provider.
         Falls back to the default configuration if none is set.
 
-        Note: This method no longer includes self-healing logic. Use the
-        management command 'saml --fix-references' to fix outdated references,
-        and signal handlers will prevent future issues.
+        When ENABLE_SAML_CONFIG_SIGNAL_HANDLERS toggle is enabled, this method includes
+        custom attributes for observability. When disabled, it uses legacy behavior.
         """
         if self.saml_configuration:
+            if ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled():
+                # .. custom_attribute_name: saml_config.using
+                # .. custom_attribute_description: Describes which config is being used: direct (from db),
+                #     latest, or default.
+                set_custom_attribute('saml_config.using', 'direct')
             return self.saml_configuration
 
         # Fall back to default configuration
         try:
             default_config = SAMLConfiguration.current(self.site_id, 'default')
             if default_config:
+                if ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled():
+                    set_custom_attribute('saml_config.using', 'default')
                 return default_config
         except Exception:  # pylint: disable=broad-except
             log.warning("Could not fetch default SAMLConfiguration for site %s", self.site_id)
 
         # No configuration found at all
+        if ENABLE_SAML_CONFIG_SIGNAL_HANDLERS.is_enabled():
+            set_custom_attribute('saml_config.using', 'none_found')
         return None
 
     def get_config(self):

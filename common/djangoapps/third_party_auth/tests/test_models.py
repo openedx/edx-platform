@@ -2,6 +2,7 @@
 Tests for third_party_auth/models.py.
 """
 import unittest
+from unittest.mock import patch, call
 
 from django.test import TestCase, override_settings
 from django.contrib.sites.models import Site
@@ -158,6 +159,46 @@ class TestSAMLConfigurationSignals(TestCase):
         with self.assertRaises(AuthNotConfigured):
             provider_without_config.get_config()
 
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
+    @patch('common.djangoapps.third_party_auth.signals.handlers.set_custom_attribute')
+    def test_signal_custom_attributes(self, mock_set_custom_attribute):
+        """Test that signal handler sets custom attributes during updates."""
+        # Update SAML configuration to trigger signal
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+
+        # Verify both custom attributes were set
+        expected_calls = [
+            call('saml_config.signal_update', 'updated_reference'),
+            call('saml_config.signal_behavior', 'active')
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
+    @patch('common.djangoapps.third_party_auth.models.set_custom_attribute')
+    def test_custom_attributes_tracking(self, mock_set_custom_attribute):
+        """Test that custom attributes track SAML configuration usage scenarios."""
+        # Test direct configuration
+        config = self.provider_config.get_current_saml_configuration()
+        self.assertIsNotNone(config)
+        mock_set_custom_attribute.assert_called_with('saml_config.using', 'direct')
+
+        # Test default fallback
+        mock_set_custom_attribute.reset_mock()
+        self.provider_config.saml_configuration = None
+        self.provider_config.save()
+
+        SAMLConfiguration.objects.create(
+            site=self.site, slug='default', enabled=True,
+            entity_id='https://default.example.com',
+            org_info_str='{"en-US": {"url": "http://default.com", "displayname": "Default", "name": "default"}}'
+        )
+
+        config = self.provider_config.get_current_saml_configuration()
+        self.assertEqual(config.slug, 'default')
+        mock_set_custom_attribute.assert_called_with('saml_config.using', 'default')
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
     def test_signal_prevents_duplicate_provider_configs(self):
         """Test that signal handler updates existing records instead of creating duplicates."""
         # Get initial count of SAMLProviderConfig records
@@ -198,6 +239,54 @@ class TestSAMLConfigurationSignals(TestCase):
             self.saml_config.id,
             "Provider should point to the updated SAMLConfiguration"
         )
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=False)
+    @patch('common.djangoapps.third_party_auth.signals.handlers.set_custom_attribute')
+    def test_toggle_disabled_signal_behavior(self, mock_set_custom_attribute):
+        """Test that signal handler respects the toggle when disabled."""
+        # Update SAML configuration to trigger signal
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+
+        # Signal should be disabled by toggle
+        mock_set_custom_attribute.assert_called_with('saml_config.signal_behavior', 'disabled_by_toggle')
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
+    @patch('common.djangoapps.third_party_auth.signals.handlers.set_custom_attribute')
+    def test_toggle_enabled_signal_behavior(self, mock_set_custom_attribute):
+        """Test that signal handler works when toggle is enabled."""
+        # Update SAML configuration to trigger signal
+        self.saml_config.entity_id = 'https://updated.example.com'
+        self.saml_config.save()
+
+        # Signal should process normally
+        expected_calls = [
+            call('saml_config.signal_update', 'updated_reference'),
+            call('saml_config.signal_behavior', 'active')
+        ]
+        mock_set_custom_attribute.assert_has_calls(expected_calls, any_order=True)
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=False)
+    @patch('common.djangoapps.third_party_auth.models.set_custom_attribute')
+    def test_toggle_disabled_custom_attributes(self, mock_set_custom_attribute):
+        """Test that custom attributes are not set when toggle is disabled."""
+        # Test that no custom attributes are set when toggle is disabled
+        config = self.provider_config.get_current_saml_configuration()
+        self.assertIsNotNone(config)
+
+        # Should not call set_custom_attribute when toggle is disabled
+        mock_set_custom_attribute.assert_not_called()
+
+    @override_settings(ENABLE_SAML_CONFIG_SIGNAL_HANDLERS=True)
+    @patch('common.djangoapps.third_party_auth.models.set_custom_attribute')
+    def test_toggle_enabled_custom_attributes(self, mock_set_custom_attribute):
+        """Test that custom attributes are set when toggle is enabled."""
+        # Test that custom attributes are set when toggle is enabled
+        config = self.provider_config.get_current_saml_configuration()
+        self.assertIsNotNone(config)
+
+        # Should call set_custom_attribute when toggle is enabled
+        mock_set_custom_attribute.assert_called_with('saml_config.using', 'direct')
 
 
 class TestSAMLConfigurationManagementCommand(TestCase):
