@@ -631,90 +631,6 @@ class AggregatedNotificationPreferences(APIView):
         }, status=status.HTTP_200_OK)
 
 
-class NotificationPreferencesView(APIView):
-    """
-    API view to retrieve and structure the notification preferences for the
-    authenticated user.
-    """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get(self, request):
-        """
-        Handles GET requests to retrieve notification preferences.
-
-        This method fetches the user's active notification preferences and
-        merges them with a default structure provided by NotificationAppManager.
-        This provides a complete view of all possible notifications and the
-        user's current settings for them.
-
-        Returns:
-            Response: A DRF Response object containing the structured
-                      notification preferences or an error message.
-        """
-        user_preferences_qs = NotificationPreference.objects.filter(user=request.user)
-        user_preferences_map = {pref.type: pref for pref in user_preferences_qs}
-
-        # Ensure all notification types are present in the user's preferences.
-        # If any are missing, create them with default values.
-        diff = set(COURSE_NOTIFICATION_TYPES.keys()) - set(user_preferences_map.keys())
-        missing_types = []
-        for missing_type in diff:
-            new_pref = create_notification_preference(
-                user_id=request.user.id,
-                notification_type=missing_type,
-
-            )
-            missing_types.append(new_pref)
-            user_preferences_map[missing_type] = new_pref
-        if missing_types:
-            NotificationPreference.objects.bulk_create(missing_types)
-
-        # If no user preferences are found, return an error response.
-        if not user_preferences_map:
-            return Response({
-                'status': 'error',
-                'message': 'No active notification preferences found for this user.'
-            }, status=status.HTTP_404_NOT_FOUND)
-
-        # Get the structured preferences from the NotificationAppManager.
-        # This will include all apps and their notification types.
-        structured_preferences = NotificationAppManager().get_notification_app_preferences()
-
-        for app_name, app_settings in structured_preferences.items():
-            notification_types = app_settings.get('notification_types', {})
-
-            # Process all notification types (core and non-core) in a single loop.
-            for type_name, type_details in notification_types.items():
-                if type_name == 'core':
-                    if structured_preferences[app_name]['core_notification_types']:
-                        # If the app has core notification types, use the first one as the type name.
-                        # This assumes that the first core notification type is representative of the core settings.
-                        notification_type = structured_preferences[app_name]['core_notification_types'][0]
-                    else:
-                        notification_type = 'core'
-                    user_pref = user_preferences_map.get(notification_type)
-                else:
-                    user_pref = user_preferences_map.get(type_name)
-                if user_pref:
-                    # If a preference exists, update the dictionary for this type.
-                    # This directly modifies the 'type_details' dictionary.
-                    type_details['web'] = user_pref.web
-                    type_details['email'] = user_pref.email
-                    type_details['push'] = user_pref.push
-                    type_details['email_cadence'] = user_pref.email_cadence
-
-        return Response({
-            'status': 'success',
-            'message': 'Notification preferences retrieved successfully.',
-            'data': structured_preferences
-        }, status=status.HTTP_200_OK)
-
-
 @allow_any_authenticated_user()
 class NotificationPreferencesView(APIView):
     """
@@ -790,7 +706,7 @@ class NotificationPreferencesView(APIView):
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved successfully.',
-            'data': structured_preferences
+            'data': add_non_editable_in_preference(structured_preferences)
         }, status=status.HTTP_200_OK)
 
     def put(self, request):
@@ -812,7 +728,7 @@ class NotificationPreferencesView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         query_set = NotificationPreference.objects.filter(user_id=request.user.id)
         if serializer.validated_data['notification_type'] == 'core':
-            __, core_types, __ = NotificationTypeManager().get_notification_app_preference(
+            __, core_types = NotificationTypeManager().get_notification_app_preference(
                 notification_app=serializer.validated_data['notification_app']
             )
             # Add all related core types in query set.
