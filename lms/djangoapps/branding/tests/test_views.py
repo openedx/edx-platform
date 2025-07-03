@@ -8,8 +8,9 @@ import ddt
 import six
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
 
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.branding.models import BrandingApiConfig
@@ -18,6 +19,7 @@ from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 
 
 @ddt.ddt
@@ -289,104 +291,119 @@ class TestIndex(SiteMixin, TestCase):
 
 
 @ddt.ddt
-class TestIndexPageConfig(SiteMixin, TestCase):
-    """Test the index_page_config view"""
+class TestLMSFrontendParams(SiteMixin, TestCase):
+    """Test the view that returns parameters for the LMS frontend."""
 
     def setUp(self):
         super().setUp()
-        self.url = reverse("index_page_config")
+        self.url = reverse("frontend_params")
 
-    def test_index_page_config_default_response(self):
-        """Test index_page_config returns expected default values"""
+    def test_params_include_all_expected_keys(self):
+        """Ensure the params response includes all required keys."""
+
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response['Content-Type'] == 'application/json'
 
-        config = json.loads(response.content.decode('utf-8'))
-        assert 'enable_course_sorting_by_start_date' in config
-        assert 'homepage_overlay_html' in config
-        assert 'show_partners' in config
-        assert 'show_homepage_promo_video' in config
-        assert 'homepage_course_max' in config
-        assert 'homepage_promo_video_youtube_id' in config
+        params = json.loads(response.content.decode('utf-8'))
 
-        # Test default values
-        assert config['show_partners'] is True
-        assert config['show_homepage_promo_video'] is False
-        assert config['homepage_promo_video_youtube_id'] == 'your-youtube-id'
-        assert config['enable_course_sorting_by_start_date'] == settings.FEATURES.get(
-            'ENABLE_COURSE_SORTING_BY_START_DATE'
-        )
-        assert config['homepage_course_max'] == settings.HOMEPAGE_COURSE_MAX
+        assert 'enable_course_sorting_by_start_date' in params
+        assert 'homepage_overlay_html' in params
+        assert 'show_partners' in params
+        assert 'show_homepage_promo_video' in params
+        assert 'homepage_course_max' in params
+        assert 'homepage_promo_video_youtube_id' in params
+        assert 'sidebar_html_enabled' in params
+        assert 'course_about_show_social_links' in params
+        assert 'course_about_twitter_account' in params
+        assert 'is_cosmetic_price_enabled' in params
+        assert 'courses_are_browsable' in params
 
     @ddt.data(
-        ('ENABLE_COURSE_SORTING_BY_START_DATE', True),
         ('ENABLE_COURSE_SORTING_BY_START_DATE', False),
         ('homepage_overlay_html', '<p>Test overlay</p>'),
         ('show_partners', False),
         ('show_homepage_promo_video', True),
         ('HOMEPAGE_COURSE_MAX', 5),
-        ('homepage_promo_video_youtube_id', 'test-youtube-id')
+        ('homepage_promo_video_youtube_id', 'test-youtube-id'),
+        ('course_about_show_social_links', False),
+        ('course_about_twitter_account', '@TestTwitterAccount'),
     )
     @ddt.unpack
-    def test_index_page_config_with_site_configuration(self, key, value):
-        """Test index_page_config returns values from site configuration"""
+    def test_params_use_site_configuration_values(self, key, value):
+        """Ensure params are correctly retrieved from site configuration."""
+
         # Configure site with the test value
         self.use_site(self.site)
-        site_dict = {key: value}
-        self.site_configuration.site_values.update(site_dict)
+        self.site_configuration.site_values[key] = value
         self.site_configuration.save()
 
         response = self.client.get(self.url)
-        assert response.status_code == 200
+        params = json.loads(response.content.decode('utf-8'))
 
-        config = json.loads(response.content.decode('utf-8'))
+        response_key = key.lower()
+        assert params[response_key] == value
 
-        # Convert keys to the response format if needed
-        response_key = key
-        if key == 'ENABLE_COURSE_SORTING_BY_START_DATE':
-            response_key = 'enable_course_sorting_by_start_date'
-        elif key == 'HOMEPAGE_COURSE_MAX':
-            response_key = 'homepage_course_max'
+    def test_params_use_defaults_if_no_site_configuration(self):
+        """Ensure default values are returned when site configuration is missing."""
 
-        assert config[response_key] == value
+        response = self.client.get(self.url)
+        params = json.loads(response.content.decode('utf-8'))
 
-    def test_config_falls_back_to_settings(self):
-        """Test that the configuration falls back to settings when not in site configuration"""
+        assert params['show_partners'] is True
+        assert params['show_homepage_promo_video'] is False
+        assert params['homepage_promo_video_youtube_id'] == 'your-youtube-id'
+        assert params['enable_course_sorting_by_start_date'] == settings.FEATURES.get(
+            'ENABLE_COURSE_SORTING_BY_START_DATE'
+        )
+        assert params['homepage_course_max'] == settings.HOMEPAGE_COURSE_MAX
+        assert params['course_about_show_social_links'] is True
+        assert params['course_about_twitter_account'] == settings.PLATFORM_TWITTER_ACCOUNT
+
+    def test_params_use_settings_if_no_site_configuration(self):
+        """Ensure Django settings are used as fallback when no site configuration is provided."""
+
         self.use_site(self.site)
         self.site_configuration.site_values.clear()
         self.site_configuration.save()
 
-        with mock.patch.dict(settings.FEATURES, {'ENABLE_COURSE_SORTING_BY_START_DATE': False}):
-            with mock.patch.object(settings, 'HOMEPAGE_COURSE_MAX', 10):
-                response = self.client.get(self.url)
-                config = json.loads(response.content.decode('utf-8'))
-                assert config['enable_course_sorting_by_start_date'] is False
-                assert config['homepage_course_max'] == 10
+        expected_settings = {
+            'HOMEPAGE_COURSE_MAX': 10,
+            'PLATFORM_TWITTER_ACCOUNT': '@TestTwitterAccount',
+            'FEATURES': settings.FEATURES | {'ENABLE_COURSE_SORTING_BY_START_DATE': False},
+        }
 
-    @mock.patch('openedx.core.djangoapps.site_configuration.helpers.get_value')
-    def test_all_values_from_config_helpers(self, mock_get_value):
-        """Test that all values come from configuration helpers if available"""
-        # Setup mock to return different values for different keys
-        def side_effect(key, default=None):
-            config_values = {
-                'ENABLE_COURSE_SORTING_BY_START_DATE': True,
-                'homepage_overlay_html': '<h1>Custom Overlay</h1>',
-                'show_partners': False,
-                'show_homepage_promo_video': True,
-                'HOMEPAGE_COURSE_MAX': 7,
-                'homepage_promo_video_youtube_id': 'custom-youtube-id'
-            }
-            return config_values.get(key, default)
+        with override_settings(**expected_settings):
+            response = self.client.get(self.url)
 
-        mock_get_value.side_effect = side_effect
+        params = json.loads(response.content.decode('utf-8'))
 
-        response = self.client.get(self.url)
-        config = json.loads(response.content.decode('utf-8'))
+        assert params['homepage_course_max'] == 10
+        assert params['course_about_twitter_account'] == '@TestTwitterAccount'
+        assert params['enable_course_sorting_by_start_date'] is False
 
-        assert config['enable_course_sorting_by_start_date'] is True
-        assert config['homepage_overlay_html'] == '<h1>Custom Overlay</h1>'
-        assert config['show_partners'] is False
-        assert config['show_homepage_promo_video'] is True
-        assert config['homepage_course_max'] == 7
-        assert config['homepage_promo_video_youtube_id'] == 'custom-youtube-id'
+    def test_params_use_waffle_switches(self):
+        """Ensure params are correctly retrieved from waffle switches."""
+
+        with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=True):
+            response = self.client.get(self.url)
+
+        params = json.loads(response.content.decode('utf-8'))
+
+        assert params['sidebar_html_enabled'] is True
+
+    def test_params_use_settings_features(self):
+        """Ensure params are correctly retrieved from Django settings."""
+
+        extra_feature_flags = {
+            'ENABLE_COSMETIC_DISPLAY_PRICE': True,
+            'COURSES_ARE_BROWSABLE': False
+        }
+
+        with override_settings(FEATURES=settings.FEATURES | extra_feature_flags):
+            response = self.client.get(self.url)
+
+        params = json.loads(response.content.decode('utf-8'))
+
+        assert params['is_cosmetic_price_enabled'] is True
+        assert params['courses_are_browsable'] is False
