@@ -539,6 +539,11 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             for _, type_prefs in app_prefs.get('notification_types', {}).items():
                 assert 'info' not in type_prefs.keys()
 
+    def test_non_editable_is_not_saved_in_json(self):
+        default_prefs = NotificationAppManager().get_notification_app_preferences()
+        for app_prefs in default_prefs.values():
+            assert 'non_editable' not in app_prefs.keys()
+
     @ddt.data(*itertools.product(('email', 'web'), (True, False)))
     @ddt.unpack
     def test_unsub_user_preferences_removal_on_email_enabled(self, channel, value):
@@ -1373,7 +1378,7 @@ class GetAggregateNotificationPreferencesTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
         self.assertEqual(response.data['message'], 'Notification preferences retrieved')
-        self.assertEqual(response.data['data'], {'mocked': {'notification_types': {}}})
+        self.assertDictEqual(response.data['data'], {'mocked': {'notification_types': {}, 'non_editable': {}}})
 
     def test_unauthenticated_user(self):
         """
@@ -1383,3 +1388,29 @@ class GetAggregateNotificationPreferencesTest(APITestCase):
         self.client.logout()  # Remove authentication
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @mock.patch.dict(COURSE_NOTIFICATION_APPS, {
+        **COURSE_NOTIFICATION_APPS,
+        **{
+            'discussion': {
+                'name': 'content_reported',
+                'non_editable': ["web"]
+            }
+        }
+    })
+    @mock.patch.dict(COURSE_NOTIFICATION_TYPES, {
+        **COURSE_NOTIFICATION_TYPES,
+        **{
+            'course_updates': {
+                **COURSE_NOTIFICATION_TYPES['course_updates'],
+                'non_editable': ["email"]
+            }
+        }
+    })
+    def test_non_editable_is_added_in_api_response(self):
+        CourseNotificationPreference.objects.create(user=self.user, is_active=True)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        prefs = response.data['data']
+        self.assertDictEqual(prefs['updates']['non_editable'], {'course_updates': ['email']})
+        self.assertDictEqual(prefs['discussion']['non_editable'], {'core': ['web']})

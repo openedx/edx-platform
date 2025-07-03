@@ -40,7 +40,8 @@ from .serializers import (
     NotificationSerializer,
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateAllSerializer,
-    UserNotificationPreferenceUpdateSerializer
+    UserNotificationPreferenceUpdateSerializer,
+    add_non_editable_in_preference
 )
 from .utils import (
     aggregate_notification_configs,
@@ -623,5 +624,5 @@ class AggregatedNotificationPreferences(APIView):
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved',
-            'data': notification_configs
+            'data': add_non_editable_in_preference(notification_configs)
         }, status=status.HTTP_200_OK)
