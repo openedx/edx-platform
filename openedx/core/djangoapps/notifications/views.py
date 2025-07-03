@@ -720,49 +720,103 @@ class NotificationPreferencesView(APIView):
         Returns:
             Response: A DRF Response object indicating success or failure.
         """
+        # Validate incoming data
         serializer = UserNotificationPreferenceUpdateAllSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({
                 'status': 'error',
                 'message': serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get validated data for easier access
+        validated_data = serializer.validated_data
+
+        # Build query set based on notification type
         query_set = NotificationPreference.objects.filter(user_id=request.user.id)
-        if serializer.validated_data['notification_type'] == 'core':
+
+        if validated_data['notification_type'] == 'core':
+            # Get core notification types for the app
             __, core_types = NotificationTypeManager().get_notification_app_preference(
-                notification_app=serializer.validated_data['notification_app']
+                notification_app=validated_data['notification_app']
             )
-            # Add all related core types in query set.
-            query_set.filter(type__in=core_types)
+            query_set = query_set.filter(type__in=core_types)
         else:
-            # In case of non-core add single type that is provided in post data.
-            query_set.filter(
-                user_id=request.user.id,
-                type=serializer.validated_data['notification_type']
-            )
+            # Filter by single notification type
+            query_set = query_set.filter(type=validated_data['notification_type'])
 
-        if serializer.validated_data['notification_channel'] == 'email_cadence':
-            updated_data = {
-                serializer.validated_data['notification_channel']: serializer.validated_data['email_cadence']
-            }
+        # Prepare update data based on channel type
+        updated_data = self._prepare_update_data(validated_data)
+
+        # Update preferences
+        query_set.update(**updated_data)
+
+        # Log the event
+        self._log_preference_update_event(request.user, validated_data)
+
+        # Prepare and return response
+        response_data = self._prepare_response_data(validated_data)
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def _prepare_update_data(self, validated_data):
+        """
+        Prepare the data dictionary for updating notification preferences.
+
+        Args:
+            validated_data (dict): Validated serializer data
+
+        Returns:
+            dict: Dictionary with update data
+        """
+        channel = validated_data['notification_channel']
+
+        if channel == 'email_cadence':
+            return {channel: validated_data['email_cadence']}
         else:
-            updated_data = {
-                serializer.validated_data['notification_channel']: serializer.validated_data['value']
-            }
-        query_set.update(
-            **updated_data
-        )
+            return {channel: validated_data['value']}
 
+    def _log_preference_update_event(self, user, validated_data):
+        """
+        Log the notification preference update event.
+
+        Args:
+            user: The user making the update
+            validated_data (dict): Validated serializer data
+        """
         event_data = {
-            'notification_app': serializer.validated_data['notification_app'],
-            'notification_type': serializer.validated_data['notification_type'],
-            'notification_channel': serializer.validated_data['notification_channel'],
-            'value': serializer.validated_data.get('value'),
-            'email_cadence': serializer.validated_data.get('email_cadence'),
+            'notification_app': validated_data['notification_app'],
+            'notification_type': validated_data['notification_type'],
+            'notification_channel': validated_data['notification_channel'],
+            'value': validated_data.get('value'),
+            'email_cadence': validated_data.get('email_cadence'),
         }
-        notification_preference_update_event(
-            request.user, [], event_data
-        )
-        return Response({
+        notification_preference_update_event(user, [], event_data)
+
+    def _prepare_response_data(self, validated_data):
+        """
+        Prepare the response data dictionary.
+
+        Args:
+            validated_data (dict): Validated serializer data
+
+        Returns:
+            dict: Response data dictionary
+        """
+        email_cadence = validated_data.get('email_cadence', None)
+        # Determine the updated value
+        updated_value = validated_data.get('value', email_cadence if email_cadence else None)
+
+        # Determine the channel
+        channel = validated_data.get('notification_channel')
+        if not channel and validated_data.get('email_cadence'):
+            channel = 'email_cadence'
+
+        return {
             'status': 'success',
-            'message': 'Notification preferences updated successfully.'
-        }, status=status.HTTP_200_OK)
+            'message': 'Notification preferences update completed',
+            'data': {
+                'updated_value': updated_value,
+                'notification_type': validated_data['notification_type'],
+                'channel': channel,
+                'app': validated_data['notification_app'],
+            }
+        }
