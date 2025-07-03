@@ -44,7 +44,8 @@ from openedx.core.djangoapps.notifications.email.utils import update_user_prefer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager
+from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager, \
+    NotificationTypeManager
 from ..utils import get_notification_types_with_visibility_settings
 
 User = get_user_model()
@@ -1658,3 +1659,62 @@ class TestNotificationPreferencesView(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_preferences_core(self):
+        """
+        Test case: Update notification preferences for the authenticated user
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "core",
+            "notification_channel": "email_cadence",
+            "email_cadence": "Weekly"
+        }
+        __, core_types, __ = NotificationTypeManager().get_notification_app_preference('discussion')
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        cadence_set = NotificationPreference.objects.filter(type__in=core_types).values_list('email_cadence', flat=True)
+        self.assertEqual(len(set(cadence_set)), 1)
+        self.assertIn('Weekly', set(cadence_set))
+
+    def test_update_preferences(self):
+        """
+        Test case: Update notification preferences for the authenticated user
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "new_discussion_post",
+            "notification_channel": "web",
+            "value": True
+        }
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        preference = NotificationPreference.objects.get(
+            type='new_discussion_post',
+            user__id=self.user.id
+        )
+        self.assertEqual(preference.web, True)
+
+    def test_update_preferences_non_core_email(self):
+        """
+        Test case: Update notification preferences for the authenticated user
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "new_discussion_post",
+            "notification_channel": "email_cadence",
+            "email_cadence": 'Weekly'
+        }
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        preference = NotificationPreference.objects.get(
+            type='new_discussion_post',
+            user__id=self.user.id
+        )
+        self.assertEqual(preference.email_cadence, 'Weekly')

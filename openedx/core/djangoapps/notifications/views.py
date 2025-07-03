@@ -9,11 +9,9 @@ from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
@@ -28,7 +26,8 @@ from openedx.core.djangoapps.notifications.permissions import allow_any_authenti
 from openedx.core.djangoapps.notifications.serializers import add_info_to_notification_config
 from openedx.core.djangoapps.user_api.models import UserPreference
 
-from .base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager, COURSE_NOTIFICATION_TYPES
+from .base_notification import COURSE_NOTIFICATION_APPS, NotificationAppManager, COURSE_NOTIFICATION_TYPES, \
+    NotificationTypeManager
 from .config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
 from .events import (
     notification_preference_update_event,
@@ -52,7 +51,6 @@ from .utils import (
     filter_out_visible_preferences_by_course_ids,
     get_show_notifications_tray
 )
-from ...lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
 @allow_any_authenticated_user()
@@ -714,4 +712,141 @@ class NotificationPreferencesView(APIView):
             'status': 'success',
             'message': 'Notification preferences retrieved successfully.',
             'data': structured_preferences
+        }, status=status.HTTP_200_OK)
+
+
+@allow_any_authenticated_user()
+class NotificationPreferencesView(APIView):
+    """
+    API view to retrieve and structure the notification preferences for the
+    authenticated user.
+    """
+
+    def get(self, request):
+        """
+        Handles GET requests to retrieve notification preferences.
+
+        This method fetches the user's active notification preferences and
+        merges them with a default structure provided by NotificationAppManager.
+        This provides a complete view of all possible notifications and the
+        user's current settings for them.
+
+        Returns:
+            Response: A DRF Response object containing the structured
+                      notification preferences or an error message.
+        """
+        user_preferences_qs = NotificationPreference.objects.filter(user=request.user)
+        user_preferences_map = {pref.type: pref for pref in user_preferences_qs}
+
+        # Ensure all notification types are present in the user's preferences.
+        # If any are missing, create them with default values.
+        diff = set(COURSE_NOTIFICATION_TYPES.keys()) - set(user_preferences_map.keys())
+        missing_types = []
+        for missing_type in diff:
+            new_pref = create_notification_preference(
+                user_id=request.user.id,
+                notification_type=missing_type,
+
+            )
+            missing_types.append(new_pref)
+            user_preferences_map[missing_type] = new_pref
+        if missing_types:
+            NotificationPreference.objects.bulk_create(missing_types)
+
+        # If no user preferences are found, return an error response.
+        if not user_preferences_map:
+            return Response({
+                'status': 'error',
+                'message': 'No active notification preferences found for this user.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get the structured preferences from the NotificationAppManager.
+        # This will include all apps and their notification types.
+        structured_preferences = NotificationAppManager().get_notification_app_preferences()
+
+        for app_name, app_settings in structured_preferences.items():
+            notification_types = app_settings.get('notification_types', {})
+
+            # Process all notification types (core and non-core) in a single loop.
+            for type_name, type_details in notification_types.items():
+                if type_name == 'core':
+                    if structured_preferences[app_name]['core_notification_types']:
+                        # If the app has core notification types, use the first one as the type name.
+                        # This assumes that the first core notification type is representative of the core settings.
+                        notification_type = structured_preferences[app_name]['core_notification_types'][0]
+                    else:
+                        notification_type = 'core'
+                    user_pref = user_preferences_map.get(notification_type)
+                else:
+                    user_pref = user_preferences_map.get(type_name)
+                if user_pref:
+                    # If a preference exists, update the dictionary for this type.
+                    # This directly modifies the 'type_details' dictionary.
+                    type_details['web'] = user_pref.web
+                    type_details['email'] = user_pref.email
+                    type_details['push'] = user_pref.push
+                    type_details['email_cadence'] = user_pref.email_cadence
+
+        return Response({
+            'status': 'success',
+            'message': 'Notification preferences retrieved successfully.',
+            'data': structured_preferences
+        }, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        """
+        Handles PUT requests to update notification preferences.
+
+        This method updates the user's notification preferences based on the
+        provided data in the request body. It expects a dictionary with
+        notification types and their settings.
+
+        Returns:
+            Response: A DRF Response object indicating success or failure.
+        """
+        serializer = UserNotificationPreferenceUpdateAllSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                'status': 'error',
+                'message': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+        query_set = NotificationPreference.objects.filter(user_id=request.user.id)
+        if serializer.validated_data['notification_type'] == 'core':
+            __, core_types, __ = NotificationTypeManager().get_notification_app_preference(
+                notification_app=serializer.validated_data['notification_app']
+            )
+            # Add all related core types in query set.
+            query_set.filter(type__in=core_types)
+        else:
+            # In case of non-core add single type that is provided in post data.
+            query_set.filter(
+                user_id=request.user.id,
+                type=serializer.validated_data['notification_type']
+            )
+
+        if serializer.validated_data['notification_channel'] == 'email_cadence':
+            updated_data = {
+                serializer.validated_data['notification_channel']: serializer.validated_data['email_cadence']
+            }
+        else:
+            updated_data = {
+                serializer.validated_data['notification_channel']: serializer.validated_data['value']
+            }
+        query_set.update(
+            **updated_data
+        )
+
+        event_data = {
+            'notification_app': serializer.validated_data['notification_app'],
+            'notification_type': serializer.validated_data['notification_type'],
+            'notification_channel': serializer.validated_data['notification_channel'],
+            'value': serializer.validated_data.get('value'),
+            'email_cadence': serializer.validated_data.get('email_cadence'),
+        }
+        notification_preference_update_event(
+            request.user, [], event_data
+        )
+        return Response({
+            'status': 'success',
+            'message': 'Notification preferences updated successfully.'
         }, status=status.HTTP_200_OK)
