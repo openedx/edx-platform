@@ -3385,7 +3385,7 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
     def post(self, request, course_id):
         response_payload = {}
 
-        if request.POST.get('mode') == 'generate':
+        if request.POST.get('api_action') == 'generate':
             """
              Generating certificates for all students enrolled in given course.
             """
@@ -3399,7 +3399,7 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
                 'task_id': task.task_id
             }
 
-        if request.POST.get('mode') == 'regenerate':
+        elif request.POST.get('api_action') == 'regenerate':
             """
             certificate_statuses 'certificate_statuses' in POST data.
             """
