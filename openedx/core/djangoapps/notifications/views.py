@@ -26,7 +26,7 @@ from openedx.core.djangoapps.notifications.serializers import add_info_to_notifi
 from openedx.core.djangoapps.user_api.models import UserPreference
 
 from .base_notification import COURSE_NOTIFICATION_APPS
-from .config.waffle import ENABLE_NOTIFICATIONS
+from .config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
 from .events import (
     notification_preference_update_event,
     notification_preferences_viewed_event,
@@ -40,7 +40,8 @@ from .serializers import (
     NotificationSerializer,
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateAllSerializer,
-    UserNotificationPreferenceUpdateSerializer
+    UserNotificationPreferenceUpdateSerializer,
+    add_non_editable_in_preference
 )
 from .utils import (
     aggregate_notification_configs,
@@ -603,15 +604,25 @@ class AggregatedNotificationPreferences(APIView):
         notification_configs = aggregate_notification_configs(
             notification_configs
         )
+        course_ids = notification_preferences.values_list('course_id', flat=True)
+
         filter_out_visible_preferences_by_course_ids(
             request.user,
             notification_configs,
-            notification_preferences.values_list('course_id', flat=True),
+            course_ids,
         )
+
         notification_preferences_viewed_event(request)
         notification_configs = add_info_to_notification_config(notification_configs)
+
+        discussion_config = notification_configs.get('discussion', {})
+        notification_types = discussion_config.get('notification_types', {})
+
+        if not any(ENABLE_NOTIFY_ALL_LEARNERS.is_enabled(course_key) for course_key in course_ids):
+            notification_types.pop('new_instructor_all_learners_post', None)
+
         return Response({
             'status': 'success',
             'message': 'Notification preferences retrieved',
-            'data': notification_configs
+            'data': add_non_editable_in_preference(notification_configs)
         }, status=status.HTTP_200_OK)

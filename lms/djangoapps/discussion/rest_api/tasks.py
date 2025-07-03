@@ -6,8 +6,11 @@ from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.locator import CourseKey
 
+from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.discussion.django_comment_client.utils import get_user_role_names
 from lms.djangoapps.discussion.rest_api.discussions_notifications import DiscussionNotificationSender
+from lms.djangoapps.discussion.rest_api.utils import can_user_notify_all_learners
 from openedx.core.djangoapps.django_comment_common.comment_client import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
@@ -17,7 +20,7 @@ User = get_user_model()
 
 @shared_task
 @set_code_owner_attribute
-def send_thread_created_notification(thread_id, course_key_str, user_id):
+def send_thread_created_notification(thread_id, course_key_str, user_id, notify_all_learners=False):
     """
     Send notification when a new thread is created
     """
@@ -26,9 +29,17 @@ def send_thread_created_notification(thread_id, course_key_str, user_id):
         return
     thread = Thread(id=thread_id).retrieve()
     user = User.objects.get(id=user_id)
+
+    if notify_all_learners:
+        is_course_staff = CourseStaffRole(course_key).has_user(user)
+        is_course_admin = CourseInstructorRole(course_key).has_user(user)
+        user_roles = get_user_role_names(user, course_key)
+        if not can_user_notify_all_learners(course_key, user_roles, is_course_staff, is_course_admin):
+            return
+
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     notification_sender = DiscussionNotificationSender(thread, course, user)
-    notification_sender.send_new_thread_created_notification()
+    notification_sender.send_new_thread_created_notification(notify_all_learners)
 
 
 @shared_task

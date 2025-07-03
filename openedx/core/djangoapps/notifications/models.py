@@ -26,7 +26,7 @@ NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 ADDITIONAL_NOTIFICATION_CHANNEL_SETTINGS = ['email_cadence']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 13
+COURSE_NOTIFICATION_CONFIG_VERSION = 14
 
 
 def get_course_notification_preference_config():
@@ -110,6 +110,7 @@ class Notification(TimeStampedModel):
     content_url = models.URLField(null=True, blank=True)
     web = models.BooleanField(default=True, null=False, blank=False)
     email = models.BooleanField(default=False, null=False, blank=False)
+    push = models.BooleanField(default=False, null=False, blank=False)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     group_by_id = models.CharField(max_length=255, db_index=True, null=False, default="")
@@ -129,6 +130,7 @@ class NotificationPreference(TimeStampedModel):
     """
     Model to store notification preferences for users at account level
     """
+
     class EmailCadenceChoices(models.TextChoices):
         DAILY = 'Daily'
         WEEKLY = 'Weekly'
@@ -146,6 +148,33 @@ class NotificationPreference(TimeStampedModel):
     email = models.BooleanField(default=False, null=False, blank=False)
     email_cadence = models.CharField(max_length=64, choices=EmailCadenceChoices.choices, null=False, blank=False)
     is_active = models.BooleanField(default=True)
+
+    def is_enabled_for_any_channel(self, *args, **kwargs) -> bool:
+        """
+        Returns True if the notification preference is enabled for any channel.
+        """
+        return self.web or self.push or self.email
+
+    def get_channels_for_notification_type(self, *args, **kwargs) -> list:
+        """
+        Returns the channels for the given app name and notification type.
+        Sample Response:
+        ['web', 'push']
+        """
+        channels = []
+        if self.web:
+            channels.append('web')
+        if self.push:
+            channels.append('push')
+        if self.email:
+            channels.append('email')
+        return channels
+
+    def get_email_cadence_for_notification_type(self, *args, **kwargs) -> str:
+        """
+        Returns the email cadence for the notification type.
+        """
+        return self.email_cadence
 
 
 class CourseNotificationPreference(TimeStampedModel):
@@ -191,7 +220,7 @@ class CourseNotificationPreference(TimeStampedModel):
                 preferences.config_version = current_config_version
                 preferences.notification_preference_config = new_prefs
                 preferences.save()
-                # pylint: disable-next=broad-except
+            # pylint: disable-next=broad-except
             except Exception as e:
                 log.error(f'Unable to update notification preference to new config. {e}')
         return preferences
