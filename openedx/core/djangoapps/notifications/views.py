@@ -9,11 +9,9 @@ from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
@@ -53,7 +51,6 @@ from .utils import (
     filter_out_visible_preferences_by_course_ids,
     get_show_notifications_tray
 )
-from ...lib.api.authentication import BearerAuthenticationAllowInactiveUser
 
 
 @allow_any_authenticated_user()
@@ -718,17 +715,12 @@ class NotificationPreferencesView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+@allow_any_authenticated_user()
 class NotificationPreferencesView(APIView):
     """
     API view to retrieve and structure the notification preferences for the
     authenticated user.
     """
-    authentication_classes = (
-        JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
-        SessionAuthenticationAllowInactiveUser,
-    )
-    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
         """
