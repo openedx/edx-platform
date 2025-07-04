@@ -15,7 +15,6 @@ class ModulestoreSourceFactory(factory.django.DjangoModelFactory):
     """
     class Meta:
         model = ModulestoreSource
-    forwarded_by = None
 
     @factory.lazy_attribute
     def key(self):
