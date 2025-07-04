@@ -25,6 +25,7 @@ omit =
     common/djangoapps/*/migrations/*
     openedx/core/djangoapps/*/migrations/*
     openedx/core/djangoapps/debug/*
+    openedx/envs/*
     openedx/features/*/migrations/*
 
 concurrency=multiprocessing
