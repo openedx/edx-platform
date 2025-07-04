@@ -840,7 +840,7 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.0
     # via -r requirements/edx/kernel.in
-openedx-learning==0.26.0
+openedx-learning @ git+https://github.com/openedx/openedx-learning.git@refs/pull/333/head
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
