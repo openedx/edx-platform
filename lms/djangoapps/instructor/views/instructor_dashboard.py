@@ -400,6 +400,10 @@ def _section_certificates(course):
                 'list_instructor_tasks',
                 kwargs={'course_id': course.id}
             ),
+            'certificate_task': reverse(
+                'certificate_task',
+                kwargs={'course_id': course.id}
+            ),
         }
     }
 

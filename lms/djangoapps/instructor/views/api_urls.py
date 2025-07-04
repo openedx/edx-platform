@@ -85,6 +85,7 @@ urlpatterns = [
     path('start_certificate_generation', api.StartCertificateGeneration.as_view(), name='start_certificate_generation'),
     path('start_certificate_regeneration', api.StartCertificateRegeneration.as_view(),
          name='start_certificate_regeneration'),
+    path('certificate_task/<course_id>', api.CertificateTask.as_view(), name='certificate_task'),
     path('certificate_exception_view/', api.CertificateExceptionView.as_view(), name='certificate_exception_view'),
     re_path(r'^generate_certificate_exceptions/(?P<generate_for>[^/]*)', api.GenerateCertificateExceptions.as_view(),
             name='generate_certificate_exceptions'),
