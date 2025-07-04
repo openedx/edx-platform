@@ -3437,6 +3437,50 @@ class StartCertificateRegeneration(DeveloperErrorViewMixin, APIView):
         return JsonResponse(response_payload)
 
 
+@require_POST
+@ensure_csrf_cookie
+@transaction.non_atomic_requests
+def unified_certificate_task(request, course_id):
+    """
+    Unified API endpoint to handle certificate-related actions for a course.
+
+    This endpoint consolidates multiple certificate operations into a single view.
+    The operation is determined by the `mode` parameter in the POST request data.
+
+    Supported modes:
+        - "toggle": Enable or disable student-generated certificates.
+        - "generate": Trigger certificate generation for all enrolled students.
+        - "regenerate": Regenerate certificates for students with specific statuses.
+
+    Args:
+        request (HttpRequest): The POST request object.
+        course_id (str): The course ID in URL format.
+
+    Returns:
+        JsonResponse: A response indicating the result of the requested action.
+                      Returns 400 if the mode is missing or invalid.
+    """
+    course_key = CourseKey.from_string(course_id)
+    mode = request.POST.get("mode")
+
+    if not mode:
+        return JsonResponse({'error': 'Missing "mode" in request.'}, status=400)
+
+    if mode == "toggle":
+        view = enable_certificate_generation
+        return view(request, course_id=course_id)
+
+    elif mode == "generate":
+        view = StartCertificateGeneration.as_view()
+        return view(request, course_id=course_id)
+
+    elif mode == "regenerate":
+        view = StartCertificateRegeneration.as_view()
+        return view(request, course_id=course_id)
+
+    return JsonResponse({'error': f'Invalid mode: {mode}'}, status=400)
+
+
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CertificateExceptionView(DeveloperErrorViewMixin, APIView):

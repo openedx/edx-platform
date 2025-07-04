@@ -215,6 +215,195 @@ class CertificatesInstructorDashTest(SharedModuleStoreTestCase):
 
 @override_settings(CERT_QUEUE='certificates')
 @ddt.ddt
+class CertificatesInstructorUnifinedApiTest(SharedModuleStoreTestCase):
+    """Tests for the unified certificate task endpoint covering toggle, generate,
+    and regenerate modes in the instructor dashboard API. """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create()
+
+    def setUp(self):
+        super().setUp()
+        self.global_staff = GlobalStaffFactory()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.user = UserFactory()
+        CourseEnrollment.enroll(self.user, self.course.id)
+
+        # Enable certificate generation
+        cache.clear()
+        CertificateGenerationConfiguration.objects.create(enabled=True)
+
+    @ddt.data('certificate_task')
+    def test_allow_only_global_staff(self, url_name):
+        url = reverse(url_name, kwargs={'course_id': self.course.id})
+        post_data = {'mode': 'toggle'}
+
+        # Instructors do not have access
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        # Global staff have access
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+
+    @ddt.data(True, False)
+    def test_enable_certificate_generation(self, is_enabled):
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        url = reverse(
+            'certificate_task',
+            kwargs={'course_id': str(self.course.id)}
+        )
+        params = {
+            'certificates-enabled': 'true' if is_enabled else 'false',
+            'mode': 'toggle'
+        }
+        response = self.client.post(url, data=params)
+
+        # Expect a redirect back to the instructor dashboard
+        self._assert_redirects_to_instructor_dash(response)
+
+        # Expect that certificate generation is now enabled for the course
+        actual_enabled = certs_api.has_self_generated_certificates_enabled(self.course.id)
+        assert is_enabled == actual_enabled
+
+    def test_certificate_generation_api_without_global_staff(self):
+        """
+        Test certificates generation api endpoint returns permission denied if
+        user who made the request is not member of global staff.
+        """
+        user = UserFactory.create()
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
+        url = reverse(
+            'certificate_task',
+            kwargs={'course_id': str(self.course.id)}
+        )
+        post_data = {'mode': 'generate'}
+
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 403
+
+        self.client.login(username=self.instructor.username, password=self.TEST_PASSWORD)
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+
+    def _assert_redirects_to_instructor_dash(self, response):
+        """Check that the response redirects to the certificates section. """
+        expected_redirect = reverse(
+            'instructor_dashboard',
+            kwargs={'course_id': str(self.course.id)}
+        )
+        expected_redirect += '#view-certificates'
+        self.assertRedirects(response, expected_redirect)
+
+    def test_certificate_generation_api_with_global_staff(self):
+        """
+        Test certificates generation api endpoint returns success status when called with
+        valid course key
+        """
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        url = reverse(
+            'certificate_task',
+            kwargs={'course_id': str(self.course.id)}
+        )
+        post_data = {'mode': 'generate'}
+
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert res_json['message'] is not None
+        assert res_json['task_id'] is not None
+
+    def test_certificate_regeneration_success(self):
+        """
+        Test certificate regeneration is successful when accessed with 'certificate_statuses'
+        present in GeneratedCertificate table.
+        """
+
+        # Create a generated Certificate of some user with status 'downloadable'
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+
+        # Login the client and access the url with 'certificate_statuses'
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
+
+        post_data = {
+            'certificate_statuses': [CertificateStatuses.downloadable],
+            'mode': 'regenerate'
+        }
+
+        response = self.client.post(url, data=post_data)
+
+        # Assert 200 status code in response
+        assert response.status_code == 200
+        res_json = json.loads(response.content.decode('utf-8'))
+
+        # Assert request is successful
+        assert res_json['success']
+
+        # Assert success message
+        assert res_json['message'] ==\
+            'Certificate regeneration task has been started.' \
+            ' You can view the status of the generation task in the "Pending Tasks" section.'
+
+    def test_certificate_regeneration_error(self):
+        """
+        Test certificate regeneration errors out when accessed with either empty list of 'certificate_statuses' or
+        the 'certificate_statuses' that are not present in GeneratedCertificate table.
+        """
+        # Create a dummy course and GeneratedCertificate with the same status as the one we will use to access
+        # 'start_certificate_regeneration' but their error message should be displayed as GeneratedCertificate
+        # belongs to a different course
+        dummy_course = CourseFactory.create()
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=dummy_course.id,
+            status=CertificateStatuses.generating,
+            mode='honor'
+        )
+
+        # Login the client and access the url without 'certificate_statuses'
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
+
+        post_data = {'mode': 'regenerate'}
+
+        response = self.client.post(url, data=post_data)
+
+        # Assert 400 status code in response
+        assert response.status_code == 400
+        res_json = json.loads(response.content.decode('utf-8'))
+
+        # Assert Error Message
+        assert res_json['message'] ==\
+            'Please select certificate statuses from the list only.'
+
+        # Access the url passing 'certificate_statuses' that are not present in db
+        url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
+        post_data = {
+            'certificate_statuses': [CertificateStatuses.generating],
+            'mode': 'regenerate'
+        }
+        response = self.client.post(url, data=post_data)
+
+        # Assert 400 status code in response
+        assert response.status_code == 400
+        res_json = json.loads(response.content.decode('utf-8'))
+
+        # Assert Error Message
+        assert (res_json['message'] ==
+                'Please select certificate statuses from the list only.')
+
+
+@override_settings(CERT_QUEUE='certificates')
+@ddt.ddt
 class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
     """Tests for the certificates end-points in the instructor dash API. """
     @classmethod
@@ -337,8 +526,8 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert success message
         assert res_json['message'] ==\
-               'Certificate regeneration task has been started.' \
-               ' You can view the status of the generation task in the "Pending Tasks" section.'
+            'Certificate regeneration task has been started.' \
+            ' You can view the status of the generation task in the "Pending Tasks" section.'
 
     def test_certificate_regeneration_error(self):
         """
@@ -367,7 +556,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
 
         # Assert Error Message
         assert res_json['message'] ==\
-               'Please select certificate statuses from the list only.'
+            'Please select certificate statuses from the list only.'
 
         # Access the url passing 'certificate_statuses' that are not present in db
         url = reverse('start_certificate_regeneration', kwargs={'course_id': str(self.course.id)})
@@ -652,7 +841,7 @@ class CertificateExceptionViewInstructorApiTest(SharedModuleStoreTestCase):
         assert not res_json['success']
         # Assert Error Message
         assert res_json['message'] ==\
-               'The record is not in the correct format. Please add a valid username or email address.'
+            'The record is not in the correct format. Please add a valid username or email address.'
 
     def test_remove_certificate_exception_non_existing_error(self):
         """
@@ -909,7 +1098,7 @@ class TestCertificatesInstructorApiBulkAllowlist(SharedModuleStoreTestCase):
         data = json.loads(response.content.decode('utf-8'))
         assert len(data['general_errors']) != 0
         assert data['general_errors'][0] ==\
-               'Make sure that the file you upload is in CSV format with no extraneous characters or rows.'
+            'Make sure that the file you upload is in CSV format with no extraneous characters or rows.'
 
     def test_bad_file_upload_type(self):
         """
