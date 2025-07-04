@@ -201,4 +201,6 @@ def courseware_disable_navigation_sidebar_blocks_caching(course_key=None):
     """
     Return whether the courseware.disable_navigation_sidebar_blocks_caching flag is on.
     """
+    return True  # For debugging the Learning core shim proof of concept
+
     return COURSEWARE_MICROFRONTEND_NAVIGATION_SIDEBAR_BLOCKS_DISABLE_CACHING.is_enabled(course_key)
