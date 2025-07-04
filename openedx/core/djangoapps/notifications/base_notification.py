@@ -451,9 +451,8 @@ class NotificationTypeManager:
         non_core_notification_types_preferences = self.get_non_core_notification_type_preferences(
             non_core_notification_types, email_opt_out
         )
-        non_editable_notification_channels = self.get_non_editable_notification_channels(non_core_notification_types)
         core_notification_types_name = [notification_type.get('name') for notification_type in core_notification_types]
-        return non_core_notification_types_preferences, core_notification_types_name, non_editable_notification_channels
+        return non_core_notification_types_preferences, core_notification_types_name
 
 
 class NotificationAppManager:
@@ -486,18 +485,15 @@ class NotificationAppManager:
         course_notification_preference_config = {}
         for notification_app_key, notification_app_attrs in COURSE_NOTIFICATION_APPS.items():
             notification_app_preferences = {}
-            notification_types, core_notifications, \
-                non_editable_channels = NotificationTypeManager().get_notification_app_preference(
-                    notification_app_key,
-                    email_opt_out
-                )
+            notification_types, core_notifications = NotificationTypeManager().get_notification_app_preference(
+                notification_app_key,
+                email_opt_out
+            )
             self.add_core_notification_preference(notification_app_attrs, notification_types, email_opt_out)
-            self.add_core_notification_non_editable(notification_app_attrs, non_editable_channels)
 
             notification_app_preferences['enabled'] = notification_app_attrs.get('enabled', False)
             notification_app_preferences['core_notification_types'] = core_notifications
             notification_app_preferences['notification_types'] = notification_types
-            notification_app_preferences['non_editable'] = non_editable_channels
             course_notification_preference_config[notification_app_key] = notification_app_preferences
         return course_notification_preference_config
 

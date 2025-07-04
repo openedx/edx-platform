@@ -1497,7 +1497,7 @@ def create_thread(request, thread_data):
     _do_extra_actions(api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request)
 
     track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
-                               from_mfe_sidebar)
+                               from_mfe_sidebar, notify_all_learners)
 
     return api_thread
 
