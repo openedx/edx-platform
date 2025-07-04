@@ -842,7 +842,7 @@ def get_assignments_grades(user, course_id, cache_timeout):
         log.warning(f'Could not get grades for the course: {course_id}, error: {err}')
         return []
 
-    return subsection_grades
+    return subsection_grades, course_grade.grader_result()['section_breakdown']
 
 
 def get_first_component_of_block(block_key, block_data):
