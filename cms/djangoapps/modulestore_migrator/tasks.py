@@ -3,6 +3,7 @@ Tasks for the modulestore_migrator
 """
 from __future__ import annotations
 
+import hashlib
 import mimetypes
 import os
 import typing as t
@@ -26,7 +27,7 @@ from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import (
     Collection,
     Component,
-    ContainerVersion,
+    ComponentVersionContent,
     LearningPackage,
     PublishableEntity,
     PublishableEntityVersion,
@@ -224,6 +225,7 @@ def migrate_from_modulestore(
             created_at=datetime.now(timezone.utc),
             created_by=status.user_id,
         )
+    change_log.save()
     migration.change_log = change_log
     status.increment_completed_steps()
 
@@ -231,47 +233,11 @@ def migrate_from_modulestore(
     staged_content.delete()
     status.increment_completed_steps()
 
-    # @@TODO We currently do the mapping in bulk in order to reduce the number of DB queries.
-    #        But, as a user, it means that there are no artifacts (ModulestoreBlockMigrations)
-    #        to be shown as the structure is being imported, which takes can take several minutes.
-    #        Would be better to, instead, create each ModulestoreBlockSource and
-    #        ModulestoreBlockMigration as we create its PublisahbleEntity(Version)? If
-    #        we did this, we'd want to make sure that the objects are actually visible
-    #        to the user mid-import (via django admin, or the library interface, or even just as
-    #        as a "progress bar" field in the REST API), otherwise this would be pointless.
-    status.set_state(MigrationStep.MAPPING_OLD_TO_NEW.value)
-    block_source_keys_to_target_vers = dict(root_migrated_node.all_source_to_target_pairs())
-    ModulestoreBlockSource.objects.bulk_create(
-        [
-            ModulestoreBlockSource(overall_source=source, key=source_usage_key)
-            for source_usage_key in block_source_keys_to_target_vers.keys()
-        ],
-        # Note: bulk_create will *not* return the primary keys of ModulestoreBlockSource
-        # objects that already exist (and thus were skipped by ignore_conflicts), so, in
-        # order to use ModulestoreBlockSource instances, we must re-load them in the next step.
-        ignore_conflicts=True
-    )
-    block_source_keys_to_sources: dict[UsageKey, ModulestoreBlockSource] = {
-        block_source.key: block_source for block_source in source.blocks.all()
-    }
-    # @@TODO We get an error when we try to use the change_log, because it hasn't
-    #        been saved yet. Until we fix this, we won't be able to set
-    #        ModuleBlockMigration.change_log_record.
-    # block_target_pks_to_change_log_record_pks: dict[int, int] = dict(
-    #     change_log.records.values_list("target_entity_id", "id")
-    # )
-    #block_migrations = ModulestoreBlockMigration.objects.bulk_create(
-    ModulestoreBlockMigration.objects.bulk_create(
-        [
-            ModulestoreBlockMigration(
-                overall_migration=migration,
-                source=block_source_keys_to_sources[block_source_key],
-                target_id=block_target_ver.entity_id,
-                # @@TODO See above
-                # change_log_record_id=block_target_pks_to_change_log_record_pks[block_target_ver.entity_id],
-            )
-            for block_source_key, block_target_ver in block_source_keys_to_target_vers.items()
-        ],
+    _create_migration_artifacts_incrementally(
+        root_migrated_node=root_migrated_node,
+        source=source,
+        migration=migration,
+        status=status,
     )
     block_migrations = ModulestoreBlockMigration.objects.filter(overall_migration=migration)
     status.increment_completed_steps()
@@ -291,16 +257,22 @@ def migrate_from_modulestore(
 
     status.set_state(MigrationStep.POPULATING_COLLECTION.value)
     if target_collection:
-        # @@TODO This dict (block_target_pks_to_change_log_record_pks) was based on the change_log calculation
-        #        above which is commented out. In order to add to target_collection, we either need to fix the
-        #        change_log query above, or we need to calculate these target_pks some other way
-        block_target_pks: list[int] = []  # list(block_target_pks_to_change_log_record_pks.keys())
-        authoring_api.add_to_collection(
-            learning_package_id=target_package_pk,
-            key=target_collection.key,
-            entities_qset=PublishableEntity.objects.filter(id__in=block_target_pks),
-            created_by=user_id,
+        block_target_pks: list[int] = list(
+            ModulestoreBlockMigration.objects.filter(
+                overall_migration=migration
+            ).values_list('target_id', flat=True)
         )
+
+        if block_target_pks:
+            authoring_api.add_to_collection(
+                learning_package_id=target_package_pk,
+                key=target_collection.key,
+                entities_qset=PublishableEntity.objects.filter(id__in=block_target_pks),
+                created_by=user_id,
+            )
+            log.info(f"Added {len(block_target_pks)} entities to collection {target_collection.key}")
+        else:
+            log.warning("No target entities found to add to collection")
     status.increment_completed_steps()
 
 
@@ -533,36 +505,94 @@ def _migrate_component(
         if filename_no_ext not in olx:
             continue
         new_path = f"static/{filename}"
-        try:
-            authoring_api.create_component_version_content(component_version.pk, content_pk, key=new_path)
-        # @@TODO is there a way to determine content already exists that doesn't run the risk
-        #        of swallowing other, unexpected IntegrityErrors?
-        except IntegrityError:
-            pass  # Content already exists
+        _create_component_version_content_safely(
+            component_version_pk=component_version.pk,
+            content_pk=content_pk,
+            key=new_path
+        )
     return component_version.publishable_entity_version
 
 
 def _slugify_source_usage_key(key: UsageKey) -> str:
     """
-    Return an appropriate slug (aka block_id, aka container_id) for the target entity.
-
-    Mix the legacy source context (course/library) information with the source block_id,
-    thus ensuring that migrations of two blocks with the same id from different source
-    contexts will not collide.
-
-    Note: We don't need to factor in block_type, because the target keys already do that.
-    Note: Slugs can't have plus signs, which are normally how legacy keys are delimted.
-
-    @@TODO -- Is this good enough? Conflicts are technically possible if a user has manually
-    formatted the key this way, but that seems super unlikely to happen by accident, right ... ?
-    Conflicts are also technically posssible for
+    Return an appropriate slug with collision avoidance.
     """
     context_key = key.course_key
+
     if isinstance(context_key, LibraryLocator):
-        return f"{context_key.org}__{context_key.library}__{key.block_id}"
+        base_slug = f"{context_key.org}__{context_key.library}__{key.block_id}"
     elif isinstance(context_key, CourseKey):
-        return f"{context_key.org}__{context_key.course}__{context_key.run}__{key.block_id}"
+        base_slug = f"{context_key.org}__{context_key.course}__{context_key.run}__{key.block_id}"
     else:
         raise ValueError(
             f"Unexpected source usage key: {key}. Expected legacy course or library usage locator."
         )
+
+    # Add hash suffix to reduce collision probability
+    key_hash = hashlib.md5(str(key).encode()).hexdigest()[:8]
+    final_slug = f"{base_slug}_{key_hash}"
+
+    # Ensure slug length is reasonable (max 250 characters)
+    if len(final_slug) > 250:
+        # Truncate and add hash to maintain uniqueness
+        truncated = base_slug[:235]
+        final_slug = f"{truncated}_{key_hash}"
+
+    return final_slug
+
+
+def _create_migration_artifacts_incrementally(
+    root_migrated_node: _MigratedNode,
+    source: ModulestoreSource,
+    migration: ModulestoreMigration,
+    status: UserTaskStatus
+) -> None:
+    """
+    Create ModulestoreBlockSource and ModulestoreBlockMigration objects incrementally.
+    """
+    nodes = tuple(root_migrated_node.all_source_to_target_pairs())
+    total_nodes = len(nodes)
+    processed = 0
+
+    for source_usage_key, target_version in root_migrated_node.all_source_to_target_pairs():
+        block_source, _ = ModulestoreBlockSource.objects.get_or_create(
+            overall_source=source,
+            key=source_usage_key
+        )
+
+        ModulestoreBlockMigration.objects.create(
+            overall_migration=migration,
+            source=block_source,
+            target_id=target_version.entity_id,
+        )
+
+        processed += 1
+        if processed % 10 == 0 or processed == total_nodes:
+            status.set_state(
+                f"{MigrationStep.MAPPING_OLD_TO_NEW.value} ({processed}/{total_nodes})"
+            )
+
+
+def _create_component_version_content_safely(
+    component_version_pk: int,
+    content_pk: int,
+    key: str
+) -> bool:
+    """
+    Create component version content, returning True if created or False if already exists.
+    """
+    try:
+        if ComponentVersionContent.objects.filter(
+            component_version_id=component_version_pk,
+            content_id=content_pk,
+            key=key
+        ).exists():
+            return False
+
+        authoring_api.create_component_version_content(
+            component_version_pk, content_pk, key=key
+        )
+        return True
+    except IntegrityError as e:
+        log.warning(f"IntegrityError creating content {key}: {e}")
+        return False

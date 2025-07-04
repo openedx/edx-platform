@@ -84,7 +84,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         result = _slugify_source_usage_key(usage_key)
 
-        self.assertEqual(result, "TestOrg__TestCourse__TestRun__test_problem")
+        self.assertEqual(result, "TestOrg__TestCourse__TestRun__test_problem_9a9c0b4c")
 
     def test_slugify_source_usage_key_library(self):
         """
@@ -95,7 +95,7 @@ class TestMigrateFromModulestore(ModuleStoreTestCase):
 
         result = _slugify_source_usage_key(usage_key)
 
-        self.assertEqual(result, "TestOrg__TestLibrary__test_problem")
+        self.assertEqual(result, "TestOrg__TestLibrary__test_problem_a63e2785")
 
     def test_migrate_node_wiki_tag(self):
         """
