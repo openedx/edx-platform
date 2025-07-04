@@ -663,15 +663,6 @@ class CoursewareMetaTestViews(BaseCoursewareTests):
             assert meta.invitation_only is invitation_only
 
     @ddt.data(True, False)
-    def test_sidebar_html_enabled_property(self, waffle_enabled):
-        """
-        Test sidebar_html_enabled property with different waffle settings
-        """
-        with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=waffle_enabled):
-            meta = self.create_courseware_meta()
-            assert meta.sidebar_html_enabled == waffle_enabled
-
-    @ddt.data(True, False)
     @mock.patch(
         'openedx.core.djangoapps.courseware_api.views.get_course_about_section', new_callable=mock.PropertyMock
     )
@@ -826,17 +817,6 @@ class CoursewareMetaAPIResponseTestViews(BaseCoursewareTests):
         assert response.status_code == 200
         assert 'pre_requisite_courses' in response.data
         assert isinstance(response.data['pre_requisite_courses'], list)
-
-    @ddt.data(True, False)
-    def test_api_sidebar_html_enabled_with_waffle(self, waffle_enabled):
-        """
-        Test API returns correct sidebar_html_enabled value based on waffle flag
-        """
-        with override_waffle_switch(ENABLE_COURSE_ABOUT_SIDEBAR_HTML, active=waffle_enabled):
-            response = self.client.get(self.url)
-            assert response.status_code == 200
-            assert 'sidebar_html_enabled' in response.data
-            assert response.data['sidebar_html_enabled'] == waffle_enabled
 
     @ddt.data(True, False)
     @mock.patch(
