@@ -53,7 +53,7 @@ urlpatterns = [
     path('change_due_date', api.ChangeDueDate.as_view(), name='change_due_date'),
     path('send_email', api.SendEmail.as_view(), name='send_email'),
     path('reset_due_date', api.ResetDueDate.as_view(), name='reset_due_date'),
-    path('show_unit_extensions', api.show_unit_extensions, name='show_unit_extensions'),
+    path('show_unit_extensions', api.ShowUnitExtensionsView.as_view(), name='show_unit_extensions'),
     path('show_student_extensions', api.ShowStudentExtensions.as_view(), name='show_student_extensions'),
 
     # proctored exam downloads...
