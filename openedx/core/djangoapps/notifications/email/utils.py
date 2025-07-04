@@ -331,31 +331,25 @@ def create_missing_account_level_preferences(notifications, preferences, user):
     Creates missing account level preferences for notifications
     """
     preferences = list(preferences)
-    notification_types = list(set(
-        (notification.app_name, "core") if COURSE_NOTIFICATION_TYPES[notification.notification_type]["is_core"]
-        else (notification.app_name, notification.notification_type)
-        for notification in notifications
-    ))
+    notification_types = list(set(notification.notification_type for notification in notifications))
     missing_prefs = []
     for notification_type in notification_types:
-        if not any(
-            preference.app == notification_type[0] and preference.type == notification_type[1]
-            for preference in preferences
-        ):
-            if notification_type[1] == "core":
-                app_pref = COURSE_NOTIFICATION_APPS.get(notification_type[0], {})
+        if not any(preference.type == notification_type for preference in preferences):
+            type_pref = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
+            app_name = type_pref["notification_app"]
+            if type_pref.get('is_core', False):
+                app_pref = COURSE_NOTIFICATION_APPS.get(app_name, {})
                 default_pref = {
-                    "notification_app": notification_type[0],
                     "web": app_pref["core_web"],
                     "push": app_pref["core_push"],
                     "email": app_pref["core_email"],
                     "email_cadence": app_pref["core_email_cadence"]
                 }
             else:
-                default_pref = COURSE_NOTIFICATION_TYPES.get(notification_type[1], {})
+                default_pref = COURSE_NOTIFICATION_TYPES.get(notification_type, {})
             missing_prefs.append(
                 NotificationPreference(
-                    user=user, type=notification_type[1], app=notification_type[0], web=default_pref['web'],
+                    user=user, type=notification_type, app=app_name, web=default_pref['web'],
                     push=default_pref['push'], email=default_pref['email'], email_cadence=default_pref['email_cadence'],
                 )
             )
