@@ -220,6 +220,7 @@ def inline_discussion(request, course_key, discussion_id):
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict(course_key=str(course_key))
+        # log.debug(f"course, cc_user, and user_info", {course, cc_user, user_info})
 
     try:
         with function_trace('get_threads'):

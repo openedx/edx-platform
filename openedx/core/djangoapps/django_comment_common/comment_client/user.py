@@ -5,7 +5,9 @@ from . import models, settings, utils
 from forum import api as forum_api
 from forum.utils import ForumV2RequestError, str_to_bool
 from openedx.core.djangoapps.discussions.config.waffle import is_forum_v2_enabled
+import logging
 
+logger = logging.getLogger('edx.user.py')
 
 class User(models.Model):
 
@@ -207,11 +209,13 @@ class User(models.Model):
             retrieve_params['group_id'] = self.group_id
 
         # course key -> id conversation
-        course_id = retrieve_params.get('course_id')
+        course_id = retrieve_params.get('course_id') or retrieve_params.get("course_key")
+
         if course_id:
             course_id = str(course_id)
             retrieve_params['course_id'] = course_id
         course_key = utils.get_course_key(course_id)
+        logger.debug(f'course key', {course_key})
 
         if is_forum_v2_enabled(course_key):
             group_ids = [retrieve_params['group_id']] if 'group_id' in retrieve_params else []
