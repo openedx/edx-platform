@@ -516,7 +516,7 @@ class TestBlocksInCourseView(TestBlocksView, CompletionWaffleTestMixin):  # pyli
         def blocks_has_discussion_xblock(blocks):
             if isinstance(blocks, ReturnList):
                 for value in blocks:
-                    if value.get('type') == 'discussion':
+                    if value['type'] == 'discussion':
                         return True
             else:
                 for key, value in blocks.items():
