@@ -6,7 +6,7 @@ from .course_details import CourseDetailsView
 from .course_index import CourseIndexView
 from .course_rerun import CourseRerunView
 from .course_waffle_flags import CourseWaffleFlagsView
-from .course_team import CourseTeamView
+from .course_team import CourseTeamView, CourseTeamManagementAPIView
 from .grading import CourseGradingView
 from .group_configurations import CourseGroupConfigurationsView
 from .help_urls import HelpUrlsView
