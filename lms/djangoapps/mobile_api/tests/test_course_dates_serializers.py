@@ -8,15 +8,15 @@ from django.db.models import F, Value
 from django.utils import timezone
 from edx_when.models import ContentDate, DatePolicy
 
-from lms.djangoapps.mobile_api.course_dates.serializers import ContentDateSerializer
+from lms.djangoapps.mobile_api.course_dates.serializers import AllCourseDatesSerializer
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
-class TestContentDateSerializer(MixedSplitTestCase):
+class TestAllCourseDatesSerializer(MixedSplitTestCase):
     """
-    Tests for the ContentDateSerializer.
+    Tests for the AllCourseDatesSerializer.
     """
 
     CREATE_USER = True
@@ -55,7 +55,7 @@ class TestContentDateSerializer(MixedSplitTestCase):
             course_name=Value("Test Display Name"),
             relative=Value(True),
         ).first()
-        serializer = ContentDateSerializer(queryset)
+        serializer = AllCourseDatesSerializer(queryset)
         expected_data = {
             "course_id": str(self.course.id),
             "location": str(self.sequential.location),

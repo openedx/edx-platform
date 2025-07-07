@@ -11,7 +11,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from rest_framework.test import APIRequestFactory
 
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from lms.djangoapps.mobile_api.course_dates.views import AllCourseDatesViewSet
+from lms.djangoapps.mobile_api.course_dates.views import AllCourseDatesAPIView
 from lms.djangoapps.mobile_api.testutils import MobileAPITestCase
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -20,11 +20,11 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 User = get_user_model()
 
 
-class TestAllCourseDatesViewSet(
+class TestAllCourseDatesAPIView(
     MobileAPITestCase, MixedSplitTestCase, MilestonesTestCaseMixin
 ):  # lint-amnesty, pylint: disable=test-inherits-tests
     """
-    Tests for AllCourseDatesViewSet.
+    Tests for AllCourseDatesAPIView.
     """
     def setUp(self):
         """
@@ -72,7 +72,7 @@ class TestAllCourseDatesViewSet(
         Returns an instance of the view with a request.
         """
         request = APIRequestFactory().get(f"/api/mobile/v1/course_dates/{self.user.username}/")
-        view = AllCourseDatesViewSet()
+        view = AllCourseDatesAPIView()
         view.request = request
         view.kwargs = {"username": self.user.username}
         return view
