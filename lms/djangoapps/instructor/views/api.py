@@ -3377,9 +3377,7 @@ class MarkStudentCanSkipEntranceExam(APIView):
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
 class CertificateTask(DeveloperErrorViewMixin, APIView):
     permission_classes = (IsAuthenticated, permissions.InstructorPermission)
-    permission_name = None
-    statuses_serializer = CertificateStatusesSerializer
-    http_method_names = ['post']
+    permission_name = permissions.START_CERTIFICATE_GENERATION
 
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(transaction.non_atomic_requests)
@@ -3388,7 +3386,7 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
         certificate_task = CertificateTaskSerializer(data=request.data)
 
         if not certificate_task.is_valid():
-            return JsonResponse({'message': certificate_task.errors}, status=400)
+            return JsonResponse({'message': certificate_task.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         if certificate_task.validated_data['api_action'] == 'generate':
             """
@@ -3410,12 +3408,12 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
             """
             self.permission_name = permissions.START_CERTIFICATE_REGENERATION
             course_key = CourseKey.from_string(course_id)
-            serializer = self.statuses_serializer(data=request.data)
+            serializer = CertificateStatusesSerializer(data=request.data)
 
             if not serializer.is_valid():
                 return JsonResponse(
                     {'message': _('Please select certificate statuses from the list only.')},
-                    status=400
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
             certificates_statuses = serializer.validated_data['certificate_statuses']
