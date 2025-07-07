@@ -3236,19 +3236,16 @@ class ShowUnitExtensionsView(APIView):
         """
         Shows all of the students which have due date extensions for the given unit.
         """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        url = serializer.validated_data['url']
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+
         try:
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
-
-            url = serializer.validated_data['url']
-            course_key = CourseKey.from_string(course_id)
-            course = get_course_by_id(course_key)
-
-            self.check_object_permissions(request, course)
-
             unit = find_unit(course, url)
             data = dump_block_extensions(course, unit)
-
             return Response(data)
 
         except DashboardError as error:
