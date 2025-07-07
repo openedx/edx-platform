@@ -38,6 +38,49 @@ from openedx.core.constants import (  # pylint: disable=unused-import
     USAGE_ID_PATTERN,
 )
 
+################ Shared Functions for Derived Configuration ################
+
+
+def make_mako_template_dirs(settings):
+    """
+    Derives the final list of Mako template directories based on the provided settings.
+
+    Args:
+        settings: A Django settings module object.
+
+    Returns:
+        list: A list of Mako template directories, potentially updated with additional
+        theme directories.
+    """
+    if settings.ENABLE_COMPREHENSIVE_THEMING:
+        themes_dirs = get_theme_base_dirs_from_settings(settings.COMPREHENSIVE_THEME_DIRS)
+        for theme in get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT):
+            if theme.themes_base_dir not in settings.MAKO_TEMPLATE_DIRS_BASE:
+                settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, theme.themes_base_dir)
+    return settings.MAKO_TEMPLATE_DIRS_BASE
+
+
+def _make_locale_paths(settings):
+    """
+    Constructs a list of paths to locale directories used for translation.
+
+    Localization (l10n) strings (e.g. django.po) are found in these directories.
+
+    Args:
+        settings: A Django settings module object.
+
+    Returns:
+        list: A list of paths, `str` or `path.Path`, to locale directories.
+    """
+    locale_paths = list(settings.PREPEND_LOCALE_PATHS)
+    locale_paths += [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
+
+    if settings.ENABLE_COMPREHENSIVE_THEMING:
+        # Add locale paths to settings for comprehensive theming.
+        for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
+            locale_paths += (path(locale_path), )
+    return locale_paths
+
 ############################# Django Built-Ins #############################
 
 USE_TZ = True
@@ -139,6 +182,8 @@ LANGUAGES = [
 LANGUAGES_BIDI = ("he", "ar", "fa", "ur", "fa-ir", "rtl")
 
 LANGUAGE_COOKIE_NAME = "openedx-language-preference"
+
+LOCALE_PATHS = Derived(_make_locale_paths)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -417,50 +462,6 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 # problems: https://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
-
-################ Shared Functions for Derived Configuration ################
-
-
-def make_mako_template_dirs(settings):
-    """
-    Derives the final list of Mako template directories based on the provided settings.
-
-    Args:
-        settings: A Django settings module object.
-
-    Returns:
-        list: A list of Mako template directories, potentially updated with additional
-        theme directories.
-    """
-    if settings.ENABLE_COMPREHENSIVE_THEMING:
-        themes_dirs = get_theme_base_dirs_from_settings(settings.COMPREHENSIVE_THEME_DIRS)
-        for theme in get_themes_unchecked(themes_dirs, settings.PROJECT_ROOT):
-            if theme.themes_base_dir not in settings.MAKO_TEMPLATE_DIRS_BASE:
-                settings.MAKO_TEMPLATE_DIRS_BASE.insert(0, theme.themes_base_dir)
-    return settings.MAKO_TEMPLATE_DIRS_BASE
-
-
-def _make_locale_paths(settings):
-    """
-    Constructs a list of paths to locale directories used for translation.
-
-    Localization (l10n) strings (e.g. django.po) are found in these directories.
-
-    Args:
-        settings: A Django settings module object.
-
-    Returns:
-        list: A list of paths, `str` or `path.Path`, to locale directories.
-    """
-    locale_paths = list(settings.PREPEND_LOCALE_PATHS)
-    locale_paths += [settings.REPO_ROOT + '/conf/locale']  # edx-platform/conf/locale/
-
-    if settings.ENABLE_COMPREHENSIVE_THEMING:
-        # Add locale paths to settings for comprehensive theming.
-        for locale_path in settings.COMPREHENSIVE_THEME_LOCALE_PATHS:
-            locale_paths += (path(locale_path), )
-    return locale_paths
-
 
 ################################### JWT ####################################
 
@@ -773,8 +774,6 @@ DISABLE_ACCOUNT_ACTIVATION_REQUIREMENT_SWITCH = "verify_student_disable_account_
 
 # If this is true, random scores will be generated for the purpose of debugging the profile graphs
 GENERATE_PROFILE_SCORES = False
-
-LOCALE_PATHS = Derived(_make_locale_paths)
 
 # The space is required for space-dependent languages like Arabic and Farsi.
 # However, backward compatibility with Ficus older releases is still maintained (space is still not valid)
