@@ -3387,8 +3387,10 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
         response_payload = {}
         certificate_task = CertificateTaskSerializer(data=request.data)
 
-        if (certificate_task.is_valid() and
-            certificate_task.validated_data['api_action'] == 'generate'):
+        if not certificate_task.is_valid():
+            return JsonResponse({'message': certificate_task.errors}, status=400)
+
+        if certificate_task.validated_data['api_action'] == 'generate':
             """
              Generating certificates for all students enrolled in given course.
             """
@@ -3402,8 +3404,7 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
                 'task_id': task.task_id
             }
 
-        elif (certificate_task.is_valid() and
-              certificate_task.validated_data['api_action'] == 'regenerate'):
+        elif certificate_task.validated_data['api_action'] == 'regenerate':
             """
             certificate_statuses 'certificate_statuses' in POST data.
             """
