@@ -441,3 +441,10 @@ class CertificateSerializer(serializers.Serializer):
             return None
 
         return user
+
+
+class RescoreEntranceExamSerializer(serializers.Serializer):
+    """Serializer for entrance exam rescoring"""
+    unique_student_identifier = serializers.CharField(required=False, allow_null=True)
+    all_students = serializers.BooleanField(required=False)
+    only_if_higher = serializers.BooleanField(required=False, allow_null=True)
