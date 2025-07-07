@@ -1512,9 +1512,9 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'external_user_key': _('External User Key'),
         }
 
-        if not settings.FEATURES.get('SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_REPORT', False):
-            keep_field_private(query_features, 'year_of_birth')
-            query_features_names.pop('year_of_birth', None)
+        for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
+            keep_field_private(query_features, field)
+            query_features_names.pop(field, None)
 
         if is_course_cohorted(course.id):
             # Translators: 'Cohort' refers to a group of students within a course.
