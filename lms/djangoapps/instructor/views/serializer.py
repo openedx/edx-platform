@@ -386,7 +386,9 @@ class CertificateTaskSerializer(serializers.Serializer):
     """
     Serializer for validating and serializing api_action
     """
-    api_action = serializers.ChoiceField(choices=[
-        'generate',
-        'regenerate'
-    ]),
+    api_action = serializers.ChoiceField(
+        choices=[
+            'generate',
+            'regenerate'
+        ]
+    ),
