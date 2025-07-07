@@ -117,7 +117,8 @@ from lms.djangoapps.instructor.views.serializer import (
     UserSerializer,
     UniqueStudentIdentifierSerializer,
     ProblemResetSerializer,
-    RescoreEntranceExamSerializer
+    RescoreEntranceExamSerializer,
+    CertificateTaskSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -3384,8 +3385,9 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
     @method_decorator(transaction.non_atomic_requests)
     def post(self, request, course_id):
         response_payload = {}
+        certificate_task = CertificateTaskSerializer(data=request.data)
 
-        if request.POST.get('api_action') == 'generate':
+        if request.POST.get('api_action') == 'generate' and certificate_task.is_valid():
             """
              Generating certificates for all students enrolled in given course.
             """
@@ -3399,7 +3401,7 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
                 'task_id': task.task_id
             }
 
-        elif request.POST.get('api_action') == 'regenerate':
+        elif request.POST.get('api_action') == 'regenerate' and certificate_task.is_valid():
             """
             certificate_statuses 'certificate_statuses' in POST data.
             """
@@ -3422,6 +3424,7 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
             }
 
         return JsonResponse(response_payload)
+
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
