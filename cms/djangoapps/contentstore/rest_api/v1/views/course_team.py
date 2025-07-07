@@ -95,6 +95,12 @@ class CourseTeamManagementAPIView(GenericAPIView):
     pagination_class = CustomPagination
     serializer_class = CourseTeamManagementSerializer
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._course_role_map = {}
+        self._user = None
+        self._access_roles = None
+
     @apidocs.schema(
         parameters=[
             apidocs.string_parameter(
@@ -126,7 +132,14 @@ class CourseTeamManagementAPIView(GenericAPIView):
             404: "The requested user does not exist.",
         },
     )
+    def get_serializer_context(self):
+        """Provide extra context to the serializer."""
+        context = super().get_serializer_context()
+        context["course_role_map"] = getattr(self, "_course_role_map", {})
+        return context
+
     def get_queryset(self):
+        """Return queryset of courses for the given org and user email."""
         org = self.request.query_params.get("org")
         email = self.request.query_params.get("email")
         if not org or not email:
@@ -138,8 +151,8 @@ class CourseTeamManagementAPIView(GenericAPIView):
 
         try:
             self._user = User.objects.get(email=email)
-        except ObjectDoesNotExist:
-            raise NotFound(f"User with email '{email}' not found.")
+        except ObjectDoesNotExist as exc:
+            raise NotFound(f"User with email '{email}' not found.") from exc
 
         self._access_roles = CourseAccessRole.objects.filter(
             user=self._user, org=org, role__in=["staff", "instructor"]
@@ -154,12 +167,8 @@ class CourseTeamManagementAPIView(GenericAPIView):
         qs = CourseOverview.objects.filter(org=org)
         return qs
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context["course_role_map"] = getattr(self, "_course_role_map", {})
-        return context
-
     def list(self, request, *args, **kwargs):
+        """Paginated list of courses for the organization and user."""
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
@@ -186,19 +195,25 @@ class CourseTeamManagementAPIView(GenericAPIView):
             Only accessible by admin users (IsAdminUser permission).
 
         Example Response:
-        {
-            "count": 4,
-            "next": "http://example.com/api/contentstore/v1/course_team/manage?email={email}&org={org}&page=4&page_size=1",
-            "previous": "http://example.com/api/contentstore/v1/course_team/manage?email={email}&org={org}&page=2&page_size=1",
-            "results": [
-                {
-                    "course_id": "course-v1:edX+DemoX+2025_T1",
-                    "course_name": "edX Demonstration Course",
-                    "role": "instructor"
-                }
-            ],
-            "current_page": 3,
-            "total_pages": 4
-        }
+            {
+                "count": 4,
+                "next": (
+                    "http://example.com/api/contentstore/v1/course_team/manage?email={email}&org={org}"
+                    "&page=4&page_size=1"
+                ),
+                "previous": (
+                    "http://example.com/api/contentstore/v1/course_team/manage?email={email}&org={org}"
+                    "&page=2&page_size=1"
+                ),
+                "results": [
+                    {
+                        "course_id": "course-v1:edX+DemoX+2025_T1",
+                        "course_name": "edX Demonstration Course",
+                        "role": "instructor"
+                    }
+                ],
+                "current_page": 3,
+                "total_pages": 4
+            }
         """
         return self.list(request, *args, **kwargs)

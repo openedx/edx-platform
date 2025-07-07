@@ -22,6 +22,7 @@ class CourseTeamSerializer(serializers.Serializer):
 
 
 class CourseTeamManagementSerializer(serializers.ModelSerializer):
+    """Serializer for course team management context data"""
     role = serializers.SerializerMethodField()
 
     class Meta:

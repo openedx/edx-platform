@@ -1,5 +1,8 @@
+"""Custom pagination for contentstore REST API views."""
+
 from django.conf import settings
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 
 def build_full_url(request, url):
@@ -21,14 +24,22 @@ class CustomPagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = "page_size"
 
-    def get_paginated_response(self, data, request=None):
+    def get_paginated_response(self, data):
+        """Return a paginated response with additional pagination details."""
         response = super().get_paginated_response(data)
-        # If request is provided, build full URLs for next/previous
-        if request:
-            response.data["next"] = build_full_url(request, self.get_next_link())
+        # If self.request is provided, build full URLs for next/previous
+        if self.request:
+            response.data["next"] = build_full_url(self.request, self.get_next_link())
             response.data["previous"] = build_full_url(
-                request, self.get_previous_link()
+                self.request, self.get_previous_link()
             )
         response.data["current_page"] = self.page.number
         response.data["total_pages"] = self.page.paginator.num_pages
-        return response
+        return Response({
+            'count': self.page.paginator.count,
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'results': data,
+            'current_page': self.page.number,
+            'total_pages': self.page.paginator.num_pages,
+        })
