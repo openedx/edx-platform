@@ -1076,16 +1076,6 @@ FEATURES = {
     # .. toggle_creation_date: 2024-04-02
     # .. toggle_target_removal_date: None
     'BADGES_ENABLED': False,
-
-    # .. toggle_name: FEATURES['SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_REPORT']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: Adds private fields to the profile information report.
-    # .. toggle_use_cases: open_edx
-    # .. toggle_creation_date: 2025-05-12
-    # .. toggle_target_removal_date: None
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/36688
-    'SHOW_PRIVATE_FIELDS_IN_PROFILE_INFORMATION_REPORT': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -4267,6 +4257,14 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'username',
     ],
 }
+
+# .. setting_name: PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS
+# .. setting_default: ["year_of_birth"]
+# .. setting_description: List of private fields that will be hidden from the profile information report.
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2025-07-07
+# .. setting_tickets: https://github.com/openedx/edx-platform/pull/36688
+PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS = ["year_of_birth"]
 
 # The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
 ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
