@@ -381,7 +381,35 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         assert (res_json['message'] ==
                 'Please select certificate statuses from the list only.')
 
-    def test_certificate_task_api_with_generation(self):
+    def test_certificate_task_api_without_action(self):
+        """
+        Test certificates task api endpoint returns success status when called with
+        valid course key and mode.
+        """
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url)
+
+        assert response.status_code == 400
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert res_json['message'] is not None
+        assert res_json['message']['api_action'][0] == "The 'api_action' field is required."
+
+    def test_certificate_task_api_with_invalid_action(self):
+        """
+        Test certificates task api endpoint returns success status when called with
+        valid course key and mode.
+        """
+        self.client.login(username=self.global_staff.username, password=self.TEST_PASSWORD)
+        url = reverse('certificate_task', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, data={'api_action': 'invalid'})
+
+        assert response.status_code == 400
+        res_json = json.loads(response.content.decode('utf-8'))
+        assert res_json['message'] is not None
+        assert res_json['message']['api_action'][0] == "The 'api_action' must be either 'generate' or 'regenerate'."
+
+    def test_certificate_task_api_with_generate_action(self):
         """
         Test certificates task api endpoint returns success status when called with
         valid course key and mode.
@@ -395,7 +423,7 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         assert res_json['message'] is not None
         assert res_json['task_id'] is not None
 
-    def test_certificate_task_api_with_regeneration(self):
+    def test_certificate_task_api_with_regenerate_action(self):
         """
         Test certificate task api is successful when accessed with 'certificate_statuses'
         present in GeneratedCertificate table.
