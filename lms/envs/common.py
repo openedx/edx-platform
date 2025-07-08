@@ -77,20 +77,12 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 #     templates/emails/etc.
 PLATFORM_NAME = _('Your Platform Name Here')
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
-CC_MERCHANT_NAME = PLATFORM_NAME
+CC_MERCHANT_NAME = Derived(lambda settings: settings.PLATFORM_NAME)
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 
 ENABLE_JASMINE = False
-
-LMS_ROOT_URL = 'https://localhost:18000'
-LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
-LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
-
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
-# IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = []
 
 # Features
 FEATURES = {
@@ -1429,23 +1421,17 @@ SEARCH_COURSEWARE_CONTENT_LOG_PARAMS = False
 # .. setting_description: Specifies the prefix used when naming elasticsearch indexes related to edx-search.
 ELASTICSEARCH_INDEX_PREFIX = ""
 
-VIDEO_CDN_URL = {
-    'EXAMPLE_COUNTRY_CODE': "http://example.com/edx/video?s3_url="
-}
-
-STATIC_ROOT_BASE = '/edx/var/edxapp/staticfiles'
-
 LOGGING_ENV = 'sandbox'
 
 EDX_ROOT_URL = ''
-EDX_API_KEY = "PUT_YOUR_API_KEY_HERE"
+EDX_API_KEY = None
 
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/login'
 LOGIN_URL = EDX_ROOT_URL + '/login'
 
 PARTNER_SUPPORT_EMAIL = ''
 
-CERT_QUEUE = 'certificates'
+CERT_QUEUE = 'test-pull'
 
 ALTERNATE_WORKER_QUEUES = 'cms'
 
@@ -1456,11 +1442,11 @@ LOG_DIR = '/edx/var/log/edx'
 DATA_DIR = '/edx/var/edxapp/data'
 
 # .. setting_name: MAINTENANCE_BANNER_TEXT
-# .. setting_default: 'Sample banner message'
+# .. setting_default: None
 # .. setting_description: Specifies the text that is rendered on the maintenance banner.
 # .. setting_warning: Depends on the `open_edx_util.display_maintenance_warning` waffle switch.
 #   The banner is only rendered when the switch is activated.
-MAINTENANCE_BANNER_TEXT = 'Sample banner message'
+MAINTENANCE_BANNER_TEXT = None
 
 DJFS = {
     'type': 'osfs',
@@ -1565,13 +1551,13 @@ TRACKING_SEGMENTIO_SOURCE_MAP = {
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
-GOOGLE_SITE_VERIFICATION_ID = ''
-GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
+GOOGLE_SITE_VERIFICATION_ID = None
+GOOGLE_ANALYTICS_LINKEDIN = None
 GOOGLE_ANALYTICS_TRACKING_ID = None
 GOOGLE_ANALYTICS_4_ID = None
 
 ######################## BRANCH.IO ###########################
-BRANCH_IO_KEY = ''
+BRANCH_IO_KEY = None
 
 ######################## OPTIMIZELY ###########################
 OPTIMIZELY_PROJECT_ID = None
@@ -1808,25 +1794,20 @@ CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG in your environment settings files, not here
-DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
-SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
 
 # django-session-cookie middleware
 DCS_SESSION_COOKIE_SAMESITE = 'None'
 DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 
-# This is the domain that is used to set shared cookies between various sub-domains.
-SHARED_COOKIE_DOMAIN = ""
-
-# CMS base
-CMS_BASE = 'localhost:18010'
-
 # LMS base
 LMS_BASE = 'localhost:18000'
+
+# CMS base
+CMS_BASE = 'studio.edx.org'
 
 # Studio name
 STUDIO_NAME = 'Studio'
@@ -1838,12 +1819,7 @@ HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 # Platform Email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-EMAIL_USE_TLS = False
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "lms")
 DEFAULT_FROM_EMAIL = 'registration@example.com'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
 SERVER_EMAIL = 'devops@example.com'
@@ -1866,11 +1842,6 @@ MANAGERS = ADMINS
 # Static content
 STATIC_URL = '/static/'
 STATIC_ROOT = os.environ.get('STATIC_ROOT_LMS', ENV_ROOT / "staticfiles")
-# .. setting_name: STATIC_URL_BASE
-# .. setting_default: "/static/"
-# .. setting_description: The LMS uses this to construct ``STATIC_URL`` by appending
-#   a slash (if needed).
-STATIC_URL_BASE = '/static/'
 
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
@@ -1910,13 +1881,8 @@ TRANSLATORS_GUIDE = 'https://docs.openedx.org/en/latest/translators/index.html'
 #################################### AWS #######################################
 # The number of seconds that a generated URL is valid for.
 AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60  # 10 years
-AWS_SES_REGION_NAME = 'us-east-1'
-AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
 AWS_ACCESS_KEY_ID = None
 AWS_SECRET_ACCESS_KEY = None
-AWS_QUERYSTRING_AUTH = False
-AWS_STORAGE_BUCKET_NAME = "SET-ME-PLEASE (ex. bucket-name)"
-AWS_S3_CUSTOM_DOMAIN = "SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)"
 
 ################################# SIMPLEWIKI ###################################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
@@ -1972,8 +1938,8 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 
 ##### Zendesk #####
 ZENDESK_URL = ''
-ZENDESK_USER = ''
-ZENDESK_API_KEY = ''
+ZENDESK_USER = None
+ZENDESK_API_KEY = None
 ZENDESK_CUSTOM_FIELDS = {}
 ZENDESK_OAUTH_ACCESS_TOKEN = ''
 # A mapping of string names to Zendesk Group IDs
@@ -2725,14 +2691,7 @@ CELERY_CREATE_MISSING_QUEUES = True
 # let logging work as configured:
 CELERYD_HIJACK_ROOT_LOGGER = False
 
-CELERY_BROKER_VHOST = ''
-CELERY_BROKER_USE_SSL = False
-CELERY_EVENT_QUEUE_TTL = None
-
-CELERY_BROKER_TRANSPORT = 'amqp'
-CELERY_BROKER_HOSTNAME = 'localhost'
-CELERY_BROKER_USER = 'celery'
-CELERY_BROKER_PASSWORD = 'celery'
+BROKER_USE_SSL = False
 
 ############################## HEARTBEAT ######################################
 
@@ -2795,11 +2754,11 @@ BULK_EMAIL_INFINITE_RETRY_CAP = 1000
 
 # We want Bulk Email running on the high-priority queue, so we define the
 # routing key that points to it.  At the moment, the name is the same.
-BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+BULK_EMAIL_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
 
 # We also define a queue for smaller jobs so that large courses don't block
 # smaller emails (see BULK_EMAIL_JOB_SIZE_THRESHOLD setting)
-BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = 'edx.lms.core.default'
+BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
 # For emails with fewer than these number of recipients, send them through
 # a different queue to avoid large courses blocking emails that are meant to be
@@ -3196,7 +3155,6 @@ CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 # It is highly recommended that you override this in any environment accessed by
 # end users
 CSRF_COOKIE_SECURE = False
-CSRF_TRUSTED_ORIGINS = []
 
 # If setting a cross-domain cookie, it's really important to choose
 # a name for the cookie that is DIFFERENT than the cookies used
@@ -3250,9 +3208,6 @@ SWAGGER_SETTINGS = {
     'DEEP_LINKING': True,
 }
 
-# How long to cache OpenAPI schemas and UI, in seconds.
-OPENAPI_CACHE_TIMEOUT = 0
-
 ######################### MARKETING SITE ###############################
 EDXMKTG_LOGGED_IN_COOKIE_NAME = 'edxloggedin'
 EDXMKTG_USER_INFO_COOKIE_NAME = 'edx-user-info'
@@ -3282,11 +3237,11 @@ MKTG_URL_LINK_MAP = {
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
 SUPPORT_SITE_LINK = ''
-ID_VERIFICATION_SUPPORT_LINK = ''
-PASSWORD_RESET_SUPPORT_LINK = ''
-ACTIVATION_EMAIL_SUPPORT_LINK = ''
 SEND_ACTIVATION_EMAIL_URL = ''
-LOGIN_ISSUE_SUPPORT_LINK = ''
+ACTIVATION_EMAIL_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+ID_VERIFICATION_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+LOGIN_ISSUE_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
+PASSWORD_RESET_SUPPORT_LINK = Derived(lambda settings: settings.SUPPORT_SITE_LINK)
 
 # .. setting_name: SECURITY_PAGE_URL
 # .. setting_default: None
@@ -3549,15 +3504,9 @@ CERT_NAME_LONG = "Certificate of Achievement"
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
 # the ones that contain information other than grades.
-GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
-
-POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
-
-SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = 'edx.lms.core.default'
+GRADES_DOWNLOAD_ROUTING_KEY = Derived(lambda settings: settings.HIGH_MEM_QUEUE)
 
 RECALCULATE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
-
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 
 GRADES_DOWNLOAD = {
     'STORAGE_CLASS': 'django.core.files.storage.FileSystemStorage',
@@ -3939,8 +3888,8 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:8005'
 # time between scheduled runs, in seconds
 NOTIFY_CREDENTIALS_FREQUENCY = 14400
 
-COMMENTS_SERVICE_URL = 'http://localhost:18080'
-COMMENTS_SERVICE_KEY = 'password'
+COMMENTS_SERVICE_URL = ''
+COMMENTS_SERVICE_KEY = ''
 
 # Reverification checkpoint name pattern
 CHECKPOINT_PATTERN = r'(?P<checkpoint_name>[^/]+)'
@@ -4089,11 +4038,11 @@ STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 ################################ Settings for Credentials Service ################################
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
-CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+CREDENTIALS_GENERATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 CREDENTIALS_COURSE_COMPLETION_STATE = 'awarded'
 
 # Queue to use for award program certificates
-PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
+PROGRAM_CERTIFICATES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
 # .. setting_name: COMPREHENSIVE_THEME_DIRS
 # .. setting_default: []
@@ -4102,19 +4051,6 @@ PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
 #   Instead, set the COMPREHENSIVE_THEME_DIRS environment variable, using colons (:) to
 #   separate paths.
 COMPREHENSIVE_THEME_DIRS = os.environ.get("COMPREHENSIVE_THEME_DIRS", "").split(":")
-
-# .. setting_name: COMPREHENSIVE_THEME_LOCALE_PATHS
-# .. setting_default: []
-# .. setting_description: A list of the paths to themes locale directories e.g.
-#   "COMPREHENSIVE_THEME_LOCALE_PATHS" : ["/edx/src/edx-themes/conf/locale"].
-COMPREHENSIVE_THEME_LOCALE_PATHS = []
-
-
-# .. setting_name: PREPEND_LOCALE_PATHS
-# .. setting_default: []
-# .. setting_description: A list of the paths to locale directories to load first e.g.
-#   "PREPEND_LOCALE_PATHS" : ["/edx/my-locales/"].
-PREPEND_LOCALE_PATHS = []
 
 # .. setting_name: DEFAULT_SITE_THEME
 # .. setting_default: None
@@ -4145,10 +4081,8 @@ ENABLE_COMPREHENSIVE_THEMING = False
 CUSTOM_RESOURCE_TEMPLATES_DIRECTORY = None
 
 # API access management
-API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
-API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
-API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
-AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+API_ACCESS_FROM_EMAIL = None
+API_ACCESS_MANAGER_EMAIL = None
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
@@ -4171,8 +4105,9 @@ HELP_TOKENS_BOOKS = {
 #
 # Only used if FEATURES['ENABLE_ENTERPRISE_INTEGRATION'] == True.
 
-ENTERPRISE_ENROLLMENT_API_URL = LMS_INTERNAL_ROOT_URL + LMS_ENROLLMENT_API_PATH
-ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
+ENTERPRISE_PUBLIC_ENROLLMENT_API_URL = Derived(
+    lambda settings: (settings.LMS_ROOT_URL or '') + settings.LMS_ENROLLMENT_API_PATH
+)
 ENTERPRISE_COURSE_ENROLLMENT_AUDIT_MODES = ['audit', 'honor']
 ENTERPRISE_SUPPORT_URL = ''
 ENTERPRISE_CUSTOMER_CATALOG_DEFAULT_CONTENT_FILTER = {}
@@ -4190,8 +4125,20 @@ INTEGRATED_CHANNELS_API_CHUNK_TRANSMISSION_LIMIT = {}
 # These default settings are utilized by the LMS when interacting with the service,
 # and are overridden by the configuration parameter accessors defined in production.py
 
-ENTERPRISE_API_URL = 'https://localhost:18000/enterprise/api/v1'
-ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
+DEFAULT_ENTERPRISE_API_URL = Derived(
+    lambda settings: (
+        None if settings.LMS_INTERNAL_ROOT_URL is None
+        else settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
+    )
+)
+ENTERPRISE_API_URL = DEFAULT_ENTERPRISE_API_URL
+DEFAULT_ENTERPRISE_CONSENT_API_URL = Derived(
+    lambda settings: (
+        None if settings.LMS_INTERNAL_ROOT_URL is None
+        else settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
+    )
+)
+ENTERPRISE_CONSENT_API_URL = DEFAULT_ENTERPRISE_CONSENT_API_URL
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 ENTERPRISE_CUSTOMER_LOGO_IMAGE_SIZE = 512   # Enterprise logo image size limit in KB's
@@ -4206,14 +4153,6 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_access_worker',
     'enterprise_subsidy_worker',
 ]
-
-# Setting for Open API key and prompts used by edx-enterprise.
-CHAT_COMPLETION_API = 'https://example.com/chat/completion'
-CHAT_COMPLETION_API_KEY = 'i am a key'
-LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
-LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
-LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
-LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
 
 
 ############## ENTERPRISE SERVICE LMS CONFIGURATION ##################################
@@ -4606,9 +4545,9 @@ SWIFT_TEMP_URL_KEY = None
 SWIFT_TEMP_URL_DURATION = 1800  # seconds
 
 ############### Settings for facebook ##############################
-FACEBOOK_APP_ID = 'FACEBOOK_APP_ID'
-FACEBOOK_APP_SECRET = 'FACEBOOK_APP_SECRET'
-FACEBOOK_API_VERSION = 'v2.1'
+FACEBOOK_APP_ID = None
+FACEBOOK_APP_SECRET = None
+FACEBOOK_API_VERSION = None
 
 ############### Settings for django-fernet-fields ##################
 FERNET_KEYS = [
@@ -5010,3 +4949,17 @@ RECAPTCHA_VERIFY_URL = ""
 # .. setting_default: empty string
 # .. setting_description: Add recaptcha site key to use captcha feature in discussion MFE.
 RECAPTCHA_SITE_KEY = ""
+PYTHON_LIB_FILENAME = 'python_lib.zip'
+HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
+MONGODB_LOG = {}
+ENABLE_REQUIRE_THIRD_PARTY_AUTH = False
+REGISTRATION_CODE_LENGTH = 8
+DASHBOARD_COURSE_LIMIT = None
+
+ENTITLEMENTS_EXPIRATION_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
+
+# TODO: We believe these were part of the DEPR'd sysadmin dashboard, and can likely be removed.
+SSL_AUTH_EMAIL_DOMAIN = "MIT.EDU"
+SSL_AUTH_DN_FORMAT_STRING = (
+    "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
+)

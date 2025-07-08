@@ -38,74 +38,6 @@ def get_env_setting(setting):
         error_msg = "Set the %s env variable" % setting
         raise ImproperlyConfigured(error_msg)  # lint-amnesty, pylint: disable=raise-missing-from
 
-
-#######################################################################################################################
-#### PRODUCTION DEFAULTS
-####
-#### Configure some defaults (beyond what has already been configured in common.py) before loading the YAML file.
-#### DO NOT ADD NEW DEFAULTS HERE! Put any new setting defaults in common.py instead, along with a setting annotation.
-#### TODO: Move all these defaults into common.py.
-####
-
-DEBUG = False
-
-# IMPORTANT: With this enabled, the server must always be behind a proxy that strips the header HTTP_X_FORWARDED_PROTO
-# from client requests. Otherwise, a user can fool our server into thinking it was an https connection. See
-# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header for other warnings.
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Constant defaults (alphabetical)
-AUTHORING_API_URL = ''
-AWS_QUERYSTRING_AUTH = True
-AWS_S3_CUSTOM_DOMAIN = 'edxuploads.s3.amazonaws.com'
-AWS_STORAGE_BUCKET_NAME = 'edxuploads'
-BROKER_HEARTBEAT = 60.0
-BROKER_HEARTBEAT_CHECKRATE = 2
-CELERY_ALWAYS_EAGER = False
-CELERY_BROKER_HOSTNAME = ""
-CELERY_BROKER_PASSWORD = ""
-CELERY_BROKER_TRANSPORT = ""
-CELERY_BROKER_USER = ""
-CELERY_RESULT_BACKEND = 'django-cache'
-CHAT_COMPLETION_API = ''
-CHAT_COMPLETION_API_KEY = ''
-CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = True
-CMS_BASE = None
-CMS_ROOT_URL = None
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
-IDA_LOGOUT_URI_LIST = []
-LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
-LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
-LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
-LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
-LMS_BASE = None
-LMS_ROOT_URL = None
-OPENAPI_CACHE_TIMEOUT = 60 * 60
-PARSE_KEYS = {}
-REGISTRATION_EMAIL_PATTERNS_ALLOWED = None
-SESSION_COOKIE_DOMAIN = None
-SESSION_COOKIE_HTTPONLY = True
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
-STATIC_ROOT_BASE = None
-STATIC_URL_BASE = None
-VIDEO_CDN_URL = {}
-
-# Derived defaults (alphabetical)
-BROKER_USE_SSL = Derived(lambda settings: settings.CELERY_BROKER_USE_SSL)
-EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "studio")
-ENTERPRISE_API_URL = Derived(lambda settings: settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
-ENTERPRISE_CONSENT_API_URL = Derived(lambda settings: settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
-LMS_INTERNAL_ROOT_URL = Derived(lambda settings: settings.LMS_ROOT_URL)
-POLICY_CHANGE_GRADES_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-SHARED_COOKIE_DOMAIN = Derived(lambda settings: settings.SESSION_COOKIE_DOMAIN)
-SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = Derived(lambda settings: settings.HIGH_PRIORITY_QUEUE)
-UPDATE_SEARCH_INDEX_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
-
-
 #######################################################################################################################
 #### YAML LOADING
 ####
@@ -223,7 +155,7 @@ if 'staticfiles' in CACHES:
 # Once we have migrated to service assets off S3, then we can convert this back to
 # managed by the yaml file contents
 STATICFILES_STORAGE = os.environ.get('STATICFILES_STORAGE', STATICFILES_STORAGE)
-CSRF_TRUSTED_ORIGINS = _YAML_TOKENS.get("CSRF_TRUSTED_ORIGINS", [])
+CSRF_TRUSTED_ORIGINS = _YAML_TOKENS.get('CSRF_TRUSTED_ORIGINS_WITH_SCHEME', [])
 
 MKTG_URL_LINK_MAP.update(_YAML_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
