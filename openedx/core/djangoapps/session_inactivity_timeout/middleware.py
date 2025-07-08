@@ -22,7 +22,6 @@ from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils import monitoring as monitoring_utils
 
 LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch_str'
-LAST_SESSION_SAVE_TIME_KEYNAME = 'SessionInactivityTimeout:last_session_save_time'
 
 log = logging.getLogger(__name__)
 
@@ -89,16 +88,14 @@ class SessionInactivityTimeout(MiddlewareMixin):
                 monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'first-login')
                 log.debug("No previous activity timestamp found (first login)")
 
-            last_save = request.session.get(LAST_SESSION_SAVE_TIME_KEYNAME)
             current_time_str = current_time.isoformat()
 
             monitoring_utils.set_custom_attribute('session_inactivity.activity_seen', current_time_str)
-            has_save_delay_been_exceeded = last_save and datetime.fromisoformat(last_save) + timedelta(seconds=frequency_time_in_seconds) < current_time
-            proceed_with_period_save = not last_save or has_save_delay_been_exceeded
+            has_save_delay_been_exceeded = last_touch_str and datetime.fromisoformat(last_touch_str) + timedelta(seconds=frequency_time_in_seconds) < current_time
+            proceed_with_period_save = not last_touch_str or has_save_delay_been_exceeded
             if proceed_with_period_save:
                 # Allow a full session save periodically
-                request.session[LAST_SESSION_SAVE_TIME_KEYNAME] = current_time_str
-                monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'last-touch-exceeded')
                 request.session[LAST_TOUCH_KEYNAME] = current_time_str
+                monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'last-touch-exceeded')
             else:
                 monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'last-touch-not-exceeded')
