@@ -73,6 +73,7 @@ ENABLE_AUTO_GENERATED_USERNAME['ENABLE_AUTO_GENERATED_USERNAME'] = True
 
 @ddt.ddt
 @skip_unless_lms
+@override_settings(ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY=False)
 class RegistrationViewValidationErrorTest(
     ThirdPartyAuthTestMixin, UserAPITestCase, RetirementTestCase, OpenEdxEventsTestMixin
 ):
@@ -2784,6 +2785,11 @@ class TestGoogleRegistrationView(
 
 
 @ddt.ddt
+@override_settings(
+    ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+    ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY=False,
+    HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD=10000,
+)
 class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestMixin):
     """
     Tests for validity of user data in registration forms.
