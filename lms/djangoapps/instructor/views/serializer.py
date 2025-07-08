@@ -125,6 +125,21 @@ class ShowStudentExtensionSerializer(serializers.Serializer):
         return user
 
 
+class ShowUnitExtensionsSerializer(serializers.Serializer):
+    """
+    Serializer for showing all students who have due date extensions
+    for a specific unit (block).
+
+    Fields:
+        url (str): The URL (block ID) of the unit for which student extensions should be retrieved.
+    """
+    url = serializers.CharField(
+        required=True,
+        max_length=2048,
+        help_text="The unit URL (block ID) to retrieve student extensions for."
+    )
+
+
 class StudentAttemptsSerializer(serializers.Serializer):
     """
     Serializer for resetting a students attempts counter or starts a task to reset all students

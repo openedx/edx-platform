@@ -112,6 +112,7 @@ from lms.djangoapps.instructor.views.serializer import (
     ModifyAccessSerializer,
     RoleNameSerializer,
     SendEmailSerializer,
+    ShowUnitExtensionsSerializer,
     ShowStudentExtensionSerializer,
     StudentAttemptsSerializer,
     UserSerializer,
@@ -139,11 +140,11 @@ from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.api.serializers import CourseKeyField
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
+    DashboardError,
     dump_block_extensions,
     dump_student_extensions,
     find_unit,
     get_student_from_identifier,
-    handle_dashboard_error,
     keep_field_private,
     parse_datetime,
     set_due_date_extension,
@@ -3220,19 +3221,35 @@ class ResetDueDate(APIView):
             return JsonResponse({'error': str(error)}, status=400)
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('url')
-def show_unit_extensions(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ShowUnitExtensionsView(APIView):
     """
-    Shows all of the students which have due date extensions for the given unit.
+    API view to retrieve a list of students who have due date extensions
+    for a specific unit in a course.
     """
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    unit = find_unit(course, request.POST.get('url'))
-    return JsonResponse(dump_block_extensions(course, unit))
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ShowUnitExtensionsSerializer
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Shows all of the students which have due date extensions for the given unit.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        url = serializer.validated_data['url']
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+
+        try:
+            unit = find_unit(course, url)
+            data = dump_block_extensions(course, unit)
+            return Response(data)
+
+        except DashboardError as error:
+            return error.response()
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
