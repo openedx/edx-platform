@@ -1,15 +1,40 @@
-{% extends 'ace_common/edx_ace/common/base_head.html' %}
-{% block additional_styles %}
-<style type="text/css">
-    @media only screen and (max-width: 456px) {
-        .goal-reminder-body-wrapper {
-            margin: 5px 12.8px 0 4.8px !important;
-            margin: .5rem .8rem 0 .3rem !important;
-            padding-left: 3% !important;
-        }
-        h3 {
-            margin-top: 0;
-        }
-    }
-</style>
-{% endblock %}
+{% load django_markup %}
+{% load i18n %}
+{% load ace %}
+{% load acetags %}
+{% load static %}
+
+<table width="600" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#F2F0EF">
+  <tr>
+    <td valign="top" align="center">
+      <table width="600" cellpadding="0" cellspacing="0" align="center" class="width_100percent">
+        <tr>
+          <td valign="top" align="center" style="max-width:600px;" class="min_width">
+            <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#F2F0EF">
+              <tr><td height="20" style="line-height:1px;">&nbsp;</td></tr>
+              <tr>
+                <td align="center" valign="top" style="padding:0 60px;" class="padding_none">
+                  <table cellpadding="0" cellspacing="0" align="center" class="width_100percent">
+                    <tr>
+                      <td align="center" valign="top">
+                        <table cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td align="center" valign="top">
+                              <a href="{% with_link_tracking homepage_url %}">
+                              <img src="{{ logo_url }}" width="92" height="65"  alt="{% filter force_escape %}{% blocktrans %}Go to {{ platform_name }} Home Page{% endblocktrans %}{% endfilter %}"/></a>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr><td height="20" style="line-height:1px;font-size:1px;">&nbsp;</td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>

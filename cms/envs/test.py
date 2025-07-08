@@ -137,6 +137,8 @@ CMS_ROOT_URL = f"http://{CMS_BASE}"
 
 COURSE_AUTHORING_MICROFRONTEND_URL = "http://course-authoring-mfe"
 DISCUSSIONS_MICROFRONTEND_URL = "http://discussions-mfe"
+ACCOUNT_MICROFRONTEND_URL = 'http://account-mfe'
+LEARNING_MICROFRONTEND_URL = 'http://learning-mfe'
 
 CACHES = {
     # This is the cache used for most things.
@@ -196,7 +198,6 @@ VIDEO_SOURCE_PORT = 8777
 ################### Make tests faster
 # http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.SHA1PasswordHasher",
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
