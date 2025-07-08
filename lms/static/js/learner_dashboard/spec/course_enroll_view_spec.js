@@ -166,13 +166,18 @@ describe('Course Enroll View', () => {
       setupView(singleCourseRunList);
 
       expect(view.$('.no-action-message').text().trim()).toEqual('Coming Soon');
-    })
+    });
 
-    // it('should not render enrollment open date if it is in the past (unset) but enrollment is not yet open', () => {
-    //  singleCourseRunList[0].is_enrollment_open = false;
-      
-    //   setupView(singleCourseRunList);
-    // })
+    it('should not render enrollment open date if it is in the past (unset) but enrollment is not yet open', () => {
+      singleCourseRunList[0].is_enrollment_open = false;
+      singleCourseRunList[0].start = today.getDate() + 1;
+      singleCourseRunList[0].enrollment_open_date = today.getDate() + 1;
+      singleCourseRunList[0].end = today.getDate() - 10;
+
+      setupView(singleCourseRunList);
+
+      expect(view.$('.enrollment-opens').length).toBe(0);
+    });
 
     it('should render run selection dropdown if multiple course runs are available', () => {
         setupView(multiCourseRunList);
