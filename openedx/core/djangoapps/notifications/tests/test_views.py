@@ -338,7 +338,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'content_reported': {
                             'web': True,
                             'email': True,
-                            'push': True,
+                            'push': False,
                             'info': '',
                             'email_cadence': 'Daily',
                         },
@@ -352,7 +352,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'course_updates': {
                             'web': True,
                             'email': False,
-                            'push': True,
+                            'push': False,
                             'email_cadence': 'Daily',
                             'info': ''
                         },
@@ -1455,7 +1455,7 @@ class TestNotificationPreferencesView(APITestCase):
                         "content_reported": {
                             "web": True,
                             "email": True,
-                            "push": True,
+                            "push": False,
                             "email_cadence": "Daily"
                         },
                         "new_instructor_all_learners_post": {
@@ -1480,7 +1480,7 @@ class TestNotificationPreferencesView(APITestCase):
                         "course_updates": {
                             "web": True,
                             "email": False,
-                            "push": True,
+                            "push": False,
                             "email_cadence": "Daily"
                         },
                         "core": {

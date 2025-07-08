@@ -130,7 +130,7 @@ COURSE_NOTIFICATION_TYPES = {
         'web': True,
         'email': True,
         'email_cadence': EmailCadence.DAILY,
-        'push': True,
+        'push': False,
         'non_editable': [],
         'content_template': _('<p><strong>{username}’s </strong> {content_type} has been reported <strong> {'
                               'content}</strong></p>'),
@@ -179,7 +179,7 @@ COURSE_NOTIFICATION_TYPES = {
         'info': '',
         'web': True,
         'email': False,
-        'push': True,
+        'push': False,
         'email_cadence': EmailCadence.DAILY,
         'non_editable': [],
         'content_template': _('<{p}><{strong}>{course_update_content}</{strong}></{p}>'),
