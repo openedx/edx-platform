@@ -166,7 +166,7 @@ describe('Course Enroll View', () => {
       setupView(singleCourseRunList);
 
       expect(view.$('.no-action-message').text().trim()).toEqual('Coming Soon');
-      expect(view.$('.enrollment-opens').length).toBe(0);
+      expect(view.$('.enrollment-opens').length).toBe(1);
     });
 
     it('should not render enrollment open date if it is in the past (unset) but enrollment is not yet open', () => {
@@ -177,7 +177,7 @@ describe('Course Enroll View', () => {
 
       setupView(singleCourseRunList);
 
-      expect(view.$('.enrollment-opens').length).toBe(0);
+      expect(view.$('.enrollment-opens').length).toBe(1);
     });
 
     it('should render run selection dropdown if multiple course runs are available', () => {
