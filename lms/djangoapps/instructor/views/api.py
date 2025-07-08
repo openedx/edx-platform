@@ -3383,12 +3383,12 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
     @method_decorator(transaction.non_atomic_requests)
     def post(self, request, course_id):
         response_payload = {}
-        certificate_task = CertificateTaskSerializer(data=request.data)
+        task_serializer = CertificateTaskSerializer(data=request.data)
 
-        if not certificate_task.is_valid():
-            return JsonResponse({'message': certificate_task.errors}, status=status.HTTP_400_BAD_REQUEST)
+        if not task_serializer.is_valid():
+            return JsonResponse({'message': task_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-        if certificate_task.validated_data['api_action'] == 'generate':
+        if task_serializer.validated_data['api_action'] == 'generate':
             """
              Generating certificates for all students enrolled in given course.
             """
@@ -3402,21 +3402,21 @@ class CertificateTask(DeveloperErrorViewMixin, APIView):
                 'task_id': task.task_id
             }
 
-        elif certificate_task.validated_data['api_action'] == 'regenerate':
+        elif task_serializer.validated_data['api_action'] == 'regenerate':
             """
             certificate_statuses 'certificate_statuses' in POST data.
             """
             self.permission_name = permissions.START_CERTIFICATE_REGENERATION
             course_key = CourseKey.from_string(course_id)
-            serializer = CertificateStatusesSerializer(data=request.data)
+            status_serializer = CertificateStatusesSerializer(data=request.data)
 
-            if not serializer.is_valid():
+            if not status_serializer.is_valid():
                 return JsonResponse(
                     {'message': _('Please select certificate statuses from the list only.')},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            certificates_statuses = serializer.validated_data['certificate_statuses']
+            certificates_statuses = status_serializer.validated_data['certificate_statuses']
             task_api.regenerate_certificates(request, course_key, certificates_statuses)
             response_payload = {
                 'message': _('Certificate regeneration task has been started. '
