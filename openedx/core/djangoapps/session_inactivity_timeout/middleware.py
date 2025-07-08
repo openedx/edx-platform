@@ -20,10 +20,9 @@ from django.conf import settings
 from django.contrib import auth
 from django.utils.deprecation import MiddlewareMixin
 from edx_django_utils import monitoring as monitoring_utils
-from edx_django_utils.cache import TieredCache
 
 LAST_TOUCH_KEYNAME = 'SessionInactivityTimeout:last_touch_str'
-LAST_SESSION_SAVE_TIME_KEYNAME = 'SessionInactivityTimeout:last_session_save_time:user_{}'
+LAST_SESSION_SAVE_TIME_KEYNAME = 'SessionInactivityTimeout:last_session_save_time'
 
 log = logging.getLogger(__name__)
 
@@ -32,9 +31,6 @@ class SessionInactivityTimeout(MiddlewareMixin):
     """
     Middleware class to keep track of activity on a given session
     """
-
-    def _get_last_session_save_time_key(self, user_id):
-        return LAST_SESSION_SAVE_TIME_KEYNAME.format(user_id)
 
     def process_request(self, request):
         """
@@ -81,30 +77,28 @@ class SessionInactivityTimeout(MiddlewareMixin):
                         auth.logout(request)
                         return
                 except (ValueError, TypeError) as e:
+                    # If parsing fails, log warning and then treat as if no timestamp exists
                     log.warning("Parsing last touch time failed: %s", e)
-                    # If parsing fails, treat as if no timestamp exists
-                    pass
+                    monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'last-touch-error')
+
             else:
-                # .. custom_attribute_name: session_inactivity.first_login
-                # .. custom_attribute_description: Tracks when users have no stored activity
-                #   timestamp (first access after login).
-                monitoring_utils.set_custom_attribute('session_inactivity.first_login', True)
+                # .. custom_attribute_name: session_inactivity.last_touch_status
+                # .. custom_attribute_description: Tracks the status of session activity timestamps.
+                #   Values: 'first-login' (Tracks when users have no stored activity), 'last-touch-error' (failed to parse timestamp),
+                #   'last-touch-exceeded' (Marks when sessions are extended through the periodic save), 'last-touch-not-exceeded' (within save delay).
+                monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'first-login')
                 log.debug("No previous activity timestamp found (first login)")
 
-            cache_key = self._get_last_session_save_time_key(request.user.id)
-            cached_response = TieredCache.get_cached_response(cache_key)
-            last_save = cached_response.value if cached_response.is_found else None
+            last_save = request.session.get(LAST_SESSION_SAVE_TIME_KEYNAME)
             current_time_str = current_time.isoformat()
 
-            # .. custom_attribute_name: session_inactivity.activity_seen
-            # .. custom_attribute_description: Records the timestamp when user activity is detected.
             monitoring_utils.set_custom_attribute('session_inactivity.activity_seen', current_time_str)
-            has_save_delay_been_exceeded = datetime.fromisoformat(last_save) + timedelta(seconds=frequency_time_in_seconds) < current_time
+            has_save_delay_been_exceeded = last_save and datetime.fromisoformat(last_save) + timedelta(seconds=frequency_time_in_seconds) < current_time
             proceed_with_period_save = not last_save or has_save_delay_been_exceeded
             if proceed_with_period_save:
                 # Allow a full session save periodically
-                TieredCache.set_all_tiers(cache_key, current_time_str, timeout_in_seconds)
-                # .. custom_attribute_name: session_inactivity.session_extended
-                # .. custom_attribute_description:  Marks when sessions are extended through the periodic save.
-                monitoring_utils.set_custom_attribute('session_inactivity.session_extended', True)
+                request.session[LAST_SESSION_SAVE_TIME_KEYNAME] = current_time_str
+                monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'last-touch-exceeded')
                 request.session[LAST_TOUCH_KEYNAME] = current_time_str
+            else:
+                monitoring_utils.set_custom_attribute('session_inactivity.last_touch_status', 'last-touch-not-exceeded')
