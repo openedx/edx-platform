@@ -166,6 +166,7 @@ describe('Course Enroll View', () => {
       setupView(singleCourseRunList);
 
       expect(view.$('.no-action-message').text().trim()).toEqual('Coming Soon');
+      expect(view.$('.enrollment-opens').length).toBe(0);
     });
 
     it('should not render enrollment open date if it is in the past (unset) but enrollment is not yet open', () => {
