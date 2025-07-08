@@ -2848,6 +2848,10 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
         ['country', list(testutils.VALID_COUNTRIES)],
     )
     @ddt.unpack
+    @override_settings(
+        ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY=False,
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+    )
     def test_positive_validation_decision(self, form_field_name, user_data):
         """
         Test if {0} as any item in {1} gives a positive validation decision.
@@ -3047,6 +3051,10 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             'frequency': 3,
             'user_request_page': 'registration',
         })
+    )
+    @override_settings(
+        ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY=True,
+        HIBP_REGISTRATION_PASSWORD_FREQUENCY_THRESHOLD=3.0,
     )
     def test_pwned_password_and_emit_track_event(self, emit):
         self.assertValidationDecision(

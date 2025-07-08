@@ -47,6 +47,10 @@ from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWO
 
 
 @ddt.ddt
+@override_settings(
+    ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=False,
+    ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=False,
+)
 class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     """
     Test login_user() view
@@ -380,7 +384,10 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
         )
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [self.user_email])
 
-    @override_settings(ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=True)
+    @override_settings(
+        ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=True,
+        HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD=5.0,
+    )
     @override_waffle_switch(ENABLE_PWNED_PASSWORD_API, True)
     def test_password_compliance_block_error(self):
         """
@@ -394,7 +401,10 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
         self._assert_response(response, success=False, error_code='require-password-change')
 
-    @override_settings(ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=True)
+    @override_settings(
+        ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=True,
+        HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD=3.0,
+    )
     @override_waffle_switch(ENABLE_PWNED_PASSWORD_API, True)
     def test_password_compliance_nudge_error(self):
         """
