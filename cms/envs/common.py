@@ -521,10 +521,6 @@ ENABLE_JASMINE = False
 
 MARKETING_EMAILS_OPT_IN = False
 
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of the LMS. Only applies to
-# IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = []
-
 ############################# MICROFRONTENDS ###################################
 COURSE_AUTHORING_MICROFRONTEND_URL = None
 DISCUSSIONS_MICROFRONTEND_URL = None
@@ -577,6 +573,7 @@ DJFS = {
     'directory_root': '/edx/var/edxapp/django-pyfs/static/django-pyfs',
     'url_root': '/static/django-pyfs',
 }
+
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
 
@@ -665,14 +662,9 @@ TEMPLATES = [
 DEFAULT_TEMPLATE_ENGINE = TEMPLATES[0]
 
 #################################### AWS #######################################
-AWS_SES_REGION_NAME = 'us-east-1'
-AWS_SES_REGION_ENDPOINT = 'email.us-east-1.amazonaws.com'
 AWS_ACCESS_KEY_ID = None
 AWS_SECRET_ACCESS_KEY = None
 AWS_SECURITY_TOKEN = None
-AWS_QUERYSTRING_AUTH = False
-AWS_STORAGE_BUCKET_NAME = 'SET-ME-PLEASE (ex. bucket-name)'
-AWS_S3_CUSTOM_DOMAIN = 'SET-ME-PLEASE (ex. bucket-name.s3.amazonaws.com)'
 
 ##############################################################################
 
@@ -687,17 +679,13 @@ AUTHENTICATION_BACKENDS = [
     'bridgekeeper.backends.RulePermissionBackend',
 ]
 
-STATIC_ROOT_BASE = '/edx/var/edxapp/staticfiles'
-
 # License for serving content in China
 ICP_LICENSE = None
 ICP_LICENSE_INFO = {}
 
 LOGGING_ENV = 'sandbox'
 
-LMS_BASE = 'localhost:18000'
-LMS_ROOT_URL = "https://localhost:18000"
-LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
+LMS_BASE = None
 
 # Use LMS SSO for login, once enabled by setting LOGIN_URL (see docs/guides/studio_oauth.rst)
 SOCIAL_AUTH_STRATEGY = 'auth_backends.strategies.EdxDjangoStrategy'
@@ -709,22 +697,13 @@ FRONTEND_LOGIN_URL = LOGIN_URL
 FRONTEND_LOGOUT_URL = '/logout/'
 FRONTEND_REGISTER_URL = Derived(lambda settings: settings.LMS_ROOT_URL + '/register')
 
-LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
-ENTERPRISE_API_URL = LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/'
-ENTERPRISE_CONSENT_API_URL = LMS_INTERNAL_ROOT_URL + '/consent/api/v1/'
+ENTERPRISE_API_URL = Derived(lambda settings: settings.LMS_INTERNAL_ROOT_URL + '/enterprise/api/v1/')
+ENTERPRISE_CONSENT_API_URL = Derived(lambda settings: settings.LMS_INTERNAL_ROOT_URL + '/consent/api/v1/')
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
 
-# Setting for Open API key and prompts used by edx-enterprise.
-CHAT_COMPLETION_API = 'https://example.com/chat/completion'
-CHAT_COMPLETION_API_KEY = 'i am a key'
-LEARNER_ENGAGEMENT_PROMPT_FOR_ACTIVE_CONTRACT = ''
-LEARNER_ENGAGEMENT_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
-LEARNER_PROGRESS_PROMPT_FOR_ACTIVE_CONTRACT = ''
-LEARNER_PROGRESS_PROMPT_FOR_NON_ACTIVE_CONTRACT = ''
-
 # Public domain name of Studio (should be resolvable from the end-user's browser)
-CMS_BASE = 'localhost:18010'
-CMS_ROOT_URL = "https://localhost:18010"
+CMS_BASE = None
+CMS_ROOT_URL = None
 
 LOG_DIR = '/edx/var/log/edx'
 
@@ -735,9 +714,6 @@ MAINTENANCE_BANNER_TEXT = 'Sample banner message'
 WIKI_ENABLED = True
 
 CERT_QUEUE = 'certificates'
-# List of logout URIs for each IDA that the learner should be logged out of when they logout of
-# Studio. Only applies to IDA for which the social auth flow uses DOT (Django OAuth Toolkit).
-IDA_LOGOUT_URI_LIST = []
 
 ELASTIC_SEARCH_CONFIG = [
     {
@@ -757,7 +733,6 @@ CSRF_COOKIE_SECURE = False
 
 CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ''
 CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
-CSRF_TRUSTED_ORIGINS = []
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
@@ -1091,15 +1066,10 @@ CODE_JAIL_REST_SERVICE_READ_TIMEOUT = 3.5  # time in seconds
 
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG in your environment settings files, not here
-DEBUG = False
 SESSION_COOKIE_SECURE = False
 SESSION_SAVE_EVERY_REQUEST = False
 SESSION_SERIALIZER = 'openedx.core.lib.session_serializers.PickleSerializer'
-SESSION_COOKIE_DOMAIN = ""
 SESSION_COOKIE_NAME = 'sessionid'
-
-# This is the domain that is used to set shared cookies between various sub-domains.
-SHARED_COOKIE_DOMAIN = ""
 
 # Site info
 SITE_NAME = "localhost"
@@ -1110,12 +1080,6 @@ COURSE_IMPORT_EXPORT_BUCKET = ''
 COURSE_METADATA_EXPORT_BUCKET = ''
 
 ALTERNATE_WORKER_QUEUES = 'lms'
-
-# .. setting_name: STATIC_URL_BASE
-# .. setting_default: "/static/"
-# .. setting_description: The CMS uses this to construct ``STATIC_URL`` by appending
-#   a slash (if needed) and then ``studio/``.
-STATIC_URL_BASE = '/static/'
 
 X_FRAME_OPTIONS = 'DENY'
 
@@ -1135,12 +1099,7 @@ GIT_EXPORT_DEFAULT_IDENT = {
 
 # Email
 TECH_SUPPORT_EMAIL = 'technical@example.com'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-EMAIL_USE_TLS = False
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_FILE_PATH = Derived(lambda settings: settings.DATA_DIR / "emails" / "studio")
 DEFAULT_FROM_EMAIL = 'registration@example.com'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
 TECH_SUPPORT_EMAIL = 'technical@example.com'
@@ -1442,13 +1401,11 @@ CELERY_QUEUE_HA_POLICY = 'all'
 
 CELERY_CREATE_MISSING_QUEUES = True
 
-CELERY_BROKER_TRANSPORT = 'amqp'
-CELERY_BROKER_HOSTNAME = 'localhost'
-CELERY_BROKER_USER = 'celery'
-CELERY_BROKER_PASSWORD = 'celery'
-CELERY_BROKER_VHOST = ''
-CELERY_BROKER_USE_SSL = False
-CELERY_EVENT_QUEUE_TTL = None
+CLEAR_REQUEST_CACHE_ON_TASK_COMPLETION = True
+
+BROKER_USE_SSL = Derived(lambda settings: settings.CELERY_BROKER_USE_SSL)
+
+CELERY_ALWAYS_EAGER = False
 
 ############################## HEARTBEAT ######################################
 
@@ -2070,18 +2027,6 @@ CREDIT_PROVIDER_SECRET_KEYS = {}
 #   separate paths.
 COMPREHENSIVE_THEME_DIRS = os.environ.get("COMPREHENSIVE_THEME_DIRS", "").split(":")
 
-# .. setting_name: COMPREHENSIVE_THEME_LOCALE_PATHS
-# .. setting_default: []
-# .. setting_description: See LMS annotation.
-#   "COMPREHENSIVE_THEME_LOCALE_PATHS" : ["/edx/src/edx-themes/conf/locale"].
-COMPREHENSIVE_THEME_LOCALE_PATHS = []
-
-# .. setting_name: PREPEND_LOCALE_PATHS
-# .. setting_default: []
-# .. setting_description: A list of the paths to locale directories to load first e.g.
-#   "PREPEND_LOCALE_PATHS" : ["/edx/my-locales/"].
-PREPEND_LOCALE_PATHS = []
-
 # .. setting_name: DEFAULT_SITE_THEME
 # .. setting_default: None
 # .. setting_description: See LMS annotation.
@@ -2216,10 +2161,8 @@ PARTNER_SUPPORT_EMAIL = ''
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
 
 # API access management
-API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
-API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
-AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 
 EDX_DRF_EXTENSIONS = {
     # Set this value to an empty dict in order to prevent automatically updating
@@ -2254,7 +2197,6 @@ USER_TASKS_MAX_AGE = timedelta(days=7)
 
 ############## Settings for the Enterprise App ######################
 
-ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + LMS_ENROLLMENT_API_PATH
 ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 ENTERPRISE_API_CACHE_TIMEOUT = 3600  # Value is in seconds
 # The default value of this needs to be a 16 character string
@@ -2283,22 +2225,10 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = "both"
 DEFAULT_MOBILE_AVAILABLE = False
 
-
-# How long to cache OpenAPI schemas and UI, in seconds.
-OPENAPI_CACHE_TIMEOUT = 0
-
 ############################# Persistent Grades ####################################
 
 # Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
-
-# Queue to use for updating grades due to grading policy change
-POLICY_CHANGE_GRADES_ROUTING_KEY = 'edx.lms.core.default'
-
-# Queue to use for individual learner course regrades
-SINGLE_LEARNER_COURSE_REGRADE_ROUTING_KEY = 'edx.lms.core.default'
-
-SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 
 # Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
@@ -2313,13 +2243,13 @@ POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 DEFAULT_GRADE_DESIGNATIONS = ['A', 'B', 'C', 'D']
 
 ########## Settings for video transcript migration tasks ############
-VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+VIDEO_TRANSCRIPT_MIGRATIONS_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
 ########## Settings youtube thumbnails scraper tasks ############
-SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+SCRAPE_YOUTUBE_THUMBNAILS_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
 ########## Settings update search index task ############
-UPDATE_SEARCH_INDEX_JOB_QUEUE = DEFAULT_PRIORITY_QUEUE
+UPDATE_SEARCH_INDEX_JOB_QUEUE = Derived(lambda settings: settings.DEFAULT_PRIORITY_QUEUE)
 
 ###################### VIDEO IMAGE STORAGE ######################
 
@@ -2554,6 +2484,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'marketing_emails_opt_in': 'hidden',
 }
 EDXAPP_PARSE_KEYS = {}
+PARSE_KEYS = {}
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
@@ -2837,3 +2768,6 @@ SOCIAL_MEDIA_LOGO_URLS = {
 # .. setting_description: The default logo url for organizations that do not have a logo set.
 # .. setting_warning: This url is used as a placeholder for organizations that do not have a logo set.
 DEFAULT_ORG_LOGO_URL = Derived(lambda settings: settings.STATIC_URL + 'images/logo.png')
+
+# Misc
+AUTHORING_API_URL = ''
