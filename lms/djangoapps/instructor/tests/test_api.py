@@ -2752,7 +2752,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
         assert "students" in res_json
         for student in res_json["students"]:
-            assert "year_of_birth" not in student
+            for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
+                assert field not in student
 
     def test_get_students_features_private_fields_with_custom_config(self):
         """
