@@ -46,7 +46,7 @@ django-model-utils
 django-mptt
 django-mysql
 django-oauth-toolkit                # Provides oAuth2 capabilities for Django
-django-pipeline
+# django-pipeline                   # using its main repo hash. since no release yet.
 django-ratelimit
 django-sekizai
 django-simple-history

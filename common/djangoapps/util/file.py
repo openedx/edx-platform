@@ -155,6 +155,7 @@ class UniversalNewlineIterator:
     object which does not inherently support being read in
     universal-newline mode.  It returns a line at a time.
     """
+
     def __init__(self, original_file, buffer_size=4096):
         self.original_file = original_file
         self.buffer_size = buffer_size

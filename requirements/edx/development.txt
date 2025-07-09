@@ -4,6 +4,10 @@
 #
 #    make upgrade
 #
+-e git+https://github.com/jazzband/django-pipeline.git@927ca9ad250d67402d2e32f64fd5a47cfb60f328#egg=django-pipeline
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 -e git+https://github.com/anupdhabarde/edx-proctoring-proctortrack.git@31c6c9923a51c903ae83760ecbbac191363aa2a2#egg=edx_proctoring_proctortrack
     # via
     #   -r requirements/edx/doc.txt
@@ -335,9 +339,8 @@ distlib==0.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==4.2.23
+django==5.2.5
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-appconf
@@ -541,10 +544,6 @@ django-object-actions==5.0.0
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   enterprise-integrated-channels
-django-pipeline==4.0.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 django-push-notifications==3.2.1
     # via
     #   -r requirements/edx/doc.txt
