@@ -429,7 +429,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
         return {
             section['sequential_id']: section['label']
             for section in section_breakdown
-            if 'sequential_id' in section and section['sequential_id'] != 'No ID'
+            if 'sequential_id' in section and section['sequential_id'] is not None
         }
 
 

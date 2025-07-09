@@ -811,7 +811,9 @@ def get_assignments_grades(user, course_id, cache_timeout):
         course_id (CourseLocator): The course key.
         cache_timeout (int): Cache timeout in seconds
     Returns:
-        list (ReadSubsectionGrade, ZeroSubsectionGrade): The list with assignments grades.
+        tuple:
+            - list[Union[ReadSubsectionGrade, ZeroSubsectionGrade]]: List of subsection grades.
+            - list[dict]: List of dictionaries with section-level grade breakdown and assignment info.
     """
     is_staff = bool(has_access(user, 'staff', course_id))
 

@@ -374,14 +374,13 @@ class AssignmentFormatGrader(CourseGrader):
         scores = list(grade_sheet.get(self.type, {}).values())
         breakdown = []
         labeler = get_short_labeler(self.short_label)
-        no_sequential_id = _("No ID")
         for i in range(max(int(float(self.min_count)), len(scores))):
             if i < len(scores) or generate_random_scores:
                 if generate_random_scores:  	# for debugging!
                     earned = random.randint(2, 15)
                     possible = random.randint(earned, 15)
                     section_name = _("Generated")
-                    sequential_id = no_sequential_id
+                    sequential_id = None
                 else:
                     earned = scores[i].graded_total.earned
                     possible = scores[i].graded_total.possible
@@ -405,7 +404,7 @@ class AssignmentFormatGrader(CourseGrader):
                     index=i + self.starting_index,
                     section_type=self.section_type
                 )
-                sequential_id = no_sequential_id
+                sequential_id = None
             short_label = labeler(i + self.starting_index)
 
             breakdown.append({'percent': percentage, 'label': short_label,
@@ -431,7 +430,7 @@ class AssignmentFormatGrader(CourseGrader):
             total_label = f"{self.short_label}"
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True,
-                          'sequential_id': str(scores[0].location) if scores else no_sequential_id}, ]
+                          'sequential_id': str(scores[0].location) if scores else None}, ]
         else:
             # Translators: "Homework Average = 0%"
             total_detail = _("{section_type} Average = {percent:.2%}").format(
