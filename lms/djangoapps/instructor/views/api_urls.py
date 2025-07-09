@@ -40,20 +40,21 @@ urlpatterns = [
     path('override_problem_score', api.override_problem_score, name='override_problem_score'),
     path('reset_student_attempts_for_entrance_exam', api.reset_student_attempts_for_entrance_exam,
          name='reset_student_attempts_for_entrance_exam'),
-    path('rescore_entrance_exam', api.rescore_entrance_exam, name='rescore_entrance_exam'),
+    path('rescore_entrance_exam', api.RescoreEntranceExamView.as_view(), name='rescore_entrance_exam'),
     path('list_entrance_exam_instructor_tasks', api.ListEntranceExamInstructorTasks.as_view(),
          name='list_entrance_exam_instructor_tasks'),
     path('mark_student_can_skip_entrance_exam', api.MarkStudentCanSkipEntranceExam.as_view(),
          name='mark_student_can_skip_entrance_exam'),
     path('list_instructor_tasks', api.ListInstructorTasks.as_view(), name='list_instructor_tasks'),
-    path('list_background_email_tasks', api.list_background_email_tasks, name='list_background_email_tasks'),
+    path('list_background_email_tasks', api.ListBackgroundEmailTasks.as_view(), name='list_background_email_tasks'),
     path('list_email_content', api.ListEmailContent.as_view(), name='list_email_content'),
-    path('list_forum_members', api.list_forum_members, name='list_forum_members'),
+    path('list_forum_members', api.ListForumMembers.as_view(), name='list_forum_members'),
     path('update_forum_role_membership', api.UpdateForumRoleMembership.as_view(), name='update_forum_role_membership'),
+    path('list_forum_members', api.ListForumMembers.as_view(), name='list_forum_members'),
     path('change_due_date', api.ChangeDueDate.as_view(), name='change_due_date'),
     path('send_email', api.SendEmail.as_view(), name='send_email'),
     path('reset_due_date', api.ResetDueDate.as_view(), name='reset_due_date'),
-    path('show_unit_extensions', api.show_unit_extensions, name='show_unit_extensions'),
+    path('show_unit_extensions', api.ShowUnitExtensionsView.as_view(), name='show_unit_extensions'),
     path('show_student_extensions', api.ShowStudentExtensions.as_view(), name='show_student_extensions'),
 
     # proctored exam downloads...
@@ -61,15 +62,15 @@ urlpatterns = [
 
     # Grade downloads...
     path('list_report_downloads', api.ListReportDownloads.as_view(), name='list_report_downloads'),
-    path('calculate_grades_csv', api.calculate_grades_csv, name='calculate_grades_csv'),
-    path('problem_grade_report', api.problem_grade_report, name='problem_grade_report'),
+    path('calculate_grades_csv', api.CalculateGradesCsvView.as_view(), name='calculate_grades_csv'),
+    path('problem_grade_report', api.ProblemGradeReport.as_view(), name='problem_grade_report'),
 
     # Reports..
     path('get_course_survey_results', api.GetCourseSurveyResults.as_view(), name='get_course_survey_results'),
-    path('export_ora2_data', api.export_ora2_data, name='export_ora2_data'),
-    path('export_ora2_summary', api.export_ora2_summary, name='export_ora2_summary'),
+    path('export_ora2_data', api.ExportOra2DataView.as_view(), name='export_ora2_data'),
+    path('export_ora2_summary', api.ExportOra2SummaryView.as_view(), name='export_ora2_summary'),
 
-    path('export_ora2_submission_files', api.export_ora2_submission_files,
+    path('export_ora2_submission_files', api.ExportOra2SubmissionFilesView.as_view(),
          name='export_ora2_submission_files'),
 
     # spoc gradebook

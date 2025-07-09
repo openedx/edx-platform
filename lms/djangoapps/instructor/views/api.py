@@ -81,11 +81,7 @@ from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_user,
-    get_group_name,
-    has_forum_access,
-)
+from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.constants import INVOICE_KEY
@@ -108,16 +104,19 @@ from lms.djangoapps.instructor.views.serializer import (
     BlockDueDateSerializer,
     CertificateSerializer,
     CertificateStatusesSerializer,
+    ForumRoleNameSerializer,
     ListInstructorTaskInputSerializer,
     ModifyAccessSerializer,
     RoleNameSerializer,
     SendEmailSerializer,
+    ShowUnitExtensionsSerializer,
     ShowStudentExtensionSerializer,
     StudentAttemptsSerializer,
     UserSerializer,
     UniqueStudentIdentifierSerializer,
     ProblemResetSerializer,
     UpdateForumRoleMembershipSerializer
+    RescoreEntranceExamSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -139,11 +138,11 @@ from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.api.serializers import CourseKeyField
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
+    DashboardError,
     dump_block_extensions,
     dump_student_extensions,
     find_unit,
     get_student_from_identifier,
-    handle_dashboard_error,
     keep_field_private,
     parse_datetime,
     set_due_date_extension,
@@ -2202,84 +2201,102 @@ def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.RESCORE_EXAMS)
-@common_exceptions_400
-def rescore_entrance_exam(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class RescoreEntranceExamView(DeveloperErrorViewMixin, APIView):
     """
-    Starts a background process a students attempts counter for entrance exam.
+    Starts a background process for a student's attempts counter for entrance exam.
     Optionally deletes student state for a problem. Limited to instructor access.
 
-    Takes either of the following query parameters
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
+    Takes either of the following parameters:
+        - unique_student_identifier: an email or username
+        - all_students: a boolean
 
     all_students and unique_student_identifier cannot both be present.
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.RESCORE_EXAMS
+    serializer_class = RescoreEntranceExamSerializer
 
-    student_identifier = request.POST.get('unique_student_identifier', None)
-    only_if_higher = request.POST.get('only_if_higher', None)
-    student = None
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Initiates a Celery task to rescore the entrance exam for a student or all students.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
 
-    all_students = _get_boolean_param(request, 'all_students')
-
-    if not course.entrance_exam_id:
-        return HttpResponseBadRequest(
-            _("Course has no entrance exam section.")
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_with_access(
+            request.user, 'staff', course_id, depth=None
         )
 
-    if all_students and student:
-        return HttpResponseBadRequest(
-            _("Cannot rescore with all_students and unique_student_identifier.")
+        if not course.entrance_exam_id:
+            return Response(
+                {"error": _("Course has no entrance exam section.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        student_identifier = data.get('unique_student_identifier')
+        only_if_higher = data.get('only_if_higher')
+        all_students = data.get('all_students', False)
+        student = None
+
+        if student_identifier:
+            student = get_student_from_identifier(student_identifier)
+
+        if all_students and student:
+            return Response(
+                {"error": _("Cannot rescore with all_students and unique_student_identifier.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
+        except InvalidKeyError:
+            return Response(
+                {"error": _("Course has no valid entrance exam section.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        response_payload = {
+            'student': student_identifier if student else _("All Students"),
+            'task': TASK_SUBMISSION_OK
+        }
+
+        task_api.submit_rescore_entrance_exam_for_student(
+            request, entrance_exam_key, student, only_if_higher,
         )
 
-    try:
-        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
-    except InvalidKeyError:
-        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
-
-    response_payload = {}
-    if student:
-        response_payload['student'] = student_identifier
-    else:
-        response_payload['student'] = _("All Students")
-
-    task_api.submit_rescore_entrance_exam_for_student(
-        request, entrance_exam_key, student, only_if_higher,
-    )
-    response_payload['task'] = TASK_SUBMISSION_OK
-    return JsonResponse(response_payload)
+        return Response(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EMAIL)
-def list_background_email_tasks(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListBackgroundEmailTasks(DeveloperErrorViewMixin, APIView):
     """
     List background email tasks.
     """
-    course_id = CourseKey.from_string(course_id)
-    task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
-    # Specifying for the history of a single task type
-    tasks = task_api.get_instructor_task_history(
-        course_id,
-        task_type=task_type
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.EMAIL
 
-    response_payload = {
-        'tasks': list(map(extract_task_features, tasks)),
-    }
-    return JsonResponse(response_payload)
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        List background email tasks.
+        """
+        course_id = CourseKey.from_string(course_id)
+        task_type = InstructorTaskTypes.BULK_COURSE_EMAIL
+        # Specifying for the history of a single task type
+        tasks = task_api.get_instructor_task_history(
+            course_id,
+            task_type=task_type
+        )
+
+        response_payload = {
+            'tasks': list(map(extract_task_features, tasks)),
+        }
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -2706,110 +2723,147 @@ def list_financial_report_downloads(_request, course_id):
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def export_ora2_data(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ExportOra2DataView(DeveloperErrorViewMixin, APIView):
     """
     Pushes a Celery task which will aggregate ora2 responses for a course into a .csv
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('ORA data')
-    task_api.submit_export_ora2_data(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Initiates a task to export Open Response Assessment (ORA) data for a course.
+
+        Args:
+            request: The HTTP request object
+            course_id: The ID of the course for which to export ORA data
+
+        Returns:
+            Response: A JSON response containing the status message indicating the task has been initiated
+        """
+        course_key = CourseKey.from_string(course_id)
+        report_type = _('ORA data')
+
+        try:
+            task_api.submit_export_ora2_data(request, course_key)
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            return Response({"status": success_status})
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
+            return JsonResponse({"error": str(err)}, status=400)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def export_ora2_summary(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ExportOra2SummaryView(DeveloperErrorViewMixin, APIView):
     """
-    Pushes a Celery task which will aggregate a summary students' progress in ora2 tasks for a course into a .csv
+    Pushes a Celery task which will aggregate a summary of students' progress in ora2 tasks for a course into a .csv
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('ORA summary')
-    task_api.submit_export_ora2_summary(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    def post(self, request, course_id):
+        """
+        Initiates a Celery task to generate an ORA summary report for the specified course.
+
+        Args:
+            request: The HTTP request object
+            course_id: The string representation of the course key
+
+        Returns:
+            Response: A JSON response with a status message indicating the report generation has started
+        """
+        course_key = CourseKey.from_string(course_id)
+        report_type = _('ORA summary')
+        try:
+            task_api.submit_export_ora2_summary(request, course_key)
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+            return Response({"status": success_status})
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
+            return JsonResponse({"error": str(err)}, status=400)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def export_ora2_submission_files(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ExportOra2SubmissionFilesView(DeveloperErrorViewMixin, APIView):
     """
     Pushes a Celery task which will download and compress all submission
     files (texts, attachments) into a zip archive.
     """
-    course_key = CourseKey.from_string(course_id)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    task_api.submit_export_ora2_submission_files(request, course_key)
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Initiates a task to export all ORA2 submission files for a course.
+        Returns a JSON response indicating the export task has been started.
+        """
+        course_key = CourseKey.from_string(course_id)
+        try:
+            task_api.submit_export_ora2_submission_files(request, course_key)
+            return Response({
+                "status": _("Attachments archive is being created.")
+            })
+        except (AlreadyRunningError, QueueConnectionError, AttributeError) as err:
+            return JsonResponse({"error": str(err)}, status=400)
 
-    return JsonResponse({
-        "status": _(
-            "Attachments archive is being created."
-        )
-    })
 
-
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def calculate_grades_csv(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class CalculateGradesCsvView(DeveloperErrorViewMixin, APIView):
     """
+    Initiates a Celery task to calculate grades CSV.
     AlreadyRunningError is raised if the course's grades are already being updated.
     """
-    report_type = _('grade')
-    course_key = CourseKey.from_string(course_id)
-    task_api.submit_calculate_grades_csv(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Initiates a Celery task to calculate grades CSV.
+        """
+        report_type = _('grade')
+        course_key = CourseKey.from_string(course_id)
+        task_api.submit_calculate_grades_csv(request, course_key)
+        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+        return Response({"status": success_status})
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
-@common_exceptions_400
-def problem_grade_report(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class ProblemGradeReport(DeveloperErrorViewMixin, APIView):
     """
-    Request a CSV showing students' grades for all problems in the
-    course.
-
-    AlreadyRunningError is raised if the course's grades are already being
-    updated.
+    Request a CSV showing students' grades for all problems in the course.
     """
-    course_key = CourseKey.from_string(course_id)
-    report_type = _('problem grade')
-    task_api.submit_problem_grade_report(request, course_key)
-    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
 
-    return JsonResponse({"status": success_status})
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Request a CSV showing students' grades for all problems in the
+        course.
+
+        AlreadyRunningError is raised if the course's grades are already being
+        updated.
+        """
+        course_key = CourseKey.from_string(course_id)
+        report_type = _('problem grade')
+        task_api.submit_problem_grade_report(request, course_key)
+        success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+
+        return JsonResponse({"status": success_status})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_FORUM_MEMBERS)
-@require_post_params('rolename')
-def list_forum_members(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListForumMembers(APIView):
     """
     Lists forum members of a certain rolename.
     Limited to staff access.
@@ -2818,61 +2872,48 @@ def list_forum_members(request, course_id):
     Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
         which is limited to instructors.
 
-    Takes query parameter `rolename`.
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
-    has_forum_admin = has_forum_access(
-        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+    permission_classes = (
+        IsAuthenticated, permissions.InstructorPermission, permissions.ForumAdminRequiresInstructorAccess
     )
+    permission_name = permissions.VIEW_FORUM_MEMBERS
+    serializer_class = ForumRoleNameSerializer
 
-    rolename = request.POST.get('rolename')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handle the POST request to list forum members with a certain role name for the given course.
 
-    # default roles require either (staff & forum admin) or (instructor)
-    if not (has_forum_admin or has_instructor_access):
-        return HttpResponseBadRequest(
-            "Operation requires staff & forum admin or instructor access"
+        Args:
+            request (HttpRequest): The request object containing the data sent by the client.
+            course_id (int): The ID of the course for which the role is being assigned or managed.
+
+        Returns:
+            Response: The Json constians lists of members.
+
+        Raises:
+            ValidationError: If the provided `rolename` is not valid according to the serializer.
+        """
+        course_id = CourseKey.from_string(course_id)
+        course_discussion_settings = CourseDiscussionSettings.get(course_id)
+
+        role_serializer = ForumRoleNameSerializer(
+            data=request.data,
+            context={
+                'course_discussion_settings': course_discussion_settings,
+                'course_id': course_id
+            }
         )
 
-    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-        return HttpResponseBadRequest("Operation requires instructor access.")
+        role_serializer.is_valid(raise_exception=True)
+        rolename = role_serializer.data['rolename']
 
-    # filter out unsupported for roles
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                        FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest(strip_tags(
-            f"Unrecognized rolename '{rolename}'."
-        ))
-
-    try:
-        role = Role.objects.get(name=rolename, course_id=course_id)
-        users = role.users.all().order_by('username')
-    except Role.DoesNotExist:
-        users = []
-
-    course_discussion_settings = CourseDiscussionSettings.get(course_id)
-
-    def extract_user_info(user):
-        """ Convert user to dict for json rendering. """
-        group_id = get_group_id_for_user(user, course_discussion_settings)
-        group_name = get_group_name(group_id, course_discussion_settings)
-
-        return {
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'group_name': group_name,
+        response_payload = {
+            'course_id': str(course_id),
+            rolename: role_serializer.data.get('users'),
+            'division_scheme': course_discussion_settings.division_scheme,
         }
-
-    response_payload = {
-        'course_id': str(course_id),
-        rolename: list(map(extract_user_info, users)),
-        'division_scheme': course_discussion_settings.division_scheme,
-    }
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -3162,19 +3203,35 @@ class ResetDueDate(APIView):
             return JsonResponse({'error': str(error)}, status=400)
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('url')
-def show_unit_extensions(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ShowUnitExtensionsView(APIView):
     """
-    Shows all of the students which have due date extensions for the given unit.
+    API view to retrieve a list of students who have due date extensions
+    for a specific unit in a course.
     """
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    unit = find_unit(course, request.POST.get('url'))
-    return JsonResponse(dump_block_extensions(course, unit))
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ShowUnitExtensionsSerializer
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Shows all of the students which have due date extensions for the given unit.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        url = serializer.validated_data['url']
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+
+        try:
+            unit = find_unit(course, url)
+            data = dump_block_extensions(course, unit)
+            return Response(data)
+
+        except DashboardError as error:
+            return error.response()
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')

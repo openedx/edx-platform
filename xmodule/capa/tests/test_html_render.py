@@ -10,13 +10,15 @@ from unittest import mock
 
 import ddt
 from lxml import etree
-from xmodule.capa.tests.helpers import new_loncapa_problem, test_capa_system
+from xmodule.capa.tests.helpers import new_loncapa_problem, mock_capa_system
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 from openedx.core.djangolib.markup import HTML
 
 from .response_xml_factory import CustomResponseXMLFactory, StringResponseXMLFactory
 
 
 @ddt.ddt
+@use_unsafe_codejail()
 class CapaHtmlRenderTest(unittest.TestCase):
     """
     CAPA HTML rendering tests class.
@@ -24,7 +26,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
     def setUp(self):
         super(CapaHtmlRenderTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.capa_system = test_capa_system()
+        self.capa_system = mock_capa_system()
 
     def test_blank_problem(self):
         """
@@ -148,7 +150,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
         xml_str = StringResponseXMLFactory().build_xml(**kwargs)
 
         # Mock out the template renderer
-        the_system = test_capa_system()
+        the_system = mock_capa_system()
         the_system.render_template = mock.Mock()
         the_system.render_template.return_value = "<div class='input-template-render'>Input Template Render</div>"
 

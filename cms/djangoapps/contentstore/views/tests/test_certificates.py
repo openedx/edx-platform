@@ -10,8 +10,10 @@ from unittest import mock
 import ddt
 from django.conf import settings
 from django.test.utils import override_settings
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.keys import AssetKey
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import get_lms_link_for_certificate_web_view, reverse_course_url
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -275,6 +277,7 @@ class CertificatesListHandlerTestCase(
         )
         self.assertEqual(link, test_url)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_info_in_response(self):
         """
@@ -302,6 +305,7 @@ class CertificatesListHandlerTestCase(
         self.assertEqual(data[0]['version'], CERTIFICATE_SCHEMA_VERSION)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
     def test_certificate_info_not_in_response(self):
         """
         Test that certificate has not been rendered audit only course mode.
@@ -346,6 +350,7 @@ class CertificatesListHandlerTestCase(
         )
         self.assertContains(response, "error", status_code=403)
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
     def test_audit_course_mode_is_skipped(self):
         """
         Tests audit course mode is skipped when rendering certificates page.
@@ -359,6 +364,7 @@ class CertificatesListHandlerTestCase(
         self.assertContains(response, 'verified')
         self.assertNotContains(response, 'audit')
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
     def test_audit_only_disables_cert(self):
         """
         Tests audit course mode is skipped when rendering certificates page.
@@ -379,6 +385,7 @@ class CertificatesListHandlerTestCase(
         ['verified', 'credit'],
         ['professional']
     )
+    @override_waffle_flag(toggles.LEGACY_STUDIO_CERTIFICATES, True)
     def test_non_audit_enables_cert(self, slugs):
         """
         Tests audit course mode is skipped when rendering certificates page.

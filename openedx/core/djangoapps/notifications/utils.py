@@ -4,9 +4,11 @@ Utils function for notifications app
 import copy
 from typing import Dict, List, Set
 
+from opaque_keys.edx.keys import CourseKey
+
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NEW_NOTIFICATION_VIEW, ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -46,13 +48,6 @@ def get_show_notifications_tray(user):
             break
 
     return show_notifications_tray
-
-
-def get_is_new_notification_view_enabled():
-    """
-    Returns True if the waffle flag for the new notification view is enabled, False otherwise.
-    """
-    return ENABLE_NEW_NOTIFICATION_VIEW.is_enabled()
 
 
 def get_list_in_batches(input_list, batch_size):
@@ -139,12 +134,21 @@ def remove_preferences_with_no_access(preferences: dict, user) -> dict:
         user=user,
         course_id=preferences['course_id']
     ).values_list('role', flat=True)
-    preferences['notification_preference_config'] = filter_out_visible_notifications(
+
+    user_preferences = filter_out_visible_notifications(
         user_preferences,
         notifications_with_visibility_settings,
         user_forum_roles,
         user_course_roles
     )
+
+    course_key = CourseKey.from_string(preferences['course_id'])
+    discussion_config = user_preferences.get('discussion', {})
+    notification_types = discussion_config.get('notification_types', {})
+
+    if notification_types and not ENABLE_NOTIFY_ALL_LEARNERS.is_enabled(course_key):
+        notification_types.pop('new_instructor_all_learners_post', None)
+
     return preferences
 
 
