@@ -250,6 +250,73 @@ class MigrateNotificationPreferencesTestCase(TestCase):
             'Performing a DRY RUN. No changes will be made to the database.'
         )
 
+    @patch(f'{COMMAND_MODULE}.logger')
+    def test_handle_use_default_mode(self, mock_logger):
+        """Test command execution while using default mode."""
+        sample_config = {
+            "grading": {
+                "enabled": True,
+                "notification_types": {
+                    "core": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    },
+                    "ora_grade_assigned": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Daily"
+                    }
+                },
+                "core_notification_types": []
+            },
+            "discussion": {
+                "enabled": True,
+                "notification_types": {
+                    "core": {
+                        "web": False,
+                        "push": False,
+                        "email": False,
+                        "email_cadence": "Weekly"
+                    },
+                    "new_discussion_post": {
+                        "web": True,
+                        "push": True,
+                        "email": True,
+                        "email_cadence": "Immediately"
+                    }
+                },
+                "core_notification_types": ["response_on_followed_post"]
+            }
+        }
+        CourseNotificationPreference.objects.create(
+            user=self.user1,
+            course_id='course-v1:Test+Course+1',
+            notification_preference_config=sample_config
+        )
+
+        call_command(
+            'migrate_preferences_to_account_level_model',
+            '--use-default',
+            'push'
+        )
+        # Check that no actual database changes were made
+        self.assertEqual(NotificationPreference.objects.count(), 3)
+        self.assertEqual(
+            NotificationPreference.objects.get(type='ora_grade_assigned').push,
+            False
+        )
+        self.assertEqual(
+            NotificationPreference.objects.get(type='new_discussion_post').push,
+            False
+        )
+        self.assertEqual(
+            NotificationPreference.objects.get(type='response_on_followed_post').push,
+            True
+        )
+
     def test_handle_normal_execution(self):
         """Test normal command execution without dry-run."""
         CourseNotificationPreference.objects.create(
