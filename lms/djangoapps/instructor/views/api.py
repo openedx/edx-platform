@@ -1030,7 +1030,7 @@ class ModifyAccess(APIView):
         body=AccessSerializer,
         responses={
             200: _("Successfully modified user access. Returns details about the modification, "
-                  "including the username, role, action taken, and confirmation of success."),
+                   "including the username, role, action taken, and confirmation of success."),
             400: _("The provided parameters were invalid. Check that the role and action are valid."),
             401: _("The requesting user is not authenticated."),
             403: _("The requesting user lacks instructor permissions for this course."),
@@ -1041,7 +1041,6 @@ class ModifyAccess(APIView):
             "Note that instructors cannot remove their own instructor access."
         ),
     )
-
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
@@ -1150,8 +1149,8 @@ class ListCourseRoleMembersView(APIView):
         body=RoleNameSerializer,
         responses={
             200: _("Successfully retrieved the list of users with the specified role. "
-                  "Returns the course ID and a list of users including their usernames, emails, "
-                  "and full names."),
+                   "Returns the course ID and a list of users including their usernames, emails, "
+                   "and full names."),
             400: _("The provided parameters were invalid. Check that the role name is valid."),
             401: _("The requesting user is not authenticated."),
             403: _("The requesting user lacks instructor permissions for this course."),
@@ -1164,7 +1163,6 @@ class ListCourseRoleMembersView(APIView):
             "Returns detailed information about each user including username, email, and full name."
         ),
     )
-
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
