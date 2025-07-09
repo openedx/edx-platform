@@ -11,6 +11,7 @@ class NotificationTypeIcons:
     CHECK_CIRCLE_GREEN = "CHECK_CIRCLE_GREEN"
     HELP_OUTLINE = "HELP_OUTLINE"
     NEWSPAPER = "NEWSPAPER"
+    OPEN_RESPONSE_OUTLINE = "OPEN_RESPONSE_OUTLINE"
     POST_OUTLINE = "POST_OUTLINE"
     QUESTION_ANSWER_OUTLINE = "QUESTION_ANSWER_OUTLINE"
     REPORT_RED = "REPORT_RED"
@@ -32,7 +33,9 @@ class NotificationTypeIcons:
             "content_reported": cls.REPORT_RED,
             "response_endorsed_on_thread": cls.VERIFIED,
             "response_endorsed": cls.CHECK_CIRCLE_GREEN,
-            "course_update": cls.NEWSPAPER,
+            "course_updates": cls.NEWSPAPER,
+            "ora_staff_notifications": cls.OPEN_RESPONSE_OUTLINE,
+            "ora_grade_assigned": cls.OPEN_RESPONSE_OUTLINE,
         }
         return notification_type_dict.get(notification_type, default)
 

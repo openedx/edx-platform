@@ -21,10 +21,48 @@ from .utils import remove_preferences_with_no_access
 
 def add_info_to_notification_config(config_obj):
     """
-    Add info of all notification types
+    Enhances the notification configuration by appending descriptive 'info' to each notification type.
+
+    This function supports two different structures of `config_obj`, depending on the source of the data:
+    either from the account preferences API (`AggregatedNotificationPreferences`) or the course preferences
+    API (`UserNotificationPreferenceView`).
+
+    Supported input structures:
+
+    1. From account preferences API:
+        {
+            'notification_app': {
+                'notification_types': {
+                    'core': { ... },
+                    'non-core': { ... }
+                }
+            }
+        }
+
+    2. From course preferences API:
+        {
+            'notification_preference_config': {
+                'notification_app': {
+                    'notification_types': {
+                        'core': { ... },
+                        'non-core': { ... }
+                    }
+                }
+            }
+        }
+
+    For each notification type:
+    - If the type is 'core', its info is fetched from `COURSE_NOTIFICATION_APPS[notification_app]['core_info']`.
+    - For all other types, info is fetched from `COURSE_NOTIFICATION_TYPES[notification_type]['info']`.
+
+    Parameters:
+        config_obj (dict): The notification configuration object to enhance.
+
+    Returns:
+        dict: The enhanced configuration object with added 'info' fields.
     """
 
-    config = config_obj['notification_preference_config']
+    config = config_obj.get('notification_preference_config', config_obj)
     for notification_app, app_prefs in config.items():
         notification_types = app_prefs.get('notification_types', {})
         for notification_type, type_prefs in notification_types.items():
@@ -78,6 +116,9 @@ class UserCourseNotificationPreferenceSerializer(serializers.ModelSerializer):
         user = self.context['user']
         preferences = add_info_to_notification_config(preferences)
         preferences = remove_preferences_with_no_access(preferences, user)
+        preferences['notification_preference_config'] = add_non_editable_in_preference(
+            preferences.get('notification_preference_config', {})
+        )
         return preferences
 
     def get_course_name(self, obj):
@@ -146,6 +187,19 @@ class UserNotificationPreferenceUpdateSerializer(serializers.Serializer):
                 f'{notification_channel} is not a valid notification channel setting.'
             )
 
+        if notification_app and notification_type and notification_channel:
+            if not is_notification_type_channel_editable(
+                notification_app,
+                notification_type,
+                'email' if notification_channel == 'email_cadence' else notification_channel
+            ):
+                raise ValidationError({
+                    'notification_channel': (
+                        f'{notification_channel} is not editable for notification type '
+                        f'{notification_type}.'
+                    )
+                })
+
         return attrs
 
     def update(self, instance, validated_data):
@@ -175,7 +229,7 @@ class UserNotificationPreferenceUpdateSerializer(serializers.Serializer):
         elif notification_channel and not notification_type:
             app_prefs = user_notification_preference_config[notification_app]
             for notification_type_name, notification_type_preferences in app_prefs['notification_types'].items():
-                non_editable_channels = app_prefs['non_editable'].get(notification_type_name, [])
+                non_editable_channels = get_non_editable_channels(notification_app).get(notification_type_name, [])
                 if notification_channel not in non_editable_channels:
                     app_prefs['notification_types'][notification_type_name][notification_channel] = value
 
@@ -256,6 +310,34 @@ def validate_notification_channel(notification_channel: str) -> str:
     return notification_channel
 
 
+def get_non_editable_channels(app_name):
+    """
+    Returns a dict of notification: [non-editable channels] for the given app name.
+    """
+    non_editable = {"core": COURSE_NOTIFICATION_APPS[app_name].get("non_editable", [])}
+    for type_name, type_dict in COURSE_NOTIFICATION_TYPES.items():
+        if type_dict.get("non_editable") and not type_dict["is_core"]:
+            non_editable[type_name] = type_dict["non_editable"]
+    return non_editable
+
+
+def add_non_editable_in_preference(preference):
+    """
+    Add non_editable preferences to the preference dict
+    """
+    for app_name, app_dict in preference.items():
+        non_editable = {}
+        for type_name in app_dict.get('notification_types', {}).keys():
+            if type_name == "core":
+                non_editable_channels = COURSE_NOTIFICATION_APPS.get(app_name, {}).get('non_editable', [])
+            else:
+                non_editable_channels = COURSE_NOTIFICATION_TYPES.get(type_name, {}).get('non_editable', [])
+            if non_editable_channels:
+                non_editable[type_name] = non_editable_channels
+        app_dict['non_editable'] = non_editable
+    return preference
+
+
 class UserNotificationPreferenceUpdateAllSerializer(serializers.Serializer):
     """
     Serializer for user notification preferences update with custom field validators.
@@ -307,7 +389,7 @@ class UserNotificationPreferenceUpdateAllSerializer(serializers.Serializer):
             if not is_notification_type_channel_editable(
                 notification_app,
                 notification_type,
-                notification_channel
+                "email" if notification_channel == "email_cadence" else notification_channel
             ):
                 raise ValidationError({
                     'notification_channel': (

@@ -8,7 +8,6 @@ import re
 import ddt
 from django.core.exceptions import ValidationError
 from django.test.utils import override_settings
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
 import pytest
 from xblock.core import XBlock
 
@@ -22,7 +21,7 @@ from .fields_test_block import FieldsTestBlock
 @skip_unless_cms
 @ddt.ddt
 @override_settings(CORS_ORIGIN_WHITELIST=[])  # For some reason, this setting isn't defined in our test environment?
-class LibrariesEmbedViewTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+class LibrariesEmbedViewTestCase(ContentLibrariesRestApiTest):
     """
     Tests for embed_view and interacting with draft/published/past versions of
     Learning-Core-based XBlocks (in Content Libraries).

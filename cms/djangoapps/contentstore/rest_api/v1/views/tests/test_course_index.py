@@ -22,6 +22,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
     """
     Tests for CourseIndexView.
     """
+    maxDiff = None  # Show the entire dictionary in the diff
 
     def setUp(self):
         super().setUp()
@@ -74,7 +75,10 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             },
             "language_code": "en",
             "lms_link": get_lms_link_for_item(self.course.location),
-            "mfe_proctored_exam_settings_url": "",
+            "mfe_proctored_exam_settings_url": (
+                f"http://course-authoring-mfe/course/{self.course.id}"
+                "/pages-and-resources/proctoring/settings"
+            ),
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
@@ -86,6 +90,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
             },
             "advance_settings_url": f"/settings/advanced/{self.course.id}",
+            'created_on': None,
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -121,7 +126,10 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             },
             "language_code": "en",
             "lms_link": get_lms_link_for_item(self.course.location),
-            "mfe_proctored_exam_settings_url": "",
+            "mfe_proctored_exam_settings_url": (
+                f"http://course-authoring-mfe/course/{self.course.id}"
+                "/pages-and-resources/proctoring/settings"
+            ),
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
@@ -133,6 +141,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
             },
             "advance_settings_url": f"/settings/advanced/{self.course.id}",
+            'created_on': None,
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -151,6 +160,6 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
         """
         Test to check number of queries made to mysql and mongo
         """
-        with self.assertNumQueries(32, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(34, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(3):
                 self.client.get(self.url)
