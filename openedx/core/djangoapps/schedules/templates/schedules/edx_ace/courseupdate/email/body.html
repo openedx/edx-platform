@@ -14,16 +14,6 @@
 
 {% block content %}
 <table width="100%"  style="margin-bottom: 30px;" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
-     <style>
-   .course-text{
-    span{
-        padding-left: 12px;
-        padding-right: 12px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-   }
-  </style>
 {% if route_enabled %}
     <tr>
         <td>
@@ -75,7 +65,7 @@
   </td>  
 </tr>
 <tr style="height: 32px;">
-    <td style="padding-top: 1rem;" class="course-text">
+    <td style="padding-top: 1rem; padding-left: 30px;">
          {% filter force_escape %}
                 {% blocktrans asvar course_cta_text %}Resume your course {% endblocktrans %}
             {% endfilter %}
