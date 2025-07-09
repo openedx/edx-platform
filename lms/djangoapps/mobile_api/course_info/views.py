@@ -416,7 +416,7 @@ class BlocksInfoInCourseView(BlocksInCourseView):
                             'assignment_type': assignment_type,
                             'num_points_earned': points_earned,
                             'num_points_possible': points_possible,
-                            'label': label,
+                            'short_label': label,
                         }
                     }
                 )
