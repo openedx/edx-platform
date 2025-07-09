@@ -36,7 +36,7 @@ from openedx.core.djangoapps.notifications.email.utils import encrypt_object, en
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
-    get_course_notification_preference_config_version
+    get_course_notification_preference_config_version, NotificationPreference
 )
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -44,7 +44,8 @@ from openedx.core.djangoapps.notifications.email.utils import update_user_prefer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager
+from ..base_notification import COURSE_NOTIFICATION_APPS, COURSE_NOTIFICATION_TYPES, NotificationAppManager, \
+    NotificationTypeManager
 from ..utils import get_notification_types_with_visibility_settings
 
 User = get_user_model()
@@ -337,7 +338,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'content_reported': {
                             'web': True,
                             'email': True,
-                            'push': True,
+                            'push': False,
                             'info': '',
                             'email_cadence': 'Daily',
                         },
@@ -351,7 +352,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'course_updates': {
                             'web': True,
                             'email': False,
-                            'push': True,
+                            'push': False,
                             'email_cadence': 'Daily',
                             'info': ''
                         },
@@ -538,6 +539,11 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         for notification_app, app_prefs in default_prefs.items():
             for _, type_prefs in app_prefs.get('notification_types', {}).items():
                 assert 'info' not in type_prefs.keys()
+
+    def test_non_editable_is_not_saved_in_json(self):
+        default_prefs = NotificationAppManager().get_notification_app_preferences()
+        for app_prefs in default_prefs.values():
+            assert 'non_editable' not in app_prefs.keys()
 
     @ddt.data(*itertools.product(('email', 'web'), (True, False)))
     @ddt.unpack
@@ -1373,7 +1379,7 @@ class GetAggregateNotificationPreferencesTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
         self.assertEqual(response.data['message'], 'Notification preferences retrieved')
-        self.assertEqual(response.data['data'], {'mocked': {'notification_types': {}}})
+        self.assertDictEqual(response.data['data'], {'mocked': {'notification_types': {}, 'non_editable': {}}})
 
     def test_unauthenticated_user(self):
         """
@@ -1383,3 +1389,332 @@ class GetAggregateNotificationPreferencesTest(APITestCase):
         self.client.logout()  # Remove authentication
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @mock.patch.dict(COURSE_NOTIFICATION_APPS, {
+        **COURSE_NOTIFICATION_APPS,
+        **{
+            'discussion': {
+                'name': 'content_reported',
+                'non_editable': ["web"]
+            }
+        }
+    })
+    @mock.patch.dict(COURSE_NOTIFICATION_TYPES, {
+        **COURSE_NOTIFICATION_TYPES,
+        **{
+            'course_updates': {
+                **COURSE_NOTIFICATION_TYPES['course_updates'],
+                'non_editable': ["email"]
+            }
+        }
+    })
+    def test_non_editable_is_added_in_api_response(self):
+        CourseNotificationPreference.objects.create(user=self.user, is_active=True)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        prefs = response.data['data']
+        self.assertDictEqual(prefs['updates']['non_editable'], {'course_updates': ['email']})
+        self.assertDictEqual(prefs['discussion']['non_editable'], {'core': ['web']})
+
+
+class TestNotificationPreferencesView(APITestCase):
+    """
+    Tests for the NotificationPreferencesView API view.
+    """
+
+    def setUp(self):
+        # Set up a user and API client
+        self.default_data = {
+            "status": "success",
+            "message": "Notification preferences retrieved successfully.",
+            "data": {
+                "discussion": {
+                    "enabled": True,
+                    "core_notification_types": [
+                        "new_comment_on_response",
+                        "new_comment",
+                        "new_response",
+                        "response_on_followed_post",
+                        "comment_on_followed_post",
+                        "response_endorsed_on_thread",
+                        "response_endorsed"
+                    ],
+                    "notification_types": {
+                        "new_discussion_post": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "new_question_post": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "content_reported": {
+                            "web": True,
+                            "email": True,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "new_instructor_all_learners_post": {
+                            "web": True,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "core": {
+                            "web": True,
+                            "email": True,
+                            "push": True,
+                            "email_cadence": "Daily"
+                        }
+                    },
+                    "non_editable": {}
+                },
+                "updates": {
+                    "enabled": True,
+                    "core_notification_types": [],
+                    "notification_types": {
+                        "course_updates": {
+                            "web": True,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "core": {
+                            "web": True,
+                            "email": True,
+                            "push": True,
+                            "email_cadence": "Daily"
+                        }
+                    },
+                    "non_editable": {}
+                },
+                "grading": {
+                    "enabled": True,
+                    "core_notification_types": [],
+                    "notification_types": {
+                        "ora_staff_notifications": {
+                            "web": True,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "ora_grade_assigned": {
+                            "web": True,
+                            "email": True,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "core": {
+                            "web": True,
+                            "email": True,
+                            "push": True,
+                            "email_cadence": "Daily"
+                        }
+                    },
+                    "non_editable": {}
+                }
+            }
+        }
+        self.user = User.objects.create_user(username='testuser', password='testpass')
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse('notification-preferences-aggregated-v2')  # Adjust with the actual name
+
+    def test_get_notification_preferences(self):
+        """
+        Test case: Get notification preferences for the authenticated user
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        self.assertIn('data', response.data)
+        self.assertEqual(response.data['data'], self.default_data['data'])
+
+    def test_if_data_is_correctly_aggregated(self):
+        """
+        Test case: Check if the data is correctly formatted
+        """
+
+        self.client.get(self.url)
+        NotificationPreference.objects.all().update(
+            web=False,
+            push=False,
+            email=False,
+        )
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        self.assertIn('data', response.data)
+        data = {
+            "status": "success",
+            "message": "Notification preferences retrieved successfully.",
+            "data": {
+                "discussion": {
+                    "enabled": True,
+                    "core_notification_types": [
+                        "new_comment_on_response",
+                        "new_comment",
+                        "new_response",
+                        "response_on_followed_post",
+                        "comment_on_followed_post",
+                        "response_endorsed_on_thread",
+                        "response_endorsed"
+                    ],
+                    "notification_types": {
+                        "new_discussion_post": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "new_question_post": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "content_reported": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "new_instructor_all_learners_post": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "core": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        }
+                    },
+                    "non_editable": {}
+                },
+                "updates": {
+                    "enabled": True,
+                    "core_notification_types": [],
+                    "notification_types": {
+                        "course_updates": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "core": {
+                            "web": True,
+                            "email": True,
+                            "push": True,
+                            "email_cadence": "Daily"
+                        }
+                    },
+                    "non_editable": {}
+                },
+                "grading": {
+                    "enabled": True,
+                    "core_notification_types": [],
+                    "notification_types": {
+                        "ora_staff_notifications": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "ora_grade_assigned": {
+                            "web": False,
+                            "email": False,
+                            "push": False,
+                            "email_cadence": "Daily"
+                        },
+                        "core": {
+                            "web": True,
+                            "email": True,
+                            "push": True,
+                            "email_cadence": "Daily"
+                        }
+                    },
+                    "non_editable": {}
+                }
+            }
+        }
+        self.assertEqual(response.data, data)
+
+    def test_api_view_permissions(self):
+        """
+        Test case: Ensure the API view has the correct permissions
+        """
+        # Check if the view requires authentication
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Re-authenticate and check again
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_preferences_core(self):
+        """
+        Test case: Update notification preferences for the authenticated user
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "core",
+            "notification_channel": "email_cadence",
+            "email_cadence": "Weekly"
+        }
+        __, core_types = NotificationTypeManager().get_notification_app_preference('discussion')
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        cadence_set = NotificationPreference.objects.filter(type__in=core_types).values_list('email_cadence', flat=True)
+        self.assertEqual(len(set(cadence_set)), 1)
+        self.assertIn('Weekly', set(cadence_set))
+
+    def test_update_preferences(self):
+        """
+        Test case: Update notification preferences for the authenticated user
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "new_discussion_post",
+            "notification_channel": "web",
+            "value": True
+        }
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        preference = NotificationPreference.objects.get(
+            type='new_discussion_post',
+            user__id=self.user.id
+        )
+        self.assertEqual(preference.web, True)
+
+    def test_update_preferences_non_core_email(self):
+        """
+        Test case: Update notification preferences for the authenticated user
+        """
+        update_data = {
+            "notification_app": "discussion",
+            "notification_type": "new_discussion_post",
+            "notification_channel": "email_cadence",
+            "email_cadence": 'Weekly'
+        }
+        self.client.get(self.url)
+        response = self.client.put(self.url, update_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'success')
+        preference = NotificationPreference.objects.get(
+            type='new_discussion_post',
+            user__id=self.user.id
+        )
+        self.assertEqual(preference.email_cadence, 'Weekly')

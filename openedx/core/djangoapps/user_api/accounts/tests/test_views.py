@@ -403,17 +403,18 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         assert data['social_links'] is not None
         assert data['time_zone'] is None
 
-    def _verify_private_account_response(self, response, requires_parental_consent=False):
+    def _verify_private_account_response(self, response, requires_parental_consent=False, has_profile_image=True):
         """
         Verify that only the public fields are returned if a user does not want to share account fields
         """
         data = response.data
         assert 3 == len(data)
         assert PRIVATE_VISIBILITY == data['account_privacy']
-        self._verify_profile_image_data(data, not requires_parental_consent)
+        self._verify_profile_image_data(data, has_profile_image)
         assert self.user.username == data['username']
 
-    def _verify_full_account_response(self, response, requires_parental_consent=False, year_of_birth=2000):
+    def _verify_full_account_response(self, response, requires_parental_consent=False,
+                                      has_profile_image=True, year_of_birth=2000):
         """
         Verify that all account fields are returned (even those that are not shareable).
         """
@@ -426,7 +427,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             UserPreference.get_value(self.user, 'account_privacy')
         )
         assert expected_account_privacy == data['account_privacy']
-        self._verify_profile_image_data(data, not requires_parental_consent)
+        self._verify_profile_image_data(data, has_profile_image)
         assert self.user.username == data['username']
 
         # additional shareable fields (8)
@@ -1271,11 +1272,11 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
             assert data['requires_parental_consent']
             assert PRIVATE_VISIBILITY == data['account_privacy']
         else:
-            self._verify_private_account_response(response, requires_parental_consent=True)
+            self._verify_private_account_response(response, requires_parental_consent=True, has_profile_image=False)
 
         # Verify that the shared view is still private
         response = self.send_get(client, query_parameters='view=shared')
-        self._verify_private_account_response(response, requires_parental_consent=True)
+        self._verify_private_account_response(response, requires_parental_consent=True, has_profile_image=False)
 
 
 @skip_unless_lms

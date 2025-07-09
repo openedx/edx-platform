@@ -869,9 +869,6 @@ MIDDLEWARE = [
     'edx_django_utils.monitoring.FrontendMonitoringMiddleware',
     'edx_django_utils.monitoring.MonitoringMemoryMiddleware',
 
-    # Before anything that looks at cookies, especially the session middleware
-    'openedx.core.djangoapps.cookie_metadata.middleware.CookieNameChange',
-
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -1196,6 +1193,10 @@ COURSE_METADATA_EXPORT_BUCKET = ''
 
 ALTERNATE_WORKER_QUEUES = 'lms'
 
+# .. setting_name: STATIC_URL_BASE
+# .. setting_default: "/static/"
+# .. setting_description: The CMS uses this to construct ``STATIC_URL`` by appending
+#   a slash (if needed) and then ``studio/``.
 STATIC_URL_BASE = '/static/'
 
 X_FRAME_OPTIONS = 'DENY'
@@ -1561,6 +1562,9 @@ YOUTUBE = {
 }
 
 YOUTUBE_API_KEY = 'PUT_YOUR_API_KEY_HERE'
+
+# Additional languages that should be supported for video transcripts, not included in ALL_LANGUAGES
+EXTENDED_VIDEO_TRANSCRIPT_LANGUAGES = []
 
 ############################# SETTINGS FOR VIDEO UPLOAD PIPELINE #############################
 
@@ -2913,3 +2917,9 @@ SOCIAL_MEDIA_LOGO_URLS = {
     'linkedin': 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png',
     'facebook': 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png',
 }
+
+# .. setting_name: DEFAULT_ORG_LOGO_URL
+# .. setting_default: Derived(lambda settings: settings.STATIC_URL + 'images/logo.png')
+# .. setting_description: The default logo url for organizations that do not have a logo set.
+# .. setting_warning: This url is used as a placeholder for organizations that do not have a logo set.
+DEFAULT_ORG_LOGO_URL = Derived(lambda settings: settings.STATIC_URL + 'images/logo.png')
