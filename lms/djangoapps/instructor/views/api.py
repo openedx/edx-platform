@@ -148,7 +148,6 @@ from .tools import (
     strip_if_string,
 )
 from .. import permissions
-from .tools import DashboardError
 
 log = logging.getLogger(__name__)
 
@@ -3145,7 +3144,7 @@ class ChangeDueDate(APIView):
         try:
             set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
         except Exception as error:  # pylint: disable=broad-except
-            return JsonResponse({'error': str(error)}, status=400)
+            return JsonResponseBadRequest({'error': str(error)})
 
         return JsonResponse(_(
             'Successfully changed due date for student {0} for {1} '
