@@ -29,6 +29,8 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import api_view
+from openedx.core.lib.api.view_utils import view_auth_classes
 
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import create_xblock_info
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
@@ -135,7 +137,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler',
-           'get_course_and_check_access']
+           'get_course_and_check_access', 'bulk_enable_disable_discussions']
 
 
 class AccessListFallback(Exception):
@@ -1708,6 +1710,58 @@ def group_configurations_detail_handler(request, course_key_string, group_config
                 group_configuration_id=group_configuration_id,
                 group_id=group_id
             )
+
+
+@api_view(['PUT'])
+@view_auth_classes()
+@expect_json
+def bulk_enable_disable_discussions(request, course_key_string):
+    """
+    API endpoint to enable/disable discussions for all verticals in the course and republish them.
+
+    PUT
+        json: enable/disable discussions for all units and republish
+    """
+    try:
+        # Validate the course key
+        course_key = CourseKey.from_string(course_key_string)
+    except InvalidKeyError:
+        return JsonResponseBadRequest({"error": "Invalid course key format"})
+
+    user = request.user
+
+    # check that logged in user has permissions to update this course
+    if not has_studio_write_access(user, course_key):
+        raise PermissionDenied()
+
+    if 'discussion_enabled' not in request.json:
+        return JsonResponseBadRequest({"error": "Missing 'discussion_enabled' field in request body"})
+    discussion_enabled = request.json['discussion_enabled']
+    log.info(
+        "User %s is attempting to %s discussions for all verticals in course %s",
+        user.username,
+        "enable" if discussion_enabled else "disable",
+        course_key
+    )
+
+    if request.method == 'PUT':
+        try:
+            store = modulestore()
+            changed = 0
+            with store.bulk_operations(course_key):
+                verticals = store.get_items(course_key, qualifiers={'block_type': 'vertical'})
+                for vertical in verticals:
+                    if vertical.discussion_enabled != discussion_enabled:
+                        vertical.discussion_enabled = discussion_enabled
+                        store.update_item(vertical, user.id)
+
+                        if store.has_published_version(vertical):
+                            store.publish(vertical.location, user.id)
+                        changed += 1
+            return JsonResponse({"units_updated_and_republished": changed})
+        except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+            log.exception("Exception occurred while enabling/disabling discussion: %s", str(e))
+            return JsonResponseBadRequest({"error": str(e)})
 
 
 def are_content_experiments_enabled(course):

@@ -138,6 +138,8 @@ class PublishableItemSerializer(serializers.Serializer):
     """
     id = serializers.SerializerMethodField()
     display_name = serializers.CharField()
+    published_display_name = serializers.CharField(required=False)
+    tags_count = serializers.IntegerField(read_only=True)
     last_published = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
     published_by = serializers.CharField(read_only=True)
     last_draft_created = serializers.DateTimeField(format=DATETIME_FORMAT, read_only=True)
@@ -149,7 +151,6 @@ class PublishableItemSerializer(serializers.Serializer):
     # When creating a new XBlock in a library, the slug becomes the ID part of
     # the definition key and usage key:
     slug = serializers.CharField(write_only=True)
-    tags_count = serializers.IntegerField(read_only=True)
 
     collections = CollectionMetadataSerializer(many=True, required=False)
     can_stand_alone = serializers.BooleanField(read_only=True)
@@ -338,14 +339,6 @@ class UsageKeyV2Serializer(serializers.BaseSerializer):
             raise ValidationError from err
 
 
-class ContentLibraryComponentKeysSerializer(serializers.Serializer):
-    """
-    Serializer for adding/removing Components to/from a Collection.
-    """
-
-    usage_keys = serializers.ListField(child=UsageKeyV2Serializer(), allow_empty=False)
-
-
 class OpaqueKeySerializer(serializers.BaseSerializer):
     """
     Serializes a OpaqueKey with the correct class.
@@ -369,6 +362,14 @@ class OpaqueKeySerializer(serializers.BaseSerializer):
                 return LibraryContainerLocator.from_string(value)
             except InvalidKeyError as err:
                 raise ValidationError from err
+
+
+class ContentLibraryItemContainerKeysSerializer(serializers.Serializer):
+    """
+    Serializer for adding/removing items to/from a Container.
+    """
+
+    usage_keys = serializers.ListField(child=OpaqueKeySerializer(), allow_empty=False)
 
 
 class ContentLibraryItemKeysSerializer(serializers.Serializer):

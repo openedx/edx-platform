@@ -166,7 +166,10 @@ def create_thread_created_notification(*args, **kwargs):
     """
     user = kwargs['user']
     post = kwargs['post']
-    send_thread_created_notification.apply_async(args=[post.id, post.attributes['course_id'], user.id])
+    notify_all_learners = kwargs.get('notify_all_learners', False)
+    send_thread_created_notification.apply_async(
+        args=[post.id, post.attributes['course_id'], user.id, notify_all_learners]
+    )
 
 
 @receiver(signals.comment_created)

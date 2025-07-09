@@ -726,7 +726,7 @@ class _BuiltInProblemBlock(
             # For the purposes of this report, we don't need to support those use cases.
             anonymous_student_id=None,
             cache=None,
-            can_execute_unsafe_code=lambda: None,
+            can_execute_unsafe_code=lambda: False,
             get_python_lib_zip=(
                 lambda: SandboxService(contentstore, self.scope_ids.usage_id.context_key).get_python_lib_zip()
             ),
