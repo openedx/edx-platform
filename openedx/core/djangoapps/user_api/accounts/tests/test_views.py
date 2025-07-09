@@ -262,6 +262,7 @@ class TestCancelAccountRetirementStatusView(UserAPITestCase):
     """
     Unit tests for CancelAccountRetirementStatusView
     """
+
     def setUp(self):
         super().setUp()
         permission = PermissionFactory(
@@ -1147,7 +1148,7 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         client = self.login_client("client", "user")
         response = self.send_patch(client, {"language_proficiencies": patch_value}, expected_status=400)
         assert response.data['field_errors']['language_proficiencies']['developer_message'] == \
-               f"Value '{patch_value}' is not valid for field 'language_proficiencies': {expected_error_message}"
+            f"Value '{patch_value}' is not valid for field 'language_proficiencies': {expected_error_message}"
 
     @mock.patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
     def test_patch_serializer_save_fails(self, serializer_save):
@@ -1201,8 +1202,8 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_get(self.client)
         assert response.data['profile_image'] == \
-               {'has_image': False,
-                'image_url_full': 'http://testserver/static/default_50.png',
+            {'has_image': False,
+             'image_url_full': 'http://testserver/static/default_50.png',
                 'image_url_small': 'http://testserver/static/default_10.png'}
 
     @override_settings(
@@ -1231,7 +1232,6 @@ class TestAccountsAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAPITe
     )
     def test_profile_backend_with_default_hardcoded_backend(self):
         """ In case of empty storages scenario uses the hardcoded backend."""
-        del settings.DEFAULT_FILE_STORAGE
         del settings.STORAGES
         storage = get_profile_image_storage()
         self.assertIsInstance(storage, FileSystemStorage)

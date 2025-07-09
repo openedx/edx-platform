@@ -37,6 +37,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     Tests that rely on the toy and test_import_course courses.
     NOTE: refactor using CourseFactory so they do not.
     """
+
     def setUp(self):
         super().setUp()
 
@@ -281,19 +282,27 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     @override_settings(
         COURSE_IMPORT_EXPORT_STORAGE="cms.djangoapps.contentstore.storage.ImportExportS3Storage",
-        DEFAULT_FILE_STORAGE="django.core.files.storage.FileSystemStorage"
+        STORAGES={
+            'default': {
+                'BACKEND': "django.core.files.storage.FileSystemStorage"
+            }
+        }
     )
     def test_resolve_default_storage(self):
         """ Ensure the default storage is invoked, even if course export storage is configured """
         storage = resolve_storage_backend(
             storage_key="default",
-            legacy_setting_key="DEFAULT_FILE_STORAGE"
+            legacy_setting_key="STORAGES"
         )
         self.assertEqual(storage.__class__.__name__, "FileSystemStorage")
 
     @override_settings(
         COURSE_IMPORT_EXPORT_STORAGE="cms.djangoapps.contentstore.storage.ImportExportS3Storage",
-        DEFAULT_FILE_STORAGE="django.core.files.storage.FileSystemStorage",
+        STORAGES={
+            'default': {
+                'BACKEND': "django.core.files.storage.FileSystemStorage"
+            }
+        },
         COURSE_IMPORT_EXPORT_BUCKET="bucket_name_test"
     )
     def test_resolve_happy_path_storage(self):
@@ -308,7 +317,6 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     @override_settings()
     def test_resolve_storage_with_no_config(self):
         """ If no storage setup is defined, we get FileSystemStorage by default """
-        del settings.DEFAULT_FILE_STORAGE
         del settings.COURSE_IMPORT_EXPORT_STORAGE
         del settings.COURSE_IMPORT_EXPORT_BUCKET
         storage = resolve_storage_backend(

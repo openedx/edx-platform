@@ -78,7 +78,7 @@ def store_uploaded_file(
         file_storage = DefaultStorage()
         # If a file already exists with the supplied name, file_storage will make the filename unique.
         stored_file_name = file_storage.save(stored_file_name, uploaded_file)
-        if is_private and settings.DEFAULT_FILE_STORAGE == 'storages.backends.s3boto3.S3Boto3Storage':
+        if is_private and settings.STORAGES['default']['BACKEND'] == 'storages.backends.s3boto3.S3Boto3Storage':
             S3Boto3Storage().connection.meta.client.put_object_acl(
                 ACL='private',
                 Bucket=settings.AWS_STORAGE_BUCKET_NAME,
@@ -155,6 +155,7 @@ class UniversalNewlineIterator:
     object which does not inherently support being read in
     universal-newline mode.  It returns a line at a time.
     """
+
     def __init__(self, original_file, buffer_size=4096):
         self.original_file = original_file
         self.buffer_size = buffer_size
