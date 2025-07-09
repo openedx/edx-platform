@@ -933,7 +933,6 @@ class BulkBetaModifyAccess(DeveloperErrorViewMixin, APIView):
             403: "The requesting user lacks access to modify beta testers.",
         }
     )
-    
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_id):
         """
