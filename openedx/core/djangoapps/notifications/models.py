@@ -130,6 +130,7 @@ class NotificationPreference(TimeStampedModel):
     """
     Model to store notification preferences for users at account level
     """
+
     class EmailCadenceChoices(models.TextChoices):
         DAILY = 'Daily'
         WEEKLY = 'Weekly'
@@ -147,6 +148,33 @@ class NotificationPreference(TimeStampedModel):
     email = models.BooleanField(default=False, null=False, blank=False)
     email_cadence = models.CharField(max_length=64, choices=EmailCadenceChoices.choices, null=False, blank=False)
     is_active = models.BooleanField(default=True)
+
+    def is_enabled_for_any_channel(self, *args, **kwargs) -> bool:
+        """
+        Returns True if the notification preference is enabled for any channel.
+        """
+        return self.web or self.push or self.email
+
+    def get_channels_for_notification_type(self, *args, **kwargs) -> list:
+        """
+        Returns the channels for the given app name and notification type.
+        Sample Response:
+        ['web', 'push']
+        """
+        channels = []
+        if self.web:
+            channels.append('web')
+        if self.push:
+            channels.append('push')
+        if self.email:
+            channels.append('email')
+        return channels
+
+    def get_email_cadence_for_notification_type(self, *args, **kwargs) -> str:
+        """
+        Returns the email cadence for the notification type.
+        """
+        return self.email_cadence
 
 
 class CourseNotificationPreference(TimeStampedModel):
@@ -192,7 +220,7 @@ class CourseNotificationPreference(TimeStampedModel):
                 preferences.config_version = current_config_version
                 preferences.notification_preference_config = new_prefs
                 preferences.save()
-                # pylint: disable-next=broad-except
+            # pylint: disable-next=broad-except
             except Exception as e:
                 log.error(f'Unable to update notification preference to new config. {e}')
         return preferences
