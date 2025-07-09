@@ -81,11 +81,7 @@ from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_user,
-    get_group_name,
-    has_forum_access,
-)
+from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.constants import INVOICE_KEY
@@ -108,6 +104,7 @@ from lms.djangoapps.instructor.views.serializer import (
     BlockDueDateSerializer,
     CertificateSerializer,
     CertificateStatusesSerializer,
+    ForumRoleNameSerializer,
     ListInstructorTaskInputSerializer,
     ModifyAccessSerializer,
     RoleNameSerializer,
@@ -2864,12 +2861,8 @@ class ProblemGradeReport(DeveloperErrorViewMixin, APIView):
         return JsonResponse({"status": success_status})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_FORUM_MEMBERS)
-@require_post_params('rolename')
-def list_forum_members(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListForumMembers(APIView):
     """
     Lists forum members of a certain rolename.
     Limited to staff access.
@@ -2878,61 +2871,48 @@ def list_forum_members(request, course_id):
     Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
         which is limited to instructors.
 
-    Takes query parameter `rolename`.
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
-    has_forum_admin = has_forum_access(
-        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+    permission_classes = (
+        IsAuthenticated, permissions.InstructorPermission, permissions.ForumAdminRequiresInstructorAccess
     )
+    permission_name = permissions.VIEW_FORUM_MEMBERS
+    serializer_class = ForumRoleNameSerializer
 
-    rolename = request.POST.get('rolename')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handle the POST request to list forum members with a certain role name for the given course.
 
-    # default roles require either (staff & forum admin) or (instructor)
-    if not (has_forum_admin or has_instructor_access):
-        return HttpResponseBadRequest(
-            "Operation requires staff & forum admin or instructor access"
+        Args:
+            request (HttpRequest): The request object containing the data sent by the client.
+            course_id (int): The ID of the course for which the role is being assigned or managed.
+
+        Returns:
+            Response: The Json constians lists of members.
+
+        Raises:
+            ValidationError: If the provided `rolename` is not valid according to the serializer.
+        """
+        course_id = CourseKey.from_string(course_id)
+        course_discussion_settings = CourseDiscussionSettings.get(course_id)
+
+        role_serializer = ForumRoleNameSerializer(
+            data=request.data,
+            context={
+                'course_discussion_settings': course_discussion_settings,
+                'course_id': course_id
+            }
         )
 
-    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-        return HttpResponseBadRequest("Operation requires instructor access.")
+        role_serializer.is_valid(raise_exception=True)
+        rolename = role_serializer.data['rolename']
 
-    # filter out unsupported for roles
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                        FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest(strip_tags(
-            f"Unrecognized rolename '{rolename}'."
-        ))
-
-    try:
-        role = Role.objects.get(name=rolename, course_id=course_id)
-        users = role.users.all().order_by('username')
-    except Role.DoesNotExist:
-        users = []
-
-    course_discussion_settings = CourseDiscussionSettings.get(course_id)
-
-    def extract_user_info(user):
-        """ Convert user to dict for json rendering. """
-        group_id = get_group_id_for_user(user, course_discussion_settings)
-        group_name = get_group_name(group_id, course_discussion_settings)
-
-        return {
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'group_name': group_name,
+        response_payload = {
+            'course_id': str(course_id),
+            rolename: role_serializer.data.get('users'),
+            'division_scheme': course_discussion_settings.division_scheme,
         }
-
-    response_payload = {
-        'course_id': str(course_id),
-        rolename: list(map(extract_user_info, users)),
-        'division_scheme': course_discussion_settings.division_scheme,
-    }
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
