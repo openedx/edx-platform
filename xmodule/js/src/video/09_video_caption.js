@@ -1353,15 +1353,33 @@
             },
 
             listenForDragDrop: function() {
-                var captions = this.captionDisplayEl['0'];
+    var captions = this.captionDisplayEl['0'];
 
-                if (typeof Draggabilly === 'function') {
-                    // eslint-disable-next-line no-new
-                    new Draggabilly(captions, {containment: true});
-                } else {
-                    console.log('Closed captioning available but not draggable');
-                }
-            },
+    // Add accessibility attributes for keyboard navigation
+    this.captionDisplayEl.attr({
+        'tabindex': '0',
+        'role': 'application',
+        'aria-label': 'Draggable video captions. Use arrow keys to reposition, Enter to toggle drag mode, Escape to cancel.'
+    });
+
+    // Initialize caption position tracking
+    this.captionDragMode = false;
+    this.captionPosition = {
+        x: parseInt(this.captionDisplayEl.css('left') || '0', 10),
+        y: parseInt(this.captionDisplayEl.css('top') || '0', 10)
+    };
+
+    // Enable mouse/touch dragging with Draggabilly
+    if (typeof Draggabilly === 'function') {
+        // eslint-disable-next-line no-new
+        new Draggabilly(captions, {containment: true});
+    } else {
+        console.log('Closed captioning available but not draggable');
+    }
+
+    // Bind keyboard event handlers for accessibility
+    this.bindCaptionKeyboardHandlers();
+},
 
             /**
             * @desc Shows/Hides the transcript panel.
@@ -1456,7 +1474,156 @@
                     maxHeight: this.captionHeight() - height
                 });
             }
-        };
+
+
+        /**
+         * @desc Bind keyboard event handlers for caption positioning
+         */
+        bindCaptionKeyboardHandlers: function() {
+            this.captionDisplayEl.on({
+                'keydown': $.proxy(this.handleCaptionKeydown, this),
+                'focus': $.proxy(this.onCaptionFocus, this),
+                'blur': $.proxy(this.onCaptionBlur, this)
+            });
+        },
+
+        /**
+         * @desc Handle keyboard navigation for caption positioning
+         * @param {Event} event - Keyboard event
+         */
+        handleCaptionKeydown: function(event) {
+            var moveStep = event.shiftKey ? 20 : 5; // Larger steps with Shift key
+            var handled = false;
+
+            switch (event.which) {
+                case 13: // Enter key - toggle drag mode
+                    this.captionDragMode = !this.captionDragMode;
+                    this.announceCaptionMode();
+                    handled = true;
+                    break;
+
+                case 27: // Escape key - exit drag mode
+                    if (this.captionDragMode) {
+                        this.captionDragMode = false;
+                        this.announceCaptionMode();
+                        handled = true;
+                    }
+                    break;
+
+                case 37: // Left arrow
+                    if (this.captionDragMode) {
+                        this.moveCaptionByKeyboard(-moveStep, 0);
+                        handled = true;
+                    }
+                    break;
+
+                case 38: // Up arrow
+                    if (this.captionDragMode) {
+                        this.moveCaptionByKeyboard(0, -moveStep);
+                        handled = true;
+                    }
+                    break;
+
+                case 39: // Right arrow
+                    if (this.captionDragMode) {
+                        this.moveCaptionByKeyboard(moveStep, 0);
+                        handled = true;
+                    }
+                    break;
+
+                case 40: // Down arrow
+                    if (this.captionDragMode) {
+                        this.moveCaptionByKeyboard(0, moveStep);
+                        handled = true;
+                    }
+                    break;
+            }
+
+            if (handled) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        },
+
+        /**
+         * @desc Move caption position using keyboard
+         * @param {number} deltaX - Horizontal movement
+         * @param {number} deltaY - Vertical movement
+         */
+        moveCaptionByKeyboard: function(deltaX, deltaY) {
+            var container = this.captionDisplayEl.parent();
+            var containerWidth = container.width();
+            var containerHeight = container.height();
+            var captionWidth = this.captionDisplayEl.outerWidth();
+            var captionHeight = this.captionDisplayEl.outerHeight();
+
+            // Update position
+            this.captionPosition.x += deltaX;
+            this.captionPosition.y += deltaY;
+
+            // Constrain to container bounds
+            this.captionPosition.x = Math.max(0, Math.min(this.captionPosition.x, containerWidth - captionWidth));
+            this.captionPosition.y = Math.max(0, Math.min(this.captionPosition.y, containerHeight - captionHeight));
+
+            // Apply new position
+            this.captionDisplayEl.css({
+                'left': this.captionPosition.x + 'px',
+                'top': this.captionPosition.y + 'px',
+                'position': 'absolute'
+            });
+
+            // Announce position change to screen readers
+            this.announceCaptionPosition();
+        },
+
+        /**
+         * @desc Handle focus on caption display element
+         */
+        onCaptionFocus: function() {
+            this.captionDisplayEl.addClass('caption-focused');
+        },
+
+        /**
+         * @desc Handle blur on caption display element
+         */
+        onCaptionBlur: function() {
+            this.captionDisplayEl.removeClass('caption-focused');
+            this.captionDragMode = false;
+        },
+
+        /**
+         * @desc Announce caption drag mode status to screen readers
+         */
+        announceCaptionMode: function() {
+            var message = this.captionDragMode ?
+                'Caption drag mode enabled. Use arrow keys to move captions.' :
+                'Caption drag mode disabled.';
+
+            // Create or update live region for screen reader announcements
+            this.announceLiveRegion(message);
+        },
+
+        /**
+         * @desc Announce caption position to screen readers
+         */
+        announceCaptionPosition: function() {
+            var message = 'Caption moved to position ' + this.captionPosition.x + ', ' + this.captionPosition.y;
+            this.announceLiveRegion(message);
+        },
+
+        /**
+         * @desc Announce messages to screen readers via live region
+         * @param {string} message - Message to announce
+         */
+        announceLiveRegion: function(message) {
+            var liveRegion = $('#caption-live-region');
+            if (liveRegion.length === 0) {
+                liveRegion = $('<div id="caption-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>');
+                $('body').append(liveRegion);
+            }
+            liveRegion.text(message);
+        },
+    };
 
         return VideoCaption;
     });
