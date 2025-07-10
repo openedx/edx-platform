@@ -395,3 +395,22 @@ class RescoreEntranceExamSerializer(serializers.Serializer):
     unique_student_identifier = serializers.CharField(required=False, allow_null=True)
     all_students = serializers.BooleanField(required=False)
     only_if_higher = serializers.BooleanField(required=False, allow_null=True)
+
+
+class OverrideProblemScoreSerializer(UniqueStudentIdentifierSerializer):
+    """
+    Serializer for overriding a student's score for a specific problem.
+    """
+    problem_to_reset = serializers.CharField(
+        help_text=_("The URL name of the problem to override the score for."),
+        error_messages={
+            'blank': _("Problem URL name cannot be blank."),
+        }
+    )
+    score = serializers.CharField(
+        help_text=_("The overriding score to set."),
+        error_messages={
+            'blank': _("Score cannot be blank."),
+        }
+    )
+    # unique_student_identifier is inherited and required from UniqueStudentIdentifierSerializer

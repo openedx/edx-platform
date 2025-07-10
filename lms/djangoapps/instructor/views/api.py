@@ -118,7 +118,8 @@ from lms.djangoapps.instructor.views.serializer import (
     UserSerializer,
     UniqueStudentIdentifierSerializer,
     ProblemResetSerializer,
-    RescoreEntranceExamSerializer
+    RescoreEntranceExamSerializer,
+    OverrideProblemScoreSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -2143,64 +2144,75 @@ class RescoreProblem(DeveloperErrorViewMixin, APIView):
         return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.OVERRIDE_GRADES)
-@require_post_params(problem_to_reset="problem urlname to reset", score='overriding score')
-@common_exceptions_400
-def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable=missing-function-docstring
-    course_key = CourseKey.from_string(course_id)
-    score = strip_if_string(request.POST.get('score'))
-    problem_to_reset = strip_if_string(request.POST.get('problem_to_reset'))
-    student_identifier = request.POST.get('unique_student_identifier', None)
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class OverrideProblemScoreView(DeveloperErrorViewMixin, APIView):
+    """
+    DRF view to override a student's score for a specific problem.
+    """
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.OVERRIDE_GRADES
+    serializer_class = OverrideProblemScoreSerializer
 
-    if not problem_to_reset:
-        return HttpResponseBadRequest("Missing query parameter problem_to_reset.")
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Takes the following query parameters:
+            - problem_to_reset: a urlname of a problem
+            - unique_student_identifier: an email or username
+            - score: the score to override with
+        Returns a response indicating the success or failure of the operation.
+        If the user does not have permission to override scores for the problem,
+        a 403 Forbidden response is returned.
+        If the problem cannot be found or parsed, a 400 Bad Request response is returned.
+        If the score override is successful, a 200 OK response is returned with the task status
+        and the problem and student identifiers in the response payload.
+        """
+        
+        serializer_data = self.serializer_class(data=request.data)
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
 
-    if not student_identifier:
-        return HttpResponseBadRequest("Missing query parameter student_identifier.")
+        course_key = CourseKey.from_string(course_id)
+        problem_to_reset = serializer_data.validated_data['problem_to_reset']
+        score = serializer_data.validated_data['score']
+        student = serializer_data.validated_data['unique_student_identifier']
+        student_identifier = request.data.get('unique_student_identifier')
 
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
-    else:
-        return _create_error_response(request, f"Invalid student ID {student_identifier}.")
+        try:
+            usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
+            block = modulestore().get_item(usage_key)
+        except InvalidKeyError:
+            return Response({"error": f"Unable to parse problem id {problem_to_reset}."}, status=status.HTTP_400_BAD_REQUEST)
+        except ItemNotFoundError:
+            return Response({"error": f"Unable to find problem id {problem_to_reset}."}, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
-        block = modulestore().get_item(usage_key)
-    except InvalidKeyError:
-        return _create_error_response(request, f"Unable to parse problem id {problem_to_reset}.")
-    except ItemNotFoundError:
-        return _create_error_response(request, f"Unable to find problem id {problem_to_reset}.")
+        if not has_access(request.user, "staff", block):
+            return Response(
+                {"error": _(f"User {request.user.id} does not have permission to override scores for problem {problem_to_reset}.")},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
-    # check the user's access to this specific problem
-    if not has_access(request.user, "staff", block):
-        _create_error_response(request, "User {} does not have permission to override scores for problem {}.".format(
-            request.user.id,
-            problem_to_reset
-        ))
+        response_payload = {
+            'problem_to_reset': problem_to_reset,
+            'student': student_identifier
+        }
+        try:
+            task_api.submit_override_score(
+                request,
+                usage_key,
+                student,
+                score,
+            )
+        except NotImplementedError as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
-    response_payload = {
-        'problem_to_reset': problem_to_reset,
-        'student': student_identifier
-    }
-    try:
-        task_api.submit_override_score(
-            request,
-            usage_key,
-            student,
-            score,
-        )
-    except NotImplementedError as exc:  # if we try to override the score of a non-scorable block, catch it here
-        return _create_error_response(request, str(exc))
+        response_payload['task'] = TASK_SUBMISSION_OK
+        return Response(response_payload)
 
-    except ValueError as exc:
-        return _create_error_response(request, str(exc))
-
-    response_payload['task'] = TASK_SUBMISSION_OK
-    return JsonResponse(response_payload)
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
