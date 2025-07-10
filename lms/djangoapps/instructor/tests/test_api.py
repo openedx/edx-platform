@@ -2698,8 +2698,12 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         assert 'task_id' in res_json
 
     @valid_problem_location
-    @ddt.data('get_problem_responses', 'instructor_api_v1:generate_problem_responses')
-    def test_get_problem_responses_already_running(self, endpoint):
+    @ddt.data(
+        ('get_problem_responses', {'problem_location': "test"}),
+        ('instructor_api_v1:generate_problem_responses', {'problem_locations': ["test"]})
+    )
+    @ddt.unpack
+    def test_get_problem_responses_already_running(self, endpoint, data):
         """
         Test whether get_problem_responses returns an appropriate status
         message if CSV generation is already in progress.
@@ -2713,7 +2717,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         with patch('lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv') as submit_task_function:
             error = AlreadyRunningError(already_running_status)
             submit_task_function.side_effect = error
-            response = self.client.post(url, {"problem_locations": ["test"]}, content_type="application/json")
+            response = self.client.post(url, data, content_type="application/json")
 
         self.assertContains(response, already_running_status, status_code=400)
 
@@ -2993,7 +2997,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         with patch(task_api_endpoint) as mock_task_api_endpoint:
             if report_type == 'problem responses':
                 mock_task_api_endpoint.return_value = Mock(task_id='task-id-1138')
-                response = self.client.post(url, {'problem_location': ''})
+                response = self.client.post(url, {'problem_location': 'test'})
                 self.assertContains(response, success_status)
             else:
                 CourseFinanceAdminRole(self.course.id).add_users(self.instructor)

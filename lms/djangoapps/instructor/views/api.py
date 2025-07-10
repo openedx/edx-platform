@@ -115,7 +115,8 @@ from lms.djangoapps.instructor.views.serializer import (
     UserSerializer,
     UniqueStudentIdentifierSerializer,
     ProblemResetSerializer,
-    RescoreEntranceExamSerializer
+    RescoreEntranceExamSerializer,
+    SingleProblemLocationSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
@@ -1337,13 +1338,19 @@ class GetProblemResponses(DeveloperErrorViewMixin, APIView):
         # The name of the POST parameter is `problem_location` (not pluralised) in
         # order to preserve backwards compatibility with existing third-party
         # scripts.
-        problem_locations = request.POST.get('problem_location', '').split(',')
-        # A comma-separated list of block types
-        problem_types_filter = request.POST.get('problem_types_filter')
+        params = SingleProblemLocationSerializer(data=request.data)
+        params.is_valid(raise_exception=True)
+
+        problem_location = params.validated_data.get('problem_location')
+        problem_types_filter = params.validated_data.get('problem_types_filter')
+
+        if problem_types_filter:
+            problem_types_filter = ','.join(problem_types_filter)
+
         return _get_problem_responses(
             request,
             course_id=course_id,
-            problem_locations=problem_locations,
+            problem_locations=problem_location,
             problem_types_filter=problem_types_filter,
         )
 
