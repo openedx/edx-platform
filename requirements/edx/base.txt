@@ -409,7 +409,7 @@ drf-yasg==1.21.10
     # via
     #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.14.0
+edx-ace==1.15.0
     # via -r requirements/edx/kernel.in
 edx-api-doc-tools==2.1.0
     # via
@@ -473,7 +473,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.7
+edx-enterprise==6.2.8
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -566,7 +566,7 @@ enmerkar==0.7.1
     # via enmerkar-underscore
 enmerkar-underscore==2.4.0
     # via -r requirements/edx/kernel.in
-enterprise-integrated-channels==0.1.2
+enterprise-integrated-channels==0.1.9
     # via -r requirements/edx/bundled.in
 event-tracking==3.3.0
     # via
