@@ -139,29 +139,60 @@ def scrape_youtube_thumbnail(course_id, edx_video_id, youtube_id):
         validate_and_update_video_image(course_id, edx_video_id, image_file, image_filename)
 
 
-def get_youtube_video_duration(youtube_video_id: str) -> float:
+def get_youtube_video_duration(youtube_video_id: str) -> float | None:
     """
-    Get youtube video duration using google api
+    Get YouTube video duration in seconds using the YouTube Data API.
+
+    Returns:
+        float: Duration in seconds, or None if unavailable or on error.
     """
     API_KEY = settings.YOUTUBE_API_KEY
-
-    url = settings.YOUTUBE.get("METADATA_URL")
+    API_URL = settings.YOUTUBE.get("METADATA_URL")
     params = {
         "part": "contentDetails",
         "id": youtube_video_id,
         "key": API_KEY
     }
 
-    response = requests.get(url, params=params)
-    data = response.json()
-    duration_iso8601 = data["items"][0]["contentDetails"]["duration"]
-    duration = isodate.parse_duration(duration_iso8601)
-    return duration.total_seconds()
+    try:
+        response = requests.get(API_URL, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        items = data.get("items", [])
+        if not items:
+            LOGGER.warning("No items found for YouTube video id: %s", youtube_video_id)
+            return None
+        duration_iso8601 = items[0]["contentDetails"].get("duration")
+        if not duration_iso8601:
+            LOGGER.warning("No duration found in contentDetails for video id: %s", youtube_video_id)
+            return None
+        duration = isodate.parse_duration(duration_iso8601)
+        return duration.total_seconds()
+    except Exception as exc:  # pylint: disable=broad-except
+        LOGGER.warning("Failed to fetch YouTube video duration for id %s: %s", youtube_video_id, exc)
+        return None
 
 
-def process_video_duration(xblock):
+def process_video_duration(xblock) -> None:
     """
-    Gets video duration and store it
+    Retrieves the duration of a YouTube video associated with the given XBlock and stores it
+    in the XBlock's 'duration' field.
+
+    This function performs the following steps:
+    1. Checks if the provided XBlock is a video and has a YouTube ID.
+    2. Verifies that YouTube API settings are properly configured.
+    3. Fetches the video's duration from YouTube using the configured API.
+    4. Updates the XBlock's 'duration' field with the retrieved value, or
+       deletes the field if the duration is not found.
+    5. Persists the updated XBlock in the modulestore.
+
+    Logging is used to record the progress and any issues encountered during the process.
+
+    Args:
+        xblock: An XBlock instance representing a video component.
+
+    Returns:
+        None. The function updates the XBlock in place and logs relevant information.
     """
     store = modulestore()
     xblock_category = getattr(xblock, 'category', '')
@@ -183,6 +214,9 @@ def process_video_duration(xblock):
 
     LOGGER.info("Video duration started. Youtube video id %s", youtube_id)
     duration_video = get_youtube_video_duration(youtube_id)
+    if duration_video is None:
+        LOGGER.warning("Video duration not found for video id: %s", youtube_id)
+        return
     LOGGER.info("Video duration completed: value %s for video id: %s", duration_video, youtube_id)
 
     with store.bulk_operations(xblock.location.course_key):
