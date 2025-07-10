@@ -55,15 +55,11 @@ from django.utils.translation import gettext as _
 from opaque_keys.edx.locator import LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
     ContentLibraryData,
-    LibraryCollectionData,
-    ContentObjectChangedData,
 )
 from openedx_events.content_authoring.signals import (
     CONTENT_LIBRARY_CREATED,
     CONTENT_LIBRARY_DELETED,
     CONTENT_LIBRARY_UPDATED,
-    LIBRARY_COLLECTION_UPDATED,
-    CONTENT_OBJECT_ASSOCIATIONS_CHANGED,
 )
 from openedx_learning.api import authoring as authoring_api
 from openedx_learning.api.authoring_models import Component
@@ -75,6 +71,7 @@ from openedx.core.types import User as UserType
 from .. import permissions
 from ..constants import ALL_RIGHTS_RESERVED
 from ..models import ContentLibrary, ContentLibraryPermission
+from .. import tasks
 from .exceptions import (
     LibraryAlreadyExists,
     LibraryPermissionIntegrityError,
@@ -183,6 +180,7 @@ class LibraryItem:
     created: datetime
     modified: datetime
     display_name: str
+    tags_count: int = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -193,6 +191,7 @@ class PublishableItem(LibraryItem):
     """
     draft_version_num: int
     published_version_num: int | None = None
+    published_display_name: str | None
     last_published: datetime | None = None
     # The username of the user who last published this.
     published_by: str = ""
@@ -202,49 +201,6 @@ class PublishableItem(LibraryItem):
     has_unpublished_changes: bool = False
     collections: list[CollectionMetadata] = dataclass_field(default_factory=list)
     can_stand_alone: bool = True
-
-
-@dataclass(frozen=True, kw_only=True)
-class LibraryXBlockMetadata(PublishableItem):
-    """
-    Class that represents the metadata about an XBlock in a content library.
-    """
-    usage_key: LibraryUsageLocatorV2
-
-    @classmethod
-    def from_component(cls, library_key, component, associated_collections=None):
-        """
-        Construct a LibraryXBlockMetadata from a Component object.
-        """
-        last_publish_log = component.versioning.last_publish_log
-
-        published_by = None
-        if last_publish_log and last_publish_log.published_by:
-            published_by = last_publish_log.published_by.username
-
-        draft = component.versioning.draft
-        published = component.versioning.published
-        last_draft_created = draft.created if draft else None
-        last_draft_created_by = draft.publishable_entity_version.created_by if draft else None
-
-        return cls(
-            usage_key=library_component_usage_key(
-                library_key,
-                component,
-            ),
-            display_name=draft.title,
-            created=component.created,
-            modified=draft.created,
-            draft_version_num=draft.version_num,
-            published_version_num=published.version_num if published else None,
-            last_published=None if last_publish_log is None else last_publish_log.published_at,
-            published_by=published_by,
-            last_draft_created=last_draft_created,
-            last_draft_created_by=last_draft_created_by,
-            has_unpublished_changes=component.versioning.has_unpublished_changes,
-            collections=associated_collections or [],
-            can_stand_alone=component.publishable_entity.can_stand_alone,
-        )
 
 
 @dataclass(frozen=True)
@@ -364,8 +320,10 @@ def require_permission_for_library_key(library_key: LibraryLocatorV2, user: User
     Raises django.core.exceptions.PermissionDenied if the user doesn't have
     permission.
     """
-    library_obj = ContentLibrary.objects.get_by_key(library_key)  # type: ignore[attr-defined]
-    if not user.has_perm(permission, obj=library_obj):
+    library_obj = ContentLibrary.objects.get_by_key(library_key)
+    # obj should be able to read any valid model object but mypy thinks it can only be
+    # "User | AnonymousUser | None"
+    if not user.has_perm(permission, obj=library_obj):  # type:ignore[arg-type]
         raise PermissionDenied
 
     return library_obj
@@ -705,61 +663,26 @@ def publish_changes(library_key: LibraryLocatorV2, user_id: int | None = None):
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
     assert learning_package is not None  # shouldn't happen but it's technically possible.
-    authoring_api.publish_all_drafts(learning_package.id, published_by=user_id)
+    publish_log = authoring_api.publish_all_drafts(learning_package.id, published_by=user_id)
 
-    CONTENT_LIBRARY_UPDATED.send_event(
-        content_library=ContentLibraryData(
-            library_key=library_key,
-            update_blocks=True
-        )
-    )
+    # Update the search index (and anything else) for the affected blocks
+    # This is mostly synchronous but may complete some work asynchronously if there are a lot of changes.
+    tasks.wait_for_post_publish_events(publish_log, library_key)
+
+    # Unlike revert_changes below, we do not have to re-index collections,
+    # because publishing changes does not affect the component counts, and
+    # collections themselves don't have draft/published/unpublished status.
 
 
-def revert_changes(library_key: LibraryLocatorV2) -> None:
+def revert_changes(library_key: LibraryLocatorV2, user_id: int | None = None) -> None:
     """
     Revert all pending changes to the specified library, restoring it to the
     last published version.
     """
     learning_package = ContentLibrary.objects.get_by_key(library_key).learning_package
     assert learning_package is not None  # shouldn't happen but it's technically possible.
-    authoring_api.reset_drafts_to_published(learning_package.id)
+    with authoring_api.bulk_draft_changes_for(learning_package.id) as draft_change_log:
+        authoring_api.reset_drafts_to_published(learning_package.id, reset_by=user_id)
 
-    CONTENT_LIBRARY_UPDATED.send_event(
-        content_library=ContentLibraryData(
-            library_key=library_key,
-            update_blocks=True
-        )
-    )
-
-    # For each collection, trigger LIBRARY_COLLECTION_UPDATED signal and set background=True to trigger
-    # collection indexing asynchronously.
-    #
-    # This is to update component counts in all library collections,
-    # because there may be components that have been discarded in the revert.
-    for collection in authoring_api.get_collections(learning_package.id):
-        LIBRARY_COLLECTION_UPDATED.send_event(
-            library_collection=LibraryCollectionData(
-                library_key=library_key,
-                collection_key=collection.key,
-                background=True,
-            )
-        )
-
-    # Reindex components that are in collections
-    #
-    # Use case: When a component that was within a collection has been deleted
-    # and the changes are reverted, the component should appear in the
-    # collection again.
-    components_in_collections = authoring_api.get_components(
-        learning_package.id, draft=True, namespace='xblock.v1',
-    ).filter(publishable_entity__collections__isnull=False)
-
-    for component in components_in_collections:
-        usage_key = library_component_usage_key(library_key, component)
-
-        CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
-            content_object=ContentObjectChangedData(
-                object_id=str(usage_key),
-                changes=["collections"],
-            ),
-        )
+    # Call the event handlers as needed.
+    tasks.wait_for_post_revert_events(draft_change_log, library_key)

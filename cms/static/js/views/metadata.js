@@ -60,13 +60,18 @@ define(
 
             /**
          * Returns just the modified metadata values, in the format used to persist to the server.
+         * Set `replaceNullWithDefault` to true to replace null values with the default values
          */
-            getModifiedMetadataValues: function() {
+            getModifiedMetadataValues: function(replaceNullWithDefault = false) {
                 var modified_values = {};
                 this.collection.each(
                     function(model) {
                         if (model.isModified()) {
-                            modified_values[model.getFieldName()] = model.getValue();
+                            let value = model.getValue();
+                            if (replaceNullWithDefault && value === null) {
+                                value = model.getDisplayValue();
+                            }
+                            modified_values[model.getFieldName()] = value
                         }
                     }
                 );

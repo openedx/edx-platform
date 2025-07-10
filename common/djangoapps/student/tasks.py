@@ -115,6 +115,7 @@ def send_course_enrollment_email(
                 "short_description": course_run.get("short_description"),
                 "pacing_type": course_run.get("pacing_type"),
                 "partner_image_url": owners[0].get("logo_image_url") if owners else "",
+                "org_name": owners[0].get("name") if owners else "",
             }
         )
     except Exception as err:  # pylint: disable=broad-except

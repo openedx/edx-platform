@@ -37,6 +37,7 @@ from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, Stude
 from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ComplexEncoder, ProblemBlock
 from xmodule.tests import DATA_DIR
+from xmodule.capa.tests.test_util import use_unsafe_codejail
 
 from ..capa_block import RANDOMIZATION, SHOWANSWER
 from . import get_test_system
@@ -1213,6 +1214,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Expect that the number of attempts is NOT incremented
         assert block.attempts == 1
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the submit_problem API.
@@ -1263,6 +1265,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         for fpath, fileobj in kwargs['files'].items():
             assert fpath == fileobj.name
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files_as_xblock(self, mock_xqueue_post):
         # Check a problem with uploaded files, using the XBlock API.
@@ -2629,12 +2632,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         else:
 
             # Since there's a small chance (expected) we might get the
-            # same seed again, give it 10 chances
+            # same seed again, give it 60 chances
             # to generate a different seed
-            success = _retry_and_check(10, lambda: _reset_and_get_seed(block) != seed)
+            success = _retry_and_check(60, lambda: _reset_and_get_seed(block) != seed)
 
             assert block.seed is not None
-            msg = 'Could not get a new seed from reset after 10 tries'
+            msg = 'Could not get a new seed from reset after 60 tries'
             assert success, msg
 
     @ddt.data(
@@ -2795,48 +2798,6 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert event_info['permutation'][CapaFactory.answer_key()] ==\
                    ('shuffle', ['choice_3', 'choice_1', 'choice_2', 'choice_0'])
             assert event_info['success'] == 'correct'
-
-    @unittest.skip("masking temporarily disabled")
-    def test_save_unmask(self):
-        """On problem save, unmasked data should appear on publish."""
-        block = CapaFactory.create(xml=self.common_shuffle_xml)
-        with patch.object(block.runtime, 'publish') as mock_publish:
-            get_request_dict = {CapaFactory.input_key(): 'mask_0'}
-            block.save_problem(get_request_dict)
-            mock_call = mock_publish.mock_calls[0]
-            event_info = mock_call[1][1]
-            assert event_info['answers'][CapaFactory.answer_key()] == 'choice_2'
-            assert event_info['permutation'][CapaFactory.answer_key()] is not None
-
-    @unittest.skip("masking temporarily disabled")
-    def test_reset_unmask(self):
-        """On problem reset, unmask names should appear publish."""
-        block = CapaFactory.create(xml=self.common_shuffle_xml)
-        get_request_dict = {CapaFactory.input_key(): 'mask_0'}
-        block.submit_problem(get_request_dict)
-        # On reset, 'old_state' should use unmasked names
-        with patch.object(block.runtime, 'publish') as mock_publish:
-            block.reset_problem(None)
-            mock_call = mock_publish.mock_calls[0]
-            event_info = mock_call[1][1]
-            assert mock_call[1][0] == 'reset_problem'
-            assert event_info['old_state']['student_answers'][CapaFactory.answer_key()] == 'choice_2'
-            assert event_info['permutation'][CapaFactory.answer_key()] is not None
-
-    @unittest.skip("masking temporarily disabled")
-    def test_rescore_unmask(self):
-        """On problem rescore, unmasked names should appear on publish."""
-        block = CapaFactory.create(xml=self.common_shuffle_xml)
-        get_request_dict = {CapaFactory.input_key(): 'mask_0'}
-        block.submit_problem(get_request_dict)
-        # On rescore, state/student_answers should use unmasked names
-        with patch.object(block.runtime, 'publish') as mock_publish:
-            block.rescore_problem(only_if_higher=False)  # lint-amnesty, pylint: disable=no-member
-            mock_call = mock_publish.mock_calls[0]
-            event_info = mock_call[1][1]
-            assert mock_call[1][0] == 'problem_rescore'
-            assert event_info['state']['student_answers'][CapaFactory.answer_key()] == 'choice_2'
-            assert event_info['permutation'][CapaFactory.answer_key()] is not None
 
     def test_check_unmask_answerpool(self):
         """Check answer-pool question publish uses unmasked names"""
@@ -3675,6 +3636,7 @@ class ComplexEncoderTest(unittest.TestCase):  # lint-amnesty, pylint: disable=mi
 
 
 @skip_unless_lms
+@use_unsafe_codejail()
 class ProblemCheckTrackingTest(unittest.TestCase):
     """
     Ensure correct tracking information is included in events emitted during problem checks.
@@ -3900,6 +3862,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                                         'group_label': '',
                                         'variant': block.seed}}
 
+    @pytest.mark.django_db
     @patch.object(XQueueInterface, '_http_post')
     def test_file_inputs(self, mock_xqueue_post):
         fnames = ["prog1.py", "prog2.py", "prog3.py"]

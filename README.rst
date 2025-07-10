@@ -79,7 +79,7 @@ Interperters/Tools:
 
 * Python 3.11
 
-* Node 18
+* Node: See the ``.nvmrc`` file in this repository.
 
 Services:
 
@@ -103,7 +103,7 @@ Language Packages:
 * Backend application:
 
   - ``pip install -r requirements/edx/base.txt`` (production)
-  - ``pip install -r requirements/edx/dev.txt`` (development)
+  - ``pip install -r requirements/edx/development.txt`` (development)
 
   Some Python packages have system dependencies. For example, installing these packages on Debian or Ubuntu will require first running ``sudo apt install python3-dev default-libmysqlclient-dev build-essential pkg-config`` to satisfy the requirements of the ``mysqlclient`` Python package.
 

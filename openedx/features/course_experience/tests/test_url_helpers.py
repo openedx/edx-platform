@@ -1,8 +1,6 @@
 """
 Test some of the functions in url_helpers
 """
-from unittest import mock
-
 import ddt
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -12,14 +10,6 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from .. import url_helpers
-
-
-def _patch_courseware_mfe_is_active(ret_val):
-    return mock.patch.object(
-        url_helpers,
-        'courseware_mfe_is_active',
-        return_value=ret_val,
-    )
 
 
 @ddt.ddt
@@ -53,8 +43,6 @@ class IsLearningMfeTests(TestCase):
 class GetCoursewareUrlTests(SharedModuleStoreTestCase):
     """
     Test get_courseware_url.
-
-    Mock out `courseware_mfe_is_active`; that is tested elseware.
     """
 
     @classmethod
@@ -121,12 +109,10 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
 
     @ddt.data(
         (
-            'mfe',
             'course_run',
             'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split'
         ),
         (
-            'mfe',
             'section',
             (
                 'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
@@ -134,7 +120,6 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             ),
         ),
         (
-            'mfe',
             'subsection',
             (
                 'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
@@ -142,7 +127,6 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             ),
         ),
         (
-            'mfe',
             'unit',
             (
                 'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
@@ -151,7 +135,6 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
             ),
         ),
         (
-            'mfe',
             'component',
             (
                 'http://learning-mfe/course/course-v1:TestX+UrlHelpers+split' +
@@ -159,31 +142,10 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
                 '/block-v1:TestX+UrlHelpers+split+type@vertical+block@Generated_Unit'
             ),
         ),
-        (
-            'legacy',
-            'course_run',
-            '/courses/course-v1:TestX+UrlHelpers+split/courseware',
-        ),
-        (
-            'legacy',
-            'subsection',
-            '/courses/course-v1:TestX+UrlHelpers+split/courseware/Generated_Section/Generated_Subsection/',
-        ),
-        (
-            'legacy',
-            'unit',
-            '/courses/course-v1:TestX+UrlHelpers+split/courseware/Generated_Section/Generated_Subsection/1',
-        ),
-        (
-            'legacy',
-            'component',
-            '/courses/course-v1:TestX+UrlHelpers+split/courseware/Generated_Section/Generated_Subsection/1',
-        )
     )
     @ddt.unpack
     def test_get_courseware_url(
         self,
-        active_experience,
         structure_level,
         expected_path,
     ):
@@ -196,9 +158,7 @@ class GetCoursewareUrlTests(SharedModuleStoreTestCase):
         check that the expected path (URL without querystring) is returned by `get_courseware_url`.
         """
         block = self.items[structure_level]
-        with _patch_courseware_mfe_is_active(active_experience == 'mfe') as mock_mfe_is_active:
-            url = url_helpers.get_courseware_url(block.location)
+        url = url_helpers.get_courseware_url(block.location)
         path = url.split('?')[0]
         assert path == expected_path
         course_run = self.items['course_run']
-        mock_mfe_is_active.assert_called_once()

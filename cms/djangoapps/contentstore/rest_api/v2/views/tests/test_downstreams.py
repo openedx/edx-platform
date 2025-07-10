@@ -3,14 +3,18 @@ Unit tests for /api/contentstore/v2/downstreams/* JSON APIs.
 """
 import json
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from django.conf import settings
+from django.urls import reverse
 from freezegun import freeze_time
 from organizations.models import Organization
 
 from cms.djangoapps.contentstore.helpers import StaticFileNotices
 from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
+from opaque_keys.edx.keys import ContainerKey, UsageKey
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -24,11 +28,15 @@ URL_LIB_CREATE = URL_PREFIX
 URL_LIB_BLOCKS = URL_PREFIX + '{lib_key}/blocks/'
 URL_LIB_BLOCK_PUBLISH = URL_PREFIX + 'blocks/{block_key}/publish/'
 URL_LIB_BLOCK_OLX = URL_PREFIX + 'blocks/{block_key}/olx/'
+URL_LIB_CONTAINER = URL_PREFIX + 'containers/{container_key}/'  # Get a container in this library
+URL_LIB_CONTAINERS = URL_PREFIX + '{lib_key}/containers/'  # Create a new container in this library
+URL_LIB_CONTAINER_PUBLISH = URL_LIB_CONTAINER + 'publish/'  # Publish changes to the specified container + children
 
 
 def _get_upstream_link_good_and_syncable(downstream):
     return UpstreamLink(
         upstream_ref=downstream.upstream,
+        upstream_key=UsageKey.from_string(downstream.upstream),
         version_synced=downstream.upstream_version,
         version_available=(downstream.upstream_version or 0) + 1,
         version_declined=downstream.upstream_version_declined,
@@ -70,8 +78,14 @@ class _BaseDownstreamViewTestMixin:
         )["id"]
         self.html_lib_id = self._add_block_to_library(self.library_id, "html", "html-baz")["id"]
         self.video_lib_id = self._add_block_to_library(self.library_id, "video", "video-baz")["id"]
+        self.unit_id = self._create_container(self.library_id, "unit", "unit-1", "Unit 1")["id"]
+        self.subsection_id = self._create_container(self.library_id, "subsection", "subsection-1", "Subsection 1")["id"]
+        self.section_id = self._create_container(self.library_id, "section", "section-1", "Section 1")["id"]
         self._publish_library_block(self.html_lib_id)
         self._publish_library_block(self.video_lib_id)
+        self._publish_container(self.unit_id)
+        self._publish_container(self.subsection_id)
+        self._publish_container(self.section_id)
         self.mock_upstream_link = f"{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/library/{self.library_id}/components?usageKey={self.video_lib_id}"  # pylint: disable=line-too-long  # noqa: E501
         self.course = CourseFactory.create()
         chapter = BlockFactory.create(category='chapter', parent=self.course)
@@ -83,6 +97,15 @@ class _BaseDownstreamViewTestMixin:
         ).usage_key
         self.downstream_html_key = BlockFactory.create(
             category='html', parent=unit, upstream=self.html_lib_id, upstream_version=1,
+        ).usage_key
+        self.downstream_chapter_key = BlockFactory.create(
+            category='chapter', parent=self.course, upstream=self.section_id, upstream_version=1,
+        ).usage_key
+        self.downstream_sequential_key = BlockFactory.create(
+            category='sequential', parent=chapter, upstream=self.subsection_id, upstream_version=1,
+        ).usage_key
+        self.downstream_unit_key = BlockFactory.create(
+            category='vertical', parent=sequential, upstream=self.unit_id, upstream_version=1,
         ).usage_key
 
         self.another_course = CourseFactory.create(display_name="Another Course")
@@ -103,14 +126,18 @@ class _BaseDownstreamViewTestMixin:
 
         self.fake_video_key = self.course.id.make_usage_key("video", "NoSuchVideo")
         self.learner = UserFactory(username="learner", password="password")
+        self._update_container(self.unit_id, display_name="Unit 2")
+        self._publish_container(self.unit_id)
         self._set_library_block_olx(self.html_lib_id, "<html><b>Hello world!</b></html>")
+        self._publish_library_block(self.html_lib_id)
+        self._publish_library_block(self.video_lib_id)
         self._publish_library_block(self.html_lib_id)
 
     def _api(self, method, url, data, expect_response):
         """
         Call a REST API
         """
-        response = getattr(self.client, method)(url, data, format="json")
+        response = getattr(self.client, method)(url, data, format="json", content_type="application/json")
         assert response.status_code == expect_response,\
             'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
         return response.data
@@ -141,12 +168,28 @@ class _BaseDownstreamViewTestMixin:
         """ Publish changes from a specified XBlock """
         return self._api('post', URL_LIB_BLOCK_PUBLISH.format(block_key=block_key), None, expect_response)
 
+    def _publish_container(self, container_key: ContainerKey | str, expect_response=200):
+        """ Publish all changes in the specified container + children """
+        return self._api('post', URL_LIB_CONTAINER_PUBLISH.format(container_key=container_key), None, expect_response)
+
+    def _update_container(self, container_key: ContainerKey | str, display_name: str, expect_response=200):
+        """ Update a container (unit etc.) """
+        data = {"display_name": display_name}
+        return self._api('patch', URL_LIB_CONTAINER.format(container_key=container_key), data, expect_response)
+
     def _set_library_block_olx(self, block_key, new_olx, expect_response=200):
         """ Overwrite the OLX of a specific block in the library """
         return self._api('post', URL_LIB_BLOCK_OLX.format(block_key=block_key), {"olx": new_olx}, expect_response)
 
     def call_api(self, usage_key_string):
         raise NotImplementedError
+
+    def _create_container(self, lib_key, container_type, slug: str | None, display_name: str, expect_response=200):
+        """ Create a container (unit etc.) """
+        data = {"container_type": container_type, "display_name": display_name}
+        if slug:
+            data["slug"] = slug
+        return self._api('post', URL_LIB_CONTAINERS.format(lib_key=lib_key), data, expect_response)
 
 
 class SharedErrorTestCases(_BaseDownstreamViewTestMixin):
@@ -232,8 +275,8 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
             content_type="application/json",
         )
 
-    @patch.object(downstreams_views, "fetch_customizable_fields")
-    @patch.object(downstreams_views, "sync_from_upstream")
+    @patch.object(downstreams_views, "fetch_customizable_fields_from_block")
+    @patch.object(downstreams_views, "sync_library_content")
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     def test_200_with_sync(self, mock_sync, mock_fetch):
         """
@@ -247,8 +290,8 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert mock_fetch.call_count == 0
         assert video_after.upstream == self.video_lib_id
 
-    @patch.object(downstreams_views, "fetch_customizable_fields")
-    @patch.object(downstreams_views, "sync_from_upstream")
+    @patch.object(downstreams_views, "fetch_customizable_fields_from_block")
+    @patch.object(downstreams_views, "sync_library_content")
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
     def test_200_no_sync(self, mock_sync, mock_fetch):
         """
@@ -262,7 +305,9 @@ class PutDownstreamViewTest(SharedErrorTestCases, SharedModuleStoreTestCase):
         assert mock_fetch.call_count == 1
         assert video_after.upstream == self.video_lib_id
 
-    @patch.object(downstreams_views, "fetch_customizable_fields", side_effect=BadUpstream(MOCK_UPSTREAM_ERROR))
+    @patch.object(
+        downstreams_views, "fetch_customizable_fields_from_block", side_effect=BadUpstream(MOCK_UPSTREAM_ERROR),
+    )
     def test_400(self, sync: str):
         """
         Do we raise a 400 if the provided upstream reference is malformed or not accessible?
@@ -329,6 +374,60 @@ class _DownstreamSyncViewTestMixin(SharedErrorTestCases):
         assert "is not linked" in response.data["developer_message"][0]
 
 
+class CreateDownstreamViewTest(CourseTestCase, _BaseDownstreamViewTestMixin, SharedModuleStoreTestCase):
+    """
+    Tests create new downstream blocks
+    """
+    def call_api_post(self, library_content_key, category):
+        """
+        Call the api to create a downstream block using
+        `library_content_key` as upstream
+        """
+        data = {
+            "parent_locator": str(self.course.location),
+            "display_name": "Test block",
+            "library_content_key": library_content_key,
+            "category": category,
+        }
+        return self.client.post(
+            reverse("xblock_handler"),
+            data=json.dumps(data),
+            content_type="application/json",
+        )
+
+    def test_200(self):
+        response = self.call_api_post(self.html_lib_id, "html")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["upstreamRef"] == self.html_lib_id
+
+        usage_key = UsageKey.from_string(data["locator"])
+        item = modulestore().get_item(usage_key)
+        assert item.upstream == self.html_lib_id
+
+    @patch("cms.djangoapps.contentstore.helpers._insert_static_files_into_downstream_xblock")
+    @patch("cms.djangoapps.contentstore.helpers.content_staging_api.stage_xblock_temporarily")
+    @patch("cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers.sync_from_upstream_block")
+    def test_200_video(self, mock_sync, mock_stage, mock_insert):
+        mock_lib_block = MagicMock()
+        mock_lib_block.runtime.get_block_assets.return_value = ['mocked_asset']
+        mock_sync.return_value = mock_lib_block
+        mock_stage.return_value = MagicMock()
+        mock_insert.return_value = StaticFileNotices()
+
+        response = self.call_api_post(self.video_lib_id, "video")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["upstreamRef"] == self.video_lib_id
+
+        usage_key = UsageKey.from_string(data["locator"])
+        item = modulestore().get_item(usage_key)
+        assert item.upstream == self.video_lib_id
+        assert item.edx_video_id is not None
+
+
 class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStoreTestCase):
     """
     Test that `POST /api/v2/contentstore/downstreams/.../sync` initiates a sync from the linked upstream.
@@ -337,17 +436,15 @@ class PostDownstreamSyncViewTest(_DownstreamSyncViewTestMixin, SharedModuleStore
         return self.client.post(f"/api/contentstore/v2/downstreams/{usage_key_string}/sync")
 
     @patch.object(UpstreamLink, "get_for_block", _get_upstream_link_good_and_syncable)
-    @patch.object(downstreams_views, "sync_from_upstream")
-    @patch.object(downstreams_views, "import_static_assets_for_library_sync", return_value=StaticFileNotices())
+    @patch.object(xblock_view_handlers, "import_static_assets_for_library_sync", return_value=StaticFileNotices())
     @patch.object(downstreams_views, "clear_transcripts")
-    def test_200(self, mock_sync_from_upstream, mock_import_staged_content, mock_clear_transcripts):
+    def test_200(self, mock_import_staged_content, mock_clear_transcripts):
         """
         Does the happy path work?
         """
         self.client.login(username="superuser", password="password")
         response = self.call_api(self.downstream_video_key)
         assert response.status_code == 200
-        assert mock_sync_from_upstream.call_count == 1
         assert mock_import_staged_content.call_count == 1
         assert mock_clear_transcripts.call_count == 1
 
@@ -383,9 +480,9 @@ class GetUpstreamViewTest(
     """
     def call_api(
         self,
-        course_id: str = None,
-        ready_to_sync: bool = None,
-        upstream_usage_key: str = None,
+        course_id: str | None = None,
+        ready_to_sync: bool | None = None,
+        upstream_usage_key: str | None = None,
     ):
         data = {}
         if course_id is not None:
@@ -487,6 +584,7 @@ class GetDownstreamSummaryViewTest(
             'upstream_context_key': self.library_id,
             'ready_to_sync_count': 0,
             'total_count': 3,
+            'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)
         response = self.call_api(str(self.course.id))
@@ -497,5 +595,96 @@ class GetDownstreamSummaryViewTest(
             'upstream_context_key': self.library_id,
             'ready_to_sync_count': 1,
             'total_count': 2,
+            'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)
+
+
+class GetContainerUpstreamViewTest(
+    _BaseDownstreamViewTestMixin,
+    SharedModuleStoreTestCase,
+):
+    """
+    Test that `GET /api/v2/contentstore/downstream-containers?...` returns list of links based on the provided filter.
+    """
+    def call_api(
+        self,
+        course_id: str | None = None,
+        ready_to_sync: bool | None = None,
+        upstream_container_key: str | None = None,
+    ):
+        data = {}
+        if course_id is not None:
+            data["course_id"] = str(course_id)
+        if ready_to_sync is not None:
+            data["ready_to_sync"] = str(ready_to_sync)
+        if upstream_container_key is not None:
+            data["upstream_container_key"] = str(upstream_container_key)
+        return self.client.get("/api/contentstore/v2/downstream-containers/", data=data)
+
+    def test_200_all_container_downstreams_for_a_course(self):
+        """
+        Returns all container links for given course
+        """
+        self.client.login(username="superuser", password="password")
+        response = self.call_api(course_id=self.course.id)
+        assert response.status_code == 200
+        data = response.json()
+        date_format = self.now.isoformat().split("+")[0] + 'Z'
+        expected = [
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_chapter_key),
+                'id': 1,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_container_key': self.section_id,
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_sequential_key),
+                'id': 2,
+                'ready_to_sync': False,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_container_key': self.subsection_id,
+                'upstream_version': 1,
+                'version_declined': None,
+                'version_synced': 1,
+            },
+            {
+                'created': date_format,
+                'downstream_context_key': str(self.course.id),
+                'downstream_usage_key': str(self.downstream_unit_key),
+                'id': 3,
+                'ready_to_sync': True,
+                'updated': date_format,
+                'upstream_context_key': self.library_id,
+                'upstream_context_title': self.library_title,
+                'upstream_container_key': self.unit_id,
+                'upstream_version': 2,
+                'version_declined': None,
+                'version_synced': 1
+            },
+        ]
+        self.assertListEqual(data["results"], expected)
+        self.assertEqual(data["count"], 3)
+
+    def test_200_all_downstreams_ready_to_sync(self):
+        """
+        Returns all links that are syncable
+        """
+        self.client.login(username="superuser", password="password")
+        response = self.call_api(ready_to_sync=True)
+        assert response.status_code == 200
+        data = response.json()
+        self.assertTrue(all(o["ready_to_sync"] for o in data["results"]))
+        self.assertEqual(data["count"], 1)

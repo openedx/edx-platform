@@ -121,12 +121,11 @@ class LibraryContextImpl(LearningContext):
         with the given usage_key.
         """
         assert isinstance(usage_key, LibraryUsageLocatorV2)
-        affected_containers = api.get_containers_contains_component(usage_key)
+        affected_containers = api.get_containers_contains_item(usage_key)
         for container in affected_containers:
             LIBRARY_CONTAINER_UPDATED.send_event(
                 library_container=LibraryContainerData(
-                    library_key=usage_key.lib_key,
-                    container_key=str(container.container_key),
+                    container_key=container.container_key,
                     background=True,
                 )
             )
