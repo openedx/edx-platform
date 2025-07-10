@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.models.user import CourseAccessRole
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, AdminFactory, UserFactory
@@ -34,20 +35,24 @@ class CourseTeamViewTest(CourseTestCase, PermissionAccessMixin):
         users = []
 
         if instructor:
-            users.append({
-                "email": instructor.email,
-                "id": instructor.id,
-                "role": "instructor",
-                "username": instructor.username
-            })
+            users.append(
+                {
+                    "email": instructor.email,
+                    "id": instructor.id,
+                    "role": "instructor",
+                    "username": instructor.username,
+                }
+            )
 
         if staff:
-            users.append({
-                "email": staff.email,
-                "id": staff.id,
-                "role": "staff",
-                "username": staff.username
-            })
+            users.append(
+                {
+                    "email": staff.email,
+                    "id": staff.id,
+                    "role": "staff",
+                    "username": staff.username,
+                }
+            )
 
         return {
             "show_transfer_ownership_hint": False,
@@ -191,3 +196,159 @@ class CourseTeamManagementAPIViewTest(CourseTestCase):
         for course in resp.data["results"]:
             if course["course_id"] == str(self.extra_courses[0].id):
                 self.assertEqual(course["role"], "instructor")
+
+    # --- PUT API TEST CASES ---
+    def test_bulk_role_api_empty_list_returns_400(self):
+        """
+        Bulk role API: sending an empty list returns a 400 with a proper error message.
+        """
+        resp = self.client.put(self.url, [], format="json")
+        self.assertEqual(resp.status_code, 400)
+        result = resp.data["results"][0]
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("error", result)
+        self.assertIn("list", result["error"])
+
+    def test_bulk_role_api_non_list_input_returns_400(self):
+        """
+        Bulk role API: sending a non-list (e.g., dict) returns a 400 with a proper error message.
+        """
+        resp = self.client.put(self.url, {"email": "foo@bar.com"}, format="json")
+        self.assertEqual(resp.status_code, 400)
+        result = resp.data["results"][0]
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("error", result)
+        self.assertIn("list", result["error"])
+
+    def test_bulk_role_api_missing_fields(self):
+        """
+        Test that missing required fields in the PUT API request returns an error.
+        """
+        data = [{"email": "", "course_id": "", "role": "", "action": ""}]
+        resp = self.client.put(self.url, data, format="json")
+        self.assertEqual(resp.status_code, 200)
+        result = resp.data["results"][0]
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("error", result)
+        self.assertIn("email", result)
+        self.assertIn("course_id", result)
+        self.assertIn("role", result)
+        self.assertIn("action", result)
+
+    def test_bulk_role_api_invalid_user(self):
+        """
+        Test that providing an invalid user email in the PUT API request returns an error.
+        """
+        data = [
+            {
+                "email": "notfound@example.com",
+                "course_id": str(self.extra_courses[0].id),
+                "role": "instructor",
+                "action": "assign",
+            }
+        ]
+        resp = self.client.put(self.url, data, format="json")
+        self.assertEqual(resp.status_code, 200)
+        result = resp.data["results"][0]
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("error", result)
+        self.assertIn("email", result)
+        self.assertIn("course_id", result)
+        self.assertIn("role", result)
+        self.assertIn("action", result)
+
+    def test_bulk_role_api_invalid_course_id(self):
+        """
+        Test that providing an invalid course_id in the PUT API request returns an error.
+        """
+        target_user = UserFactory()
+        data = [
+            {
+                "email": target_user.email,
+                "course_id": "invalid-course-id",
+                "role": "instructor",
+                "action": "assign",
+            }
+        ]
+        resp = self.client.put(self.url, data, format="json")
+        self.assertEqual(resp.status_code, 200)
+        result = resp.data["results"][0]
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("error", result)
+        self.assertIn("email", result)
+        self.assertIn("course_id", result)
+        self.assertIn("role", result)
+        self.assertIn("action", result)
+
+    def test_bulk_role_api_invalid_action(self):
+        """
+        Test that providing an invalid action in the PUT API request returns an error.
+        """
+        target_user = UserFactory()
+        course = self.extra_courses[0]
+        data = [
+            {
+                "email": target_user.email,
+                "course_id": str(course.id),
+                "role": "instructor",
+                "action": "not_a_valid_action",
+            }
+        ]
+        resp = self.client.put(self.url, data, format="json")
+        self.assertEqual(resp.status_code, 200)
+        result = resp.data["results"][0]
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("error", result)
+        self.assertIn("email", result)
+        self.assertIn("course_id", result)
+        self.assertIn("role", result)
+        self.assertIn("action", result)
+
+    def assert_enrolled(self, user, course_id):
+        self.assertTrue(
+            CourseEnrollment.is_enrolled(user, course_id),
+            f"User {user} should have been enrolled in the course",
+        )
+
+    def test_bulk_role_api_revoke_role_removes_user(self):
+        """
+        Bulk role API: revoking a role via the PUT API removes the user from the course team.
+        """
+        target_user = UserFactory()
+        course = self.extra_courses[1]
+        CourseStaffRole(course.id).add_users(target_user)
+        data = [
+            {
+                "email": target_user.email,
+                "course_id": str(course.id),
+                "role": "staff",
+                "action": "revoke",
+            }
+        ]
+        resp = self.client.put(self.url, data, format="json")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["results"][0]["status"], "success")
+        self.assertFalse(CourseStaffRole(course.id).has_user(target_user))
+
+    def test_bulk_role_api_assign_role_enrolls_user(self):
+        """
+        Bulk role API: assigning a role via the PUT API also enrolls the user in the course.
+        Verifies both the role assignment and the enrollment using CourseEnrollment.is_enrolled.
+        """
+        target_user = UserFactory()
+        course = self.extra_courses[2]
+        data = [
+            {
+                "email": target_user.email,
+                "course_id": str(course.id),
+                "role": "instructor",
+                "action": "assign",
+            }
+        ]
+        resp = self.client.put(self.url, data, format="json")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data["results"][0]["status"], "success")
+        # Check that the role was assigned
+        self.assertTrue(CourseInstructorRole(course.id).has_user(target_user))
+        # Check that the user is enrolled in the course
+        self.assert_enrolled(target_user, course.id)

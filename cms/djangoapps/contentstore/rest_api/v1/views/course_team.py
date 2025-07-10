@@ -1,9 +1,12 @@
-""" API Views for course team """
+"""
+API Views for course team.
+"""
 
 import edx_api_doc_tools as apidocs
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAdminUser
@@ -14,7 +17,9 @@ from rest_framework.views import APIView
 from cms.djangoapps.contentstore.rest_api.pagination import CustomPagination
 from cms.djangoapps.contentstore.utils import get_course_team
 from common.djangoapps.student.auth import STUDIO_VIEW_USERS, get_user_permissions
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.models.user import CourseAccessRole
+from common.djangoapps.student.roles import CourseRole
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 
@@ -28,9 +33,12 @@ class CourseTeamView(DeveloperErrorViewMixin, APIView):
     """
     View for getting data for course team.
     """
+
     @apidocs.schema(
         parameters=[
-            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
+            apidocs.string_parameter(
+                "course_id", apidocs.ParameterLocation.PATH, description="Course ID"
+            ),
         ],
         responses={
             200: CourseTeamSerializer,
@@ -217,3 +225,166 @@ class CourseTeamManagementAPIView(GenericAPIView):
             }
         """
         return self.list(request, *args, **kwargs)
+
+    @apidocs.schema(
+        responses={
+            200: "Roles updated successfully.",
+            400: "Invalid request data.",
+            401: "The requester is not authenticated.",
+            403: "The requester is not an admin.",
+        },
+    )
+    def put(self, request, *args, **kwargs):
+        """
+        Bulk assign or revoke course team roles for users across multiple courses.
+
+        **Endpoint:**
+            PUT /api/contentstore/v1/course_team/manage
+
+        **Request Data:**
+            A JSON list of dicts, each containing:
+                - email: User's email address
+                - course_id: Course key string
+                - role: Role to assign or revoke ("instructor" or "staff")
+                - action: "assign" or "revoke"
+
+        **Example Request**
+        ```json
+        [
+            {
+                "email": "user1@example.com",
+                "course_id": "course-v1:edX+DemoX+2025_T1",
+                "role": "instructor",
+                "action": "assign"
+            },
+            {
+                "email": "user2@example.com",
+                "course_id": "course-v1:edX+DemoX+2025_T2",
+                "role": "instructor",
+                "action": "revoke"
+            }
+        ]
+        ```
+
+        **Returns:**
+            - HTTP 200 with per-entry results for each operation (success or error details)
+            - HTTP 400 if the request data is not a non-empty list
+
+        **Example Response**
+        ```json
+        {
+            "results": [
+                {
+                    "email": "user1@example.com",
+                    "course_id": "course-v1:edX+DemoX+2025_T1",
+                    "role": "instructor",
+                    "action": "assign",
+                    "status": "success"
+                },
+                {
+                    "email": "user2@example.com",
+                    "course_id": "course-v1:edX+DemoX+2025_T2",
+                    "role": "instructor",
+                    "action": "revoke",
+                    "status": "failed",
+                    "error": "User not found."
+                }
+            ]
+        }
+        ```
+        """
+        results = []
+
+        # Validate request.data is a non-empty list
+        if not isinstance(request.data, list) or not request.data:
+            return Response(
+                {
+                    "results": [
+                        {
+                            "status": "failed",
+                            "error": "Request data must be a non-empty list of role assignment objects.",
+                        }
+                    ]
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        for data in request.data:
+            email = data.get("email")
+            course_id = data.get("course_id")
+            role = data.get("role")
+            action = data.get("action")
+
+            if not all([email, course_id, role, action]):
+                results.append(
+                    self._make_result(
+                        data,
+                        outcome="failed",
+                        error="Missing required fields: 'email', 'course_id', 'role', and 'action' are all required.",
+                    )
+                )
+                continue
+
+            # Only allow 'instructor' or 'staff' roles
+            if role not in ["instructor", "staff"]:
+                results.append(
+                    self._make_result(
+                        data,
+                        outcome="failed",
+                        error="Invalid role. Only 'instructor' or 'staff' are allowed.",
+                    )
+                )
+                continue
+
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                results.append(
+                    self._make_result(data, outcome="failed", error="User not found.")
+                )
+                continue
+
+            try:
+                course_key = CourseKey.from_string(course_id)
+            except Exception:  # pylint: disable=broad-except
+                results.append(
+                    self._make_result(data, outcome="failed", error="Invalid course_id.")
+                )
+                continue
+
+            try:
+                course_role = CourseRole(role, course_key)
+                if action == "assign":
+                    course_role.add_users(user)
+                    # Enroll the user in the course
+                    CourseEnrollment.enroll(user, course_key)
+                elif action == "revoke":
+                    course_role.remove_users(user)
+                else:
+                    results.append(
+                        self._make_result(
+                            data,
+                            outcome="failed",
+                            error="Invalid action. Only 'assign' or 'revoke' are allowed.",
+                        )
+                    )
+                    continue
+                results.append(self._make_result(data, outcome="success"))
+            except Exception as exc:  # pylint: disable=broad-except
+                results.append(self._make_result(data, outcome="failed", error=str(exc)))
+        return Response({"results": results}, status=status.HTTP_200_OK)
+
+    def _make_result(self, data, outcome, error=None):
+        """
+        Helper to generate a consistent result dictionary for bulk role API responses.
+        """
+        result = {
+            "email": data.get("email"),
+            "course_id": data.get("course_id"),
+            "role": data.get("role"),
+            "action": data.get("action"),
+            "status": outcome,
+        }
+        if error is not None:
+            result["error"] = error
+        return result
