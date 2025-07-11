@@ -887,10 +887,6 @@ urlpatterns += [
                                       namespace='certificates_api')),
 ]
 
-# XDomain proxy
-urlpatterns += [
-    re_path(r'^xdomain_proxy.html$', cors_csrf_views.xdomain_proxy, name='xdomain_proxy'),
-]
 
 # Custom courses on edX (CCX) URLs
 if settings.FEATURES.get('CUSTOM_COURSES_EDX'):

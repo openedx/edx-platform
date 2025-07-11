@@ -21,13 +21,12 @@ from lms.djangoapps.experiments import filters, serializers
 from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 from lms.djangoapps.experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
 from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
-from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.lib.courses import get_course_by_id
 
 User = get_user_model()  # pylint: disable=invalid-name
 
 
-class ExperimentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser, SessionAuthenticationCrossDomainCsrf):
+class ExperimentCrossDomainSessionAuth(SessionAuthenticationAllowInactiveUser):
     """Session authentication that allows inactive users and cross-domain requests. """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
