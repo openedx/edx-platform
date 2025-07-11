@@ -8,7 +8,7 @@ from opaque_keys.edx.keys import UsageKey
 from lms.djangoapps.courseware.access import has_access
 from common.djangoapps.student.models import EntranceExamConfiguration
 from common.djangoapps.util.milestones_helpers import get_required_content
-from openedx.core.toggles import ENTRANCE_EXAMS
+from openedx.core.toggles import are_entrance_exams_enabled
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 
@@ -16,7 +16,7 @@ def course_has_entrance_exam(course):
     """
     Checks to see if a course is properly configured for an entrance exam
     """
-    if not ENTRANCE_EXAMS.is_enabled():
+    if not are_entrance_exams_enabled():
         return False
     entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', None)
     if not entrance_exam_enabled:
