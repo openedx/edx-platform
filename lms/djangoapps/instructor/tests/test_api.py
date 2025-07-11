@@ -513,11 +513,15 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         msg: message to display if assertion fails.
         """
+        data = {"problem_locations": ["test"]}
+        if endpoint == "get_problem_responses":
+            data = {"problem_location": "test"}
+
         mock_problem_key = NonCallableMock(return_value='')
         mock_problem_key.course_key = self.course.id
         with patch.object(UsageKey, 'from_string') as patched_method:
             patched_method.return_value = mock_problem_key
-            self._access_endpoint(endpoint, {"problem_locations": ["test"]}, 200, msg, content_type="application/json")
+            self._access_endpoint(endpoint, data, 200, msg, content_type="application/json")
 
     def test_staff_level(self):
         """
@@ -2636,7 +2640,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             )
 
     @ddt.data(
-        ('get_problem_responses', {'problem_location': ""}),
+        ('get_problem_responses', {'problem_location': "abc"}),
         ('instructor_api_v1:generate_problem_responses', {"problem_locations": ["abc"]}),
     )
     @ddt.unpack
