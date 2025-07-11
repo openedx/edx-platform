@@ -113,6 +113,14 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
 
     forum_event = TRACKING_LOG_TO_EVENT_MAPS.get(event_name, None)
     if forum_event is not None:
+        # .. event_implemented_name: FORUM_THREAD_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.created.v1
+
+        # .. event_implemented_name: FORUM_THREAD_RESPONSE_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.response.created.v1
+
+        # .. event_implemented_name: FORUM_RESPONSE_COMMENT_CREATED
+        # .. event_type: org.openedx.learning.forum.thread.response.comment.created.v1
         forum_event.send_event(
             thread=DiscussionThreadData(
                 anonymous=data.get('anonymous'),
