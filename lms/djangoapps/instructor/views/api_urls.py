@@ -48,12 +48,12 @@ urlpatterns = [
     path('list_instructor_tasks', api.ListInstructorTasks.as_view(), name='list_instructor_tasks'),
     path('list_background_email_tasks', api.ListBackgroundEmailTasks.as_view(), name='list_background_email_tasks'),
     path('list_email_content', api.ListEmailContent.as_view(), name='list_email_content'),
-    path('list_forum_members', api.list_forum_members, name='list_forum_members'),
+    path('list_forum_members', api.ListForumMembers.as_view(), name='list_forum_members'),
     path('update_forum_role_membership', api.update_forum_role_membership, name='update_forum_role_membership'),
     path('change_due_date', api.ChangeDueDate.as_view(), name='change_due_date'),
     path('send_email', api.SendEmail.as_view(), name='send_email'),
     path('reset_due_date', api.ResetDueDate.as_view(), name='reset_due_date'),
-    path('show_unit_extensions', api.show_unit_extensions, name='show_unit_extensions'),
+    path('show_unit_extensions', api.ShowUnitExtensionsView.as_view(), name='show_unit_extensions'),
     path('show_student_extensions', api.ShowStudentExtensions.as_view(), name='show_student_extensions'),
 
     # proctored exam downloads...

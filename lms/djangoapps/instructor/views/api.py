@@ -81,11 +81,7 @@ from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_user,
-    get_group_name,
-    has_forum_access,
-)
+from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.constants import INVOICE_KEY
@@ -108,10 +104,12 @@ from lms.djangoapps.instructor.views.serializer import (
     BlockDueDateSerializer,
     CertificateSerializer,
     CertificateStatusesSerializer,
+    ForumRoleNameSerializer,
     ListInstructorTaskInputSerializer,
     ModifyAccessSerializer,
     RoleNameSerializer,
     SendEmailSerializer,
+    ShowUnitExtensionsSerializer,
     ShowStudentExtensionSerializer,
     StudentAttemptsSerializer,
     UserSerializer,
@@ -140,11 +138,11 @@ from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.api.serializers import CourseKeyField
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
+    DashboardError,
     dump_block_extensions,
     dump_student_extensions,
     find_unit,
     get_student_from_identifier,
-    handle_dashboard_error,
     keep_field_private,
     parse_datetime,
     set_due_date_extension,
@@ -2864,12 +2862,8 @@ class ProblemGradeReport(DeveloperErrorViewMixin, APIView):
         return JsonResponse({"status": success_status})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_FORUM_MEMBERS)
-@require_post_params('rolename')
-def list_forum_members(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListForumMembers(APIView):
     """
     Lists forum members of a certain rolename.
     Limited to staff access.
@@ -2878,61 +2872,48 @@ def list_forum_members(request, course_id):
     Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
         which is limited to instructors.
 
-    Takes query parameter `rolename`.
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
-    has_forum_admin = has_forum_access(
-        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+    permission_classes = (
+        IsAuthenticated, permissions.InstructorPermission, permissions.ForumAdminRequiresInstructorAccess
     )
+    permission_name = permissions.VIEW_FORUM_MEMBERS
+    serializer_class = ForumRoleNameSerializer
 
-    rolename = request.POST.get('rolename')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handle the POST request to list forum members with a certain role name for the given course.
 
-    # default roles require either (staff & forum admin) or (instructor)
-    if not (has_forum_admin or has_instructor_access):
-        return HttpResponseBadRequest(
-            "Operation requires staff & forum admin or instructor access"
+        Args:
+            request (HttpRequest): The request object containing the data sent by the client.
+            course_id (int): The ID of the course for which the role is being assigned or managed.
+
+        Returns:
+            Response: The Json constians lists of members.
+
+        Raises:
+            ValidationError: If the provided `rolename` is not valid according to the serializer.
+        """
+        course_id = CourseKey.from_string(course_id)
+        course_discussion_settings = CourseDiscussionSettings.get(course_id)
+
+        role_serializer = ForumRoleNameSerializer(
+            data=request.data,
+            context={
+                'course_discussion_settings': course_discussion_settings,
+                'course_id': course_id
+            }
         )
 
-    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-        return HttpResponseBadRequest("Operation requires instructor access.")
+        role_serializer.is_valid(raise_exception=True)
+        rolename = role_serializer.data['rolename']
 
-    # filter out unsupported for roles
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                        FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest(strip_tags(
-            f"Unrecognized rolename '{rolename}'."
-        ))
-
-    try:
-        role = Role.objects.get(name=rolename, course_id=course_id)
-        users = role.users.all().order_by('username')
-    except Role.DoesNotExist:
-        users = []
-
-    course_discussion_settings = CourseDiscussionSettings.get(course_id)
-
-    def extract_user_info(user):
-        """ Convert user to dict for json rendering. """
-        group_id = get_group_id_for_user(user, course_discussion_settings)
-        group_name = get_group_name(group_id, course_discussion_settings)
-
-        return {
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'group_name': group_name,
+        response_payload = {
+            'course_id': str(course_id),
+            rolename: role_serializer.data.get('users'),
+            'division_scheme': course_discussion_settings.division_scheme,
         }
-
-    response_payload = {
-        'course_id': str(course_id),
-        rolename: list(map(extract_user_info, users)),
-        'division_scheme': course_discussion_settings.division_scheme,
-    }
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -3141,24 +3122,30 @@ class ChangeDueDate(APIView):
         """
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
-            return HttpResponseBadRequest(reason=serializer_data.errors)
+            return JsonResponseBadRequest({'error': _('All fields must be filled out')})
 
         student = serializer_data.validated_data.get('student')
         if not student:
             response_payload = {
-                'error': f'Could not find student matching identifier: {request.data.get("student")}'
+                'error': _(
+                    'Could not find student matching identifier: {student}'
+                ).format(student=request.data.get("student"))
             }
-            return JsonResponse(response_payload)
+            return JsonResponse(response_payload, status=status.HTTP_404_NOT_FOUND)
+
+        due_datetime = serializer_data.validated_data.get('due_datetime')
+        try:
+            due_date = parse_datetime(due_datetime)
+        except DashboardError:
+            return JsonResponseBadRequest({'error': _('The extension due date and time format is incorrect')})
 
         course = get_course_by_id(CourseKey.from_string(course_id))
-
         unit = find_unit(course, serializer_data.validated_data.get('url'))
-        due_date = parse_datetime(serializer_data.validated_data.get('due_datetime'))
         reason = strip_tags(serializer_data.validated_data.get('reason', ''))
         try:
             set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
         except Exception as error:  # pylint: disable=broad-except
-            return JsonResponse({'error': str(error)}, status=400)
+            return JsonResponseBadRequest({'error': str(error)})
 
         return JsonResponse(_(
             'Successfully changed due date for student {0} for {1} '
@@ -3221,19 +3208,35 @@ class ResetDueDate(APIView):
             return JsonResponse({'error': str(error)}, status=400)
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('url')
-def show_unit_extensions(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ShowUnitExtensionsView(APIView):
     """
-    Shows all of the students which have due date extensions for the given unit.
+    API view to retrieve a list of students who have due date extensions
+    for a specific unit in a course.
     """
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    unit = find_unit(course, request.POST.get('url'))
-    return JsonResponse(dump_block_extensions(course, unit))
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ShowUnitExtensionsSerializer
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Shows all of the students which have due date extensions for the given unit.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        url = serializer.validated_data['url']
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+
+        try:
+            unit = find_unit(course, url)
+            data = dump_block_extensions(course, unit)
+            return Response(data)
+
+        except DashboardError as error:
+            return error.response()
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')

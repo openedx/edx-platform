@@ -290,12 +290,10 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             enrollment=enrollment_data
         )
 
-    def _expected_api_response(self, course=None):
+    def _expected_api_response(self, is_staff=False):
         """
         Helper method to return expected API response.
         """
-        if course is None:
-            course = self.course
         response = {
             'id': 1,
             'course_name': 'course-v1:testorg+testcourse+testrun Course',
@@ -338,12 +336,15 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'content_reported': {
                             'web': True,
                             'email': True,
-                            'push': True,
+                            'push': False,
                             'info': '',
                             'email_cadence': 'Daily',
                         },
                     },
-                    'non_editable': {}
+                    'non_editable': {
+                        'new_discussion_post': ['push'],
+                        'new_question_post': ['push'],
+                    }
                 },
                 'updates': {
                     'enabled': True,
@@ -352,7 +353,7 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                         'course_updates': {
                             'web': True,
                             'email': False,
-                            'push': True,
+                            'push': False,
                             'email_cadence': 'Daily',
                             'info': ''
                         },
@@ -364,7 +365,9 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'info': 'Notifications for new announcements and updates from the course team.'
                         }
                     },
-                    'non_editable': {}
+                    'non_editable': {
+                        'course_updates': ['push']
+                    }
                 },
                 'grading': {
                     'enabled': True,
@@ -393,10 +396,17 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
                             'info': ''
                         },
                     },
-                    'non_editable': {}
+                    'non_editable': {
+                        'ora_grade_assigned': ['push']
+                    }
                 }
             }
         }
+        if is_staff:
+            response['notification_preference_config']['grading']['non_editable'] = {
+                'ora_staff_notifications': ['push'],
+                'ora_grade_assigned': ['push']
+            }
         return response
 
     def test_get_user_notification_preference_without_login(self):
@@ -452,11 +462,10 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        expected_response = self._expected_api_response()
+        expected_response = self._expected_api_response(is_staff=bool(role))
 
         if not role:
             expected_response = remove_notifications_with_visibility_settings(expected_response)
-
         self.assertEqual(response.data, expected_response)
         event_name, event_data = mock_emit.call_args[0]
         self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
@@ -1191,13 +1200,12 @@ class UpdateAllNotificationPreferencesViewTests(APITestCase):
         """
         data = {
             'notification_app': 'discussion',
-            'notification_type': 'content_reported',
-            'notification_channel': 'push',
+            'notification_type': 'core',
+            'notification_channel': 'web',
             'value': False
         }
 
         response = self.client.post(self.url, data, format='json')
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'success')
         self.assertEqual(response.data['data']['total_updated'], 3)
@@ -1205,7 +1213,8 @@ class UpdateAllNotificationPreferencesViewTests(APITestCase):
         # Verify database updates
         for pref in CourseNotificationPreference.objects.filter(is_active=True):
             self.assertFalse(
-                pref.notification_preference_config['discussion']['notification_types']['content_reported']['push']
+                pref.notification_preference_config['discussion'][
+                    'notification_types']['core']['web']
             )
 
     def test_update_non_editable_field(self):
@@ -1414,7 +1423,11 @@ class GetAggregateNotificationPreferencesTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         prefs = response.data['data']
         self.assertDictEqual(prefs['updates']['non_editable'], {'course_updates': ['email']})
-        self.assertDictEqual(prefs['discussion']['non_editable'], {'core': ['web']})
+        self.assertDictEqual(prefs['discussion']['non_editable'], {
+            'new_discussion_post': ['push'],
+            'new_question_post': ['push'],
+            'core': ['web']
+        })
 
 
 class TestNotificationPreferencesView(APITestCase):
@@ -1455,7 +1468,7 @@ class TestNotificationPreferencesView(APITestCase):
                         "content_reported": {
                             "web": True,
                             "email": True,
-                            "push": True,
+                            "push": False,
                             "email_cadence": "Daily"
                         },
                         "new_instructor_all_learners_post": {
@@ -1471,7 +1484,12 @@ class TestNotificationPreferencesView(APITestCase):
                             "email_cadence": "Daily"
                         }
                     },
-                    "non_editable": {}
+                    "non_editable": {
+                        "new_discussion_post": ["push"],
+                        "new_question_post": ["push"],
+                        "content_reported": ["push"],
+                        "new_instructor_all_learners_post": ["push"]
+                    }
                 },
                 "updates": {
                     "enabled": True,
@@ -1480,7 +1498,7 @@ class TestNotificationPreferencesView(APITestCase):
                         "course_updates": {
                             "web": True,
                             "email": False,
-                            "push": True,
+                            "push": False,
                             "email_cadence": "Daily"
                         },
                         "core": {
@@ -1490,7 +1508,9 @@ class TestNotificationPreferencesView(APITestCase):
                             "email_cadence": "Daily"
                         }
                     },
-                    "non_editable": {}
+                    "non_editable": {
+                        "course_updates": ["push"],
+                    }
                 },
                 "grading": {
                     "enabled": True,
@@ -1515,7 +1535,10 @@ class TestNotificationPreferencesView(APITestCase):
                             "email_cadence": "Daily"
                         }
                     },
-                    "non_editable": {}
+                    "non_editable": {
+                        "ora_grade_assigned": ["push"],
+                        "ora_staff_notifications": ["push"]
+                    }
                 }
             }
         }
@@ -1596,7 +1619,12 @@ class TestNotificationPreferencesView(APITestCase):
                             "email_cadence": "Daily"
                         }
                     },
-                    "non_editable": {}
+                    "non_editable": {
+                        "new_discussion_post": ["push"],
+                        "new_question_post": ["push"],
+                        "content_reported": ["push"],
+                        "new_instructor_all_learners_post": ["push"]
+                    }
                 },
                 "updates": {
                     "enabled": True,
@@ -1615,7 +1643,9 @@ class TestNotificationPreferencesView(APITestCase):
                             "email_cadence": "Daily"
                         }
                     },
-                    "non_editable": {}
+                    "non_editable": {
+                        "course_updates": ["push"],
+                    }
                 },
                 "grading": {
                     "enabled": True,
@@ -1640,7 +1670,10 @@ class TestNotificationPreferencesView(APITestCase):
                             "email_cadence": "Daily"
                         }
                     },
-                    "non_editable": {}
+                    "non_editable": {
+                        "ora_grade_assigned": ["push"],
+                        "ora_staff_notifications": ["push"]
+                    }
                 }
             }
         }
