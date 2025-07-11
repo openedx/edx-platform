@@ -28,19 +28,19 @@ pbr==6.1.1
     #   stevedore
 pluggy==1.6.0
     # via pytest
-pygments==2.19.1
+pygments==2.19.2
     # via pytest
 pymongo==4.4.0
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys
-pytest==8.4.0
+pytest==8.4.1
     # via -r scripts/structures_pruning/requirements/testing.in
 stevedore==5.4.1
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys
-typing-extensions==4.14.0
+typing-extensions==4.14.1
     # via
     #   -r scripts/structures_pruning/requirements/base.txt
     #   edx-opaque-keys
