@@ -5084,6 +5084,11 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
 EXAMS_DASHBOARD_MICROFRONTEND_URL = None
 
+# .. setting_name: DISCUSSION_SPAM_URLS
+# .. setting_default: []
+# .. setting_description: Urls to filter from discussion content to avoid spam
+DISCUSSION_SPAM_URLS = []
+
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
