@@ -394,6 +394,8 @@ DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 ################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = None
 
+DISCUSSION_SPAM_URLS = []
+
 ############## Docker based devstack settings #######################
 
 FEATURES.update({
