@@ -463,3 +463,17 @@ class RescoreEntranceExamSerializer(serializers.Serializer):
     unique_student_identifier = serializers.CharField(required=False, allow_null=True)
     all_students = serializers.BooleanField(required=False)
     only_if_higher = serializers.BooleanField(required=False, allow_null=True)
+
+
+class CertificateTaskSerializer(serializers.Serializer):
+    """
+    Serializer for validating and serializing api_action
+    """
+    api_action = serializers.ChoiceField(
+        choices=["generate", "regenerate"],
+        required=True,
+        error_messages={
+            "required": "The 'api_action' field is required.",
+            "invalid_choice": "The 'api_action' must be either 'generate' or 'regenerate'."
+        }
+    )
