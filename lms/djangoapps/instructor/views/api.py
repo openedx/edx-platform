@@ -81,7 +81,6 @@ from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.constants import INVOICE_KEY
@@ -3007,16 +3006,25 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
 class UpdateForumRoleMembership(APIView):
     """
-    Modify user's forum role.
+    Modify a user's forum role in a course.
 
-    The requesting user must be at least staff.
-    Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
-        which is limited to instructors.
-    No one can revoke an instructors FORUM_ROLE_ADMINISTRATOR status.
+    Permissions:
+    - Must be authenticated.
+    - Must be instructor or (staff + forum admin).
+    - Only instructors can grant FORUM_ROLE_ADMINISTRATOR.
+
+    Request (POST body):
+    {
+        "unique_student_identifier": "user@example.com",
+        "rolename": "FORUM_ROLE_MODERATOR",
+        "action": "allow"  or "revoke"
+    }
 
     """
     permission_classes = (
-        IsAuthenticated, permissions.InstructorPermission, permissions.ForumAdminRequiresInstructorAccess
+        IsAuthenticated,
+        permissions.InstructorPermission,
+        permissions.ForumAdminRequiresInstructorAccess
     )
     permission_name = permissions.EDIT_FORUM_ROLES
     serializer_class = UpdateForumRoleMembershipSerializer
@@ -3047,16 +3055,19 @@ class UpdateForumRoleMembership(APIView):
 
         if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
             CourseEnrollment.enroll(user, course_id)
+
         try:
             update_forum_role(course_id, user, rolename, action)
         except Role.DoesNotExist:
             return HttpResponseBadRequest("Role does not exist.")
 
-        response_payload = {
-            'course_id': str(course_id),
-            'action': action,
-        }
-        return JsonResponse(response_payload)
+        return Response(
+            {
+                "course_id": str(course_id),
+                "action": action,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 @require_POST
