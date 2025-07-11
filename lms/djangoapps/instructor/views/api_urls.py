@@ -80,6 +80,9 @@ urlpatterns = [
     # Cohort management
     path('add_users_to_cohorts', api.AddUsersToCohorts.as_view(), name='add_users_to_cohorts'),
 
+    # Unified endpoint for Certificate tasks
+    path('certificate_task/<action>', api.CertificateTask.as_view(), name='certificate_task'),
+
     # Certificates
     path('enable_certificate_generation', api.enable_certificate_generation, name='enable_certificate_generation'),
     path('start_certificate_generation', api.StartCertificateGeneration.as_view(), name='start_certificate_generation'),
