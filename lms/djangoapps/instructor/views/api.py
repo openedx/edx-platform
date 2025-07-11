@@ -123,10 +123,6 @@ from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_MODERATOR,
     Role,
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -3019,7 +3015,9 @@ class UpdateForumRoleMembership(APIView):
     No one can revoke an instructors FORUM_ROLE_ADMINISTRATOR status.
 
     """
-    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_classes = (
+        IsAuthenticated, permissions.InstructorPermission, permissions.ForumAdminRequiresInstructorAccess
+    )
     permission_name = permissions.EDIT_FORUM_ROLES
     serializer_class = UpdateForumRoleMembershipSerializer
 
@@ -3035,13 +3033,8 @@ class UpdateForumRoleMembership(APIView):
         - `action` is one of ['allow', 'revoke']
         """
         course_id = CourseKey.from_string(course_id)
-        course = get_course_by_id(course_id)
-        has_instructor_access = has_access(request.user, 'instructor', course)
-        has_forum_admin = has_forum_access(
-            request.user, course_id, FORUM_ROLE_ADMINISTRATOR
-        )
-
         serializer_data = UpdateForumRoleMembershipSerializer(data=request.data)
+
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
 
@@ -3051,16 +3044,6 @@ class UpdateForumRoleMembership(APIView):
 
         rolename = serializer_data.data['rolename']
         action = serializer_data.data['action']
-
-        # default roles require either (staff & forum admin) or (instructor)
-        if not (has_forum_admin or has_instructor_access):
-            return HttpResponseBadRequest(
-                "Operation requires staff & forum admin or instructor access"
-            )
-
-        # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-        if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-            return HttpResponseBadRequest("Operation requires instructor access.")
 
         if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
             CourseEnrollment.enroll(user, course_id)
