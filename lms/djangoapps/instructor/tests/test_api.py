@@ -4336,6 +4336,36 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         assert response.status_code == 400, response.content
         assert get_extended_due(self.course, self.week3, self.user1) is None
 
+    def test_change_to_invalid_username(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': 'invalid_username',
+            'url': str(self.week1.location),
+            'due_datetime': '12/30/2026 02:00'
+        })
+        assert response.status_code == 404, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
+
+    def test_change_to_invalid_due_date_format(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': str(self.week1.location),
+            'due_datetime': '12/30/2kkk 00:00:00'
+        })
+        assert response.status_code == 400, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
+
+    def test_change_with_blank_fields(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': '',
+            'url': '',
+            'due_datetime': ''
+        })
+        assert response.status_code == 400, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
+
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date(self):
         self.test_change_due_date()
