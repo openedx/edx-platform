@@ -3378,7 +3378,6 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.sections",
 ]
 
-
 ######################### CSRF #########################################
 
 # Forwards-compatibility with Django 1.7
@@ -5674,3 +5673,13 @@ USE_EXTRACTED_PROBLEM_BLOCK = False
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
 USE_EXTRACTED_VIDEO_BLOCK = False
+
+# .. setting_name: RECAPTCHA_PRIVATE_KEY
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha private key to use captcha feature in discussion app.
+RECAPTCHA_PRIVATE_KEY = ""
+
+# .. setting_name: RECAPTCHA_VERIFY_URL
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha verification api url to verify capthca tokens.
+RECAPTCHA_VERIFY_URL = ""

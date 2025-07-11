@@ -4,12 +4,17 @@ Utils for discussion API.
 from datetime import datetime
 from typing import Dict, List
 
+import requests
+from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
 from pytz import UTC
 
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
+
+from lms.djangoapps.discussion.config.settings import ENABLE_CAPTCHA_IN_DISCUSSION
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFY_ALL_LEARNERS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
@@ -402,3 +407,39 @@ def can_user_notify_all_learners(course_key, user_roles, is_course_staff, is_cou
     ])
 
     return is_staff_or_instructor and ENABLE_NOTIFY_ALL_LEARNERS.is_enabled(course_key)
+
+
+def verify_recaptcha_token(token):
+    """
+    Helper function to verify reCAPTCHA token
+    """
+    verify_url = settings.RECAPTCHA_VERIFY_URL
+    verify_data = {
+        'secret': settings.RECAPTCHA_PRIVATE_KEY,
+        'response': token,
+    }
+
+    try:
+        response = requests.post(verify_url, data=verify_data, timeout=10)
+        result = response.json()
+        return result.get('success', False)
+    except:  # pylint: disable=bare-except
+        return False
+
+
+def is_captcha_enabled(course_id):
+    """
+    Check if reCAPTCHA is enabled for discussion posts in the given course.
+    """
+    return ENABLE_CAPTCHA_IN_DISCUSSION.is_enabled(course_id) and settings.RECAPTCHA_PRIVATE_KEY
+
+
+def get_course_id_from_thread_id(thread_id: str) -> str:
+    """
+    Get course id from thread id.
+    """
+    thread = Thread(id=thread_id).retrieve(**{
+        'with_responses': False,
+        'mark_as_read': False
+    })
+    return thread["course_id"]

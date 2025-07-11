@@ -1,11 +1,11 @@
 """
 Discussion API views
 """
-
 import logging
 import uuid
 
 import edx_api_doc_tools as apidocs
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import BadRequest, ValidationError
 from django.shortcuts import get_object_or_404
@@ -20,6 +20,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+
 from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
@@ -79,9 +80,8 @@ from ..rest_api.serializers import (
 )
 from .utils import (
     create_blocks_params,
-    create_topics_v3_structure,
+    create_topics_v3_structure, is_captcha_enabled, verify_recaptcha_token, get_course_id_from_thread_id,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -664,6 +664,15 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
+        if not request.data.get("course_id"):
+            raise ValidationError({"course_id": ["This field is required."]})
+        if is_captcha_enabled(CourseKey.from_string(request.data.get("course_id"))):
+            captcha_token = request.data.get('captcha_token')
+            if not captcha_token:
+                raise ValidationError({'captcha_token': 'This field is required.'})
+
+            if not verify_recaptcha_token(captcha_token):
+                return Response({'error': 'CAPTCHA verification failed.'}, status=400)
         return Response(create_thread(request, request.data))
 
     def partial_update(self, request, thread_id):
@@ -1019,6 +1028,16 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
+        if not request.data.get("thread_id"):
+            raise ValidationError({"thread_id": ["This field is required."]})
+        course_id = get_course_id_from_thread_id(request.data["thread_id"])
+        if is_captcha_enabled(CourseKey.from_string(course_id)):
+            captcha_token = request.data.get('captcha_token')
+            if not captcha_token:
+                raise ValidationError({'captcha_token': 'This field is required.'})
+
+            if not verify_recaptcha_token(captcha_token):
+                return Response({'error': 'CAPTCHA verification failed.'}, status=400)
         return Response(create_comment(request, request.data))
 
     def destroy(self, request, comment_id):
