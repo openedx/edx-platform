@@ -47,6 +47,7 @@ iwIDAQAB
         "CERT_VERIFICATION_PATH": False,
     },
     "DAYS_GOOD_FOR": 10,
+    "STORAGE_CLASS": "storages.backends.s3boto3.S3Boto3Storage"
 }
 
 
