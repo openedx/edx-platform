@@ -89,6 +89,7 @@ from .outlines import update_outline_from_modulestore
 from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
+from .video_utils import process_video_duration
 
 User = get_user_model()
 
@@ -1445,6 +1446,22 @@ def handle_create_or_update_xblock_upstream_link(usage_key):
     if not xblock.upstream or not xblock.upstream_version:
         return
     create_or_update_xblock_upstream_link(xblock, xblock.course_id)
+
+
+@shared_task
+@set_code_owner_attribute
+def handle_create_or_update_xblock_video_duration(usage_key):
+    """
+    Create or update upstream link for a single xblock.
+    """
+    ensure_cms("handle_create_or_update_xblock_upstream_link may only be executed in a CMS context")
+    store = modulestore()
+    try:
+        xblock = store.get_item(UsageKey.from_string(usage_key))
+    except (ItemNotFoundError, InvalidKeyError):
+        LOGGER.exception(f'Could not find item for given usage_key: {usage_key}')
+        return
+    process_video_duration(xblock)
 
 
 @shared_task
