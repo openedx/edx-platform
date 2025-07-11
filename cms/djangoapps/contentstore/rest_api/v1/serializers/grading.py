@@ -2,6 +2,8 @@
 API Serializers for course grading
 """
 
+import re
+
 from rest_framework import serializers
 
 
@@ -13,6 +15,7 @@ class GradersSerializer(serializers.Serializer):
     short_label = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     weight = serializers.IntegerField()
     id = serializers.IntegerField()
+    color = serializers.CharField()
 
 
 class GracePeriodSerializer(serializers.Serializer):
@@ -43,3 +46,18 @@ class CourseGradingSerializer(serializers.Serializer):
     default_grade_designations = serializers.ListSerializer(
         child=serializers.CharField()
     )
+
+
+class GradingColorSerializer(serializers.Serializer):
+    """
+    Serializer for grading color
+    """
+    color = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    def validate_color(self, value: str) -> str:
+        """
+        Validate that the color is a valid hex color code.
+        """
+        if value and not re.match(r'^#(?:[0-9a-fA-F]{3}){1,2}$', value):
+            raise serializers.ValidationError("Invalid color format. Must be a hex color code.")
+        return value
