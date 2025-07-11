@@ -115,7 +115,7 @@ from lms.djangoapps.instructor.views.serializer import (
     UserSerializer,
     UniqueStudentIdentifierSerializer,
     ProblemResetSerializer,
-    UpdateForumRoleMembershipSerializer
+    UpdateForumRoleMembershipSerializer,
     RescoreEntranceExamSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

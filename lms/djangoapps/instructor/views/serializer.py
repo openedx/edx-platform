@@ -14,6 +14,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_MODERATOR,
     Role
+)
 from lms.djangoapps.discussion.django_comment_client.utils import (
     get_group_id_for_user,
     get_group_name
