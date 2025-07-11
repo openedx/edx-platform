@@ -513,15 +513,11 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         msg: message to display if assertion fails.
         """
-        data = {"problem_locations": ["test"]}
-        if endpoint == "get_problem_responses":
-            data = {"problem_location": "test"}
-
         mock_problem_key = NonCallableMock(return_value='')
         mock_problem_key.course_key = self.course.id
         with patch.object(UsageKey, 'from_string') as patched_method:
             patched_method.return_value = mock_problem_key
-            self._access_endpoint(endpoint, data, 200, msg, content_type="application/json")
+            self._access_endpoint(endpoint, {"problem_locations": ["test"]}, 200, msg, content_type="application/json")
 
     def test_staff_level(self):
         """
@@ -2640,7 +2636,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             )
 
     @ddt.data(
-        ('get_problem_responses', {'problem_location': "abc"}),
+        ('get_problem_responses', {'problem_location': ""}),
         ('instructor_api_v1:generate_problem_responses', {"problem_locations": ["abc"]}),
     )
     @ddt.unpack
@@ -2702,12 +2698,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         assert 'task_id' in res_json
 
     @valid_problem_location
-    @ddt.data(
-        ('get_problem_responses', {'problem_location': "test"}),
-        ('instructor_api_v1:generate_problem_responses', {'problem_locations': ["test"]})
-    )
-    @ddt.unpack
-    def test_get_problem_responses_already_running(self, endpoint, data):
+    @ddt.data('get_problem_responses', 'instructor_api_v1:generate_problem_responses')
+    def test_get_problem_responses_already_running(self, endpoint):
         """
         Test whether get_problem_responses returns an appropriate status
         message if CSV generation is already in progress.
@@ -2721,7 +2713,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         with patch('lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv') as submit_task_function:
             error = AlreadyRunningError(already_running_status)
             submit_task_function.side_effect = error
-            response = self.client.post(url, data, content_type="application/json")
+            response = self.client.post(url, {"problem_locations": ["test"]}, content_type="application/json")
 
         self.assertContains(response, already_running_status, status_code=400)
 
@@ -3001,7 +2993,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         with patch(task_api_endpoint) as mock_task_api_endpoint:
             if report_type == 'problem responses':
                 mock_task_api_endpoint.return_value = Mock(task_id='task-id-1138')
-                response = self.client.post(url, {'problem_location': 'test'})
+                response = self.client.post(url, {'problem_location': ''})
                 self.assertContains(response, success_status)
             else:
                 CourseFinanceAdminRole(self.course.id).add_users(self.instructor)

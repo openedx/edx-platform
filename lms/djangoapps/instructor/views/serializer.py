@@ -463,23 +463,3 @@ class RescoreEntranceExamSerializer(serializers.Serializer):
     unique_student_identifier = serializers.CharField(required=False, allow_null=True)
     all_students = serializers.BooleanField(required=False)
     only_if_higher = serializers.BooleanField(required=False, allow_null=True)
-
-
-class SingleProblemLocationSerializer(serializers.Serializer):
-    """
-    For endpoints that accept only one problem location instead of a list.
-    """
-    problem_location = serializers.CharField(
-        help_text=_(
-            "A usage key location for a section or a problem."
-        ),
-        required=True,
-    )
-    problem_types_filter = serializers.ListSerializer(
-        child=serializers.CharField(),
-        required=False,
-        allow_empty=True,
-        help_text=_(
-            "A list of problem/block types to generate the report for."
-        ),
-    )
