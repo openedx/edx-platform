@@ -47,6 +47,12 @@ from common.djangoapps.util.password_policy_validators import DEFAULT_MAX_PASSWO
 
 
 @ddt.ddt
+@override_settings(
+    ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=False,
+    ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=False,
+    HIBP_LOGIN_BLOCK_PASSWORD_FREQUENCY_THRESHOLD=100000,
+    HIBP_LOGIN_NUDGE_PASSWORD_FREQUENCY_THRESHOLD=100000,
+)
 class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
     """
     Test login_user() view

@@ -113,6 +113,11 @@ class AuthTestCase(ContentStoreTestCase):
         self.assertEqual(resp.status_code, expected)
         return resp
 
+    @override_settings(
+        ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=False,
+        ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=False,
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+    )
     @override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""
@@ -147,7 +152,12 @@ class AuthTestCase(ContentStoreTestCase):
             print(f"Checking '{page}'")
             self.check_page_get(page, expected=200)
 
-    @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)
+    @override_settings(
+        SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1,
+        ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=False,
+        ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=False,
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+    )
     @override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
     def test_inactive_session_timeout(self):
         """

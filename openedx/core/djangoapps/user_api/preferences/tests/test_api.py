@@ -274,6 +274,7 @@ class TestPreferenceAPI(CacheIsolationTestCase):
 
 
 @ddt.ddt
+@override_settings(ENABLE_AUTHN_REGISTER_HIBP_POLICY=False)
 class UpdateEmailOptInTests(ModuleStoreTestCase):
     """
     Test cases to cover API-driven email list opt-in update workflows
