@@ -3121,24 +3121,30 @@ class ChangeDueDate(APIView):
         """
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
-            return HttpResponseBadRequest(reason=serializer_data.errors)
+            return JsonResponseBadRequest({'error': _('All fields must be filled out')})
 
         student = serializer_data.validated_data.get('student')
         if not student:
             response_payload = {
-                'error': f'Could not find student matching identifier: {request.data.get("student")}'
+                'error': _(
+                    'Could not find student matching identifier: {student}'
+                ).format(student=request.data.get("student"))
             }
-            return JsonResponse(response_payload)
+            return JsonResponse(response_payload, status=status.HTTP_404_NOT_FOUND)
+
+        due_datetime = serializer_data.validated_data.get('due_datetime')
+        try:
+            due_date = parse_datetime(due_datetime)
+        except DashboardError:
+            return JsonResponseBadRequest({'error': _('The extension due date and time format is incorrect')})
 
         course = get_course_by_id(CourseKey.from_string(course_id))
-
         unit = find_unit(course, serializer_data.validated_data.get('url'))
-        due_date = parse_datetime(serializer_data.validated_data.get('due_datetime'))
         reason = strip_tags(serializer_data.validated_data.get('reason', ''))
         try:
             set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
         except Exception as error:  # pylint: disable=broad-except
-            return JsonResponse({'error': str(error)}, status=400)
+            return JsonResponseBadRequest({'error': str(error)})
 
         return JsonResponse(_(
             'Successfully changed due date for student {0} for {1} '
