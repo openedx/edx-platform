@@ -598,7 +598,7 @@ class RegistrationView(APIView):
             errors = {
                 "error_message": [{"user_message": str(exc)}],
             }
-            return self._create_response(request, errors, status_code=exc.status_code)
+            return self._create_response(request, errors, status_code=exc.status_code, error_code=exc.error_code)
 
         response = self._handle_duplicate_email_username(request, data)
         if response:
