@@ -144,10 +144,13 @@ def _validate_privileged_access(context: Dict) -> bool:
 def filter_spam_urls_from_html(html_string):
     """
     Filters out spam posts from html
+    Returns:
+        clean_post, is_spam
     """
     html_string = html.unescape(html_string)
     soup = BeautifulSoup(html_string, "html.parser")
     patterns = []
+    is_spam = False
     for domain in settings.DISCUSSION_SPAM_URLS:
         escaped = domain.replace(".", r"\.")
         domain_pattern = rf"(\w+\.)*{escaped}(?:/\S*)*"
@@ -165,6 +168,7 @@ def filter_spam_urls_from_html(html_string):
         if href:
             if any(p.search(href) for p in patterns):
                 a_tag.replace_with(a_tag.get_text(strip=True))
+                is_spam = True
 
     for text_node in soup.find_all(string=True):
         new_text = text_node
@@ -172,8 +176,9 @@ def filter_spam_urls_from_html(html_string):
             new_text = p.sub('', new_text)
         if new_text != text_node:
             text_node.replace_with(new_text.strip())
+            is_spam = True
 
-    return str(soup)
+    return str(soup), is_spam
 
 
 class _ContentSerializer(serializers.Serializer):
@@ -283,7 +288,9 @@ class _ContentSerializer(serializers.Serializer):
         """
         if self._rendered_body is None:
             self._rendered_body = render_body(obj["body"])
-        self._rendered_body = filter_spam_urls_from_html(self._rendered_body)
+            self._rendered_body, is_spam = filter_spam_urls_from_html(self._rendered_body)
+            if is_spam and settings.CONTENT_FOR_SPAM_POSTS:
+                self._rendered_body = settings.CONTENT_FOR_SPAM_POSTS
         return self._rendered_body
 
     def get_abuse_flagged(self, obj):
