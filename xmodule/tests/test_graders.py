@@ -70,9 +70,10 @@ class GraderTest(unittest.TestCase):
         """
         Mock class for SubsectionGrade object.
         """
-        def __init__(self, graded_total, display_name):
+        def __init__(self, graded_total, location, display_name):
             self.graded_total = graded_total
             self.display_name = display_name
+            self.location = location
 
         @property
         def percent_graded(self):
@@ -81,27 +82,64 @@ class GraderTest(unittest.TestCase):
     common_fields = dict(graded=True, first_attempted=datetime.now())
     test_gradesheet = {
         'Homework': {
-            'hw1': MockGrade(AggregatedScore(tw_earned=2, tw_possible=20.0, **common_fields), display_name='hw1'),
-            'hw2': MockGrade(AggregatedScore(tw_earned=16, tw_possible=16.0, **common_fields), display_name='hw2'),
+            'hw1': MockGrade(
+                AggregatedScore(tw_earned=2, tw_possible=20.0, **common_fields),
+                location='location_hw1_mock',
+                display_name='hw1'
+            ),
+            'hw2': MockGrade(
+                AggregatedScore(tw_earned=16, tw_possible=16.0, **common_fields),
+                location='location_hw2_mock',
+                display_name='hw2'
+            ),
         },
 
         # The dropped scores should be from the assignments that don't exist yet
         'Lab': {
             # Dropped
-            'lab1': MockGrade(AggregatedScore(tw_earned=1, tw_possible=2.0, **common_fields), display_name='lab1'),
-            'lab2': MockGrade(AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields), display_name='lab2'),
-            'lab3': MockGrade(AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields), display_name='lab3'),
+            'lab1': MockGrade(
+                AggregatedScore(tw_earned=1, tw_possible=2.0, **common_fields),
+                location='location_lab1_mock',
+                display_name='lab1'
+            ),
+            'lab2': MockGrade(
+                AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields),
+                location='location_lab2_mock',
+                display_name='lab2'
+            ),
+            'lab3': MockGrade(
+                AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields),
+                location='location_lab3_mock',
+                display_name='lab3'
+            ),
             # Dropped
-            'lab4': MockGrade(AggregatedScore(tw_earned=5, tw_possible=25.0, **common_fields), display_name='lab4'),
+            'lab4': MockGrade(
+                AggregatedScore(tw_earned=5, tw_possible=25.0, **common_fields),
+                location='location_lab4_mock',
+                display_name='lab4'
+            ),
             # Dropped
-            'lab5': MockGrade(AggregatedScore(tw_earned=3, tw_possible=4.0, **common_fields), display_name='lab5'),
-            'lab6': MockGrade(AggregatedScore(tw_earned=6, tw_possible=7.0, **common_fields), display_name='lab6'),
-            'lab7': MockGrade(AggregatedScore(tw_earned=5, tw_possible=6.0, **common_fields), display_name='lab7'),
+            'lab5': MockGrade(
+                AggregatedScore(tw_earned=3, tw_possible=4.0, **common_fields),
+                location='location_lab5_mock',
+                display_name='lab5'
+            ),
+            'lab6': MockGrade(
+                AggregatedScore(tw_earned=6, tw_possible=7.0, **common_fields),
+                location='location_lab6_mock',
+                display_name='lab6'
+            ),
+            'lab7': MockGrade(
+                AggregatedScore(tw_earned=5, tw_possible=6.0, **common_fields),
+                location='location_lab7_mock',
+                display_name='lab7'
+            ),
         },
 
         'Midterm': {
             'midterm': MockGrade(
                 AggregatedScore(tw_earned=50.5, tw_possible=100, **common_fields),
+                location='location_midterm_mock',
                 display_name="Midterm Exam",
             ),
         },
@@ -336,6 +374,47 @@ class GraderTest(unittest.TestCase):
         with pytest.raises(ValueError) as error:
             graders.grader_from_conf([invalid_conf])
         assert expected_error_message in str(error.value)
+
+    def test_sequential_location_in_section_breakdown(self):
+        homework_grader = graders.AssignmentFormatGrader("Homework", 12, 2)
+        lab_grader = graders.AssignmentFormatGrader("Lab", 7, 3)
+        midterm_grader = graders.AssignmentFormatGrader("Midterm", 1, 0)
+
+        weighted_grader = graders.WeightedSubsectionsGrader([
+            (homework_grader, homework_grader.category, 0.25),
+            (lab_grader, lab_grader.category, 0.25),
+            (midterm_grader, midterm_grader.category, 0.5),
+        ])
+
+        expected_sequential_ids = [
+            'location_hw1_mock',
+            'location_hw2_mock',
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            'location_lab1_mock',
+            'location_lab2_mock',
+            'location_lab3_mock',
+            'location_lab4_mock',
+            'location_lab5_mock',
+            'location_lab6_mock',
+            'location_lab7_mock',
+            None,
+            'location_midterm_mock',
+        ]
+
+        graded = weighted_grader.grade(self.test_gradesheet)
+
+        for i, section_breakdown in enumerate(graded['section_breakdown']):
+            assert expected_sequential_ids[i] == section_breakdown.get('sequential_id')
 
 
 @ddt.ddt
