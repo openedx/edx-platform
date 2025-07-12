@@ -63,7 +63,6 @@ from importlib import import_module
 
 from bson.objectid import ObjectId
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
-from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import (
     BlockUsageLocator,
@@ -953,7 +952,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             branch=branch,
         )
 
-    @autoretry_read()
     def get_courses(self, branch, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Returns a list of course blocks matching any given qualifiers.
@@ -969,7 +967,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # get the blocks for each course index (s/b the root)
         return self._get_structures_for_branch_and_locator(branch, self._create_course_locator, **kwargs)
 
-    @autoretry_read()
     def get_course_summaries(self, branch, **kwargs):
         """
         Returns a list of `CourseSummary` which matching any given qualifiers.
@@ -1026,7 +1023,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             in self.find_matching_course_indexes(branch="library")
         })
 
-    @autoretry_read()
     def get_library_summaries(self, **kwargs):
         """
         Returns a list of `LegacyLibrarySummary` objects.
@@ -3255,7 +3251,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         structure['blocks'][block_key] = content
 
-    @autoretry_read()
     def find_courses_by_search_target(self, field_name, field_value):
         """
         Find all the courses which cached that they have the given field with the given value.
@@ -3325,6 +3320,7 @@ class SparseList(list):
     Enable inserting items into a list in arbitrary order and then retrieving them.
     """
     # taken from http://stackoverflow.com/questions/1857780/sparse-assignment-list-in-python
+
     def __setitem__(self, index, value):
         """
         Add value to the list ensuring the list is long enough to accommodate it at the given index

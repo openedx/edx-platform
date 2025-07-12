@@ -12,7 +12,6 @@ import pymongo
 from bson.son import SON
 from fs.osfs import OSFS
 from gridfs.errors import NoFile, FileExists
-from mongodb_proxy import autoretry_read
 from opaque_keys.edx.keys import AssetKey
 
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
@@ -29,6 +28,7 @@ class MongoContentStore(ContentStore):
     MongoDB-backed ContentStore.
     """
     # lint-amnesty, pylint: disable=unused-argument
+
     def __init__(
         self, host, db,
         port=27017, tz_aware=True, user=None, password=None, bucket='fs', collection=None, **kwargs
@@ -39,8 +39,6 @@ class MongoContentStore(ContentStore):
         :param collection: ignores but provided for consistency w/ other doc_store_config patterns
         """
         # GridFS will throw an exception if the Database is wrapped in a MongoProxy. So don't wrap it.
-        # The appropriate methods below are marked as autoretry_read - those methods will handle
-        # the AutoReconnect errors.
         self.connection_params = {
             'db': db,
             'host': host,
@@ -48,7 +46,6 @@ class MongoContentStore(ContentStore):
             'tz_aware': tz_aware,
             'user': user,
             'password': password,
-            'proxy': False,
             **kwargs
         }
         self.bucket = bucket
@@ -164,7 +161,6 @@ class MongoContentStore(ContentStore):
         # Deletes of non-existent files are considered successful
         self.fs.delete(location_or_id)
 
-    @autoretry_read()
     def find(self, location, throw_on_not_found=True, as_stream=False):  # lint-amnesty, pylint: disable=arguments-differ
         content_id, __ = self.asset_db_key(location)
 
@@ -292,7 +288,6 @@ class MongoContentStore(ContentStore):
             self.fs_files.remove(query)
         return assets_to_delete
 
-    @autoretry_read()
     def _get_all_content_for_course(self,
                                     course_key,
                                     get_thumbnails=False,
@@ -404,7 +399,6 @@ class MongoContentStore(ContentStore):
         if result.matched_count == 0:
             raise NotFoundError(asset_db_key)
 
-    @autoretry_read()
     def get_attrs(self, location):
         """
         Gets all of the attributes associated with the given asset. Note, returns even built in attrs

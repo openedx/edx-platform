@@ -36,3 +36,13 @@ class MongoUtilsTests(TestCase):
         # Support for read_preference given as mongos name.
         connection = connect_to_mongodb(db, host, read_preference=mongos_name)
         assert connection.client.read_preference == expected_read_preference
+
+    @ddt.data(True, False)
+    def test_connect_to_mongo_with_retry_reads(self, is_retry_enabled):
+        """
+        Test that the MongoDB client is created with retryReads=[True | False].
+        """
+        host = 'localhost'
+        db = 'test_retry_reads_%s_%s' % (str(is_retry_enabled).lower(), uuid4().hex)
+        connection = connect_to_mongodb(db, host, retry_reads=is_retry_enabled)
+        assert connection.client.options.retry_reads is is_retry_enabled
