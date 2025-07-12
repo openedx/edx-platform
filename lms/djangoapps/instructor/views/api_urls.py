@@ -21,7 +21,7 @@ v1_api_urls = [
 ]
 
 urlpatterns = [
-    path('students_update_enrollment', api.students_update_enrollment, name='students_update_enrollment'),
+    path('students_update_enrollment', api.StudentsUpdateEnrollmentView.as_view(), name='students_update_enrollment'),
     path('register_and_enroll_students', api.RegisterAndEnrollStudents.as_view(), name='register_and_enroll_students'),
     path('list_course_role_members', api.ListCourseRoleMembersView.as_view(), name='list_course_role_members'),
     path('modify_access', api.ModifyAccess.as_view(), name='modify_access'),
