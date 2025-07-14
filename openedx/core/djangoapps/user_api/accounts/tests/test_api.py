@@ -187,7 +187,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
     def test_set_multiple_social_links(self):
         social_links = [
             dict(platform="facebook", social_link=f"https://www.facebook.com/{self.user.username}"),
-            dict(platform="twitter", social_link=f"https://www.twitter.com/{self.user.username}"),
+            dict(platform="x", social_link=f"https://www.x.com/{self.user.username}"),
         ]
         update_account_settings(self.user, {"social_links": social_links})
         account_settings = get_account_settings(self.default_request)[0]
@@ -200,7 +200,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         update_account_settings(self.user, {"social_links": original_social_links})
 
         extra_social_links = [
-            dict(platform="twitter", social_link=f"https://www.twitter.com/{self.user.username}"),
+            dict(platform="x", social_link=f"https://www.x.com/{self.user.username}"),
             dict(platform="linkedin", social_link=f"https://www.linkedin.com/in/{self.user.username}"),
         ]
         update_account_settings(self.user, {"social_links": extra_social_links})
@@ -211,25 +211,25 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
 
     def test_replace_social_links(self):
         original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
-        original_twitter_link = dict(platform="twitter", social_link="https://www.twitter.com/myself")
-        update_account_settings(self.user, {"social_links": [original_facebook_link, original_twitter_link]})
+        original_x_link = dict(platform="x", social_link="https://www.x.com/myself")
+        update_account_settings(self.user, {"social_links": [original_facebook_link, original_x_link]})
 
         modified_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/new_me")
         update_account_settings(self.user, {"social_links": [modified_facebook_link]})
 
         account_settings = get_account_settings(self.default_request)[0]
-        assert account_settings['social_links'] == [modified_facebook_link, original_twitter_link]
+        assert account_settings['social_links'] == [modified_facebook_link, original_x_link]
 
     def test_remove_social_link(self):
         original_facebook_link = dict(platform="facebook", social_link="https://www.facebook.com/myself")
-        original_twitter_link = dict(platform="twitter", social_link="https://www.twitter.com/myself")
-        update_account_settings(self.user, {"social_links": [original_facebook_link, original_twitter_link]})
+        original_x_link = dict(platform="x", social_link="https://www.x.com/myself")
+        update_account_settings(self.user, {"social_links": [original_facebook_link, original_x_link]})
 
         removed_facebook_link = dict(platform="facebook", social_link="")
         update_account_settings(self.user, {"social_links": [removed_facebook_link]})
 
         account_settings = get_account_settings(self.default_request)[0]
-        assert account_settings['social_links'] == [original_twitter_link]
+        assert account_settings['social_links'] == [original_x_link]
 
     def test_unsupported_social_link_platform(self):
         social_links = [
