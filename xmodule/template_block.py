@@ -8,7 +8,6 @@ from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 
-from openedx.core.djangolib.markup import Text
 from xmodule.editing_block import EditingMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.raw_block import RawMixin
