@@ -1,25 +1,22 @@
 """
 Template block
 """
-
+import logging
 from string import Template
-from xblock.core import XBlock
 
 from lxml import etree
 from web_fragments.fragment import Fragment
-from xmodule.editing_block import EditingMixin
-from xmodule.raw_block import RawMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
-from xmodule.x_module import (
-    ResourceTemplates,
-    shim_xmodule_js,
-    XModuleMixin,
-    XModuleToXBlockMixin,
-)
-from xmodule.xml_block import XmlMixin
+from xblock.core import XBlock
 
 from openedx.core.djangolib.markup import Text
+from xmodule.editing_block import EditingMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.raw_block import RawMixin
+from xmodule.util.builtin_assets import add_css_to_fragment, add_webpack_js_to_fragment
+from xmodule.x_module import ResourceTemplates, XModuleMixin, XModuleToXBlockMixin, shim_xmodule_js
+from xmodule.xml_block import XmlMixin
 
+log = logging.getLogger(__name__)
 
 class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     RawMixin,
@@ -76,6 +73,8 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
     def render_template(self, system, xml_data):
         '''Render the template, given the definition xml_data'''
+        if not xml_data:
+            return "Please set the template for this custom tag."
         xmltree = etree.fromstring(xml_data)
         if 'impl' in xmltree.attrib:
             template_name = xmltree.attrib['impl']
@@ -93,9 +92,13 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
         # cdodge: look up the template as a module
         template_loc = self.location.replace(category='custom_tag_template', name=template_name)
+        try:
+            template_block = system.get_block(template_loc)
+            template_block_data = template_block.data
+        except ItemNotFoundError as ex:
+            log.exception(f"Could not find template block for custom tag with Id {template_name}", )
+            template_block_data= f"Could not find template block for custom tag with Id {template_name}. Error: {ex}"
 
-        template_block = system.get_block(template_loc)
-        template_block_data = template_block.data
         template = Template(template_block_data)
         return template.safe_substitute(params)
 
