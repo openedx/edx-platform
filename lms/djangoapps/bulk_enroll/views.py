@@ -15,7 +15,7 @@ from six.moves import zip_longest
 
 from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 from lms.djangoapps.bulk_enroll.serializers import BulkEnrollmentSerializer
-from lms.djangoapps.instructor.views.api import students_update_enrollment
+from lms.djangoapps.instructor.views.api import StudentsUpdateEnrollmentView
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
@@ -89,7 +89,11 @@ class BulkEnrollView(APIView):
             }
             for course_id, cohort_name in zip_longest(serializer.data.get('courses'),
                                                       serializer.data.get('cohorts', [])):
-                response = students_update_enrollment(self.request, course_id=course_id)
+                # Prepare internal request to DRF view
+                # pylint: disable=protected-access
+                request._request.POST = request.data
+                view = StudentsUpdateEnrollmentView.as_view()
+                response = view(request._request, course_id=course_id)
                 response_content = json.loads(response.content.decode('utf-8'))
 
                 if cohort_name:
