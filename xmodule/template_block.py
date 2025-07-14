@@ -85,8 +85,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
                 template_name = child_impl.text
             else:
                 # TODO (vshnayder): better exception type
-                raise Exception("Could not find impl attribute in customtag {}"
-                                .format(self.location))
+                return Template("Could not find impl attribute in customtag {}").safe_substitute({})
 
         params = dict(list(xmltree.items()))
 
@@ -123,8 +122,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
 
 class TranslateCustomTagBlock(  # pylint: disable=abstract-method
-    XModuleToXBlockMixin,
-    XModuleMixin,
+    CustomTagBlock,
 ):
     """
     Converts olx of the form `<$custom_tag attr="" attr=""/>` to CustomTagBlock
@@ -132,19 +130,20 @@ class TranslateCustomTagBlock(  # pylint: disable=abstract-method
     """
     resources_dir = None
 
-    @classmethod
-    def parse_xml(cls, node, runtime, _keys):
-        """
-        Transforms the xml_data from <$custom_tag attr="" attr=""/> to
-        <customtag attr="" attr="" impl="$custom_tag"/>
-        """
+    def render_template(self, system, xml_data):
+        xml_string = ""
+        if xml_data:
+            xmltree = etree.fromstring(xml_data)
+            xmltree = self.replace_xml(xmltree)
+            xml_string = etree.tostring(xmltree, pretty_print=True).decode("utf-8")
+        return super().render_template(system, xml_string or xml_data)
 
-        runtime.error_tracker(Text('WARNING: the <{tag}> tag is deprecated.  '
-                              'Instead, use <customtag impl="{tag}" attr1="..." attr2="..."/>. ')
-                              .format(tag=node.tag))
-
+    def replace_xml(self, node):
+        """
+        Replaces the xml_data from <$custom_tag attr="" attr=""/> to
+        <customtag attr="" attr="" impl="$custom_tag"/>.
+        """
         tag = node.tag
         node.tag = 'customtag'
         node.attrib['impl'] = tag
-
-        return runtime.process_xml(etree.tostring(node))
+        return node
