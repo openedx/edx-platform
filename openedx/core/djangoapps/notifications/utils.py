@@ -9,6 +9,7 @@ from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from openedx.core.djangoapps.django_comment_common.models import Role
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_NOTIFY_ALL_LEARNERS
+from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.lib.cache_utils import request_cached
 
 
@@ -270,8 +271,11 @@ def aggregate_notification_configs(existing_user_configs: List[Dict]) -> Dict:
             if len(type_config.get("email_cadence", [])) > 1:
                 result_config[app]["notification_types"][type_key]["email_cadence"] = "Mixed"
             else:
-                result_config[app]["notification_types"][type_key]["email_cadence"] = (
-                    result_config[app]["notification_types"][type_key]["email_cadence"].pop())
+                if result_config[app]["notification_types"][type_key].get('email_cadence'):
+                    result_config[app]["notification_types"][type_key]["email_cadence"] = (
+                        result_config[app]["notification_types"][type_key]["email_cadence"].pop())
+                else:
+                    result_config[app]["notification_types"][type_key]["email_cadence"] = EmailCadence.DAILY
     return result_config
 
 
