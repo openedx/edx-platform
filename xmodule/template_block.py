@@ -17,6 +17,7 @@ from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
 
+
 class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     RawMixin,
     XmlMixin,
@@ -94,8 +95,8 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
             template_block = system.get_block(template_loc)
             template_block_data = template_block.data
         except ItemNotFoundError as ex:
-            log.exception(f"Could not find template block for custom tag with Id {template_name}", )
-            template_block_data= f"Could not find template block for custom tag with Id {template_name}. Error: {ex}"
+            log.exception(f"Could not find template block for custom tag with Id {template_name}")
+            template_block_data = f"Could not find template block for custom tag with Id {template_name}. Error: {ex}"
 
         template = Template(template_block_data)
         return template.safe_substitute(params)
