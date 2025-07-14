@@ -52,6 +52,7 @@ var onCertificatesReady = null;
             var url = $btn_generating_certs.data('endpoint');
             $.ajax({
                 type: 'POST',
+                data: $('#certificates-generating-form').serializeArray(),
                 url: url,
                 success: function(data) {
                     $btn_generating_certs.attr('disabled', 'disabled');
