@@ -475,10 +475,7 @@ class OverrideProblemScoreSerializer(UniqueStudentIdentifierSerializer):
             'blank': _("Problem URL name cannot be blank."),
         }
     )
-    score = serializers.CharField(
+    score = serializers.FloatField(
         help_text=_("The overriding score to set."),
-        error_messages={
-            'blank': _("Score cannot be blank."),
-        }
     )
     # unique_student_identifier is inherited and required from UniqueStudentIdentifierSerializer
