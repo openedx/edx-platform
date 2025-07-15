@@ -5089,6 +5089,11 @@ EXAMS_DASHBOARD_MICROFRONTEND_URL = None
 # .. setting_description: Urls to filter from discussion content to avoid spam
 DISCUSSION_SPAM_URLS = []
 
+# .. setting_name: CONTENT_FOR_SPAM_POSTS
+# .. setting_default: ""
+# .. setting_description: Content to replace spam posts with
+CONTENT_FOR_SPAM_POSTS = ""
+
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False

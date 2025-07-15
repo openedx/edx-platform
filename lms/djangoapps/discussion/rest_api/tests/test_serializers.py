@@ -1123,14 +1123,14 @@ class FilterSpamTest(SharedModuleStoreTestCase):
     @override_settings(DISCUSSION_SPAM_URLS=['example.com'])
     def test_filter(self):
         self.assertEqual(
-            filter_spam_urls_from_html('<div><a href="example.com/abc/def">abc</a></div>'),
+            filter_spam_urls_from_html('<div><a href="example.com/abc/def">abc</a></div>')[0],
             '<div>abc</div>'
         )
         self.assertEqual(
-            filter_spam_urls_from_html('<div>example.com/abc/def</div>'),
+            filter_spam_urls_from_html('<div>example.com/abc/def</div>')[0],
             '<div></div>'
         )
         self.assertEqual(
-            filter_spam_urls_from_html('<div>e x a m p l e . c o m / a b c / d e f</div>'),
+            filter_spam_urls_from_html('<div>e x a m p l e . c o m / a b c / d e f</div>')[0],
             '<div></div>'
         )
