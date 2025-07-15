@@ -40,29 +40,19 @@
 <tr>
   <td>
     <p style="margin-top: 16px; color: #1F453D; font-family: Arial; font-size: 30px; font-weight: 700; line-height: 36px; margin-left: 30px;">
-      {% trans "We hope you’re enjoying Introduction to Data Science with Python!" as tmsg %}{{ tmsg | force_escape }}
+        {% trans "We hope you're enjoying" as tmsg %}{{ tmsg | force_escape }} {{ course_name }}!
     </p>
     <p style="margin-top: 16px; color: #000000; font-family: Arial; font-size: 16px; font-weight: 400; line-height: 24px; margin-left: 30px;">
-      {% trans "We want to let you know what you can look forward to in week two: " as tmsg %}{{ tmsg | force_escape }}
+        {% filter force_escape %}
+            We want to let you know what you can look forward to in week {{ week_num }}:
+        {% endfilter %}
     </p>
     <ul style="margin-bottom: 16px; list-style: disc;">
-        <li>
-            <p>
-            {% trans "Learn kNN regression" as tmsg %}{{ tmsg | force_escape }}
-            </p>
-        </li>
-        <li>
-            <p>
-            {% trans "Learn linear regression" as tmsg %}{{ tmsg | force_escape }}
-            </p>
-        </li>
-        <li>
-            <p>
-            {% trans "Find out how to choose which model you want" as tmsg %}{{ tmsg | force_escape }}
-            </p>
-        </li>
-    </ul>                       
-  </td>  
+        {% for highlight in week_highlights %}
+            <li>{{ highlight }}</li>
+        {% endfor %}
+    </ul>
+</td> 
 </tr>
 <tr style="height: 32px;">
     <td style="padding-top: 1rem; padding-left: 30px;">
