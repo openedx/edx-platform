@@ -856,8 +856,8 @@ class GetDownstreamSummaryViewTest(
         expected = [{
             'upstream_context_title': 'Test Library 1',
             'upstream_context_key': self.library_id,
-            'ready_to_sync_count': 1,
-            'total_count': 2,
+            'ready_to_sync_count': 2,
+            'total_count': 5,
             'last_published_at': self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
         }]
         self.assertListEqual(data, expected)
