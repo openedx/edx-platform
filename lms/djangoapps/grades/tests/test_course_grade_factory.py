@@ -162,6 +162,7 @@ class TestCourseGradeFactory(GradeTestBase):
         with mock_get_score(1, 2):
             self.subsection_grade_factory.update(self.course_structure[self.sequence.location])
         course_grade = CourseGradeFactory().update(self.request.user, self.course)
+        subsection_grades = list(course_grade.subsection_grades.values())
 
         actual_summary = course_grade.summary
 
@@ -187,13 +188,15 @@ class TestCourseGradeFactory(GradeTestBase):
                     'category': 'Homework',
                     'detail': 'Homework 1 - Test Sequential X with an & Ampersand - 50.00% (1/2)',
                     'label': 'HW 01',
-                    'percent': 0.5
+                    'percent': 0.5,
+                    'sequential_id': str(subsection_grades[0].location),
                 },
                 {
                     'category': 'Homework',
                     'detail': 'Homework 2 - Test Sequential A - 0.00% (0/1)',
                     'label': 'HW 02',
-                    'percent': 0.0
+                    'percent': 0.0,
+                    'sequential_id': str(subsection_grades[1].location),
                 },
                 {
                     'category': 'Homework',
