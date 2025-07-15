@@ -50,7 +50,6 @@ urlpatterns = [
     path('list_email_content', api.ListEmailContent.as_view(), name='list_email_content'),
     path('list_forum_members', api.ListForumMembers.as_view(), name='list_forum_members'),
     path('update_forum_role_membership', api.UpdateForumRoleMembership.as_view(), name='update_forum_role_membership'),
-    path('list_forum_members', api.ListForumMembers.as_view(), name='list_forum_members'),
     path('change_due_date', api.ChangeDueDate.as_view(), name='change_due_date'),
     path('send_email', api.SendEmail.as_view(), name='send_email'),
     path('reset_due_date', api.ResetDueDate.as_view(), name='reset_due_date'),
