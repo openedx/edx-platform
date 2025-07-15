@@ -9,7 +9,7 @@ from cms.djangoapps.contentstore.models import ComponentLink, ContainerLink
 
 class ComponentLinksSerializer(serializers.ModelSerializer):
     """
-    Serializer for publishable entity links.
+    Serializer for publishable component entity links.
     """
     upstream_context_title = serializers.CharField(read_only=True)
     upstream_version = serializers.IntegerField(read_only=True, source="upstream_version_num")
@@ -42,3 +42,16 @@ class ContainerLinksSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContainerLink
         exclude = ['upstream_container', 'uuid']
+
+
+class PublishableEntityLinkSerializer(serializers.ModelSerializer):
+    """
+    Serializer for publishable component or container entity links.
+    """
+
+    def to_representation(self, instance):
+        if isinstance(instance, ComponentLink):
+            return ComponentLinksSerializer(instance).data
+        elif isinstance(instance, ContainerLink):
+            return ContainerLinksSerializer(instance).data
+        raise Exception("Unexpected type")
