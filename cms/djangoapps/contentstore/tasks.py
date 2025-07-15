@@ -37,7 +37,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryContainerLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
-from organizations.models import Organization, OrganizationCourse
+from organizations.models import Organization
 from path import Path as path
 from pytz import UTC
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
@@ -163,12 +163,6 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)
 
-        # Copy OrganizationCourse
-        organization_course = OrganizationCourse.objects.filter(course_id=source_course_key_string).first()
-
-        if organization_course:
-            clone_instance(organization_course, {'course_id': destination_course_key_string})
-
         # Copy RestrictedCourse
         restricted_course = RestrictedCourse.objects.filter(course_key=source_course_key).first()
 
@@ -178,7 +172,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             for country_access_rule in country_access_rules:
                 clone_instance(country_access_rule, {'restricted_course': new_restricted_course})
 
-        org_data = ensure_organization(source_course_key.org)
+        org_data = ensure_organization(destination_course_key.org)
         add_organization_course(org_data, destination_course_key)
         return "succeeded"
 
@@ -1286,6 +1280,7 @@ async def _validate_url_access(session, url_data, course_key):
         }
     """
     block_id, url = url_data
+    url = url.strip()  # Trim leading/trailing whitespace
     result = {'block_id': block_id, 'url': url}
     standardized_url = _convert_to_standard_url(url, course_key)
     try:
