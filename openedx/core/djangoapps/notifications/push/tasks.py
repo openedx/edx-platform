@@ -10,7 +10,7 @@ User = get_user_model()
 logger = get_task_logger(__name__)
 
 
-def send_ace_msg_to_push_channel(audience_ids, notification_object, sender_id):
+def send_ace_msg_to_push_channel(audience_ids, notification_object):
     """
     Send mobile notifications using ace to push channels.
     """

@@ -11,6 +11,7 @@ from django.db import transaction
 from openedx.core.djangoapps.notifications.email_notifications import EmailCadence
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, NotificationPreference
 from openedx.core.djangoapps.notifications.utils import aggregate_notification_configs
+from openedx.core.djangoapps.notifications.base_notification import NotificationTypeManager, COURSE_NOTIFICATION_APPS
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,13 @@ class Command(BaseCommand):
             action='store_true',
             help="Simulate the migration without making any database changes."
         )
+        parser.add_argument(
+            '--use-default',
+            nargs='+',
+            choices=['web', 'push', 'email', 'email_cadence'],
+            help="Specify which notification channels should use default values. Can accept multiple values"
+                 " (e.g., --use-default web push email)."
+        )
 
     @staticmethod
     def _get_user_ids_to_process() -> Iterator[int]:
@@ -59,11 +67,28 @@ class Command(BaseCommand):
         user_id: int,
         app_name: str,
         notification_type: str,
-        values: Dict[str, Any]
+        values: Dict[str, Any],
+        use_default: List[str] = None
     ) -> NotificationPreference:
         """
         Helper function to create a NotificationPreference instance.
+        Args:
+            user_id: The user ID for whom the preference is being created
+            app_name: The name of the notification app
+            notification_type: The type of notification (e.g., 'assignment', 'discussion')
+            values: A dictionary containing the preference values for web, email, push, etc.
+            use_default: List of channels that should use default values
         """
+        if use_default:
+            non_core_defaults, core_defaults = NotificationTypeManager().get_notification_app_preference(app_name)
+
+            if non_core_defaults and notification_type in non_core_defaults:
+                for default in use_default:
+                    values[default] = non_core_defaults[notification_type][default]
+
+            elif core_defaults and notification_type in core_defaults:
+                for default in use_default:
+                    values[default] = COURSE_NOTIFICATION_APPS[app_name][f'core_{default}']
         return NotificationPreference(
             user_id=user_id,
             app=app_name,
@@ -77,13 +102,20 @@ class Command(BaseCommand):
     def _create_preferences_from_configs(
         self,
         user_id: int,
-        course_preferences_configs: List[Dict]
+        course_preferences_configs: List[Dict],
+        use_default: List[str] = None
     ) -> List[NotificationPreference]:
         """
         Processes a list of preference configs for a single user.
         Returns a list of NotificationPreference objects to be created.
+
+        Args:
+            user_id: The user ID to process preferences for
+            course_preferences_configs: List of preference configuration dictionaries
+            use_default: List of channels ('web', 'push', 'email') that should use default values
         """
         new_account_preferences: List[NotificationPreference] = []
+        use_default = use_default or []
 
         if not course_preferences_configs:
             logger.debug(f"No course preferences found for user {user_id}. Skipping.")
@@ -118,7 +150,7 @@ class Command(BaseCommand):
                     )
                     continue
                 new_account_preferences.append(
-                    self._create_preference_object(user_id, app_name, notification_type, values)
+                    self._create_preference_object(user_id, app_name, notification_type, values, use_default)
                 )
 
             # Handle core notification types
@@ -145,13 +177,17 @@ class Command(BaseCommand):
                     )
                     continue
                 new_account_preferences.append(
-                    self._create_preference_object(user_id, app_name, core_type_name, core_values)
+                    self._create_preference_object(user_id, app_name, core_type_name, core_values, use_default)
                 )
         return new_account_preferences
 
-    def _process_batch(self, user_ids: List[int]) -> List[NotificationPreference]:
+    def _process_batch(self, user_ids: List[int], use_default: List[str] = None) -> List[NotificationPreference]:
         """
         Fetches all preferences for a batch of users and processes them.
+
+        Args:
+            user_ids: List of user IDs to process
+            use_default: List of channels that should use default values
         """
         all_new_preferences: List[NotificationPreference] = []
 
@@ -167,7 +203,7 @@ class Command(BaseCommand):
 
         # 3. Process each user's grouped data.
         for user_id, configs in prefs_by_user.items():
-            user_new_preferences = self._create_preferences_from_configs(user_id, configs)
+            user_new_preferences = self._create_preferences_from_configs(user_id, configs, use_default)
             if user_new_preferences:
                 all_new_preferences.extend(user_new_preferences)
                 logger.debug(f"User {user_id}: Aggregated {len(configs)} course preferences "
@@ -181,6 +217,7 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any):
         dry_run = options['dry_run']
         batch_size = options['batch_size']
+        use_default = options.get('use_default', [])
 
         if dry_run:
             logger.info(self.style.WARNING("Performing a DRY RUN. No changes will be made to the database."))
@@ -189,6 +226,9 @@ class Command(BaseCommand):
             # This is more efficient and safer than deleting per-user.
             NotificationPreference.objects.all().delete()
             logger.info('Cleared all existing account-level notification preferences.')
+
+        if use_default:
+            logger.info(f"Using default values for channels: {', '.join(use_default)}")
 
         user_id_iterator = self._get_user_ids_to_process()
 
@@ -203,7 +243,7 @@ class Command(BaseCommand):
                 try:
                     with transaction.atomic():
                         # Process the entire batch of users
-                        preferences_to_create = self._process_batch(user_id_batch)
+                        preferences_to_create = self._process_batch(user_id_batch, use_default)
 
                         if preferences_to_create:
                             if not dry_run:
@@ -237,7 +277,7 @@ class Command(BaseCommand):
         if user_id_batch:
             try:
                 with transaction.atomic():
-                    preferences_to_create = self._process_batch(user_id_batch)
+                    preferences_to_create = self._process_batch(user_id_batch, use_default)
                     if preferences_to_create:
                         if not dry_run:
                             NotificationPreference.objects.bulk_create(preferences_to_create)

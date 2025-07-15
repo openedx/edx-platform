@@ -66,7 +66,7 @@ class StructuredTagsAside(XBlockAside):
             fragment = Fragment(render_to_string('structured_tags_block.html', {'tags': tags,
                                                                                 'tags_count': len(tags),
                                                                                 'block_location': block.location}))
-            fragment.add_javascript_url(self._get_studio_resource_url('/js/xblock_asides/structured_tags.js'))
+            fragment.add_javascript_url(self._get_studio_resource_url('js/xblock_asides/structured_tags.js'))
             fragment.initialize_js('StructuredTagsInit')
             return fragment
         else:

@@ -251,7 +251,7 @@ CATEGORY_TO_LEVEL_MAP = {
 }
 
 
-def _create_dto_recursive(xblock_node, xblock_dictionary):
+def _create_dto_recursive(xblock_node, xblock_dictionary, parent_id=None):
     """
     Recursively build the Data Transfer Object by using
     the structure from the node tree and data from the dictionary.
@@ -264,7 +264,7 @@ def _create_dto_recursive(xblock_node, xblock_dictionary):
     xblock_children = []
 
     for xblock_id, node in xblock_node.items():
-        child_blocks = _create_dto_recursive(node, xblock_dictionary)
+        child_blocks = _create_dto_recursive(node, xblock_dictionary, parent_id=xblock_id)
         xblock_data = xblock_dictionary.get(xblock_id, {})
 
         xblock_entry = {
@@ -281,6 +281,13 @@ def _create_dto_recursive(xblock_node, xblock_dictionary):
             })
         else:   # Non-leaf node
             category = xblock_data.get('category', None)
+            # If parent and child has same IDs and level is 'sections', change it to 'subsections'
+            # And if parent and child has same IDs and level is 'subsections', change it to 'units'
+            if xblock_id == parent_id:
+                if category == "chapter":
+                    category = "sequential"
+                elif category == "sequential":
+                    category = "vertical"
             level = CATEGORY_TO_LEVEL_MAP.get(category, None)
             xblock_entry.update(child_blocks)
 
