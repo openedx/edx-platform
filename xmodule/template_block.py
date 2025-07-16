@@ -95,8 +95,8 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
             template_block = system.get_block(template_loc)
             template_block_data = template_block.data
         except ItemNotFoundError as ex:
-            log.exception(f"Could not find template block for custom tag with Id {template_name}")
-            template_block_data = f"Could not find template block for custom tag with Id {template_name}. Error: {ex}"
+            template_block_data = f"Could not find template block for custom tag with Id {template_name}"
+            log.info(template_block_data)
 
         template = Template(template_block_data)
         return template.safe_substitute(params)
