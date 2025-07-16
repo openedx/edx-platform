@@ -128,7 +128,7 @@ from .utils import (
     get_usernames_from_search_string,
     set_attribute,
     is_posting_allowed,
-    can_user_notify_all_learners
+    can_user_notify_all_learners, is_captcha_enabled
 )
 
 User = get_user_model()
@@ -378,6 +378,11 @@ def get_course(request, course_key, check_tab=True):
         'is_notify_all_learners_enabled': can_user_notify_all_learners(
             course_key, user_roles, is_course_staff, is_course_admin
         ),
+        'captcha_settings': {
+            'enabled': is_captcha_enabled(course_key),
+            'site_key': settings.RECAPTCHA_SITE_KEY,
+        }
+
     }
 
 
