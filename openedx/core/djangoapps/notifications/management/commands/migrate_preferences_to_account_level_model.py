@@ -59,7 +59,7 @@ class Command(BaseCommand):
             collected_objects = gc.collect()
             logger.debug(f"Garbage collection freed {collected_objects} objects")
             return collected_objects
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logger.warning(f"Garbage collection failed: {e}")
             return 0
 
@@ -231,7 +231,7 @@ class Command(BaseCommand):
 
         return all_new_preferences
 
-    def handle(self, *args: Any, **options: Any):
+    def handle(self, *args: Any, **options: Any):  # pylint: disable=too-many-statements
         dry_run = options['dry_run']
         batch_size = options['batch_size']
         use_default = options.get('use_default', [])
