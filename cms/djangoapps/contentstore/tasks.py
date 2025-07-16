@@ -1280,6 +1280,7 @@ async def _validate_url_access(session, url_data, course_key):
         }
     """
     block_id, url = url_data
+    url = url.strip()  # Trim leading/trailing whitespace
     result = {'block_id': block_id, 'url': url}
     standardized_url = _convert_to_standard_url(url, course_key)
     try:
