@@ -673,7 +673,9 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
 
             if not verify_recaptcha_token(captcha_token):
                 return Response({'error': 'CAPTCHA verification failed.'}, status=400)
-        return Response(create_thread(request, request.data))
+        data = request.data.copy()
+        data.pop('captcha_token', None)
+        return Response(create_thread(request, data))
 
     def partial_update(self, request, thread_id):
         """
@@ -1038,6 +1040,8 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
 
             if not verify_recaptcha_token(captcha_token):
                 return Response({'error': 'CAPTCHA verification failed.'}, status=400)
+        data = request.data.copy()
+        data.pop('captcha_token', None)
         return Response(create_comment(request, request.data))
 
     def destroy(self, request, comment_id):
