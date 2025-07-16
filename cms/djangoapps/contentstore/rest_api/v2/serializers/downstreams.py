@@ -48,10 +48,21 @@ class PublishableEntityLinkSerializer(serializers.ModelSerializer):
     """
     Serializer for publishable component or container entity links.
     """
+    upstream_key = serializers.CharField(read_only=True)
+    upstream_type = serializers.ChoiceField(read_only=True, choices=['component', 'container'])
 
     def to_representation(self, instance):
         if isinstance(instance, ComponentLink):
-            return ComponentLinksSerializer(instance).data
+            data = ComponentLinksSerializer(instance).data
+            data['upstream_key'] = data.get('upstream_usage_key')
+            data['upstream_type'] = 'component'
+            del data['upstream_usage_key']
         elif isinstance(instance, ContainerLink):
-            return ContainerLinksSerializer(instance).data
-        raise Exception("Unexpected type")
+            data = ContainerLinksSerializer(instance).data
+            data['upstream_key'] = data.get('upstream_container_key')
+            data['upstream_type'] = 'container'
+            del data['upstream_container_key']
+        else:
+            raise Exception("Unexpected type")
+
+        return data

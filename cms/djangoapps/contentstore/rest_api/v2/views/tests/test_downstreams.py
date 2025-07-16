@@ -518,7 +518,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_usage_key': self.video_lib_id,
+                'upstream_key': self.video_lib_id,
+                'upstream_type': 'component',
                 'upstream_version': 1,
                 'version_declined': None,
                 'version_synced': 1
@@ -532,7 +533,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_usage_key': self.html_lib_id,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
                 'upstream_version': 2,
                 'version_declined': None,
                 'version_synced': 1,
@@ -546,7 +548,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_container_key': self.section_id,
+                'upstream_key': self.section_id,
+                'upstream_type': 'container',
                 'upstream_version': 1,
                 'version_declined': None,
                 'version_synced': 1,
@@ -560,7 +563,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_container_key': self.subsection_id,
+                'upstream_key': self.subsection_id,
+                'upstream_type': 'container',
                 'upstream_version': 1,
                 'version_declined': None,
                 'version_synced': 1,
@@ -574,7 +578,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_container_key': self.unit_id,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
                 'upstream_version': 2,
                 'version_declined': None,
                 'version_synced': 1
@@ -605,7 +610,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_usage_key': self.video_lib_id,
+                'upstream_key': self.video_lib_id,
+                'upstream_type': 'component',
                 'upstream_version': 1,
                 'version_declined': None,
                 'version_synced': 1
@@ -619,7 +625,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_usage_key': self.html_lib_id,
+                'upstream_key': self.html_lib_id,
+                'upstream_type': 'component',
                 'upstream_version': 2,
                 'version_declined': None,
                 'version_synced': 1,
@@ -650,7 +657,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_container_key': self.section_id,
+                'upstream_key': self.section_id,
+                'upstream_type': 'container',
                 'upstream_version': 1,
                 'version_declined': None,
                 'version_synced': 1,
@@ -664,7 +672,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_container_key': self.subsection_id,
+                'upstream_key': self.subsection_id,
+                'upstream_type': 'container',
                 'upstream_version': 1,
                 'version_declined': None,
                 'version_synced': 1,
@@ -678,7 +687,8 @@ class GetUpstreamViewTest(
                 'updated': date_format,
                 'upstream_context_key': self.library_id,
                 'upstream_context_title': self.library_title,
-                'upstream_container_key': self.unit_id,
+                'upstream_key': self.unit_id,
+                'upstream_type': 'container',
                 'upstream_version': 2,
                 'version_declined': None,
                 'version_synced': 1
@@ -709,7 +719,7 @@ class GetUpstreamViewTest(
 
     def test_200_component_downstream_context_list(self):
         """
-        Returns all component downstream links for given component
+        Returns all entity downstream links for given component
         """
         self.client.login(username="superuser", password="password")
         response = self.call_api(upstream_key=self.video_lib_id)
@@ -722,7 +732,7 @@ class GetUpstreamViewTest(
 
     def test_200_container_downstream_context_list(self):
         """
-        Returns all component downstream links for given container
+        Returns all entity downstream links for given container
         """
         self.client.login(username="superuser", password="password")
         response = self.call_api(upstream_key=self.unit_id)
