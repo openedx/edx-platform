@@ -21,20 +21,23 @@ class XBlockSerializer:
     """
     static_files: list[StaticFile]
     tags: TagValuesByObjectIdDict
+    olx_node: etree.Element
+    olx_str: str
 
-    def __init__(self, block, write_url_name=True, fetch_asset_data=False):
+    def __init__(self, block, write_url_name=True, fetch_asset_data=False, add_upstream=False):
         """
         Serialize an XBlock to an OLX string + supporting files, and store the
         resulting data in this object.
         """
         self.write_url_name = write_url_name
+        self.add_upstream = add_upstream
 
         self.orig_block_key = block.scope_ids.usage_id
         self.static_files = []
         self.tags = {}
-        olx_node = self._serialize_block(block)
+        self.olx_node = self._serialize_block(block)
 
-        self.olx_str = etree.tostring(olx_node, encoding="unicode", pretty_print=True)
+        self.olx_str = etree.tostring(self.olx_node, encoding="unicode", pretty_print=True)
 
         course_key = self.orig_block_key.course_key
         # Search the OLX for references to files stored in the course's
@@ -131,7 +134,7 @@ class XBlockSerializer:
 
         return olx_node
 
-    def _serialize_children(self, block, parent_olx_node):
+    def _serialize_children(self, block, parent_olx_node) -> None:
         """
         Recursively serialize the children of XBlock 'block'.
         Subclasses may override this.
@@ -146,6 +149,9 @@ class XBlockSerializer:
         """
         olx_node = etree.Element("html")
         olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
+        if self.add_upstream:
+            olx_node.attrib["upstream"] = str(block.scope_ids.usage_id)
+            olx_node.attrib["upstream_version"] = str(block.scope_ids.version)
         if block.display_name:
             olx_node.attrib["display_name"] = block.display_name
         if block.fields["editor"].is_set_on(block):
