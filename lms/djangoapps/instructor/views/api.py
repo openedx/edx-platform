@@ -1598,6 +1598,46 @@ class GetStudentsWhoMayEnroll(DeveloperErrorViewMixin, APIView):
         raise MethodNotAllowed('GET')
 
 
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetInactiveEnrolledStudents(DeveloperErrorViewMixin, APIView):
+    """
+    Initiate generation of a CSV file containing information about
+    students who are enrolled in a course but have inactive account.
+    """
+
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Initiate generation of a CSV file containing information about
+        students who are enrolled in a course but have inactive account.
+
+        Responds with JSON
+            {"status": "... status message ..."}
+        """
+        course_key = CourseKey.from_string(course_id)
+        query_features = ["email"]
+        report_type = _("inactive enrollment")
+        try:
+            task_api.submit_calculate_inactive_enrolled_students_csv(
+                request, course_key, query_features
+            )
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        except Exception as e:
+            raise self.api_error(
+                status.HTTP_400_BAD_REQUEST, str(e), "Requested task is already running"
+            )
+
+        return JsonResponse({"status": success_status})
+
+    def get(self, request, *args, **kwargs):
+        raise MethodNotAllowed("GET")
+
+
 def _cohorts_csv_validator(file_storage, file_to_validate):
     """
     Verifies that the expected columns are present in the CSV used to add users to cohorts.
