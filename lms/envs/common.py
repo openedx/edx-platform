@@ -5683,3 +5683,8 @@ RECAPTCHA_PRIVATE_KEY = ""
 # .. setting_default: empty string
 # .. setting_description: Add recaptcha verification api url to verify capthca tokens.
 RECAPTCHA_VERIFY_URL = ""
+
+# .. setting_name: RECAPTCHA_SITE_KEY
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha site key to use captcha feature in discussion MFE.
+RECAPTCHA_SITE_KEY = ""

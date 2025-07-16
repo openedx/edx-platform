@@ -427,11 +427,11 @@ def verify_recaptcha_token(token):
         return False
 
 
-def is_captcha_enabled(course_id):
+def is_captcha_enabled(course_id) -> bool:
     """
     Check if reCAPTCHA is enabled for discussion posts in the given course.
     """
-    return ENABLE_CAPTCHA_IN_DISCUSSION.is_enabled(course_id) and settings.RECAPTCHA_PRIVATE_KEY
+    return bool(ENABLE_CAPTCHA_IN_DISCUSSION.is_enabled(course_id) and settings.RECAPTCHA_PRIVATE_KEY)
 
 
 def get_course_id_from_thread_id(thread_id: str) -> str:
