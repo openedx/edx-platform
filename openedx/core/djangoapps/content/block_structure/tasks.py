@@ -13,6 +13,7 @@ from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.capa.responsetypes import LoncapaProblemError
+from xmodule.modulestore.django import modulestore, SignalHandler
 from openedx.core.djangoapps.content.block_structure import api
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -44,6 +45,7 @@ def update_course_in_cache_v2(self, **kwargs):
         course_id (string) - The string serialized value of the course key.
     """
     _update_course_in_cache(self, **kwargs)
+    SignalHandler(modulestore()).send('course_cache_updated', course_key=CourseKey.from_string(kwargs['course_id']))
 
 
 @block_structure_task()
