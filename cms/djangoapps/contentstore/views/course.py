@@ -22,6 +22,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiRequest, OpenApiResponse
 from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -29,6 +30,8 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import api_view
+from openedx.core.lib.api.view_utils import view_auth_classes
 
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import create_xblock_info
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
@@ -1710,10 +1713,40 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             )
 
 
-@login_required
+@extend_schema(
+    summary="Bulk enable/disable discussions for all units in a course.",
+    description="Enable or disable discussions for all verticals in the specified course.",
+    request=OpenApiRequest(
+        request={
+            "type": "object",
+            "properties": {"discussion_enabled": {"type": "boolean"}},
+            "required": ["discussion_enabled"],
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            response={
+                "type": "object",
+                "properties": {"units_updated_and_republished": {"type": "integer"}},
+            }
+        ),
+        400: OpenApiResponse(description="Bad request"),
+        403: OpenApiResponse(description="Permission denied"),
+    },
+    methods=["PUT"],
+    parameters=[
+        OpenApiParameter(
+            name="course_key_string",
+            description="Course key string",
+            required=True,
+            type=str,
+            location=OpenApiParameter.PATH,
+        )
+    ],
+)
+@api_view(['PUT'])
+@view_auth_classes()
 @expect_json
-@ensure_csrf_cookie
-@require_http_methods(["PUT"])
 def bulk_enable_disable_discussions(request, course_key_string):
     """
     API endpoint to enable/disable discussions for all verticals in the course and republish them.
@@ -1732,9 +1765,6 @@ def bulk_enable_disable_discussions(request, course_key_string):
     # check that logged in user has permissions to update this course
     if not has_studio_write_access(user, course_key):
         raise PermissionDenied()
-
-    if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
-        return JsonResponseBadRequest({"error": "Only supports json requests"})
 
     if 'discussion_enabled' not in request.json:
         return JsonResponseBadRequest({"error": "Missing 'discussion_enabled' field in request body"})
@@ -1760,7 +1790,7 @@ def bulk_enable_disable_discussions(request, course_key_string):
                         if store.has_published_version(vertical):
                             store.publish(vertical.location, user.id)
                         changed += 1
-            return JsonResponse({"updated_and_republished": changed})
+            return JsonResponse({"units_updated_and_republished": changed})
         except Exception as e:  # lint-amnesty, pylint: disable=broad-except
             log.exception("Exception occurred while enabling/disabling discussion: %s", str(e))
             return JsonResponseBadRequest({"error": str(e)})
