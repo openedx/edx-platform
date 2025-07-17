@@ -12,6 +12,8 @@ from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from forum.backends.mongodb.comments import Comment
+from forum.backends.mongodb.threads import CommentThread
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
@@ -23,9 +25,12 @@ from rest_framework.viewsets import ViewSet
 
 from xmodule.modulestore.django import modulestore
 
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete
+from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
@@ -1515,3 +1520,76 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
         context = {'course_discussion_settings': CourseDiscussionSettings.get(course_id)}
         serializer = DiscussionRolesListSerializer(data, context=context)
         return Response(serializer.data)
+
+
+class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+        A privileged user that can delete all posts and comments made by a user.
+        It returns expected number of comments and threads that will be deleted
+
+    **Example Requests**:
+        POST /api/discussion/v1/bulk_delete_user_posts/{course_id}
+        Query Parameters:
+            username: The username of the user whose posts are to be deleted
+            course_id: Course id for which posts are to be removed
+            execute: If True, runs deletion task
+            course_or_org: If 'course', deletes posts in the course, if 'org', deletes posts in all courses of the org
+
+    **Example Response**:
+        Empty string
+    """
+
+    authentication_classes = (
+        JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (permissions.IsAuthenticated, IsAllowedToBulkDelete)
+
+    def post(self, request, course_id):
+        """
+        Implements the delete user posts endpoint.
+        TODO: Add support for both MySQLBackend as well
+        """
+        username = request.GET.get("username", None)
+        execute_task = request.GET.get("execute", "false").lower() == "true"
+        if (not username) or (not course_id):
+            raise BadRequest("username and course_id are required.")
+        course_or_org = request.GET.get("course_or_org", "course")
+        if course_or_org not in ["course", "org"]:
+            raise BadRequest("course_or_org must be either 'course' or 'org'.")
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise BadRequest("Invalid request")       # pylint: disable=raise-missing-from
+
+        course_ids = [course_id]
+        if course_or_org == "org":
+            org_id = CourseKey.from_string(course_id).org
+            course_ids = [
+                str(c_id)
+                for c_id in CourseEnrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
+                if c_id.org == org_id
+            ]
+
+        query_params = {
+            "course_id": {"$in": course_ids},
+            "author_id": str(user.id),
+            "_type": "Comment"
+        }
+        comment_count = Comment()._collection.count_documents(query_params)         # pylint: disable=protected-access
+
+        query_params["_type"] = "CommentThread"
+        thread_count = CommentThread()._collection.count_documents(query_params)    # pylint: disable=protected-access
+
+        query_params["username"] = username
+        query_params.pop("_type", None)
+
+        if execute_task:
+            delete_course_post_for_user.apply_async(
+                args=(query_params,),
+            )
+        return Response(
+            {"comment_count": comment_count, "thread_count": thread_count},
+            status=status.HTTP_202_ACCEPTED
+        )

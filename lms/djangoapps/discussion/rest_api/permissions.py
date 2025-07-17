@@ -19,7 +19,7 @@ from lms.djangoapps.discussion.django_comment_client.utils import (
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.django_comment_common.models import (
-    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR
+    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_MODERATOR
 )
 
 
@@ -184,4 +184,42 @@ class IsStaffOrAdmin(permissions.BasePermission):
             GlobalStaff().has_user(request.user) or
             request.user.is_staff or
             is_user_staff and request.method == "GET"
+        )
+
+
+class IsAllowedToBulkDelete(permissions.BasePermission):
+    """
+    Permission that checks if the user is staff or an admin.
+    """
+
+    def has_permission(self, request, view):
+        """Returns true if the user can bulk delete posts"""
+        if not request.user.is_authenticated:
+            return False
+
+        course_ids = CourseEnrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
+
+        user_roles = set(
+            Role.objects.filter(
+                users=request.user,
+                course_id__in=course_ids,
+            ).values_list('name', flat=True).distinct()
+        )
+        is_user_staff = bool(user_roles & {
+            FORUM_ROLE_ADMINISTRATOR,
+            FORUM_ROLE_MODERATOR,
+        })
+        if is_user_staff is True:
+            return True
+
+        for course_id in course_ids:
+            if (
+                CourseStaffRole(course_id).has_user(request.user) or
+                CourseInstructorRole(course_id).has_user(request.user)
+            ) is True:
+                return True
+
+        return (
+            GlobalStaff().has_user(request.user) or
+            request.user.is_staff
         )
