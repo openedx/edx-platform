@@ -136,6 +136,7 @@ account_get_me_return_schema = openapi.Schema(
 )
 
 
+# pylint: disable=line-too-long
 class AccountViewSet(ViewSet):
     """View or update a user's account information."""
 
@@ -363,7 +364,7 @@ class AccountViewSet(ViewSet):
 
             PATCH /api/user/v1/accounts/{username}
 
-        **Request Body**
+        **Request Body
 
             {
               "level_of_education": "m",
@@ -412,6 +413,9 @@ class AccountViewSet(ViewSet):
             )
 
         return Response(account_settings)
+
+
+# pylint: enable=line-too-long
 
 
 class NameChangeView(ViewSet):
