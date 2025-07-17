@@ -110,7 +110,7 @@ class MobileConfig(TimeStampedModel):
     .. no_pii:
     """
     name = models.CharField(max_length=255)
-    value = models.CharField(max_length=255)
+    value = models.CharField(max_length=1000)
 
     class Meta:
         app_label = "mobile_api"

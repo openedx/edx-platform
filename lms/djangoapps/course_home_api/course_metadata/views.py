@@ -11,14 +11,17 @@ from rest_framework.response import Response
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from lms.djangoapps.certificates.api import certificates_viewable_for_course
+from lms.djangoapps.course_home_api.toggles import new_discussion_sidebar_view_is_enabled
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
 
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_api.api import course_detail
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.course_metadata.serializers import CourseHomeMetadataSerializer
-from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.access import has_access, has_cms_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import check_course_access
 from lms.djangoapps.courseware.masquerade import setup_masquerade
@@ -117,9 +120,12 @@ class CourseHomeMetadataView(RetrieveAPIView):
         # Record course goals user activity for (web) learning mfe course tabs
         UserActivity.record_user_activity(request.user, course_key)
 
+        course_modes = CourseMode.modes_for_course(course_key, include_expired=True, only_selectable=False)
+
         data = {
             'course_id': course.id,
             'username': username,
+            'studio_access': has_cms_access(request.user, course_key),
             'is_staff': has_access(request.user, 'staff', course_key).has_access,
             'original_user_is_staff': original_user_is_staff,
             'number': course.display_number_with_default,
@@ -133,6 +139,14 @@ class CourseHomeMetadataView(RetrieveAPIView):
             'celebrations': celebrations,
             'user_timezone': user_timezone,
             'can_view_certificate': certificates_viewable_for_course(course),
+            'course_modes': course_modes,
+            'is_new_discussion_sidebar_view_enabled': new_discussion_sidebar_view_is_enabled(course_key),
+            # We check the course author access in the context of CMS here because this field is used
+            # to determine whether the user can access the course authoring tools in the CMS.
+            # This is a temporary solution until the course author role is split into "Course Author" and
+            # "Course Editor" as described in the permission matrix here:
+            # https://github.com/openedx/platform-roadmap/issues/246
+            'has_course_author_access': has_course_author_access(request.user, course_key, 'cms'),
         }
         context = self.get_serializer_context()
         context['course'] = course

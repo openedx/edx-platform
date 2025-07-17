@@ -4,21 +4,18 @@ Public rest API endpoints for the CMS API.
 import logging
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from django.views.decorators.csrf import csrf_exempt
-from django.http import Http404
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 from common.djangoapps.util.json_request import expect_json_in_class_view
 
 from cms.djangoapps.contentstore.api import course_author_access_required
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
-import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 from ..serializers import XblockSerializer
 from .utils import validate_request_with_serializer
 
 
 log = logging.getLogger(__name__)
-toggles = contentstore_toggles
 handle_xblock = view_handlers.handle_xblock
 
 
@@ -31,17 +28,6 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView):
     xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"
     """
     serializer_class = XblockSerializer
-
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     # pylint: disable=arguments-differ
     @course_author_access_required
@@ -76,17 +62,6 @@ class XblockCreateView(DeveloperErrorViewMixin, CreateAPIView):
     xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"
     """
     serializer_class = XblockSerializer
-
-    def dispatch(self, request, *args, **kwargs):
-        # TODO: probably want to refactor this to a decorator.
-        """
-        The dispatch method of a View class handles HTTP requests in general
-        and calls other methods to handle specific HTTP methods.
-        We use this to raise a 404 if the content api is disabled.
-        """
-        if not toggles.use_studio_content_api():
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     # pylint: disable=arguments-differ
     @csrf_exempt

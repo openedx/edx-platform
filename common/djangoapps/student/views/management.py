@@ -8,6 +8,7 @@ import logging
 import urllib.parse
 import uuid
 from collections import namedtuple
+import re
 
 from django.conf import settings
 from django.contrib import messages
@@ -55,9 +56,14 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.djangoapps.user_authn.tasks import send_activation_email
-from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
+from openedx.core.djangoapps.user_authn.toggles import (
+    should_redirect_to_authn_microfrontend,
+    is_auto_generated_username_enabled
+)
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
+from openedx.features.discounts.applicability import FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG
 from openedx.features.enterprise_support.utils import is_enterprise_learner
 from common.djangoapps.student.email_helpers import generate_activation_email_context
 from common.djangoapps.student.helpers import DISABLE_UNENROLL_CERT_STATES, cert_info
@@ -65,6 +71,7 @@ from common.djangoapps.student.message_types import AccountActivation, EmailChan
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollment,
+    EnrollmentNotAllowed,
     PendingEmailChange,  # unimport:skip
     PendingSecondaryEmailChange,
     Registration,
@@ -172,7 +179,26 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-def compose_activation_email(user, user_registration=None, route_enabled=False, profile_name='', redirect_url=None):
+def show_auto_generated_username(username):
+    """
+    Check if the auto-generated username is valid based on the specified pattern.
+
+    Parameters:
+    - username (str): The username to be checked.
+
+    Returns:
+    - bool: True if the username is valid and the auto-generated username check is enabled, False otherwise.
+    """
+    if not is_auto_generated_username_enabled():
+        return False
+
+    pattern = r'^[A-Z]{1,2}_\d{4}_[A-Z0-9]+$'
+    return bool(re.match(pattern, username))
+
+
+def compose_activation_email(
+    user, user_registration=None, route_enabled=False, profile_name='', redirect_url=None, registration_flow=False
+):
     """
     Construct all the required params for the activation email
     through celery task
@@ -183,10 +209,14 @@ def compose_activation_email(user, user_registration=None, route_enabled=False, 
     message_context = generate_activation_email_context(user, user_registration)
     message_context.update({
         'confirm_activation_link': _get_activation_confirmation_link(message_context['key'], redirect_url),
+        'is_enterprise_learner': is_enterprise_learner(user),
+        'is_first_purchase_discount_overridden': FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG.is_enabled(),
         'route_enabled': route_enabled,
         'routed_user': user.username,
         'routed_user_email': user.email,
         'routed_profile_name': profile_name,
+        'registration_flow': registration_flow,
+        'show_auto_generated_username': show_auto_generated_username(user.username),
     })
 
     if route_enabled:
@@ -222,7 +252,9 @@ def _get_activation_confirmation_link(activation_key, redirect_url=None):
     return urllib.parse.urlunparse((scheme, netloc, path, params, query, fragment))
 
 
-def compose_and_send_activation_email(user, profile, user_registration=None, redirect_url=None):
+def compose_and_send_activation_email(
+    user, profile, user_registration=None, redirect_url=None, registration_flow=False,
+):
     """
     Construct all the required params and send the activation email
     through celery task
@@ -232,10 +264,13 @@ def compose_and_send_activation_email(user, profile, user_registration=None, red
         profile: profile object of the current logged-in user
         user_registration: registration of the current logged-in user
         redirect_url: The URL to redirect to after successful activation
+        registration_flow: Is the request coming from registration workflow
     """
     route_enabled = settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL')
 
-    msg = compose_activation_email(user, user_registration, route_enabled, profile.name, redirect_url)
+    msg = compose_activation_email(
+        user, user_registration, route_enabled, profile.name, redirect_url, registration_flow
+    )
     from_address = configuration_helpers.get_value('ACTIVATION_EMAIL_FROM_ADDRESS') or (
         configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     )
@@ -374,7 +409,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponse(redirect_url)
 
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
-            return HttpResponse(reverse('courseware', args=[str(course_id)]))
+            return HttpResponse(make_learning_mfe_courseware_url(course_id))
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)
@@ -389,6 +424,8 @@ def change_enrollment(request, check_access=True):
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
                     CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+            except EnrollmentNotAllowed as exc:
+                return HttpResponseBadRequest(str(exc))
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 
@@ -402,7 +439,7 @@ def change_enrollment(request, check_access=True):
             )
 
         if should_redirect_to_courseware_after_enrollment():
-            return HttpResponse(reverse('courseware', args=[str(course_id)]))
+            return HttpResponse(make_learning_mfe_courseware_url(course_id))
         else:
             return HttpResponse()
     elif action == "unenroll":
@@ -425,6 +462,7 @@ def change_enrollment(request, check_access=True):
         except UnenrollmentNotAllowed as exc:
             return HttpResponseBadRequest(str(exc))
 
+        log.info("User %s unenrolled from %s; sending REFUND_ORDER", user.username, course_id)
         REFUND_ORDER.send(sender=None, course_enrollment=enrollment)
         return HttpResponse()
     else:

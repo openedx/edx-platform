@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from openedx.core.djangoapps.django_comment_common.utils import are_permissions_roles_seeded, seed_permissions_roles
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import SignalHandler, modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_importer import import_course_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -73,6 +73,10 @@ class Command(BaseCommand):
 
         for course in course_items:
             course_id = course.id
+            # Importing is an act of publishing so send the course published signal.
+            SignalHandler.course_published.send_robust(sender=self, course_key=course_id)
+
+            # Seed forum permission roles if we need to.
             if not are_permissions_roles_seeded(course_id):
                 self.stdout.write(f'Seeding forum roles for course {course_id}\n')
                 seed_permissions_roles(course_id)

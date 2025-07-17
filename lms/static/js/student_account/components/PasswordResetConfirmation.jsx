@@ -1,6 +1,5 @@
 /* globals gettext */
 
-import 'whatwg-fetch';
 import PropTypes from 'prop-types';
 import React from 'react';
 

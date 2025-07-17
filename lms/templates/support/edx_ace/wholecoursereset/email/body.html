@@ -1,0 +1,41 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+
+{% load i18n %}
+{% load static %}
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+  <tr>
+    <td>
+      <h1>
+        {% filter force_escape %}
+          {% blocktrans %}The course {{ course_title }} has been reset !{% endblocktrans %}
+          {% endfilter %}
+      </h1>
+      <p style="color: rgba(0,0,0,.75);">
+        {% filter force_escape %}
+          {% blocktrans %}Hello {{ full_name }},{% endblocktrans %}
+        {% endfilter %}
+      </p>
+      <p style="color: rgba(0,0,0,.75);">
+        {% filter force_escape %}
+          {% blocktrans %}Your progress in course {{course_title}} has been reset on your behalf.{% endblocktrans %}
+        {% endfilter %}
+
+        {% filter force_escape %}
+          {% blocktrans %}You will be able to re-attempt this course and earn a verified certificate upon successful completion.{% endblocktrans %}
+        {% endfilter %}
+        <br/>
+      </p>
+
+      <p>
+        {% trans "Best," as tmsg %}{{ tmsg | force_escape }}
+        <br/>
+        {% filter force_escape %}
+          {% blocktrans %}The {{ platform_name }} Team {% endblocktrans %}
+        {% endfilter %}
+      </p>
+
+    </td>
+  </tr>
+</table>
+{% endblock %}

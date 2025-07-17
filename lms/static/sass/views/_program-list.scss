@@ -39,13 +39,6 @@
 .program-cards-container {
   @include grid-container();
   padding-top: 32px;
-
-  .subscription-badge {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 10;
-  }
 }
 
 .sidebar {

@@ -126,6 +126,17 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                     if (successCallback) {
                         successCallback();
                     }
+                    try {
+                        window.parent.postMessage(
+                            {
+                                type: 'refreshPositions',
+                                message: 'Refresh positions of all xblocks',
+                                payload: {}
+                            }, document.referrer
+                        );
+                    } catch (e) {
+                        console.error(e);
+                    }
                     // Update publish and last modified information from the server.
                     xblockInfo.fetch();
                 }

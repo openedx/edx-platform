@@ -7,7 +7,7 @@ from datetime import datetime
 
 from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
-from opaque_keys.edx.keys import UsageKey, AssetKey
+from opaque_keys.edx.keys import UsageKey, AssetKey, LearningContextKey
 
 
 class StagedContentStatus(TextChoices):
@@ -25,6 +25,10 @@ class StagedContentStatus(TextChoices):
 
 # Value of the "purpose" field on StagedContent objects used for clipboards.
 CLIPBOARD_PURPOSE = "clipboard"
+
+# Value of the "purpose" field on StagedContent objects used for library to course sync.
+LIBRARY_SYNC_PURPOSE = "library_sync"
+
 # There may be other valid values of "purpose" which aren't defined within this app.
 
 
@@ -42,6 +46,8 @@ class StagedContentData:
     status: StagedContentStatus = field(validator=validators.in_(StagedContentStatus), converter=StagedContentStatus)
     block_type: str = field(validator=validators.instance_of(str))
     display_name: str = field(validator=validators.instance_of(str))
+    tags: dict = field(validator=validators.optional(validators.instance_of(dict)))
+    version_num: int = field(validator=validators.instance_of(int))
 
 
 @frozen
@@ -64,3 +70,9 @@ class UserClipboardData:
     """ Read-only data model for User Clipboard data (copied OLX) """
     content: StagedContentData = field(validator=validators.instance_of(StagedContentData))
     source_usage_key: UsageKey = field(validator=validators.instance_of(UsageKey))  # type: ignore[type-abstract]
+    source_context_title: str
+
+    @property
+    def source_context_key(self) -> LearningContextKey:
+        """ Get the context (course/library) that this was copied from """
+        return self.source_usage_key.context_key

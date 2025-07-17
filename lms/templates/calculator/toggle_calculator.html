@@ -24,10 +24,10 @@ from openedx.core.djangolib.markup import HTML, Text
                             <p class="sr">${_('Use the arrow keys to navigate the tips or use the tab key to return to the calculator')}</p>
                             <p>
                                 <span class="bold">
-                                    ${Text(_("For detailed information, see {math_link_start}Entering Mathematical and Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for Students{guide_link_end}.")).format(
-                                        math_link_start=HTML('<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/completing_assignments/SFD_mathformatting.html"  target="_blank" >'),
+                                    ${Text(_("For detailed information, see {math_link_start}Entering Mathematical and Scientific Expressions{math_link_end} in the {guide_link_start}Open edX Guide for Students{guide_link_end}.")).format(
+                                        math_link_start=HTML('<a href="https://docs.openedx.org/en/latest/learners/completing_assignments/SFD_mathformatting.html#entering-math-expressions-in-assignments-or-the-calculator"  target="_blank" >'),
                                         math_link_end=HTML('</a>'),
-                                        guide_link_start=HTML('<a href="https://edx.readthedocs.io/projects/open-edx-learner-guide/en/latest/index.html" target="_blank">'),
+                                        guide_link_start=HTML('<a href="https://docs.openedx.org/en/latest/learners/index.html" target="_blank">'),
                                         guide_link_end=HTML('</a>'),
                                     )}
                                 </span>

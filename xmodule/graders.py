@@ -387,7 +387,7 @@ class AssignmentFormatGrader(CourseGrader):
                     section_name = scores[i].display_name
 
                 percentage = scores[i].percent_graded
-                summary_format = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
+                summary_format = "{section_type} {index} - {name} - {percent:.2%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(
                     index=i + self.starting_index,
                     section_type=self.section_type,
@@ -421,7 +421,7 @@ class AssignmentFormatGrader(CourseGrader):
         if len(breakdown) == 1:
             # if there is only one entry in a section, suppress the existing individual entry and the average,
             # and just display a single entry for the section.
-            total_detail = "{section_type} = {percent:.0%}".format(
+            total_detail = "{section_type} = {percent:.2%}".format(
                 percent=total_percent,
                 section_type=self.section_type,
             )
@@ -430,7 +430,7 @@ class AssignmentFormatGrader(CourseGrader):
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
             # Translators: "Homework Average = 0%"
-            total_detail = _("{section_type} Average = {percent:.0%}").format(
+            total_detail = _("{section_type} Average = {percent:.2%}").format(
                 percent=total_percent,
                 section_type=self.section_type
             )

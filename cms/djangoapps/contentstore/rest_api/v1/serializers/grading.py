@@ -40,3 +40,6 @@ class CourseGradingSerializer(serializers.Serializer):
     course_details = CourseGradingModelSerializer()
     show_credit_eligibility = serializers.BooleanField()
     is_credit_course = serializers.BooleanField()
+    default_grade_designations = serializers.ListSerializer(
+        child=serializers.CharField()
+    )

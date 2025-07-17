@@ -37,6 +37,7 @@
             ),
             "${grading_url | n, js_escaped_string}",
             ${course_assignment_lists | n, dump_js_escaped_json},
+            ${default_grade_designations | n, dump_js_escaped_json},
         );
     });
 </%block>

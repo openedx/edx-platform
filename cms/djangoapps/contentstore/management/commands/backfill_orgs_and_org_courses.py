@@ -273,9 +273,9 @@ def find_orgslug_libraryid_pairs() -> Set[Tuple[str, str]]:
 
     Note that this only considers "version 1" (aka "legacy" or "modulestore-based")
     content libraries.
-    We do not consider "version 2" (aka "blockstore-based") content libraries,
-    because those require a database-level link to their authoring organization,
-    and thus would not need backfilling via this command.
+    We do not consider "version 2" content libraries, because those require a
+    database-level link to their authoring organization, and thus would not need
+    backfilling via this command.
 
     Returns: set[tuple[str, str]]
     """

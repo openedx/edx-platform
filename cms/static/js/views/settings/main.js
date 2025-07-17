@@ -388,9 +388,6 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                     Hides and clears the certificate available date field if a display behavior that doesn't use it is
                     chosen. Because we are clearing it, toggling back to "end_with_date" will require re-entering the date
                     */
-            if (!this.useV2CertDisplaySettings) {
-                return;
-            }
             // eslint-disable-next-line prefer-const
             let showDatepicker = this.model.get('certificates_display_behavior') == 'end_with_date';
             // eslint-disable-next-line prefer-const

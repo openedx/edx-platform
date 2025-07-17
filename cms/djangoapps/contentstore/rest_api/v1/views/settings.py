@@ -95,7 +95,6 @@ class CourseSettingsView(DeveloperErrorViewMixin, APIView):
             "show_min_grade_warning": false,
             "sidebar_html_enabled": true,
             "upgrade_deadline": null,
-            "use_v2_cert_display_settings": false
             }
         ```
         """
@@ -112,7 +111,6 @@ class CourseSettingsView(DeveloperErrorViewMixin, APIView):
                 'course_display_name_with_default': course_block.display_name_with_default,
                 'platform_name': settings.PLATFORM_NAME,
                 'licensing_enabled': settings.FEATURES.get("LICENSING", False),
-                'use_v2_cert_display_settings': settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False),
             })
 
             serializer = CourseSettingsSerializer(settings_context)

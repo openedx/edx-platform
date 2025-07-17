@@ -7,9 +7,11 @@ import logging
 
 import requests
 from celery import shared_task
+from django.core.exceptions import ObjectDoesNotExist
 from edx_django_utils.monitoring import set_code_owner_attribute
 from lxml import etree
 from requests import exceptions
+from social_django.models import UserSocialAuth
 
 from common.djangoapps.third_party_auth.models import SAMLConfiguration, SAMLProviderConfig
 from common.djangoapps.third_party_auth.utils import (
@@ -127,3 +129,63 @@ def fetch_saml_metadata():
 
     # Return counts for total, skipped, attempted, updated, and failed, along with any failure messages
     return num_total, num_skipped, num_attempted, num_updated, len(failure_messages), failure_messages
+
+
+@shared_task
+@set_code_owner_attribute
+def update_saml_users_social_auth_uid(reader, slug):
+    """
+    Update the UserSocialAuth UID for users based on a CSV reader input.
+
+    This function reads old and new UIDs from a CSV reader, fetches the corresponding
+    SAMLProviderConfig object using the provided slug, and updates the UserSocialAuth
+    records accordingly.
+
+    Args:
+        reader (csv.DictReader): A CSV reader object that iterates over rows containing 'old-uid' and 'new-uid'.
+        slug (str): The slug of the SAMLProviderConfig object to be fetched.
+
+    Returns:
+        None
+    """
+    log_prefix = "UpdateSamlUsersAuthUID"
+    log.info(f"{log_prefix}: Updated user UID request received with slug: {slug}")
+
+    try:
+        # Fetching the SAMLProviderConfig object with slug
+        saml_provider_config = SAMLProviderConfig.objects.current_set().get(slug=slug)
+    except SAMLProviderConfig.DoesNotExist:
+        log.error(f"{log_prefix}: SAMLProviderConfig with slug {slug} does not exist")
+        return
+    except Exception as e:  # pylint: disable=broad-except
+        log.error(f"{log_prefix}: An error occurred while fetching SAMLProviderConfig: {str(e)}")
+        return
+
+    success_count = 0
+    error_count = 0
+
+    for row in reader:
+        old_uid = row.get('old-uid')
+        new_uid = row.get('new-uid')
+
+        # Construct the UID using the SAML provider slug and old UID
+        uid = f'{saml_provider_config.slug}:{old_uid}'
+
+        try:
+            user_social_auth = UserSocialAuth.objects.get(uid=uid)
+            user_social_auth.uid = f'{saml_provider_config.slug}:{new_uid}'
+            user_social_auth.save()
+            log.info(f"{log_prefix}: Updated UID from {old_uid} to {new_uid} for user:{user_social_auth.user.id}.")
+            success_count += 1
+
+        except ObjectDoesNotExist:
+            log.error(f"{log_prefix}: UserSocialAuth with UID {uid} does not exist for old UID {old_uid}")
+            error_count += 1
+
+        except Exception as e:  # pylint: disable=broad-except
+            log.error(f"{log_prefix}: An error occurred while updating UID for old UID {old_uid}"
+                      f" to new UID {new_uid}: {str(e)}")
+            error_count += 1
+
+    log.info(f"{log_prefix}: Process completed for SAML configuration with slug: {slug}, {success_count} records"
+             f" successfully processed, {error_count} records encountered errors")

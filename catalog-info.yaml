@@ -10,7 +10,9 @@ metadata:
     - url: "https://docs.openedx.org"
       title: "Documentation"
       icon: "Web"
+  annotations:
+    openedx.org/release: "master"
 spec:
-  owner: group:arch-bom
+  owner: group:wg-maintenance-edx-platform
   type: 'service'
   lifecycle: 'production'

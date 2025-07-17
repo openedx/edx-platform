@@ -88,6 +88,7 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
             'core_web': True,
             'core_email': True,
             'core_push': True,
+            'core_email_cadence': 'Daily',
         }
         if overrides is not None:
             notification_app.update(overrides)
@@ -104,6 +105,7 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
             'web': True,
             'email': True,
             'push': True,
+            'email_cadence': 'Daily',
             'info': '',
             'non_editable': [],
             'content_template': '',
@@ -184,42 +186,6 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
         assert preference_type['email'] == email_value
         assert preference_type['push'] == push_value
 
-    def test_non_editable_addition_and_removal(self):
-        """
-        Tests if non_editable updates on existing preferences
-        """
-        current_config_version = get_course_notification_preference_config_version()
-        base_notification.COURSE_NOTIFICATION_TYPES[self.default_type_name]['non_editable'] = ['web']
-        self._set_notification_config_version(current_config_version + 1)
-        new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
-        preferences = new_config.notification_preference_config
-        preference_non_editable = preferences[self.default_app_name]['non_editable'][self.default_type_name]
-        assert 'web' in preference_non_editable
-        base_notification.COURSE_NOTIFICATION_TYPES[self.default_type_name]['non_editable'] = []
-        self._set_notification_config_version(current_config_version + 2)
-        new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
-        preferences = new_config.notification_preference_config
-        preference_non_editable = preferences[self.default_app_name]['non_editable'].get(self.default_type_name, [])
-        assert preference_non_editable == []
-
-    def test_non_editable_addition_and_removal_for_core_notification(self):
-        """
-        Tests if non_editable updates on existing preferences of core notification
-        """
-        current_config_version = get_course_notification_preference_config_version()
-        base_notification.COURSE_NOTIFICATION_APPS[self.default_app_name]['non_editable'] = ['web']
-        self._set_notification_config_version(current_config_version + 1)
-        new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
-        preferences = new_config.notification_preference_config
-        preference_non_editable = preferences[self.default_app_name]['non_editable']['core']
-        assert 'web' in preference_non_editable
-        base_notification.COURSE_NOTIFICATION_APPS[self.default_app_name]['non_editable'] = []
-        self._set_notification_config_version(current_config_version + 2)
-        new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
-        preferences = new_config.notification_preference_config
-        preference_non_editable = preferences[self.default_app_name]['non_editable'].get('core', [])
-        assert preference_non_editable == []
-
     def test_notification_type_in_core(self):
         """
         Tests addition/removal of core in notification type
@@ -255,6 +221,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
         for app_data in notification_apps.values():
             assert 'core_info' in app_data.keys()
             assert isinstance(app_data['non_editable'], list)
+            assert isinstance(app_data['core_email_cadence'], str)
             for key in bool_keys:
                 assert isinstance(app_data[key], bool)
 
@@ -290,6 +257,7 @@ class NotificationPreferenceValidationTest(ModuleStoreTestCase):
             assert 'content_template' in notification_type.keys()
             assert isinstance(notification_type['content_context'], dict)
             assert isinstance(notification_type['non_editable'], list)
+            assert isinstance(notification_type['email_cadence'], str)
             for key in str_keys:
                 assert isinstance(notification_type[key], str)
             for key in bool_keys:

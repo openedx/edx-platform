@@ -177,7 +177,7 @@ class LTIAuthBackend(BaseAuth):
 
             # As this must take constant time, do not use shortcutting operators such as 'and'.
             # Instead, use constant time operators such as '&', which is the bitwise and.
-            valid = (lti_consumer_valid)
+            valid = lti_consumer_valid
             valid = valid & (submitted_signature == computed_signature)
             valid = valid & (request.oauth_version == '1.0')
             valid = valid & (request.oauth_signature_method == 'HMAC-SHA1')

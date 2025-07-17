@@ -1,6 +1,7 @@
 """
 Unit tests for course index outline.
 """
+from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -10,7 +11,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from cms.djangoapps.contentstore.config.waffle import CUSTOM_RELATIVE_DATES
 from cms.djangoapps.contentstore.rest_api.v1.mixins import PermissionAccessMixin
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import get_lms_link_for_item
+from cms.djangoapps.contentstore.utils import get_lms_link_for_item, get_pages_and_resources_url
 from cms.djangoapps.contentstore.views.course import _course_outline_json
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
@@ -21,6 +22,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
     """
     Tests for CourseIndexView.
     """
+    maxDiff = None  # Show the entire dictionary in the diff
 
     def setUp(self):
         super().setUp()
@@ -62,7 +64,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 "advance_settings_url": f"/settings/advanced/{self.course.id}"
             },
             "discussions_incontext_feedback_url": "",
-            "discussions_incontext_learnmore_url": "",
+            "discussions_incontext_learnmore_url": settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL,
             "is_custom_relative_dates_active": True,
             "initial_state": None,
             "initial_user_clipboard": {
@@ -73,7 +75,10 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             },
             "language_code": "en",
             "lms_link": get_lms_link_for_item(self.course.location),
-            "mfe_proctored_exam_settings_url": "",
+            "mfe_proctored_exam_settings_url": (
+                f"http://course-authoring-mfe/course/{self.course.id}"
+                "/pages-and-resources/proctoring/settings"
+            ),
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
@@ -82,8 +87,10 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 "enable_in_context": True,
                 "enable_graded_units": False,
                 "unit_level_visibility": True,
+                'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
             },
             "advance_settings_url": f"/settings/advanced/{self.course.id}",
+            'created_on': None,
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -102,7 +109,7 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 "advance_settings_url": f"/settings/advanced/{self.course.id}"
             },
             "discussions_incontext_feedback_url": "",
-            "discussions_incontext_learnmore_url": "",
+            "discussions_incontext_learnmore_url": settings.DISCUSSIONS_INCONTEXT_LEARNMORE_URL,
             "is_custom_relative_dates_active": False,
             "initial_state": {
                 "expanded_locators": [
@@ -119,7 +126,10 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
             },
             "language_code": "en",
             "lms_link": get_lms_link_for_item(self.course.location),
-            "mfe_proctored_exam_settings_url": "",
+            "mfe_proctored_exam_settings_url": (
+                f"http://course-authoring-mfe/course/{self.course.id}"
+                "/pages-and-resources/proctoring/settings"
+            ),
             "notification_dismiss_url": None,
             "proctoring_errors": [],
             "reindex_link": f"/course/{self.course.id}/search_reindex",
@@ -128,8 +138,10 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
                 "enable_in_context": True,
                 "enable_graded_units": False,
                 "unit_level_visibility": True,
+                'discussion_configuration_url': f'{get_pages_and_resources_url(self.course.id)}/discussion/settings',
             },
             "advance_settings_url": f"/settings/advanced/{self.course.id}",
+            'created_on': None,
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -148,6 +160,6 @@ class CourseIndexViewTest(CourseTestCase, PermissionAccessMixin):
         """
         Test to check number of queries made to mysql and mongo
         """
-        with self.assertNumQueries(29, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(34, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(3):
                 self.client.get(self.url)

@@ -10,7 +10,7 @@ from fs.memoryfs import MemoryFS
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
+from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID, Group, UserPartition
 from xmodule.partitions.tests.test_partitions import MockPartitionService, MockUserPartitionScheme, PartitionTestCase
 from xmodule.split_test_block import (
     SplitTestBlock,
@@ -94,10 +94,10 @@ class SplitTestBlockTest(XModuleXmlImportTest, PartitionTestCase):
         self.course.user_partitions = [
             self.user_partition,
             UserPartition(
-                MINIMUM_STATIC_PARTITION_ID, 'second_partition', 'Second Partition',
+                MINIMUM_UNUSED_PARTITION_ID, 'second_partition', 'Second Partition',
                 [
-                    Group(str(MINIMUM_STATIC_PARTITION_ID + 1), 'abel'),
-                    Group(str(MINIMUM_STATIC_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
+                    Group(str(MINIMUM_UNUSED_PARTITION_ID + 1), 'abel'),
+                    Group(str(MINIMUM_UNUSED_PARTITION_ID + 2), 'baker'), Group("103", 'charlie')
                 ],
                 MockUserPartitionScheme()
             )
@@ -586,8 +586,7 @@ class SplitTestBlockExportImportTest(MixedSplitTestCase):
 
         # Now import it.
         olx_element = lxml.etree.fromstring(exported_olx)
-        id_generator = Mock()
-        imported_split_test_block = SplitTestBlock.parse_xml(olx_element, runtime, None, id_generator)
+        imported_split_test_block = SplitTestBlock.parse_xml(olx_element, runtime, None)
 
         # Check the new XBlock has the same properties as the old one.
         assert imported_split_test_block.display_name == split_test_block.display_name

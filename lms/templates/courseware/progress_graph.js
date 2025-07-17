@@ -1,6 +1,6 @@
 <%page args="grade_summary, grade_cutoffs, graph_div_id, show_grade_breakdown = True, show_grade_cutoffs = True, **kwargs"/>
 <%!
-    import bleach
+    import nh3
     import json
     import math
     import six
@@ -74,7 +74,7 @@ $(function () {
       ## allowing the display of such images, and remove any previously stored HTML
       ## to prevent ugly HTML from being shown to learners.
       ## xss-lint: disable=javascript-jquery-append
-      ticks.append( [tickIndex, bleach.clean(section['label'], tags=set(), strip=True)] )
+      ticks.append( [tickIndex, nh3.clean(section['label'], tags=set())] )
 
       if section['category'] in detail_tooltips:
           ## xss-lint: disable=javascript-jquery-append

@@ -37,20 +37,3 @@ ENABLE_MASTERS_PROGRAM_TAB_VIEW = WaffleFlag(
     'learner_dashboard.enable_masters_program_tab_view',
     __name__,
 )
-
-# .. toggle_name: learner_dashboard.enable_b2c_subscriptions
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Waffle flag to enable new B2C Subscriptions Program data.
-#    This flag is used to decide whether we need to enable program subscription related properties in program listing
-#    and detail pages.
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-04-13
-# .. toggle_target_removal_date: 2023-07-01
-# .. toggle_warning: When the flag is ON, the new B2C Subscriptions Program data will be enabled in program listing
-#    and detail pages.
-# .. toggle_tickets: PON-79
-ENABLE_B2C_SUBSCRIPTIONS = WaffleFlag(
-    'learner_dashboard.enable_b2c_subscriptions',
-    __name__,
-)

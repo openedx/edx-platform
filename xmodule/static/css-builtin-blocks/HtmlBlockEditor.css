@@ -1,0 +1,201 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700");
+
+
+.xmodule_edit.xmodule_AboutBlock .ui-col-wide,
+.xmodule_edit.xmodule_CourseInfoBlock .ui-col-wide,
+.xmodule_edit.xmodule_HtmlBlock .ui-col-wide,
+.xmodule_edit.xmodule_StaticTabBlock .ui-col-wide {
+    width: 74.46809%;
+    margin-right: 2.12766%;
+    float: left;
+}
+
+.xmodule_edit.xmodule_AboutBlock .ui-col-narrow,
+.xmodule_edit.xmodule_CourseInfoBlock .ui-col-narrow,
+.xmodule_edit.xmodule_HtmlBlock .ui-col-narrow,
+.xmodule_edit.xmodule_StaticTabBlock .ui-col-narrow {
+    width: 23.40426%;
+    float: left;
+}
+
+.xmodule_edit.xmodule_AboutBlock .ui-loading,
+.xmodule_edit.xmodule_CourseInfoBlock .ui-loading,
+.xmodule_edit.xmodule_HtmlBlock .ui-loading,
+.xmodule_edit.xmodule_StaticTabBlock .ui-loading {
+    box-shadow: inset 0 1px 2px 1px rgba(0, 0, 0, 0.2);
+    padding: 15px 20px;
+}
+
+.xmodule_edit.xmodule_AboutBlock .ui-loading,
+.xmodule_edit.xmodule_CourseInfoBlock .ui-loading,
+.xmodule_edit.xmodule_HtmlBlock .ui-loading,
+.xmodule_edit.xmodule_StaticTabBlock .ui-loading {
+    animation: fadeIn 0.25s linear 1;
+    opacity: 0.6;
+    background-color: #fff;
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.xmodule_edit.xmodule_AboutBlock .ui-loading .spin,
+.xmodule_edit.xmodule_CourseInfoBlock .ui-loading .spin,
+.xmodule_edit.xmodule_HtmlBlock .ui-loading .spin,
+.xmodule_edit.xmodule_StaticTabBlock .ui-loading .spin {
+    display: inline-block;
+}
+
+.xmodule_edit.xmodule_AboutBlock .ui-loading .copy,
+.xmodule_edit.xmodule_CourseInfoBlock .ui-loading .copy,
+.xmodule_edit.xmodule_HtmlBlock .ui-loading .copy,
+.xmodule_edit.xmodule_StaticTabBlock .ui-loading .copy {
+    padding-left: 5px;
+}
+
+.xmodule_edit.xmodule_AboutBlock .is-hidden,
+.xmodule_edit.xmodule_CourseInfoBlock .is-hidden,
+.xmodule_edit.xmodule_HtmlBlock .is-hidden,
+.xmodule_edit.xmodule_StaticTabBlock .is-hidden {
+    display: none;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor,
+.xmodule_edit.xmodule_CourseInfoBlock .editor,
+.xmodule_edit.xmodule_HtmlBlock .editor,
+.xmodule_edit.xmodule_StaticTabBlock .editor {
+    position: relative;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .row,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .row,
+.xmodule_edit.xmodule_HtmlBlock .editor .row,
+.xmodule_edit.xmodule_StaticTabBlock .editor .row {
+    position: relative;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-bar,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-bar {
+    background-color: #d4dee8;
+    background-image: -webkit-linear-gradient(top, #d4dee8, #c9d5e2);
+    background-image: linear-gradient(to bottom, #d4dee8, #c9d5e2);
+    position: relative;
+    padding: calc(var(--baseline, 20px) / 4);
+    border-bottom-color: #a5aaaf;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar:after,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar:after,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-bar:after,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-bar:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar button,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-bar button,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-bar button {
+    display: inline-block;
+    float: left;
+    padding: 3px calc(var(--baseline, 20px) / 2) 5px;
+    margin-left: 7px;
+    border: 0;
+    border-radius: 2px;
+    background: transparent;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button .icon,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar button .icon,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-bar button .icon,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-bar button .icon {
+    height: 21px;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:hover,
+.xmodule_edit.xmodule_AboutBlock .editor .editor-bar button:focus,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar button:hover,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-bar button:focus,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-bar button:hover,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-bar button:focus,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-bar button:hover,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-bar button:focus {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-tabs,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-tabs,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    text-align: left;
+    direction: ltr;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-tabs li,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-tabs li,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs li,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs li {
+    float: left;
+    margin-right: calc(var(--baseline, 20px) / 4);
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-tabs li:last-child,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-tabs li:last-child,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs li:last-child,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs li:last-child {
+    margin-right: 0;
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-tabs .tab,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-tabs .tab,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs .tab,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs .tab {
+    display: block;
+    height: 24px;
+    padding: 7px 20px 3px;
+    border: 1px solid #a5aaaf;
+    border-radius: 3px 3px 0 0;
+    background-color: var(--transparent, transparent);
+    background-image: -webkit-linear-gradient(top, var(--transparent, transparent) 87%, rgba(0, 0, 0, 0.06));
+    background-image: linear-gradient(to bottom, var(--transparent, transparent) 87%, rgba(0, 0, 0, 0.06));
+    background-color: #e5ecf3;
+    font-size: 13px;
+    color: #3c3c3c;
+    box-shadow: 1px -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.xmodule_edit.xmodule_AboutBlock .editor .editor-tabs .tab.current,
+.xmodule_edit.xmodule_CourseInfoBlock .editor .editor-tabs .tab.current,
+.xmodule_edit.xmodule_HtmlBlock .editor .editor-tabs .tab.current,
+.xmodule_edit.xmodule_StaticTabBlock .editor .editor-tabs .tab.current {
+    background: var(--white, #fff);
+    border-bottom-color: var(--white, #fff);
+}
+
+.xmodule_edit.xmodule_AboutBlock .html-editor:after,
+.xmodule_edit.xmodule_CourseInfoBlock .html-editor:after,
+.xmodule_edit.xmodule_HtmlBlock .html-editor:after,
+.xmodule_edit.xmodule_StaticTabBlock .html-editor:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.xmodule_edit.xmodule_AboutBlock .html-editor .CodeMirror,
+.xmodule_edit.xmodule_CourseInfoBlock .html-editor .CodeMirror,
+.xmodule_edit.xmodule_HtmlBlock .html-editor .CodeMirror,
+.xmodule_edit.xmodule_StaticTabBlock .html-editor .CodeMirror {
+    box-sizing: border-box;
+    height: 435px;
+}
+
+.xmodule_edit.xmodule_AboutBlock .html-editor .is-inactive,
+.xmodule_edit.xmodule_CourseInfoBlock .html-editor .is-inactive,
+.xmodule_edit.xmodule_HtmlBlock .html-editor .is-inactive,
+.xmodule_edit.xmodule_StaticTabBlock .html-editor .is-inactive {
+    display: none;
+}

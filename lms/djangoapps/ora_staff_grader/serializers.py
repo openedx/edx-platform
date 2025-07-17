@@ -4,6 +4,8 @@ Serializers for Enhanced Staff Grader (ESG)
 # pylint: disable=abstract-method
 # pylint: disable=missing-function-docstring
 
+from urllib.parse import urljoin
+from django.conf import settings
 from rest_framework import serializers
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -133,11 +135,13 @@ class ScoreSerializer(serializers.Serializer):
 
 class SubmissionMetadataSerializer(serializers.Serializer):
     """
-    Submission metadata for displaying submissions table in ESG
+    Submission metadata for displaying submissions table in Enhanced Staff Grader (ESG)
     """
 
     submissionUUID = serializers.CharField(source="submissionUuid")
     username = serializers.CharField(allow_null=True)
+    email = serializers.CharField(allow_null=True)
+    fullname = serializers.CharField(allow_null=True)
     teamName = serializers.CharField(allow_null=True)
     dateSubmitted = serializers.DateTimeField()
     dateGraded = serializers.DateTimeField(allow_null=True)
@@ -157,6 +161,57 @@ class SubmissionMetadataSerializer(serializers.Serializer):
             "gradeStatus",
             "lockStatus",
             "score",
+            "email",
+            "fullname",
+        ]
+        read_only_fields = fields
+
+
+class AssessmentScoresSerializer(serializers.Serializer):
+    """
+    Serializer for score information associated with a specific assessment.
+
+    This serializer is included in the `AssessmentSerializer` as a `ListField`
+    """
+    criterion_name = serializers.CharField()
+    score_earned = serializers.IntegerField()
+    score_type = serializers.CharField()
+
+    class Meta:
+        fields = [
+            "criterion_name",
+            "score_earned",
+            "score_type",
+        ]
+        read_only_fields = fields
+
+
+class AssessmentSerializer(serializers.Serializer):
+    """
+    Serializer for the each assessment metadata in the response from the assessments
+    feedback endpoints (from/to) in Enhanced Staff Grader (ESG)
+
+    This serializer is included in the `AssessmentFeedbackSerializer` as a `ListField`
+    """
+    assessment_id = serializers.CharField()
+    scorer_name = serializers.CharField(allow_null=True)
+    scorer_username = serializers.CharField(allow_null=True)
+    scorer_email = serializers.CharField(allow_null=True)
+    assessment_date = serializers.DateTimeField()
+    assessment_scores = serializers.ListField(child=AssessmentScoresSerializer())
+    problem_step = serializers.CharField(allow_null=True)
+    feedback = serializers.CharField(allow_null=True)
+
+    class Meta:
+        fields = [
+            "assessment_id",
+            "scorer_name",
+            "scorer_username",
+            "scorer_email",
+            "assessment_date",
+            "assessment_scores",
+            "problem_step",
+            "feedback",
         ]
         read_only_fields = fields
 
@@ -188,13 +243,35 @@ class InitializeSerializer(serializers.Serializer):
         return obj['isEnabled'] and not obj['oraMetadata'].teams_enabled
 
 
+class AssessmentFeedbackSerializer(serializers.Serializer):
+    """
+    Serializer for a list of assessments for the response from the assessments
+    feedback endpoints (from/to) in Enhanced Staff Grader (ESG)
+    """
+
+    assessments = serializers.ListField(child=AssessmentSerializer())
+
+    class Meta:
+        fields = ["assessments"]
+        read_only_fields = fields
+
+
 class UploadedFileSerializer(serializers.Serializer):
     """Serializer for a file uploaded as a part of a response"""
 
-    downloadUrl = serializers.URLField(source="download_url")
+    downloadUrl = serializers.SerializerMethodField(method_name="get_download_url")
     description = serializers.CharField()
     name = serializers.CharField()
     size = serializers.IntegerField()
+
+    def get_download_url(self, obj):
+        """
+        Get the representation for SerializerMethodField `downloadUrl`
+        """
+        if not obj.get("download_url"):
+            return ""
+
+        return urljoin(settings.LMS_ROOT_URL, obj.get("download_url"))
 
 
 class ResponseSerializer(serializers.Serializer):

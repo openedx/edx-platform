@@ -4,6 +4,7 @@ Additional utilities for Learner Home
 
 import logging
 
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.exceptions import MultipleObjectsReturned
 from rest_framework.exceptions import PermissionDenied, NotFound
@@ -11,6 +12,8 @@ from rest_framework.exceptions import PermissionDenied, NotFound
 from common.djangoapps.student.models import (
     get_user_by_username_or_email,
 )
+from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_is_active
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -54,3 +57,16 @@ def get_masquerade_user(request):
         )
         log.info(success_msg)
         return masquerade_user
+
+
+def course_progress_url(course_key) -> str:
+    """
+    Returns the course progress page's URL for the current user.
+
+    :param course_key: The course key for which the home url is being requested.
+
+    :return: The course progress page URL.
+    """
+    if course_home_mfe_progress_tab_is_active(course_key):
+        return get_learning_mfe_home_url(course_key, url_fragment='progress')
+    return reverse('progress', kwargs={'course_id': course_key})

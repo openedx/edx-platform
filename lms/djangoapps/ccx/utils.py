@@ -269,7 +269,13 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 log.info("%s", error)
                 errors.append(error)
                 break
-            enroll_email(course_key, email, auto_enroll=True, email_students=email_students, email_params=email_params)
+            enroll_email(
+                course_key,
+                email,
+                auto_enroll=True,
+                message_students=email_students,
+                message_params=email_params
+            )
     elif action == 'Unenroll' or action == 'revoke':  # lint-amnesty, pylint: disable=consider-using-in
         for identifier in identifiers:
             try:
@@ -278,7 +284,7 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 log.info("%s", exp)
                 errors.append(f"{exp}")
                 continue
-            unenroll_email(course_key, email, email_students=email_students, email_params=email_params)
+            unenroll_email(course_key, email, message_students=email_students, message_params=email_params)
     return errors
 
 
@@ -348,8 +354,8 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                         course_id=ccx_key,
                         student_email=staff.email,
                         auto_enroll=True,
-                        email_students=send_email,
-                        email_params=email_params,
+                        message_students=send_email,
+                        message_params=email_params,
                     )
 
                     # allow 'staff' access on ccx to staff of master course
@@ -373,8 +379,8 @@ def add_master_course_staff_to_ccx(master_course, ccx_key, display_name, send_em
                         course_id=ccx_key,
                         student_email=instructor.email,
                         auto_enroll=True,
-                        email_students=send_email,
-                        email_params=email_params,
+                        message_students=send_email,
+                        message_params=email_params,
                     )
 
                     # allow 'instructor' access on ccx to instructor of master course
@@ -417,8 +423,8 @@ def remove_master_course_staff_from_ccx(master_course, ccx_key, display_name, se
                 unenroll_email(
                     course_id=ccx_key,
                     student_email=staff.email,
-                    email_students=send_email,
-                    email_params=email_params,
+                    message_students=send_email,
+                    message_params=email_params,
                 )
 
         for instructor in list_instructor:
@@ -430,6 +436,6 @@ def remove_master_course_staff_from_ccx(master_course, ccx_key, display_name, se
                 unenroll_email(
                     course_id=ccx_key,
                     student_email=instructor.email,
-                    email_students=send_email,
-                    email_params=email_params,
+                    message_students=send_email,
+                    message_params=email_params,
                 )

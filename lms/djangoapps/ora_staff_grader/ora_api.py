@@ -12,6 +12,10 @@ Other handlers return status OK even for an error, but contain error info in the
 These are checked (usually by checking for a {"success":false} response) and raise errors, possibly with extra context.
 """
 import json
+from http import HTTPStatus
+
+from rest_framework.request import Request
+
 from lms.djangoapps.ora_staff_grader.errors import (
     LockContestedError,
     XBlockInternalError,
@@ -30,7 +34,48 @@ def get_submissions(request, usage_id):
     if response.status_code != 200:
         raise XBlockInternalError(context={"handler": handler_name})
 
-    return json.loads(response.content)
+    try:
+        return json.loads(response.content)
+    except json.JSONDecodeError as exc:
+        raise XBlockInternalError(
+            context={"handler": handler_name, "details": response.content}
+        ) from exc
+
+
+def get_assessments(request: Request, usage_id: str, handler_name: str, submission_uuid: str):
+    """
+    Get a list of assessments according to the handler name from ORA XBlock.json_handler
+
+    * `list_assessments_to` handler
+        Lists all assessments given by a user (according to their submissionUUID)
+        in an ORA assignment. Assessments can be Self, Peer and Staff.
+
+    * `list_assessments_from` handler
+        Lists all assessments received by a user (according to their submissionUUID)
+        in an ORA assignment. Assessments can be Self, Peer and Staff.
+
+    Args:
+        request (Request): The request object.
+        usage_id (str): Usage ID of the XBlock for running the handler
+        handler_name (str): The name of the handler to call
+        submission_uuid (str): The ORA submission UUID
+    """
+    data = {
+        "item_id": usage_id,
+        "submission_uuid": submission_uuid,
+    }
+
+    response = call_xblock_json_handler(request, usage_id, handler_name, data)
+
+    if response.status_code != HTTPStatus.OK:
+        raise XBlockInternalError(context={"handler": handler_name})
+
+    try:
+        return json.loads(response.content)
+    except json.JSONDecodeError as exc:
+        raise XBlockInternalError(
+            context={"handler": handler_name, "details": response.content}
+        ) from exc
 
 
 def get_submission_info(request, usage_id, submission_uuid):

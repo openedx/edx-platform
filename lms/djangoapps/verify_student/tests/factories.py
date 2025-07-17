@@ -3,7 +3,7 @@ Factories related to student verification.
 """
 from factory.django import DjangoModelFactory
 
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSOVerification, VerificationAttempt
 
 
 class SoftwareSecurePhotoVerificationFactory(DjangoModelFactory):
@@ -19,3 +19,8 @@ class SoftwareSecurePhotoVerificationFactory(DjangoModelFactory):
 class SSOVerificationFactory(DjangoModelFactory):
     class Meta():
         model = SSOVerification
+
+
+class VerificationAttemptFactory(DjangoModelFactory):
+    class Meta:
+        model = VerificationAttempt

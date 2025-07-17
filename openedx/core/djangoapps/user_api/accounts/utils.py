@@ -6,7 +6,6 @@ import logging
 import random
 import re
 import string
-from urllib.parse import urlparse  # pylint: disable=import-error
 
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
 from completion.models import BlockCompletion
@@ -52,11 +51,11 @@ def format_social_link(platform_name, new_social_link):
     """
     Given a user's social link, returns a safe absolute url for the social link.
 
-    Returns the following based on the provided new_social_link:
-    1) Given an empty string, returns ''
-    1) Given a valid username, return 'https://www.[platform_name_base][username]'
-    2) Given a valid URL, return 'https://www.[platform_name_base][username]'
-    3) Given anything unparseable, returns None
+    Returns:
+    - An empty string if `new_social_link` is empty.
+    - A formatted URL if `new_social_link` is a username.
+    - Returns `new_social_link` if it is a valid URL.
+    - None for unparseable inputs.
     """
     # Blank social links should return '' or None as was passed in.
     if not new_social_link:
@@ -85,11 +84,9 @@ def _get_username_from_social_link(platform_name, new_social_link):
     if not new_social_link:
         return new_social_link
 
-    # Parse the social link as if it were a URL.
-    parse_result = urlparse(new_social_link)
-    url_domain_and_path = parse_result[1] + parse_result[2]
     url_stub = re.escape(settings.SOCIAL_PLATFORMS[platform_name]['url_stub'])
-    username_match = re.search(r'(www\.)?' + url_stub + r'(?P<username>.*?)[/]?$', url_domain_and_path, re.IGNORECASE)
+    username_match = re.search(r'(www\.)?' + url_stub + r'(?P<username>.+?)(?:/)?$', new_social_link, re.IGNORECASE)
+
     if username_match:
         username = username_match.group('username')
     else:

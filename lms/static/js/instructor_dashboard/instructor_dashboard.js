@@ -50,6 +50,12 @@ such that the value can be defined later than this assignment (file load order).
 
     $activeSection = null;
 
+    var usesProctoringLegacyView = function () {
+        // If the element #proctoring-mfe-view is present, then uses the new MFE
+        // and the legacy views should not be initialized.
+        return !document.getElementById('proctoring-mfe-view');
+    }
+
     SafeWaiter = (function() {
         function safeWaiter() {
             this.after_handlers = [];
@@ -200,7 +206,7 @@ such that the value can be defined later than this assignment (file load order).
             }
         ];
         // eslint-disable-next-line no-void
-        if (edx.instructor_dashboard.proctoring !== void 0) {
+        if (usesProctoringLegacyView() && edx.instructor_dashboard.proctoring !== void 0) {
             sectionsToInitialize = sectionsToInitialize.concat([
                 {
                     constructor: edx.instructor_dashboard.proctoring.ProctoredExamAllowanceView,

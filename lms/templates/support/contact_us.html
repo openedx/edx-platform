@@ -41,6 +41,7 @@ from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_j
 
         % if user.is_authenticated:
             context['user'] = {
+                'fullName': "${user.profile.name | n, js_escaped_string}",
                 'username': "${user.username | n, js_escaped_string}",
                 'email': "${user.email | n, js_escaped_string}",
                 'course_id': "${course_id | n, js_escaped_string}"

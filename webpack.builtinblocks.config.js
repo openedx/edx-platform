@@ -1,17 +1,5 @@
 module.exports = {
     entry: {
-        AboutBlockDisplay: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/html/display.js',
-            './xmodule/js/src/javascript_loader.js',
-            './xmodule/js/src/collapsible.js',
-            './xmodule/js/src/html/imageModal.js',
-            './xmodule/js/common_static/js/vendor/draggabilly.js'
-        ],
-        AboutBlockEditor: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/html/edit.js'
-        ],
         AnnotatableBlockDisplay: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/html/display.js',
@@ -33,18 +21,6 @@ module.exports = {
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/sequence/edit.js'
         ],
-        CourseInfoBlockDisplay: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/html/display.js',
-            './xmodule/js/src/javascript_loader.js',
-            './xmodule/js/src/collapsible.js',
-            './xmodule/js/src/html/imageModal.js',
-            './xmodule/js/common_static/js/vendor/draggabilly.js'
-        ],
-        CourseInfoBlockEditor: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/html/edit.js'
-        ],
         CustomTagBlockDisplay: './xmodule/js/src/xmodule.js',
         CustomTagBlockEditor: [
             './xmodule/js/src/xmodule.js',
@@ -62,6 +38,10 @@ module.exports = {
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/html/edit.js'
         ],
+        LibraryContentBlockEditor: [
+            './xmodule/js/src/xmodule.js',
+            './xmodule/js/src/vertical/edit.js'
+        ],
         LTIBlockDisplay: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/lti/lti.js'
@@ -69,11 +49,6 @@ module.exports = {
         LTIBlockEditor: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/raw/edit/metadata-only.js'
-        ],
-        LibraryContentBlockDisplay: './xmodule/js/src/xmodule.js',
-        LibraryContentBlockEditor: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/vertical/edit.js'
         ],
         PollBlockDisplay: [
             './xmodule/js/src/xmodule.js',
@@ -103,18 +78,6 @@ module.exports = {
         SplitTestBlockEditor: [
             './xmodule/js/src/xmodule.js',
             './xmodule/js/src/sequence/edit.js'
-        ],
-        StaticTabBlockDisplay: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/html/display.js',
-            './xmodule/js/src/javascript_loader.js',
-            './xmodule/js/src/collapsible.js',
-            './xmodule/js/src/html/imageModal.js',
-            './xmodule/js/common_static/js/vendor/draggabilly.js'
-        ],
-        StaticTabBlockEditor: [
-            './xmodule/js/src/xmodule.js',
-            './xmodule/js/src/html/edit.js'
         ],
         VideoBlockDisplay: [
             './xmodule/js/src/xmodule.js',

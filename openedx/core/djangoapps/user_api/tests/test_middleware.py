@@ -5,13 +5,18 @@ from unittest.mock import Mock, patch
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ..middleware import UserTagsEventContextMiddleware
 from ..tests.factories import UserCourseTagFactory
 
 
+# This middleware only gets installed in the LMS so no need to test
+# it in the CMS context.
+@skip_unless_lms
 class TagsMiddlewareTest(TestCase):
     """
     Test the UserTagsEventContextMiddleware
@@ -25,9 +30,7 @@ class TagsMiddlewareTest(TestCase):
         self.course_id = 'mock/course/id'
         self.request_factory = RequestFactory()
 
-        # TODO: Make it so we can use reverse. Appears to fail depending on the order in which tests are run
-        #self.request = RequestFactory().get(reverse('courseware', kwargs={'course_id': self.course_id}))
-        self.request = RequestFactory().get(f'/courses/{self.course_id}/courseware')
+        self.request = RequestFactory().get(reverse('progress', kwargs={'course_id': self.course_id}))
         self.request.user = self.user
 
         self.response = Mock(spec=HttpResponse)

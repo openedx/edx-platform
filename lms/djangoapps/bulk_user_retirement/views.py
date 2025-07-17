@@ -3,7 +3,6 @@ An API for retiring user accounts.
 """
 import logging
 
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from rest_framework import permissions, status
@@ -34,7 +33,6 @@ class BulkUsersRetirementView(APIView):
 
           * usernames: Comma separated strings of usernames that should be retired.
     """
-    authentication_classes = (JwtAuthentication, )
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
 
     def post(self, request, **kwargs):  # pylint: disable=unused-argument

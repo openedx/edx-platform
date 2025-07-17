@@ -89,7 +89,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """
         Collect all blocks from a course that are "importable" and write them to the
-        a blockstore library.
+        a learning core library.
         """
 
         # Search for the library.

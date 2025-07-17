@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.urls import reverse
 from django.views.decorators.http import require_GET
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -244,7 +243,6 @@ class RetireUserView(APIView):
           - EdxNotesServiceUnavailable is thrown: the edx-notes-api IDA is not available.
     """
 
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
 
     def post(self, request):

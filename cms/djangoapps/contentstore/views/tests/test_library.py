@@ -56,58 +56,69 @@ class UnitTestLibraries(CourseTestCase):
     # Tests for /library/ - list and create libraries:
 
     # When libraries are disabled, nobody can create libraries
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", False)
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", False)
     def test_library_creator_status_libraries_not_enabled(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
-        self.assertEqual(user_can_create_library(nostaff_user), False)
+        self.assertEqual(user_can_create_library(nostaff_user, None), False)
 
     # When creator group is disabled, non-staff users can create libraries
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
     def test_library_creator_status_with_no_course_creator_role(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
-        self.assertEqual(user_can_create_library(nostaff_user), True)
+        self.assertEqual(user_can_create_library(nostaff_user, 'An Org'), True)
 
     # When creator group is enabled, Non staff users cannot create libraries
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
     def test_library_creator_status_for_enabled_creator_group_setting_for_non_staff_users(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            self.assertEqual(user_can_create_library(nostaff_user), False)
+            self.assertEqual(user_can_create_library(nostaff_user, None), False)
 
-    # Global staff can create libraries
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    # Global staff can create libraries for any org, even ones that don't exist.
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
     def test_library_creator_status_with_is_staff_user(self):
-        self.assertEqual(user_can_create_library(self.user), True)
+        print(self.user.is_staff)
+        self.assertEqual(user_can_create_library(self.user, 'aNyOrg'), True)
 
-    # When creator groups are enabled, global staff can create libraries
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    # Global staff can create libraries for any org, but an org has to be supplied.
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
+    def test_library_creator_status_with_is_staff_user_no_org(self):
+        print(self.user.is_staff)
+        self.assertEqual(user_can_create_library(self.user, None), False)
+
+    # When creator groups are enabled, global staff can create libraries in any org
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
     def test_library_creator_status_for_enabled_creator_group_setting_with_is_staff_user(self):
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            self.assertEqual(user_can_create_library(self.user), True)
+            self.assertEqual(user_can_create_library(self.user, 'RandomOrg'), True)
 
-    # When creator groups are enabled, course creators can create libraries
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    # When creator groups are enabled, course creators can create libraries in any org.
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
     def test_library_creator_status_with_course_creator_role_for_enabled_creator_group_setting(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             grant_course_creator_status(self.user, nostaff_user)
-            self.assertEqual(user_can_create_library(nostaff_user), True)
+            self.assertEqual(user_can_create_library(nostaff_user, 'soMeRandOmoRg'), True)
 
     # When creator groups are enabled, course staff members can create libraries
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    # but only in the org they are course staff for.
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
     def test_library_creator_status_with_course_staff_role_for_enabled_creator_group_setting(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             auth.add_users(self.user, CourseStaffRole(self.course.id), nostaff_user)
-            self.assertEqual(user_can_create_library(nostaff_user), True)
+            self.assertEqual(user_can_create_library(nostaff_user, self.course.org), True)
+            self.assertEqual(user_can_create_library(nostaff_user, 'SomEOtherOrg'), False)
 
     # When creator groups are enabled, course instructor members can create libraries
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    # but only in the org they are course staff for.
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
     def test_library_creator_status_with_course_instructor_role_for_enabled_creator_group_setting(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             auth.add_users(self.user, CourseInstructorRole(self.course.id), nostaff_user)
-            self.assertEqual(user_can_create_library(nostaff_user), True)
+            self.assertEqual(user_can_create_library(nostaff_user, self.course.org), True)
+            self.assertEqual(user_can_create_library(nostaff_user, 'SomEOtherOrg'), False)
 
     @ddt.data(
         (False, False, True),
@@ -123,7 +134,7 @@ class UnitTestLibraries(CourseTestCase):
         Ensure that the setting DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION as expected.
         """
         _, nostaff_user = self.create_non_staff_authed_user_client()
-        with mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True):
+        with mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True):
             with mock.patch.dict(
                 "django.conf.settings.FEATURES",
                 {
@@ -131,16 +142,16 @@ class UnitTestLibraries(CourseTestCase):
                     "DISABLE_LIBRARY_CREATION": disable_library
                 }
             ):
-                self.assertEqual(user_can_create_library(nostaff_user), expected_status)
+                self.assertEqual(user_can_create_library(nostaff_user, 'SomEOrg'), expected_status)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True})
-    @mock.patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", True)
+    @mock.patch("cms.djangoapps.contentstore.toggles.libraries_v1_enabled", True)
     def test_library_creator_status_with_no_course_creator_role_and_disabled_nonstaff_course_creation(self):
         """
         Ensure that `DISABLE_COURSE_CREATION` feature works with libraries as well.
         """
         nostaff_client, nostaff_user = self.create_non_staff_authed_user_client()
-        self.assertFalse(user_can_create_library(nostaff_user))
+        self.assertFalse(user_can_create_library(nostaff_user, 'SomEOrg'))
 
         # To be explicit, this user can GET, but not POST
         get_response = nostaff_client.get_json(LIBRARY_REST_URL)
@@ -150,7 +161,7 @@ class UnitTestLibraries(CourseTestCase):
         self.assertEqual(get_response.status_code, 200)
         self.assertEqual(post_response.status_code, 403)
 
-    @patch("cms.djangoapps.contentstore.views.library.LIBRARIES_ENABLED", False)
+    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_CONTENT_LIBRARIES': False})
     def test_with_libraries_disabled(self):
         """
         The library URLs should return 404 if libraries are disabled.
@@ -251,7 +262,7 @@ class UnitTestLibraries(CourseTestCase):
         auth.add_users(self.user, CourseStaffRole(self.course.id), ns_user)
         self.assertTrue(auth.user_has_role(ns_user, CourseStaffRole(self.course.id)))
         response = self.client.ajax_post(LIBRARY_REST_URL, {
-            'org': 'org', 'library': 'lib', 'display_name': "New Library",
+            'org': self.course.org, 'library': 'lib', 'display_name': "New Library",
         })
         self.assertEqual(response.status_code, 200)
 
@@ -392,6 +403,8 @@ class UnitTestLibraries(CourseTestCase):
         self.assertNotIn('advanced', templates)
         self.assertNotIn('openassessment', templates)
         self.assertNotIn('library', templates)
+        self.assertNotIn('library_v2', templates)
+        self.assertNotIn('itembank', templates)
 
     def test_advanced_problem_types(self):
         """

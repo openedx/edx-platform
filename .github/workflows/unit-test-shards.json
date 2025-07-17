@@ -34,7 +34,6 @@
     "paths": [
       "lms/djangoapps/discussion/",
       "lms/djangoapps/edxnotes/",
-      "lms/djangoapps/email_marketing/",
       "lms/djangoapps/experiments/"
     ]
   },
@@ -106,7 +105,6 @@
       "openedx/core/djangoapps/course_live/",
       "openedx/core/djangoapps/dark_lang/",
       "openedx/core/djangoapps/debug/",
-      "openedx/core/djangoapps/demographics/",
       "openedx/core/djangoapps/discussions/",
       "openedx/core/djangoapps/django_comment_common/",
       "openedx/core/djangoapps/embargo/",
@@ -187,7 +185,6 @@
       "openedx/core/djangoapps/credit/",
       "openedx/core/djangoapps/dark_lang/",
       "openedx/core/djangoapps/debug/",
-      "openedx/core/djangoapps/demographics/",
       "openedx/core/djangoapps/discussions/",
       "openedx/core/djangoapps/django_comment_common/",
       "openedx/core/djangoapps/embargo/",
@@ -239,9 +236,9 @@
     "paths": [
       "cms/djangoapps/api/",
       "cms/djangoapps/cms_user_tasks/",
-      "cms/djangoapps/coursegraph/",
       "cms/djangoapps/course_creators/",
       "cms/djangoapps/export_course_metadata/",
+      "cms/djangoapps/import_from_modulestore/",
       "cms/djangoapps/maintenance/",
       "cms/djangoapps/models/",
       "cms/djangoapps/pipeline_js/",

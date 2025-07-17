@@ -44,13 +44,14 @@
                     isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
                     isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff,
                     isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type),
+                    canJoinTeam = TeamUtils.canJoinTeam(this.context.userInfo, this.topic.attributes.type),
                     maxTeamSize = this.topic.getMaxTeamSize(this.context.courseMaxTeamSize);
 
                 // Assignments URL isn't provided if team assignments shouldn't be shown
                 // so we can treat it like a toggle
                 var showAssignments = !!this.context.teamsAssignmentsUrl;
 
-                var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
+                var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic || canJoinTeam);
 
                 HtmlUtils.setHtml(
                     this.$el,

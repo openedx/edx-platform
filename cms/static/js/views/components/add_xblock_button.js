@@ -8,7 +8,8 @@ define(['js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
                 var attributes = {
                     type: this.model.type,
                     templates: this.model.templates,
-                    display_name: this.model.display_name
+                    display_name: this.model.display_name,
+                    beta: this.model.beta,
                 };
                 BaseView.prototype.initialize.call(this);
                 this.template = this.loadTemplate('add-xblock-component-button');

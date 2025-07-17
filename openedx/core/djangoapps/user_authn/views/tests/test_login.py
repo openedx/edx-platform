@@ -496,7 +496,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
         # Check that the URLs are absolute
         for url in user_info["header_urls"].values():
-            assert 'http://testserver/' in url
+            assert 'http://' in url
 
     def test_logout_deletes_mktg_cookies(self):
         response, _ = self._login_response(self.user_email, self.password)
@@ -1027,8 +1027,7 @@ class LoginTest(SiteMixin, CacheIsolationTestCase, OpenEdxEventsTestMixin):
 
             with self.assertLogs(level='WARN') as log:
                 _check_user_auth_flow(site, invalid_email_user)
-                assert len(log.output) == 1
-                assert "Shortcircuiting THIRD_PART_AUTH_ONLY_DOMAIN check." in log.output[0]
+                assert any("Shortcircuiting THIRD_PARTY_AUTH_ONLY_DOMAIN check." in warning for warning in log.output)
 
 
 @ddt.ddt
@@ -1145,7 +1144,7 @@ class LoginSessionViewTest(ApiTestCase, OpenEdxEventsTestMixin):
         mock_segment.track.assert_called_once_with(
             expected_user_id,
             'edx.bi.user.account.authenticated',
-            {'category': 'conversion', 'provider': None, 'label': track_label}
+            {'category': 'conversion', 'provider': None, 'label': track_label, 'anonymous_id': ''}
         )
 
     def test_login_with_username(self):

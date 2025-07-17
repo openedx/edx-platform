@@ -37,6 +37,8 @@ from xmodule.tests import get_test_descriptor_system
 from xmodule.validation import StudioValidationMessage
 from xmodule.video_block import EXPORT_IMPORT_STATIC_DIR, VideoBlock, create_youtube_string
 from xmodule.video_block.transcripts_utils import save_to_store
+from xblock.core import XBlockAside
+from xmodule.modulestore.tests.test_asides import AsideTestType
 
 from .test_import import DummySystem
 
@@ -298,7 +300,7 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         '''
         xml_object = etree.fromstring(xml_data)
-        output = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -315,6 +317,36 @@ class VideoBlockImportTestCase(TestCase):
             'data': '',
             'transcripts': {'uk': 'ukrainian_translation.srt', 'de': 'german_translation.srt'},
         })
+
+    @XBlockAside.register_temp_plugin(AsideTestType, "test_aside")
+    @patch('xmodule.video_block.video_block.VideoBlock.load_file')
+    @patch('xmodule.video_block.video_block.is_pointer_tag')
+    @ddt.data(True, False)
+    def test_parse_xml_with_asides(self, video_xml_has_aside, mock_is_pointer_tag, mock_load_file):
+        """Test that `parse_xml` parses asides from the video xml"""
+        runtime = DummySystem(load_error_blocks=True)
+        if video_xml_has_aside:
+            xml_data = '''
+                <video url_name="a16643fa63234fef8f6ebbc1902e2253">
+                <test_aside xblock-family="xblock_asides.v1" data_field="aside parsed"/>
+                </video>
+            '''
+        else:
+            xml_data = '''
+                <video url_name="a16643fa63234fef8f6ebbc1902e2253">
+                </video>
+            '''
+        mock_is_pointer_tag.return_value = True
+        xml_object = etree.fromstring(xml_data)
+        mock_load_file.return_value = xml_object
+        output = VideoBlock.parse_xml(xml_object, runtime, None)
+        aside = runtime.get_aside_of_type(output, "test_aside")
+        if video_xml_has_aside:
+            assert aside.content == "default_content"
+            assert aside.data_field == "aside parsed"
+        else:
+            assert aside.content == "default_content"
+            assert aside.data_field == "default_data"
 
     @ddt.data(
         ('course-v1:test_org+test_course+test_run',
@@ -344,10 +376,9 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         '''
         xml_object = etree.fromstring(xml_data)
-        id_generator = Mock()
-        id_generator.target_course_id = course_id
+        module_system.id_generator.target_course_id = course_id
 
-        output = VideoBlock.parse_xml(xml_object, module_system, None, id_generator)
+        output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -379,7 +410,7 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         '''
         xml_object = etree.fromstring(xml_data)
-        output = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -411,7 +442,7 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         '''
         xml_object = etree.fromstring(xml_data)
-        output = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -435,7 +466,7 @@ class VideoBlockImportTestCase(TestCase):
         module_system = DummySystem(load_error_blocks=True)
         xml_data = '<video></video>'
         xml_object = etree.fromstring(xml_data)
-        output = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': '3_yD_cEKoCk',
@@ -475,7 +506,7 @@ class VideoBlockImportTestCase(TestCase):
                 />
         '''
         xml_object = etree.fromstring(xml_data)
-        output = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'OEoXaMPEzf65',
             'youtube_id_1_0': 'OEoXaMPEzf10',
@@ -500,7 +531,7 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         '''
         xml_object = etree.fromstring(xml_data)
-        output = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -534,7 +565,7 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         """
         xml_object = etree.fromstring(xml_data)
-        output = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        output = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -565,7 +596,7 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         """
         xml_object = etree.fromstring(xml_data)
-        video = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        video = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(video, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -596,7 +627,7 @@ class VideoBlockImportTestCase(TestCase):
             </video>
         """
         xml_object = etree.fromstring(xml_data)
-        video = VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+        video = VideoBlock.parse_xml(xml_object, module_system, None)
         self.assert_attributes_equal(video, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -643,9 +674,8 @@ class VideoBlockImportTestCase(TestCase):
             edx_video_id=edx_video_id
         )
         xml_object = etree.fromstring(xml_data)
-        id_generator = Mock()
-        id_generator.target_course_id = 'test_course_id'
-        video = VideoBlock.parse_xml(xml_object, module_system, None, id_generator)
+        module_system.id_generator.target_course_id = 'test_course_id'
+        video = VideoBlock.parse_xml(xml_object, module_system, None)
 
         self.assert_attributes_equal(video, {'edx_video_id': edx_video_id})
         mock_val_api.import_from_xml.assert_called_once_with(
@@ -671,7 +701,7 @@ class VideoBlockImportTestCase(TestCase):
         """
         xml_object = etree.fromstring(xml_data)
         with pytest.raises(mock_val_api.ValCannotCreateError):
-            VideoBlock.parse_xml(xml_object, module_system, None, Mock())
+            VideoBlock.parse_xml(xml_object, module_system, None)
 
 
 class VideoExportTestCase(VideoBlockTestBase):
@@ -742,6 +772,48 @@ class VideoExportTestCase(VideoBlockTestBase):
             resource_fs=self.file_system,
             course_id=self.block.scope_ids.usage_id.context_key,
         )
+
+    def test_export_to_xml_without_video_id(self):
+        """
+        Test that we write the correct XML on export of a video without edx_video_id.
+        """
+        self.block.youtube_id_0_75 = 'izygArpw-Qo'
+        self.block.youtube_id_1_0 = 'p2Q6BrNhdh8'
+        self.block.youtube_id_1_25 = '1EeWXzPdhSA'
+        self.block.youtube_id_1_5 = 'rABDYkeK0x8'
+        self.block.show_captions = False
+        self.block.start_time = datetime.timedelta(seconds=1.0)
+        self.block.end_time = datetime.timedelta(seconds=60)
+        self.block.track = 'http://www.example.com/track'
+        self.block.handout = 'http://www.example.com/handout'
+        self.block.download_track = True
+        self.block.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source1.ogg']
+        self.block.download_video = True
+        self.block.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
+
+        xml = self.block.definition_to_xml(self.file_system)
+        parser = etree.XMLParser(remove_blank_text=True)
+        xml_string = '''\
+         <video
+            url_name="SampleProblem"
+            start_time="0:00:01"
+            show_captions="false"
+            end_time="0:01:00"
+            download_video="true"
+            download_track="true"
+            youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"
+            transcripts='{"ge": "german_translation.srt", "ua": "ukrainian_translation.srt"}'
+         >
+           <source src="http://www.example.com/source.mp4"/>
+           <source src="http://www.example.com/source1.ogg"/>
+           <track src="http://www.example.com/track"/>
+           <handout src="http://www.example.com/handout"/>
+           <transcript language="ge" src="german_translation.srt" />
+           <transcript language="ua" src="ukrainian_translation.srt" />
+         </video>
+        '''
+        expected = etree.XML(xml_string, parser=parser)
+        self.assertXmlEqual(expected, xml)
 
     @patch('xmodule.video_block.video_block.edxval_api')
     def test_export_to_xml_val_error(self, mock_val_api):

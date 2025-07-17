@@ -443,6 +443,15 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert metadata['tag'] == 'sequential'
         assert metadata['display_name'] == self.sequence_3_1.display_name_with_default
 
+    def test_get_metadata_navigation_disabled(self):
+        """Test that the sequence metadata is returned correctly when navigation is disabled"""
+        self.sequence_3_1.hide_from_toc = True
+        metadata = self.sequence_3_1.get_metadata()
+        assert len(metadata['items']) == 3
+        assert metadata['tag'] == 'sequential'
+        assert metadata['display_name'] == self.sequence_3_1.display_name_with_default
+        assert metadata['navigation_disabled'] is True
+
     @override_settings(FIELD_OVERRIDE_PROVIDERS=(
         'openedx.features.content_type_gating.field_override.ContentTypeGatingFieldOverride',
     ))
@@ -469,3 +478,97 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         # Replace tuple and un-necessary info from inside string and get the dictionary.
         cleaned_data = data.replace("(('seq_block.html',\n", '').replace("),\n {})", '').strip()
         return ast.literal_eval(cleaned_data)
+
+    def test_not_gated_blocks_rendered_normally(self):
+        """
+        Test that non-gated blocks are rendered with full content when prerequisites are met.
+        """
+        # Mock child block
+        child = Mock()
+        child.scope_ids.usage_id = "block1"
+        child.scope_ids.block_type = "vertical"
+        child.display_name_with_default = "Test Block"
+        children = [child]
+
+        # Mock context
+        context = {"next_url": "next_url", "prev_url": "prev_url"}
+        fragment = Mock()
+
+        # Mock `_render_student_view_for_blocks`
+        self.sequence_3_1._render_student_view_for_blocks = Mock(return_value="rendered_blocks")  # pylint: disable=protected-access
+
+        # Call `_get_render_metadata` with prerequisites met
+        metadata = self.sequence_3_1._get_render_metadata(  # pylint: disable=protected-access
+            context, children, prereq_met=True, prereq_meta_info={}, fragment=fragment
+        )
+
+        # Assert that blocks are rendered normally
+        assert metadata["items"] == "rendered_blocks"
+        assert metadata["next_url"] == "next_url"
+        assert metadata["prev_url"] == "prev_url"
+
+    def test_gated_blocks_rendered_with_basic_info(self):
+        """
+        Test that gated blocks are rendered with minimal metadata when prerequisites are not met.
+        """
+        # Mock child block
+        child = Mock()
+        child.scope_ids.usage_id = "block1"
+        child.scope_ids.block_type = "vertical"
+        child.display_name_with_default = "Test Block"
+        children = [child]
+
+        # Mock context
+        context = {"next_url": "next_url", "prev_url": "prev_url"}
+
+        # Mock prereq_meta_info with required keys
+        prereq_meta_info = {
+            "url": "http://example.com/prereq",
+            "display_name": "Prerequisite Section",
+            "id": "prereq_block_id",
+        }
+
+        # Call `_get_render_metadata` with prerequisites not met
+        metadata = self.sequence_3_1._get_render_metadata(  # pylint: disable=protected-access
+            context, children, prereq_met=False, prereq_meta_info=prereq_meta_info
+        )
+
+        # Assert that gated blocks are rendered with basic info
+        assert len(metadata["items"]) == 1
+        assert metadata["items"][0]["id"] == "block1"
+        assert metadata["items"][0]["type"] == "vertical"
+        assert metadata["items"][0]["display_name"] == "Test Block"
+        assert metadata["items"][0]["is_gated"] is True
+        assert metadata["items"][0]["content"] == ""
+
+        # Assert that next and previous URLs are present
+        assert metadata["next_url"] == "next_url"
+        assert metadata["prev_url"] == "prev_url"
+
+    def test_prereqs_met_content_rendered_normally(self):
+        """
+        Test that content is rendered normally when prerequisites are met.
+        """
+        # Mock child block
+        child = Mock()
+        child.scope_ids.usage_id = "block1"
+        child.scope_ids.block_type = "vertical"
+        child.display_name_with_default = "Test Block"
+        children = [child]
+
+        # Mock context
+        context = {"next_url": "next_url", "prev_url": "prev_url"}
+        fragment = Mock()
+
+        # Mock `_render_student_view_for_blocks`
+        self.sequence_3_1._render_student_view_for_blocks = Mock(return_value="rendered_blocks")  # pylint: disable=protected-access
+
+        # Call `_get_render_metadata` with prerequisites met
+        metadata = self.sequence_3_1._get_render_metadata(  # pylint: disable=protected-access
+            context, children, prereq_met=True, prereq_meta_info={}, fragment=fragment
+        )
+
+        # Assert that content is rendered normally
+        assert metadata["items"] == "rendered_blocks"
+        assert metadata["next_url"] == "next_url"
+        assert metadata["prev_url"] == "prev_url"

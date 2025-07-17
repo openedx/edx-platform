@@ -1,5 +1,6 @@
 """ Tests for transcripts_utils. """
 
+from contextlib import contextmanager
 import copy
 import json
 import re
@@ -464,14 +465,16 @@ class TestYoutubeTranscripts(unittest.TestCase):
         setup_caption_responses(mock_get, 'en', 'test', track_status_code)
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
-            transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
+            link = transcripts_utils.get_transcript_links_from_youtube(youtube_id, settings, translation)
+            transcripts_utils.get_transcript_from_youtube(link, youtube_id, translation)
 
     @patch('xmodule.video_block.transcripts_utils.requests.get')
     def test_youtube_empty_text(self, mock_get):
         setup_caption_responses(mock_get, 'en', '')
         youtube_id = 'bad_youtube_id'
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
-            transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
+            link = transcripts_utils.get_transcript_links_from_youtube(youtube_id, settings, translation)
+            transcripts_utils.get_transcript_from_youtube(link, youtube_id, translation)
 
     def test_youtube_good_result(self):
         caption_response_string = textwrap.dedent("""<?xml version="1.0" encoding="utf-8" ?>
@@ -491,7 +494,8 @@ class TestYoutubeTranscripts(unittest.TestCase):
         language_code = 'en'
         with patch('xmodule.video_block.transcripts_utils.requests.get') as mock_get:
             setup_caption_responses(mock_get, language_code, caption_response_string)
-            transcripts = transcripts_utils.get_transcripts_from_youtube(youtube_id, settings, translation)
+            link = transcripts_utils.get_transcript_links_from_youtube(youtube_id, settings, translation)
+            transcripts = transcripts_utils.get_transcript_from_youtube(link['en'], youtube_id, translation)
 
         self.assertEqual(transcripts, expected_transcripts)
         self.assertEqual(2, len(mock_get.mock_calls))
@@ -997,3 +1001,116 @@ class TestGetTranscript(SharedModuleStoreTestCase):
                 output_format=transcripts_utils.Transcript.SRT,
                 transcripts_info=transcripts_info
             )
+
+
+@ddt.ddt
+class TestResolveLanguageCodeToTranscriptCode(unittest.TestCase):
+    """ Tests for resolve_language_code_to_transcript_code """
+    TEST_OTHER_LANGS = {'ab': 1, 'ab-cd': 1, 'ab-EF': 1, 'cd': 1, 'cd-jk': 1}
+    TEST_TRANSCRIPTS = {'transcripts': TEST_OTHER_LANGS, 'sub': False}
+
+    @ddt.unpack
+    @ddt.data(
+        ('ab', 'ab'),
+        ('ab-CD', 'ab-cd'),
+        ('ab-ef', 'ab-EF'),
+        ('zx', None),
+        ('cd-lmao', 'cd'),
+    )
+    def test_resolve_lang(self, lang, expected):
+        """
+        Test that resolve_language_code_to_transcript_code will successfully match
+        language codes of different cases, and return None if it isn't found
+        """
+        self.assertEqual(
+            transcripts_utils.resolve_language_code_to_transcript_code(self.TEST_TRANSCRIPTS, lang),
+            expected
+        )
+
+
+class TestGetEndonymOrLabel(unittest.TestCase):
+    """
+    tests for the get_endonym_or_label function
+    """
+    LANG_CODE = 'ab-cd'
+    GENERIC_CODE = 'ab'
+    LANG_ENTONYM = 'ab language entonym (cd)'
+    LANG_LABEL = 'ab-cd language english label'
+    GENERIC_LABEL = 'ab language english label'
+
+    TEST_LANGUAGE_DICT = {LANG_CODE: LANG_ENTONYM}
+    TEST_ALL_LANGUAGES = (
+        ["aa", "Afar"],
+        [GENERIC_CODE, GENERIC_LABEL],
+        [LANG_CODE, LANG_LABEL],
+        ["ur", "Urdu"],
+    )
+
+    @contextmanager
+    def mock_django_get_language_info(self, side_effect=None):
+        """
+        Helper for cleaner mocking
+        """
+        with patch('xmodule.video_block.transcripts_utils.get_language_info') as mock_get:
+            if side_effect:
+                mock_get.side_effect = side_effect
+            yield mock_get
+
+    def test_language_in_languages(self):
+        """ If language is found in LANGUAGE_DICT that value should be returned """
+        with override_settings(LANGUAGE_DICT=self.TEST_LANGUAGE_DICT):
+            self.assertEqual(
+                transcripts_utils.get_endonym_or_label(self.LANG_CODE),
+                self.LANG_ENTONYM
+            )
+
+    def test_language_in_django_lang_info(self):
+        """
+        If language is not found in LANGUAGE_DICT, check get_language_info and return that
+        local name if found
+        """
+        with override_settings(LANGUAGE_DICT={}):
+            with self.mock_django_get_language_info() as mock_get_language_info:
+                self.assertEqual(
+                    transcripts_utils.get_endonym_or_label(self.LANG_CODE),
+                    mock_get_language_info.return_value['name_local']
+                )
+
+    def test_language_exact_in_all_languages(self):
+        """
+        If not found in LANGUAGE_DICT or get_language_info, check in
+        ALL_LANGUAGES for the English language name
+        """
+        with override_settings(LANGUAGE_DICT={}):
+            with self.mock_django_get_language_info(side_effect=KeyError):
+                with override_settings(ALL_LANGUAGES=self.TEST_ALL_LANGUAGES):
+                    label = transcripts_utils.get_endonym_or_label(self.LANG_CODE)
+        self.assertEqual(label, self.LANG_LABEL)
+
+    def test_language_generic_in_all_languages(self):
+        """
+        If not found in LANGUAGE_DICT or get_language_info, and the exact code
+        wasn't found in ALL_LANGUAGES, use the generic code if it is found in ALL_LANGUAGES.
+        """
+        all_languages = (
+            self.TEST_ALL_LANGUAGES[0],
+            self.TEST_ALL_LANGUAGES[1],
+            self.TEST_ALL_LANGUAGES[3]
+        )
+
+        with override_settings(LANGUAGE_DICT={}):
+            with self.mock_django_get_language_info(side_effect=KeyError):
+                with override_settings(ALL_LANGUAGES=all_languages):
+                    label = transcripts_utils.get_endonym_or_label(self.LANG_CODE)
+        self.assertEqual(label, self.GENERIC_LABEL)
+
+    def test_language_not_found_anywhere(self):
+        """
+        Raise a NotFoundError if the language isn't found anywhere
+        """
+        all_languages = (self.TEST_ALL_LANGUAGES[0], self.TEST_ALL_LANGUAGES[3])
+        with override_settings(LANGUAGE_DICT={}):
+            with self.mock_django_get_language_info(side_effect=KeyError):
+                with override_settings(ALL_LANGUAGES=all_languages):
+                    with self.assertRaises(NotFoundError):
+                        transcripts_utils.get_endonym_or_label(self.LANG_CODE)

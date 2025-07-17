@@ -17,7 +17,7 @@ show_link = group_configuration_url is not None
         <p>
             <span class="message-text">
                 ${Text(_("This content experiment uses group configuration '{group_configuration_name}'.")).format(
-                    group_configuration_name=Text(HTML("<a href='{}'>{}</a>")).format(group_configuration_url, user_partition.name) if show_link else user_partition.name
+                    group_configuration_name=Text(HTML("<a href='{}' class='xblock-view-group-link'>{}</a>")).format(group_configuration_url, user_partition.name) if show_link else user_partition.name
                 )}
             </span>
         </p>

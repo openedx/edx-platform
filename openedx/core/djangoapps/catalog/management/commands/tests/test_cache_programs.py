@@ -142,6 +142,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             expected = {
                 'exclude_utm': ['1'],
                 'page': [str(page_number)],
+                'status': ['published']
             }
             assert request.querystring == expected
 
@@ -156,7 +157,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         httpretty.register_uri(
             httpretty.GET,
-            self.pathway_url + f'?exclude_utm=1&page={page_number}',
+            self.pathway_url + f'?status=published&exclude_utm=1&page={page_number}',
             body=pathways_callback,
             content_type='application/json',
             match_querystring=True,

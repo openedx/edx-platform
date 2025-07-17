@@ -2,8 +2,8 @@
 
 import json
 from datetime import datetime
-from unittest import skipIf, skipUnless
-from unittest import mock
+from unittest import mock, skipIf, skipUnless
+from unittest.mock import patch
 
 import ddt
 import httpretty
@@ -15,16 +15,32 @@ from django.test import TransactionTestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from pytz import UTC
 from social_django.models import Partial, UserSocialAuth
 from testfixtures import LogCapture
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
+from common.djangoapps.student.helpers import authenticate_new_user
+from common.djangoapps.student.tests.factories import AccountRecoveryFactory, UserFactory
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
+from common.djangoapps.third_party_auth.tests.utils import (
+    ThirdPartyOAuthTestMixin,
+    ThirdPartyOAuthTestMixinFacebook,
+    ThirdPartyOAuthTestMixinGoogle
+)
+from common.djangoapps.util.password_policy_validators import (
+    DEFAULT_MAX_PASSWORD_LENGTH,
+    create_validator_config,
+    password_validators_instruction_texts,
+    password_validators_restrictions
+)
+from openedx.core.djangoapps.embargo.models import Country, GlobalRestrictedCountry
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
     AUTHN_EMAIL_CONFLICT_MSG,
     AUTHN_EMAIL_INVALID_MSG,
+    AUTHN_PASSWORD_COMPROMISED_MSG,
     AUTHN_USERNAME_CONFLICT_MSG,
     EMAIL_BAD_LENGTH_MSG,
     EMAIL_MAX_LENGTH,
@@ -50,20 +66,9 @@ from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
-from common.djangoapps.student.helpers import authenticate_new_user
-from common.djangoapps.student.tests.factories import AccountRecoveryFactory, UserFactory
-from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from common.djangoapps.third_party_auth.tests.utils import (
-    ThirdPartyOAuthTestMixin,
-    ThirdPartyOAuthTestMixinFacebook,
-    ThirdPartyOAuthTestMixinGoogle
-)
-from common.djangoapps.util.password_policy_validators import (
-    DEFAULT_MAX_PASSWORD_LENGTH,
-    create_validator_config,
-    password_validators_instruction_texts,
-    password_validators_restrictions
-)
+
+ENABLE_AUTO_GENERATED_USERNAME = settings.FEATURES.copy()
+ENABLE_AUTO_GENERATED_USERNAME['ENABLE_AUTO_GENERATED_USERNAME'] = True
 
 
 @ddt.ddt
@@ -308,6 +313,30 @@ class RegistrationViewValidationErrorTest(
             response_json,
             {
                 "name": [{"user_message": 'Enter a valid name'}],
+                "error_code": "validation-error"
+            }
+        )
+
+    def test_register_fullname_max_lenghth_validation_error(self):
+        """
+        Full name error detection test if the length exceeds 255 characters.
+        """
+        expected_error_message = f"Your legal name is too long. It must not exceed {NAME_MAX_LENGTH} characters"
+
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "x" * 256,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": expected_error_message}],
                 "error_code": "validation-error"
             }
         )
@@ -1553,7 +1582,7 @@ class RegistrationViewTestV1(
         assert len(mail.outbox) == 1
         sent_email = mail.outbox[0]
         assert sent_email.to == [self.EMAIL]
-        assert sent_email.subject ==\
+        assert sent_email.subject == \
                f'Action Required: Activate your {settings.PLATFORM_NAME} account'
         assert f'high-quality {settings.PLATFORM_NAME} courses' in sent_email.body
 
@@ -1828,37 +1857,116 @@ class RegistrationViewTestV1(
             response = self.client.post(self.url, {"email": self.EMAIL, "username": self.USERNAME})
             assert response.status_code == 403
 
-    @override_settings(
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-                'LOCATION': 'registration_proxy',
-            }
-        }
-    )
-    def test_rate_limiting_registration_view(self):
+    @override_settings(FEATURES=ENABLE_AUTO_GENERATED_USERNAME)
+    def test_register_with_auto_generated_username(self):
         """
-        Confirm rate limits work as expected for registration
-        end point.
-        Note that drf's rate limiting makes use of the default cache
-        to enforce limits; that's why this test needs a "real"
-        default cache (as opposed to the usual-for-tests DummyCache)
+        Test registration functionality with auto-generated username.
+
+        This method tests the registration process when auto-generated username
+        feature is enabled. It creates a new user account, verifies that the user
+        account settings are correctly set, and checks if the user is successfully
+        logged in after registration.
         """
-        payload = {
-            "email": 'email',
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
             "name": self.NAME,
-            "username": self.USERNAME,
             "password": self.PASSWORD,
             "honor_code": "true",
-        }
+        })
+        self.assertHttpOK(response)
 
-        for _ in range(int(settings.REGISTRATION_RATELIMIT.split('/')[0])):
-            response = self.client.post(self.url, payload)
-            assert response.status_code != 403
+        user = User.objects.get(email=self.EMAIL)
+        request = RequestFactory().get('/url')
+        request.user = user
+        account_settings = get_account_settings(request)[0]
 
-        response = self.client.post(self.url, payload)
-        assert response.status_code == 403
-        cache.clear()
+        assert self.EMAIL == account_settings["email"]
+        assert not account_settings["is_active"]
+        assert self.NAME == account_settings["name"]
+
+        # Verify that we've been logged in
+        # by trying to access a page that requires authentication
+        response = self.client.get(reverse("dashboard"))
+        self.assertHttpOK(response)
+
+    @override_settings(FEATURES=ENABLE_AUTO_GENERATED_USERNAME)
+    def test_register_with_empty_name(self):
+        """
+        Test registration field validations when ENABLE_AUTO_GENERATED_USERNAME is enabled.
+
+        Sends a POST request to the registration endpoint with empty name field.
+        Expects a 400 Bad Request response with the corresponding validation error message for the name field.
+        """
+        response = self.client.post(self.url, {
+            "email": "bob@example.com",
+            "name": "",
+            "password": "password",
+            "honor_code": "true",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {
+                "name": [{"user_message": 'Your legal name must be a minimum of one character long'}],
+                "error_code": "validation-error"
+            }
+        )
+
+    @override_settings(FEATURES=ENABLE_AUTO_GENERATED_USERNAME)
+    @mock.patch('openedx.core.djangoapps.user_authn.views.utils._get_username_prefix')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.utils.random.choices')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.utils.datetime')
+    @mock.patch('openedx.core.djangoapps.user_authn.views.utils.get_auto_generated_username')
+    def test_register_autogenerated_duplicate_username(self,
+                                                       mock_get_auto_generated_username,
+                                                       mock_datetime,
+                                                       mock_choices,
+                                                       mock_get_username_prefix):
+        """
+        Test registering a user with auto-generated username where a duplicate username conflict occurs.
+
+        Mocks various utilities to control the auto-generated username process and verifies the response content
+        when a duplicate username conflict happens during user registration.
+        """
+        mock_datetime.now.return_value.strftime.return_value = '24 03'
+        mock_choices.return_value = ['X', 'Y', 'Z', 'A']  # Fixed random string for testing
+
+        mock_get_username_prefix.return_value = None
+
+        current_year_month = f"{datetime.now().year % 100}{datetime.now().month:02d}_"
+        random_string = 'XYZA'
+        expected_username = current_year_month + random_string
+        mock_get_auto_generated_username.return_value = expected_username
+
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+        # Try to create a second user with the same username
+        response = self.client.post(self.url, {
+            "email": "someone+else@example.com",
+            "name": "Someone Else",
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        })
+
+        assert response.status_code == 409
+        response_json = json.loads(response.content.decode('utf-8'))
+        response_json.pop('username_suggestions')
+        self.assertDictEqual(
+            response_json,
+            {
+                "username": [{
+                    "user_message": AUTHN_USERNAME_CONFLICT_MSG,
+                }],
+                "error_code": "duplicate-username"
+            }
+        )
 
     def _assert_fields_match(self, actual_field, expected_field):
         """
@@ -2258,6 +2366,11 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
     @override_settings(LOGIN_REDIRECT_WHITELIST=['openedx.service'])
     @skip_unless_lms
     def test_register_success_with_redirect(self, next_url, course_id, expected_redirect):
+        expected_response = {
+            'username': self.USERNAME,
+            'full_name': self.NAME,
+            'user_id': 1
+        }
         post_params = {
             "email": self.EMAIL,
             "name": self.NAME,
@@ -2282,7 +2395,7 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
         # Check that authenticated user details are also returned in
         # the response for successful registration
         decoded_response = json.loads(response.content.decode('utf-8'))
-        assert decoded_response['authenticated_user'] == {'username': self.USERNAME, 'user_id': 1}
+        assert decoded_response['authenticated_user'] == expected_response
 
     @mock.patch('openedx.core.djangoapps.user_authn.views.register._record_is_marketable_attribute')
     def test_logs_for_error_when_setting_is_marketable_attribute(self, set_is_marketable_attr):
@@ -2314,6 +2427,87 @@ class RegistrationViewTestV2(RegistrationViewTestV1):
             )
 
             assert response.status_code == 200
+
+    @override_settings(
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True
+    )
+    @mock.patch('eventtracking.tracker.emit')
+    @mock.patch(
+        'openedx.core.djangoapps.user_authn.views.registration_form.check_pwned_password',
+        mock.Mock(return_value={
+            'vulnerability': 'yes',
+            'frequency': 3,
+            'user_request_page': 'registration',
+        })
+    )
+    def test_register_error_with_pwned_password(self, emit):
+        post_params = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+        }
+        response = self.client.post(
+            self.url,
+            post_params,
+            HTTP_ACCEPT='*/*',
+        )
+        emit.assert_called_with(
+            'edx.bi.user.pwned.password.status',
+            {
+                'frequency': 3,
+                'vulnerability': 'yes',
+                'user_request_page': 'registration',
+            })
+        assert response.status_code == 400
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    def test_register_with_disabled_country(self):
+        """
+        Test case to check user registration is forbidden when registration is disabled for a country
+        """
+        country = Country.objects.create(country="KP")
+        GlobalRestrictedCountry.objects.create(country=country)
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+            "country": "KP",
+        })
+        assert response.status_code == 400
+        response_json = json.loads(response.content.decode('utf-8'))
+        self.assertDictEqual(
+            response_json,
+            {'country':
+                [
+                    {
+                        'user_message': 'Registration from this country is not allowed due to restrictions.'
+                    }
+                ], 'error_code': 'validation-error'}
+        )
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': False})
+    def test_registration_allowed_when_embargo_disabled(self):
+        """
+        Ensures that user registration proceeds normally even for restricted countries
+        when the EMBARGO feature flag is disabled.
+        """
+        country = Country.objects.create(country="KP")
+        GlobalRestrictedCountry.objects.create(country=country)
+
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+            "country": "KP",
+        })
+
+        self.assertEqual(response.status_code, 200)
 
 
 @httpretty.activate
@@ -2420,6 +2614,40 @@ class ThirdPartyRegistrationTestMixin(
         response = self.client.post(self.url, self.data())
         assert response.status_code == 200
 
+        self._verify_user_existence(user_exists=True, social_link_exists=True, user_is_active=False)
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    def test_with_disabled_country(self):
+        """
+        Test case to check user registration is forbidden when registration is restricted for a country
+        """
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+        self._setup_provider_response(success=True)
+        country_obj = Country.objects.create(country="US")
+        GlobalRestrictedCountry.objects.create(country=country_obj)
+        response = self.client.post(self.url, self.data())
+        assert response.status_code == 400
+        assert response.json() == {
+            'country': [
+                {
+                    'user_message': 'Registration from this country is not allowed due to restrictions.'
+                }
+            ], 'error_code': 'validation-error'
+        }
+        self._verify_user_existence(user_exists=False, social_link_exists=False, user_is_active=False)
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': False})
+    def test_with_disabled_country_when_embargo_disabled(self):
+        """
+        Ensures that user registration proceeds normally even for restricted countries
+        when the EMBARGO feature flag is disabled.
+        """
+        self._verify_user_existence(user_exists=False, social_link_exists=False)
+        self._setup_provider_response(success=True)
+        country_obj = Country.objects.create(country="US")
+        GlobalRestrictedCountry.objects.create(country=country_obj)
+        response = self.client.post(self.url, self.data())
+        assert response.status_code == 200
         self._verify_user_existence(user_exists=True, social_link_exists=True, user_is_active=False)
 
     def test_unlinked_active_user(self):
@@ -2807,3 +3035,28 @@ class RegistrationValidationViewTests(test_utils.ApiTestCase, OpenEdxEventsTestM
             {'username': 'user', 'email': 'user@email.com', 'is_authn_mfe': True, 'form_field_key': 'email'},
             {'email': AUTHN_EMAIL_CONFLICT_MSG}
         )
+
+    @override_settings(
+        ENABLE_AUTHN_REGISTER_HIBP_POLICY=True
+    )
+    @mock.patch('eventtracking.tracker.emit')
+    @mock.patch(
+        'openedx.core.djangoapps.user_api.accounts.api.check_pwned_password',
+        mock.Mock(return_value={
+            'vulnerability': 'yes',
+            'frequency': 3,
+            'user_request_page': 'registration',
+        })
+    )
+    def test_pwned_password_and_emit_track_event(self, emit):
+        self.assertValidationDecision(
+            {'password': 'testtest12'},
+            {'password': AUTHN_PASSWORD_COMPROMISED_MSG}
+        )
+        emit.assert_called_with(
+            'edx.bi.user.pwned.password.status',
+            {
+                'frequency': 3,
+                'vulnerability': 'yes',
+                'user_request_page': 'registration',
+            })

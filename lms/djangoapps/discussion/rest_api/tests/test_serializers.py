@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 import ddt
 import httpretty
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -17,7 +18,12 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.testing import UrlResetMixin
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
-from lms.djangoapps.discussion.rest_api.serializers import CommentSerializer, ThreadSerializer, get_context
+from lms.djangoapps.discussion.rest_api.serializers import (
+    CommentSerializer,
+    ThreadSerializer,
+    filter_spam_urls_from_html,
+    get_context
+)
 from lms.djangoapps.discussion.rest_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
@@ -54,6 +60,12 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.maxDiff = None  # pylint: disable=invalid-name
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
@@ -102,9 +114,9 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         assert actual_serialized_anonymous == expected_serialized_anonymous
 
     @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, False, "Staff"),
+        (FORUM_ROLE_ADMINISTRATOR, False, "Moderator"),
         (FORUM_ROLE_ADMINISTRATOR, True, None),
-        (FORUM_ROLE_MODERATOR, False, "Staff"),
+        (FORUM_ROLE_MODERATOR, False, "Moderator"),
         (FORUM_ROLE_MODERATOR, True, None),
         (FORUM_ROLE_COMMUNITY_TA, False, "Community TA"),
         (FORUM_ROLE_COMMUNITY_TA, True, None),
@@ -116,7 +128,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
         """
         Test correctness of the author_label field.
 
-        The label should be "Staff", "Staff", or "Community TA" for the
+        The label should be "Staff", "Moderator", or "Community TA" for the
         Administrator, Moderator, and Community TA roles, respectively, but
         the label should not be present if the content is anonymous.
 
@@ -143,6 +155,7 @@ class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetM
 @ddt.ddt
 class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer serialization."""
+
     def make_cs_content(self, overrides):
         """
         Create a thread with the given overrides, plus some useful test data.
@@ -274,11 +287,12 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "unread_comments_count": 3,
             "closed_by": moderator
         })
-        closed_by_label = "Staff" if visible else None
+        closed_by_label = "Moderator" if visible else None
         closed_by = moderator if visible else None
         can_delete = role != FORUM_ROLE_STUDENT
         editable_fields = ["abuse_flagged", "copy_link", "following", "read", "voted"]
         if role == "author":
+            editable_fields.remove("voted")
             editable_fields.extend(['anonymous', 'raw_body', 'title', 'topic_id', 'type'])
         elif role == FORUM_ROLE_MODERATOR:
             editable_fields.extend(['close_reason_code', 'closed', 'edit_reason_code', 'pinned',
@@ -329,13 +343,15 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "unread_comments_count": 3,
             "closed_by": None
         })
-        edit_by_label = "Staff" if visible else None
+        edit_by_label = "Moderator" if visible else None
         can_delete = role != FORUM_ROLE_STUDENT
         last_edit = None if role == FORUM_ROLE_STUDENT else {"editor_username": moderator}
         editable_fields = ["abuse_flagged", "copy_link", "following", "read", "voted"]
 
         if role == "author":
+            editable_fields.remove("voted")
             editable_fields.extend(['anonymous', 'raw_body', 'title', 'topic_id', 'type'])
+
         elif role == FORUM_ROLE_MODERATOR:
             editable_fields.extend(['close_reason_code', 'closed', 'edit_reason_code', 'pinned',
                                     'raw_body', 'title', 'topic_id', 'type'])
@@ -375,6 +391,7 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
 @ddt.ddt
 class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
     """Tests for CommentSerializer."""
+
     def setUp(self):
         super().setUp()
         self.endorser = UserFactory.create()
@@ -491,8 +508,8 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         assert actual_endorser_anonymous == expected_endorser_anonymous
 
     @ddt.data(
-        (FORUM_ROLE_ADMINISTRATOR, "Staff"),
-        (FORUM_ROLE_MODERATOR, "Staff"),
+        (FORUM_ROLE_ADMINISTRATOR, "Moderator"),
+        (FORUM_ROLE_MODERATOR, "Moderator"),
         (FORUM_ROLE_COMMUNITY_TA, "Community TA"),
         (FORUM_ROLE_STUDENT, None),
     )
@@ -501,7 +518,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
         """
         Test correctness of the endorsed_by_label field.
 
-        The label should be "Staff", "Staff", or "Community TA" for the
+        The label should be "Staff", "Moderator", or "Community TA" for the
         Administrator, Moderator, and Community TA roles, respectively.
 
         role_name is the name of the author's role.
@@ -566,6 +583,12 @@ class ThreadSerializerDeserializationTest(
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
@@ -610,7 +633,7 @@ class ThreadSerializerDeserializationTest(
         self.register_post_thread_response({"id": "test_id", "username": self.user.username})
         saved = self.save_and_reserialize(self.minimal_data)
         assert urlparse(httpretty.last_request().path).path ==\
-               '/api/v1/test_topic/threads'  # lint-amnesty, pylint: disable=no-member
+            '/api/v1/test_topic/threads'  # lint-amnesty, pylint: disable=no-member
         assert parsed_body(httpretty.last_request()) == {
             'course_id': [str(self.course.id)],
             'commentable_id': ['test_topic'],
@@ -797,6 +820,22 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         httpretty.enable()
         self.addCleanup(httpretty.reset)
         self.addCleanup(httpretty.disable)
+        patcher = mock.patch(
+            'openedx.core.djangoapps.discussions.config.waffle.ENABLE_FORUM_V2.is_enabled',
+            return_value=False
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.models.forum_api.get_course_id_by_comment"
+        )
+        self.mock_get_course_id_by_comment = patcher.start()
+        self.addCleanup(patcher.stop)
+        patcher = mock.patch(
+            "openedx.core.djangoapps.django_comment_common.comment_client.thread.forum_api.get_course_id_by_thread"
+        )
+        self.mock_get_course_id_by_thread = patcher.start()
+        self.addCleanup(patcher.stop)
         self.user = UserFactory.create()
         self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/dummy")
@@ -1075,3 +1114,23 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         )
         assert not serializer.is_valid()
         assert serializer.errors == {field: ['This field is not allowed in an update.']}
+
+
+class FilterSpamTest(SharedModuleStoreTestCase):
+    """
+    Tests for the filter_spam method
+    """
+    @override_settings(DISCUSSION_SPAM_URLS=['example.com'])
+    def test_filter(self):
+        self.assertEqual(
+            filter_spam_urls_from_html('<div><a href="example.com/abc/def">abc</a></div>')[0],
+            '<div>abc</div>'
+        )
+        self.assertEqual(
+            filter_spam_urls_from_html('<div>example.com/abc/def</div>')[0],
+            '<div></div>'
+        )
+        self.assertEqual(
+            filter_spam_urls_from_html('<div>e x a m p l e . c o m / a b c / d e f</div>')[0],
+            '<div></div>'
+        )

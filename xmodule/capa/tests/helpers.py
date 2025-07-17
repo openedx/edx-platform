@@ -6,10 +6,10 @@ import io
 import os
 import os.path
 import xml.sax.saxutils as saxutils
+from unittest.mock import MagicMock, Mock
 
 import fs.osfs
 from mako.lookup import TemplateLookup
-from mock import MagicMock, Mock
 from path import Path
 
 from xmodule.capa.capa_problem import LoncapaProblem, LoncapaSystem
@@ -58,10 +58,9 @@ class StubXQueueService:
         return dispatch
 
 
-def test_capa_system(render_template=None):
+def mock_capa_system(render_template=None):
     """
     Construct a mock LoncapaSystem instance.
-
     """
     the_system = Mock(
         spec=LoncapaSystem,
@@ -102,7 +101,7 @@ def mock_capa_block():
 def new_loncapa_problem(xml, problem_id='1', capa_system=None, seed=723, use_capa_render_template=False):
     """Construct a `LoncapaProblem` suitable for unit tests."""
     render_template = capa_render_template if use_capa_render_template else None
-    return LoncapaProblem(xml, id=problem_id, seed=seed, capa_system=capa_system or test_capa_system(render_template),
+    return LoncapaProblem(xml, id=problem_id, seed=seed, capa_system=capa_system or mock_capa_system(render_template),
                           capa_block=mock_capa_block())
 
 

@@ -37,7 +37,8 @@
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
                 'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
-                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie'
+                'listenForDragDrop', 'setTranscriptVisibility', 'updateTranscriptCookie',
+                'updateGoogleDisclaimer', 'toggleGoogleDisclaimer', 'updateProblematicCaptionsContent'
             );
 
             this.state = state;
@@ -493,6 +494,68 @@
             },
 
             /**
+            * @desc Sets whether or not the Google disclaimer should be shown based on captions 
+            * being AI generated, and shows/hides based on the above and if ClosedCaptions are being shown.
+            *
+            * @param {array} captions List of captions for the video.
+            *
+            * @returns {boolean}
+            */
+            updateGoogleDisclaimer: function(captions) {
+                const aIGeneratedSpanText = '<span id="captions-ai-generated"',
+                      aiProviderRegexp = /data\-provider=["'](?<provider>\w+)["']/;
+                var self = this,
+                    state = this.state,
+                    aiGeneratedSpan = captions.find(caption => caption.includes(aIGeneratedSpanText)),
+                    captionsAIGenerated = !(aiGeneratedSpan === undefined),
+                    aiCaptionProviderIsGoogle = true;
+
+                if (captionsAIGenerated) {
+                    const providerMatch = aiProviderRegexp.exec(aiGeneratedSpan);
+                    if (providerMatch !== null) {
+                        aiCaptionProviderIsGoogle = providerMatch.groups['provider'] === 'gcp';
+                    }
+                    // If there is no provider tag, it was generated before we added those,
+                    // so it must be Google
+                }
+                // This field is whether or not, in general, this video should show the google disclaimer
+                self.shouldShowGoogleDisclaimer = captionsAIGenerated && aiCaptionProviderIsGoogle;
+                // Should we, right now, on load, show the google disclaimer
+                self.toggleGoogleDisclaimer(!self.hideCaptionsOnLoad && !state.captionsHidden);
+            },
+
+            /**
+            * @desc Show or hide the google translate disclaimer based on the passed param
+            *       and whether or not we are currently showing a google translated transcript.
+            * @param {boolean} [show] Show if true, hide if false - if we are showing a google
+            *                         translated transcript. If not, this will always hide.
+            */
+            toggleGoogleDisclaimer: function(show) {
+                var self = this,
+                    state = this.state;
+                if (show && self.shouldShowGoogleDisclaimer) {
+                    state.el.find('.google-disclaimer').show();
+                } else {
+                    state.el.find('.google-disclaimer').hide();
+                }
+            },
+
+            /**
+            * @desc Replaces content in a caption
+            *
+            * @param {array} captions List of captions for the video.
+            * @param {string} content content to be replaced
+            * @param {string} replacementContent the replace string
+            *
+            * @returns {array} captions List of captions for the video.
+            */
+            updateProblematicCaptionsContent: function(captions, content = '', replacementContent = '') {
+                var updatedCaptions = captions.map(caption => caption.replace(content, replacementContent));
+
+                return updatedCaptions;
+            },
+
+            /**
             * @desc Fetch the caption file specified by the user. Upon successful
             *     receipt of the file, the captions will be rendered.
             * @param {boolean} [fetchWithYoutubeId] Fetch youtube captions if true.
@@ -546,6 +609,12 @@
                         results = self.getBoundedCaptions();
                         start = results.start;
                         captions = results.captions;
+                        var contentToReplace = CAPTIONS_CONTENT_TO_REPLACE,
+                            replacementContent = CAPTIONS_CONTENT_REPLACEMENT;
+
+                        captions = self.updateProblematicCaptionsContent(captions, contentToReplace, replacementContent);
+
+                        self.updateGoogleDisclaimer(captions);
 
                         if (self.loaded) {
                             if (self.rendered) {
@@ -1068,12 +1137,13 @@
                         if (typeof this.currentIndex !== 'undefined') {
                             this.subtitlesEl
                                 .find('li.current')
+                                .attr('aria-current', 'false')
                                 .removeClass('current');
-                        }
-
+                        }                 
                         this.subtitlesEl
                             .find("span[data-index='" + newIndex + "']")
                             .parent()
+                            .attr('aria-current', 'true')
                             .addClass('current');
 
                         this.currentIndex = newIndex;
@@ -1165,10 +1235,12 @@
                     this.state.showClosedCaptions = false;
                     this.updateCaptioningCookie(false);
                     this.hideClosedCaptions();
+                    this.toggleGoogleDisclaimer(false);
                 } else {
                     this.state.showClosedCaptions = true;
                     this.updateCaptioningCookie(true);
                     this.showClosedCaptions();
+                    this.toggleGoogleDisclaimer(true);
                 }
             },
 
@@ -1299,6 +1371,7 @@
             */
             hideCaptions: function(hideCaptions, triggerEvent) {
                 var transcriptControlEl = this.transcriptControlEl,
+                    self = this,
                     state = this.state,
                     text;
 
@@ -1309,6 +1382,8 @@
                     if (triggerEvent) {
                         this.state.el.trigger('transcript:hide');
                     }
+
+                    self.toggleGoogleDisclaimer(false);
 
                     transcriptControlEl
                         .removeClass('is-active')
@@ -1322,6 +1397,8 @@
                     if (triggerEvent) {
                         this.state.el.trigger('transcript:show');
                     }
+
+                    self.toggleGoogleDisclaimer(true);
 
                     transcriptControlEl
                         .addClass('is-active')

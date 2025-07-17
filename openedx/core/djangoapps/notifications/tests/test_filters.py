@@ -28,8 +28,8 @@ from openedx.core.djangoapps.notifications.audience_filters import (
     CourseRoleAudienceFilter,
     CohortAudienceFilter,
     TeamAudienceFilter,
+    NotificationFilter,
 )
-from openedx.core.djangoapps.notifications.filters import NotificationFilter
 from openedx.core.djangoapps.notifications.handlers import calculate_course_wide_notification_audience
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
@@ -96,7 +96,8 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
 
     @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     @mock.patch(
-        "openedx.core.djangoapps.notifications.filters.NotificationFilter.filter_audit_expired_users_with_no_role")
+        "openedx.core.djangoapps.notifications.audience_filters.NotificationFilter"
+        ".filter_audit_expired_users_with_no_role")
     def test_apply_filter(
         self,
         mock_filter_audit_expired,

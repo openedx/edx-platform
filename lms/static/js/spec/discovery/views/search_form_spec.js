@@ -41,10 +41,17 @@ define(['jquery', 'js/discovery/views/search_form'], function($, SearchForm) {
         it('shows messages', function() {
             this.form.showFoundMessage(123);
             expect($('#discovery-message')).toContainHtml(123);
-            this.form.showNotFoundMessage();
-            expect($('#discovery-message')).not.toBeEmpty();
             this.form.showErrorMessage();
             expect($('#discovery-message')).not.toBeEmpty();
+        });
+
+        it('shows not found messages', function() {
+            // message should not be displayed if search term is empty
+            this.form.showNotFoundMessage();
+            expect($('#discovery-message')).toBeEmpty();
+            this.form.showNotFoundMessage('xyz');
+            expect($('#discovery-message')).not.toBeEmpty();
+            expect($('#discovery-message')).toContainHtml('xyz');
         });
 
         it('shows default error message', function() {

@@ -1,11 +1,11 @@
 """
 Discussion API views
 """
-
 import logging
 import uuid
 
 import edx_api_doc_tools as apidocs
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import BadRequest, ValidationError
 from django.shortcuts import get_object_or_404
@@ -20,6 +20,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+
 from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
@@ -79,9 +80,8 @@ from ..rest_api.serializers import (
 )
 from .utils import (
     create_blocks_params,
-    create_topics_v3_structure,
+    create_topics_v3_structure, is_captcha_enabled, verify_recaptcha_token, get_course_id_from_thread_id,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -117,6 +117,36 @@ class CourseView(DeveloperErrorViewMixin, APIView):
         # Record user activity for tracking progress towards a user's course goals (for mobile app)
         UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
         return Response(get_course(request, course_key))
+
+
+@view_auth_classes()
+class CourseViewV2(DeveloperErrorViewMixin, APIView):
+    """
+    General discussion metadata API v2.
+    """
+
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID")
+        ],
+        responses={
+            200: CourseMetadataSerailizer(read_only=True, required=False),
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        }
+    )
+    def get(self, request, course_id):
+        """
+        Retrieve general discussion metadata for a course.
+
+        **Example Requests**:
+            GET /api/discussion/v2/courses/course-v1:ExampleX+Subject101+2015
+        """
+        course_key = CourseKey.from_string(course_id)
+        # Record user activity for tracking progress towards a user's course goals (for mobile app)
+        UserActivity.record_user_activity(request.user, course_key, request=request, only_if_mobile_app=True)
+        return Response(get_course(request, course_key, False))
 
 
 @view_auth_classes()
@@ -634,7 +664,18 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
-        return Response(create_thread(request, request.data))
+        if not request.data.get("course_id"):
+            raise ValidationError({"course_id": ["This field is required."]})
+        if is_captcha_enabled(CourseKey.from_string(request.data.get("course_id"))):
+            captcha_token = request.data.get('captcha_token')
+            if not captcha_token:
+                raise ValidationError({'captcha_token': 'This field is required.'})
+
+            if not verify_recaptcha_token(captcha_token):
+                return Response({'error': 'CAPTCHA verification failed.'}, status=400)
+        data = request.data.copy()
+        data.pop('captcha_token', None)
+        return Response(create_thread(request, data))
 
     def partial_update(self, request, thread_id):
         """
@@ -948,6 +989,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
             form.cleaned_data["page_size"],
             form.cleaned_data["flagged"],
             form.cleaned_data["requested_fields"],
+            form.cleaned_data["merge_question_type_responses"]
         )
 
     def list_by_user(self, request):
@@ -988,6 +1030,18 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
+        if not request.data.get("thread_id"):
+            raise ValidationError({"thread_id": ["This field is required."]})
+        course_id = get_course_id_from_thread_id(request.data["thread_id"])
+        if is_captcha_enabled(CourseKey.from_string(course_id)):
+            captcha_token = request.data.get('captcha_token')
+            if not captcha_token:
+                raise ValidationError({'captcha_token': 'This field is required.'})
+
+            if not verify_recaptcha_token(captcha_token):
+                return Response({'error': 'CAPTCHA verification failed.'}, status=400)
+        data = request.data.copy()
+        data.pop('captcha_token', None)
         return Response(create_comment(request, request.data))
 
     def destroy(self, request, comment_id):
@@ -1099,7 +1153,6 @@ class RetireUserView(APIView):
         Empty string
     """
 
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanRetireUser)
 
     def post(self, request):
@@ -1147,7 +1200,6 @@ class ReplaceUsernamesView(APIView):
 
     """
 
-    authentication_classes = (JwtAuthentication,)
     permission_classes = (permissions.IsAuthenticated, CanReplaceUsername)
 
     def post(self, request):

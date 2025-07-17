@@ -66,7 +66,7 @@ Glossary
    plan on removing this term from this app's code to avoid confusion.
 
 -  **Section**: From our
-   `documentation <https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/developing_course/course_sections.html#what-is-a-section>`__,
+   `documentation <https://docs.openedx.org/en/latest/educators/concepts/open_edx_platform/about_course_sections.html>`__,
    “A section is the topmost category in your course. A section can
    represent a time period in your course, a chapter, or another
    organizing principle. A section contains one or more subsections.”
@@ -155,7 +155,7 @@ Configuring A.C.E.
 
 These instructions assume you have already setup an Open edX instance or
 are running devstack. See the `Open edX Developer’s
-Guide <https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/>`__
+Guide <https://docs.openedx.org/en/latest/developers/references/developer_guide/index.html>`__
 for information on setting them up.
 
 The Schedule app relies on ACE. When live, ACE sends emails to users

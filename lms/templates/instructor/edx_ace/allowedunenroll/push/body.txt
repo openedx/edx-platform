@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}You have been unenrolled from the course {{ course_name }}. Please disregard the invitation previously sent.{% endblocktrans %}
+{% endautoescape %}

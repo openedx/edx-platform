@@ -7,7 +7,11 @@ from django.db import models
 
 
 class Announcement(models.Model):
-    """Site-wide announcements to be displayed on the dashboard"""
+    """
+    Site-wide announcements to be displayed on the dashboard
+
+    .. no_pii:
+    """
     class Meta:
         app_label = 'announcements'
 

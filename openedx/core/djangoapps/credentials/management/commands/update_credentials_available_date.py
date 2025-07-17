@@ -1,12 +1,6 @@
 """
-A manangement command to populate the new available_date field in all CourseCertificates
-in credentials. Accomplished by sending the COURSE_CERT_DATE_CHANGE signal accross all
-course runs in the LMS to call a new API in credentials that will populate the date if one
-is found.
-
-This command is designed to be ran once to backpopulate data. New courses added or any time
-the COURSE_CERT_DATE_CHANGE signal fires, the API will automatically be called as a part of
-that flow.
+A manangement command to populate or correct the `certificate_available_date` data of the
+CourseCertificateConfiguration model instances stored by the Credentials IDA.
 """
 from django.core.management.base import BaseCommand
 
@@ -15,9 +9,11 @@ from openedx.core.djangoapps.credentials.tasks.v1.tasks import backfill_date_for
 
 class Command(BaseCommand):
     """
-    A command to populate the available_date field in the CourseCertificate model for every
-    course run inside of the LMS.
-    """
+    Enqueue the `backfill_date_for_all_course_runs` Celery task, which will enqueue additional subtasks responsible for
+    sending certificate availability updates to the Credentials IDA.
 
+    Example usage:
+        $ ./manage.py lms update_credentials_available_date
+    """
     def handle(self, *args, **options):
         backfill_date_for_all_course_runs.delay()

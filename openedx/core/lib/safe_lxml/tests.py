@@ -4,7 +4,7 @@ Test that we have defused XML.
 
 
 from lxml import etree
-from defusedxml.lxml import EntitiesForbidden
+from defusedxml.common import EntitiesForbidden
 from .xmlparser import fromstring
 
 import pytest

@@ -6,7 +6,7 @@ from django.urls import include
 from django.urls import path, re_path
 from rest_framework.routers import DefaultRouter
 
-from .views import EntitlementEnrollmentViewSet, EntitlementViewSet, SubscriptionsRevokeVerifiedAccessView
+from .views import EntitlementEnrollmentViewSet, EntitlementViewSet
 
 router = DefaultRouter()
 router.register(r'entitlements', EntitlementViewSet, basename='entitlements')
@@ -24,9 +24,4 @@ urlpatterns = [
         ENROLLMENTS_VIEW,
         name='enrollments'
     ),
-    path(
-        'subscriptions/entitlements/revoke',
-        SubscriptionsRevokeVerifiedAccessView.as_view(),
-        name='revoke_subscriptions_verified_access'
-    )
 ]

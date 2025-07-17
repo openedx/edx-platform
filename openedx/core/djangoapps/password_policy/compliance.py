@@ -97,7 +97,7 @@ def enforce_compliance_on_login(user, password):
                 platform_name=settings.PLATFORM_NAME,
                 deadline=strftime_localized(deadline, DEFAULT_SHORT_DATE_FORMAT),
                 anchor_tag_open=HTML('<a href="{account_settings_url}">').format(
-                    account_settings_url=settings.LMS_ROOT_URL + "/account/settings"
+                    account_settings_url=settings.ACCOUNT_MICROFRONTEND_URL
                 ),
                 anchor_tag_close=HTML('</a>')
             )

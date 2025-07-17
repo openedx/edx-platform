@@ -98,7 +98,8 @@ class CourseYoutubeBlockedFlag(ConfigurationModel):
     Disables the playback of youtube videos for a given course.
     If the flag is present for the course, and set to "enabled",
     then youtube is disabled for that course.
-    .. no_pii
+
+    .. no_pii:
     """
     KEY_FIELDS = ('course_id',)
 

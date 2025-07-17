@@ -6,6 +6,15 @@ from logging import getLogger
 from crum import get_current_user
 from django.conf import settings
 from eventtracking import tracker
+from openedx_events.learning.data import (
+    CcxCourseData,
+    CcxCoursePassingStatusData,
+    CourseData,
+    CoursePassingStatusData,
+    UserData,
+    UserPersonalData
+)
+from openedx_events.learning.signals import CCX_COURSE_PASSING_STATUS_UPDATED, COURSE_PASSING_STATUS_UPDATED
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
@@ -174,8 +183,8 @@ def course_grade_passed_first_time(user_id, course_id):
 
 def course_grade_now_passed(user, course_id):
     """
-    Emits an edx.course.grade.now_passed event
-    with data from the course and user passed now .
+    Emits an edx.course.grade.now_passed and passing status updated events
+    with data from the course and user passed now.
     """
     event_name = COURSE_GRADE_NOW_PASSED_EVENT_TYPE
     context = contexts.course_context_from_course_id(course_id)
@@ -190,11 +199,13 @@ def course_grade_now_passed(user, course_id):
             }
         )
 
+    _emit_course_passing_status_update(user, course_id, is_passing=True)
+
 
 def course_grade_now_failed(user, course_id):
     """
-    Emits an edx.course.grade.now_failed event
-    with data from the course and user failed now .
+    Emits an edx.course.grade.now_failed and passing status updated events
+    with data from the course and user failed now.
     """
     event_name = COURSE_GRADE_NOW_FAILED_EVENT_TYPE
     context = contexts.course_context_from_course_id(course_id)
@@ -208,6 +219,8 @@ def course_grade_now_failed(user, course_id):
                 'event_transaction_type': str(get_event_transaction_type())
             }
         )
+
+    _emit_course_passing_status_update(user, course_id, is_passing=False)
 
 
 def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator):
@@ -258,3 +271,47 @@ def fire_segment_event_on_course_grade_passed_first_time(user_id, course_locator
         )
 
     log.info("Segment event fired for passed learners. Event: [{}], Data: [{}]".format(event_name, event_properties))
+
+
+def _emit_course_passing_status_update(user, course_id, is_passing):
+    """
+    Emit course passing status event according to the course type.
+    The status of event is determined by is_passing parameter.
+    """
+    if hasattr(course_id, 'ccx'):
+        CCX_COURSE_PASSING_STATUS_UPDATED.send_event(
+            course_passing_status=CcxCoursePassingStatusData(
+                is_passing=is_passing,
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=user.username,
+                        email=user.email,
+                        name=user.get_full_name(),
+                    ),
+                    id=user.id,
+                    is_active=user.is_active,
+                ),
+                course=CcxCourseData(
+                    ccx_course_key=course_id,
+                    master_course_key=course_id.to_course_locator(),
+                ),
+            )
+        )
+    else:
+        COURSE_PASSING_STATUS_UPDATED.send_event(
+            course_passing_status=CoursePassingStatusData(
+                is_passing=is_passing,
+                user=UserData(
+                    pii=UserPersonalData(
+                        username=user.username,
+                        email=user.email,
+                        name=user.get_full_name(),
+                    ),
+                    id=user.id,
+                    is_active=user.is_active,
+                ),
+                course=CourseData(
+                    course_key=course_id,
+                ),
+            )
+        )

@@ -40,8 +40,8 @@ def authenticate_lti_user(request, lti_user_id, lti_consumer):
         if lti_consumer.require_user_account:
             # Verify that the email from the LTI Launch and the logged-in user are the same
             # before linking the LtiUser with the edx_user.
-            if request.user.is_authenticated and request.user.email == lis_email:
-                lti_user = create_lti_user(lti_user_id, lti_consumer, lis_email)
+            if request.user.is_authenticated and request.user.email.lower() == lis_email.lower():
+                lti_user = create_lti_user(lti_user_id, lti_consumer, request.user.email)
             else:
                 # Ask the user to login before linking.
                 raise PermissionDenied() from exc

@@ -1,2 +1,1 @@
 <h2><%- gettext('My programs') %></h2>
-<div class="js-program-list-alerts program-list-alerts program-subscription-alert-wrapper mr-md-3"></div>

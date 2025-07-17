@@ -139,6 +139,45 @@ class EnrollmentUtilsTest(TestCase):
             is_active=True,
             enrollment_attributes=None,
             enterprise_uuid=ENTERPRISE_UUID,
+            force_enrollment=False,
+        )
+        mock_get_enrollment_api.assert_called_once_with(USERNAME, str(COURSE_ID))
+
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.add_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.enrollment_api.get_enrollment')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.User.objects.get')
+    @mock.patch('openedx.features.enterprise_support.enrollments.utils.transaction')
+    def test_passes_force_enrollment_flag(
+        self,
+        mock_tx,
+        mock_user_model,
+        mock_get_enrollment_api,
+        mock_add_enrollment_api,
+    ):
+        """
+        Everything about this test is the same as the standard happy case, except we're just making sure the
+        force_enrollment flag gets passed to add_enrollment().
+        """
+        expected_response = {'mode': COURSE_MODE, 'is_active': True}
+
+        mock_add_enrollment_api.return_value = expected_response
+        mock_tx.return_value.atomic.side_effect = None
+
+        mock_user_model.return_value = self.a_user
+        mock_get_enrollment_api.return_value = None
+
+        response = lms_update_or_create_enrollment(
+            USERNAME, COURSE_ID, COURSE_MODE, is_active=True, enterprise_uuid=ENTERPRISE_UUID, force_enrollment=True
+        )
+        assert response == expected_response
+        mock_add_enrollment_api.assert_called_once_with(
+            USERNAME,
+            str(COURSE_ID),
+            mode=COURSE_MODE,
+            is_active=True,
+            enrollment_attributes=None,
+            enterprise_uuid=ENTERPRISE_UUID,
+            force_enrollment=True,  # Literally the only purpose of this test.
         )
         mock_get_enrollment_api.assert_called_once_with(USERNAME, str(COURSE_ID))
 

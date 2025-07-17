@@ -34,7 +34,6 @@ from lms.djangoapps.courseware.access_utils import (
     check_course_open_for_learner,
     check_start_date,
     debug,
-    in_preview_mode
 )
 from lms.djangoapps.courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
@@ -53,7 +52,8 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     OrgInstructorRole,
     OrgStaffRole,
-    SupportStaffRole
+    SupportStaffRole,
+    CourseLimitedStaffRole,
 )
 from common.djangoapps.util import milestones_helpers as milestones_helpers  # lint-amnesty, pylint: disable=useless-import-alias
 from common.djangoapps.util.milestones_helpers import (
@@ -97,6 +97,31 @@ def has_ccx_coach_role(user, course_key):
     return False
 
 
+def has_cms_access(user, course_key):
+    """
+    Check if user has access to the CMS. When requesting from the LMS, a user with the
+    limited staff access role needs access to the CMS APIs, but not the CMS site. This
+    function accounts for this edge case when determining if a user has access to the CMS
+    site.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        course_key: Key to course.
+
+    Returns:
+        bool: whether user has access to the CMS site.
+    """
+    has_course_author_access = auth.has_course_author_access(user, course_key)
+    is_limited_staff = auth.user_has_role(
+        user, CourseLimitedStaffRole(course_key)
+    ) and not GlobalStaff().has_user(user)
+
+    if is_limited_staff and has_course_author_access:
+        return False
+
+    return has_course_author_access
+
+
 @function_trace('has_access')
 def has_access(user, action, obj, course_key=None):
     """
@@ -131,11 +156,6 @@ def has_access(user, action, obj, course_key=None):
     # Just in case user is passed in as None, make them anonymous
     if not user:
         user = AnonymousUser()
-
-    # Preview mode is only accessible by staff.
-    if in_preview_mode() and course_key:
-        if not has_staff_access_to_preview_mode(user, course_key):
-            return ACCESS_DENIED
 
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)

@@ -9,6 +9,8 @@ define([
 ], function(domReady, Import, $, gettext) {
     'use strict';
 
+    const IMPORTABLE_FILE_TYPES = /\.tar\.gz$|\.zip$/;
+
     return {
         Import: function(feedbackUrl, library) {
             var dbError,
@@ -35,7 +37,7 @@ define([
                     var filepath = $(this).val(),
                         msg;
 
-                    if (filepath.substr(filepath.length - 6, 6) === 'tar.gz') {
+                    if (IMPORTABLE_FILE_TYPES.test(filepath)) {
                         $('.error-block').hide();
                         $('.file-name').text($(this).val().replace('C:\\fakepath\\', ''));
                         $('.file-name-block').show();
@@ -44,7 +46,7 @@ define([
                         $('.progress').show();
                     } else {
                         msg = gettext('File format not supported. Please upload a file with a {ext} extension.')
-                            .replace('{ext}', '<code>tar.gz</code>');
+                            .replace('{ext}', '<code>tar.gz or zip</code>');
 
                         $('.error-block').text(msg).show();
                     }
@@ -84,7 +86,7 @@ define([
 
                     file = data.files[0];
 
-                    if (file.name.match(/tar\.gz$/)) {
+                    if (IMPORTABLE_FILE_TYPES.test(file.name)) {
                         $submitBtn.click(function(event) {
                             event.preventDefault();
 

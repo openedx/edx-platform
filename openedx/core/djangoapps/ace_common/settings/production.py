@@ -1,4 +1,5 @@
 """Common environment variables unique to the ace_common plugin."""
+from openedx.core.djangoapps.ace_common.utils import setup_firebase_app
 
 
 def plugin_settings(settings):
@@ -26,3 +27,26 @@ def plugin_settings(settings):
     settings.ACE_CHANNEL_TRANSACTIONAL_EMAIL = settings.ENV_TOKENS.get(
         'ACE_CHANNEL_TRANSACTIONAL_EMAIL', settings.ACE_CHANNEL_TRANSACTIONAL_EMAIL
     )
+    settings.FCM_APP_NAME = settings.ENV_TOKENS.get('FCM_APP_NAME', settings.FCM_APP_NAME)
+    settings.FIREBASE_CREDENTIALS_PATH = settings.ENV_TOKENS.get(
+        'FIREBASE_CREDENTIALS_PATH', settings.FIREBASE_CREDENTIALS_PATH
+    )
+    settings.FIREBASE_CREDENTIALS = settings.ENV_TOKENS.get('FIREBASE_CREDENTIALS', settings.FIREBASE_CREDENTIALS)
+
+    settings.FIREBASE_APP = setup_firebase_app(
+        settings.FIREBASE_CREDENTIALS_PATH or settings.FIREBASE_CREDENTIALS, settings.FCM_APP_NAME
+    )
+    if settings.FIREBASE_APP:
+        settings.ACE_ENABLED_CHANNELS.append(settings.ACE_CHANNEL_DEFAULT_PUSH)
+        settings.ACE_ENABLED_POLICIES.append('course_push_notification_optout')
+
+        settings.PUSH_NOTIFICATIONS_SETTINGS = {
+            'CONFIG': 'push_notifications.conf.AppConfig',
+            'APPLICATIONS': {
+                settings.FCM_APP_NAME: {
+                    'PLATFORM': 'FCM',
+                    'FIREBASE_APP': settings.FIREBASE_APP,
+                },
+            },
+            'UPDATE_ON_DUPLICATE_REG_ID': True,
+        }

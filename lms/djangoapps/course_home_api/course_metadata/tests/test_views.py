@@ -1,18 +1,22 @@
 """
 Tests for the Course Home Course Metadata API in the Course Home API
 """
+import json
+from unittest.mock import patch
 
 import ddt
-import json
-import mock
 from django.db import transaction
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from unittest.mock import patch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseInstructorRole
+from common.djangoapps.student.roles import (
+    CourseBetaTesterRole,
+    CourseInstructorRole,
+    CourseLimitedStaffRole,
+    CourseStaffRole
+)
 from common.djangoapps.student.tests.factories import UserFactory
 from lms.djangoapps.course_home_api.tests.utils import BaseCourseHomeTests
 from lms.djangoapps.courseware.toggles import (
@@ -108,7 +112,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
         CourseEnrollment.enroll(self.user, self.course.id, 'audit')
         with override_waffle_flag(COURSEWARE_MFE_MILESTONES_STREAK_DISCOUNT, active=True):
             UPDATES_METHOD_NAME = 'common.djangoapps.student.models.user.UserCelebration.perform_streak_updates'
-            with mock.patch(UPDATES_METHOD_NAME, return_value=3):
+            with patch(UPDATES_METHOD_NAME, return_value=3):
                 response = self.client.get(self.url, content_type='application/json')
                 celebrations = response.json()['celebrations']
                 assert celebrations['streak_length_to_celebrate'] == 3
@@ -187,7 +191,7 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
             self.update_masquerade(role=masquerade_role)
 
         consent_url = 'dump/consent/url' if dsc_required else None
-        with mock.patch('openedx.features.enterprise_support.api.get_enterprise_consent_url', return_value=consent_url):
+        with patch('openedx.features.enterprise_support.api.get_enterprise_consent_url', return_value=consent_url):
             response = self.client.get(self.url)
 
         self._assert_course_access_response(response, expect_course_access, error_code)
@@ -248,3 +252,32 @@ class CourseHomeMetadataTests(BaseCourseHomeTests):
             assert 'discussion' in tab_ids
         else:
             assert 'discussion' not in tab_ids
+
+    @ddt.data(
+        {
+            'course_team_role': None,
+            'has_course_author_access': False
+        },
+        {
+            'course_team_role': CourseBetaTesterRole,
+            'has_course_author_access': False
+        },
+        {
+            'course_team_role': CourseStaffRole,
+            'has_course_author_access': True
+        },
+        {
+            'course_team_role': CourseLimitedStaffRole,
+            'has_course_author_access': False
+        },
+    )
+    @ddt.unpack
+    def test_has_course_author_access_for_staff_roles(self, course_team_role, has_course_author_access):
+        CourseEnrollment.enroll(self.user, self.course.id, CourseMode.VERIFIED)
+
+        if course_team_role:
+            course_team_role(self.course.id).add_users(self.user)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.data['has_course_author_access'] == has_course_author_access

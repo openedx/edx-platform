@@ -38,28 +38,20 @@ class LinkedInAddToProfileUrlTests(TestCase):
     def test_linked_in_url(self, cert_mode, expected_cert_name):
         config = LinkedInAddToProfileConfigurationFactory()
 
-        # We can switch to this once edx-platform reaches Python 3.8
-        # expected_url = (
-        #     'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-        #     'name={platform}+{cert_name}&certUrl={cert_url}&'
-        #     'organizationId={company_identifier}'
-        # ).format(
-        #     platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
-        #     cert_name=expected_cert_name,
-        #     cert_url=quote(self.CERT_URL, safe=''),
-        #     company_identifier=config.company_identifier,
-        # )
+        expected_url = (
+            'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+            'name={platform}+{cert_name}&certUrl={cert_url}&'
+            'organizationId={company_identifier}'
+        ).format(
+            platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+            cert_name=expected_cert_name,
+            cert_url=quote(self.CERT_URL, safe=''),
+            company_identifier=config.company_identifier,
+        )
 
         actual_url = config.add_to_profile_url(self.COURSE_NAME, cert_mode, self.CERT_URL)
 
-        # We can switch to this instead of the assertIn once edx-platform reaches Python 3.8
-        # There was a problem with dict ordering in the add_to_profile_url function that will go away then.
-        # self.assertEqual(actual_url, expected_url)
-
-        assert 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME' in actual_url
-        assert f'&name={quote(settings.PLATFORM_NAME.encode("utf-8"))}+{expected_cert_name}' in actual_url
-        assert '&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')) in actual_url
-        assert f'&organizationId={config.company_identifier}' in actual_url
+        self.assertEqual(actual_url, expected_url)
 
     @ddt.data(
         ('honor', 'Honor+Code+Credential+for+Test+Course+%E2%98%83'),
@@ -72,26 +64,18 @@ class LinkedInAddToProfileUrlTests(TestCase):
     def test_linked_in_url_with_cert_name_override(self, cert_mode, expected_cert_name):
         config = LinkedInAddToProfileConfigurationFactory()
 
-        # We can switch to this once edx-platform reaches Python 3.8
-        # expected_url = (
-        #     'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
-        #     'name={platform}+{cert_name}&certUrl={cert_url}&'
-        #     'organizationId={company_identifier}'
-        # ).format(
-        #     platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
-        #     cert_name=expected_cert_name,
-        #     cert_url=quote(self.CERT_URL, safe=''),
-        #     company_identifier=config.company_identifier,
-        # )
+        expected_url = (
+            'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&'
+            'name={platform}+{cert_name}&certUrl={cert_url}&'
+            'organizationId={company_identifier}'
+        ).format(
+            platform=quote(settings.PLATFORM_NAME.encode('utf-8')),
+            cert_name=expected_cert_name,
+            cert_url=quote(self.CERT_URL, safe=''),
+            company_identifier=config.company_identifier,
+        )
 
         with with_site_configuration_context(configuration=self.SITE_CONFIGURATION):
             actual_url = config.add_to_profile_url(self.COURSE_NAME, cert_mode, self.CERT_URL)
 
-            # We can switch to this instead of the assertIn once edx-platform reaches Python 3.8
-            # There was a problem with dict ordering in the add_to_profile_url function that will go away then.
-            # self.assertEqual(actual_url, expected_url)
-
-            assert 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME' in actual_url
-            assert f'&name={quote(settings.PLATFORM_NAME.encode("utf-8"))}+{expected_cert_name}' in actual_url
-            assert '&certUrl={cert_url}'.format(cert_url=quote(self.CERT_URL, safe='')) in actual_url
-            assert f'&organizationId={config.company_identifier}' in actual_url
+        self.assertEqual(actual_url, expected_url)

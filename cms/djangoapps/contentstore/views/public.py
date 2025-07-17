@@ -11,6 +11,7 @@ from django.shortcuts import redirect
 from common.djangoapps.edxmako.shortcuts import render_to_response
 
 from ..config.waffle import ENABLE_ACCESSIBILITY_POLICY_PAGE
+from ..toggles import use_legacy_logged_out_home
 
 __all__ = [
     'register_redirect_to_lms', 'login_redirect_to_lms', 'howitworks', 'accessibility',
@@ -62,11 +63,12 @@ def _build_next_param(request):
 
 
 def howitworks(request):
-    "Proxy view"
-    if request.user.is_authenticated:
-        return redirect('/home/')
-    else:
+    """
+    Deprecated logged-out home page. New behavior is just login w/ redirect to studio course list.
+    """
+    if use_legacy_logged_out_home() and not request.user.is_authenticated:
         return render_to_response('howitworks.html', {})
+    return redirect('/home/')
 
 
 def accessibility(request):
@@ -74,7 +76,8 @@ def accessibility(request):
     Display the accessibility accommodation form.
     """
     if ENABLE_ACCESSIBILITY_POLICY_PAGE.is_enabled():
-        return render_to_response('accessibility.html', {
-            'language_code': request.LANGUAGE_CODE
-        })
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if mfe_base_url:
+            studio_accessbility_url = f'{mfe_base_url}/accessibility'
+            return redirect(studio_accessbility_url)
     raise Http404

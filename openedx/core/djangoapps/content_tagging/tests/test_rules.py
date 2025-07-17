@@ -534,10 +534,10 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
     )
     @ddt.unpack
     def test_object_tag_no_orgs(self, perm, tag_attr):
-        """Only staff & superusers can create/edit an ObjectTag with a no-org Taxonomy"""
+        """Only superusers can create/edit an ObjectTag with a no-org Taxonomy"""
         object_tag = getattr(self, tag_attr)
         assert self.superuser.has_perm(perm, object_tag)
-        assert self.staff.has_perm(perm, object_tag)
+        assert not self.staff.has_perm(perm, object_tag)
         assert not self.user_both_orgs.has_perm(perm, object_tag)
         assert not self.user_org2.has_perm(perm, object_tag)
         assert not self.learner.has_perm(perm, object_tag)
@@ -546,10 +546,11 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         "oel_tagging.add_objecttag",
         "oel_tagging.change_objecttag",
         "oel_tagging.delete_objecttag",
+        "oel_tagging.can_tag_object",
     )
     def test_change_object_tag_all_orgs(self, perm):
         """
-        Taxonomy administrators can create/edit an ObjectTag using taxonomies in their org,
+        Taxonomy administrators and org authors can create/edit an ObjectTag using taxonomies in their org,
         but only on objects they have write access to.
         """
         for perm_item in self.all_org_perms:
@@ -588,7 +589,7 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         "tax_both_xblock2",
     )
     def test_view_object_tag(self, tag_attr):
-        """Anyone can view any ObjectTag"""
+        """Content authors can view ObjectTags associated with enabled taxonomies in their org."""
         perm = "oel_tagging.view_objecttag"
         perm_item = getattr(self, tag_attr)
         assert self.superuser.has_perm(perm, perm_item)

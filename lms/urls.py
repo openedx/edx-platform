@@ -111,6 +111,9 @@ urlpatterns = [
 
     path('i18n/', include('django.conf.urls.i18n')),
 
+    # Course assets
+    path('', include('openedx.core.djangoapps.contentserver.urls')),
+
     # Enrollment API RESTful endpoints
     path('api/enrollment/v1/', include('openedx.core.djangoapps.enrollments.urls')),
 
@@ -125,9 +128,6 @@ urlpatterns = [
             namespace='entitlements_api',
         ),
     ),
-
-    # Demographics API RESTful endpoints
-    path('api/demographics/', include('openedx.core.djangoapps.demographics.rest_api.urls')),
 
     # Courseware search endpoints
     path('search/', include('search.urls')),
@@ -192,12 +192,12 @@ urlpatterns = [
     path('api-admin/', include(('openedx.core.djangoapps.api_admin.urls', 'openedx.core.djangoapps.api_admin'),
                                namespace='api_admin')),
 
-    # Learner Dashboard
-    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
-    path('api/dashboard/', include('lms.djangoapps.learner_dashboard.api.urls', namespace='dashboard_api')),
-
-    # Learner Home
+    # Learner Home and Program Dashboard
     path('api/learner_home/', include('lms.djangoapps.learner_home.urls', namespace='learner_home')),
+    path('dashboard/', include('lms.djangoapps.learner_dashboard.urls')),
+    # This is the legacy URL for the program dashboard API when the legacy learner dashboard existed.
+    # Current-and-future advertised URLs for this API will be under 'api/learner_home'
+    path('api/dashboard/', include('openedx.core.djangoapps.programs.rest_api.urls', namespace='dashboard_api')),
 
     path(
         'api/experiments/',
@@ -218,7 +218,7 @@ urlpatterns = [
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
     urlpatterns += [
-        re_path(r'^api/mobile/(?P<api_version>v(3|2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
+        re_path(r'^api/mobile/(?P<api_version>v(4|3|2|1|0.5))/', include('lms.djangoapps.mobile_api.urls')),
     ]
 
 urlpatterns += [
@@ -336,7 +336,7 @@ urlpatterns += [
         name='xblock_resource_url',
     ),
 
-    # New (Blockstore-based) XBlock REST API
+    # New (Learning-Core-based) XBlock REST API
     path('', include(('openedx.core.djangoapps.xblock.rest_api.urls', 'openedx.core.djangoapps.xblock'),
                      namespace='xblock_api')),
 
@@ -658,12 +658,6 @@ urlpatterns += [
         include('openedx.features.calendar_sync.urls'),
     ),
 
-    # Learner profile
-    path(
-        'u/',
-        include('openedx.features.learner_profile.urls'),
-    ),
-
     # Survey Report
     re_path(
         fr'^survey_report/',
@@ -748,6 +742,11 @@ urlpatterns += [
         ),
         courseware_views.courseware_mfe_search_enabled,
         name='courseware_search_enabled_view',
+    ),
+    re_path(
+        fr'^courses/{settings.COURSE_ID_PATTERN}/courseware-navigation-sidebar/toggles/$',
+        courseware_views.courseware_mfe_navigation_sidebar_toggles,
+        name='courseware_navigation_sidebar_toggles_view',
     ),
 ]
 

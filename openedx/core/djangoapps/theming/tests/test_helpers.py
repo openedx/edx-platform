@@ -44,6 +44,7 @@ class TestHelpers(TestCase):
             Theme('red-theme', 'red-theme', get_theme_base_dir('red-theme'), settings.PROJECT_ROOT),
             Theme('stanford-style', 'stanford-style', get_theme_base_dir('stanford-style'), settings.PROJECT_ROOT),
             Theme('test-theme', 'test-theme', get_theme_base_dir('test-theme'), settings.PROJECT_ROOT),
+            Theme('empty-theme', 'empty-theme', get_theme_base_dir('empty-theme'), settings.PROJECT_ROOT),
         ]
         actual_themes = get_themes()
         self.assertCountEqual(expected_themes, actual_themes)

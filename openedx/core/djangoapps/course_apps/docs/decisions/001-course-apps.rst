@@ -1,12 +1,13 @@
 Course Apps API
-_______________
+###############
 
 Status
-======
+******
+
 Proposal
 
 Context
-=======
+*******
 
 The new `Course Authoring MFE`_ includes a new UX called "Pages and Resources"
 for configuring different aspects of the course experience such as progress,
@@ -27,7 +28,7 @@ enable/disable these apps using the API.
 
 
 Decision
-========
+########
 
 We propose to call such individual course features "Course Apps". They can be
 introduced as a new type of Open edX plugin. Any functionality that can be
@@ -39,16 +40,29 @@ some bits of metadata, such as a name, a description etc. Additionally we will
 need a common interface for such apps so they can be enabled/disabled using
 a standard common interface.
 
-To do this we can follow the example of existing plugins, [such as Course
-Tabs](https://github.com/openedx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/common/lib/xmodule/xmodule/tabs.py#L24-L243),
+To do this we can follow the example of existing plugins, `such as Course Tabs`_,
 which provide a specific Python class that the plugin can inherit from, or
 implement. The required metadata and features, can be implemented as class
 attributes, and methods on this class.
 
 We can then discover the installed apps using the existing tooling for plugins
-using a subclass of PluginManager designed for this purpose. Here is an example
-for [Course
-Tabs](https://github.com/openedx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/openedx/core/lib/course_tabs.py#L13-L47)
+using a subclass of ``PluginManager`` designed for this purpose.
+Here is an example for `CourseTabs`_:
+
+.. code-block:: python
+
+     class CourseTabPluginManager(PluginManager):
+     """
+     Manager for all of the course tabs that have been made available.
+
+     All course tabs should implement `CourseTab`.
+     """
+     NAMESPACE = COURSE_TAB_NAMESPACE
+
+     @classmethod
+     def get_tab_types(cls):
+         """
+         Returns the list of available course tabs in their canonical order. 
 
 It might not always make sense for an app installed in this way to be
 automatically show up for use on all courses. So each app will expose a method
@@ -85,14 +99,17 @@ In the case of Course Apps, the standard plugin API will automatically discover
 all installed apps. Inactive apps will be filtered out during the availability
 check.
 
-Course App Plugin Class
------------------------
+.. _such as Course Tabs: https://github.com/openedx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/common/lib/xmodule/xmodule/tabs.py#L24-L243
+.. _CourseTabs: https://github.com/openedx/edx-platform/blob/636b2ca4c5add531cfce755fdb8965599acd79e0/openedx/core/lib/course_tabs.py#L13-L47
 
-To be loaded as a Course App, you need to provide an entrypoint in `setup.py`
-with the namespace "openedx.course_app". The entry should point to a Python
+Course App Plugin Class
+=======================
+
+To be loaded as a Course App, you need to provide an entrypoint in ``setup.py``
+with the namespace ``openedx.course_app``. The entry should point to a Python
 class with the following basic structure:
 
-.. code-block :: python
+.. code-block:: python
 
     class CourseApp:
         # The app id should match what is specified in the setup.py entrypoint
@@ -143,7 +160,7 @@ such a class and have these class methods call back to the existing code for
 availability checks and enabled checks.
 
 Course Apps API
----------------
+===============
 
 Each app has some associated metadata:
 
@@ -218,9 +235,8 @@ link should only be provided for Course Apps that don't have a UI in the course
 authoring MFE yet. If a partial UI exists, the MFE settings view can always link
 back to the old studio view from there.
 
-
 Consequences
-============
+************
 
 - A new Course Apps API that consistently uses a standard mechanism (a plugin
   class) for discovering Course Apps, determining their availability and

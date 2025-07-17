@@ -54,7 +54,7 @@ class TestBackfillSSOVerificationsCommand(TestCase):
         #self.assertNumQueries(100)
 
     def test_signal_called(self):
-        with patch('openedx.core.djangoapps.signals.signals.LEARNER_NOW_VERIFIED.send_robust') as mock_signal:
+        with patch('openedx.core.djangoapps.signals.signals.LEARNER_SSO_VERIFIED.send_robust') as mock_signal:
             call_command('backfill_sso_verifications_for_old_account_links', '--provider-slug', self.provider.provider_id)  # lint-amnesty, pylint: disable=line-too-long
         assert mock_signal.call_count == 1
 

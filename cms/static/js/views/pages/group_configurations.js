@@ -25,6 +25,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
                 currentScheme = this.allGroupConfigurations[i].get('scheme');
                 this.allGroupViewList.push(
                     new PartitionGroupListView({
+                        id: this.allGroupConfigurations[i].get('id'),
                         collection: this.allGroupConfigurations[i].get('groups'),
                         restrictEditing: this.allGroupConfigurations[i].get('read_only'),
                         scheme: currentScheme
@@ -43,7 +44,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
 
             // Render the remaining Configuration groups
             for (i = 0; i < this.allGroupViewList.length; i++) {
-                currentClass = '.wrapper-groups.content-groups.' + this.allGroupViewList[i].scheme;
+                currentClass = `.wrapper-groups.content-groups.${this.allGroupViewList[i].scheme}.${this.allGroupViewList[i].id}`;
                 this.$(currentClass).append(this.allGroupViewList[i].render().el);
             }
 

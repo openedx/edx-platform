@@ -18,11 +18,11 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from edx_django_utils import monitoring as monitoring_utils
 from edx_django_utils.plugins import get_plugins_view_context
 from edx_toggles.toggles import WaffleFlag
-from ipware.ip import get_client_ip
 from opaque_keys.edx.keys import CourseKey
 from openedx_filters.learning.filters import DashboardRenderStarted
 from pytz import UTC
 
+from edx_django_utils.plugins import pluggable_override
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models import Optout
 from common.djangoapps.course_modes.models import CourseMode
@@ -30,7 +30,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_st
 from common.djangoapps.entitlements.models import CourseEntitlement
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.learner_home.waffle import should_redirect_to_learner_home_mfe
+from lms.djangoapps.learner_home.waffle import learner_home_mfe_enabled
 from lms.djangoapps.experiments.utils import get_dashboard_course_info, get_experiment_user_metadata_context
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.utils import (
@@ -53,7 +53,7 @@ from openedx.features.enterprise_support.api import (
     get_enterprise_learner_portal_context,
 )
 from openedx.features.enterprise_support.utils import is_enterprise_learner
-from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+
 from common.djangoapps.student.api import COURSE_DASHBOARD_PLUGIN_VIEW_NAME
 from common.djangoapps.student.helpers import cert_info, check_verify_status_by_course, get_resume_urls_for_enrollments
 from common.djangoapps.student.models import (
@@ -324,6 +324,14 @@ def reverification_info(statuses):
     return reverifications
 
 
+@pluggable_override('OVERRIDE_GET_CREDIT_BUTTON_HREF')
+def get_credit_button_href(course_key):
+    """
+    Get the credit button URL for a course.
+    """
+    return f"{settings.ECOMMERCE_PUBLIC_URL_ROOT}/credit/checkout/{course_key}/"
+
+
 def credit_statuses(user, course_enrollments):
     """
     Retrieve the status for credit courses.
@@ -424,6 +432,7 @@ def credit_statuses(user, course_enrollments):
             "provider_id": None,
             "request_status": request_status_by_course.get(course_key),
             "error": False,
+            "credit_btn_href": get_credit_button_href(str(course_key)),
         }
 
         # If the user has purchased credit, then include information about the credit
@@ -519,9 +528,9 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     """
     user = request.user
     if not UserProfile.objects.filter(user=user).exists():
-        return redirect(reverse('account_settings'))
+        return redirect(settings.ACCOUNT_MICROFRONTEND_URL)
 
-    if should_redirect_to_learner_home_mfe(user):
+    if learner_home_mfe_enabled():
         return redirect(settings.LEARNER_HOME_MICROFRONTEND_URL)
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
@@ -624,7 +633,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
                         "Go to {link_start}your Account Settings{link_end}.")
                 ).format(
                     link_start=HTML("<a href='{account_setting_page}'>").format(
-                        account_setting_page=reverse('account_settings'),
+                        account_setting_page=settings.ACCOUNT_MICROFRONTEND_URL,
                     ),
                     link_end=HTML("</a>")
                 )
@@ -787,9 +796,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         if fbe_is_on:
             enrollments_fbe_is_on.append(course_key)
 
-    ip_address = get_client_ip(request)[0]
-    country_code = country_code_from_ip(ip_address).upper()
-
     context = {
         'urls': urls,
         'programs_data': programs_data,
@@ -844,7 +850,6 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         'course_info': get_dashboard_course_info(user, course_enrollments),
         # TODO START: clean up as part of REVEM-199 (END)
         'disable_unenrollment': disable_unenrollment,
-        'country_code': country_code,
         # TODO: clean when experiment(Merchandise 2U LOBs - Dashboard) would be stop. [VAN-1097]
         'is_enterprise_user': is_enterprise_learner(user),
     }
@@ -897,7 +902,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     except DashboardRenderStarted.RenderInvalidDashboard as exc:
         response = render_to_response(exc.dashboard_template, exc.template_context)
     except DashboardRenderStarted.RedirectToPage as exc:
-        response = HttpResponseRedirect(exc.redirect_to or reverse('account_settings'))
+        response = HttpResponseRedirect(exc.redirect_to or settings.ACCOUNT_MICROFRONTEND_URL)
     except DashboardRenderStarted.RenderCustomResponse as exc:
         response = exc.response
     else:

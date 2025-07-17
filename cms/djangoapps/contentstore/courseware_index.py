@@ -14,7 +14,7 @@ from search.search_engine_base import SearchEngine
 
 from cms.djangoapps.contentstore.course_group_config import GroupConfiguration
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.core.lib.courses import course_image_url
+from openedx.core.lib.courses import course_image_url, course_organization_image_url
 from xmodule.annotator_mixin import html_to_text  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.library_tools import normalize_key_for_search  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -256,7 +256,8 @@ class SearchIndexerBase(metaclass=ABCMeta):
                 # Now index the content
                 for item in structure.get_children():
                     prepare_item_index(item, groups_usage_info=groups_usage_info)
-                searcher.index(items_index, request_timeout=timeout)
+                if items_index:
+                    searcher.index(items_index, request_timeout=timeout)
                 cls.remove_deleted_items(searcher, structure_key, indexed_items)
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
@@ -278,7 +279,7 @@ class SearchIndexerBase(metaclass=ABCMeta):
         (Re)index all content within the given structure (course or library),
         tracking the fact that a full reindex has taken place
         """
-        indexed_count = cls.index(modulestore, structure_key)
+        indexed_count = cls.index(modulestore, structure_key, timeout=180)
         if indexed_count:
             cls._track_index_request(cls.INDEX_EVENT['name'], cls.INDEX_EVENT['category'], indexed_count)
         return indexed_count
@@ -611,6 +612,7 @@ class CourseAboutSearchIndexer(CoursewareSearchIndexer):
             'course': course_id,
             'content': {},
             'image_url': course_image_url(course),
+            'org_image_url': course_organization_image_url(course),
         }
 
         # load data for all of the 'about' blocks for this course into a dictionary

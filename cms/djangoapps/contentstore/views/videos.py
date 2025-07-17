@@ -27,6 +27,7 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     storage_service_key as storage_service_key_source_function,
     send_video_status_update as send_video_status_update_source_function,
     is_status_update_request as is_status_update_request_source_function,
+    get_course_youtube_edx_video_ids,
 )
 
 from common.djangoapps.util.json_request import expect_json
@@ -41,6 +42,7 @@ __all__ = [
     'get_video_features',
     'transcript_preferences_handler',
     'generate_video_upload_link_handler',
+    'get_course_youtube_edx_videos_ids',
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -236,3 +238,18 @@ def is_status_update_request(request_data):
     Exposes helper method without breaking existing bindings/dependencies
     """
     return is_status_update_request_source_function(request_data)
+
+
+@api_view(['GET'])
+@view_auth_classes()
+@require_GET
+def get_course_youtube_edx_videos_ids(request, course_key_string):
+    """
+    Get an object containing course videos.
+    **Example Request**
+        GET /api/contentstore/v1/videos/youtube_ids{course_id}
+    **Response Values**
+    If the request is successful, an HTTP 200 "OK" response is returned.
+    The HTTP 200 response contains a list of youtube edx_video_ids for a given course.
+    """
+    return get_course_youtube_edx_video_ids(course_key_string)

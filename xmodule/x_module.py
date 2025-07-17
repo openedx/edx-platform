@@ -1,5 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 
+import importlib.resources as resources
 import logging
 import os
 import time
@@ -13,7 +14,6 @@ from django.conf import settings
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_isdir, resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from webob.multidict import MultiDict
@@ -856,16 +856,16 @@ class ResourceTemplates:
     def get_template_dir(cls):  # lint-amnesty, pylint: disable=missing-function-docstring
         if getattr(cls, 'template_dir_name', None):
             dirname = os.path.join('templates', cls.template_dir_name)  # lint-amnesty, pylint: disable=no-member
-            if not resource_isdir(__name__, dirname):
+            template_path = resources.files(__name__.rsplit('.', 1)[0]) / dirname
+
+            if not template_path.is_dir():
                 log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
                     cls_name=cls.__name__,
                 ))
-                return None
-            else:
-                return dirname
-        else:
-            return None
+                return
+            return dirname
+        return
 
     @classmethod
     def get_template_dirpaths(cls):
@@ -874,8 +874,11 @@ class ResourceTemplates:
         """
         template_dirpaths = []
         template_dirname = cls.get_template_dir()
-        if template_dirname and resource_isdir(__name__, template_dirname):
-            template_dirpaths.append(resource_filename(__name__, template_dirname))
+        if template_dirname:
+            template_path = resources.files(__name__.rsplit('.', 1)[0]) / template_dirname
+            if template_path.is_dir():
+                with resources.as_file(template_path) as template_real_path:
+                    template_dirpaths.append(str(template_real_path))
 
         custom_template_dir = cls.get_custom_template_dir()
         if custom_template_dir:
@@ -1529,18 +1532,16 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
         super().__init__(**kwargs)
         self.process_xml = process_xml
 
-    def _usage_id_from_node(self, node, parent_id, id_generator=None):
+    def _usage_id_from_node(self, node, parent_id):
         """Create a new usage id from an XML dom node.
 
         Args:
             node (lxml.etree.Element): The DOM node to interpret.
             parent_id: The usage ID of the parent block
-            id_generator (IdGenerator): The :class:`.IdGenerator` to use
-                for creating ids
         Returns:
             UsageKey: the usage key for the new xblock
         """
-        return self.xblock_from_node(node, parent_id, id_generator).scope_ids.usage_id
+        return self.xblock_from_node(node, parent_id, self.id_generator).scope_ids.usage_id
 
     def xblock_from_node(self, node, parent_id, id_generator=None):
         """
@@ -1575,7 +1576,7 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
         aside_children = self.parse_asides(node, def_id, usage_id, id_generator)
         asides_tags = [x.tag for x in aside_children]
 
-        block = block_class.parse_xml(node, self, keys, id_generator)
+        block = block_class.parse_xml(node, self, keys)
         self._convert_reference_fields_to_keys(block)  # difference from XBlock.runtime
         block.parent = parent_id
         block.save()
@@ -1599,7 +1600,7 @@ class XMLParsingSystem(DescriptorSystem):  # lint-amnesty, pylint: disable=abstr
                     aside_children.append(child)
         # now process them & remove them from the xml payload
         for child in aside_children:
-            self._aside_from_xml(child, def_id, usage_id, id_generator)
+            self._aside_from_xml(child, def_id, usage_id)
             node.remove(child)
         return aside_children
 

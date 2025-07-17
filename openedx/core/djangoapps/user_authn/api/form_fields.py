@@ -346,7 +346,8 @@ def add_country_field(is_field_required=False):
     to send the field name and whether or not we want to show error message if this field is
     empty
     """
-    return {'name': 'country', 'error_message': is_field_required}
+    error_msg = accounts.REQUIRED_FIELD_COUNTRY_MSG
+    return {'name': 'country', 'error_message': error_msg if is_field_required else ''}
 
 
 def add_confirm_email_field(is_field_required=False):

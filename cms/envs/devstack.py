@@ -5,7 +5,6 @@ Specific overrides to the base prod settings to make development easier.
 
 import logging
 from os.path import abspath, dirname, join
-from corsheaders.defaults import default_headers as corsheaders_default_headers
 
 from .production import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -46,7 +45,6 @@ EMAIL_FILE_PATH = '/edx/src/ace_messages/'
 
 LMS_BASE = 'localhost:18000'
 LMS_ROOT_URL = f'http://{LMS_BASE}'
-FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
 
@@ -66,9 +64,6 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
-
-# Load development webpack donfiguration
-WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 
 ############################ PYFS XBLOCKS SERVICE #############################
 # Set configuration for Django pyfilesystem
@@ -104,8 +99,12 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.profiling.ProfilingPanel',
+    'debug_toolbar.panels.cache.CachePanel',
     'debug_toolbar.panels.history.HistoryPanel',
+
+    # ProfilingPanel has been intentionally removed for default devstack.py
+    # runtimes for performance reasons.
+    # 'debug_toolbar.panels.profiling.ProfilingPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -175,14 +174,17 @@ FEATURES['ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES'] = True
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
 FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'
 
-################### FRONTEND APPLICATION LIBRARY AUTHORING ###################
-LIBRARY_AUTHORING_MICROFRONTEND_URL = 'http://localhost:3001'
-
 ################### FRONTEND APPLICATION COURSE AUTHORING ###################
 COURSE_AUTHORING_MICROFRONTEND_URL = 'http://localhost:2001'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
+
+################### FRONTEND APPLICATION ACCOUNT ###################
+ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
+
+################### FRONTEND APPLICATION LEARNING ###################
+LEARNING_MICROFRONTEND_URL = 'http://localhost:2000'
 
 ################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = None
@@ -219,9 +221,6 @@ IDA_LOGOUT_URI_LIST = [
 
 ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://edx.devstack.lms/oauth2"
 
-############################### BLOCKSTORE #####################################
-BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
-
 #####################################################################
 
 # pylint: disable=wrong-import-order, wrong-import-position
@@ -256,11 +255,6 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 FEATURES['ENABLE_CORS_HEADERS'] = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_HEADERS = corsheaders_default_headers + (
-    'use-jwt-cookie',
-    'content-range',
-    'content-disposition',
-)
 
 ################### Special Exams (Proctoring) and Prereqs ###################
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
@@ -270,24 +264,14 @@ FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
 # (ref MST-637)
 PROCTORING_USER_OBFUSCATION_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-############## CourseGraph devstack settings ############################
-
-COURSEGRAPH_CONNECTION: dict = {
-    "protocol": "bolt",
-    "secure": False,
-    "host": "edx.devstack.coursegraph",
-    "port": 7687,
-    "user": "neo4j",
-    "password": "edx",
-}
-
 #################### Webpack Configuration Settings ##############################
 WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 
 ################ Using LMS SSO for login to Studio ################
 SOCIAL_AUTH_EDX_OAUTH2_KEY = 'studio-sso-key'
 SOCIAL_AUTH_EDX_OAUTH2_SECRET = 'studio-sso-secret'  # in stage, prod would be high-entropy secret
-SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = 'http://edx.devstack.lms:18000'  # routed internally server-to-server
+# routed internally server-to-server
+SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT = ENV_TOKENS.get('SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT', 'http://edx.devstack.lms:18000')
 SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT = 'http://localhost:18000'  # used in browser redirect
 
 # Don't form the return redirect URL with HTTPS on devstack
@@ -298,7 +282,7 @@ SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
 #################### Credentials Settings ####################
-CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
+CREDENTIALS_INTERNAL_SERVICE_URL = 'http://edx.devstack.credentials:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
 ########################## ORA MFE APP ##############################
@@ -306,6 +290,16 @@ ORA_MICROFRONTEND_URL = 'http://localhost:1992'
 
 ############################ AI_TRANSLATIONS ##################################
 AI_TRANSLATIONS_API_URL = 'http://localhost:18760/api/v1'
+
+############################ CSRF ##################################
+
+# MFEs that will call this service in devstack
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3001',  # frontend-app-library-authoring
+    'http://localhost:2001',  # frontend-app-course-authoring
+    'http://localhost:1992',  # frontend-app-ora
+    'http://localhost:1999',  # frontend-app-authn
+]
 
 #################### Event bus backend ########################
 
@@ -356,6 +350,7 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
     'SERVERS': [
         {'url': AUTHORING_API_URL, 'description': 'Public'},
-        {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'Local'}
+        {'url': f'http://{CMS_BASE}', 'description': 'Local'},
+        {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'CMS-contentstore'}
     ],
 }

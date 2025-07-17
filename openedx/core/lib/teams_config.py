@@ -1,17 +1,37 @@
 """
 Safe configuration wrapper for Course Teams feature.
 """
-
-
+import logging
 import re
 from enum import Enum
 
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+
+from xmodule.partitions.partitions import UserPartition, UserPartitionError
+log = logging.getLogger(__name__)
 
 # "Arbitrarily large" but still limited
 MANAGED_TEAM_MAX_TEAM_SIZE = 200
 # Arbitrarily arbitrary
 DEFAULT_COURSE_RUN_MAX_TEAM_SIZE = 50
+TEAM_SCHEME = "team"
+TEAMS_NAMESPACE = "teams"
+
+# .. toggle_name: teams.content_groups_for_teams
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables content groups for teams. Content groups are virtual groupings of learners
+#    who will see a particular set of course content. When this flag is enabled, course authors can create teams and
+#    assign content to each of them. Then, when a learner joins a team, they will see the content that is assigned to
+#    that team's content group. This flag is only relevant for courses that have teams enabled.
+# .. toggle_use_cases: temporary, opt_in
+# .. toggle_target_removal_date: Teak
+# .. toggle_creation_date: 2024-04-01
+CONTENT_GROUPS_FOR_TEAMS = CourseWaffleFlag(
+    f"{TEAMS_NAMESPACE}.content_groups_for_teams", __name__
+)
 
 
 class TeamsConfig:
@@ -190,7 +210,7 @@ class TeamsetConfig:
         """
         Return developer-helpful string.
         """
-        attrs = ['teamset_id', 'name', 'description', 'max_team_size', 'teamset_type']
+        attrs = ['teamset_id', 'name', 'description', 'max_team_size', 'teamset_type', 'user_partition_id']
         return "<{} {}>".format(
             self.__class__.__name__,
             " ".join(
@@ -230,6 +250,7 @@ class TeamsetConfig:
             'description': self.description,
             'max_team_size': self.max_team_size,
             'type': self.teamset_type.value,
+            'user_partition_id': self.user_partition_id,
         }
 
     @cached_property
@@ -287,6 +308,14 @@ class TeamsetConfig:
         """
         return self.teamset_type == TeamsetType.private_managed
 
+    @cached_property
+    def user_partition_id(self):
+        """
+        The ID of the dynamic user partition for this team-set,
+        falling back to None.
+        """
+        return self._data.get('user_partition_id')
+
 
 class TeamsetType(Enum):
     """
@@ -304,6 +333,7 @@ class TeamsetType(Enum):
     open = "open"
     public_managed = "public_managed"
     private_managed = "private_managed"
+    open_managed = "open_managed"
 
     @classmethod
     def get_default(cls):
@@ -331,3 +361,63 @@ def _clean_max_team_size(value):
     if value < 0:
         return None
     return value
+
+
+def create_team_set_partitions_with_course_id(course_id, team_sets=None):
+    """
+    Create and return the team-set user partitions based only on course_id.
+    If they cannot be created, None is returned.
+    """
+    if not team_sets:
+        team_sets = _get_team_sets(course_id) or {}
+
+    try:
+        team_scheme = UserPartition.get_scheme(TEAM_SCHEME)
+    except UserPartitionError:
+        log.warning(f"No {TEAM_SCHEME} scheme registered, TeamUserPartition will not be created.")
+        return None
+
+    # Get team-sets from course and create user partitions for each team-set
+    # Then get teams from each team-set and create user groups for each team
+    partitions = []
+    for team_set in team_sets:
+        partition = team_scheme.create_user_partition(
+            id=team_set.user_partition_id,
+            name=_("Team Group: {team_set_name}").format(team_set_name=team_set.name),
+            description=_("Partition for segmenting users by team-set"),
+            parameters={
+                "course_id": str(course_id),
+                "team_set_id": team_set.teamset_id,
+            }
+        )
+        if partition:
+            partitions.append(partition)
+
+    return partitions
+
+
+def create_team_set_partition(course):
+    """
+    Get the dynamic enrollment track user partition based on the team-sets of the course.
+    """
+    if not CONTENT_GROUPS_FOR_TEAMS.is_enabled(course.id):
+        return []
+    return create_team_set_partitions_with_course_id(
+        course.id,
+        _get_team_sets(course.id),
+    )
+
+
+def _get_team_sets(course_key):
+    """
+    Get team-sets of the course.
+    """
+    # Avoid ImportError import by importing at this level:
+    # TeamsConfigurationService -> is_masquerading_as_specific_student -> CourseMode -> CourseOverview
+    # Raises: ImportError: cannot import name 'CourseOverview' from partially initialized module
+    from xmodule.services import TeamsConfigurationService
+    team_sets = TeamsConfigurationService().get_teams_configuration(course_key).teamsets
+    if not team_sets:
+        return None
+
+    return team_sets

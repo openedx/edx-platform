@@ -6,11 +6,39 @@
         <%- gettext('Section Visibility') %>
     <% } %>
 </h3>
+<div class="list-fields list-input content-visibility" role="group" aria-labelledby="content_visibility_label">
+<% if (enableHideFromTOCUI) { %>
+  <div class="modal-section-content no-visibility-option">
+      <label class="label">
+          <input type="radio" id="visible_to_learners" name="content-visibility" class="input input-radio" />
+          <span> <%- gettext('Visible to learners') %> </span>
+      </label>
+      <p class='field-message' id='visible-to-learners-description'> <%- gettext('It is visible to learners, ensuring that all learners can view its contents.') %> </p>
+  </div>
+  <div class="modal-section-content hide-from-toc">
+    <% if (!xblockInfo.isVertical()) { %>
+      <label class="label">
+        <input type="radio" id="hide_from_toc" name="content-visibility" class="input input-radio" />
+        <span> <%- gettext('Hide in Course Outline, accessible via Link') %> </span>
+      </label>
+      <p class='field-message' id='hide-from-toc-description'> <%- gettext('It is intentionally hidden from standard navigation, ensuring that only individuals with the link can view its contents.') %> </p>
+      <% if (hideFromTOC) { %>
+          <p class="tip tip-warning">
+            <%- gettext('If you make this section visible in the table of content, learners will be able to see its content.') %>
+          </p>
+      <% } %>
+    <% } %>
+  </div>
+<% } %>
 <div class="modal-section-content staff-lock">
     <label class="label">
-        <input type="checkbox" id="staff_lock" name="staff_lock" class="input input-checkbox" />
+      <% var inputType = enableHideFromTOCUI ? 'radio' : 'checkbox'; %>
+        <input type="<%- inputType %>" id="staff_lock" name="content-visibility" class="<%- inputType === 'radio' ? 'input input-radio' : 'input input-checkbox' %>" />
         <%- gettext('Hide from learners') %>
-     </label>
+      </label>
+    <% if (enableHideFromTOCUI) { %>
+      <p class='field-message' id='staff-lock-description'> <%- gettext('It is intentionally hidden from learners, ensuring that only the course staff can view its contents.') %> </p>
+    <% } %>
     <% if (hasExplicitStaffLock && !ancestorLocked) { %>
         <p class="tip tip-warning">
           <% if (xblockInfo.isVertical()) { %>
@@ -20,6 +48,7 @@
             <%- interpolate(message, { xblockType: xblockType }, true) %>
           <% } %>
         </p>
-    <% } %>
+  <% } %>
+</div>
 </div>
 </form>

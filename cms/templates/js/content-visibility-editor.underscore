@@ -1,6 +1,12 @@
 <form>
 <h3 class="modal-section-title" id="content_visibility_label"><%- gettext('Subsection Visibility') %></h3>
 <div class="modal-section-content staff-lock">
+    <% if (enable_hide_from_toc_ui) { %>
+        <div class="enable-hide-from-toc-container">
+            <span class="icon fa fa-solid fa-link icon-message"></span>
+            <p class="text-message"><%- gettext('To hide the subsections and keep them accesible through links, you must adjust it from the section that contains them.') %></p>
+        </div>
+    <% } %>
     <div class="list-fields list-input content-visibility" role="group" aria-labelledby="content_visibility_label">
         <label class="label">
             <input class="input input-radio" name="content-visibility" type="radio" value="visible" aria-describedby="visible_description">

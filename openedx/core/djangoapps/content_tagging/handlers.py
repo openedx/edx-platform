@@ -8,6 +8,7 @@ import logging
 from django.dispatch import receiver
 from openedx_events.content_authoring.data import (
     CourseData,
+    DuplicatedXBlockData,
     XBlockData,
     LibraryBlockData,
 )
@@ -16,18 +17,18 @@ from openedx_events.content_authoring.signals import (
     XBLOCK_CREATED,
     XBLOCK_DELETED,
     XBLOCK_UPDATED,
+    XBLOCK_DUPLICATED,
     LIBRARY_BLOCK_CREATED,
     LIBRARY_BLOCK_UPDATED,
-    LIBRARY_BLOCK_DELETED,
 )
 
-from .tasks import delete_course_tags
+from .api import copy_object_tags
 from .tasks import (
+    delete_course_tags,
     delete_xblock_tags,
     update_course_tags,
     update_xblock_tags,
     update_library_block_tags,
-    delete_library_block_tags,
 )
 from .toggles import CONTENT_TAGGING_AUTO
 
@@ -64,9 +65,14 @@ def auto_tag_xblock(**kwargs):
     if not CONTENT_TAGGING_AUTO.is_enabled(xblock_info.usage_key.course_key):
         return
 
+    if xblock_info.block_type == 'course_info':
+        # We want to add tags only to the course id, not with its XBlock
+        return
+
     if xblock_info.block_type == "course":
         # Course update is handled by XBlock of course type
         update_course_tags.delay(str(xblock_info.usage_key.course_key))
+        return
 
     update_xblock_tags.delay(str(xblock_info.usage_key))
 
@@ -111,17 +117,17 @@ def auto_tag_library_block(**kwargs):
     )
 
 
-@receiver(LIBRARY_BLOCK_DELETED)
-def delete_tag_library_block(**kwargs):
+@receiver(XBLOCK_DUPLICATED)
+def duplicate_tags(**kwargs):
     """
-    Delete tags associated with a Library XBlock whenever the block is deleted.
+    Duplicates tags associated with an XBlock whenever the block is duplicated to a new location.
     """
-    library_block_data = kwargs.get("library_block", None)
-    if not library_block_data or not isinstance(library_block_data, LibraryBlockData):
+    xblock_data = kwargs.get("xblock_info", None)
+    if not xblock_data or not isinstance(xblock_data, DuplicatedXBlockData):
         log.error("Received null or incorrect data for event")
         return
 
-    try:
-        delete_library_block_tags(str(library_block_data.usage_key))
-    except Exception as err:  # pylint: disable=broad-except
-        log.error(f"Failed to delete library block tags: {err}")
+    copy_object_tags(
+        xblock_data.source_usage_key,
+        xblock_data.usage_key,
+    )

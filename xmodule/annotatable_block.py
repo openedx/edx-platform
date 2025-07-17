@@ -3,22 +3,24 @@
 import logging
 import textwrap
 
+from django.conf import settings
 from lxml import etree
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
+from xblocks_contrib.annotatable import AnnotatableBlock as _ExtractedAnnotatableBlock
 
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
-from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
-from xmodule.xml_block import XmlMixin
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_css_to_fragment
 from xmodule.x_module import (
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
     XModuleToXBlockMixin,
 )
+from xmodule.xml_block import XmlMixin
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +30,7 @@ _ = lambda text: text
 
 
 @XBlock.needs('mako')
-class AnnotatableBlock(
+class _BuiltInAnnotatableBlock(
     RawMixin,
     XmlMixin,
     EditingMixin,
@@ -39,6 +41,8 @@ class AnnotatableBlock(
     """
     Annotatable XBlock.
     """
+
+    is_extracted = False
 
     data = String(
         help=_("XML data for the annotation"),
@@ -136,9 +140,8 @@ class AnnotatableBlock(
         """ Renders annotatable content with annotation spans and returns HTML. """
 
         xmltree = etree.fromstring(self.data)
-        content = etree.tostring(xmltree, encoding='unicode')
+        self._extract_instructions(xmltree)
 
-        xmltree = etree.fromstring(content)
         xmltree.tag = 'div'
         if 'display_name' in xmltree.attrib:
             del xmltree.attrib['display_name']
@@ -180,7 +183,7 @@ class AnnotatableBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.get_html())
-        add_sass_to_fragment(fragment, 'AnnotatableBlockDisplay.scss')
+        add_css_to_fragment(fragment, 'AnnotatableBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'AnnotatableBlockDisplay')
         shim_xmodule_js(fragment, 'Annotatable')
 
@@ -193,7 +196,14 @@ class AnnotatableBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_cms_template(self.mako_template, self.get_context())
         )
-        add_sass_to_fragment(fragment, 'AnnotatableBlockEditor.scss')
+        add_css_to_fragment(fragment, 'AnnotatableBlockEditor.css')
         add_webpack_js_to_fragment(fragment, 'AnnotatableBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
+
+
+AnnotatableBlock = (
+    _ExtractedAnnotatableBlock if settings.USE_EXTRACTED_ANNOTATABLE_BLOCK
+    else _BuiltInAnnotatableBlock
+)
+AnnotatableBlock.__name__ = "AnnotatableBlock"

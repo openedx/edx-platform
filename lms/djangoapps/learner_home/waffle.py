@@ -1,8 +1,6 @@
 """
 Configuration for features of Learner Home
 """
-from django.conf import settings
-
 from edx_toggles.toggles import WaffleFlag
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -23,25 +21,12 @@ ENABLE_LEARNER_HOME_MFE = WaffleFlag(
 )
 
 
-def should_redirect_to_learner_home_mfe(user):
+def learner_home_mfe_enabled():
     """
-    Redirect a percentage of learners to Learner Home for experimentation.
-
-    Percentage is based on the LEARNER_HOME_MFE_REDIRECT_PERCENTAGE setting.
+    Determine if Learner Home MFE is enabled, replacing student_dashboard
     """
 
-    is_learning_mfe_enabled = configuration_helpers.get_value(
-        "ENABLE_LEARNER_HOME_MFE", ENABLE_LEARNER_HOME_MFE.is_enabled()
+    return configuration_helpers.get_value(
+        "ENABLE_LEARNER_HOME_MFE",
+        ENABLE_LEARNER_HOME_MFE.is_enabled(),
     )
-
-    learning_mfe_redirect_percent = configuration_helpers.get_value(
-        "LEARNER_HOME_MFE_REDIRECT_PERCENTAGE",
-        settings.LEARNER_HOME_MFE_REDIRECT_PERCENTAGE,
-    )
-
-    # Redirect when 1) Learner Home MFE is enabled and 2) a user falls into the
-    # target range for experimental rollout.
-    if is_learning_mfe_enabled and user.id % 100 < learning_mfe_redirect_percent:
-        return True
-
-    return False

@@ -36,6 +36,7 @@ from openedx.features.enterprise_support.api import (
     data_sharing_consent_required,
     enterprise_customer_for_request,
     enterprise_customer_from_api,
+    enterprise_customer_from_session,
     enterprise_customer_from_session_or_learner_data,
     enterprise_customer_uuid_for_request,
     enterprise_enabled,
@@ -1330,6 +1331,10 @@ class TestEnterpriseApi(EnterpriseServiceMockMixin, CacheIsolationTestCase):
         add_enterprise_customer_to_session(mock_request, None)
         # verify that existing session value should not be updated for un-authenticate user
         assert mock_request.session[ENTERPRISE_CUSTOMER_KEY_NAME] == enterprise_customer
+
+    @ddt.data(None, object())
+    def test_enterprise_customer_from_session_no_session_CACHE_MISS(self, request):
+        assert enterprise_customer_from_session(request) == _CACHE_MISS
 
     def test_get_consent_notification_data_no_overrides(self):
         enterprise_customer = {

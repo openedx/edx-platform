@@ -9,8 +9,6 @@ import random
 
 from pytz import UTC
 
-from common.djangoapps.util.date_utils import get_default_time_display
-
 
 class FakeInfo:
     """Parent class for faking objects used in tests"""
@@ -35,6 +33,9 @@ class FakeContentTask(FakeInfo):
 
     def __init__(self, email_id, num_sent, num_failed, sent_to):  # lint-amnesty, pylint: disable=unused-argument
         super().__init__()
+        self.task_id = random.randint(1, 15401)
+        self.task_type = 'test_task'
+        self.task_key = random.randint(1, 15401)
         self.task_input = {'email_id': email_id}
         self.task_input = json.dumps(self.task_input)
         self.task_output = {'succeeded': num_sent, 'failed': num_failed}
@@ -102,7 +103,7 @@ class FakeEmailInfo(FakeInfo):
 
     def __init__(self, fake_email, num_sent, num_failed):
         super().__init__()
-        self.created = get_default_time_display(fake_email.created)
+        self.created = fake_email.created.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         number_sent = str(num_sent) + ' sent'
         if num_failed > 0:

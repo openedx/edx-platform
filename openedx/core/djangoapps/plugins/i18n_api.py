@@ -92,6 +92,7 @@ class BaseAtlasPullCommand(BaseCommand):
         Ensure the pull directory is empty before running atlas pull.
         """
         plugin_translations_root = directory
+        os.makedirs(plugin_translations_root, exist_ok=True)
         if os.listdir(plugin_translations_root):
             raise CommandError(f'"{plugin_translations_root}" should be empty before running atlas pull.')
 

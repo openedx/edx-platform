@@ -18,3 +18,4 @@ class NotificationsConfig(AppConfig):
         """
         # pylint: disable=unused-import
         from . import handlers
+        from .email import tasks

@@ -49,14 +49,16 @@ from xmodule.course_block import (  # lint-amnesty, pylint: disable=wrong-import
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
+
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     ModuleStoreTestCase,
     SharedModuleStoreTestCase
 )
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.partitions.partitions import MINIMUM_UNUSED_PARTITION_ID, Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.features.enterprise_support.api import add_enterprise_customer_to_session
 from enterprise.api.v1.serializers import EnterpriseCustomerSerializer
 from openedx.features.enterprise_support.tests.factories import (
@@ -245,35 +247,54 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         course_key = self.course.id
         chapter = BlockFactory.create(category="chapter", parent_location=self.course.location)
         overview = CourseOverview.get_from_id(course_key)
+        subsection = BlockFactory.create(category="sequential", parent_location=chapter.location)
+        unit = BlockFactory.create(category="vertical", parent_location=subsection.location)
+
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            html_block = BlockFactory.create(
+                category="html",
+                parent_location=unit.location,
+                display_name="Unpublished Block",
+                data='<p>This block should not be published.</p>',
+                publish_item=False,
+            )
 
         # Enroll student to the course
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
         modules = [
             self.course,
-            overview,
             chapter,
+            overview,
+            subsection,
+            unit,
+
         ]
-        with patch('lms.djangoapps.courseware.access.in_preview_mode') as mock_preview:
-            mock_preview.return_value = False
-            for obj in modules:
-                assert bool(access.has_access(self.student, 'load', obj, course_key=self.course.id))
+        # Student should have access to modules they're enrolled in
+        for obj in modules:
+            assert bool(access.has_access(
+                self.student,
+                'load',
+                self.store.get_item(obj.location),
+                course_key=self.course.id)
+            )
 
-        with patch('lms.djangoapps.courseware.access.in_preview_mode') as mock_preview:
-            mock_preview.return_value = True
-            for obj in modules:
-                assert not bool(access.has_access(self.student, 'load', obj, course_key=self.course.id))
+        # If the document is not published yet, it should return an error when we try to fetch
+        # it from the store.  This check confirms that the student would not be able to access it.
+        with pytest.raises(ItemNotFoundError):
+            self.store.get_item(html_block.location)
 
-    @patch('lms.djangoapps.courseware.access.in_preview_mode', Mock(return_value=True))
-    def test_has_access_with_preview_mode(self):
+    def test_has_access_based_on_roles(self):
         """
-        Tests particular user's can access content via has_access in preview mode.
+        Tests user access to content based on their role.
         """
         assert bool(access.has_access(self.global_staff, 'staff', self.course, course_key=self.course.id))
         assert bool(access.has_access(self.course_staff, 'staff', self.course, course_key=self.course.id))
         assert bool(access.has_access(self.course_instructor, 'staff', self.course, course_key=self.course.id))
         assert not bool(access.has_access(self.student, 'staff', self.course, course_key=self.course.id))
-        assert not bool(access.has_access(self.student, 'load', self.course, course_key=self.course.id))
+
+        # Student should be able to load the course even if they don't have staff access.
+        assert bool(access.has_access(self.student, 'load', self.course, course_key=self.course.id))
 
         # When masquerading is true, user should not be able to access staff content
         with patch('lms.djangoapps.courseware.access.is_masquerading_as_student') as mock_masquerade:
@@ -281,16 +302,15 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             assert not bool(access.has_access(self.global_staff, 'staff', self.course, course_key=self.course.id))
             assert not bool(access.has_access(self.student, 'staff', self.course, course_key=self.course.id))
 
-    @patch('lms.djangoapps.courseware.access_utils.in_preview_mode', Mock(return_value=True))
-    def test_has_access_in_preview_mode_with_group(self):
+    def test_has_access_with_content_groups(self):
         """
-        Test that a user masquerading as a member of a group sees appropriate content in preview mode.
+        Test that a user masquerading as a member of a group sees appropriate content.
         """
         # Note about UserPartition and UserPartition Group IDs: these must not conflict with IDs used
         # by dynamic user partitions.
-        partition_id = MINIMUM_STATIC_PARTITION_ID
-        group_0_id = MINIMUM_STATIC_PARTITION_ID + 1
-        group_1_id = MINIMUM_STATIC_PARTITION_ID + 2
+        partition_id = MINIMUM_UNUSED_PARTITION_ID
+        group_0_id = MINIMUM_UNUSED_PARTITION_ID + 1
+        group_1_id = MINIMUM_UNUSED_PARTITION_ID + 2
         user_partition = UserPartition(
             partition_id, 'Test User Partition', '',
             [Group(group_0_id, 'Group 1'), Group(group_1_id, 'Group 2')],
@@ -423,24 +443,6 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
         assert bool(access._has_access_to_block(self.beta_user, 'load', mock_unit, course_key=self.course.id))
 
-    @ddt.data(None, YESTERDAY, TOMORROW)
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @patch(
-        'lms.djangoapps.courseware.access_utils.get_current_request_hostname',
-        Mock(return_value='preview.localhost')
-    )
-    def test__has_access_to_block_in_preview_mode(self, start):
-        """
-        Tests that block has access in preview mode.
-        """
-        mock_unit = Mock(location=self.course.location, user_partitions=[])
-        mock_unit._class_tags = {}  # Needed for detached check in _has_access_to_block
-        mock_unit.visible_to_staff_only = False
-        mock_unit.start = self.DATES[start]
-        mock_unit.merged_group_access = {}
-
-        self.verify_access(mock_unit, True)
-
     @ddt.data(
         (TOMORROW, access_response.StartDateError),
         (None, None),
@@ -448,10 +450,11 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
     )  # ddt throws an error if I don't put the None argument there
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
-    @patch('lms.djangoapps.courseware.access_utils.get_current_request_hostname', Mock(return_value='localhost'))
-    def test__has_access_to_block_when_not_in_preview_mode(self, start, expected_error_type):
+    def test__has_access_to_block_with_start_date(self, start, expected_error_type):
         """
-        Tests that block has no access when start date in future & without preview.
+        Tests that block access follows start date rules.
+        Access should be denied when start date is in the future and granted when
+        start date is in the past or not set.
         """
         expected_access = expected_error_type is None
         mock_unit = Mock(location=self.course.location, user_partitions=[])
@@ -903,7 +906,6 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
     )
     @ddt.unpack
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False, 'ENABLE_ENTERPRISE_INTEGRATION': True})
-    @override_settings(COURSEWARE_COURSE_NOT_STARTED_ENTERPRISE_LEARNER_ERROR=True)
     def test_course_catalog_access_num_queries_enterprise(self, user_attr_name, course_attr_name):
         """
         Similar to test_course_catalog_access_num_queries_no_enterprise, except enable enterprise features and make the

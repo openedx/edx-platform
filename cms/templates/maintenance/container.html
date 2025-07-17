@@ -18,14 +18,6 @@ from openedx.core.djangolib.js_utils import js_escaped_string
 </section>
 </%block>
 
-<%block name="header_extras">
-% for template_name in ["force-published-course-response"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="js/maintenance/${template_name}.underscore" />
-</script>
-% endfor
-</%block>
-
 <%block name="requirejs">
   require(["js/maintenance/${view['slug'] | n, js_escaped_string}"], function(MaintenanceFactory) {
       MaintenanceFactory("${reverse(view['url']) | n, js_escaped_string}");

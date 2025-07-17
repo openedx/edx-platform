@@ -25,6 +25,8 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx_filters.content_authoring.filters import LMSPageURLRequested
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -193,7 +195,9 @@ def _assets_json(request, course_key):
     '''
     request_options = _parse_request_to_dictionary(request)
 
-    filter_parameters = {}
+    filter_parameters = {
+        'user_language': UserPreference.get_value(request.user, 'pref-lang') or 'en',
+    }
 
     if request_options['requested_asset_type']:
         filters_are_invalid_error = _get_error_if_invalid_parameters(request_options['requested_asset_type'])
@@ -714,7 +718,15 @@ def get_asset_json(display_name, content_type, date, location, thumbnail_locatio
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
-    external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
+
+    ## .. filter_implemented_name: LMSPageURLRequested
+    ## .. filter_type: org.openedx.content_authoring.lms.page.url.requested.v1
+    lms_root, _ = LMSPageURLRequested.run_filter(
+        url=configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL),
+        org=location.org,
+    )
+
+    external_url = urljoin(lms_root, asset_url)
     portable_url = StaticContent.get_static_path_from_location(location)
     usage_locations = [] if usage is None else usage
     return {

@@ -14,7 +14,7 @@ from common.djangoapps.student.helpers import (
     get_course_dates_for_email,
     get_instructors,
 )
-from lms.djangoapps.utils import get_braze_client
+from lms.djangoapps.utils import get_email_client
 from openedx.core.djangoapps.catalog.utils import (
     get_course_uuid_for_course,
     get_owners_for_course,
@@ -115,6 +115,7 @@ def send_course_enrollment_email(
                 "short_description": course_run.get("short_description"),
                 "pacing_type": course_run.get("pacing_type"),
                 "partner_image_url": owners[0].get("logo_image_url") if owners else "",
+                "org_name": owners[0].get("name") if owners else "",
             }
         )
     except Exception as err:  # pylint: disable=broad-except
@@ -131,9 +132,9 @@ def send_course_enrollment_email(
 
     try:
         recipients = [{"external_user_id": user_id}]
-        braze_client = get_braze_client()
-        if braze_client:
-            braze_client.send_canvas_message(
+        email_client = get_email_client()
+        if email_client:
+            email_client.send_canvas_message(
                 canvas_id=settings.BRAZE_COURSE_ENROLLMENT_CANVAS_ID,
                 recipients=recipients,
                 canvas_entry_properties=canvas_entry_properties,

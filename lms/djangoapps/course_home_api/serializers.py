@@ -9,7 +9,6 @@ from rest_framework import serializers
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.djangoapps.courseware_api.utils import serialize_upgrade_info
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
-from openedx.features.course_experience import DISPLAY_COURSE_SOCK_FLAG
 from openedx.features.course_experience.utils import dates_banner_should_display
 
 
@@ -59,12 +58,7 @@ class VerifiedModeSerializer(ReadOnlySerializer):
 
     Requires 'course_overview', 'enrollment', and 'request' from self.context.
     """
-    can_show_upgrade_sock = serializers.SerializerMethodField()
     verified_mode = serializers.SerializerMethodField()
-
-    def get_can_show_upgrade_sock(self, _):
-        course_overview = self.context['course_overview']
-        return DISPLAY_COURSE_SOCK_FLAG.is_enabled(course_overview.id)
 
     def get_verified_mode(self, _):
         """Return verified mode information, or None."""

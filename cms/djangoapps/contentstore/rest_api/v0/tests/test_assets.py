@@ -5,12 +5,11 @@ Tests for the xblock view of the CMS API. This tests only the view itself,
 not the underlying Xblock service.
 It checks that the assets_handler method of the Xblock service is called with the expected parameters.
 """
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+
 from django.core.files import File
 from django.http import JsonResponse
-
 from django.urls import reverse
-from mock import MagicMock
 from rest_framework import status
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -61,13 +60,8 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
             }
         ),
     )
-    @patch(
-        f"cms.djangoapps.contentstore.rest_api.{VERSION}.views.xblock.toggles.use_studio_content_api",
-        return_value=True,
-    )
     def make_request(
         self,
-        mock_use_studio_content_api,
         mock_handle_assets,
         run_assertions=None,
         course_id=None,
@@ -126,13 +120,6 @@ class AssetsViewGetTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     def send_request(self, url, data):
         return self.client.get(url)
 
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_assets_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
@@ -183,13 +170,6 @@ class AssetsViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     def send_request(self, url, data):
         return self.client.post(url, data=data, format="multipart")
 
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_assets_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
@@ -233,13 +213,6 @@ class AssetsViewPutTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     def send_request(self, url, data):
         return self.client.put(url, data=data, format="json")
 
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.put(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_assets_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
@@ -277,13 +250,6 @@ class AssetsViewDeleteTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase)
 
     def send_request(self, url, data):
         return self.client.delete(url)
-
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_assets_handler_called_with_correct_arguments(self):
         self.client.login(

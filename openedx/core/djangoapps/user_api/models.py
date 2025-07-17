@@ -105,6 +105,13 @@ class UserPreference(models.Model):
         """
         return cls.objects.filter(user=user, key=preference_key).exists()
 
+    @classmethod
+    def get_preference_for_users(cls, user_ids, preference_key):
+        """
+        Returns preference for list of users
+        """
+        return cls.objects.filter(user__in=user_ids, key=preference_key)
+
 
 @receiver(pre_save, sender=UserPreference)
 def pre_save_callback(sender, **kwargs):
@@ -426,6 +433,8 @@ class UserRetirementStatus(TimeStampedModel):
 class BulkUserRetirementConfig(ConfigurationModel):
     """
     Configuration to store a csv file that will be used in retire_user management command.
+
+    .. no_pii:
     """
     # Timeout set to 0 so that the model does not read from cached config in case the config entry is deleted.
     cache_timeout = 0

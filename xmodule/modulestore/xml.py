@@ -259,7 +259,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):  # lint-amnesty, pyl
 
     # id_generator is ignored, because each ImportSystem is already local to
     # a course, and has it's own id_generator already in place
-    def add_node_as_child(self, block, node, id_generator):  # lint-amnesty, pylint: disable=signature-differs
+    def add_node_as_child(self, block, node):  # lint-amnesty, pylint: disable=signature-differs
         child_block = self.process_xml(etree.tostring(node))
         block.children.append(child_block.scope_ids.usage_id)
 

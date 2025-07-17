@@ -2,11 +2,11 @@
 Helper functions for XBlock serialization
 """
 from __future__ import annotations
+
 import logging
 import re
 from contextlib import contextmanager
 
-from django.conf import settings
 from fs.memoryfs import MemoryFS
 from fs.wrapfs import WrapFS
 from opaque_keys import InvalidKeyError
@@ -17,7 +17,7 @@ from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
+from xmodule.util.sandboxing import course_code_library_asset_name
 from xmodule.xml_block import XmlMixin
 
 from .data import StaticFile
@@ -105,7 +105,7 @@ def get_python_lib_zip_if_using(olx: str, course_id: CourseKey) -> StaticFile | 
     using python_lib.zip
     """
     if _has_python_script(olx):
-        python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
+        python_lib_filename = course_code_library_asset_name()
         asset_key = StaticContent.get_asset_key_from_path(course_id, python_lib_filename)
         # Now, it seems like this capa problem uses python_lib.zip - but does it exist in the course?
         if AssetManager.find(asset_key, throw_on_not_found=False):
@@ -225,17 +225,17 @@ def override_export_fs(block):
     XmlMixin.export_to_file = old_global_export_to_file
 
 
-def blockstore_def_key_from_modulestore_usage_key(usage_key):
+def learning_core_def_key_from_modulestore_usage_key(usage_key):
     """
     In modulestore, the "definition key" is a MongoDB ObjectID kept in split's
     definitions table, which theoretically allows the same block to be used in
     many places (each with a unique usage key). However, that functionality is
     not exposed in Studio (other than via content libraries). So when we import
-    into Blockstore, we assume that each usage is unique, don't generate a usage
+    into learning core, we assume that each usage is unique, don't generate a usage
     key, and create a new "definition key" from the original usage key.
     So modulestore usage key
         block-v1:A+B+C+type@html+block@introduction
-    will become Blockstore definition key
+    will become learning core definition key
         html/introduction
     """
     block_type = usage_key.block_type

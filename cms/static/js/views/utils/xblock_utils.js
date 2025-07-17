@@ -29,6 +29,8 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
          *
          *   staffOnly - all of the block's content is to be shown to staff only
          *     Note: staff only items do not affect their parent's state.
+         *
+         *   hideFromTOC - all of the block's content is to be hidden from the table of contents.
          */
     VisibilityState = {
         live: 'live',
@@ -36,7 +38,8 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         unscheduled: 'unscheduled',
         needsAttention: 'needs_attention',
         staffOnly: 'staff_only',
-        gated: 'gated'
+        gated: 'gated',
+        hideFromTOC: 'hide_from_toc'
     };
 
     /**
@@ -309,6 +312,9 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     getXBlockVisibilityClass = function(visibilityState) {
         if (visibilityState === VisibilityState.staffOnly) {
             return 'is-staff-only';
+        }
+        if (visibilityState === VisibilityState.hideFromTOC) {
+            return 'is-hidden-from-toc';
         }
         if (visibilityState === VisibilityState.gated) {
             return 'is-gated';

@@ -2,9 +2,15 @@
 Common mixins for module.
 """
 import json
+import logging
 from unittest.mock import patch
 
+from django.http import Http404
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey
 from rest_framework import status
+
+log = logging.getLogger(__name__)
 
 
 class PermissionAccessMixin:
@@ -30,7 +36,7 @@ class PermissionAccessMixin:
         self.assertEqual(error, "Authentication credentials were not provided.")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_ADVANCED_SETTINGS': True})
+    @patch.dict("django.conf.settings.FEATURES", {"DISABLE_ADVANCED_SETTINGS": True})
     def test_permissions_unauthorized(self):
         """
         Test that an error is returned if the user is unauthorised.
@@ -40,3 +46,20 @@ class PermissionAccessMixin:
         error = self.get_and_check_developer_response(response)
         self.assertEqual(error, "You do not have permission to perform this action.")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ContainerHandlerMixin:
+    """
+    A mixin providing common functionality for container handler views.
+    """
+
+    def get_object(self, usage_key_string):
+        """
+        Get an object by usage-id of the block
+        """
+        try:
+            usage_key = UsageKey.from_string(usage_key_string)
+            return usage_key
+        except InvalidKeyError as err:
+            log.error(f"Invalid usage key: {usage_key_string}", exc_info=True)
+            raise Http404(f"Object not found for usage key: {usage_key_string}") from err

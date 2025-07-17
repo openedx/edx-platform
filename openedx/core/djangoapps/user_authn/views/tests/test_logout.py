@@ -5,7 +5,7 @@ Tests for logout
 import urllib
 from unittest import mock
 import ddt
-import bleach
+import nh3
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -237,6 +237,6 @@ class LogoutTests(TestCase):
         )
         response = self.client.get(url, HTTP_HOST=host)
         expected = {
-            'target': bleach.clean(urllib.parse.unquote(redirect_url)),
+            'target': nh3.clean(urllib.parse.unquote(redirect_url)),
         }
         self.assertDictContainsSubset(expected, response.context_data)

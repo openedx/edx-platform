@@ -5,17 +5,15 @@ Tests for toggles, where there is logic beyond enable/disable.
 from unittest.mock import patch
 import ddt
 
-from django.test import override_settings
-
 from common.djangoapps.student.tests.factories import UserFactory
-from lms.djangoapps.learner_home.waffle import should_redirect_to_learner_home_mfe
+from lms.djangoapps.learner_home.waffle import learner_home_mfe_enabled
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
 @ddt.ddt
-class TestLearnerHomeRedirect(SharedModuleStoreTestCase):
+class TestLearnerHomeWaffle(SharedModuleStoreTestCase):
     """
-    Tests for should_redirect_to_learner_home, used for experimental rollout.
+    Tests for learner_home_mfe_enabled
     """
 
     def setUp(self):
@@ -24,31 +22,16 @@ class TestLearnerHomeRedirect(SharedModuleStoreTestCase):
         # Set up a user for testing
         self.user = UserFactory
 
+    @ddt.data(True, False)
     @patch("lms.djangoapps.learner_home.waffle.ENABLE_LEARNER_HOME_MFE")
-    def test_should_redirect_to_learner_home_disabled(self, mock_enable_learner_home):
-        # Given Learner Home MFE feature is not enabled
-        mock_enable_learner_home.is_enabled.return_value = False
-
-        # When I check if I should redirect
-        redirect_choice = should_redirect_to_learner_home_mfe(self.user)
-
-        # Then I never redirect
-        self.assertFalse(redirect_choice)
-
-    @ddt.data((0, True), (50, False), (100, True))
-    @ddt.unpack
-    @patch("lms.djangoapps.learner_home.waffle.ENABLE_LEARNER_HOME_MFE")
-    @override_settings(LEARNER_HOME_MFE_REDIRECT_PERCENTAGE=50)
-    def test_should_redirect_to_learner_home_enabled(
-        self, user_id, expect_redirect, mock_enable_learner_home
+    def test_learner_home_mfe_enabled(
+        self, is_waffle_enabled, mock_enable_learner_home
     ):
-        # Given Learner Home MFE feature is enabled
-        mock_enable_learner_home.is_enabled.return_value = True
-        self.user.id = user_id
+        # Given Learner Home MFE feature is / not enabled
+        mock_enable_learner_home.is_enabled.return_value = is_waffle_enabled
 
-        # When I check if I should redirect
-        redirect_choice = should_redirect_to_learner_home_mfe(self.user)
+        # When I check if the feature is enabled
+        is_learner_home_enabled = learner_home_mfe_enabled()
 
-        # Then I redirect based on configuration
-        # (currently user ID % 100 < redirect percentage)
-        self.assertEqual(expect_redirect, redirect_choice)
+        # Then I respects waffle setting.
+        self.assertEqual(is_learner_home_enabled, is_waffle_enabled)

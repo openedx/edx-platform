@@ -277,7 +277,7 @@ def get_enterprise_readonly_account_fields(user):
     # if user has no `UserSocialAuth` record then allow to edit `fullname`
     # whether the `sync_learner_profile_data` is enabled or disabled
     user_social_auth_record = _user_has_social_auth_record(user, enterprise_customer)
-    if not user_social_auth_record:
+    if not user_social_auth_record and 'name' in enterprise_readonly_account_fields:
         enterprise_readonly_account_fields.remove('name')
 
     sync_learner_profile_data = _get_sync_learner_profile_data(enterprise_customer)
@@ -294,9 +294,12 @@ def _user_has_social_auth_record(user, enterprise_customer):
             identity_provider = third_party_auth.provider.Registry.get(
                 provider_id=idp['provider_id']
             )
-            provider_backend_names.append(identity_provider.backend_name)
-        return UserSocialAuth.objects.select_related('user').\
-            filter(provider__in=provider_backend_names, user=user).exists()
+            if identity_provider and hasattr(identity_provider, 'backend_name'):
+                provider_backend_names.append(identity_provider.backend_name)
+
+        if provider_backend_names:
+            return UserSocialAuth.objects.select_related('user').\
+                filter(provider__in=provider_backend_names, user=user).exists()
     return False
 
 

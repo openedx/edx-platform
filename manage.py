@@ -12,7 +12,6 @@ Any arguments not understood by this manage.py will be passed to django-admin.py
 """
 # pylint: disable=wrong-import-order, wrong-import-position
 
-
 from openedx.core.lib.logsettings import log_python_warnings
 log_python_warnings()
 
@@ -20,7 +19,6 @@ log_python_warnings()
 from openedx.core.lib.safe_lxml import defuse_xml_libs  # isort:skip
 defuse_xml_libs()
 
-import importlib
 import os
 import sys
 from argparse import ArgumentParser
@@ -51,7 +49,6 @@ def parse_args():
         help_string=lms.format_help(),
         settings_base='lms/envs',
         default_settings='lms.envs.devstack_docker',
-        startup='lms.startup',
     )
 
     cms = subparsers.add_parser(
@@ -70,7 +67,6 @@ def parse_args():
         settings_base='cms/envs',
         default_settings='cms.envs.devstack_docker',
         service_variant='cms',
-        startup='cms.startup',
     )
 
     edx_args, django_args = parser.parse_known_args()
@@ -98,9 +94,6 @@ if __name__ == "__main__":
         print("Django:")
         # This will trigger django-admin.py to print out its help
         django_args.append('--help')
-
-    startup = importlib.import_module(edx_args.startup)
-    startup.run()
 
     from django.core.management import execute_from_command_line
     execute_from_command_line([sys.argv[0]] + django_args)

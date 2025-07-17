@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils.http import int_to_base36
 from edx_ace import ace
 from edx_ace.recipient import Recipient
+from eventtracking import tracker
 
 from common.djangoapps.student.models import AccountRecoveryConfiguration
 from openedx.core.djangoapps.user_authn.toggles import should_redirect_to_authn_microfrontend
@@ -27,6 +28,7 @@ from openedx.core.djangoapps.user_authn.message_types import PasswordReset
 from openedx.core.lib.celery.task_utils import emulate_http_request
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+PASSWORD_RESET_INITIATED = 'edx.user.passwordreset.initiated'
 
 
 class Command(BaseCommand):
@@ -84,6 +86,13 @@ class Command(BaseCommand):
                 user = get_user_model().objects.get(Q(username__iexact=username) | Q(email__iexact=current_email))
                 user.email = desired_email
                 user.save()
+                tracker.emit(
+                    PASSWORD_RESET_INITIATED,
+                    {
+                        "user_id": user.id,
+                        "source": "Account Recovery Management Command",
+                    }
+                )
                 self.send_password_reset_email(user, site)
                 successful_updates.append(desired_email)
             except Exception as exc:  # pylint: disable=broad-except

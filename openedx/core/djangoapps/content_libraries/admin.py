@@ -24,12 +24,11 @@ class ContentLibraryAdmin(admin.ModelAdmin):
         "library_key",
         "org",
         "slug",
-        "bundle_uuid",
         "allow_public_learning",
         "allow_public_read",
         "authorized_lti_configs",
     )
-    list_display = ("slug", "org", "bundle_uuid")
+    list_display = ("slug", "org",)
     inlines = (ContentLibraryPermissionInline, )
 
     def get_readonly_fields(self, request, obj=None):
@@ -37,6 +36,6 @@ class ContentLibraryAdmin(admin.ModelAdmin):
         Ensure that 'slug' and 'uuid' cannot be edited after creation.
         """
         if obj:
-            return ["library_key", "org", "slug", "bundle_uuid"]
+            return ["library_key", "org", "slug"]
         else:
             return ["library_key", ]

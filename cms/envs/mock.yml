@@ -1,0 +1,828 @@
+# This is a mock configuration file used for testing the
+# settings-loading code in production.py.
+#
+# WARNING: Do not use this in production -- it contains randomized and
+# nonsensical values.
+
+
+ACTIVATION_EMAIL_SUPPORT_LINK: https://support.localhost/hc/en-us/articles/227340127-Why-haven-t-I-received-my-activation-email-
+AFFILIATE_COOKIE_NAME: affiliate_id
+AI_TRANSLATIONS_API_URL: https://ai-translations.localhost/api/v1
+AI_TRANSLATIONS_URL_ROOT: https://ai-translations.localhost
+ALLOWED_HOSTS:
+- hello
+ALTERNATE_WORKER_QUEUES: lms
+ANALYTICS_DASHBOARD_NAME: Insights
+ANALYTICS_DASHBOARD_URL: https://insights.localhost
+AUTHORING_API_URL: https://api.localhost/authoring
+AUTH_PASSWORD_VALIDATORS:
+- NAME: django.contrib.auth.password_validation.CommonPasswordValidator
+- NAME: django.contrib.auth.password_validation.UserAttributeSimilarityValidator
+- NAME: common.djangoapps.util.password_policy_validators.MinimumLengthValidator
+  OPTIONS:
+    min_length: 8
+- NAME: common.djangoapps.util.password_policy_validators.MaximumLengthValidator
+  OPTIONS:
+    max_length: 100
+- NAME: common.djangoapps.util.password_policy_validators.AlphabeticValidator
+  OPTIONS:
+    min_alphabetic: 1
+- NAME: common.djangoapps.util.password_policy_validators.NumericValidator
+  OPTIONS:
+    min_numeric: 1
+AWS_ACCESS_KEY_ID: null
+AWS_QUERYSTRING_AUTH: true
+AWS_S3_CUSTOM_DOMAIN: test.s3.amazonaws.com
+AWS_SECRET_ACCESS_KEY: null
+AWS_SES_REGION_ENDPOINT: test.amazonaws.com
+AWS_SES_REGION_NAME: us-east-1
+AWS_STORAGE_BUCKET_NAME: test
+BASE_COOKIE_DOMAIN: .localhost
+BEAMER_PRODUCT_ID: test_beamer_product
+BIG_BLUE_BUTTON_GLOBAL_KEY: test_bluebutton_key
+BIG_BLUE_BUTTON_GLOBAL_SECRET: test_bluebutton_secret
+BIG_BLUE_BUTTON_GLOBAL_URL: https://dev.com/
+BLOCK_STRUCTURES_SETTINGS:
+  COURSE_PUBLISH_TASK_DELAY: 30
+  DIRECTORY_PREFIX: courses/
+  PRUNING_ACTIVE: true
+  STORAGE_CLASS: storages.backends.s3boto3.S3Boto3Storage
+  STORAGE_KWARGS:
+    bucket_name: block-structures
+  TASK_DEFAULT_RETRY_DELAY: 30
+  TASK_MAX_RETRIES: 5
+BRANCH_IO_KEY: test_BRANCH_IO_KEY
+BUGS_EMAIL: bugs@example.com
+BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@courseupdates.localhost
+BULK_EMAIL_LOG_SENT_EMAILS: true
+BUNDLE_ASSET_STORAGE_SETTINGS:
+  STORAGE_CLASS: storages.backends.s3boto3.S3Boto3Storage
+  STORAGE_KWARGS:
+    bucket_name: settings
+    custom_domain: null
+    default_acl: null
+    location: ''
+    querystring_auth: true
+    querystring_expire: 172800
+    signature_version: s3v4
+BUNDLE_ASSET_URL_STORAGE_KEY: test_storage_key
+BUNDLE_ASSET_URL_STORAGE_SECRET: test_storage_secret
+CACHES:
+  celery:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: celery
+    LOCATION:
+    - test.amazonaws.com:11211
+    - test.amazonaws.com:11211
+    OPTIONS:
+      connect_timeout: 0.5
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    TIMEOUT: '7200'
+  configuration:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: ip-0
+    LOCATION:
+    - test.amazonaws.com:11211
+    - test.amazonaws.com:11211
+    OPTIONS:
+      connect_timeout: 0.5
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+  course_structure_cache:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: course_structure
+    LOCATION:
+    - test.amazonaws.com:11211
+    - test.amazonaws.com:11211
+    OPTIONS:
+      connect_timeout: 0.5
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    TIMEOUT: null
+  default:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: default
+    LOCATION:
+    - test.amazonaws.com:11211
+    - test.amazonaws.com:11211
+    OPTIONS:
+      connect_timeout: 0.5
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    VERSION: bb6cd7d
+  general:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: general
+    LOCATION:
+    - test.amazonaws.com:11211
+    - test.amazonaws.com:11211
+    OPTIONS:
+      connect_timeout: 0.5
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+  mongo_metadata_inheritance:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: mongo_metadata_inheritance
+    LOCATION:
+    - test.amazonaws.com:11211
+    - test.amazonaws.com:11211
+    OPTIONS:
+      connect_timeout: 0.5
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+    TIMEOUT: 300
+  staticfiles:
+    BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
+    KEY_PREFIX: ip-0
+    LOCATION:
+    - test.amazonaws.com:11211
+    - test.amazonaws.com:11211
+    OPTIONS:
+      connect_timeout: 0.5
+      ignore_exc: true
+      no_delay: true
+      use_pooling: true
+CELERY_BROKER_HOSTNAME: celery.cache.amazonaws.com:6379
+CELERY_BROKER_PASSWORD: ''
+CELERY_BROKER_TRANSPORT: redis
+CELERY_BROKER_USER: ''
+CELERY_BROKER_USE_SSL: true
+CELERY_BROKER_VHOST: 0
+CELERY_EVENT_QUEUE_TTL: 5
+CLOSEST_CLIENT_IP_FROM_HEADERS:
+- index: 0
+  name: CF-Connecting-IP
+CMS_BASE: studio.localhost
+CODE_JAIL:
+  limit_overrides:
+    codejail_expanded_limits:
+      CPU: 10
+      FSIZE: 2097152
+      PROXY: 1
+      REALTIME: 60
+      VMEM: 1073741824
+    course-v1:Org+Course+Run:
+      CPU: 5
+      FSIZE: 5
+      PROXY: 5
+      REALTIME: 5
+      VMEM: 5
+  limits:
+    CPU: 2
+    FSIZE: 1048576
+    PROXY: 1
+    REALTIME: 6
+    VMEM: 536870912
+  python_bin: /edx/app/edxapp/venvs/edxapp-sandbox/bin/python
+  user: sandbox
+COMMENTS_SERVICE_KEY: test_COMMENTS_SERVICE_KEY
+COMMENTS_SERVICE_URL: https://forum.localhost
+COMPLETION_VIDEO_COMPLETE_PERCENTAGE: 0.9
+COMPREHENSIVE_THEME_DIRS: []
+COMPREHENSIVE_THEME_LOCALE_PATHS:
+- /edx/var/edx-themes/edx-themes/conf/locale
+CONFIG_WATCHER_SERVICE_NAME: CMS
+CONFIG_WATCHER_SLACK_WEBHOOK_URL: test_CONFIG_WATCHER_SLACK_WEBHOOK_URL
+CONTACT_EMAIL: info@example.com
+CONTENTSTORE:
+  ADDITIONAL_OPTIONS:
+    trashcan:
+      bucket: trash
+  DOC_STORE_CONFIG:
+    auth_source: null
+    collection: modulestore
+    connectTimeoutMS: 2000
+    db: db
+    host: 127.0.0.1
+    password: test_password
+    port: 27017
+    read_preference: PRIMARY
+    replicaSet: rs0
+    socketTimeoutMS: 3000
+    ssl: true
+    user: user
+  ENGINE: xmodule.contentstore.mongo.MongoContentStore
+  OPTIONS:
+    auth_source: null
+    db: db
+    host: 127.0.0.1
+    password: test_password
+    port: 27017
+    ssl: true
+    user: user
+COOKIE_HEADER_SIZE_LOGGING_THRESHOLD: 9000
+COOKIE_SAMPLING_REQUEST_COUNT: 600
+CORS_ORIGIN_WHITELIST:
+- https://localhost
+- https://www.localhost
+COURSE_AUTHORING_MICROFRONTEND_URL: https://course-authoring.localhost
+COURSE_CATALOG_API_URL: https://discovery.localhost/api/v1
+COURSE_CATALOG_URL_ROOT: https://discovery.localhost
+COURSE_IMPORT_EXPORT_BUCKET: import-export
+COURSE_METADATA_EXPORT_BUCKET: export
+COURSE_OLX_VALIDATION_IGNORE_LIST:
+- InvalidHTML
+COURSE_OLX_VALIDATION_STAGE: 1
+CREDENTIALS_INTERNAL_SERVICE_URL: https://credentials.localhost
+CREDENTIALS_PUBLIC_SERVICE_URL: https://credentials.localhost
+CREDIT_PROVIDER_SECRET_KEYS:
+  org:
+  - '[encrypted]'
+CROSS_DOMAIN_CSRF_COOKIE_DOMAIN: .localhost
+CROSS_DOMAIN_CSRF_COOKIE_NAME: csrftoken
+CSRF_COOKIE_SECURE: true
+CSRF_TRUSTED_ORIGINS:
+- .localhost
+CSRF_TRUSTED_ORIGINS_WITH_SCHEME:
+- https://*.localhost
+DATABASES:
+  blockstore:
+    CONN_MAX_AGE: 600
+    ENGINE: django.db.backends.mysql
+    HOST: localhost
+    NAME: blockstore
+    OPTIONS:
+      connect_timeout: 10
+      init_command: SET sql_mode='STRICT_TRANS_TABLES', NAMES utf8mb4
+    PASSWORD: test_password
+    PORT: '3306'
+    USER: user
+  default:
+    ATOMIC_REQUESTS: true
+    CONN_MAX_AGE: 600
+    ENGINE: django.db.backends.mysql
+    HOST: localhost
+    NAME: default
+    OPTIONS:
+      charset: utf8mb4
+      collation: utf8mb4_unicode_ci
+    PASSWORD: test_password
+    PORT: '3306'
+    USER: user
+  read_replica:
+    CONN_MAX_AGE: 600
+    ENGINE: django.db.backends.mysql
+    HOST: localhost
+    NAME: read
+    OPTIONS: {}
+    PASSWORD: test_password
+    PORT: '3306'
+    USER: user
+  student_module_history:
+    CONN_MAX_AGE: 600
+    ENGINE: django.db.backends.mysql
+    HOST: localhost
+    NAME: smh
+    OPTIONS: {}
+    PASSWORD: test_password
+    PORT: '3306'
+    USER: user
+DATA_DIR: /edx/var/edxapp
+DEFAULT_FEEDBACK_EMAIL: feedback@example.com
+DEFAULT_FILE_STORAGE: storages.backends.s3boto3.S3Boto3Storage
+DEFAULT_FROM_EMAIL: no-reply@registration.localhost
+DEFAULT_HASHING_ALGORITHM: sha256
+DEFAULT_JWT_ISSUER:
+  AUDIENCE: test_password
+  ISSUER: https://courses.localhost/oauth2
+  SECRET_KEY: test_secret_key
+DEFAULT_SITE_THEME: localhost
+DISABLED_COUNTRIES:
+- US
+DISCUSSIONS_INCONTEXT_FEEDBACK_URL: test_url
+DISCUSSIONS_INCONTEXT_LEARNMORE_URL: test_learnmore_url
+DISCUSSIONS_MFE_FEEDBACK_URL: https://bit.ly/
+DISCUSSIONS_MICROFRONTEND_URL: https://discussions.localhost
+DJFS:
+  bucket: storage
+  prefix: prefix/
+  type: s3fs
+DOC_STORE_CONFIG:
+  auth_source: null
+  collection: modulestore
+  connectTimeoutMS: 2000
+  db: db
+  host: localhost
+  password: test_secret_key
+  port: 27017
+  read_preference: PRIMARY
+  replicaSet: rs0
+  socketTimeoutMS: 3000
+  ssl: true
+  user: user
+ECOMMERCE_API_SIGNING_KEY: test_secret_key
+ECOMMERCE_API_URL: https://ecommerce.localhost/api/v2/
+ECOMMERCE_PUBLIC_URL_ROOT: https://ecommerce.localhost
+EDXMKTG_USER_INFO_COOKIE_NAME: user-info
+EDX_REST_API_CLIENT_NAME: edxapp-cms
+ELASTIC_SEARCH_CONFIG:
+- host: test.amazonaws.com
+  port: 443
+  use_ssl: true
+ELASTIC_SEARCH_CONFIG_ES7:
+- host: test.amazonaws.com
+  port: 443
+  use_ssl: true
+EMAIL_BACKEND: django_ses.SESBackend
+EMAIL_HOST: localhost
+EMAIL_HOST_PASSWORD: ''
+EMAIL_HOST_USER: ''
+EMAIL_PORT: 25
+EMAIL_USE_TLS: true
+ENABLE_COMPREHENSIVE_THEMING: true
+ENTERPRISE_API_URL: https://courses.localhost/enterprise/api/v1
+ENTERPRISE_CATALOG_INTERNAL_ROOT_URL: https://enterprise-catalog.localhost
+ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS:
+  utm_campaign: localhost Referral
+  utm_medium: Footer
+  utm_source: localhost
+EVENTS_SERVICE_NAME: cms
+EVENT_BUS_KAFKA_API_KEY: test_kafka_key
+EVENT_BUS_KAFKA_API_SECRET: test_kafka_secret
+EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS: testconfluent.cloud:9092
+EVENT_BUS_KAFKA_SCHEMA_REGISTRY_API_KEY: test_kafka__api_key
+EVENT_BUS_KAFKA_SCHEMA_REGISTRY_API_SECRET: test_schema_registry_secret
+EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL: https://test.confluent.cloud
+EVENT_BUS_PRODUCER: edx_event_bus_kafka.create_producer
+EVENT_BUS_PRODUCER_CONFIG:
+  org.openedx.content_authoring.course.catalog_info.changed.v1:
+    course-catalog-info-changed:
+      enabled: true
+      event_key_field: catalog_info.course_key
+  org.openedx.learning.user.course_access_role.added.v1:
+    learning-course-access-role-lifecycle:
+      enabled: true
+      event_key_field: course_access_role_data.course_key
+  org.openedx.learning.user.course_access_role.removed.v1:
+    learning-course-access-role-lifecycle:
+      enabled: true
+      event_key_field: course_access_role_data.course_key
+EVENT_BUS_TOPIC_PREFIX: prefix
+EVENT_TRACKING_SEGMENTIO_EMIT_WHITELIST:
+- hello
+EXAMS_MICROFRONTEND_URL: https://exams-dashboard.localhost
+EXAMS_SERVICE_URL: https://edx-exams.localhost/api/v1
+EXTRA_MIDDLEWARE_CLASSES: []
+FACEBOOK_APP_ID: test_facebook_app_id
+FACEBOOK_APP_SECRET: test_facebook_app_secret
+FAVICON_URL: https://cdn.org/favicon.ico
+FEATURES:
+  ALLOW_COURSE_RERUNS: true
+  ALLOW_COURSE_STAFF_GRADE_DOWNLOADS: true
+  CERTIFICATES_HTML_VIEW: true
+  CERTIFICATES_INSTRUCTOR_GENERATION: true
+  COURSEWARE_SEARCH_INCLUSION_DATE: '2024-01-01'
+  CUSTOM_CERTIFICATE_TEMPLATES_ENABLED: true
+  CUSTOM_COURSES_EDX: true
+  DEPRECATE_OLD_COURSE_KEYS_IN_STUDIO: true
+  DISABLE_COURSE_CREATION: true
+  DISABLE_HONOR_CERTIFICATES: true
+  DISABLE_LIBRARY_CREATION: true
+  DISABLE_MOBILE_COURSE_AVAILABLE: true
+  DISPLAY_ANALYTICS_DEMOGRAPHICS: true
+  DISPLAY_ANALYTICS_ENROLLMENTS: true
+  EDITABLE_SHORT_DESCRIPTION: true
+  EMBARGO: true
+  ENABLE_ANALYTICS_ACTIVE_COUNT: true
+  ENABLE_API_DOCS: true
+  ENABLE_ASYNC_ANSWER_DISTRIBUTION: true
+  ENABLE_COMBINED_LOGIN_REGISTRATION: true
+  ENABLE_CONTENT_LIBRARIES_LTI_TOOL: true
+  ENABLE_CORS_HEADERS: true
+  ENABLE_COUNTRY_ACCESS: true
+  ENABLE_COURSEWARE_INDEX: true
+  ENABLE_COURSE_OLX_VALIDATION: true
+  ENABLE_CREATOR_GROUP: true
+  ENABLE_CREDIT_API: true
+  ENABLE_CREDIT_ELIGIBILITY: true
+  ENABLE_CROSS_DOMAIN_CSRF_COOKIE: true
+  ENABLE_CSMH_EXTENDED: true
+  ENABLE_DEBUG_RUN_PYTHON: true
+  ENABLE_DISCUSSION_HOME_PANEL: true
+  ENABLE_DISCUSSION_SERVICE: true
+  ENABLE_EDXNOTES: true
+  ENABLE_ENTERPRISE_INTEGRATION: true
+  ENABLE_EXPORT_GIT: true
+  ENABLE_FEEDBACK_SUBMISSION: true
+  ENABLE_FINANCIAL_ASSISTANCE_FORM: true
+  ENABLE_FOOTER_MOBILE_APP_LINKS: true
+  ENABLE_FORUM_DAILY_DIGEST: true
+  ENABLE_GRADE_DOWNLOADS: true
+  ENABLE_INSTRUCTOR_ANALYTICS: true
+  ENABLE_INSTRUCTOR_BETA_DASHBOARD: true
+  ENABLE_INSTRUCTOR_LEGACY_DASHBOARD: true
+  ENABLE_INTEGRITY_SIGNATURE: true
+  ENABLE_LIBRARY_AUTHORING_MICROFRONTEND: true
+  ENABLE_LTI_PROVIDER: true
+  ENABLE_MAX_FAILED_LOGIN_ATTEMPTS: true
+  ENABLE_MKTG_EMAIL_OPT_IN: true
+  ENABLE_MKTG_SITE: true
+  ENABLE_MOBILE_REST_API: true
+  ENABLE_OAUTH2_PROVIDER: true
+  ENABLE_PASSWORD_RESET_FAILURE_EMAIL: true
+  ENABLE_PROCTORED_EXAMS: true
+  ENABLE_PUBLISHER: true
+  ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES: true
+  ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS: true
+  ENABLE_SEND_XBLOCK_LIFECYCLE_EVENTS_OVER_BUS: true
+  ENABLE_SERVICE_STATUS: true
+  ENABLE_SPECIAL_EXAMS: true
+  ENABLE_THIRD_PARTY_AUTH: true
+  ENABLE_V2_CERT_DISPLAY_SETTINGS: true
+  ENABLE_VERIFIED_CERTIFICATES: true
+  ENABLE_VIDEO_ABSTRACTION_LAYER_API: true
+  ENABLE_VIDEO_BUMPER: true
+  ENABLE_VIDEO_UPLOAD_PIPELINE: true
+  ENABLE_XBLOCK_VIEW_ENDPOINT: true
+  FRONTEND_APP_PUBLISHER_URL: https://publisher.localhost
+  IS_EDX_DOMAIN: true
+  LICENSING: true
+  LTI_1P3_ENABLED: true
+  MILESTONES_APP: true
+  PREVENT_CONCURRENT_LOGINS: true
+  SEGMENT_IO_LMS: true
+  SEPARATE_VERIFICATION_FROM_PAYMENT: true
+  SHOW_FOOTER_LANGUAGE_SELECTOR: true
+  SQUELCH_PII_IN_LOGS: true
+  STUDIO_REQUEST_EMAIL: studio-request@example.com
+FEEDBACK_SUBMISSION_EMAIL: bugs@example.com
+FERNET_KEYS:
+- test_fernet_key
+FILE_UPLOAD_STORAGE_BUCKET_NAME: upload
+FILE_UPLOAD_STORAGE_PREFIX: submission_attachments
+FINANCIAL_REPORTS:
+  BUCKET: reports
+  CUSTOM_DOMAIN: test.s3.amazonaws.com
+  ROOT_PATH: env
+  STORAGE_TYPE: s3
+FOOTER_ORGANIZATION_IMAGE: null
+GITHUB_REPO_ROOT: /edx/var/edxapp/data
+GRADES_DOWNLOAD:
+  BUCKET: ''
+  ROOT_PATH: ''
+  STORAGE_CLASS: storages.backends.s3boto3.S3Boto3Storage
+  STORAGE_KWARGS:
+    bucket_name: grades
+    custom_domain: null
+    default_acl: private
+    gzip: true
+    location: env
+    querystring_auth: true
+    querystring_expire: 300
+  STORAGE_TYPE: ''
+HELP_TOKENS_BOOKS:
+  course_author: https://edx.readthedocs.io/projects/edx-partner-course-staff
+  learner: https://edx.readthedocs.io/projects/edx-guide-for-students
+HOTJAR_ID: 7890
+ICP_LICENSE: icp_license
+ICP_LICENSE_INFO:
+  icp_license: icp_license
+  icp_license_link: https://beian.miit.gov.cn
+  text: icp_license_text
+IDA_LOGOUT_URI_LIST:
+- https://ecommerce.localhost/logout/
+- https://credentials.localhost/logout/
+- https://discovery.localhost/logout/
+- https://commerce-coordinator.localhost/logout/
+ID_VERIFICATION_SUPPORT_LINK: https://support.localhost/hc/en-us/articles/206503858-How-do-I-complete-photo-verification-
+JWT_AUTH:
+  JWT_AUDIENCE: test_jwt_audience
+  JWT_AUTH_COOKIE_HEADER_PAYLOAD: jwt-cookie-header-payload
+  JWT_AUTH_COOKIE_SIGNATURE: jwt-cookie-signature
+  JWT_ISSUER: https://courses.localhost/oauth2
+  JWT_ISSUERS:
+  - AUDIENCE: test_jwt_issuers
+    ISSUER: https://courses.localhost/oauth2
+    SECRET_KEY: test_jwt_issuers
+  JWT_PUBLIC_SIGNING_JWK_SET: '{"keys": [{"n": "test-key", "kty": "RSA", "e": "AQAB",
+    "kid": "lms001"}]}'
+  JWT_SECRET_KEY: test_JWT_SECRET_KEY
+  JWT_SIGNING_ALGORITHM: RS512
+JWT_ISSUER: https://courses.localhost/oauth2
+LANGUAGE_COOKIE: language-preference
+LEARNER_PORTAL_URL_ROOT: https://masters.localhost
+LEARNER_RECORD_MICROFRONTEND_URL: https://records.localhost
+LEARNING_ASSISTANT_AUDIT_TRIAL_LENGTH_DAYS: 14
+LEARNING_ASSISTANT_AVAILABLE: true
+LEARNING_MICROFRONTEND_URL: https://learning.localhost
+LIBRARY_AUTHORING_MICROFRONTEND_URL: https://library-authoring.localhost
+LMS_BASE: courses.localhost
+LMS_INTERNAL_ROOT_URL: https://courses.localhost
+LMS_ROOT_URL: https://courses.localhost
+LOGGING_ENV: edxapp
+LOGIN_REDIRECT_WHITELIST:
+- https://localhost
+- https://courses.localhost
+- https://ecommerce.localhost
+- https://studio.localhost
+LOGO_TRADEMARK_URL: https://cdn.org/v3/logo-trademark.svg
+LOGO_TRADEMARK_URL_PNG: https://cdn.org/v3/logo-trademark.png
+LOGO_TRADEMARK_URL_SVG: https://cdn.org/v3/logo-trademark.svg
+LOGO_URL: https://cdn.org/v3/logo.svg
+LOGO_URL_PNG: https://cdn.org/v3/logo.png
+LOGO_URL_SVG: https://cdn.org/v3/logo.svg
+LOGO_WHITE_URL: https://cdn.org/v3/logo-white.svg
+LOGO_WHITE_URL_PNG: https://cdn.org/v3/logo-white.png
+LOGO_WHITE_URL_SVG: https://cdn.org/v3/logo-white.svg
+LOG_DIR: /edx/var/log/edx
+MAINTENANCE_BANNER_TEXT: "System maintenance is scheduled for Wednesday, March 28,\
+  \ 2018 from 15:00\u201316:00 UTC. Courses might not be available during this\
+  \ time.\n"
+MEDIA_URL: http://s3.amazonaws.com/something/
+MKTG_URLS:
+  ABOUT: /about-us
+  ACCESSIBILITY: /accessibility
+  AFFILIATES: /affiliate-program
+  BLOG: /resources
+  CAREERS: /careers
+  CCPA: https://www.localhost/?opendns=true
+  CONTACT: /support/contact_us
+  COOKIE: /privacy-policy/cookies
+  COURSES: /course
+  DONATE: /donate
+  ENTERPRISE: https://business.localhost
+  FAQ: /student-faq
+  HONOR: /terms-service
+  HOW_IT_WORKS: /how-it-works
+  MEDIA_KIT: /media-kit
+  NEWS: /news-announcements
+  PRESS: /press
+  PRIVACY: /privacy-policy
+  ROOT: https://localhost
+  SCHOOLS: /schools-partners
+  SITE_MAP: /sitemap
+  TOS: /terms-service
+  TOS_AND_HONOR: /terms-service
+  TRADEMARKS: /trademarks
+  WHAT_IS_VERIFIED_CERT: /verified-certificate
+MOBILE_STORE_URLS:
+  apple: store_url
+  google: strore_url
+MODULESTORE:
+  default:
+    ENGINE: xmodule.modulestore.mixed.MixedModuleStore
+    OPTIONS:
+      mappings: {}
+      stores:
+      - DOC_STORE_CONFIG:
+          auth_source: null
+          collection: modulestore
+          connectTimeoutMS: 2000
+          db: db
+          host: 127.0.0.1
+          password: test_password
+          port: 27017
+          read_preference: PRIMARY
+          replicaSet: rs0
+          socketTimeoutMS: 3000
+          ssl: true
+          user: user
+        ENGINE: xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore
+        NAME: split
+        OPTIONS:
+          default_class: xmodule.hidden_block.HiddenBlock
+          fs_root: /edx/var/edxapp/data
+          render_template: common.djangoapps.edxmako.shortcuts.render_to_string
+      - DOC_STORE_CONFIG:
+          auth_source: null
+          collection: modulestore
+          connectTimeoutMS: 2000
+          db: db
+          host: 127.0.0.1
+          password: test_password
+          port: 27017
+          read_preference: PRIMARY
+          replicaSet: rs0
+          socketTimeoutMS: 3000
+          ssl: true
+          user: user
+        ENGINE: xmodule.modulestore.mongo.DraftMongoModuleStore
+        NAME: draft
+        OPTIONS:
+          default_class: xmodule.hidden_block.HiddenBlock
+          fs_root: /edx/var/edxapp/data
+          render_template: common.djangoapps.edxmako.shortcuts.render_to_string
+OPENEDX_TELEMETRY:
+- edx_django_utils.monitoring.NewRelicBackend
+- edx_django_utils.monitoring.DatadogBackend
+OPENEDX_TELEMETRY_FRONTEND_SCRIPTS: "<script\n    src='https://www.datadoghq-browser-agent.com/us1/v5/datadog-rum.js'\n\
+  \    type='text/javascript'>\n</script>\n"
+OPTIMIZELY_FULLSTACK_SDK_KEY: test_optimizely_key
+ORA2_FILE_PREFIX: ora2
+ORA_GRADING_MICROFRONTEND_URL: https://ora-grading.localhost
+ORA_MICROFRONTEND_URL: https://ora.localhost
+ORGANIZATIONS_AUTOCREATE: true
+PARSE_KEYS:
+  APPLICATION_ID: test_app_id
+  REST_API_KEY: test_rest_api_key
+PARTNER_SUPPORT_EMAIL: partner-support@example.com
+PASSWORD_POLICY_COMPLIANCE_ROLLOUT_CONFIG:
+  ELEVATED_PRIVILEGE_USER_COMPLIANCE_DEADLINE: '1970-01-01 00:00:00-00:00'
+  ENFORCE_COMPLIANCE_ON_LOGIN: true
+  GENERAL_USER_COMPLIANCE_DEADLINE: '1970-01-01 00:00:00-00:00'
+  STAFF_USER_COMPLIANCE_DEADLINE: '1970-01-01 00:00:00-00:00'
+PASSWORD_RESET_SUPPORT_LINK: https://support.localhost/hc/en-us/articles/206212088-What-if-I-did-not-receive-a-password-reset-message
+PAYMENT_SUPPORT_EMAIL: billing@example.com
+PLATFORM_FACEBOOK_ACCOUNT: http://www.facebook.com/
+PLATFORM_NAME: Name
+PLATFORM_TWITTER_ACCOUNT: '@name'
+POLICY_CHANGE_GRADES_ROUTING_KEY: edx.lms.core.grades_policy_change
+PRESS_EMAIL: press@example.com
+PROCTORING_BACKENDS:
+  DEFAULT: proctortrack
+  proctortrack:
+    base_url: https://testing.verificient.com
+    client_id: test_client_id
+    client_secret: test_client_secret
+    integration_specific_email: proctortrack-support@example.com
+PROCTORING_SETTINGS:
+  ALLOW_CALLBACK_SIMULATION: true
+  LINK_URLS:
+    contact_us: https://www.localhost/contact-us
+    course_authoring_faq: https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/proctored_exams/overview.html
+    faq: https://help.localhost/edxlearner/s/article/How-do-proctored-exams-work
+    online_proctoring_rules: https://help.localhost/edxlearner/s/article/Proctored-exam-rules-and-requirements
+    tech_requirements: https://help.localhost/edxlearner/s/article/Proctored-exam-rules-and-requirements
+  SOFTWARE_SECURE_CLIENT_TIMEOUT: 5
+PROCTORING_USER_OBFUSCATION_KEY: test_user_obfuscation_key
+REGISTRATION_EXTRA_FIELDS:
+  city: hidden
+  country: optional
+  gender: optional
+  goals: optional
+  honor_code: required
+  level_of_education: optional
+  mailing_address: hidden
+  year_of_birth: optional
+REGISTRATION_RATELIMIT: 10
+REGISTRATION_VALIDATION_RATELIMIT: 10
+REST_FRAMEWORK:
+  NUM_PROXIES: 2
+RETIRED_USER_SALTS:
+- test_retired_user_salts
+- test_retired_user_salts_2
+RETIREMENT_SERVICE_WORKER_USERNAME: retirement_service_worker
+RETIREMENT_STATES:
+- PENDING
+- RETIRING_FORUMS
+- FORUMS_COMPLETE
+- RETIRING_SALESFORCE_LEADS
+- SALESFORCE_LEADS_COMPLETE
+- RETIRING_SEGMENT
+- SEGMENT_COMPLETE
+- RETIRING_HUBSPOT
+- HUBSPOT_COMPLETE
+- RETIRING_BRAZE
+- BRAZE_COMPLETE
+- RETIRING_ENROLLMENTS
+- ENROLLMENTS_COMPLETE
+- RETIRING_NOTES
+- NOTES_COMPLETE
+- RETIRING_PROCTORING
+- PROCTORING_COMPLETE
+- RETIRING_LICENSE_MANAGER
+- LICENSE_MANAGER_COMPLETE
+- RETIRING_LMS_MISC
+- LMS_MISC_COMPLETE
+- RETIRING_LMS
+- LMS_COMPLETE
+- ADDING_TO_PARTNER_QUEUE
+- PARTNER_QUEUE_COMPLETE
+- ERRORED
+- ABORTED
+- COMPLETE
+SECRET_KEY: test_secret_key
+SEGMENT_KEY: test_segment_key
+SEND_CATALOG_INFO_SIGNAL: true
+SERVER_EMAIL: devops@example.com
+SESSION_COOKIE_NAME: studio_sessionid
+SESSION_COOKIE_SECURE: true
+SGA_STORAGE_SETTINGS:
+  STORAGE_CLASS: storages.backends.s3boto3.S3Boto3Storage
+  STORAGE_KWARGS:
+    default_acl: private
+SITE_NAME: studio.localhost
+SKILLS_MICROFRONTEND_URL: https://skills.localhost
+SOCIAL_AUTH_EDX_OAUTH2_KEY: test_social_auth
+SOCIAL_AUTH_EDX_OAUTH2_PUBLIC_URL_ROOT: https://courses.localhost
+SOCIAL_AUTH_EDX_OAUTH2_SECRET: test_oauth2_secret
+SOCIAL_AUTH_EDX_OAUTH2_URL_ROOT: https://courses.localhost
+SOCIAL_AUTH_SAML_SP_PRIVATE_KEY: test_saml_key
+SOCIAL_AUTH_SAML_SP_PRIVATE_KEY_DICT:
+  one: '[encrypted]'
+  another: '[encrypted]'
+SOCIAL_AUTH_SAML_SP_PUBLIC_CERT: test_saml_public_cert
+SOCIAL_AUTH_SAML_SP_PUBLIC_CERT_DICT:
+  one: hello
+  another: hello
+SOCIAL_MEDIA_FOOTER_URLS:
+  facebook: http://www.facebook.com/
+  instagram: https://www.instagram.com
+  linkedin: http://www.linkedin.com/company/
+  meetup: http://www.meetup.com/
+  reddit: http://www.reddit.com
+  tumblr: http://tumblr.com/
+  twitter: https://twitter.com/
+  youtube: https://www.youtube.com/
+SOCIAL_SHARING_SETTINGS:
+  CERTIFICATE_FACEBOOK: true
+  CERTIFICATE_FACEBOOK_TEXT: 'I just earned a certifcate! Check it out: '
+  CERTIFICATE_TWITTER: true
+  CERTIFICATE_TWITTER_TEXT: 'I just earned a Certificate !Check it out: '
+  CUSTOM_COURSE_URLS: true
+  DASHBOARD_FACEBOOK: true
+  DASHBOARD_TWITTER: true
+SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS: 5
+STATICFILES_STORAGE_KWARGS:
+  openedx.core.storage.ProductionS3Storage:
+    bucket_name: static
+    default_acl: null
+STATIC_ROOT_BASE: /edx/var/edxapp/staticfiles
+STATIC_URL_BASE: /static/
+STUDIO_NAME: Studio
+SUPPORT_SITE_LINK: https://support.localhost
+SURVEY_REPORT_ENABLE: true
+SURVEY_REPORT_ENDPOINT: http://localhost:0
+SYSTEM_WIDE_ROLE_CLASSES:
+- enterprise.SystemWideEnterpriseUserRoleAssignment
+TECH_SUPPORT_EMAIL: technical@example.com
+TIME_ZONE: America/New_York
+UNIVERSITY_EMAIL: university@example.com
+UPDATE_SEARCH_INDEX_JOB_QUEUE: cms.core.search_index
+USERNAME_REPLACEMENT_WORKER: username_replacement_service_worker
+VIDEO_CDN_URL:
+  CN: https://video.localhost
+  default: https://video.localhost
+VIDEO_IMAGE_SETTINGS:
+  DIRECTORY_PREFIX: video-images/
+  STORAGE_CLASS: storages.backends.s3boto3.S3Boto3Storage
+  STORAGE_KWARGS:
+    bucket_name: image
+    custom_domain: localhost
+    default_acl: public-read
+    object_parameters:
+      CacheControl: max-age-31536000
+  VIDEO_IMAGE_MAX_BYTES: 2097152
+  VIDEO_IMAGE_MIN_BYTES: 2048
+VIDEO_TRANSCRIPTS_SETTINGS:
+  DIRECTORY_PREFIX: video-transcripts/
+  STORAGE_CLASS: storages.backends.s3boto3.S3Boto3Storage
+  STORAGE_KWARGS:
+    bucket_name: transcripts
+    custom_domain: localhost
+    default_acl: public-read
+    object_parameters:
+      CacheControl: max-age-31536000
+  VIDEO_TRANSCRIPTS_MAX_BYTES: 3145728
+VIDEO_UPLOAD_PIPELINE:
+  BUCKET: upload
+  CONCURRENT_UPLOAD_LIMIT: 4
+  ROOT_PATH: unprocessed
+  VEM_S3_BUCKET: vem
+XBLOCK_FS_STORAGE_BUCKET: xblock
+XBLOCK_FS_STORAGE_PREFIX: prefix
+XBLOCK_HANDLER_TOKEN_KEYS:
+- test_token_key
+XBLOCK_SETTINGS:
+  AcclaimBadgeXBlock:
+    ORG:
+      api_key: '[encrypted]'
+      id: hello
+  ScormXBlock:
+    S3_BUCKET_NAME: scorm
+    STORAGE_FUNC: storage.s3
+XQUEUE_INTERFACE:
+  basic_auth:
+  - user
+  - pass
+  django_auth:
+    password: pass
+    username: user
+  url: https://xqueue.localhost
+YOUTUBE_API_KEY: test_youtube
+ZENDESK_API_KEY: test_zendesk
+ZENDESK_CUSTOM_FIELDS:
+  course_id: 0
+  enrollment_mode: 0
+  enterprise_customer_name: 0
+  referrer: 0
+ZENDESK_GROUP_ID_MAPPING:
+  Financial Assistance: fin_assistance
+ZENDESK_OAUTH_ACCESS_TOKEN: test_zendesk_access
+ZENDESK_URL: https://zendesk.com
+ZENDESK_USER: daemon@example.com
+

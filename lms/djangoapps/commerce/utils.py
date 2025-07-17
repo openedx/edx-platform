@@ -11,10 +11,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.course_modes.models import CourseMode
-from lms.djangoapps.commerce.waffle import should_redirect_to_commerce_coordinator_checkout
 from openedx.core.djangoapps.commerce.utils import (
     get_ecommerce_api_base_url,
     get_ecommerce_api_client,
@@ -24,6 +22,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
 from .models import CommerceConfiguration
+from edx_django_utils.plugins import pluggable_override
 
 log = logging.getLogger(__name__)
 
@@ -53,6 +52,7 @@ class EcommerceService:
         """ Retrieve Ecommerce service public url root. """
         return configuration_helpers.get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
 
+    @pluggable_override('OVERRIDE_GET_ABSOLUTE_ECOMMERCE_URL')
     def get_absolute_ecommerce_url(self, ecommerce_page_url):
         """ Return the absolute URL to the ecommerce page.
 
@@ -105,22 +105,14 @@ class EcommerceService:
         """
         return self.get_absolute_ecommerce_url(self.config.basket_checkout_page)
 
-    def get_add_to_basket_url(self):
-        """ Return the URL for the payment page based on the waffle switch.
-
-        Example:
-            http://localhost/enabled_service_api_path
-        """
-        if should_redirect_to_commerce_coordinator_checkout():
-            return urljoin(settings.COMMERCE_COORDINATOR_URL_ROOT, settings.COORDINATOR_CHECKOUT_REDIRECT_PATH)
-        return self.payment_page_url()
-
+    @pluggable_override('OVERRIDE_GET_CHECKOUT_PAGE_URL')
     def get_checkout_page_url(self, *skus, **kwargs):
         """ Construct the URL to the ecommerce checkout page and include products.
 
         Args:
             skus (list): List of SKUs associated with products to be added to basket
             program_uuid (string): The UUID of the program, if applicable
+            course_run_keys (list): The course run keys of the products to be added to basket.
 
         Returns:
             Absolute path to the ecommerce checkout page showing basket that contains specified products.
@@ -150,15 +142,18 @@ class EcommerceService:
         """
         Returns the URL for the user to upgrade, or None if not applicable.
         """
+        course_run_key = str(course_key)
+
         verified_mode = CourseMode.verified_mode_for_course(course_key)
         if verified_mode:
             if self.is_enabled(user):
-                return self.get_checkout_page_url(verified_mode.sku)
+                return self.get_checkout_page_url(verified_mode.sku, course_run_keys=[course_run_key])
             else:
                 return reverse('dashboard')
         return None
 
 
+@pluggable_override('OVERRIDE_REFUND_ENTITLEMENT')
 def refund_entitlement(course_entitlement):
     """
     Attempt a refund of a course entitlement. Verify the User before calling this refund method
@@ -230,6 +225,7 @@ def refund_entitlement(course_entitlement):
         return False
 
 
+@pluggable_override('OVERRIDE_REFUND_SEAT')
 def refund_seat(course_enrollment, change_mode=False):
     """
     Attempt to initiate a refund for any orders associated with the seat being unenrolled,
@@ -274,14 +270,65 @@ def refund_seat(course_enrollment, change_mode=False):
             mode=course_enrollment.mode,
             user=enrollee,
         )
-        if change_mode and CourseMode.can_auto_enroll(course_id=CourseKey.from_string(course_key_str)):
-            course_enrollment.update_enrollment(mode=CourseMode.auto_enroll_mode(course_id=course_key_str),
-                                                is_active=False, skip_refund=True)
-            course_enrollment.save()
+        if change_mode:
+            auto_enroll(course_enrollment)
     else:
         log.info('No refund opened for user [%s], course [%s]', enrollee.id, course_key_str)
 
     return refund_ids
+
+
+@pluggable_override('OVERRIDE_GET_PROGRAM_PRICE_INFO')
+def get_program_price_info(api_user, params):
+    """
+    Get the program price info from the ecommerce service.
+
+    Args:
+        api_user: The user to use to make the request.
+        params: The params to use to make the request.
+
+    Returns:
+       JSON: {
+                'total_incl_tax_excl_discounts': basket.total_incl_tax_excl_discounts,
+                'total_incl_tax': basket.total_incl_tax,
+                'currency': basket.currency
+            }
+    """
+    if not api_user.is_authenticated:
+        api_user = get_user_model().objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+
+    api_client = get_ecommerce_api_client(api_user)
+    api_url = urljoin(f"{get_ecommerce_api_base_url()}/", "baskets/calculate/")
+
+    response = api_client.get(api_url, params=params)
+    return response
+
+
+def auto_enroll(course_enrollment):
+    """
+    Helper method to update an enrollment to a default course mode.
+
+    Arguments:
+        course_enrollment (CourseEnrollment): The course_enrollment to update.
+
+    Returns:
+        bool: True if auto-enroll is successful. False if auto-enroll is not applicable.
+    """
+    enrollment_course_id = course_enrollment.course_id
+
+    if CourseMode.can_auto_enroll(course_id=enrollment_course_id):
+        auto_enroll_mode = CourseMode.auto_enroll_mode(course_id=enrollment_course_id)
+        course_enrollment.update_enrollment(mode=auto_enroll_mode, is_active=False, skip_refund=True)
+        course_enrollment.save()
+        log.info(
+            'Auto-enrolled user [%s], course [%s] in mode [%s].',
+            course_enrollment.user_id,
+            enrollment_course_id,
+            auto_enroll_mode
+        )
+        return True
+    else:
+        return False
 
 
 def _process_refund(refund_ids, api_client, mode, user, always_notify=False):

@@ -18,7 +18,6 @@ from collections import OrderedDict
 from uuid import uuid4
 
 import openid.oidutil
-import django
 from django.utils.translation import gettext_lazy
 from edx_django_utils.plugins import add_plugins
 from path import Path as path
@@ -215,13 +214,6 @@ CACHES = {
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
-    # Blockstore caching tests require a cache that actually works:
-    'blockstore': {
-        'KEY_PREFIX': 'blockstore',
-        'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
-        'LOCATION': 'edx_loc_mem_cache',
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    },
 }
 
 ############################# SECURITY SETTINGS ################################
@@ -295,6 +287,7 @@ MKTG_URL_LINK_MAP = {
 SUPPORT_SITE_LINK = 'https://example.support.edx.org'
 PASSWORD_RESET_SUPPORT_LINK = 'https://support.example.com/password-reset-help.html'
 ACTIVATION_EMAIL_SUPPORT_LINK = 'https://support.example.com/activation-email-help.html'
+SEND_ACTIVATION_EMAIL_URL = 'https://courses.example.edx.org/api/send_account_activation_email'
 LOGIN_ISSUE_SUPPORT_LINK = 'https://support.example.com/login-issue-help.html'
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = OrderedDict([
     ("utm_campaign", "edX.org Referral"),
@@ -337,18 +330,13 @@ YOUTUBE_PORT = 8031
 LTI_PORT = 8765
 VIDEO_SOURCE_PORT = 8777
 
-FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost"
 ############### Module Store Items ##########
-PREVIEW_DOMAIN = FEATURES['PREVIEW_LMS_BASE'].split(':')[0]
-HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {
-    PREVIEW_DOMAIN: 'draft-preferred'
-}
+HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = {}
 
 
 ################### Make tests faster
 
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
@@ -546,16 +534,6 @@ add_plugins(__name__, ProjectType.LMS, SettingsType.TEST)
 
 derive_settings(__name__)
 
-############################### BLOCKSTORE #####################################
-XBLOCK_RUNTIME_V2_EPHEMERAL_DATA_CACHE = 'blockstore'  # This must be set to a working cache for the tests to pass
-BUNDLE_ASSET_STORAGE_SETTINGS = dict(
-    STORAGE_CLASS='django.core.files.storage.FileSystemStorage',
-    STORAGE_KWARGS=dict(
-        location=MEDIA_ROOT,
-        base_url=MEDIA_URL,
-    ),
-)
-
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
@@ -581,7 +559,7 @@ PDF_RECEIPT_BILLING_ADDRESS = 'add your own billing address here with appropriat
 PDF_RECEIPT_TERMS_AND_CONDITIONS = 'add your own terms and conditions'
 PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
 
-PROFILE_MICROFRONTEND_URL = "http://profile-mfe/abc/"
+PROFILE_MICROFRONTEND_URL = "http://profile-mfe"
 ORDER_HISTORY_MICROFRONTEND_URL = "http://order-history-mfe/"
 ACCOUNT_MICROFRONTEND_URL = "http://account-mfe"
 AUTHN_MICROFRONTEND_URL = "http://authn-mfe"
@@ -667,19 +645,47 @@ SURVEY_REPORT_CHECK_THRESHOLD = 6
 SURVEY_REPORT_ENABLE = True
 ANONYMOUS_SURVEY_REPORT = False
 
-######################## Subscriptions API SETTINGS ########################
-SUBSCRIPTIONS_ROOT_URL = "http://localhost:18750"
-SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
+CSRF_TRUSTED_ORIGINS = ['https://*.example.com']
 
-SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
-SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
-SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
-SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
-SUBSCRIPTIONS_TRIAL_LENGTH = 7
-CSRF_TRUSTED_ORIGINS = ['.example.com']
-CSRF_TRUSTED_ORIGINS_WITH_SCHEME = ['https://*.example.com']
+############## Settings for JWT token handling ##############
+TOKEN_SIGNING = {
+    'JWT_ISSUER': 'token-test-issuer',
+    'JWT_SIGNING_ALGORITHM': 'RS512',
+    'JWT_SUPPORTED_VERSION': '1.2.0',
+    'JWT_PRIVATE_SIGNING_JWK': """
+        {
+            "kid": "token-test-sign",
+            "kty": "RSA",
+            "key_ops": [
+                "sign"
+            ],
+            "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ",
+            "e": "AQAB",
+            "d": "HIiV7KNjcdhVbpn3KT-I9n3JPf5YbGXsCIedmPqDH1d4QhBofuAqZ9zebQuxkRUpmqtYMv0Zi6ECSUqH387GYQF_XvFUFcjQRPycISd8TH0DAKaDpGr-AYNshnKiEtQpINhcP44I1AYNPCwyoxXA1fGTtmkKChsuWea7o8kytwU5xSejvh5-jiqu2SF4GEl0BEXIAPZsgbzoPIWNxgO4_RzNnWs6nJZeszcaDD0CyezVSuH9QcI6g5QFzAC_YuykSsaaFJhZ05DocBsLczShJ9Omf6PnK9xlm26I84xrEh_7x4fVmNBg3xWTLh8qOnHqGko93A1diLRCrKHOvnpvgQ",
+            "p": "3T3DEtBUka7hLGdIsDlC96Uadx_q_E4Vb1cxx_4Ss_wGp1Loz3N3ZngGyInsKlmbBgLo1Ykd6T9TRvRNEWEtFSOcm2INIBoVoXk7W5RuPa8Cgq2tjQj9ziGQ08JMejrPlj3Q1wmALJr5VTfvSYBu0WkljhKNCy1KB6fCby0C9WE",
+            "q": "vUqzWPZnDG4IXyo-k5F0bHV0BNL_pVhQoLW7eyFHnw74IOEfSbdsMspNcPSFIrtgPsn7981qv3lN_staZ6JflKfHayjB_lvltHyZxfl0dvruShZOx1N6ykEo7YrAskC_qxUyrIvqmJ64zPW3jkuOYrFs7Ykj3zFx3Zq1H5568G0",
+            "dp": "Azh08H8r2_sJuBXAzx_mQ6iZnAZQ619PnJFOXjTqnMgcaK8iSHLL2CgDIUQwteUcBphgP0uBrfWIBs5jmM8rUtVz4CcrPb5jdjhHjuu4NxmnFbPlhNoOp8OBUjPP3S-h-fPoaFjxDrUqz_zCdPVzp4S6UTkf6Hu-SiI9CFVFZ8E",
+            "dq": "WQ44_KTIbIej9qnYUPMA1DoaAF8ImVDIdiOp9c79dC7FvCpN3w-lnuugrYDM1j9Tk5bRrY7-JuE6OaKQgOtajoS1BIxjYHj5xAVPD15CVevOihqeq5Zx0ZAAYmmCKRrfUe0iLx2QnIcoKH1-Azs23OXeeo6nysznZjvv9NVJv60",
+            "qi": "KSWGH607H1kNG2okjYdmVdNgLxTUB-Wye9a9FNFE49UmQIOJeZYXtDzcjk8IiK3g-EU3CqBeDKVUgHvHFu4_Wj3IrIhKYizS4BeFmOcPDvylDQCmJcC9tXLQgHkxM_MEJ7iLn9FOLRshh7GPgZphXxMhezM26Cz-8r3_mACHu84"
+        }
+    """,  # noqa: E501,
 
-# values are already updated above with default CSRF_TRUSTED_ORIGINS values but in
-# case of new django version these values will override.
-if django.VERSION[0] >= 4:  # for greater than django 3.2 use with schemes.
-    CSRF_TRUSTED_ORIGINS = CSRF_TRUSTED_ORIGINS_WITH_SCHEME
+    'JWT_PUBLIC_SIGNING_JWK_SET': """
+        {
+          "keys": [
+            {
+              "kid": "token-test-sign",
+              "kty": "RSA",
+              "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ",
+              "e": "AQAB"
+            },
+            {
+              "kid": "token-test-wrong-key",
+              "kty": "RSA",
+              "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGypuDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ",
+              "e": "AQAB"
+            }
+          ]
+        }
+    """,  # noqa: E501
+}

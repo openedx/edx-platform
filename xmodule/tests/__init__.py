@@ -1,10 +1,5 @@
 """
 unittests for xmodule
-
-Run like this:
-
-    paver test_lib -l ./xmodule
-
 """
 
 

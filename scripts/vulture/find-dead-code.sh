@@ -35,9 +35,9 @@ mkdir -p "$OUTPUT_DIR"
 OUTPUT_FILE="${OUTPUT_DIR}/vulture-report.txt"
 echo '' > "$OUTPUT_FILE"
 # exclude test code from analysis, as it isn't explicitly called by other
-# code. Additionally, application code that is only called by tests 
+# code. Additionally, application code that is only called by tests
 # should be considered dead
-EXCLUSIONS='/test,/acceptance,cms/envs,lms/envs,/terrain,migrations/,signals.py'
+EXCLUSIONS='/test,/acceptance,cms/envs,lms/envs,migrations/,signals.py'
 MIN_CONFIDENCE=90
 # paths to the code on which to run the analysis
 CODE_PATHS=('cms' 'common' 'lms' 'openedx')

@@ -5,14 +5,17 @@ Utility functions for working with discounts and discounted pricing.
 from datetime import datetime
 
 import pytz
+from django.conf import settings
 from django.utils.translation import get_language
 from django.utils.translation import gettext as _
+from edx_django_utils.plugins import pluggable_override
 
 from common.djangoapps.course_modes.models import format_course_price, get_course_prices
 from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.djangolib.markup import HTML
 from openedx.features.discounts.applicability import (
+    FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG,
     REV1008_EXPERIMENT_ID,
     can_receive_discount,
     discount_percentage,
@@ -71,6 +74,7 @@ def _get_discount_prices(user, course, assume_discount=False):
         return format_course_price(base_price), None, None
 
 
+@pluggable_override("OVERRIDE_GENERATE_OFFER_DATA")
 def generate_offer_data(user, course):
     """
     Create a dictionary of information about the current discount offer.
@@ -98,8 +102,17 @@ def generate_offer_data(user, course):
 
     original, discounted, percentage = _get_discount_prices(user, course, assume_discount=True)
 
+    # Override the First Purchase Discount to another code only if flag is enabled
+    first_purchase_discount_code = 'BIENVENIDOAEDX' if get_language() == 'es-419' else 'EDXWELCOME'
+    if FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG.is_enabled():
+        first_purchase_discount_code = getattr(
+            settings,
+            'FIRST_PURCHASE_DISCOUNT_OVERRIDE_CODE',
+            first_purchase_discount_code
+        )
+
     return {
-        'code': 'BIENVENIDOAEDX' if get_language() == 'es-419' else 'EDXWELCOME',
+        'code': first_purchase_discount_code,
         'expiration_date': expiration_date,
         'original_price': original,
         'discounted_price': discounted,

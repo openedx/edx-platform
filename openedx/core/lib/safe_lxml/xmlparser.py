@@ -8,7 +8,7 @@ import threading
 
 from lxml import etree as _etree
 
-from defusedxml.lxml import DTDForbidden, EntitiesForbidden, NotSupportedError
+from defusedxml.common import DTDForbidden, EntitiesForbidden, NotSupportedError
 
 LXML3 = _etree.LXML_VERSION[0] >= 3
 

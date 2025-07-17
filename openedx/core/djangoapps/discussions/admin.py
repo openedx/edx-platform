@@ -3,6 +3,7 @@ Customize the django admin experience
 """
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from django.contrib.admin.utils import quote
 from simple_history.admin import SimpleHistoryAdmin
 
 from openedx.core.djangoapps.config_model_utils.admin import StackedConfigModelAdmin
@@ -25,6 +26,9 @@ class DiscussionsConfigurationAdmin(SimpleHistoryAdmin):
         'enabled',
         'provider_type',
     )
+
+    def change_view(self, request, object_id=None, form_url="", extra_context=None):
+        return super().change_view(request, quote(object_id), form_url, extra_context)
 
 
 class AllowListFilter(SimpleListFilter):

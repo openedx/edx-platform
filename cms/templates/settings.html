@@ -43,7 +43,6 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             ${show_min_grade_warning | n, dump_js_escaped_json},
             ${can_show_certificate_available_date_field(context_course) | n, dump_js_escaped_json},
             "${upgrade_deadline | n, js_escaped_string}",
-            ${settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS") | n, dump_js_escaped_json}
         );
     });
 </%block>
@@ -251,58 +250,45 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             </li>
           </ol>
 
-          <%
-            use_v2_cert_display_settings = settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False)
-          %>
           % if can_show_certificate_available_date_field(context_course):
           <ol class="list-input">
             <li class="field-group field-group-certificate-available" id="certificate-available">
               <div class="field date" id="field-certificates-display-behavior">
                 <label for="certificates-display-behavior">${_("Certificates Display Behavior")}</label>
-                % if use_v2_cert_display_settings:
-                  <select id="certificates-display-behavior">
-                    <option value="early_no_info">${_("Immediately upon passing")}</option>
-                    <option value="end">${_("End date of course")}</option>
-                    <option value="end_with_date">${_("A date after the course end date")}</option>
-                  </select>
-                % else:
-                  <input id="certificates-display-behavior" type="text">
-                % endif
+                <select id="certificates-display-behavior">
+                  <option value="early_no_info">${_("Immediately upon passing")}</option>
+                  <option value="end">${_("End date of course")}</option>
+                  <option value="end_with_date">${_("A date after the course end date")}</option>
+                </select>
                 <span class="tip tip-stacked">${_("Certificates are awarded at the end of a course run")}</span>
 
-                % if use_v2_cert_display_settings:
-                  <!-- Collapsible -->
-                  <div class="collapsible">
-                    <div id="certificate-display-behavior-collapsible-trigger" class="collapsible-trigger" role="button" tabindex="0" aria-expanded="false">
-                      <span>
-                        <span class="icon icon-inline fa fa-info-circle" aria-hidden="true"></span>
-                        ${_("Read more about this setting")}
-                      </span>
+                <!-- Collapsible -->
+                <div class="collapsible">
+                  <div id="certificate-display-behavior-collapsible-trigger" class="collapsible-trigger" role="button" tabindex="0" aria-expanded="false">
+                    <span>
+                      <span class="icon icon-inline fa fa-info-circle" aria-hidden="true"></span>
+                      ${_("Read more about this setting")}
+                    </span>
+                  </div>
+                  <div id="certificate-display-behavior-collapsible-content" class="collapsible-content collapsed">
+                    <p>${_("In all configurations of this setting, certificates are generated for learners as soon as they achieve the passing threshold in the course (which can occur before a final assignment based on course design)")}</p>
+                    <div>
+                      <div class="collapsible-description-heading">${_("Immediately upon passing")}</div>
+                      <div class="collapsible-description-description">${_("Learners can access their certificate as soon as they achieve a passing grade above the course grade threshold. Note: learners can achieve a passing grade before encountering all assignments in some course configurations.")}</div>
                     </div>
-                    <div id="certificate-display-behavior-collapsible-content" class="collapsible-content collapsed">
-                      <p>${_("In all configurations of this setting, certificates are generated for learners as soon as they achieve the passing threshold in the course (which can occur before a final assignment based on course design)")}</p>
-                      <div>
-                        <div class="collapsible-description-heading">${_("Immediately upon passing")}</div>
-                        <div class="collapsible-description-description">${_("Learners can access their certificate as soon as they achieve a passing grade above the course grade threshold. Note: learners can achieve a passing grade before encountering all assignments in some course configurations.")}</div>
-                      </div>
-                      <div>
-                        <div class="collapsible-description-heading">${_("On course end date")}</div>
-                        <div class="collapsible-description-description">${_("Learners with passing grades can access their certificate once the end date of the course has elapsed.")}</div>
-                      </div>
-                      <div>
-                        <div class="collapsible-description-heading">${_("A date after the course end date")}</div>
-                        <div class="collapsible-description-description">${_("Learners with passing grades can access their certificate after the date that you set has elapsed.")}</div>
-                      </div>
+                    <div>
+                      <div class="collapsible-description-heading">${_("On course end date")}</div>
+                      <div class="collapsible-description-description">${_("Learners with passing grades can access their certificate once the end date of the course has elapsed.")}</div>
+                    </div>
+                    <div>
+                      <div class="collapsible-description-heading">${_("A date after the course end date")}</div>
+                      <div class="collapsible-description-description">${_("Learners with passing grades can access their certificate after the date that you set has elapsed.")}</div>
                     </div>
                   </div>
-                % endif
+                </div>
               </div>
 
-              % if use_v2_cert_display_settings:
-                <div class="field date hidden" id="field-certificate-available-date" >
-              % else:
-                <div class="field date" id="field-certificate-available-date" >
-              % endif
+              <div class="field date hidden" id="field-certificate-available-date" >
                 <label for="certificate-available-date">${_("Certificates Available Date")}</label>
                 <input type="text" class="certificate-available-date date start datepicker" id="certificate-available-date" placeholder="MM/DD/YYYY" autocomplete="off" />
                 <span class="icon icon-inline fa fa-calendar-check-o datepicker-icon" aria-hidden="true"></span>

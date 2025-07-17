@@ -5,7 +5,6 @@ Script for importing a content library from a tar.gz file
 
 import base64
 import os
-import tarfile
 
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -16,7 +15,7 @@ from opaque_keys.edx.locator import LibraryLocator
 from path import Path
 
 from cms.djangoapps.contentstore.utils import add_instructor
-from openedx.core.lib.extract_tar import safetar_extractall
+from openedx.core.lib.extract_archive import safe_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -47,13 +46,10 @@ class Command(BaseCommand):
         course_dir = data_root / subdir
 
         # Extract library archive
-        tar_file = tarfile.open(archive_path)  # lint-amnesty, pylint: disable=consider-using-with
         try:
-            safetar_extractall(tar_file, course_dir)
+            safe_extractall(archive_path, course_dir)
         except SuspiciousOperation as exc:
-            raise CommandError(f'\n=== Course import {archive_path}: Unsafe tar file - {exc.args[0]}\n')  # lint-amnesty, pylint: disable=raise-missing-from
-        finally:
-            tar_file.close()
+            raise CommandError(f'\n=== Course import {archive_path}: Unsafe tar file - {exc.args[0]}\n') from exc
 
         # Paths to the library.xml file
         abs_xml_path = os.path.join(course_dir, 'library')

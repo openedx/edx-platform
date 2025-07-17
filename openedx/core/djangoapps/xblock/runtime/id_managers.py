@@ -3,11 +3,8 @@ Implementation of the APIs required for XBlock runtimes to work with
 our newer Open edX-specific opaque key formats.
 """
 
-
 from opaque_keys.edx.keys import UsageKeyV2
 from xblock.runtime import IdReader
-
-from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 
 
 class OpaqueKeyReader(IdReader):
@@ -24,7 +21,7 @@ class OpaqueKeyReader(IdReader):
             The `definition_id` the usage is derived from
         """
         if isinstance(usage_id, UsageKeyV2):
-            return get_learning_context_impl(usage_id).definition_for_usage(usage_id)
+            return None
         raise TypeError("This version of get_definition_id doesn't support the given key type.")
 
     def get_block_type(self, def_id):

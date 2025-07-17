@@ -2,13 +2,13 @@
 Unit tests for helpers.py.
 """
 
-
+from unittest.mock import patch, Mock
 from urllib.parse import quote
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, LibraryFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ...helpers import xblock_studio_url, xblock_type_display_name
+from ...helpers import xblock_embed_lms_url, xblock_lms_url, xblock_studio_url, xblock_type_display_name
 
 
 class HelpersTestCase(CourseTestCase):
@@ -59,6 +59,44 @@ class HelpersTestCase(CourseTestCase):
         library = LibraryFactory.create()
         expected_url = f'/library/{str(library.location.library_key)}'
         self.assertEqual(xblock_studio_url(library), expected_url)
+
+    @patch('cms.djangoapps.contentstore.helpers.configuration_helpers.get_value')
+    def test_xblock_lms_url(self, mock_get_value: Mock):
+        mock_get_value.return_value = 'lms.example.com'
+
+        # Verify chapter URL
+        chapter = BlockFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Week 1"
+        )
+        self.assertEqual(
+            xblock_lms_url(chapter),
+            f"lms.example.com/courses/{chapter.location.course_key}/jump_to/{chapter.location}"
+        )
+
+        # Verify sequential URL
+        sequential = BlockFactory.create(
+            parent_location=chapter.location, category='sequential', display_name="Lesson 1"
+        )
+        self.assertEqual(
+            xblock_lms_url(sequential),
+            f"lms.example.com/courses/{sequential.location.course_key}/jump_to/{sequential.location}"
+        )
+
+    @patch('cms.djangoapps.contentstore.helpers.configuration_helpers.get_value')
+    def test_xblock_embed_lms_url(self, mock_get_value: Mock):
+        mock_get_value.return_value = 'lms.example.com'
+
+        # Verify chapter URL
+        chapter = BlockFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Week 1"
+        )
+        self.assertEqual(xblock_embed_lms_url(chapter), f"lms.example.com/xblock/{chapter.location}")
+
+        # Verify sequential URL
+        sequential = BlockFactory.create(
+            parent_location=chapter.location, category='sequential', display_name="Lesson 1"
+        )
+        self.assertEqual(xblock_embed_lms_url(sequential), f"lms.example.com/xblock/{sequential.location}")
 
     def test_xblock_type_display_name(self):
 

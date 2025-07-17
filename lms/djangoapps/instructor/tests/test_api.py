@@ -22,20 +22,15 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.client import MULTIPART_CONTENT
+from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import gettext as _
-from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
 from testfixtures import LogCapture
-from xmodule.fields import Date
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
-)
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -47,6 +42,7 @@ from common.djangoapps.student.models import (
     UNENROLLED_TO_ALLOWEDTOENROLL,
     UNENROLLED_TO_ENROLLED,
     UNENROLLED_TO_UNENROLLED,
+    CourseAccessRole,
     CourseEnrollment,
     CourseEnrollmentAllowed,
     ManualEnrollmentAudit,
@@ -58,19 +54,21 @@ from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
-    CourseInstructorRole,
+    CourseInstructorRole
 )
-from common.djangoapps.student.tests.factories import BetaTesterFactory
-from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import InstructorFactory
-from common.djangoapps.student.tests.factories import StaffFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import (
+    BetaTesterFactory,
+    CourseAccessRoleFactory,
+    CourseEnrollmentFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    StaffFactory,
+    UserFactory
+)
+
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.data import CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import (
-    GeneratedCertificateFactory
-)
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
@@ -88,17 +86,30 @@ from lms.djangoapps.instructor_task.api_helper import (
     generate_already_running_error_message
 )
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
+from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTaskSchedule
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
-from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
+from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from xmodule.fields import Date
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .test_tools import msk_from_problem_urlname
 
@@ -641,6 +652,25 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
             last_name='Student'
         )
 
+    def test_api_without_login(self):
+        """
+        verify in case of no authentication it returns 401.
+        """
+        self.client.logout()
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        assert response.status_code == 401
+
+    def test_api_without_permission(self):
+        """
+        verify in case of no authentication it returns 403.
+        """
+        # removed role from course for instructor
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        assert response.status_code == 403
+
     @patch('lms.djangoapps.instructor.views.api.log.info')
     @ddt.data(
         b"test_student@example.com,test_student_1,tester1,USA",  # Typical use case.
@@ -712,7 +742,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         """
         Try uploading some non-CSV file and verify that it is rejected
         """
-        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \xC3\x01").read())
         response = self.client.post(self.url, {'students_list': uploaded_file})
         assert response.status_code == 200
         data = json.loads(response.content.decode('utf-8'))
@@ -919,15 +949,16 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         assert manual_enrollments.count() == 2
 
-    @patch('lms.djangoapps.instructor.views.api', 'generate_random_string',
-           Mock(side_effect=['first', 'first', 'second']))
     def test_generate_unique_password_no_reuse(self):
         """
         generate_unique_password should generate a unique password string that hasn't been generated before.
         """
-        generated_password = ['first']
-        password = generate_unique_password(generated_password, 12)
-        assert password != 'first'
+        with patch('lms.djangoapps.instructor.views.api.generate_random_string') as mock:
+            mock.side_effect = ['first', 'first', 'second']
+
+            generated_password = ['first']
+            password = generate_unique_password(generated_password, 12)
+            assert password != 'first'
 
     @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
     def test_allow_automated_signups_flag_not_set(self):
@@ -1963,6 +1994,15 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         self.add_notenrolled(response, self.notenrolled_student.username)
         assert CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id)
 
+    def test_add_notenrolled_username_autoenroll_with_multiple_users(self):
+        url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
+        identifiers = (f"Lorem@ipsum.dolor, "
+                       f"sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed, "
+                       f"{self.notenrolled_student.username}"
+                       )
+        response = self.client.post(url, {'identifiers': identifiers, 'action': 'add', 'email_students': False, 'auto_enroll': True})  # lint-amnesty, pylint: disable=line-too-long
+        assert 6, len(json.loads(response.content.decode())['results'])
+
     @ddt.data('http', 'https')
     def test_add_notenrolled_with_email(self, protocol):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': str(self.course.id)})
@@ -2223,6 +2263,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         self.other_instructor = InstructorFactory(course_key=self.course.id)
         self.other_staff = StaffFactory(course_key=self.course.id)
         self.other_user = UserFactory()
+        self.list_forum_members_url = reverse('list_forum_members', kwargs={'course_id': str(self.course.id)})
 
     def test_modify_access_noparams(self):
         """ Test missing all query parameters. """
@@ -2250,14 +2291,26 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         })
         assert response.status_code == 400
 
-    def test_modify_access_allow(self):
-        url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, {
-            'unique_student_identifier': self.other_user.email,
-            'rolename': 'staff',
-            'action': 'allow',
-        })
-        assert response.status_code == 200
+    def test_modify_access_api(self):
+        for rolename in ["staff", "limited_staff", "instructor", "data_researcher"]:
+            assert CourseEnrollment.is_enrolled(self.other_user, self.course.id) is False
+            url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
+            response = self.client.post(url, {
+                'unique_student_identifier': self.other_user.email,
+                'rolename': rolename,
+                'action': 'allow',
+            })
+            assert response.status_code == 200
+            # User should be auto enrolled in the course
+            assert CourseEnrollment.is_enrolled(self.other_user, self.course.id)
+            # Test role revoke action
+            response = self.client.post(url, {
+                'unique_student_identifier': self.other_user.email,
+                'rolename': rolename,
+                'action': 'revoke',
+            })
+            assert response.status_code == 200
+            CourseEnrollment.unenroll(self.other_user, self.course.id)
 
     def test_modify_access_allow_with_uname(self):
         url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
@@ -2265,15 +2318,6 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             'unique_student_identifier': self.other_instructor.username,
             'rolename': 'staff',
             'action': 'allow',
-        })
-        assert response.status_code == 200
-
-    def test_modify_access_revoke(self):
-        url = reverse('modify_access', kwargs={'course_id': str(self.course.id)})
-        response = self.client.post(url, {
-            'unique_student_identifier': self.other_staff.email,
-            'rolename': 'staff',
-            'action': 'revoke',
         })
         assert response.status_code == 200
 
@@ -2416,8 +2460,11 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def assert_update_forum_role_membership(self, current_user, identifier, rolename, action):
         """
-        Test update forum role membership.
-        Get unique_student_identifier, rolename and action and update forum role.
+        default roles require either (staff & forum admin) or (instructor)
+        User should be forum-admin and staff to access this endpoint.
+
+        But if request rolename is  FORUM_ROLE_ADMINISTRATOR, then user must also have
+        instructor-level access to proceed.
         """
         url = reverse('update_forum_role_membership', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(
@@ -2437,6 +2484,126 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             assert rolename in user_roles
         elif action == 'revoke':
             assert rolename not in user_roles
+
+    def test_autoenroll_on_forum_role_add(self):
+        """
+        Test forum role modification auto enrolls user.
+        """
+        seed_permissions_roles(self.course.id)
+        user = UserFactory()
+        for rolename in ["Administrator", "Moderator", "Community TA"]:
+            assert CourseEnrollment.is_enrolled(user, self.course.id) is False
+            self.assert_update_forum_role_membership(user, user.email, rolename, "allow")
+            assert CourseEnrollment.is_enrolled(user, self.course.id)
+            self.assert_update_forum_role_membership(user, user.email, rolename, "revoke")
+            CourseEnrollment.unenroll(user, self.course.id)
+
+    def create_forum_roles(self, role_name, user):
+        """
+        DRY Utility method for adding roles.
+        """
+        role, __ = Role.objects.get_or_create(
+            course_id=self.course.id,
+            name=role_name
+        )
+        role.users.add(user)
+
+    def access_list_forum(self, user):
+        """
+        Utility method for adding forums rules and hitting the url.
+        """
+        for role_name in ["Group Moderator", "Moderator", "Community TA", "Administrator"]:
+            self.create_forum_roles(role_name, user)
+            return self.client.post(self.list_forum_members_url, {'rolename': role_name})
+
+    def test_staff_without_forum_admin_access(self):
+        """
+        Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
+        Allowed Role is either (staff & forum admin) or (instructor).
+
+        In this test case user has staff permissions but his forum admin role is missing.
+        """
+        self.client.logout()
+        self.client.login(username=self.other_user.username, password=self.TEST_PASSWORD)
+        role_name = "staff"
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=self.other_user,
+            role=role_name,
+            org=self.course.id.org
+        )
+
+        response = self.access_list_forum(self.other_user)
+        assert response.status_code == 403
+
+        if role_name in ["Administrator"]:
+            # if the rolename is `Administrator` then user must need `Administrator` access.
+            assert (response.__dict__['data'].get('detail') ==
+                    "Operation requires instructor access.")
+        else:
+            assert (response.__dict__['data'].get('detail') ==
+                    "Operation requires staff & forum admin or instructor access")
+
+    def test_staff_with_forum_admin_access(self):
+        """
+        Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
+        Allowed Role is either (staff & forum admin) or (instructor)
+
+        In this test case user has staff permissions and forum admin role also.
+        """
+        self.client.logout()
+        self.client.login(username=self.other_user.username, password=self.TEST_PASSWORD)
+
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=self.other_user,
+            role="staff",
+            org=self.course.id.org
+        )
+
+        # make user staff and administrator
+        self.create_forum_roles('Administrator', self.other_user)
+        response = self.access_list_forum(self.other_user)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        assert data['course_id'] == str(self.course.id)
+
+    def test_staff_with_forum_admin_access_with_oauth(self):
+        """
+        Verify the endpoint using JWT authentication.
+        """
+        self.client.logout()
+        dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
+        access_token = AccessTokenFactory(user=self.other_user, application=dot_application)
+        oauth_adapter = DOTAdapter()
+        token_dict = {
+            'access_token': access_token,
+            'scope': 'email profile',
+        }
+        jwt_token = jwt_api.create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=True)
+        headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
+        }
+        response = self.client.post(
+            self.list_forum_members_url,
+            data={'rolename': 'Moderator'},
+            **headers
+        )
+        # JWT authentication works but it has no permissions.
+        assert response.status_code == 403
+
+        # add user as course staff.
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=self.other_user,
+            role="staff",
+            org=self.course.id.org
+        )
+
+        # add user as forum admin.
+        self.create_forum_roles('Administrator', self.other_user)
+        response = self.client.post(self.list_forum_members_url, data={'rolename': 'Moderator'}, **headers)
+        assert response.status_code == 200
 
 
 @ddt.ddt
@@ -2574,6 +2741,63 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             assert student_json['city'] == student.profile.city
             assert student_json['country'] == ''
 
+    def test_get_students_features_private_fields(self):
+        """
+        Test that the get_students_features does not return the private fields
+        if they are by default in the `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting.
+        """
+        url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+        response = self.client.post(url, {})
+        res_json = json.loads(response.content.decode("utf-8"))
+
+        assert "students" in res_json
+        for student in res_json["students"]:
+            for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
+                assert field not in student
+
+    def test_get_students_features_private_fields_with_custom_config(self):
+        """
+        Test that the get_students_features does not return the private custom
+        fields set in the `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting.
+        """
+        private_fields = ["email", "location", "gender"]
+
+        with override_settings(PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS=private_fields):
+            url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+            response = self.client.post(url, {})
+            res_json = json.loads(response.content.decode("utf-8"))
+
+            assert "students" in res_json
+            for student in res_json["students"]:
+                for field in private_fields:
+                    assert field not in student
+
+    @override_settings(PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS=[])
+    def test_get_students_features_private_fields_empty(self):
+        """
+        Test that the get_students_features returns all the fields if the
+        `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting is empty.
+        """
+        custom_config = {
+            "student_profile_download_fields": [
+                "id",
+                "username",
+                "email",
+                "language",
+                "year_of_birth",
+            ]
+        }
+
+        with with_site_configuration_context(configuration=custom_config):
+            url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+            response = self.client.post(url, {})
+            res_json = json.loads(response.content.decode("utf-8"))
+
+            assert "students" in res_json
+            for student in res_json["students"]:
+                for field in custom_config["student_profile_download_fields"]:
+                    assert field in student
+
     @ddt.data(True, False)
     def test_get_students_features_cohorted(self, is_cohorted):
         """
@@ -2634,6 +2858,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 assert student_json['external_user_key'] == external_key_dict[student.username]
             else:
                 assert student_json['external_user_key'] == ''
+
+    def test_get_students_features_without_permissions(self):
+        """ Test that get_students_features returns 403 without credentials. """
+
+        # removed both roles from courses for instructor
+        CourseDataResearcherRole(self.course.id).remove_users(self.instructor)
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        url = reverse('get_students_features', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {})
+        assert response.status_code == 403
 
     def test_get_students_who_may_enroll(self):
         """
@@ -2927,7 +3161,37 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.post(url, data)
         assert response.status_code == 200
         res_json = json.loads(response.content.decode('utf-8'))
-        assert 'progress_url' in res_json
+        expected_data = {
+            'course_id': str(self.course.id),
+            'progress_url': f'/courses/{self.course.id}/progress/{self.students[0].id}/'
+        }
+
+        for key, value in expected_data.items():
+            self.assertIn(key, res_json)
+            self.assertEqual(res_json[key], value)
+
+    def test_get_student_progress_url_response_headers(self):
+        """
+        Test that the progress_url endpoint returns the correct headers.
+        """
+        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        data = {'unique_student_identifier': self.students[0].email}
+        response = self.client.post(url, data)
+        assert response.status_code == 200
+
+        expected_headers = {
+            'Allow': 'POST, OPTIONS',  # drf view brings this key.
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Content-Language': 'en',
+            'Content-Length': str(len(response.content.decode('utf-8'))),
+            'Content-Type': 'application/json',
+            'Vary': 'Cookie, Accept-Language, origin',
+            'X-Frame-Options': 'DENY'
+        }
+
+        for key, value in expected_headers.items():
+            self.assertIn(key, response.headers)
+            self.assertEqual(response.headers[key], value)
 
     def test_get_student_progress_url_from_uname(self):
         """ Test that progress_url is in the successful response. """
@@ -2937,6 +3201,14 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         assert response.status_code == 200
         res_json = json.loads(response.content.decode('utf-8'))
         assert 'progress_url' in res_json
+        expected_data = {
+            'course_id': str(self.course.id),
+            'progress_url': f'/courses/{self.course.id}/progress/{self.students[0].id}/'
+        }
+
+        for key, value in expected_data.items():
+            self.assertIn(key, res_json)
+            self.assertEqual(res_json[key], value)
 
     def test_get_student_progress_url_noparams(self):
         """ Test that the endpoint 404's without the required query params. """
@@ -2949,6 +3221,17 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url)
         assert response.status_code == 400
+
+    def test_get_student_progress_url_without_permissions(self):
+        """ Test that progress_url returns 403 without credentials. """
+
+        # removed both roles from courses for instructor
+        CourseDataResearcherRole(self.course.id).remove_users(self.instructor)
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        url = reverse('get_student_progress_url', kwargs={'course_id': str(self.course.id)})
+        data = {'unique_student_identifier': self.students[0].email}
+        response = self.client.post(url, data)
+        assert response.status_code == 403
 
 
 class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -3363,6 +3646,15 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
         })
         assert response.status_code == 400
 
+    def test_skip_entrance_exam_student_with_invalid_student(self):
+        """ Test skip entrance exam api for non existing user. """
+        # create a re-score entrance exam task
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'unique_student_identifier': 'test',
+        })
+        assert response.status_code == 400
+
     def test_skip_entrance_exam_student(self):
         """ Test skip entrance exam api for student. """
         # create a re-score entrance exam task
@@ -3427,6 +3719,14 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
 
     def test_send_email_but_not_logged_in(self):
         self.client.logout()
+        url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, self.full_test_message)
+        assert response.status_code == 401
+
+    def test_send_email_logged_in_but_no_perms(self):
+        self.client.logout()
+        user = UserFactory()
+        self.client.login(username=user.username, password=self.TEST_PASSWORD)
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, self.full_test_message)
         assert response.status_code == 403
@@ -3549,6 +3849,7 @@ class TestInstructorSendEmail(SiteMixin, SharedModuleStoreTestCase, LoginEnrollm
 
         url = reverse('send_email', kwargs={'course_id': str(self.course.id)})
         with LogCapture() as log:
+
             response = self.client.post(url, self.full_test_message)
 
         assert response.status_code == 400
@@ -3773,7 +4074,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         self.emails = {}
         self.emails_info = {}
 
-    def setup_fake_email_info(self, num_emails, with_failures=False):
+    def setup_fake_email_info(self, num_emails, with_failures=False, with_schedules=False):
         """ Initialize the specified number of fake emails """
         for email_id in range(num_emails):
             num_sent = random.randint(1, 15401)
@@ -3785,15 +4086,25 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
             self.tasks[email_id] = FakeContentTask(email_id, num_sent, failed, 'expected')
             self.emails[email_id] = FakeEmail(email_id)
             self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent, failed)
+            if with_schedules and email_id % 2 == 0:
+                instructor_task = InstructorTask.create(self.course.id, self.tasks[email_id].task_type,
+                                                        self.tasks[email_id].task_key, self.tasks[email_id].task_input,
+                                                        self.instructor)
+                schedule = "2099-05-02T14:00:00.000Z"
+                InstructorTaskSchedule.objects.create(
+                    task=instructor_task,
+                    task_args=json.dumps(self.tasks[email_id].task_output),
+                    task_due=schedule,
+                )
 
     def get_matching_mock_email(self, **kwargs):
         """ Returns the matching mock emails for the given id """
         email_id = kwargs.get('id', 0)
         return self.emails[email_id]
 
-    def get_email_content_response(self, num_emails, task_history_request, with_failures=False):
+    def get_email_content_response(self, num_emails, task_history_request, with_failures=False, with_schedules=False):
         """ Calls the list_email_content endpoint and returns the respsonse """
-        self.setup_fake_email_info(num_emails, with_failures)
+        self.setup_fake_email_info(num_emails, with_failures, with_schedules)
         task_history_request.return_value = list(self.tasks.values())
         url = reverse('list_email_content', kwargs={'course_id': str(self.course.id)})
         with patch(
@@ -3804,9 +4115,9 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         assert response.status_code == 200
         return response
 
-    def check_emails_sent(self, num_emails, task_history_request, with_failures=False):
+    def check_emails_sent(self, num_emails, task_history_request, with_failures=False, with_schedules=False):
         """ Tests sending emails with or without failures """
-        response = self.get_email_content_response(num_emails, task_history_request, with_failures)
+        response = self.get_email_content_response(num_emails, task_history_request, with_failures, with_schedules)
         assert task_history_request.called
         expected_email_info = [email_info.to_dict() for email_info in self.emails_info.values()]
         actual_email_info = json.loads(response.content.decode('utf-8'))['emails']
@@ -3844,6 +4155,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
     def test_content_list_email_content_many(self, task_history_request):
         """ Test listing of bulk emails sent large amount of emails """
         self.check_emails_sent(50, task_history_request)
+        self.check_emails_sent(50, task_history_request, False, True)
 
     def test_list_email_content_error(self, task_history_request):
         """ Test handling of error retrieving email """
@@ -3864,10 +4176,12 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
     def test_list_email_with_failure(self, task_history_request):
         """ Test the handling of email task that had failures """
         self.check_emails_sent(1, task_history_request, True)
+        self.check_emails_sent(1, task_history_request, True, True)
 
     def test_list_many_emails_with_failures(self, task_history_request):
         """ Test the handling of many emails with failures """
         self.check_emails_sent(50, task_history_request, True)
+        self.check_emails_sent(50, task_history_request, True, True)
 
     def test_list_email_with_no_successes(self, task_history_request):
         task_info = FakeContentTask(0, 0, 10, 'expected')
@@ -4046,6 +4360,31 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # This operation regenerates the cache, so we can use cached results from edx-when.
         assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
 
+    def test_change_due_date_with_reason(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        due_date = datetime.datetime(2013, 12, 30, tzinfo=UTC)
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': str(self.week1.location),
+            'due_datetime': '12/30/2013 00:00',
+            'reason': 'Testing reason.'  # this is optional field.
+        })
+        assert response.status_code == 200, response.content
+
+        assert get_extended_due(self.course, self.week1, self.user1) == due_date
+        # This operation regenerates the cache, so we can use cached results from edx-when.
+        assert get_date_for_block(self.course, self.week1, self.user1, use_cached=True) == due_date
+
+    def test_reset_due_date_with_reason(self):
+        url = reverse('reset_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': str(self.week1.location),
+            'reason': 'Testing reason.'  # this is optional field.
+        })
+        assert response.status_code == 200
+        assert 'Successfully reset due date for student' in response.content.decode('utf-8')
+
     def test_change_to_invalid_due_date(self):
         url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(url, {
@@ -4065,6 +4404,36 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         })
         assert response.status_code == 400, response.content
         assert get_extended_due(self.course, self.week3, self.user1) is None
+
+    def test_change_to_invalid_username(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': 'invalid_username',
+            'url': str(self.week1.location),
+            'due_datetime': '12/30/2026 02:00'
+        })
+        assert response.status_code == 404, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
+
+    def test_change_to_invalid_due_date_format(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': str(self.week1.location),
+            'due_datetime': '12/30/2kkk 00:00:00'
+        })
+        assert response.status_code == 400, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
+
+    def test_change_with_blank_fields(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': '',
+            'url': '',
+            'due_datetime': ''
+        })
+        assert response.status_code == 400, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
 
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date(self):
@@ -4567,3 +4936,127 @@ class TestInstructorCertificateExceptions(SharedModuleStoreTestCase):
             f"The student {self.user} does not have certificate for the course {self.course.id.course}. Kindly "
             "verify student username/email and the selected course are correct and try again."
         )
+
+
+@patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+class TestOauthInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test endpoints using Oauth2 authentication.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create(
+            org='test_org',
+            course='test_course',
+            run='test_run',
+            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
+        )
+        self.problem_location = msk_from_problem_urlname(
+            self.course.id,
+            'robot-some-problem-urlname'
+        )
+        self.problem_urlname = str(self.problem_location)
+
+        self.other_user = UserFactory()
+        dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
+        access_token = AccessTokenFactory(user=self.other_user, application=dot_application)
+        oauth_adapter = DOTAdapter()
+        token_dict = {
+            'access_token': access_token,
+            'scope': 'email profile',
+        }
+        jwt_token = jwt_api.create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=True)
+
+        self.headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
+        }
+
+        # endpoints contains all urls with body and role.
+        self.endpoints = [
+            ('list_course_role_members', {'rolename': 'staff'}, 'instructor'),
+            ('register_and_enroll_students', {}, 'staff'),
+            ('get_student_progress_url', {'course_id': str(self.course.id),
+                                          'unique_student_identifier': self.other_user.email
+                                          }, 'staff'
+             ),
+            ('list_entrance_exam_instructor_tasks', {'unique_student_identifier': self.other_user.email}, 'staff'),
+            ('list_email_content', {}, 'staff'),
+            ('show_student_extensions', {'student': self.other_user.email}, 'staff'),
+            ('list_email_content', {}, 'staff'),
+            ('list_report_downloads', {
+                "send-to": ["myself"],
+                "subject": "This is subject",
+                "message": "message"
+            }, 'data_researcher'),
+            ('list_instructor_tasks',
+             {
+                 'problem_location_str': self.problem_urlname,
+                 'unique_student_identifier': self.other_user.email
+             },
+             'data_researcher'),
+            ('list_instructor_tasks', {}, 'data_researcher')
+        ]
+
+        self.fake_jwt = ('wyJUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjaGFuZ2UtbWUiLCJleHAiOjE3MjU4OTA2NzIsImdyY'
+                         'W50X3R5cGUiOiJwYXNzd29yZCIsImlhdCI6MTcyNTg4NzA3MiwiaXNzIjoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL29h'
+                         'XNlcl9pZCI6MX0'
+                         '.ec8neWp1YAuF40ye4oeK40obaapUvjfNPUQCycrsajwvcu58KcuLc96sf0JKmMMMn7DH9N98hg8W38iwbhKif1kLsCKr'
+                         'tStl1u2XGvFkyMov8TtespbHit5LYRZpJwrhC1h50ru2buYj3isWrAElGPIDyAj0FAvSJnvJhWSMDtIwB2gxZI1DqOm'
+                         'M6mzT7JbOU4QH2PNZrb2EZ11F6k9I-HrHnLQymr4s0vyjMlcBWllW3y19futNCgsFFRMXI4Z9zIbspsy5bq_Skub'
+                         'dBpnl0P9x8vUJCAbFnJABAVPtF7F7nNsROQMKsZtQxaUUwdcYZi5qKL2GcgGfO0eTL4IbJA')
+
+    def assert_all_end_points(self, endpoint, body, role, add_role, use_jwt=True):
+        """
+        Util method for verifying different end-points.
+        """
+        if add_role:
+            role, _ = CourseAccessRole.objects.get_or_create(
+                course_id=self.course.id,
+                user=self.other_user,
+                role=role,
+                org=self.course.id.org
+            )
+
+        if use_jwt:
+            headers = self.headers
+        else:
+            headers = {
+                'HTTP_AUTHORIZATION': 'JWT ' + self.fake_jwt  # this is fake jwt.
+            }
+
+        url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(
+            url,
+            data=body,
+            **headers
+        )
+        return response
+
+    def run_endpoint_tests(self, expected_status, add_role, use_jwt):
+        """
+        Util method for running different end-points.
+        """
+        for endpoint, body, role in self.endpoints:
+            with self.subTest(endpoint=endpoint, role=role, body=body):
+                response = self.assert_all_end_points(endpoint, body, role, add_role, use_jwt)
+                # JWT authentication works but it has no permissions.
+                assert response.status_code == expected_status, f"Failed for endpoint: {endpoint}"
+
+    def test_end_points_with_oauth_without_jwt(self):
+        """
+        Verify the endpoint using invalid JWT returns 401.
+        """
+        self.run_endpoint_tests(expected_status=401, add_role=False, use_jwt=False)
+
+    def test_end_points_with_oauth_without_permissions(self):
+        """
+        Verify the endpoint using JWT authentication. But has no permissions.
+        """
+        self.run_endpoint_tests(expected_status=403, add_role=False, use_jwt=True)
+
+    def test_end_points_with_oauth_with_permissions(self):
+        """
+        Verify the endpoint using JWT authentication with permissions.
+        """
+        self.run_endpoint_tests(expected_status=200, add_role=True, use_jwt=True)

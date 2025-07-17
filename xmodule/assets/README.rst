@@ -27,25 +27,15 @@ However, we are proactively working towards a system where:
 Themable Sass (.scss)
 *********************
 
-XBlock CSS for ``student_view``, ``author_view``, and ``public_view`` is compiled from the various ``./<ClassName>BlockDisplay.scss`` modules, such as `AnnotatableBlockDisplay.scss`_.
+Formerly, built-in XBlock CSS for ``student_view``, ``author_view``, and
+``public_view`` was compiled from the various
+``./<ClassName>BlockDisplay.scss`` modules, and ``studio_view`` CSS was
+compiled from the various ``./<ClassName>BlockEditor.scss`` modules.
 
-XBlock CSS for ``studio_view`` is compiled from the various ``./<ClassName>BlockEditor.scss`` modules, such as `AnnotatableBlockEditor.scss`_.
-
-Those Sass modules are mostly thin wrappers around the underscore-prefixed Sass
-modules within block-type-subdirectories, such as `annotatable/_display.css`. In the
-future, we may `simplify things`_ by collapsing the top-level Sass modules and
-just directly compiling the block-type-subdirectories' Sass.
-
-The CSS is compiled into the static folders of both LMS and CMS, as well as into
-the corresponding folders in any enabled themes, as part of the edx-platform build.
-It is collected into the static root, and then linked to from XBlock fragments by the
-``add_sass_to_fragment`` function in `builtin_assets.py`_.
-
-.. _AnnotatableBlockDisplay.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/AnnotatableBlockDisplay.scss
-.. _AnnotatableBlockEditor.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/AnnotatableBlockEditor.scss
-.. _annotatable/_display.scss: https://github.com/openedx/edx-platform/tree/master/xmodule/assets/annotatable/_display.scss
-.. _simplify things: https://github.com/openedx/edx-platform/issues/32621
-
+As of November 2024, all that built-in XBlock Sass was been permanently
+compiled into CSS, stored at ``../static/css-builtin-blocks/``.
+The theme-overridable Sass variables are injected into CSS variables via
+``../../common/static/sass/_builtin-block-variables.scss``.
 
 JavaScript (.js)
 ****************

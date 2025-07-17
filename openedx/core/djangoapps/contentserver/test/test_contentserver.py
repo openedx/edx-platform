@@ -1,10 +1,9 @@
 """
-Tests for StaticContentServer
+Tests for content server.
 """
 
 
 import copy
-
 import datetime
 import logging
 import unittest
@@ -17,18 +16,18 @@ from django.test import RequestFactory
 from django.test.client import Client
 from django.test.utils import override_settings
 from opaque_keys import InvalidKeyError
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent, VERSIONED_ASSETS_PREFIX
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
-from xmodule.modulestore.xml_importer import import_course_from_xml
-from xmodule.assetstore.assetmgr import AssetManager
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
+from xmodule.assetstore.assetmgr import AssetManager
+from xmodule.contentstore.content import VERSIONED_ASSETS_PREFIX, StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
-from ..middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
+from .. import views
 
 log = logging.getLogger(__name__)
 
@@ -102,6 +101,11 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         cls.url_unlocked_versioned = get_versioned_asset_url(cls.url_unlocked)
         cls.url_unlocked_versioned_old_style = get_old_style_versioned_asset_url(cls.url_unlocked)
         cls.length_unlocked = cls.contentstore.get_attr(cls.unlocked_asset, 'length')
+
+        # Special case: python_lib.zip
+        cls.pylib_asset = cls.course_key.make_asset_key('asset', 'python_lib.zip')
+        cls.url_pylib = '/' + str(cls.pylib_asset)
+        cls.contentstore.set_attr(cls.pylib_asset, 'locked', False)
 
     def setUp(self):
         """
@@ -209,6 +213,83 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         resp = self.client.get(self.url_locked)
         assert resp.status_code == 200
 
+    def test_python_lib_zip_staff(self):
+        """
+        Test that staff can download python_lib.zip.
+        """
+        self.client.login(username=self.staff_usr, password=self.TEST_PASSWORD)
+        resp = self.client.get(self.url_pylib)
+        assert resp.status_code == 200
+        assert resp['Cache-Control'] == 'private, no-cache, no-store'
+
+    def test_python_lib_zip_not_staff(self):
+        """
+        Test that python_lib.zip cannot be downloaded by non-staff by default.
+        """
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
+        resp = self.client.get(self.url_pylib)
+        assert resp.status_code == 403
+        # We should be sending a no-cache header, but the contentserver
+        # currently doesn't set caching headers for "unauthorized" responses. So
+        # this test allows either in order to make the transition easier if we
+        # fix that.
+        assert 'Cache-Control' not in resp or resp['Cache-Control'] == 'private, no-cache, no-store'
+
+    @patch(
+        'openedx.core.djangoapps.contentserver.views.COURSE_CODE_LIBRARY_DOWNLOAD_ALLOWED.is_enabled',
+        return_value=True,
+    )
+    def test_python_lib_zip_not_staff_but_course_allows_it(self, mock_download_allowed_flag):
+        """
+        Test that python_lib.zip can be downloaded by non-staff when flag enabled.
+        """
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
+        resp = self.client.get(self.url_pylib)
+        assert resp.status_code == 200
+        assert resp['Cache-Control'] == 'private, no-cache, no-store'
+
+        mock_download_allowed_flag.assert_called_once_with(self.course_key)
+
+    @patch(
+        'openedx.core.djangoapps.contentserver.views.COURSE_CODE_LIBRARY_DOWNLOAD_ALLOWED.is_enabled',
+        return_value=True,
+    )
+    @patch(
+        'openedx.core.djangoapps.contentserver.views.is_content_locked',
+        return_value=True,
+    )
+    def test_python_lib_zip_can_be_locked(self, mock_is_locked, mock_download_allowed_flag):
+        """
+        Even when python_lib.zip download is broadly allowed, it can be locked.
+        """
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
+        resp = self.client.get(self.url_pylib)
+        assert resp.status_code == 403
+        assert 'Cache-Control' not in resp or resp['Cache-Control'] == 'private, no-cache, no-store'
+
+        assert mock_is_locked.call_count == 2  # for auth check, then caching check
+        mock_download_allowed_flag.assert_called_once_with(self.course_key)
+
+    @ddt.data(True, False)
+    def test_python_lib_zip_uses_studio_read_check(self, allow):
+        """
+        Specifically check that python_lib.zip is gated on studio read access.
+
+        Ideally this test would actually check access for a course team member
+        who is *not* site staff/superuser, but that would require more
+        complicated setup.
+        """
+        self.client.login(username=self.non_staff_usr, password=self.TEST_PASSWORD)
+        with patch('openedx.core.djangoapps.contentserver.views.has_studio_read_access', return_value=allow):
+            resp = self.client.get(self.url_pylib)
+
+        if allow:
+            assert resp.status_code == 200
+            assert resp['Cache-Control'] == 'private, no-cache, no-store'
+        else:
+            assert resp.status_code == 403
+            assert 'Cache-Control' not in resp or resp['Cache-Control'] == 'private, no-cache, no-store'
+
     def test_range_request_full_file(self):
         """
         Test that a range request from byte 0 to last,
@@ -247,7 +328,6 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         """
         first_byte = self.length_unlocked / 4
         last_byte = self.length_unlocked / 2
-        # lint-amnesty, pylint: disable=bad-option-value, unicode-format-string
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte))
 
@@ -357,8 +437,8 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         assert 'private, no-cache, no-store' == resp['Cache-Control']
 
     def test_get_expiration_value(self):
-        start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", HTTP_DATE_FORMAT)
-        near_expire_dt = StaticContentServer.get_expiration_value(start_dt, 55)
+        start_dt = datetime.datetime.strptime("Thu, 01 Dec 1983 20:00:00 GMT", views.HTTP_DATE_FORMAT)
+        near_expire_dt = views.get_expiration_value(start_dt, 55)
         assert 'Thu, 01 Dec 1983 20:00:55 GMT' == near_expire_dt
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -372,7 +452,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Chrome 1234')
 
-        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        is_from_cdn = views.is_cdn_request(browser_request)
         assert is_from_cdn is False
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -386,7 +466,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
 
-        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        is_from_cdn = views.is_cdn_request(browser_request)
         assert is_from_cdn is True
 
     @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
@@ -401,7 +481,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         request_factory = RequestFactory()
         browser_request = request_factory.get('/fake', HTTP_USER_AGENT='Amazon CloudFront')
 
-        is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
+        is_from_cdn = views.is_cdn_request(browser_request)
         assert is_from_cdn is True
 
 
@@ -416,7 +496,7 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
         self.content_length = 10000
 
     def test_bytes_unit(self):
-        unit, __ = parse_range_header('bytes=100-', self.content_length)
+        unit, __ = views.parse_range_header('bytes=100-', self.content_length)
         assert unit == 'bytes'
 
     @ddt.data(
@@ -429,7 +509,7 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     )
     @ddt.unpack
     def test_valid_syntax(self, header_value, excepted_ranges_length, expected_ranges):
-        __, ranges = parse_range_header(header_value, self.content_length)
+        __, ranges = views.parse_range_header(header_value, self.content_length)
         assert len(ranges) == excepted_ranges_length
         assert ranges == expected_ranges
 
@@ -447,5 +527,5 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
     @ddt.unpack
     def test_invalid_syntax(self, header_value, exception_class, exception_message_regex):
         self.assertRaisesRegex(
-            exception_class, exception_message_regex, parse_range_header, header_value, self.content_length
+            exception_class, exception_message_regex, views.parse_range_header, header_value, self.content_length
         )

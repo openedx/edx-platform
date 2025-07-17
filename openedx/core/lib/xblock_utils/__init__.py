@@ -452,7 +452,7 @@ def xblock_resource_pkg(block):
        ProblemBlock, and most other built-in blocks currently. Handling for these
        assets does not interact with this function.
     2. The (preferred) standard XBlock runtime resource loading system, used by
-       LibraryContentBlock. Handling for these assets *does* interact with this
+       LegacyLibraryContentBlock. Handling for these assets *does* interact with this
        function.
 
     We hope to migrate to (2) eventually, tracked by:

@@ -44,6 +44,7 @@ class XModuleFactoryLock(threading.local):
     after ensuring that a) the modulestore will be cleaned up, and b) that XModuleFactoryLock.disable
     will be called.
     """
+
     def __init__(self):
         super().__init__()
         self._enabled = False
@@ -123,6 +124,7 @@ class CourseFactory(XModuleFactory):
         run = kwargs.pop('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
         emit_signals = kwargs.pop('emit_signals', False)
+
         # By default course has enrollment_start in the future which means course is closed for enrollment.
         # We're setting the 'enrollment_start' field to None to reduce number of arguments needed to setup course.
         # Use the 'default_enrollment_start=True' kwarg to skip this and use the default enrollment_start date.
@@ -478,6 +480,7 @@ class StackTraceCounter:
     """
     A class that counts unique stack traces underneath a particular stack frame.
     """
+
     def __init__(self, stack_depth, include_arguments=True):
         """
         Arguments:

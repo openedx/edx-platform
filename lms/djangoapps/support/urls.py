@@ -8,6 +8,7 @@ from django.urls import path, re_path
 from .views.certificate import CertificatesSupportView
 from .views.contact_us import ContactUsView
 from .views.course_entitlements import EntitlementSupportView
+from .views.course_reset import CourseResetAPIView
 from .views.enrollments import EnrollmentSupportListView, EnrollmentSupportView
 from .views.feature_based_enrollments import FeatureBasedEnrollmentsSupportView, FeatureBasedEnrollmentSupportAPIView
 from .views.index import index
@@ -23,6 +24,7 @@ from .views.sso_records import (
     SsoView,
 )
 from .views.onboarding_status import OnboardingView
+
 
 COURSE_ENTITLEMENTS_VIEW = EntitlementSupportView.as_view()
 
@@ -83,5 +85,10 @@ urlpatterns = [
     re_path(
         r'onboarding_status/(?P<username_or_email>[\w.@+-]+)?$',
         OnboardingView.as_view(), name='onboarding_status'
+    ),
+    re_path(
+        r'course_reset/(?P<username_or_email>[\w.@+-]+)?$',
+        CourseResetAPIView.as_view(),
+        name='course_reset'
     ),
 ]

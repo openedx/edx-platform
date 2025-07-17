@@ -5,6 +5,10 @@ Enrollment track related signals.
 
 from django.dispatch import Signal
 
+from openedx_events.learning.data import CourseAccessRoleData, UserData, UserPersonalData
+from openedx_events.learning.signals import COURSE_ACCESS_ROLE_ADDED, COURSE_ACCESS_ROLE_REMOVED
+
+
 # The purely documentational providing_args argument for Signal is deprecated.
 # So we are moving the args to a comment.
 
@@ -21,3 +25,45 @@ ENROLL_STATUS_CHANGE = Signal()
 REFUND_ORDER = Signal()
 
 USER_EMAIL_CHANGED = Signal()
+
+
+def emit_course_access_role_added(user, course_id, org_key, role):
+    """
+    Emit an event to the event-bus when a CourseAccessRole is added
+    """
+    COURSE_ACCESS_ROLE_ADDED.send_event(
+        course_access_role_data=CourseAccessRoleData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=user.username,
+                    email=user.email,
+                ),
+                id=user.id,
+                is_active=user.is_active,
+            ),
+            course_key=course_id,
+            org_key=org_key,
+            role=role,
+        )
+    )
+
+
+def emit_course_access_role_removed(user, course_id, org_key, role):
+    """
+    Emit an event to the event-bus when a CourseAccessRole is deleted
+    """
+    COURSE_ACCESS_ROLE_REMOVED.send_event(
+        course_access_role_data=CourseAccessRoleData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=user.username,
+                    email=user.email,
+                ),
+                id=user.id,
+                is_active=user.is_active,
+            ),
+            course_key=course_id,
+            org_key=org_key,
+            role=role,
+        )
+    )

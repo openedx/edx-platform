@@ -80,7 +80,6 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     """
 
     access_expiration = serializers.DictField()
-    can_show_upgrade_sock = serializers.BooleanField()
     content_type_gating_enabled = serializers.BooleanField()
     course_goals = CourseGoalsSerializer()
     effort = serializers.CharField()
@@ -91,6 +90,7 @@ class CourseInfoSerializer(serializers.Serializer):  # pylint: disable=abstract-
     entrance_exam_data = serializers.DictField()
     id = serializers.CharField()  # pylint: disable=invalid-name
     license = serializers.CharField()
+    language = serializers.CharField(allow_null=True)
     media = _CourseApiMediaCollectionSerializer(source='*')
     name = serializers.CharField(source='display_name_with_default_escaped')
     offer = serializers.DictField()

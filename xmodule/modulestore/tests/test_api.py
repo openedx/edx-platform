@@ -46,7 +46,7 @@ def test_get_xblock_root_module_name():
 
     mixed_done_xblock = runtime.construct_xblock_from_class(DoneXBlock, Mock())
 
-    assert mixed_done_xblock.__module__ == 'xblock.internal'  # Mixed classes has a runtime generated module name.
+    assert mixed_done_xblock.__module__ == 'xblock.core'
     assert mixed_done_xblock.unmixed_class == DoneXBlock, 'The unmixed_class property retains the original property.'
 
     assert get_xblock_root_module_name(mixed_done_xblock) == 'done'
@@ -57,7 +57,7 @@ def test_file_paths_api():
     Test the `get_python_locale_root` returned path.
     """
     root = get_python_locale_root()
-    assert root.endswith('edx-platform/conf/plugins-locale/xblock.v1'), 'Needs to match Makefile and other code'
+    assert root.endswith('/conf/plugins-locale/xblock.v1'), 'Needs to match Makefile and other code'
 
 
 def test_get_javascript_i18n_file_name():

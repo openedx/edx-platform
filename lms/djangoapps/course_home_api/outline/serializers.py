@@ -19,7 +19,8 @@ class CourseBlockSerializer(serializers.Serializer):
     def get_blocks(self, block):  # pylint: disable=missing-function-docstring
         block_key = block['id']
         block_type = block['type']
-        children = block.get('children', []) if block_type != 'sequential' else []  # Don't descend past sequential
+        last_parent_block_type = 'vertical' if self.context.get('include_vertical') else 'sequential'
+        children = block.get('children', []) if block_type != last_parent_block_type else []
         description = block.get('format')
         display_name = block['display_name']
         enable_links = self.context.get('enable_links')
@@ -35,9 +36,15 @@ class CourseBlockSerializer(serializers.Serializer):
         if graded and scored:
             icon = 'fa-pencil-square-o'
 
+        if block_type == 'vertical':
+            icon = self.get_vertical_icon_class(block)
+
         if 'special_exam_info' in block:
             description = block['special_exam_info'].get('short_description')
             icon = block['special_exam_info'].get('suggested_icon', 'fa-pencil-square-o')
+
+        if self.context.get('enable_prerequisite_block_type', False) and block.get('accessible') is False:
+            block_type = 'lock'
 
         serialized = {
             block_key: {
@@ -54,11 +61,33 @@ class CourseBlockSerializer(serializers.Serializer):
                 'resume_block': block.get('resume_block', False),
                 'type': block_type,
                 'has_scheduled_content': block.get('has_scheduled_content'),
+                'hide_from_toc': block.get('hide_from_toc'),
             },
         }
+        if 'special_exam_info' in self.context.get('extra_fields', []) and block.get('special_exam_info'):
+            serialized[block_key]['special_exam_info'] = block.get('special_exam_info').get('short_description')
+        if 'completion_stat' in self.context.get('extra_fields', []):
+            serialized[block_key]['completion_stat'] = block.get('completion_stat', {})
+
         for child in children:
             serialized.update(self.get_blocks(child))
         return serialized
+
+    @staticmethod
+    def get_vertical_icon_class(block):
+        """
+        Get the icon class for a vertical block based priority of child blocks types.
+        Currently, the priority for the icon is as follows:
+            problem
+            video
+        """
+        children = block.get('children', [])
+        child_classes = {child.get('type') for child in children}
+        if 'problem' in child_classes:
+            return 'problem'
+        if 'video' in child_classes:
+            return 'video'
+        return 'other'
 
 
 class CourseGoalsSerializer(serializers.Serializer):

@@ -1,9 +1,7 @@
 /* globals setFixtures */
 
 import Backbone from 'backbone';
-import moment from 'moment';
 
-import SubscriptionModel from '../models/program_subscription_model';
 import ProgramSidebarView from '../views/program_details_sidebar_view';
 
 describe('Program Progress View', () => {
@@ -25,15 +23,13 @@ describe('Program Progress View', () => {
         "url": "/certificates/bed3980e67ca40f0b31e309d9dfe9e7e", "type": "course", "title": "Introduction to the Treatment of Urban Sewage"
       }
     ],
-    urls: {"program_listing_url": "/dashboard/programs/", "commerce_api_url": "/api/commerce/v0/baskets/", "track_selection_url": "/course_modes/choose/", "program_record_url": "/foo/bar", "buy_subscription_url": "/subscriptions", "orders_and_subscriptions_url": "/orders", "subscriptions_learner_help_center_url": "/learner"},
+    urls: {"program_listing_url": "/dashboard/programs/", "commerce_api_url": "/api/commerce/v0/baskets/", "track_selection_url": "/course_modes/choose/"},
     userPreferences: {"pref-lang": "en"}
     };
     /* eslint-enable */
     let programModel;
     let courseData;
-    let subscriptionData;
     let certificateCollection;
-    let isSubscriptionEligible;
 
     const testCircle = (progress) => {
         const $circle = view.$('.progress-circle');
@@ -53,55 +49,15 @@ describe('Program Progress View', () => {
         expect(parseInt($numbers.find('.total').html(), 10)).toEqual(total);
     };
 
-    const testSubscriptionState = (state, heading, body) => {
-        isSubscriptionEligible = true;
-        subscriptionData.subscription_state = state;
-        // eslint-disable-next-line no-use-before-define
-        view = initView();
-        // eslint-disable-next-line no-param-reassign
-        body += ' on the <a class="subscription-link" href="/orders">Orders and subscriptions</a> page';
-
-        expect(view.$('.js-subscription-info')[0]).toBeInDOM();
-        expect(
-            view.$('.js-subscription-info .divider-heading').text().trim(),
-        ).toEqual(heading);
-        expect(
-            view.$('.js-subscription-info .subscription-section p:nth-child(1)'),
-        ).toContainHtml(body);
-        expect(
-            view.$('.js-subscription-info .subscription-section p:nth-child(2)'),
-        ).toContainText(
-            /Need help\? Check out the.*Learner Help Center.*to troubleshoot issues or contact support/,
-        );
-        expect(
-            view.$('.js-subscription-info .subscription-section p:nth-child(2) .subscription-link').attr('href'),
-        ).toEqual('/learner');
-    };
-
     const initView = () => new ProgramSidebarView({
         el: '.js-program-sidebar',
         model: programModel,
         courseModel: courseData,
-        subscriptionModel: new SubscriptionModel({
-            context: {
-                programData: {
-                    subscription_eligible: isSubscriptionEligible,
-                    subscription_prices: [{
-                        price: '100.00',
-                        currency: 'USD',
-                    }],
-                },
-                subscriptionData: [subscriptionData],
-                urls: data.urls,
-                userPreferences: data.userPreferences,
-            },
-        }),
         certificateCollection,
         industryPathways: data.industryPathways,
         creditPathways: data.creditPathways,
         programTabViewEnabled: false,
         urls: data.urls,
-        isSubscriptionEligible,
     });
 
     beforeEach(() => {
@@ -109,14 +65,6 @@ describe('Program Progress View', () => {
         programModel = new Backbone.Model(data.programData);
         courseData = new Backbone.Model(data.courseData);
         certificateCollection = new Backbone.Collection(data.certificateData);
-        isSubscriptionEligible = false;
-        subscriptionData = {
-            trial_end: '1970-01-01T03:25:45Z',
-            current_period_end: '1970-06-03T07:12:04Z',
-            price: '100.00',
-            currency: 'USD',
-            subscription_state: 'pre',
-        };
     });
 
     afterEach(() => {
@@ -203,69 +151,14 @@ describe('Program Progress View', () => {
             el: '.js-program-sidebar',
             model: programModel,
             courseModel: courseData,
-            subscriptionModel: new SubscriptionModel({
-                context: {
-                    programData: {
-                        subscription_eligible: isSubscriptionEligible,
-                        subscription_prices: [{
-                            price: '100.00',
-                            currency: 'USD',
-                        }],
-                    },
-                    subscriptionData: [subscriptionData],
-                    urls: data.urls,
-                    userPreferences: data.userPreferences,
-                },
-            }),
             certificateCollection,
             industryPathways: [],
             creditPathways: [],
             programTabViewEnabled: false,
             urls: data.urls,
-            isSubscriptionEligible,
         });
 
         expect(emptyView.$('.program-credit-pathways .divider-heading')).toHaveLength(0);
         expect(emptyView.$('.program-industry-pathways .divider-heading')).toHaveLength(0);
-    });
-
-    it('should not render subscription info if program is not subscription eligible', () => {
-        view = initView();
-        expect(view.$('.js-subscription-info')[0]).not.toBeInDOM();
-    });
-
-    it('should render subscription info if program is subscription eligible', () => {
-        testSubscriptionState(
-            'pre',
-            'Inactive subscription',
-            'If you had a subscription previously, your payment history is still available',
-        );
-    });
-
-    it('should render active trial subscription info if subscription is active with trial', () => {
-        subscriptionData.trial_end = moment().add(3, 'days').utc().format(
-            'YYYY-MM-DDTHH:mm:ss[Z]',
-        );
-        testSubscriptionState(
-            'active',
-            'Trial subscription',
-            'View your receipts or modify your subscription',
-        );
-    });
-
-    it('should render active subscription info if subscription active', () => {
-        testSubscriptionState(
-            'active',
-            'Active subscription',
-            'View your receipts or modify your subscription',
-        );
-    });
-
-    it('should render inactive subscription info if subscription inactive', () => {
-        testSubscriptionState(
-            'inactive',
-            'Inactive subscription',
-            'Restart your subscription for $100/month USD. Your payment history is still available',
-        );
     });
 });

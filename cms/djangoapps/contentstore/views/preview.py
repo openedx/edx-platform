@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryContainerLocator
 from rest_framework.request import Request
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
@@ -29,6 +30,7 @@ from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, XModuleMi
 from cms.djangoapps.xblock_config.models import StudioConfig
 from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id
 from cms.lib.xblock.field_data import CmsFieldData
+from cms.lib.xblock.upstream_sync import UpstreamLink
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
 from common.djangoapps.student.models import anonymous_id_for_user
@@ -45,7 +47,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock_aside
 )
 
-from ..utils import get_visibility_partition_info, StudioPermissionsService
+from ..utils import StudioPermissionsService, get_visibility_partition_info
 from .access import get_user_role
 from .session_kv_store import SessionKeyValueStore
 
@@ -299,9 +301,19 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         if selected_groups_label:
             selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)  # lint-amnesty, pylint: disable=line-too-long
         course = modulestore().get_course(xblock.location.course_key)
+
         can_edit = context.get('can_edit', True)
+        can_add = context.get('can_add', True)
+        upstream_link = UpstreamLink.try_get_for_block(root_xblock, log_error=False)
+        if upstream_link.error_message is None and isinstance(upstream_link.upstream_key, LibraryContainerLocator):
+            # If this unit is linked to a library unit, for now we make it completely read-only
+            # because when it is synced, all local changes like added components will be lost.
+            # (This is only on the frontend; the backend doesn't enforce it)
+            can_edit = False
+            can_add = False
+
         # Is this a course or a library?
-        is_course = xblock.scope_ids.usage_id.context_key.is_course
+        is_course = xblock.context_key.is_course
         tags_count_map = context.get('tags_count_map')
         tags_count = 0
         if tags_count_map:
@@ -314,13 +326,16 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_root': is_root,
             'is_reorderable': is_reorderable,
             'can_edit': can_edit,
-            'can_edit_visibility': context.get('can_edit_visibility', is_course),
+            'can_edit_visibility': can_edit and context.get('can_edit_visibility', is_course),
             'course_authoring_url': settings.COURSE_AUTHORING_MICROFRONTEND_URL,
             'is_loading': context.get('is_loading', False),
             'is_selected': context.get('is_selected', False),
             'selectable': context.get('selectable', False),
             'selected_groups_label': selected_groups_label,
-            'can_add': context.get('can_add', True),
+            'can_add': can_add,
+            # Generally speaking, "if you can add, you can delete". One exception is itembank (Problem Bank)
+            # which has its own separate "add" workflow but uses the normal delete workflow for its child blocks.
+            'can_delete': can_add or (root_xblock and root_xblock.scope_ids.block_type == "itembank" and can_edit),
             'can_move': context.get('can_move', is_course),
             'language': getattr(course, 'language', None),
             'is_course': is_course,

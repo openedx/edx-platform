@@ -403,6 +403,7 @@ class GeneratedCertificate(models.Model):
         )
 
         # .. event_implemented_name: CERTIFICATE_REVOKED
+        # .. event_type: org.openedx.learning.certificate.revoked.v1
         CERTIFICATE_REVOKED.send_event(
             time=self.modified_date.astimezone(timezone.utc),
             certificate=CertificateData(
@@ -487,6 +488,7 @@ class GeneratedCertificate(models.Model):
         )
 
         # .. event_implemented_name: CERTIFICATE_CHANGED
+        # .. event_type: org.openedx.learning.certificate.changed.v1
         CERTIFICATE_CHANGED.send_event(
             time=timestamp,
             certificate=CertificateData(
@@ -520,6 +522,7 @@ class GeneratedCertificate(models.Model):
             )
 
             # .. event_implemented_name: CERTIFICATE_CREATED
+            # .. event_type: org.openedx.learning.certificate.created.v1
             CERTIFICATE_CREATED.send_event(
                 time=timestamp,
                 certificate=CertificateData(
@@ -1281,6 +1284,30 @@ class CertificateGenerationCommandConfiguration(ConfigurationModel):
         blank=True,
         help_text=(
             "Arguments for the 'cert_generation' management command. Specify like '-u <user_id> -c <course_run_key>'"
+        ),
+        default="",
+    )
+
+    def __str__(self):
+        return str(self.arguments)
+
+
+class PurgeReferencestoPDFCertificatesCommandConfiguration(ConfigurationModel):
+    """
+    Manages configuration for a run of the purge_references_to_pdf_certificates management command.
+
+    .. no_pii:
+    """
+
+    class Meta:
+        app_label = "certificates"
+        verbose_name = "purge_references_to_pdf_certificates argument"
+
+    arguments = models.TextField(
+        blank=True,
+        help_text=(
+            "Arguments for the 'purge_references_to_pdf_certificates' management command. "
+            "Specify like '--certificate_ids <id1> <id2>'"
         ),
         default="",
     )

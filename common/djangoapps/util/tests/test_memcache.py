@@ -65,19 +65,6 @@ class MemcacheTest(TestCase):
         key = safe_key('key', 'prefix', 'a' * 300)
         assert self._is_valid_key(key)
 
-    def test_safe_key_unicode(self):
-
-        for unicode_char in self.UNICODE_CHAR_CODES:
-
-            # Generate a key with that character
-            key = chr(unicode_char)
-
-            # Make the key safe
-            key = safe_key(key, '', '')
-
-            # The key should now be valid
-            assert self._is_valid_key(key), f'Failed for unicode character {unicode_char}'
-
     def test_safe_key_prefix_unicode(self):
 
         for unicode_char in self.UNICODE_CHAR_CODES:

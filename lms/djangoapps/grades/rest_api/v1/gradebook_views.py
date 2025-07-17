@@ -859,11 +859,6 @@ class GradebookBulkUpdateView(GradeViewMixin, PaginatedAPIView):
                 subsection = course.get_child(usage_key)
                 if subsection:
                     subsection_grade_model = self._create_subsection_grade(user, course, subsection)
-                    # TODO: Remove as part of EDUCATOR-4602.
-                    if str(course_key) == 'course-v1:UQx+BUSLEAD5x+2T2019':
-                        log.info('PersistentSubsectionGrade ***{}*** created for'
-                                 ' subsection ***{}*** in course ***{}*** for user ***{}***.'
-                                 .format(subsection_grade_model, subsection.location, course, user.id))
                 else:
                     self._log_update_result(request.user, requested_user_id, requested_usage_id, success=False)
                     result.append(GradebookUpdateResponseItem(

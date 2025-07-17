@@ -45,7 +45,7 @@ from lms.djangoapps.teams.services import TeamsService
 from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.library_tools import LibraryToolsService
+from xmodule.library_tools import LegacyLibraryToolsService
 from xmodule.modulestore.django import XBlockI18nService, modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.partitions.partitions_service import PartitionService
@@ -71,6 +71,7 @@ from lms.djangoapps.verify_student.services import XBlockVerificationService
 from openedx.core.djangoapps.bookmarks.api import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
+from openedx.core.djangoapps.enrollments.services import EnrollmentsService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.djangolib.markup import HTML
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -625,7 +626,7 @@ def prepare_runtime_for_user(
         ),
         'completion': CompletionService(user=user, context_key=course_id) if user and user.is_authenticated else None,
         'i18n': XBlockI18nService,
-        'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
+        'library_tools': LegacyLibraryToolsService(store, user_id=user.id if user else None),
         'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
         'settings': SettingsService(),
         'user_tags': UserTagsService(user=user, course_id=course_id),
@@ -633,6 +634,7 @@ def prepare_runtime_for_user(
         'teams_configuration': TeamsConfigurationService(),
         'call_to_action': CallToActionService(),
         'publish': EventPublishingService(user, course_id, track_function),
+        'enrollments': EnrollmentsService(),
     }
 
     runtime.get_block_for_descriptor = inner_get_block

@@ -19,14 +19,12 @@ from .accounts.views import (
     NameChangeView,
     UsernameReplacementView, CancelAccountRetirementStatusView
 )
-from .learner_skill_levels.views import LearnerSkillLevelsView
 from . import views as user_api_views
 from .models import UserPreference
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import (
     IDVerificationStatusView,
     IDVerificationStatusDetailsView,
-    IDVerificationSupportView,
 )
 
 ME = AccountViewSet.as_view({
@@ -148,11 +146,6 @@ urlpatterns = [
         name='verification_details'
     ),
     re_path(
-        r'^v1/accounts/verifications/(?P<attempt_id>[0-9]+)/$',
-        IDVerificationSupportView.as_view(),
-        name='verification_for_support'
-    ),
-    re_path(
         fr'^v1/accounts/{settings.USERNAME_PATTERN}/retirement_status/$',
         RETIREMENT_RETRIEVE,
         name='accounts_retirement_retrieve'
@@ -196,11 +189,6 @@ urlpatterns = [
         fr'^v1/preferences/{settings.USERNAME_PATTERN}/(?P<preference_key>[a-zA-Z0-9_]+)$',
         PreferencesDetailView.as_view(),
         name='preferences_detail_api'
-    ),
-    re_path(
-        r'^v1/skill_level/(?P<job_id>[0-9]+)/$',
-        LearnerSkillLevelsView.as_view(),
-        name="learner_skill_level"
     ),
     # Moved from user_api/legacy_urls.py
     path('v1/', include(USER_API_ROUTER.urls)),

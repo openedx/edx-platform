@@ -1,0 +1,45 @@
+{
+  extends: [
+    'config:recommended',
+    'schedule:weekly',
+    ':automergeLinters',
+    ':automergeMinor',
+    ':automergeTesters',
+    ':enableVulnerabilityAlerts',
+    ':semanticCommits',
+    ':updateNotScheduled',
+  ],
+  packageRules: [
+    {
+      matchDepTypes: [
+        'devDependencies',
+      ],
+      matchUpdateTypes: [
+        'lockFileMaintenance',
+        'minor',
+        'patch',
+        'pin',
+      ],
+      automerge: true,
+    },
+    {
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
+      automerge: true,
+      matchPackageNames: [
+        '/@edx/',
+        '/@openedx/',
+      ],
+    },
+  ],
+  ignoreDeps: [
+    'karma-spec-reporter',
+  ],
+  timezone: 'America/New_York',
+  prConcurrentLimit: 3,
+  enabledManagers: [
+    'npm',
+  ],
+}

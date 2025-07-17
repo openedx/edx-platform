@@ -2,16 +2,13 @@
 Viewset for auth/saml/v0/saml_configuration
 """
 
-from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from rest_framework import permissions, viewsets
-from rest_framework.authentication import SessionAuthentication
 
 from ..models import SAMLConfiguration
 from .serializers import SAMLConfigurationSerializer
 
 
 class SAMLConfigurationMixin:
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = SAMLConfigurationSerializer
 

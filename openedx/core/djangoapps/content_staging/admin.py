@@ -19,7 +19,7 @@ class StagedContentAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'created', 'purpose', 'status', 'block_type', 'display_name', 'suggested_url_name')
     list_filter = ('purpose', 'status', 'block_type')
     search_fields = ('user__username', 'display_name', 'suggested_url_name')
-    readonly_fields = ('id', 'user', 'created', 'purpose', 'status', 'block_type', 'olx')
+    readonly_fields = ('id', 'user', 'created', 'purpose', 'status', 'block_type', 'olx', 'tags')
     inlines = (StagedContentFileInline, )
 
 

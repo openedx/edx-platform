@@ -1,0 +1,7 @@
+{% load i18n %}
+
+{% if digest_frequency == "Weekly" %}
+    {% trans "Weekly Notifications Digest for the Week of" %} {{ start_date }}
+{% else %}
+    {% trans "Daily Notifications Digest for" %} {{ start_date }}
+{% endif %}

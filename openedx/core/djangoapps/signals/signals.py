@@ -36,9 +36,16 @@ COURSE_GRADE_NOW_PASSED = Signal()
 # ]
 COURSE_GRADE_NOW_FAILED = Signal()
 
-# Signal that indicates that a user has become verified for certificate purposes
+# Signal that indicates that a user has become verified via SSO for certificate purposes
 # providing_args=['user']
-LEARNER_NOW_VERIFIED = Signal()
+LEARNER_SSO_VERIFIED = Signal()
+
+# Signal that indicates a user has been verified via verify_studnet.PhotoVerification for certificate purposes
+# Please note that this signal and the corresponding PhotoVerification model are planned for deprecation.
+# Future implementations of IDV will use the verify_student.VerificationAttempt model and corresponding
+# openedx events.
+# DEPR:  https://github.com/openedx/edx-platform/issues/35128
+PHOTO_VERIFICATION_APPROVED = Signal()
 
 # providing_args=['user']
 USER_ACCOUNT_ACTIVATED = Signal()  # Signal indicating email verification

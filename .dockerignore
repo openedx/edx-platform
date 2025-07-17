@@ -20,6 +20,9 @@ cms/envs/private.py
 
 ### Python artifacts
 **/*.pyc
+**/__pycache__
+.venv
+venv
 
 ### Editor and IDE artifacts
 **/*~
@@ -102,7 +105,6 @@ common/test/data/badges/*.png
 ### Static assets pipeline artifacts
 **/*.scssc
 lms/static/css/
-!lms/static/css/vendor
 lms/static/certificates/css/
 cms/static/css/
 common/static/common/js/vendor/
@@ -149,5 +151,3 @@ openedx/core/djangoapps/django_comment_common/comment_client/python
 
 # Locally generated PII reports
 **/pii_report
-
-/Dockerfile

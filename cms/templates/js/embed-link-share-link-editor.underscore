@@ -1,0 +1,20 @@
+<div class="modal-section-content">
+    <div class="subsection-share-link-container">
+        <div>
+            <p>
+                <%- gettext('Embed your subsection content directly on a page using an iframe, and view it without the LMS header and footer.') %>
+            </p>
+            <button
+                type="button"
+                id="embed-link-button"
+                data-clipboard-text="<%- embedLmsUrl %>"
+                title="<%- gettext('Click to copy link to clipboard') %>"
+                class="button btn-primary copy-link-button"
+            >
+                <span class="icon fa fa-clipboard icon-copy-clipboard"></span>
+                <span class="copy-link-button-text"><%- gettext('Copy link') %></span>
+            </button>
+        </div>
+        <img class="share-link-animated-svg" src="/static/studio/images/subsection-embed.svg">
+    </div>
+</div>

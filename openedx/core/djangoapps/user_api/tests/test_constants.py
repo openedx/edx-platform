@@ -143,7 +143,7 @@ SORTED_COUNTRIES = [
     ("MU", "Mauritius"),
     ("YT", "Mayotte"),
     ("MX", "Mexico"),
-    ("FM", "Micronesia (Federated States of)"),
+    ("FM", "Micronesia"),
     ("MD", "Moldova"),
     ("MC", "Monaco"),
     ("MN", "Mongolia"),

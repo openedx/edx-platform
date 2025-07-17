@@ -10,7 +10,6 @@ from django.core.management.base import BaseCommand
 import openedx.core.djangoapps.content.block_structure.api as api
 import openedx.core.djangoapps.content.block_structure.store as store
 import openedx.core.djangoapps.content.block_structure.tasks as tasks
-from openedx.core.djangoapps.content.block_structure.config import enable_storage_backing_for_cache_in_request
 from openedx.core.lib.command_utils import (
     get_mutually_exclusive_required_option,
     parse_course_keys,
@@ -75,12 +74,6 @@ class Command(BaseCommand):
             default=0,
             type=int,
         )
-        parser.add_argument(
-            '--with_storage',
-            help='Store the course blocks in Storage, overriding value of the storage_backing_for_cache waffle switch',
-            action='store_true',
-            default=False,
-        )
 
     def handle(self, *args, **options):
 
@@ -129,9 +122,6 @@ class Command(BaseCommand):
         """
         Generates course blocks for the given course_keys per the given options.
         """
-        if options.get('with_storage'):
-            enable_storage_backing_for_cache_in_request()
-
         for course_key in course_keys:
             try:
                 self._generate_for_course(options, course_key)
@@ -150,7 +140,7 @@ class Command(BaseCommand):
             action = tasks.update_course_in_cache_v2 if options.get('force_update') else tasks.get_course_in_cache_v2
             task_options = {'routing_key': options['routing_key']} if options.get('routing_key') else {}
             result = action.apply_async(
-                kwargs=dict(course_id=str(course_key), with_storage=options.get('with_storage')),
+                kwargs=dict(course_id=str(course_key)),
                 **task_options
             )
             log.info('BlockStructure: ENQUEUED generating for course: %s, task_id: %s.', course_key, result.id)

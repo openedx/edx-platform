@@ -240,6 +240,13 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings
     )
 
+    hide_from_toc = Boolean(
+        display_name=_("Hide from Table of Contents"),
+        help=_("Enter true or false. If true, this block will be hidden from the Table of Contents."),
+        default=False,
+        scope=Scope.settings
+    )
+
     @property
     def close_date(self):
         """

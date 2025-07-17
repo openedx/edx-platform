@@ -135,8 +135,7 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware, MiddlewareMi
         """
         Ensure that the user's session hash hasn't changed.
         """
-        # Auto-auth causes issues in Bok Choy tests because it resets
-        # the requesting user. Since session verification is a
+        # Since session verification is a
         # security feature, we can turn it off when auto-auth is
         # enabled since auto-auth is highly insecure and only for
         # tests.

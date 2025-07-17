@@ -14,9 +14,11 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test.utils import override_settings
 from django.utils.translation import gettext as _
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import (
@@ -41,6 +43,8 @@ from ..course import _deprecated_blocks_info, course_outline_initial_state, rein
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import VisibilityState, create_xblock_info
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
+@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
@@ -58,6 +62,11 @@ class TestCourseIndex(CourseTestCase):
             org='test.org_1-2',
             number='test-2.3_course',
             display_name='dotted.course.name-2',
+        )
+        CourseOverviewFactory.create(
+            id=self.odd_course.id,
+            org=self.odd_course.org,
+            display_name=self.odd_course.display_name,
         )
 
     def check_courses_on_index(self, authed_client, expected_course_tab_len):
@@ -330,6 +339,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertContains(response, 'display_course_number: ""')
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
 @ddt.ddt
 class TestCourseIndexArchived(CourseTestCase):
     """
@@ -422,16 +432,16 @@ class TestCourseIndexArchived(CourseTestCase):
 
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 0, 21),
-        (False, 'staff', None, 0, 21),
+        (True, 'staff', None, 23),
+        (False, 'staff', None, 23),
         # Base user has global staff access
-        (True, 'user', ORG, 2, 21),
-        (False, 'user', ORG, 2, 21),
-        (True, 'user', None, 2, 21),
-        (False, 'user', None, 2, 21),
+        (True, 'user', ORG, 23),
+        (False, 'user', ORG, 23),
+        (True, 'user', None, 23),
+        (False, 'user', None, 23),
     )
     @ddt.unpack
-    def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):
+    def test_separate_archived_courses(self, separate_archived_courses, username, org, sql_queries):
         """
         Ensure that archived courses are shown as expected for all user types, when the feature is enabled/disabled.
         Also ensure that enabling the feature does not adversely affect the database query count.
@@ -447,10 +457,47 @@ class TestCourseIndexArchived(CourseTestCase):
         with override_settings(FEATURES=features):
             self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
                                                    org=org,
-                                                   mongo_queries=mongo_queries,
+                                                   mongo_queries=0,
+                                                   sql_queries=sql_queries)
+
+    @ddt.data(
+        # Staff user has course staff access
+        (True, 'staff', None, 23),
+        (False, 'staff', None, 23),
+        # Base user has global staff access
+        (True, 'user', ORG, 23),
+        (False, 'user', ORG, 23),
+        (True, 'user', None, 23),
+        (False, 'user', None, 23),
+    )
+    @ddt.unpack
+    def test_separate_archived_courses_with_home_page_course_v2_api(
+        self,
+        separate_archived_courses,
+        username,
+        org,
+        sql_queries
+    ):
+        """
+        Ensure that archived courses are shown as expected for all user types, when the feature is enabled/disabled.
+        Also ensure that enabling the feature does not adversely affect the database query count.
+        """
+        # Authenticate the requested user
+        user = getattr(self, username)
+        password = getattr(self, username + '_password')
+        self.client.login(username=user, password=password)
+
+        # Enable/disable the feature before viewing the index page.
+        features = settings.FEATURES.copy()
+        features['ENABLE_SEPARATE_ARCHIVED_COURSES'] = separate_archived_courses
+        with override_settings(FEATURES=features):
+            self.check_index_page_with_query_count(separate_archived_courses=separate_archived_courses,
+                                                   org=org,
+                                                   mongo_queries=0,
                                                    sql_queries=sql_queries)
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 @ddt.ddt
 class TestCourseOutline(CourseTestCase):
     """
@@ -668,11 +715,12 @@ class TestCourseOutline(CourseTestCase):
         """
         Test to check number of queries made to mysql and mongo
         """
-        with self.assertNumQueries(26, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(39, table_ignorelist=WAFFLE_TABLES):
             with check_mongo_calls(3):
                 self.client.get_html(reverse_course_url('course_handler', self.course.id))
 
 
+@override_waffle_flag(toggles.LEGACY_STUDIO_COURSE_OUTLINE, True)
 class TestCourseReIndex(CourseTestCase):
     """
     Unit tests for the course outline.

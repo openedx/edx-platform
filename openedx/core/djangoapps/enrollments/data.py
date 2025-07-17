@@ -28,7 +28,7 @@ from common.djangoapps.student.models import (
     EnrollmentClosedError,
     NonExistentCourseError
 )
-from common.djangoapps.student.roles import RoleCache
+from common.djangoapps.student.role_helpers import get_course_roles
 
 log = logging.getLogger(__name__)
 
@@ -341,22 +341,17 @@ def get_course_enrollment_info(course_id, include_expired=False):
         msg = f"Requested enrollment information for unknown course {course_id}"
         log.warning(msg)
         raise CourseNotFoundError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
-    else:
-        return CourseSerializer(course, include_expired=include_expired).data
+    return CourseSerializer(course, include_expired=include_expired).data
 
 
 def get_user_roles(username):
     """
-    Returns a list of all roles that this user has.
+    Returns a set of all roles that this user has.
     :param username: The id of the selected user.
     :return: All roles for all courses that this user has.
     """
-    # pylint: disable=protected-access
     user = _get_user(username)
-    if not hasattr(user, '_roles'):
-        user._roles = RoleCache(user)
-    role_cache = user._roles
-    return role_cache._roles
+    return set(get_course_roles(user))
 
 
 def serialize_enrollments(enrollments):

@@ -9,7 +9,6 @@ from tempfile import mkdtemp
 from factory import Factory, Sequence, lazy_attribute, post_generation
 from fs.osfs import OSFS
 from lxml import etree
-from xblock.mixins import HierarchyMixin
 
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
@@ -58,7 +57,7 @@ class XmlImportData:
 
 # Extract all argument names used to construct XmlImportData objects,
 # so that the factory doesn't treat them as XML attributes
-XML_IMPORT_ARGS = inspect.getargspec(XmlImportData.__init__).args  # lint-amnesty, pylint: disable=deprecated-method
+XML_IMPORT_ARGS = inspect.getfullargspec(XmlImportData.__init__).args
 
 
 class XmlImportFactory(Factory):
@@ -70,7 +69,7 @@ class XmlImportFactory(Factory):
         model = XmlImportData
 
     filesystem = OSFS(mkdtemp())
-    xblock_mixins = (InheritanceMixin, XModuleMixin, HierarchyMixin)
+    xblock_mixins = (InheritanceMixin, XModuleMixin)
     url_name = Sequence(str)
     attribs = {}
     policy = {}

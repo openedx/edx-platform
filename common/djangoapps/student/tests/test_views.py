@@ -51,8 +51,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # l
 
 TOMORROW = now() + timedelta(days=1)
 ONE_WEEK_AGO = now() - timedelta(weeks=1)
-THREE_YEARS_FROM_NOW = now() + timedelta(days=(365 * 3))
-THREE_YEARS_AGO = now() - timedelta(days=(365 * 3))
+THREE_YEARS_FROM_NOW = now() + timedelta(days=365 * 3)
+THREE_YEARS_AGO = now() - timedelta(days=365 * 3)
 
 # Name of the method to mock for Content Type Gating.
 GATING_METHOD_NAME = 'openedx.features.content_type_gating.models.ContentTypeGatingConfig.enabled_for_enrollment'
@@ -233,14 +233,14 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
         """
         UserProfile.objects.get(user=self.user).delete()
         response = self.client.get(self.path)
-        self.assertRedirects(response, reverse('account_settings'))
+        self.assertRedirects(response, settings.ACCOUNT_MICROFRONTEND_URL, target_status_code=302)
 
-    @patch('common.djangoapps.student.views.dashboard.should_redirect_to_learner_home_mfe')
-    def test_redirect_to_learner_home(self, mock_should_redirect_to_learner_home_mfe):
+    @patch('common.djangoapps.student.views.dashboard.learner_home_mfe_enabled')
+    def test_redirect_to_learner_home(self, mock_learner_home_mfe_enabled):
         """
         if learner home mfe is enabled, redirect to learner home mfe
         """
-        mock_should_redirect_to_learner_home_mfe.return_value = True
+        mock_learner_home_mfe_enabled.return_value = True
         response = self.client.get(self.path)
         self.assertRedirects(response, settings.LEARNER_HOME_MICROFRONTEND_URL, fetch_redirect_response=False)
 
