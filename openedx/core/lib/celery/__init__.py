@@ -18,6 +18,10 @@ over older code, and there is probably a better mechanism to be had.)
 """
 
 from celery import Celery
+from celery.signals import worker_process_init
+from edx_django_utils.monitoring import initialize_celery_monitoring
+
+initialize_celery_monitoring(worker_process_init=worker_process_init)
 
 # WARNING: Do not refer to this unless you are cms.celery or
 # lms.celery. See module docstring!
