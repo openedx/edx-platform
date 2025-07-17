@@ -6,7 +6,7 @@ from typing import Dict, Set, Union
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions
 
-from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseAccessRole, CourseEnrollment
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -187,6 +187,40 @@ class IsStaffOrAdmin(permissions.BasePermission):
         )
 
 
+def can_take_action_on_spam(user, course_id):
+    """
+    Returns if the user has access to take action against forum spam posts
+    Parameters:
+        user: User object
+        course_id: CourseKey or string of course_id
+    """
+    if isinstance(course_id, str):
+        course_id = CourseKey.from_string(course_id)
+    org_id = course_id.org
+    course_ids = CourseEnrollment.objects.filter(user=user).values_list('course_id', flat=True)
+    course_ids = [c_id for c_id in course_ids if c_id.org == org_id]
+    user_roles = set(
+        Role.objects.filter(
+            users=user,
+            course_id__in=course_ids,
+        ).values_list('name', flat=True).distinct()
+    )
+    is_user_staff = bool(user_roles & {
+        FORUM_ROLE_ADMINISTRATOR,
+        FORUM_ROLE_MODERATOR,
+    })
+    if is_user_staff is True:
+        return True
+
+    if CourseAccessRole.objects.filter(user=user, course_id__in=course_ids, role__in=["instructor", "staff"]).exists():
+        return True
+
+    return (
+        GlobalStaff().has_user(user) or
+        user.is_staff
+    )
+
+
 class IsAllowedToBulkDelete(permissions.BasePermission):
     """
     Permission that checks if the user is staff or an admin.
@@ -197,29 +231,5 @@ class IsAllowedToBulkDelete(permissions.BasePermission):
         if not request.user.is_authenticated:
             return False
 
-        course_ids = CourseEnrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
-
-        user_roles = set(
-            Role.objects.filter(
-                users=request.user,
-                course_id__in=course_ids,
-            ).values_list('name', flat=True).distinct()
-        )
-        is_user_staff = bool(user_roles & {
-            FORUM_ROLE_ADMINISTRATOR,
-            FORUM_ROLE_MODERATOR,
-        })
-        if is_user_staff is True:
-            return True
-
-        for course_id in course_ids:
-            if (
-                CourseStaffRole(course_id).has_user(request.user) or
-                CourseInstructorRole(course_id).has_user(request.user)
-            ) is True:
-                return True
-
-        return (
-            GlobalStaff().has_user(request.user) or
-            request.user.is_staff
-        )
+        course_id = view.kwargs.get("course_id")
+        return can_take_action_on_spam(request.user, course_id)

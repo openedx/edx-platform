@@ -6,8 +6,6 @@ import logging
 from celery import shared_task
 from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
-from forum.backends.mongodb.comments import Comment as ForumComment
-from forum.backends.mongodb.threads import CommentThread as ForumCommentThread
 from opaque_keys.edx.locator import CourseKey
 
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
@@ -94,29 +92,12 @@ def send_response_endorsed_notifications(thread_id, response_id, course_key_str,
 
 @shared_task
 @set_code_owner_attribute
-def delete_course_post_for_user(params):
+def delete_course_post_for_user(user_id, username, course_ids):
     """
     Deletes all posts for user in a course.
-    TODO: Add support for MySQLBackend as well. It currently supports only MongoDB
-          Hint: use get_backend from forum.backend to get the backend type.
     """
-    username = params.get("username", "")
-    course_key_str = params.get("course_id")
-    author_id = str(params.get("author_id"))
-
-    log.info(f"<<Bulk Delete>> Deleting all posts for {username} in course {course_key_str}")
-    comments_deleted = 0
-    comments = ForumComment().get_list(course_id=course_key_str, author_id=author_id)
-    for comment in comments:
-        comment_id = comment.get("_id")
-        if comment_id:
-            comments_deleted += ForumComment().delete(comment_id)
-
-    threads_deleted = 0
-    threads = ForumCommentThread().get_list(course_id=course_key_str, author_id=author_id)
-    for thread in threads:
-        thread_id = thread.get("_id")
-        if thread_id:
-            threads_deleted += ForumCommentThread().delete(thread_id)
+    log.info(f"<<Bulk Delete>> Deleting all posts for {username} in course {course_ids}")
+    threads_deleted = Thread.delete_user_threads(user_id, course_ids)
+    comments_deleted = Comment.delete_user_comments(user_id, course_ids)
     log.info(f"<<Bulk Delete>> Deleted {threads_deleted} posts and {comments_deleted} comments for {username} "
-             f"in course {course_key_str}")
+             f"in course {course_ids}")

@@ -12,8 +12,6 @@ from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from forum.backends.mongodb.comments import Comment
-from forum.backends.mongodb.threads import CommentThread
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, status
 from rest_framework.authentication import SessionAuthentication
@@ -39,6 +37,8 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration,
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
+from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
@@ -1541,14 +1541,14 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
     """
 
     authentication_classes = (
-        JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser,
+        JwtAuthentication, BearerAuthentication, SessionAuthentication,
     )
     permission_classes = (permissions.IsAuthenticated, IsAllowedToBulkDelete)
 
     def post(self, request, course_id):
         """
         Implements the delete user posts endpoint.
-        TODO: Add support for both MySQLBackend as well
+        TODO: Add support for MySQLBackend as well
         """
         username = request.GET.get("username", None)
         execute_task = request.GET.get("execute", "false").lower() == "true"
@@ -1558,11 +1558,7 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
         if course_or_org not in ["course", "org"]:
             raise BadRequest("course_or_org must be either 'course' or 'org'.")
 
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise BadRequest("Invalid request")       # pylint: disable=raise-missing-from
-
+        user = get_object_or_404(User, username=username)
         course_ids = [course_id]
         if course_or_org == "org":
             org_id = CourseKey.from_string(course_id).org
@@ -1572,22 +1568,12 @@ class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
                 if c_id.org == org_id
             ]
 
-        query_params = {
-            "course_id": {"$in": course_ids},
-            "author_id": str(user.id),
-            "_type": "Comment"
-        }
-        comment_count = Comment()._collection.count_documents(query_params)         # pylint: disable=protected-access
-
-        query_params["_type"] = "CommentThread"
-        thread_count = CommentThread()._collection.count_documents(query_params)    # pylint: disable=protected-access
-
-        query_params["username"] = username
-        query_params.pop("_type", None)
+        comment_count = Comment.get_user_comment_count(user.id, course_ids)
+        thread_count = Thread.get_user_threads_count(user.id, course_ids)
 
         if execute_task:
             delete_course_post_for_user.apply_async(
-                args=(query_params,),
+                args=(user.id, username, course_ids),
             )
         return Response(
             {"comment_count": comment_count, "thread_count": thread_count},
