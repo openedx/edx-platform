@@ -1133,7 +1133,6 @@ slumber==0.7.1
     #   enterprise-integrated-channels
 snowflake-connector-python==3.15.0
     # via edx-enterprise
-social-auth-app-django==5.4.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in

@@ -1973,7 +1973,6 @@ snowflake-connector-python==3.15.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-social-auth-app-django==5.4.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
