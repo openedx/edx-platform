@@ -1,9 +1,13 @@
 """ Utility functions related to django storages """
+import logging
 
 from typing import Optional, List
 from django.conf import settings
 from django.core.files.storage import storages
 from django.utils.module_loading import import_string
+
+
+logger = logging.getLogger(__name__)
 
 
 def resolve_storage_backend(
@@ -19,12 +23,12 @@ def resolve_storage_backend(
         legacy_sec_setting_keys = List of keys to get the storage class.
             For legacy dict settings like settings.BLOCK_STRUCTURES_SETTINGS.get('STORAGE_CLASS'),
             it is necessary to access a second-level key or above to retrieve the class path.
-        legacy_options = Kwargs for the storage class.
         options = Kwargs for the storage class.
     Returns:
         An instance of the configured storage backend.
     Raises:
         ImportError: If the specified storage class cannot be imported.
+        KeyError: If the specified key is not found in the legacy settings.
     Main goal:
         Deprecate the use of `django.core.files.storage.get_storage_class`.
     How:
@@ -33,10 +37,6 @@ def resolve_storage_backend(
     """
 
     storage_path = getattr(settings, legacy_setting_key, None)
-    if isinstance(storage_path, dict) and legacy_sec_setting_keys:
-        for deep_setting_key in legacy_sec_setting_keys:
-            # For legacy dict settings like settings.CUSTOM_STORAGE = {"BACKEND": "cms.custom.."}
-            storage_path = storage_path.get(deep_setting_key)
     storages_config = getattr(settings, 'STORAGES', {})
 
     if options is None:
@@ -55,5 +55,20 @@ def resolve_storage_backend(
 
     # Use case 2: Legacy settings
     # Fallback to import the storage_path (Obtained from django settings) manually
+    if isinstance(storage_path, dict) and legacy_sec_setting_keys:
+        # If storage_path is a dict, we need to access the second-level keys
+        # to retrieve the storage class path.
+        # This is useful for legacy settings that store storage paths in a nested structure.
+        for deep_setting_key in legacy_sec_setting_keys:
+            # For legacy dict settings like settings.CUSTOM_STORAGE = {"BACKEND": "cms.custom.."}
+            if deep_setting_key not in storage_path:
+                logger.warning(
+                    f"Key {legacy_setting_key} '{deep_setting_key}' not found in storage settings {storage_path}."
+                    "Using default storage path."
+                )
+                storage_path = None  # We set it to None to use the default storage later
+                break
+            storage_path = storage_path.get(deep_setting_key)
+
     StorageClass = import_string(storage_path or settings.DEFAULT_FILE_STORAGE)
     return StorageClass(**options)

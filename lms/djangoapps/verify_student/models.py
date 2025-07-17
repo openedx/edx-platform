@@ -44,7 +44,7 @@ from lms.djangoapps.verify_student.ssencrypt import (
     rsa_decrypt,
     rsa_encrypt
 )
-from openedx.core.djangoapps.content.block_structure.models import resolve_storage_backend
+from common.djangoapps.util.storage import resolve_storage_backend
 from openedx.core.djangoapps.signals.signals import LEARNER_SSO_VERIFIED, PHOTO_VERIFICATION_APPROVED
 
 from .utils import auto_verify_for_testing_enabled, earliest_allowed_verification_date, submit_request_to_ss
