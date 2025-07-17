@@ -98,6 +98,15 @@ FULL_COURSE_REINDEX_THRESHOLD = 1
 ALL_ALLOWED_XBLOCKS = frozenset(
     [entry_point.name for entry_point in entry_points(group="xblock.v1")]
 )
+DEFAULT_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/115.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Connection": "keep-alive",
+}
 
 
 class LinkState:
@@ -1255,7 +1264,7 @@ async def _validate_urls_access_in_batches(url_list, course_key, batch_size=100)
 
 async def _validate_batch(batch, course_key):
     """Validate a batch of URLs"""
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers=DEFAULT_HEADERS) as session:
         tasks = [_validate_url_access(session, url_data, course_key) for url_data in batch]
         batch_results = await asyncio.gather(*tasks)
         return batch_results
