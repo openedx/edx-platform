@@ -246,6 +246,23 @@ def _url_for_un_pin_thread(thread_id):
     return f"{settings.PREFIX}/threads/{thread_id}/unpin"
 
 
+def _clean_forum_params(params):
+    """Convert string booleans to actual booleans and remove None values from forum parameters."""
+    result = {}
+    for k, v in params.items():
+        if v is not None:
+            if isinstance(v, str):
+                if v.lower() == 'true':
+                    result[k] = True
+                elif v.lower() == 'false':
+                    result[k] = False
+                else:
+                    result[k] = v
+            else:
+                result[k] = v
+    return result
+
+
 def is_forum_v2_enabled_for_thread(thread_id: str) -> tuple[bool, t.Optional[str]]:
     """
     Figure out whether we use forum v2 for a given thread.
