@@ -1042,7 +1042,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
                 return Response({'error': 'CAPTCHA verification failed.'}, status=400)
         data = request.data.copy()
         data.pop('captcha_token', None)
-        return Response(create_comment(request, request.data))
+        return Response(create_comment(request, data))
 
     def destroy(self, request, comment_id):
         """
