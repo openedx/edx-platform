@@ -7,12 +7,11 @@ import io
 from itertools import groupby
 import csv
 from typing import Iterator
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey, CollectionKey, ContainerKey, UsageKey
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import Exists, OuterRef, Q, QuerySet
 from django.utils.timezone import now
-from opaque_keys.edx.keys import CourseKey, LibraryCollectionKey
 from opaque_keys.edx.locator import LibraryLocatorV2
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 from openedx_tagging.core.tagging.models.utils import TAGS_CSV_SEPARATOR
@@ -230,8 +229,8 @@ def generate_csv_rows(object_id, buffer) -> Iterator[str]:
     """
     content_key = get_content_key_from_string(object_id)
 
-    if isinstance(content_key, (UsageKey, LibraryCollectionKey)):
-        raise ValueError("The object_id must be a CourseKey or a LibraryLocatorV2.")
+    if isinstance(content_key, (UsageKey, CollectionKey, ContainerKey)):
+        raise ValueError("The object_id must be a component, collection, or container.")
 
     all_object_tags, taxonomies = get_all_object_tags(content_key)
     tagged_content = build_object_tree_with_objecttags(content_key, all_object_tags)
@@ -441,3 +440,4 @@ resync_object_tags = oel_tagging.resync_object_tags
 get_object_tags = oel_tagging.get_object_tags
 add_tag_to_taxonomy = oel_tagging.add_tag_to_taxonomy
 copy_tags_as_read_only = oel_tagging.copy_tags
+make_copied_tags_editable = oel_tagging.unmark_copied_tags

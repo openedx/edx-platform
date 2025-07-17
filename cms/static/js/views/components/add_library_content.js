@@ -22,6 +22,7 @@ function($, _, gettext, BaseModal) {
             // Translators: "title" is the name of the current component being edited.
             titleFormat: gettext('Add library content'),
             addPrimaryActionButton: false,
+            showEditorModeButtons: false,
         }),
 
         initialize: function() {

@@ -17,7 +17,7 @@
 
 click                                   # Used for perf_tests utilities in modulestore
 django-debug-toolbar                    # A set of panels that display debug information about the current request/response
-django-stubs                            # Typing stubs for Django, so it works with mypy
+django-stubs[compatible-mypy]           # Typing stubs for Django, so it works with mypy
 djangorestframework-stubs               # Typing stubs for DRF
 mypy                                    # static type checking
 pywatchman                              # More efficient checking for runserver reload trigger events

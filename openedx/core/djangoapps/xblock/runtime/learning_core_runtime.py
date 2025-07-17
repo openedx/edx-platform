@@ -311,8 +311,14 @@ class LearningCoreXBlockRuntime(XBlockRuntime):
                     "block.xml": content.id,
                 },
                 created=now,
+                created_by=self.user.id if self.user else None
             )
         self.authored_data_store.mark_unchanged(block)
+
+        # Signal that we've modified this block
+        learning_context = get_learning_context_impl(usage_key)
+        learning_context.send_block_updated_event(usage_key)
+        learning_context.send_container_updated_events(usage_key)
 
     def _get_component_from_usage_key(self, usage_key):
         """

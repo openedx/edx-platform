@@ -1,22 +1,28 @@
 """
 Test CMS's upstream->downstream syncing system
 """
-import ddt
+import datetime
 
+import ddt
 from organizations.api import ensure_organization
 from organizations.models import Organization
+from pytz import utc
 
 from cms.lib.xblock.upstream_sync import (
+    BadDownstream,
+    BadUpstream,
+    NoUpstream,
     UpstreamLink,
-    sync_from_upstream, decline_sync, fetch_customizable_fields, sever_upstream_link,
-    NoUpstream, BadUpstream, BadDownstream,
+    decline_sync,
+    sever_upstream_link,
 )
+from cms.lib.xblock.upstream_sync_block import sync_from_upstream_block, fetch_customizable_fields_from_block
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content_libraries import api as libs
 from openedx.core.djangoapps.content_tagging import api as tagging_api
 from openedx.core.djangoapps.xblock import api as xblock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 
 @ddt.ddt
@@ -42,12 +48,47 @@ class UpstreamTestCase(ModuleStoreTestCase):
             title="Test Upstream Library",
         )
         self.upstream_key = libs.create_library_block(self.library.key, "html", "test-upstream").usage_key
-        libs.create_library_block(self.library.key, "video", "video-upstream")
 
         upstream = xblock.load_block(self.upstream_key, self.user)
         upstream.display_name = "Upstream Title V2"
         upstream.data = "<html><body>Upstream content V2</body></html>"
         upstream.save()
+
+        self.upstream_problem_key = libs.create_library_block(self.library.key, "problem", "problem-upstream").usage_key
+        libs.set_library_block_olx(self.upstream_problem_key, (
+            '<problem'
+            ' attempts_before_showanswer_button="1"'
+            ' display_name="Upstream Problem Title V2"'
+            ' due="2024-01-01T00:00:00Z"'
+            ' force_save_button="false"'
+            ' graceperiod="1d"'
+            ' grading_method="last_attempt"'
+            ' matlab_api_key="abc"'
+            ' max_attempts="10"'
+            ' rerandomize="&quot;always&quot;"'
+            ' show_correctness="never"'
+            ' show_reset_button="false"'
+            ' showanswer="on_correct"'
+            ' submission_wait_seconds="10"'
+            ' use_latex_compiler="false"'
+            ' weight="1"'
+            '/>\n'
+        ))
+
+        self.upstream_video_key = libs.create_library_block(self.library.key, "video", "video-upstream").usage_key
+        libs.set_library_block_olx(self.upstream_video_key, (
+            '<video'
+            ' display_name="Video Test"'
+            ' edx_video_id=""'
+            ' end_time="00:00:00"'
+            ' html5_sources="[&quot;https://www.sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4&quot;]"'
+            ' start_time="00:00:00"'
+            ' track=""'
+            ' youtube_id_1_0=""'
+            '>'
+            ' <source src="https://www.sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4"/>'
+            '</video>'
+        ))
 
         libs.publish_changes(self.library.key, self.user.id)
 
@@ -76,7 +117,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         downstream_lib_block.save()
 
         with self.assertRaises(BadDownstream):
-            sync_from_upstream(downstream_lib_block, self.user)
+            sync_from_upstream_block(downstream_lib_block, self.user)
 
         assert downstream_lib_block.display_name == "Another lib block"
         assert downstream_lib_block.data == "<html>another lib block</html>"
@@ -90,7 +131,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         block.data = "Block content"
 
         with self.assertRaises(NoUpstream):
-            sync_from_upstream(block, self.user)
+            sync_from_upstream_block(block, self.user)
 
         assert block.display_name == "Block Title"
         assert block.data == "Block content"
@@ -101,7 +142,6 @@ class UpstreamTestCase(ModuleStoreTestCase):
         ("course-v1:Oops+ItsA+CourseKey", ".*is malformed.*"),
         ("block-v1:The+Wrong+KindOfUsageKey+type@html+block@nope", ".*is malformed.*"),
         ("lb:TestX:NoSuchLib:html:block-id", ".*not found in the system.*"),
-        ("lb:TestX:TestLib:video:should-be-html-but-is-a-video", ".*type mismatch.*"),
         ("lb:TestX:TestLib:html:no-such-html", ".*not found in the system.*"),
     )
     @ddt.unpack
@@ -114,11 +154,28 @@ class UpstreamTestCase(ModuleStoreTestCase):
         block.data = "Block content"
 
         with self.assertRaisesRegex(BadUpstream, message_regex):
-            sync_from_upstream(block, self.user)
+            sync_from_upstream_block(block, self.user)
 
         assert block.display_name == "Block Title"
         assert block.data == "Block content"
         assert not block.upstream_display_name
+
+    def test_sync_incompatible_upstream(self):
+        """
+        Syncing with a bad upstream raises BadUpstream, but doesn't affect the block
+        """
+        downstream_block = BlockFactory.create(
+            category='html', parent=self.unit, upstream=str(self.upstream_problem_key),
+        )
+        downstream_block.display_name = "Block Title"
+        downstream_block.data = "Block content"
+
+        with self.assertRaisesRegex(BadUpstream, "Content type mismatch.*"):
+            sync_from_upstream_block(downstream_block, self.user)
+
+        assert downstream_block.display_name == "Block Title"
+        assert downstream_block.data == "Block content"
+        assert not downstream_block.upstream_display_name
 
     def test_sync_not_accessible(self):
         """
@@ -127,7 +184,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
         user_who_cannot_read_upstream = UserFactory.create(username="rando", is_staff=False, is_superuser=False)
         with self.assertRaisesRegex(BadUpstream, ".*could not be loaded.*") as exc:
-            sync_from_upstream(downstream, user_who_cannot_read_upstream)
+            sync_from_upstream_block(downstream, user_who_cannot_read_upstream)
 
     def test_sync_updates_happy_path(self):
         """
@@ -136,7 +193,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
 
         # Initial sync
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
         assert downstream.upstream_version == 2  # Library blocks start at version 2 (v1 is the empty new block)
         assert downstream.upstream_display_name == "Upstream Title V2"
         assert downstream.display_name == "Upstream Title V2"
@@ -157,7 +214,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         tagging_api.tag_object(str(self.upstream_key), self.taxonomy_all_org, new_upstream_tags)
 
         # Assert that un-published updates are not yet pulled into downstream
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
         assert downstream.upstream_version == 2  # Library blocks start at version 2 (v1 is the empty new block)
         assert downstream.upstream_display_name == "Upstream Title V2"
         assert downstream.display_name == "Upstream Title V2"
@@ -167,7 +224,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         libs.publish_changes(self.library.key, self.user.id)
 
         # Follow-up sync. Assert that updates are pulled into downstream.
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
         assert downstream.upstream_version == 3
         assert downstream.upstream_display_name == "Upstream Title V3"
         assert downstream.display_name == "Upstream Title V3"
@@ -179,6 +236,100 @@ class UpstreamTestCase(ModuleStoreTestCase):
         for object_tag in object_tags:
             assert object_tag.value in new_upstream_tags
 
+    # pylint: disable=too-many-statements
+    def test_sync_updates_to_downstream_only_fields(self):
+        """
+        If we sync to modified content, will it preserve downstream-only fields, and overwrite the rest?
+        """
+        downstream = BlockFactory.create(category='problem', parent=self.unit, upstream=str(self.upstream_problem_key))
+
+        # Initial sync
+        sync_from_upstream_block(downstream, self.user)
+
+        # These fields are copied from upstream
+        assert downstream.upstream_display_name == "Upstream Problem Title V2"
+        assert downstream.display_name == "Upstream Problem Title V2"
+        assert downstream.rerandomize == '"always"'
+        assert downstream.matlab_api_key == 'abc'
+        assert not downstream.use_latex_compiler
+
+        # These fields are "downstream only", so field defaults are preserved, and values are NOT copied from upstream
+        assert downstream.attempts_before_showanswer_button == 0
+        assert downstream.due is None
+        assert not downstream.force_save_button
+        assert downstream.graceperiod is None
+        assert downstream.grading_method == 'last_score'
+        assert downstream.max_attempts is None
+        assert downstream.show_correctness == 'always'
+        assert not downstream.show_reset_button
+        assert downstream.showanswer == 'finished'
+        assert downstream.submission_wait_seconds == 0
+        assert downstream.weight is None
+
+        # Upstream updates
+        libs.set_library_block_olx(self.upstream_problem_key, (
+            '<problem'
+            ' attempts_before_showanswer_button="10"'
+            ' display_name="Upstream Problem Title V3"'
+            ' due="2024-02-02T00:00:00Z"'
+            ' force_save_button="false"'
+            ' graceperiod=""'
+            ' grading_method="final_attempt"'
+            ' matlab_api_key="def"'
+            ' max_attempts="11"'
+            ' rerandomize="&quot;per_student&quot;"'
+            ' show_correctness="past_due"'
+            ' show_reset_button="false"'
+            ' showanswer="attempted"'
+            ' submission_wait_seconds="11"'
+            ' use_latex_compiler="true"'
+            ' weight="2"'
+            '/>\n'
+        ))
+        libs.publish_changes(self.library.key, self.user.id)
+
+        # Modifing downstream-only fields are "safe" customizations
+        downstream.display_name = "Downstream Title Override"
+        downstream.attempts_before_showanswer_button = 2
+        downstream.due = datetime.datetime(2025, 2, 2, tzinfo=utc)
+        downstream.force_save_button = True
+        downstream.graceperiod = '2d'
+        downstream.grading_method = 'last_score'
+        downstream.max_attempts = 100
+        downstream.show_correctness = 'always'
+        downstream.show_reset_button = True
+        downstream.showanswer = 'on_expired'
+        downstream.submission_wait_seconds = 100
+        downstream.weight = 3
+
+        # Modifying synchronized fields are "unsafe" customizations
+        downstream.rerandomize = '"onreset"'
+        downstream.matlab_api_key = 'hij'
+        downstream.save()
+
+        # Follow-up sync.
+        sync_from_upstream_block(downstream, self.user)
+
+        # "unsafe" customizations are overridden by upstream
+        assert downstream.upstream_display_name == "Upstream Problem Title V3"
+        assert downstream.rerandomize == '"per_student"'
+        assert downstream.matlab_api_key == 'def'
+        assert downstream.use_latex_compiler
+
+        # but "safe" customizations survive
+        assert downstream.display_name == "Downstream Title Override"
+        assert downstream.attempts_before_showanswer_button == 2
+        assert downstream.due == datetime.datetime(2025, 2, 2, tzinfo=utc)
+        assert downstream.force_save_button
+        assert downstream.graceperiod == '2d'
+        assert downstream.grading_method == 'last_score'
+        assert downstream.max_attempts == 100
+        assert downstream.show_correctness == 'always'
+        assert downstream.show_reset_button
+        assert downstream.showanswer == 'on_expired'
+        assert downstream.submission_wait_seconds == 100
+        assert downstream.weight == 3
+
     def test_sync_updates_to_modified_content(self):
         """
         If we sync to modified content, will it preserve customizable fields, but overwrite the rest?
@@ -186,7 +337,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
 
         # Initial sync
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
         assert downstream.upstream_display_name == "Upstream Title V2"
         assert downstream.display_name == "Upstream Title V2"
         assert downstream.data == "<html><body>Upstream content V2</body></html>"
@@ -204,7 +355,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         downstream.save()
 
         # Follow-up sync. Assert that updates are pulled into downstream, but customizations are saved.
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
         assert downstream.upstream_display_name == "Upstream Title V3"
         assert downstream.display_name == "Downstream Title Override"  # "safe" customization survives
         assert downstream.data == "<html><body>Upstream content V3</body></html>"  # "unsafe" override is gone
@@ -221,7 +372,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
     #       """
     #       # Start with an uncustomized downstream block.
     #       downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
-    #       sync_from_upstream(downstream, self.user)
+    #       sync_from_upstream_block(downstream, self.user)
     #       assert downstream.downstream_customized == []
     #       assert downstream.display_name == downstream.upstream_display_name == "Upstream Title V2"
     #
@@ -231,7 +382,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
     #       assert downstream.downstream_customized == ["display_name"]
     #
     #       # Syncing should retain the customization.
-    #       sync_from_upstream(downstream, self.user)
+    #       sync_from_upstream_block(downstream, self.user)
     #       assert downstream.upstream_version == 2
     #       assert downstream.upstream_display_name == "Upstream Title V2"
     #       assert downstream.display_name == "Title V3"
@@ -242,7 +393,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
     #       upstream.save()
     #
     #       # ...which is reflected when we sync.
-    #       sync_from_upstream(downstream, self.user)
+    #       sync_from_upstream_block(downstream, self.user)
     #       assert downstream.upstream_version == 3
     #       assert downstream.upstream_display_name == downstream.display_name == "Title V3"
     #
@@ -253,7 +404,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
     #       upstream.save()
     #
     #       # ...then the downstream title should remain put.
-    #       sync_from_upstream(downstream, self.user)
+    #       sync_from_upstream_block(downstream, self.user)
     #       assert downstream.upstream_version == 4
     #       assert downstream.upstream_display_name == "Title V4"
     #       assert downstream.display_name == "Title V3"
@@ -262,12 +413,12 @@ class UpstreamTestCase(ModuleStoreTestCase):
     #       downstream.downstream_customized = []
     #       upstream.display_name = "Title V5"
     #       upstream.save()
-    #       sync_from_upstream(downstream, self.user)
+    #       sync_from_upstream_block(downstream, self.user)
     #       assert downstream.upstream_version == 5
     #       assert downstream.upstream_display_name == downstream.display_name == "Title V5"
 
     @ddt.data(None, "Title From Some Other Upstream Version")
-    def test_fetch_customizable_fields(self, initial_upstream_display_name):
+    def test_update_customizable_fields(self, initial_upstream_display_name):
         """
         Can we fetch a block's upstream field values without syncing it?
 
@@ -278,13 +429,13 @@ class UpstreamTestCase(ModuleStoreTestCase):
         downstream.display_name = "Some Title"
         downstream.data = "<html><data>Some content</data></html>"
 
-        # Note that we're not linked to any upstream. fetch_customizable_fields shouldn't care.
+        # Note that we're not linked to any upstream. fetch_customizable_fields_from_block shouldn't care.
         assert not downstream.upstream
         assert not downstream.upstream_version
 
         # fetch!
         upstream = xblock.load_block(self.upstream_key, self.user)
-        fetch_customizable_fields(upstream=upstream, downstream=downstream, user=self.user)
+        fetch_customizable_fields_from_block(upstream=upstream, downstream=downstream, user=self.user)
 
         # Ensure: fetching doesn't affect the upstream link (or lack thereof).
         assert not downstream.upstream
@@ -310,7 +461,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         assert link.ready_to_sync is True
 
         # Initial sync to V2
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
         link = UpstreamLink.get_for_block(downstream)
         assert link.version_synced == 2
         assert link.version_declined is None
@@ -360,7 +511,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         """
         # Start with a course block that is linked+synced to a content library block.
         downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(self.upstream_key))
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
 
         # (sanity checks)
         assert downstream.upstream == str(self.upstream_key)
@@ -400,7 +551,7 @@ class UpstreamTestCase(ModuleStoreTestCase):
         downstream = BlockFactory.create(category='html', parent=self.unit, upstream=str(upstream_lib_block_key))
 
         # Initial sync
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
 
         # Verify tags
         object_tags = tagging_api.get_object_tags(str(downstream.location))
@@ -416,10 +567,23 @@ class UpstreamTestCase(ModuleStoreTestCase):
         tagging_api.tag_object(str(upstream_lib_block_key), self.taxonomy_all_org, new_upstream_tags)
 
         # Follow-up sync.
-        sync_from_upstream(downstream, self.user)
+        sync_from_upstream_block(downstream, self.user)
 
         #Verify tags
         object_tags = tagging_api.get_object_tags(str(downstream.location))
         assert len(object_tags) == len(new_upstream_tags)
         for object_tag in object_tags:
             assert object_tag.value in new_upstream_tags
+
+    def test_sync_video_block(self):
+        downstream = BlockFactory.create(category='video', parent=self.unit, upstream=str(self.upstream_video_key))
+        downstream.edx_video_id = "test_video_id"
+
+        # Sync
+        sync_from_upstream_block(downstream, self.user)
+        assert downstream.upstream_version == 2
+        assert downstream.upstream_display_name == "Video Test"
+        assert downstream.display_name == "Video Test"
+
+        # `edx_video_id` doesn't change
+        assert downstream.edx_video_id == "test_video_id"

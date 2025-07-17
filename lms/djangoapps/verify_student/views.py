@@ -1128,7 +1128,8 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         log.info("[COSMO-184] Denied verification for receipt_id={receipt_id}.".format(receipt_id=receipt_id))
 
         attempt.deny(json.dumps(reason), error_code=error_code)
-        reverify_url = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
+        account_base_url = (settings.ACCOUNT_MICROFRONTEND_URL or "").rstrip('/')
+        reverify_url = f'{account_base_url}/id-verification'
         verification_status_email_vars['reasons'] = reason
         verification_status_email_vars['reverify_url'] = reverify_url
         verification_status_email_vars['faq_url'] = settings.ID_VERIFICATION_SUPPORT_LINK

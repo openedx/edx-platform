@@ -49,7 +49,7 @@
     background-image: -webkit-linear-gradient(top, #d4dee8, #c9d5e2);
     background-image: linear-gradient(to bottom, #d4dee8, #c9d5e2);
     position: relative;
-    padding: calc(var(--baseline) / 4);
+    padding: calc(var(--baseline, 20px) / 4);
     border-bottom-color: #a5aaaf;
 }
 
@@ -62,7 +62,7 @@
 .xmodule_edit.xmodule_ProblemBlock .editor .editor-bar button {
     display: inline-block;
     float: left;
-    padding: 3px calc(var(--baseline) / 2) 5px;
+    padding: 3px calc(var(--baseline, 20px) / 2) 5px;
     margin-left: 7px;
     border: 0;
     border-radius: 2px;
@@ -88,7 +88,7 @@
 
 .xmodule_edit.xmodule_ProblemBlock .editor .editor-tabs li {
     float: left;
-    margin-right: calc(var(--baseline) / 4);
+    margin-right: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_edit.xmodule_ProblemBlock .editor .editor-tabs li:last-child {
@@ -101,9 +101,9 @@
     padding: 7px 20px 3px;
     border: 1px solid #a5aaaf;
     border-radius: 3px 3px 0 0;
-    background-color: var(--transparent);
-    background-image: -webkit-linear-gradient(top, var(--transparent) 87%, rgba(0, 0, 0, 0.06));
-    background-image: linear-gradient(to bottom, var(--transparent) 87%, rgba(0, 0, 0, 0.06));
+    background-color: var(--transparent, transparent);
+    background-image: -webkit-linear-gradient(top, var(--transparent, transparent) 87%, rgba(0, 0, 0, 0.06));
+    background-image: linear-gradient(to bottom, var(--transparent, transparent) 87%, rgba(0, 0, 0, 0.06));
     background-color: #e5ecf3;
     font-size: 13px;
     color: #3c3c3c;
@@ -111,8 +111,8 @@
 }
 
 .xmodule_edit.xmodule_ProblemBlock .editor .editor-tabs .tab.current {
-    background: var(--white);
-    border-bottom-color: var(--white);
+    background: var(--white, #fff);
+    border-bottom-color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle {
@@ -120,14 +120,14 @@
     margin-top: -4px;
     padding: 3px 9px;
     font-size: 12px;
-    color: var(--link-color);
+    color: var(--link-color, #1b6d99);
 }
 
 .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current {
-    border: 1px solid var(--lightGrey) !important;
+    border: 1px solid var(--lightGrey, #edf1f5) !important;
     border-radius: 3px !important;
-    background: var(--lightGrey) !important;
-    color: var(--darkGrey) !important;
+    background: var(--lightGrey, #edf1f5) !important;
+    color: var(--darkGrey, #8891a1) !important;
     pointer-events: none;
     cursor: none;
 }
@@ -135,7 +135,7 @@
 .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current:hover,
 .xmodule_edit.xmodule_ProblemBlock .editor-bar .editor-tabs .advanced-toggle.current:focus {
     box-shadow: 0 0 0 0 !important;
-    background-color: var(--white);
+    background-color: var(--white, #fff);
 }
 
 .xmodule_edit.xmodule_ProblemBlock .simple-editor-cheatsheet {
@@ -143,8 +143,8 @@
     top: 41px;
     left: 70%;
     width: 0;
-    border-left: 1px solid var(--gray-l2);
-    background-color: var(--lightGrey);
+    border-left: 1px solid var(--gray-l2, #adadad);
+    background-color: var(--lightGrey, #edf1f5);
     overflow: hidden;
 }
 
@@ -194,7 +194,7 @@
 }
 
 .xmodule_edit.xmodule_ProblemBlock .simple-editor-cheatsheet .col.sample .icon {
-    height: calc(var(--baseline) * 1.5);
+    height: calc(var(--baseline, 20px) * 1.5);
 }
 
 .xmodule_edit.xmodule_ProblemBlock .simple-editor-cheatsheet pre {
@@ -217,5 +217,5 @@
     width: 26px;
     height: 21px;
     vertical-align: middle;
-    color: var(--body-color);
+    color: var(--body-color, #313131);
 }

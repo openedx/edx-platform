@@ -72,12 +72,35 @@ def is_registration_api_v1(request):
     return 'v1' in request.get_full_path() and 'register' not in request.get_full_path()
 
 
-def remove_special_characters_from_name(name):
+def remove_special_characters_from_name(name: str) -> str:
     return "".join(re.findall(r"[\w-]+", name))
 
 
-def generate_username_suggestions(name):
-    """ Generate 3 available username suggestions """
+def generate_username_suggestions(name: str) -> list[str]:
+    """
+    Generate 3 available username suggestions based on the provided name.
+
+    Args:
+        name (str): The full name to generate username suggestions from.
+            Must contain only ASCII characters.
+
+    Returns:
+        list[str]: A list of up to 3 available username suggestions,
+            or an empty list if name contains non-ASCII characters or if no valid
+            suggestions could be generated.
+
+    Note:
+        Generated usernames will be combinations of:
+        - firstname + lastname
+        - first initial + lastname
+        - firstname + random number
+    """
+    # Check if name contains non-ASCII characters
+    try:
+        name.encode('ascii')
+    except UnicodeEncodeError:
+        return []
+
     username_suggestions = []
     max_length = USERNAME_MAX_LENGTH
     names = name.split(' ')

@@ -22,14 +22,16 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiRequest, OpenApiResponse
 from edx_django_utils.monitoring import function_trace
-from edx_toggles.toggles import WaffleSwitch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import api_view
+from openedx.core.lib.api.view_utils import view_auth_classes
 
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import create_xblock_info
 from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
@@ -136,12 +138,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler',
-           'get_course_and_check_access']
-
-WAFFLE_NAMESPACE = 'studio_home'
-ENABLE_GLOBAL_STAFF_OPTIMIZATION = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
-    f'{WAFFLE_NAMESPACE}.enable_global_staff_optimization', __name__
-)
+           'get_course_and_check_access', 'bulk_enable_disable_discussions']
 
 
 class AccessListFallback(Exception):
@@ -394,15 +391,12 @@ def get_in_process_course_actions(request):
     ]
 
 
-def _accessible_courses_summary_iter(request, org=None):
+def _accessible_courses_summary_iter(request):
     """
     List all courses available to the logged in user by iterating through all the courses
 
     Arguments:
         request: the request object
-        org (string): if not None, this value will limit the courses returned. An empty
-            string will result in no courses, and otherwise only courses with the
-            specified org will be returned. The default value is None.
     """
     def course_filter(course_summary):
         """
@@ -414,25 +408,15 @@ def _accessible_courses_summary_iter(request, org=None):
 
         return has_studio_read_access(request.user, course_summary.id)
 
-    enable_home_page_api_v2 = settings.FEATURES["ENABLE_HOME_PAGE_COURSE_API_V2"]
-
-    if org is not None:
-        courses_summary = [] if org == '' else CourseOverview.get_all_courses(orgs=[org])
-    elif enable_home_page_api_v2:
-        # If the new home page API is enabled, we should use the Django ORM to filter and order the courses
-        courses_summary = CourseOverview.get_all_courses()
-    else:
-        courses_summary = modulestore().get_course_summaries()
-
-    if enable_home_page_api_v2:
-        search_query, order, active_only, archived_only = get_query_params_if_present(request)
-        courses_summary = get_filtered_and_ordered_courses(
-            courses_summary,
-            active_only,
-            archived_only,
-            search_query,
-            order,
-        )
+    courses_summary = CourseOverview.get_all_courses()
+    search_query, order, active_only, archived_only = get_query_params_if_present(request)
+    courses_summary = get_filtered_and_ordered_courses(
+        courses_summary,
+        active_only,
+        archived_only,
+        search_query,
+        order,
+    )
 
     courses_summary = filter(course_filter, courses_summary)
     in_process_course_actions = get_in_process_course_actions(request)
@@ -765,21 +749,17 @@ def course_index(request, course_key):
 
 
 @function_trace('get_courses_accessible_to_user')
-def get_courses_accessible_to_user(request, org=None):
+def get_courses_accessible_to_user(request):
     """
     Try to get all courses by first reversing django groups and fallback to old method if it fails
     Note: overhead of pymongo reads will increase if getting courses from django groups fails
 
     Arguments:
         request: the request object
-        org (string): for global staff users ONLY, this value will be used to limit
-            the courses returned. A value of None will have no effect (all courses
-            returned), an empty string will result in no courses, and otherwise only courses with the
-            specified org will be returned. The default value is None.
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_summary_iter(request, org)
+        courses, in_process_course_actions = _accessible_courses_summary_iter(request)
     else:
         try:
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
@@ -1731,6 +1711,89 @@ def group_configurations_detail_handler(request, course_key_string, group_config
                 group_configuration_id=group_configuration_id,
                 group_id=group_id
             )
+
+
+@extend_schema(
+    summary="Bulk enable/disable discussions for all units in a course.",
+    description="Enable or disable discussions for all verticals in the specified course.",
+    request=OpenApiRequest(
+        request={
+            "type": "object",
+            "properties": {"discussion_enabled": {"type": "boolean"}},
+            "required": ["discussion_enabled"],
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            response={
+                "type": "object",
+                "properties": {"units_updated_and_republished": {"type": "integer"}},
+            }
+        ),
+        400: OpenApiResponse(description="Bad request"),
+        403: OpenApiResponse(description="Permission denied"),
+    },
+    methods=["PUT"],
+    parameters=[
+        OpenApiParameter(
+            name="course_key_string",
+            description="Course key string",
+            required=True,
+            type=str,
+            location=OpenApiParameter.PATH,
+        )
+    ],
+)
+@api_view(['PUT'])
+@view_auth_classes()
+@expect_json
+def bulk_enable_disable_discussions(request, course_key_string):
+    """
+    API endpoint to enable/disable discussions for all verticals in the course and republish them.
+
+    PUT
+        json: enable/disable discussions for all units and republish
+    """
+    try:
+        # Validate the course key
+        course_key = CourseKey.from_string(course_key_string)
+    except InvalidKeyError:
+        return JsonResponseBadRequest({"error": "Invalid course key format"})
+
+    user = request.user
+
+    # check that logged in user has permissions to update this course
+    if not has_studio_write_access(user, course_key):
+        raise PermissionDenied()
+
+    if 'discussion_enabled' not in request.json:
+        return JsonResponseBadRequest({"error": "Missing 'discussion_enabled' field in request body"})
+    discussion_enabled = request.json['discussion_enabled']
+    log.info(
+        "User %s is attempting to %s discussions for all verticals in course %s",
+        user.username,
+        "enable" if discussion_enabled else "disable",
+        course_key
+    )
+
+    if request.method == 'PUT':
+        try:
+            store = modulestore()
+            changed = 0
+            with store.bulk_operations(course_key):
+                verticals = store.get_items(course_key, qualifiers={'block_type': 'vertical'})
+                for vertical in verticals:
+                    if vertical.discussion_enabled != discussion_enabled:
+                        vertical.discussion_enabled = discussion_enabled
+                        store.update_item(vertical, user.id)
+
+                        if store.has_published_version(vertical):
+                            store.publish(vertical.location, user.id)
+                        changed += 1
+            return JsonResponse({"units_updated_and_republished": changed})
+        except Exception as e:  # lint-amnesty, pylint: disable=broad-except
+            log.exception("Exception occurred while enabling/disabling discussion: %s", str(e))
+            return JsonResponseBadRequest({"error": str(e)})
 
 
 def are_content_experiments_enabled(course):

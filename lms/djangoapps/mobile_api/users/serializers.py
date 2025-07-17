@@ -17,7 +17,7 @@ from lms.djangoapps.certificates.api import certificate_downloadable_status
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_assignments_completions, get_past_and_future_course_assignments
 from lms.djangoapps.course_home_api.dates.serializers import DateSummarySerializer
-from lms.djangoapps.mobile_api.utils import API_V4
+from lms.djangoapps.mobile_api.utils import API_V4, get_course_organization_logo
 from openedx.features.course_duration_limits.access import get_user_course_expiration_date
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -39,6 +39,7 @@ class CourseOverviewField(serializers.RelatedField):  # lint-amnesty, pylint: di
             'name': course_overview.display_name,
             'number': course_overview.display_number_with_default,
             'org': course_overview.display_org_with_default,
+            'org_logo': get_course_organization_logo(course_id),
 
             # dates
             'start': course_overview.start,

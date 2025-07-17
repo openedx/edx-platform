@@ -5,7 +5,7 @@ rules:
     # https://github.com/returntocorp/semgrep/issues/8608
     #
     # Here's the intended URL, for reference:
-    # https://edx.readthedocs.io/projects/edx-django-utils/en/latest/monitoring/how_tos/add_code_owner_custom_attribute_to_an_ida.html#handling-celery-tasks
+    # https://docs.openedx.org/projects/edx-django-utils/en/latest/monitoring/how_tos/add_code_owner_custom_attribute_to_an_ida.html#handling-celery-tasks
     message: |
       Celery tasks need to be decorated with `@set_code_owner_attribute`
       (from the `edx_django_utils.monitoring` module) in order for us
@@ -13,7 +13,7 @@ rules:
 
       For more information, see the Celery section of "Add Code_Owner
       Custom Attributes to an IDA" in the Monitoring How-Tos of
-      <https://edx.readthedocs.io/projects/edx-django-utils>.
+      <https://docs.openedx.org/projects/edx-django-utils/en/latest/>.
     languages:
       - python
     patterns:
@@ -68,7 +68,7 @@ rules:
 
       For more information, see the Celery section of "Add Code_Owner
       Custom Attributes to an IDA" in the Monitoring How-Tos of
-      <https://edx.readthedocs.io/projects/edx-django-utils>.
+      <https://docs.openedx.org/projects/edx-django-utils/en/latest/>.
     languages:
       - python
     patterns:

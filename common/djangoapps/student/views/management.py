@@ -62,6 +62,7 @@ from openedx.core.djangoapps.user_authn.toggles import (
 )
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
+from openedx.features.course_experience.url_helpers import make_learning_mfe_courseware_url
 from openedx.features.discounts.applicability import FIRST_PURCHASE_DISCOUNT_OVERRIDE_FLAG
 from openedx.features.enterprise_support.utils import is_enterprise_learner
 from common.djangoapps.student.email_helpers import generate_activation_email_context
@@ -70,6 +71,7 @@ from common.djangoapps.student.message_types import AccountActivation, EmailChan
 from common.djangoapps.student.models import (  # lint-amnesty, pylint: disable=unused-import
     AccountRecovery,
     CourseEnrollment,
+    EnrollmentNotAllowed,
     PendingEmailChange,  # unimport:skip
     PendingSecondaryEmailChange,
     Registration,
@@ -407,7 +409,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponse(redirect_url)
 
         if CourseEntitlement.check_for_existing_entitlement_and_enroll(user=user, course_run_key=course_id):
-            return HttpResponse(reverse('courseware', args=[str(course_id)]))
+            return HttpResponse(make_learning_mfe_courseware_url(course_id))
 
         # Check that auto enrollment is allowed for this course
         # (= the course is NOT behind a paywall)
@@ -422,6 +424,8 @@ def change_enrollment(request, check_access=True):
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
                     CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
+            except EnrollmentNotAllowed as exc:
+                return HttpResponseBadRequest(str(exc))
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 
@@ -435,7 +439,7 @@ def change_enrollment(request, check_access=True):
             )
 
         if should_redirect_to_courseware_after_enrollment():
-            return HttpResponse(reverse('courseware', args=[str(course_id)]))
+            return HttpResponse(make_learning_mfe_courseware_url(course_id))
         else:
             return HttpResponse()
     elif action == "unenroll":

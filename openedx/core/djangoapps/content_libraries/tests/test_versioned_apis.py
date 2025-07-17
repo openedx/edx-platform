@@ -2,7 +2,6 @@
 Tests that several XBlock APIs support versioning
 """
 from django.test.utils import override_settings
-from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from xblock.core import XBlock
 
 from openedx.core.djangoapps.content_libraries.tests.base import (
@@ -14,7 +13,7 @@ from .fields_test_block import FieldsTestBlock
 
 @skip_unless_cms
 @override_settings(CORS_ORIGIN_WHITELIST=[])  # For some reason, this setting isn't defined in our test environment?
-class VersionedXBlockApisTestCase(ContentLibrariesRestApiTest, OpenEdxEventsTestMixin):
+class VersionedXBlockApisTestCase(ContentLibrariesRestApiTest):
     """
     Tests for three APIs implemented by djangoapps.xblock, and used by content
     libraries. These tests focus on versioning.

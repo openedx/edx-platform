@@ -200,7 +200,7 @@ class Command(BaseCommand):
         failure = False
         logger.info(f'Requesting pathways for {site.domain}.')
         try:
-            api_url = urljoin(f"{api_base_url}/", "pathways/")
+            api_url = urljoin(f"{api_base_url}/", "pathways/?status=published")
             next_page = 1
             while next_page:
                 response = client.get(api_url, params=dict(exclude_utm=1, page=next_page))

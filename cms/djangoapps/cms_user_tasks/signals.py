@@ -86,9 +86,16 @@ def user_task_stopped_handler(sender, **kwargs):  # pylint: disable=unused-argum
                 reverse('usertaskstatus-detail', args=[status.uuid])
             )
 
+        # check if this is a course optimizer task
+        is_course_optimizer_task = False
+        course_optimizer_artifact = UserTaskArtifact.objects.filter(status=status, name="BrokenLinks").first()
+        if course_optimizer_artifact:
+            is_course_optimizer_task = True
+
         user_email = status.user.email
         olx_validation_text = get_olx_validation_from_artifact()
-        task_args = [task_name, str(status.state_text), user_email, detail_url, olx_validation_text]
+        task_args = [task_name, str(status.state_text), user_email, detail_url,
+                     olx_validation_text, is_course_optimizer_task]
         try:
             send_task_complete_email.delay(*task_args)
         except Exception:  # pylint: disable=broad-except

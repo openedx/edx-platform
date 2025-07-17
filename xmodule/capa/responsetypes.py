@@ -2140,6 +2140,9 @@ class CustomResponse(LoncapaResponse):
                             globals_dict,
                             python_path=self.context['python_path'],
                             extra_files=self.context['extra_files'],
+                            limit_overrides_context=get_course_id_from_capa_block(
+                                self.capa_block
+                            ),
                             slug=self.id,
                             random_seed=self.context['seed'],
                             unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -2291,6 +2294,9 @@ class CustomResponse(LoncapaResponse):
                     cache=self.capa_system.cache,
                     python_path=self.context['python_path'],
                     extra_files=self.context['extra_files'],
+                    limit_overrides_context=get_course_id_from_capa_block(
+                        self.capa_block
+                    ),
                     slug=self.id,
                     random_seed=self.context['seed'],
                     unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -3274,6 +3280,9 @@ class SchematicResponse(LoncapaResponse):
                 cache=self.capa_system.cache,
                 python_path=self.context['python_path'],
                 extra_files=self.context['extra_files'],
+                limit_overrides_context=get_course_id_from_capa_block(
+                    self.capa_block
+                ),
                 slug=self.id,
                 random_seed=self.context['seed'],
                 unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -3390,7 +3399,7 @@ class ImageResponse(LoncapaResponse):
                         parsed_region = [parsed_region]
                     for region in parsed_region:
                         polygon = MultiPoint(region).convex_hull
-                        if (polygon.type == 'Polygon' and
+                        if (polygon.geom_type == 'Polygon' and
                                 polygon.contains(Point(ans_x, ans_y))):
                             correct_map.set(aid, 'correct')
                             break

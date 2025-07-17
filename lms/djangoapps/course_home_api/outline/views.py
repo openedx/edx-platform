@@ -35,6 +35,8 @@ from lms.djangoapps.course_home_api.outline.serializers import (
     OutlineTabSerializer,
 )
 from lms.djangoapps.course_home_api.utils import get_course_or_403
+from lms.djangoapps.course_home_api.tasks import collect_progress_for_user_in_course
+from lms.djangoapps.course_home_api.toggles import send_course_progress_analytics_for_student_is_enabled
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section
@@ -366,6 +368,9 @@ class OutlineTabView(RetrieveAPIView):
         context['enrollment'] = enrollment
         serializer = self.get_serializer_class()(data, context=context)
 
+        if send_course_progress_analytics_for_student_is_enabled(course_key) and not user_is_masquerading:
+            collect_progress_for_user_in_course.delay(course_key_string, request.user.id)
+
         return Response(serializer.data)
 
     def finalize_response(self, request, response, *args, **kwargs):
@@ -501,7 +506,7 @@ class CourseNavigationBlocksView(RetrieveAPIView):
             for section_data in course_sections:
                 section_data['children'] = self.get_accessible_sequences(
                     user_course_outline,
-                    section_data.get('children', ['completion'])
+                    section_data.get('children', [])
                 )
                 accessible_sequence_ids = {str(usage_key) for usage_key in user_course_outline.accessible_sequences}
                 for sequence_data in section_data['children']:

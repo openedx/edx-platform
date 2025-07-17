@@ -226,13 +226,6 @@ Use this command to generate an HTML report::
 
 The report is then saved in reports/xmodule/cover/index.html
 
-To run tests for stub servers, for example for `YouTube stub server`_, you can
-run one of these commands::
-
-    pytest --ds=cms.env.test common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
-
-.. _YouTube stub server: https://github.com/openedx/edx-platform/blob/master/common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
-
 
 Handling flaky unit tests
 =========================
@@ -310,8 +303,6 @@ We use several tools to analyze code quality. The full set of them is::
     make xsslint
     make pii_check
     make check_keywords
-    npm run lint
 
 Where ``$PATHS...`` is a list of folders and files to analyze, or nothing if
 you would like to analyze the entire codebase (which can take a while).
-

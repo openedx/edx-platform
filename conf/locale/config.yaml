@@ -26,7 +26,6 @@ ignore_dirs:
     # Directories that only contain tests.
     - common/test
     - test_root
-    - '*/terrain'
     - '*/spec'
     - '*/tests'
     - '*/djangoapps/*/features'
@@ -54,3 +53,42 @@ ignore_dirs:
 third_party:
     - wiki
     - edx_proctoring_proctortrack
+
+
+# How should .po files be segmented?  See i18n/segment.py for details. Strings
+# that are only found in a particular segment are segregated into that .po file
+# so that translators can focus on separate parts of the product.
+#
+# We segregate Studio so we can provide new languages for LMS without having to
+# also translate the Studio strings. LMS needs the strings from lms/* and
+# common/*, so those will stay in the main .po file.
+segment:
+    django-partial.po:          # This .po file..
+        django-studio.po:       #  produces this .po file..
+            - cms/*             #   by segregating strings from these files.
+        # Anything that doesn't match a pattern stays in the original file.
+    djangojs-partial.po:
+        djangojs-studio.po:
+            - cms/*
+    mako.po:
+        mako-studio.po:
+            - cms/*
+    underscore.po:
+        underscore-studio.po:
+            - cms/*
+
+# How should the generate step merge files?
+generate_merge:
+    django.po:
+        - django-partial.po
+        - django-studio.po
+        - mako.po
+        - mako-studio.po
+        - wiki.po
+        - edx_proctoring_proctortrack.po
+    djangojs.po:
+        - djangojs-partial.po
+        - djangojs-studio.po
+        - djangojs-account-settings-view.po
+        - underscore.po
+        - underscore-studio.po

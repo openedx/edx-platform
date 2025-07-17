@@ -17,6 +17,7 @@ function($, _, gettext, BaseModal) {
             viewSpecificClasses: 'modal-add-component-picker confirm',
             titleFormat: gettext('Add library content'),
             addPrimaryActionButton: false,
+            showEditorModeButtons: false,
         }),
 
         events: {

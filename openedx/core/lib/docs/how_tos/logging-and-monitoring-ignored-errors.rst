@@ -20,7 +20,7 @@ Additionally, a subset of ignored errors that are configured as ignored will als
 * Using New Relic terminology, this extra error class and message data will live on the Transaction and not the TransactionError, because ignored errors won't have a TransactionError.
 * Use these additional custom attributes to help diagnose unexpected issues with ignored errors.
 
-.. _IGNORED_ERRORS settings and toggles on Readthedocs: https://edx.readthedocs.io/projects/edx-platform-technical/en/latest/search.html?q=IGNORED_ERRORS&check_keywords=yes&area=default
+.. _IGNORED_ERRORS settings and toggles on Readthedocs: https://docs.openedx.org/projects/edx-platform/en/latest/search.html?q=IGNORED_ERRORS
 
 Logging ignored errors
 -----------------------

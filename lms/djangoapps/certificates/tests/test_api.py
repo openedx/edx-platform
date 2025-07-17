@@ -210,13 +210,14 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         }
 
     @ddt.data(
-        (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
-        (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
-        (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None),
-        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END, True, None),
-        (False, timedelta(days=2), CertificatesDisplayBehaviors.END, False, True),
-        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None),
-        (False, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, False, True),
+        (True, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.EARLY_NO_INFO, True, None, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END, True, None, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END, False, True, None),
+        (False, -timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, True, None, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, False, True, None),
+        (False, timedelta(days=2), CertificatesDisplayBehaviors.END_WITH_DATE, False, None, True),
     )
     @ddt.unpack
     @patch.dict(settings.FEATURES, {"CERTIFICATES_HTML_VIEW": True})
@@ -227,6 +228,7 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
         certificates_display_behavior,
         cert_downloadable_status,
         earned_but_not_available,
+        no_earned_but_available_date,
     ):
         """
         Test 'downloadable status'
@@ -239,7 +241,14 @@ class CertificateDownloadableStatusTests(WebCertificateTestMixin, ModuleStoreTes
 
         self._setup_course_certificate()
 
-        downloadable_status = certificate_downloadable_status(self.student, self.course.id)
+        if no_earned_but_available_date:
+            downloadable_status = certificate_downloadable_status(self.student_no_cert, self.course.id)
+
+            assert downloadable_status.get("not_earned_but_available_date") == no_earned_but_available_date
+            assert downloadable_status.get("certificate_available_date") is not None
+        else:
+            downloadable_status = certificate_downloadable_status(self.student, self.course.id)
+
         assert downloadable_status["is_downloadable"] == cert_downloadable_status
         assert downloadable_status.get("earned_but_not_available") == earned_but_not_available
 
@@ -1134,6 +1143,67 @@ class CertificatesApiTestCase(TestCase):
             date = self.certificate.date_override.date
             assert date == display_date_for_certificate(self.course, self.certificate)
             assert maybe_avail == available_date_for_certificate(self.course, self.certificate)
+
+    def test_display_date_for_certificate_cdb_early_no_info(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the last modified date of a
+        certificate instance when the display behavior is set to EARLY_NO_INFO.
+        """
+        with configure_waffle_namespace(True):
+            self.course.self_paced = False
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
+            assert display_date_for_certificate(self.course, self.certificate) == self.certificate.modified_date
+
+    def test_display_date_for_certificate_cdb_end_with_date(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the certificate available date
+        associated with the course when the display behavior is set to END_WITH_DATE.
+        """
+        with configure_waffle_namespace(True):
+            self.course.self_paced = False
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END_WITH_DATE
+            self.course.certificate_available_date = datetime(2017, 2, 1, tzinfo=pytz.UTC)
+            assert display_date_for_certificate(self.course, self.certificate) == self.course.certificate_available_date
+
+    def test_display_date_for_certificate_cdb_end(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the end date of the course run
+        when the display behavior is set to END.
+        """
+        with configure_waffle_namespace(True):
+            self.course.self_paced = False
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END
+            assert display_date_for_certificate(self.course, self.certificate) == self.course.end
+
+    def test_display_date_for_certificate_date_override(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the certificate override date
+        if-and-only-if date override associated with the certificate instance.
+        """
+        with configure_waffle_namespace(True):
+            self.certificate.date_override = datetime(2016, 1, 1, tzinfo=pytz.UTC)
+            assert display_date_for_certificate(self.course, self.certificate) == self.certificate.date_override.date
+
+    def test_display_date_for_self_paced_course_run(self):
+        """
+        Test to verify that the "earned date" displayed on a course certificate is the last modified date of a
+        certificate instance when the display behavior is set to EARLY_NO_INFO and the course run is self-paced.
+        """
+        with configure_waffle_namespace(True):
+            self.course.self_paced = True
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.EARLY_NO_INFO
+            assert display_date_for_certificate(self.course, self.certificate) == self.certificate.modified_date
+
+    def test_display_date_for_self_paced_course_run_with_cdb_end(self):
+        """
+        Test for a bug fix and some defensive coding. It is possible for self-paced course runs to end up with a display
+        behavior of END. This test ensures that we select the correct issue date even when the course run's
+        configuration is unexpected.
+        """
+        with configure_waffle_namespace(True):
+            self.course.self_paced = True
+            self.course.certificates_display_behavior = CertificatesDisplayBehaviors.END
+            assert display_date_for_certificate(self.course, self.certificate) == self.certificate.modified_date
 
 
 @ddt.ddt

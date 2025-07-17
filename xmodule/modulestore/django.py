@@ -6,10 +6,10 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 
 from contextlib import contextmanager
 from importlib import import_module
+import importlib.resources as resources
 import gettext
 import logging
 
-from pkg_resources import resource_filename
 import re  # lint-amnesty, pylint: disable=wrong-import-order
 
 from django.conf import settings
@@ -422,9 +422,9 @@ class XBlockI18nService:
             return 'django', xblock_locale_path
 
         # Pre-OEP-58 translations within the XBlock pip packages are deprecated but supported.
-        deprecated_xblock_locale_path = resource_filename(xblock_module_name, 'translations')
-        # The `text` domain was used for XBlocks pre-OEP-58.
-        return 'text', deprecated_xblock_locale_path
+        with resources.as_file(resources.files(xblock_module_name) / 'translations') as deprecated_xblock_locale_path:
+            # The `text` domain was used for XBlocks pre-OEP-58.
+            return 'text', str(deprecated_xblock_locale_path)
 
     def get_javascript_i18n_catalog_url(self, block):
         """

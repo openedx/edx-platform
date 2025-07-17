@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.management import BaseCommand
 from django.utils import timezone
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
 from common.djangoapps.track import segment
@@ -140,7 +141,9 @@ class Command(BaseCommand):
                     )
                     break
                 for course_run in candidate_course['course_runs']:
-                    if self.valid_course_run(course_run) and course_run['key'] != completed_course_id:
+                    course_org = CourseKey.from_string(course_run['key']).org
+                    if self.valid_course_run(course_run) and course_run['key'] != completed_course_id \
+                            and course_org not in settings.DISABLED_ORGS_FOR_PROGRAM_NUDGE:
                         return program, course_run, candidate_course
         return None, None, None
 

@@ -5,7 +5,7 @@ Tests for derived.py
 
 import sys
 from unittest import TestCase
-from openedx.core.lib.derived import derived, derived_collection_entry, derive_settings, clear_for_tests
+from openedx.core.lib.derived import Derived, derive_settings
 
 
 class TestDerivedSettings(TestCase):
@@ -14,18 +14,14 @@ class TestDerivedSettings(TestCase):
     """
     def setUp(self):
         super().setUp()
-        clear_for_tests()
         self.module = sys.modules[__name__]
         self.module.SIMPLE_VALUE = 'paneer'
-        self.module.DERIVED_VALUE = lambda settings: 'mutter ' + settings.SIMPLE_VALUE
-        self.module.ANOTHER_DERIVED_VALUE = lambda settings: settings.DERIVED_VALUE + ' with naan'
+        self.module.DERIVED_VALUE = Derived(lambda settings: 'mutter ' + settings.SIMPLE_VALUE)
+        self.module.ANOTHER_DERIVED_VALUE = Derived(lambda settings: settings.DERIVED_VALUE + ' with naan')
         self.module.UNREGISTERED_DERIVED_VALUE = lambda settings: settings.SIMPLE_VALUE + ' is cheese'
-        derived('DERIVED_VALUE', 'ANOTHER_DERIVED_VALUE')
         self.module.DICT_VALUE = {}
-        self.module.DICT_VALUE['test_key'] = lambda settings: settings.DERIVED_VALUE * 3
-        derived_collection_entry('DICT_VALUE', 'test_key')
-        self.module.DICT_VALUE['list_key'] = ['not derived', lambda settings: settings.DERIVED_VALUE]
-        derived_collection_entry('DICT_VALUE', 'list_key', 1)
+        self.module.DICT_VALUE['test_key'] = Derived(lambda settings: settings.DERIVED_VALUE * 3)
+        self.module.DICT_VALUE['list_key'] = ['not derived', Derived(lambda settings: settings.DERIVED_VALUE)]
 
     def test_derived_settings_are_derived(self):
         derive_settings(__name__)

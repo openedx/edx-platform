@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
-<html>
+<!-- Set the height of the iframe to 100% of the viewport height to avoid an extra scrollbar -->
+<html style="height: 100vh;">
 <head>
   <!-- Open links in a new tab, not this iframe -->
   <base target="_blank">
@@ -14,6 +15,8 @@
   {% endif %}
   <!-- Most XBlocks require jQuery: -->
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <!-- ORA2 blocks require timepicker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.13.18/jquery.timepicker.min.js"></script>
   <!-- The Video XBlock requires "ajaxWithPrefix" -->
   <script type="text/javascript">
     $.postWithPrefix = $.post;
@@ -34,23 +37,52 @@
   <script type="text/javascript" src="{{ lms_root_url }}/static/common/js/vendor/require.js"></script>
   <script type="text/javascript" src="{{ lms_root_url }}/static/js/RequireJS-namespace-undefine.js"></script>
   <script>
-    // The minimal RequireJS configuration required for common LMS building XBlock types to work:
+    // The minimal RequireJS configuration required for common LMS and CMS building XBlock types to work:
+    require = require || RequireJS.require;
+    define = define || RequireJS.define;
+    baseUrl = "";
     (function (require, define) {
-        require.config({
-            baseUrl: "{{ lms_root_url }}/static/",
-            paths: {
-                accessibility: 'js/src/accessibility_tools',
-                draggabilly: 'js/vendor/draggabilly',
-                hls: 'common/js/vendor/hls',
-                moment: 'common/js/vendor/moment-with-locales',
-                HtmlUtils: 'edx-ui-toolkit/js/utils/html-utils',
-            },
-        });
+        if ('{{ view_name | safe }}' === 'studio_view') {
+            // Call `require-config.js` of the CMS
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = "{{ cms_root_url }}/static/studio/cms/js/require-config.js";
+            document.head.appendChild(script);
+            baseUrl = "{{ cms_root_url }}/static/studio";
+
+            require.config({
+                baseUrl,
+                paths: {
+                        accessibility: 'js/src/accessibility_tools',
+                        draggabilly: 'js/vendor/draggabilly',
+                        hls: 'common/js/vendor/hls',
+                        moment: 'common/js/vendor/moment-with-locales',
+                        'tinymce': 'js/vendor/tinymce/js/tinymce/tinymce.full.min',
+                        'jquery.tinymce': 'js/vendor/tinymce/js/tinymce/jquery.tinymce.min',
+                },
+            });
+            require([
+                "{{ lms_root_url }}/static/dist{{ oa_manifest.oa_editor_tinymce_js }}",
+                "{{ lms_root_url }}/static/dist{{ oa_manifest.oa_editor_textarea_js }}",
+            ]);
+        } else {
+            baseUrl = "{{ lms_root_url }}/static/";
+            require.config({
+                baseUrl,
+                paths: {
+                    accessibility: 'js/src/accessibility_tools',
+                    draggabilly: 'js/vendor/draggabilly',
+                    hls: 'common/js/vendor/hls',
+                    moment: 'common/js/vendor/moment-with-locales',
+                    HtmlUtils: 'edx-ui-toolkit/js/utils/html-utils',
+                },
+            });
+        }
         define('gettext', [], function() { return window.gettext; });
         define('jquery', [], function() { return window.jQuery; });
         define('jquery-migrate', [], function() { return window.jQuery; });
         define('underscore', [], function() { return window._; });
-    }).call(this, require || RequireJS.require, define || RequireJS.define);
+    }).call(this, require, define);
   </script>
   <!-- edX HTML Utils requires GlobalLoader -->
   <script type="text/javascript" src="{{ lms_root_url }}/static/edx-ui-toolkit/js/utils/global-loader.js"></script>
@@ -81,8 +113,14 @@
         href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <!-- Capa Problem Editing requires CodeMirror -->
   <link rel="stylesheet" href="{{ lms_root_url }}/static/js/vendor/CodeMirror/codemirror.css">
-  <!-- Built-in XBlocks (and some plugins) depends on LMS CSS -->
-  <link rel="stylesheet" href="{{ lms_root_url }}/static/css/lms-course.css">
+  <!-- Additional CSS for the XBlock Editor on the Library Authoring -->
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/vendor/normalize.css">
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/vendor/hint.css">
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/studio-main-v1.css" />
+  <link rel="stylesheet" href="{{ cms_root_url }}/static/studio/css/course-unit-mfe-iframe-bundle.css" />
+  <link rel="stylesheet" href="{{ lms_root_url }}/static/dist{{ oa_manifest.oa_ltr_css }}">
+  <script type="text/javascript" src="{{ lms_root_url }}/static/dist{{ oa_manifest.oa_ltr_js }}"></script>
+
   <!-- Configure and load MathJax -->
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
@@ -156,11 +194,13 @@
 <!-- The default stylesheet will set the body min-height to 100% (a common strategy to allow for background
   images to fill the viewport), but this has the undesireable side-effect of causing an infinite loop via the onResize
   event listeners below, in certain situations.  Resetting it to the default "auto" skirts the problem.-->
-<body style="min-height: auto; background-color: white;">
-  <!-- fragment body -->
-  {{ fragment.body_html | safe }}
-  <!-- fragment foot -->
-  {{ fragment.foot_html | safe }}
+<body style="background-color: white;" class="view-container">
+  <div id="content" class="wrapper xblock-iframe-content">
+      <!-- fragment body -->
+      {{ fragment.body_html | safe }}
+      <!-- fragment foot -->
+      {{ fragment.foot_html | safe }}
+  </div>
   <script>
     /**
      * Map of all URL handlers for this block and its children, keyed by usage
@@ -215,6 +255,16 @@
                 }
                 return url;
             },
+            notify: (eventName, data) => {
+                /**
+                 * Used in `studio_view` to notify events and errors
+                 **/
+                window.parent.postMessage({
+                    type: 'xblock-event',
+                    eventName,
+                    data,
+                }, '*');
+            }
         };
 
         /**
@@ -226,8 +276,6 @@
             // Check if the XBlock has an initialization function:
             const initFunctionName = element.getAttribute('data-init');
             if (initFunctionName !== null) {
-                // Since this block has an init function, it may need to call handlers:
-                element[HANDLER_URL] = HANDLER_URL_MAP[usageId];
                 // Now proceed with initializing the block's JavaScript:
                 const InitFunction = (window)[initFunctionName];
                 // Does the XBlock HTML contain arguments to pass to the InitFunction?
@@ -246,17 +294,123 @@
                 // to pass 'element' as a jQuery-wrapped DOM element, whereas the LMS
                 // runtime used to pass 'element' as the pure DOM node. In order not to
                 // break backwards compatibility, we would need to maintain that.
-                // However, this is currently disabled as it causes issues (need to
-                // modify the runtime methods like handlerUrl too), and we decided not
-                // to maintain support for legacy studio_view in this runtime.
-                // const isStudioView = element.className.indexOf('studio_view') !== -1;
-                // const passElement = isStudioView && (window as any).$ ? (window as any).$(element) : element;
-                const blockJS = new InitFunction(runtime, element, data) || {};
-                blockJS.element = element;
+                const isStudioView = element.className.indexOf('studio_view') !== -1;
+                const passElement = isStudioView && window.$ ? window.$(element) : element;
+                // Since this block has an init function, it may need to call handlers:
+                passElement[HANDLER_URL] = HANDLER_URL_MAP[usageId];
+                const blockJS = new InitFunction(runtime, passElement, data) || {};
+                blockJS.element = passElement;
+
+                if (['MetadataOnlyEditingDescriptor', 'SequenceDescriptor'].includes(data['xmodule-type'])) {
+                    // The xmodule type `MetadataOnlyEditingDescriptor` and `SequenceDescriptor` renders a `<div>` with
+                    // the block metadata in the `data-metadata` attribute. But is necessary
+                    // to call `XBlockEditorView.xblockReady()` to run the scripts to build the
+                    // editor using the metadata.
+                    require(['{{ cms_root_url }}/static/studio/js/views/xblock_editor.js'], function(XBlockEditorView) {
+                        var editorView = new XBlockEditorView({
+                            el: passElement,
+                            xblock: blockJS,
+                        });
+                        // To render block using metadata
+                        editorView.xblockReady(blockJS);
+
+                        // Adding cancel and save buttons
+                        var xblockActions = `
+                            <div class="xblock-actions">
+                                <ul>
+                                    <li class="action-item">
+                                        <input id="poll-submit-options" type="submit" class="button action-primary save-button" value="Save" onclick="return false;">
+                                    </li>
+                                    <li class="action-item">
+                                        <a href="#" class="button cancel-button">Cancel</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        `;
+                        // Check if passElement is a jQuery-wrapped dom element
+                        if (passElement.jquery) {
+                            passElement.append(xblockActions);
+                        } else {
+                            passElement.innerHTML += xblockActions;
+                        }
+                        // Adding cancel functionality
+                        $('.cancel-button', passElement).bind('click', function() {
+                            runtime.notify('cancel', {});
+                            event.preventDefault();
+                        });
+
+                        // Adding save functionality
+                        $('.save-button', passElement).bind('click', function() {
+                            //event.preventDefault();
+                            var error_message_div = $('.xblock-editor-error-message', passElement);
+                            const modifiedData = editorView.getChangedMetadata(true);
+
+                            error_message_div.html();
+                            error_message_div.css('display', 'none');
+
+                            var handlerUrl = runtime.handlerUrl(passElement, 'studio_submit');
+
+                            runtime.notify('save', {state: 'start', message: gettext("Saving")});
+
+                            $.post(handlerUrl, JSON.stringify(modifiedData)).done(function(response) {
+                                if (response.result === 'success') {
+                                    runtime.notify('save', {state: 'end'})
+                                    window.location.reload(false);
+                                } else {
+                                    runtime.notify('error', {
+                                        'title': 'Error saving changes',
+                                        'message': response.message,
+                                    });
+                                    error_message_div.html('Error: '+response.message);
+                                    error_message_div.css('display', 'block');
+                                }
+                            });
+                        });
+                    });
+                }
+
                 callback(blockJS);
             } else {
                 const blockJS = { element };
                 callback(blockJS);
+            }
+
+            if ('{{ view_name | safe }}' === 'studio_view') {
+              // Used when rendering the `studio_view`, in order to avoid open a new tab on click cancel or save
+              const selectors = [
+                  '.save-button',
+                  '.action-cancel',
+                  '.action-save',
+                  '.openassessment_cancel_button',
+                  '.openassessment_save_button',
+              ];
+
+              for (const selector of selectors) {
+                  const queryObject = document.querySelector(selector);
+                  if (queryObject) {
+                      queryObject.addEventListener('click', function() {
+                          event.preventDefault();
+                      });
+                  }
+              }
+
+              // This button is used in `StudioEditableXBlockMixin` from the `Xblock` app
+              // That app adds a listener that removes any TinyMCE editors on click cancel.
+              // ref: https://github.com/openedx/XBlock/blob/86eee4b05dffa42b009fab2a9050b73766131b9d/xblock/utils/public/studio_edit.js#L169
+              //
+              // Here that is an issue because we show a confirmation modal when clicking cancel,
+              // if the user stays to edit all TinyMCE editors are no longer there.
+              // 
+              // We uncouple the listener to avoid remove the TinyMCE editors
+              const extraCancelSelector = '.cancel-button';
+              const elements = $(extraCancelSelector).first();
+              if (elements.length) {
+                elements.first().unbind("click");
+                elements.on('click', function() {                    
+                    event.preventDefault();
+                    runtime.notify('cancel', {});
+                });
+              }
             }
         }
 
@@ -306,21 +460,48 @@
         const rootNode = document.querySelector('.xblock, .xblock-v1'); // will always return the first matching element
         initializeXBlockAndChildren(rootNode, () => {
         });
+        (function() {
+            // If this view is rendered in an iframe within the authoring microfrontend app
+            // it will report the height of its contents to the parent window when the
+            // document loads, window resizes, or DOM mutates.
+            if (window !== window.parent) {
+                function dispatchResizeMessage(event) {
+                    // Note: event is actually an Array of MutationRecord objects when fired from the MutationObserver
+                    var newHeight = rootNode.scrollHeight;
+                    var newWidth = rootNode.offsetWidth;
 
-        let lastHeight = -1;
-        function checkFrameHeight() {
-            const newHeight = document.documentElement.scrollHeight;
-            if (newHeight !== lastHeight) {
-                lastHeight = newHeight;
+                    window.parent.postMessage(
+                        {
+                            type: 'plugin.resize',
+                            payload: {
+                                width: newWidth,
+                                height: newHeight,
+                            }
+                        }, document.referrer
+                    );
+                    // Within the authoring microfrontend the iframe resizes to match the
+                    // height of this document and it should never scroll. It does scroll
+                    // ocassionally when javascript is used to focus elements on the page
+                    // before the parent iframe has been resized to match the content
+                    // height. This window.scrollTo is an attempt to keep the content at the
+                    // top of the page.
+                    window.scrollTo(0, 0);
+                }
+
+                // Create an observer instance linked to the callback function
+                const observer = new MutationObserver(dispatchResizeMessage);
+
+                // Start observing the target node for configured mutations
+                observer.observe(rootNode, { attributes: true, childList: true, subtree: true });
+
+                const resizeObserver = new ResizeObserver(dispatchResizeMessage);
+                resizeObserver.observe(rootNode);
             }
-        }
-        // Check the size whenever the DOM changes:
-        new MutationObserver(checkFrameHeight).observe(document.body, { attributes: true, childList: true, subtree: true });
-        // And whenever the IFrame is resized
-        window.addEventListener('resize', checkFrameHeight);
+        }());
     }
 
     window.addEventListener('load', blockFrameJS);
+
   </script>
 </body>
 </html>

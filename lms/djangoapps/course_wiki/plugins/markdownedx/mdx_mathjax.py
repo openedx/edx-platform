@@ -21,9 +21,9 @@ class MathJaxPattern(markdown.inlinepatterns.Pattern):  # lint-amnesty, pylint: 
 
 
 class MathJaxExtension(markdown.Extension):
-    def extendMarkdown(self, md, md_globals):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
+    def extendMarkdown(self, md):  # lint-amnesty, pylint: disable=arguments-differ, unused-argument
         # Needs to come before escape matching because \ is pretty important in LaTeX
-        md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
+        md.inlinePatterns.register(MathJaxPattern(), 'mathjax', 180)
 
 
 def makeExtension(**kwargs):

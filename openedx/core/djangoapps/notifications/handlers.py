@@ -3,8 +3,10 @@ Handlers for notifications
 """
 import logging
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, ProgrammingError
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from openedx_events.learning.signals import (
     COURSE_ENROLLMENT_CREATED,
@@ -21,9 +23,14 @@ from openedx.core.djangoapps.notifications.audience_filters import (
     ForumRoleAudienceFilter,
     TeamAudienceFilter
 )
+from openedx.core.djangoapps.notifications.base_notification import NotificationAppManager, COURSE_NOTIFICATION_TYPES
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, ENABLE_ORA_GRADE_NOTIFICATION
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
+from openedx.core.djangoapps.notifications.email import ONE_CLICK_EMAIL_UNSUB_KEY
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, NotificationPreference
+from openedx.core.djangoapps.notifications.tasks import create_notification_preference
+from openedx.core.djangoapps.user_api.models import UserPreference
 
+User = get_user_model()
 log = logging.getLogger(__name__)
 
 AUDIENCE_FILTER_CLASSES = {
@@ -44,13 +51,41 @@ def course_enrollment_post_save(signal, sender, enrollment, metadata, **kwargs):
     if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.course_key):
         try:
             with transaction.atomic():
+                email_opt_out = UserPreference.objects.filter(
+                    user_id=enrollment.user.id,
+                    key=ONE_CLICK_EMAIL_UNSUB_KEY
+                ).exists()
                 CourseNotificationPreference.objects.create(
                     user_id=enrollment.user.id,
-                    course_id=enrollment.course.course_key
+                    course_id=enrollment.course.course_key,
+                    notification_preference_config=NotificationAppManager().get_notification_app_preferences(
+                        email_opt_out
+                    )
                 )
         except IntegrityError:
             log.info(f'CourseNotificationPreference already exists for user {enrollment.user.id} '
                      f'and course {enrollment.course.course_key}')
+
+
+@receiver(post_save, sender=User)
+def create_user_account_preferences(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
+    """
+    Initialize user notification preferences when new user is created.
+    """
+    preferences = []
+    if created:
+        try:
+            with transaction.atomic():
+                for name in COURSE_NOTIFICATION_TYPES.keys():
+                    preferences.append(create_notification_preference(instance.id, name))
+                NotificationPreference.objects.bulk_create(preferences, ignore_conflicts=True)
+        except IntegrityError:
+            log.info(f'Account-level CourseNotificationPreference already exists for user {instance.id}')
+        except ProgrammingError as e:
+            # This is here because there is a dependency issue in the migrations where
+            # this signal handler tries to run before the NotificationPreference model is created.
+            # In reality, this should never be hit because migrations will have already run.
+            log.error(f'ProgrammingError encountered while creating user preferences: {e}')
 
 
 @receiver(COURSE_UNENROLLMENT_COMPLETED)

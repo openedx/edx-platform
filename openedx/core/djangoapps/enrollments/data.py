@@ -341,8 +341,7 @@ def get_course_enrollment_info(course_id, include_expired=False):
         msg = f"Requested enrollment information for unknown course {course_id}"
         log.warning(msg)
         raise CourseNotFoundError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
-    else:
-        return CourseSerializer(course, include_expired=include_expired).data
+    return CourseSerializer(course, include_expired=include_expired).data
 
 
 def get_user_roles(username):

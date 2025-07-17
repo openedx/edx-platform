@@ -20,6 +20,9 @@ cms/envs/private.py
 
 ### Python artifacts
 **/*.pyc
+**/__pycache__
+.venv
+venv
 
 ### Editor and IDE artifacts
 **/*~
@@ -148,5 +151,3 @@ openedx/core/djangoapps/django_comment_common/comment_client/python
 
 # Locally generated PII reports
 **/pii_report
-
-/Dockerfile

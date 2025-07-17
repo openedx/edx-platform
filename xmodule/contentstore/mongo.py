@@ -310,71 +310,51 @@ class MongoContentStore(ContentStore):
             contentType: The mimetype string of the asset
             md5: An md5 hash of the asset content
         '''
-        # TODO: Using an aggregate() instead of a find() here is a hack to get around the fact that Mongo 3.2 does not
-        # support sorting case-insensitively.
-        # If a sort on displayname is requested, the aggregation pipeline creates a new field:
-        # `insensitive_displayname`, a lowercase version of `displayname` that is sorted on instead.
-        # Mongo 3.4 does not require this hack. When upgraded, change this aggregation back to a find and specifiy
-        # a collation based on user's language locale instead.
-        # See: https://openedx.atlassian.net/browse/EDUCATOR-2221
-        pipeline_stages = []
         query = query_for_course(course_key, 'asset' if not get_thumbnails else 'thumbnail')
+        user_language = 'en'
         if filter_params:
+            user_language = filter_params.pop('user_language', 'en')
             query.update(filter_params)
-        pipeline_stages.append({'$match': query})
 
+        # Count total matching documents
+        count = self.fs_files.count_documents(query)
+
+        sort_list = []
         if sort:
             sort = dict(sort)
             if 'displayname' in sort:
-                pipeline_stages.append({
-                    '$project': {
-                        'contentType': 1,
-                        'locked': 1,
-                        'chunkSize': 1,
-                        'content_son': 1,
-                        'displayname': 1,
-                        'filename': 1,
-                        'length': 1,
-                        'import_path': 1,
-                        'uploadDate': 1,
-                        'thumbnail_location': 1,
-                        'md5': 1,
-                        'insensitive_displayname': {
-                            '$toLower': '$displayname'
-                        }
-                    }
+                # Apply case-insensitive sorting
+                cursor = self.fs_files.find(query, {
+                    'contentType': 1,
+                    'locked': 1,
+                    'chunkSize': 1,
+                    'content_son': 1,
+                    'displayname': 1,
+                    'filename': 1,
+                    'length': 1,
+                    'import_path': 1,
+                    'uploadDate': 1,
+                    'thumbnail_location': 1,
+                    'md5': 1
                 })
-                sort = {'insensitive_displayname': sort['displayname']}
-            pipeline_stages.append({'$sort': sort})
+                cursor = cursor.sort('displayname', sort['displayname']).collation(
+                    {'locale': user_language, 'strength': 2}
+                )
+            else:
+                # Apply simple sorting
+                sort_list = list(sort.items())
+                cursor = self.fs_files.find(query).sort(sort_list)
+        else:
+            cursor = self.fs_files.find(query)
 
-        # This is another hack to get the total query result count, but only the Nth page of actual documents
-        # See: https://stackoverflow.com/a/39784851/6620612
-        pipeline_stages.append({'$group': {'_id': None, 'count': {'$sum': 1}, 'results': {'$push': '$$ROOT'}}})
+        # Apply pagination
+        if start > 0:
+            cursor = cursor.skip(start)
         if maxresults > 0:
-            pipeline_stages.append({
-                '$project': {
-                    'count': 1,
-                    'results': {
-                        '$slice': ['$results', start, maxresults]
-                    }
-                }
-            })
+            cursor = cursor.limit(maxresults)
 
-        cursor = self.fs_files.aggregate(pipeline_stages)
-        # Set values if result of query is empty
-        count = 0
-        assets = []
-        try:
-            result = cursor.next()
-            if result:
-                count = result['count']
-                assets = list(result['results'])
-        except StopIteration:
-            # Skip if no assets were returned
-            pass
-
-        # We're constructing the asset key immediately after retrieval from the database so that
-        # callers are insulated from knowing how our identifiers are stored.
+        assets = list(cursor)
+        # Construct asset keys
         for asset in assets:
             asset_id = asset.get('content_son', asset['_id'])
             asset['asset_key'] = course_key.make_asset_key(asset_id['category'], asset_id['name'])

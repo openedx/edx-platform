@@ -69,12 +69,12 @@ If you want to provide learners with new content experiences within courses, opt
 
 For a more detailed comparison of content integration options, see `Options for Extending the edX Platform`_ in the *Open edX Developer's Guide*.
 
-.. _XBlock tutorial: https://edx.readthedocs.io/projects/xblock-tutorial/en/latest/
-.. _as a consumer: https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/lti_component.html
-.. _as a provider: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/lti/
-.. _Options for Extending the edX Platform: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/extending.html
-.. _custom JavaScript application: https://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/javascript.html
-.. _external grader documentation: https://edx.readthedocs.io/projects/open-edx-ca/en/latest/exercises_tools/external_graders.html
+.. _XBlock tutorial: https://docs.openedx.org/projects/xblock/en/latest/xblock-tutorial/index.html
+.. _as a consumer: https://docs.openedx.org/en/latest/educators/navigation/components_activities.html#lti-component
+.. _as a provider: https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/lti/index.html
+.. _Options for Extending the edX Platform: https://docs.openedx.org/en/latest/developers/references/developer_guide/extending_platform/extending.html
+.. _custom JavaScript application: https://docs.openedx.org/en/latest/educators/references/course_development/exercise_tools/custom_javascript.html
+.. _external grader documentation: https://docs.openedx.org/en/latest/educators/concepts/exercise_tools/about_external_graders.html
 .. _You can follow this guide to install and enable custom TinyMCE plugins: extensions/tinymce_plugins.rst
 
 
@@ -150,7 +150,7 @@ Here are the different integration points that python plugins can use:
 .. _course tabs documentation: https://openedx.atlassian.net/wiki/spaces/AC/pages/30965919/Adding+a+new+course+tab
 .. |course_tools.py| replace:: ``course_tools.py``
 .. _course_tools.py: https://github.com/openedx/edx-platform/blob/master/openedx/features/course_experience/course_tools.py
-.. _Adding Custom Fields to the Registration Page: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/customize_registration_page.html
+.. _Adding Custom Fields to the Registration Page: https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/customize_registration_page.html
 .. |learning_context.py| replace:: ``learning_context.py``
 .. _learning_context.py: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/xblock/learning_context/learning_context.py
 .. |UserPartition docstring| replace:: ``UserPartition`` docstring
@@ -189,8 +189,8 @@ In addition, Open edX operators will be able to replace entire MFEs with complet
 
 .. |example edx theme| replace:: example ``edx`` theme
 .. _example edx theme: https://github.com/openedx/paragon/tree/master/scss/edx
-.. _Changing Themes for an Open edX Site: https://edx.readthedocs.io/projects/edx-installing-configuring-and-running/en/latest/configuration/changing_appearance/theming/
-.. _Overriding Brand Specific Elements: https://edx.readthedocs.io/projects/edx-developer-docs/en/latest/developers_guide/micro_frontends_in_open_edx.html#overriding-brand-specific-elements
+.. _Changing Themes for an Open edX Site: https://docs.openedx.org/en/latest/site_ops/install_configure_run_guide/configuration/changing_appearance/theming/index.html
+.. _Overriding Brand Specific Elements: https://github.com/openedx/brand-openedx
 
 Custom frontends
 ****************

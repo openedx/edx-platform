@@ -76,8 +76,7 @@ class TemplateTestCase(unittest.TestCase):
         except Exception as exc:
             raise TemplateError("Could not parse XML from '{0}': {1}".format(  # lint-amnesty, pylint: disable=raise-missing-from
                                 xml_str, str(exc)))
-        else:
-            return xml
+        return xml
 
     def assert_has_xpath(self, xml_root, xpath, context_dict, exact_num=1):
         """

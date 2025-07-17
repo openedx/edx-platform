@@ -263,6 +263,7 @@ def create_account_with_params(request, params):  # pylint: disable=too-many-sta
     REGISTER_USER.send(sender=None, user=user, registration=registration)
 
     # .. event_implemented_name: STUDENT_REGISTRATION_COMPLETED
+    # .. event_type: org.openedx.learning.student.registration.completed.v1
     STUDENT_REGISTRATION_COMPLETED.send_event(
         user=UserData(
             pii=UserPersonalData(

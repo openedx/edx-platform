@@ -111,7 +111,7 @@ def _get_course_email_context(course):
         'course_url': course_url,
         'course_image_url': image_url,
         'course_end_date': course_end_date,
-        'account_settings_url': '{}{}'.format(lms_root_url, reverse('account_settings')),
+        'account_settings_url': settings.ACCOUNT_MICROFRONTEND_URL,
         'email_settings_url': '{}{}'.format(lms_root_url, reverse('dashboard')),
         'logo_url': get_logo_url_for_email(),
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
@@ -181,7 +181,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     # inefficient OUTER JOIN query that would read the whole user table.
     combined_set = recipient_qsets[0].union(*recipient_qsets[1:]) if len(recipient_qsets) > 1 \
         else recipient_qsets[0]
-    recipient_fields = ['profile__name', 'email', 'username']
+    recipient_fields = ['profile__name', 'email', 'username', 'password']
 
     log.info("Task %s: Preparing to queue subtasks for sending emails for course %s, email %s",
              task_id, course_id, email_id)
@@ -350,6 +350,21 @@ def _filter_optouts_from_recipients(to_list, course_id):
     return to_list, num_optout
 
 
+def _filter_disabled_users_from_recipients(to_list, course_key_str):
+    """
+    Filters a user if its account is disabled
+    """
+    user_list = []
+    disabled_count = 0
+    for user in to_list:
+        if user['password'].startswith('!'):
+            log.info(f"Bulk Email User is disabled {user['email']} in course {course_key_str}")
+            disabled_count += 1
+        else:
+            user_list.append(user)
+    return user_list, disabled_count
+
+
 def _get_source_address(course_id, course_title, course_language, truncate=True):
     """
     Calculates an email address to be used as the 'from-address' for sent emails.
@@ -485,7 +500,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     # in the Optout list.
     if subtask_status.get_retry_count() == 0:
         to_list, num_optout = _filter_optouts_from_recipients(to_list, course_email.course_id)
-        subtask_status.increment(skipped=num_optout)
+        to_list, num_disabled = _filter_disabled_users_from_recipients(to_list, str(course_email.course_id))
+        subtask_status.increment(skipped=num_optout + num_disabled)
 
     course_title = global_email_context['course_title']
     course_language = global_email_context['course_language']

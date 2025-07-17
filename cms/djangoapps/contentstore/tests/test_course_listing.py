@@ -3,16 +3,17 @@ Unit tests for getting the list of courses for a user through iterating all cour
 by reversing group name formats.
 """
 
-
 import random
 from unittest.mock import Mock, patch
 
 import ddt
 from ccx_keys.locator import CCXLocator
 from django.conf import settings
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys.edx.locations import CourseLocator
 
+from cms.djangoapps.contentstore import toggles
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.utils import delete_course
 from cms.djangoapps.contentstore.views.course import (
@@ -35,17 +36,12 @@ from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
-from xmodule.course_block import CourseSummary  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 TOTAL_COURSES_COUNT = 10
 USER_COURSES_COUNT = 1
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITH_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = True
-FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API = settings.FEATURES.copy()
-FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API['ENABLE_HOME_PAGE_COURSE_API_V2'] = False
 
 
 @ddt.ddt
@@ -93,6 +89,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client.logout()
         ModuleStoreTestCase.tearDown(self)  # pylint: disable=non-parent-method-called
 
+    @override_waffle_flag(toggles.LEGACY_STUDIO_HOME, True)
     def test_empty_course_listing(self):
         """
         Test on empty course listing, studio name is properly displayed
@@ -185,19 +182,11 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list_by_staff, __ = get_courses_accessible_to_user(self.request)
 
         self.assertEqual(len(list(courses_list_by_staff)), TOTAL_COURSES_COUNT)
+        self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_list_by_staff))
 
-        with override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API):
-            # Verify fetched accessible courses list is a list of CourseOverview instances when home page course v2
-            # api is enabled.
-            self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_list_by_staff))
-
-        with override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API):
-            # Verify fetched accessible courses list is a list of CourseSummery instances
-            self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_list_by_staff))
-
-            # Now count the db queries for staff
-            with check_mongo_calls(2):
-                list(_accessible_courses_summary_iter(self.request))
+        # Now count the db queries for staff
+        with self.assertNumQueries(2):
+            list(_accessible_courses_summary_iter(self.request))
 
     def test_get_course_list_with_invalid_course_location(self):
         """
@@ -212,21 +201,10 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list = list(courses_iter)
         self.assertEqual(len(courses_list), 1)
 
-        with override_settings(FEATURES=FEATURES_WITH_HOME_PAGE_COURSE_V2_API):
-            # Verify fetched accessible courses list is a list of CourseOverview instances when home page course v2
-            # api is enabled.
-            courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
-            courses_summary_list = list(courses_summary_iter)
-            self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_summary_list))
-            self.assertEqual(len(courses_summary_list), 1)
-
-        with override_settings(FEATURES=FEATURES_WITHOUT_HOME_PAGE_COURSE_V2_API):
-            # Verify fetched accessible courses list is a list of CourseSummery instances and only one course
-            # is returned
-            courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
-            courses_summary_list = list(courses_summary_iter)
-            self.assertTrue(all(isinstance(course, CourseSummary) for course in courses_summary_list))
-            self.assertEqual(len(courses_summary_list), 1)
+        courses_summary_iter, __ = _accessible_courses_summary_iter(self.request)
+        courses_summary_list = list(courses_summary_iter)
+        self.assertTrue(all(isinstance(course, CourseOverview) for course in courses_summary_list))
+        self.assertEqual(len(courses_summary_list), 1)
 
         # get courses by reversing group name formats
         courses_list_by_groups, __ = _accessible_courses_list_from_groups(self.request)

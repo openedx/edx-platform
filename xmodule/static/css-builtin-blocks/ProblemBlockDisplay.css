@@ -41,7 +41,7 @@
 
 .xmodule_display.xmodule_ProblemBlock h2 {
     margin-top: 0;
-    margin-bottom: calc((var(--baseline) * 0.75));
+    margin-bottom: calc((var(--baseline, 20px) * 0.75));
 }
 
 .xmodule_display.xmodule_ProblemBlock h2.problem-header {
@@ -49,7 +49,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock h2.problem-header section.staff {
-    margin-top: calc((var(--baseline) * 1.5));
+    margin-top: calc((var(--baseline, 20px) * 1.5));
     font-size: 80%;
 }
 
@@ -68,22 +68,22 @@
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct {
-    margin-top: calc((var(--baseline) / 4));
+    margin-top: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect .icon,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct .icon,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct .icon {
-    margin-right: calc((var(--baseline) / 4));
+    margin-right: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-incorrect .icon {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-partially-correct .icon,
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-correct .icon {
-    color: var(--correct);
+    color: var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock .feedback-hint-text {
@@ -116,17 +116,17 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock .inline-error {
-    color: var(--error-color-dark);
+    color: var(--error-color-dark, #95050d);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem-progress {
     display: inline-block;
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
     font-size: 0.875em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem {
-    padding-top: var(--baseline);
+    padding-top: var(--baseline, 20px);
 }
 
 @media print {
@@ -151,30 +151,30 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .inline+p {
-    margin-top: var(--baseline);
+    margin-top: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .question-description {
-    color: var(--gray-d1);
-    font-size: var(--small-font-size);
+    color: var(--gray-d1, #5e5e5e);
+    font-size: var(--small-font-size, 80%);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem form>label,
 .xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label {
     display: block;
-    margin-bottom: var(--baseline);
+    margin-bottom: var(--baseline, 20px);
     font: inherit;
     color: inherit;
     -webkit-font-smoothing: initial;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .problem-group-label+.question-description {
-    margin-top: calc(-1 * var(--baseline));
+    margin-top: calc(-1 * var(--baseline, 20px));
 }
 
 .xmodule_display.xmodule_ProblemBlock .wrapper-problem-response+.wrapper-problem-response,
 .xmodule_display.xmodule_ProblemBlock .wrapper-problem-response+p {
-    margin-top: calc((var(--baseline) * 1.5));
+    margin-top: calc((var(--baseline, 20px) * 1.5));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup,
@@ -196,16 +196,16 @@
     box-sizing: border-box;
     display: inline-block;
     clear: both;
-    margin-bottom: calc((var(--baseline) / 2));
-    border: 2px solid var(--gray-l4);
+    margin-bottom: calc((var(--baseline, 20px) / 2));
+    border: 2px solid var(--gray-l4, #e4e4e4);
     border-radius: 3px;
-    padding: calc((var(--baseline) / 2));
+    padding: calc((var(--baseline, 20px) / 2));
     width: 100%;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label::after {
-    margin-left: calc((var(--baseline) * 0.75));
+    margin-left: calc((var(--baseline, 20px) * 0.75));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup .indicator-container,
@@ -224,15 +224,15 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input[type="radio"],
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input[type="checkbox"],
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input[type="checkbox"] {
-    margin: calc((var(--baseline) / 4));
-    margin-right: calc((var(--baseline) / 2));
+    margin: calc((var(--baseline, 20px) / 4));
+    margin-right: calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:focus+label,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:focus+label,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input:hover+label,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label {
-    border: 2px solid var(--blue);
+    border: 2px solid var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct,
@@ -253,7 +253,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_correct,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_correct,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_correct {
-    border: 2px solid var(--correct);
+    border: 2px solid var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_correct .status-icon::after,
@@ -274,7 +274,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_correct .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
@@ -297,7 +297,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_partially-correct,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_partially-correct,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_partially-correct {
-    border: 2px solid var(--partially-correct);
+    border: 2px solid var(--partially-correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_partially-correct .status-icon::after,
@@ -318,7 +318,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_partially-correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_partially-correct .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_partially-correct .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
@@ -341,7 +341,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_incorrect,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_incorrect,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_incorrect {
-    border: 2px solid var(--incorrect);
+    border: 2px solid var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup input+label.choicegroup_incorrect .status-icon::after,
@@ -362,7 +362,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_incorrect .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_incorrect .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_incorrect .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
@@ -385,7 +385,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+label.choicetextgroup_submitted,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup .choicegroup input:hover+section.choicetextgroup_submitted,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup input:hover+section.choicetextgroup_submitted {
-    border: 2px solid var(--submitted);
+    border: 2px solid var(--submitted, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup .field {
@@ -393,10 +393,10 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup label {
-    padding: calc((var(--baseline) / 2));
-    padding-left: calc((var(--baseline) * 2.3));
+    padding: calc((var(--baseline, 20px) / 2));
+    padding-left: calc((var(--baseline, 20px) * 2.3));
     position: relative;
-    font-size: var(--base-font-size);
+    font-size: var(--base-font-size, 18px);
     line-height: normal;
     cursor: pointer;
 }
@@ -406,45 +406,45 @@
     left: 0.5625em;
     position: absolute;
     top: 0.35em;
-    width: calc(var(--baseline) * 1.1);
-    height: calc(var(--baseline) * 1.1);
+    width: calc(var(--baseline, 20px) * 1.1);
+    height: calc(var(--baseline, 20px) * 1.1);
     z-index: 1;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend {
-    margin-bottom: var(--baseline);
+    margin-bottom: var(--baseline, 20px);
     max-width: 100%;
     white-space: normal;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicegroup legend+.question-description {
-    margin-top: calc(-1 * var(--baseline));
+    margin-top: calc(-1 * var(--baseline, 20px));
     max-width: 100%;
     white-space: normal;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container {
-    margin-left: calc((var(--baseline) * 0.75));
+    margin-left: calc((var(--baseline, 20px) * 0.75));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status {
-    width: var(--baseline);
+    width: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.correct .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.partially-correct .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .indicator-container .status.incorrect .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
@@ -463,7 +463,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .solution-span>span {
-    margin: var(--baseline) 0;
+    margin: var(--baseline, 20px) 0;
     display: block;
     position: relative;
 }
@@ -490,17 +490,17 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div p span.clarification i:hover {
-    color: var(--blue);
+    color: var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.correct input,
 .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
-    border-color: var(--correct);
+    border-color: var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.partially-correct input,
 .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
-    border-color: var(--partially-correct);
+    border-color: var(--partially-correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.processing input {
@@ -508,22 +508,22 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-close input {
-    border-color: var(--incorrect);
+    border-color: var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.incorrect input,
 .xmodule_display.xmodule_ProblemBlock div.problem div.incomplete input {
-    border-color: var(--incorrect);
+    border-color: var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.submitted input,
 .xmodule_display.xmodule_ProblemBlock div.problem div.ui-icon-check input {
-    border-color: var(--submitted);
+    border-color: var(--submitted, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div p.answer {
     display: inline-block;
-    margin-top: calc((var(--baseline) / 2));
+    margin-top: calc((var(--baseline, 20px) / 2));
     margin-bottom: 0;
 }
 
@@ -546,7 +546,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div div.equation img.loading {
-    padding-left: calc((var(--baseline) / 2));
+    padding-left: calc((var(--baseline, 20px) / 2));
     display: inline-block;
 }
 
@@ -577,7 +577,7 @@
     top: 4px;
     width: 14px;
     height: 14px;
-    background: url("var(--static-path)/images/unanswered-icon.png") center center no-repeat;
+    background: var(--icon-unanswered) center center no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div span.processing,
@@ -587,7 +587,7 @@
     top: 6px;
     width: 25px;
     height: 20px;
-    background: url("var(--static-path)/images/spinner.gif") center center no-repeat;
+    background: var(--icon-spinner) center center no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div span.ui-icon-check {
@@ -596,7 +596,7 @@
     top: 3px;
     width: 25px;
     height: 20px;
-    background: url("var(--static-path)/images/correct-icon.png") center center no-repeat;
+    background: var(--icon-correct) center center no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div span.incomplete,
@@ -606,19 +606,19 @@
     top: 3px;
     width: 20px;
     height: 20px;
-    background: url("var(--static-path)/images/incorrect-icon.png") center center no-repeat;
+    background: var(--icon-incorrect) center center no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .reload {
     float: right;
-    margin: calc((var(--baseline) / 2));
+    margin: calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status {
-    margin: calc(var(--baseline) / 2) 0;
-    padding: calc(var(--baseline) / 2);
+    margin: calc(var(--baseline, 20px) / 2) 0;
+    padding: calc(var(--baseline, 20px) / 2);
     border-radius: 5px;
-    background: var(--gray-l6);
+    background: var(--gray-l6, #f8f8f8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status:after {
@@ -638,7 +638,7 @@
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status .grading {
     margin: 0px 7px 0 0;
     padding-left: 25px;
-    background: url("var(--static-path)/images/info-icon.png") left center no-repeat;
+    background: var(--icon-info) left center no-repeat;
     text-indent: 0px;
 }
 
@@ -650,11 +650,11 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status.file {
-    margin-top: var(--baseline);
-    padding: var(--baseline) 0 0 0;
+    margin-top: var(--baseline, 20px);
+    padding: var(--baseline, 20px) 0 0 0;
     border: 0;
     border-top: 1px solid #eee;
-    background: var(--white);
+    background: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .grader-status.file p.debug {
@@ -666,11 +666,11 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .evaluation p {
-    margin-bottom: calc((var(--baseline) / 5));
+    margin-bottom: calc((var(--baseline, 20px) / 5));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .feedback-on-feedback {
-    margin-right: var(--baseline);
+    margin-right: var(--baseline, 20px);
     height: 100px;
 }
 
@@ -701,7 +701,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div .submit-message-container {
-    margin: var(--baseline) 0px;
+    margin: var(--baseline, 20px) 0px;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.inline>span {
@@ -803,17 +803,17 @@
     padding: 0px 5px;
     border: 1px solid #eaeaea;
     border-radius: 3px;
-    background-color: var(--gray-l6);
+    background-color: var(--gray-l6, #f8f8f8);
     white-space: nowrap;
     font-size: .9em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem pre {
     overflow: auto;
-    padding: 6px calc(var(--baseline) / 2);
-    border: 1px solid var(--gray-l3);
+    padding: 6px calc(var(--baseline, 20px) / 2);
+    border: 1px solid var(--gray-l3, #c8c8c8);
     border-radius: 3px;
-    background-color: var(--gray-l6);
+    background-color: var(--gray-l6, #f8f8f8);
     font-size: .9em;
     line-height: 1.4;
 }
@@ -829,7 +829,7 @@
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput input {
     box-sizing: border-box;
-    border: 2px solid var(--gray-l4);
+    border: 2px solid var(--gray-l4, #e4e4e4);
     border-radius: 3px;
     min-width: 160px;
     height: 46px;
@@ -838,49 +838,49 @@
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline .status,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput .status {
     display: inline-block;
-    margin-top: calc((var(--baseline) / 2));
+    margin-top: calc((var(--baseline, 20px) / 2));
     background: none;
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.incorrect input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.incorrect input {
-    border: 2px solid var(--incorrect);
+    border: 2px solid var(--incorrect, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.incorrect .status .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.incorrect .status .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.partially-correct input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.partially-correct input {
-    border: 2px solid var(--partially-correct);
+    border: 2px solid var(--partially-correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.partially-correct .status .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.partially-correct .status .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.correct input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.correct input {
-    border: 2px solid var(--correct);
+    border: 2px solid var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.correct .status .status-icon::after,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.correct .status .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.submitted input {
-    border: 2px solid var(--submitted);
+    border: 2px solid var(--submitted, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.submitted .status,
@@ -892,7 +892,7 @@
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.unsubmitted input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.unanswered input,
 .xmodule_display.xmodule_ProblemBlock .problem .inputtype.formulaequationinput>.unsubmitted input {
-    border: 2px solid var(--gray-l4);
+    border: 2px solid var(--gray-l4, #e4e4e4);
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .capa_inputtype.textline>.unanswered .status .status-icon::after,
@@ -909,7 +909,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock .problem .trailing_text {
-    margin-right: calc((var(--baseline) / 2));
+    margin-right: calc((var(--baseline, 20px) / 2));
     display: inline-block;
 }
 
@@ -961,7 +961,7 @@
     visibility: hidden;
     width: 0;
     border-right: none;
-    border-left: 1px solid var(--black);
+    border-left: 1px solid var(--black, #000);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .CodeMirror-focused pre.CodeMirror-cursor {
@@ -980,12 +980,12 @@
 
 .xmodule_display.xmodule_ProblemBlock .capa-message {
     display: inline-block;
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
     -webkit-font-smoothing: antialiased;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action {
-    min-height: var(--baseline);
+    min-height: var(--baseline, 20px);
     width: 100%;
     display: flex;
     display: -ms-flexbox;
@@ -999,11 +999,11 @@
     display: inline-flex;
     justify-content: flex-end;
     width: 100%;
-    padding-bottom: var(--baseline);
+    padding-bottom: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-button-wrapper {
-    border-right: 1px solid var(--gray-300);
+    border-right: 1px solid var(--gray-300, #d9d9d9);
     padding: 0 13px;
     display: inline-block;
 }
@@ -1021,11 +1021,11 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:hover,
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:focus,
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn:active {
-    color: var(--primary) !important;
+    color: var(--primary, #0075b4) !important;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .problem-action-btn .icon {
-    margin-bottom: calc(var(--baseline) / 10);
+    margin-bottom: calc(var(--baseline, 20px) / 10);
     display: block;
 }
 
@@ -1036,42 +1036,42 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container {
-    padding-bottom: var(--baseline);
+    padding-bottom: var(--baseline, 20px);
     flex-grow: 1;
     display: flex;
     align-items: center;
 }
 
-@media (max-width: var(--bp-screen-lg)) {
+@media (max-width: var(--bp-screen-lg, 1024px)) {
     .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container {
         max-width: 100%;
-        padding-bottom: var(--baseline);
+        padding-bottom: var(--baseline, 20px);
     }
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit {
-    margin-right: calc((var(--baseline) / 2));
+    margin-right: calc((var(--baseline, 20px) / 2));
     float: left;
     white-space: nowrap;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit-cta-description {
-    color: var(--primary);
+    color: var(--primary, #0075b4);
     font-size: small;
-    padding-right: calc(var(--baseline) / 2);
+    padding-right: calc(var(--baseline, 20px) / 2);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submit-attempt-container .submit-cta-link-button {
-    color: var(--primary);
-    padding-right: calc(var(--baseline) / 4);
+    color: var(--primary, #0075b4);
+    padding-right: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .action .submission-feedback {
-    margin-right: calc((var(--baseline) / 2));
-    margin-top: calc(var(--baseline) / 2);
+    margin-right: calc((var(--baseline, 20px) / 2));
+    margin-top: calc(var(--baseline, 20px) / 2);
     display: inline-block;
-    color: var(--gray-d1);
-    font-size: var(--medium-font-size);
+    color: var(--gray-d1, #5e5e5e);
+    font-size: var(--medium-font-size, 0.9em);
     -webkit-font-smoothing: antialiased;
     vertical-align: middle;
 }
@@ -1105,7 +1105,7 @@
     display: block;
     margin: lh() 0;
     padding: lh();
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .message {
@@ -1128,79 +1128,79 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.capa_alert {
-    margin-top: var(--baseline);
+    margin-top: var(--baseline, 20px);
     padding: 8px 12px;
-    border: 1px solid var(--warning-color);
+    border: 1px solid var(--warning-color, #ffc01f);
     border-radius: 3px;
-    background: var(--warning-color-accent);
+    background: var(--warning-color-accent, #fffcdd);
     font-size: 0.9em;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification {
     float: left;
-    margin-top: calc(var(--baseline) / 2);
-    padding: calc((var(--baseline) / 2.5)) calc((var(--baseline) / 2)) calc((var(--baseline) / 5)) calc((var(--baseline) / 2));
-    line-height: var(--base-line-height);
+    margin-top: calc(var(--baseline, 20px) / 2);
+    padding: calc((var(--baseline, 20px) / 2.5)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 5)) calc((var(--baseline, 20px) / 2));
+    line-height: var(--base-line-height, 1.5em);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.success {
-    border-top: 3px solid var(--success);
+    border-top: 3px solid var(--success, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.success .icon {
     margin-right: 15px;
-    color: var(--success);
+    color: var(--success, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.error {
-    border-top: 3px solid var(--danger);
+    border-top: 3px solid var(--danger, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.error .icon {
     margin-right: 15px;
-    color: var(--danger);
+    color: var(--danger, #b20610);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.warning {
-    border-top: 3px solid var(--warning);
+    border-top: 3px solid var(--warning, #e2c01f);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.warning .icon {
     margin-right: 15px;
-    color: var(--warning);
+    color: var(--warning, #e2c01f);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.general {
-    border-top: 3px solid var(--general-color-accent);
+    border-top: 3px solid var(--general-color-accent, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.general .icon {
     margin-right: 15px;
-    color: var(--general-color-accent);
+    color: var(--general-color-accent, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint {
-    border: 1px solid var(--uxpl-gray-background);
+    border: 1px solid var(--uxpl-gray-background, #d9d9d9);
     border-radius: 6px;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint .icon {
-    margin-right: calc(3 * var(--baseline) / 4);
-    color: var(--uxpl-gray-dark);
+    margin-right: calc(3 * var(--baseline, 20px) / 4);
+    color: var(--uxpl-gray-dark, #111111);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint li {
-    color: var(--uxpl-gray-base);
+    color: var(--uxpl-gray-base, #414141);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification.problem-hint li strong {
-    color: var(--uxpl-gray-dark);
+    color: var(--uxpl-gray-dark, #111111);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .icon {
     float: left;
     position: relative;
-    top: calc(var(--baseline) / 5);
+    top: calc(var(--baseline, 20px) / 5);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-message {
@@ -1216,7 +1216,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-message ol li:not(:last-child) {
-    margin-bottom: calc(var(--baseline) / 4);
+    margin-bottom: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification .notification-btn-wrapper {
@@ -1225,14 +1225,14 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification-btn {
     float: right;
-    padding: calc((var(--baseline) / 10)) calc((var(--baseline) / 4));
-    min-width: calc((var(--baseline) * 3));
+    padding: calc((var(--baseline, 20px) / 10)) calc((var(--baseline, 20px) / 4));
+    min-width: calc((var(--baseline, 20px) * 3));
     display: block;
     clear: both;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .notification-btn:first-child {
-    margin-bottom: calc(var(--baseline) / 4);
+    margin-bottom: calc(var(--baseline, 20px) / 4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem button:hover {
@@ -1249,25 +1249,25 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem button.btn-brand:hover {
-    background-color: var(--btn-brand-focus-background);
+    background-color: var(--btn-brand-focus-background, #065683);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .review-btn {
-    color: var(--blue);
+    color: var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .review-btn.sr {
-    color: var(--blue);
+    color: var(--blue, #0075b4);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem div.capa_reset {
     padding: 25px;
-    background-color: var(--error-color-light);
-    border: 1px solid var(--error-color);
+    background-color: var(--error-color-light, #f95861);
+    border: 1px solid var(--error-color, #cb0712);
     border-radius: 3px;
     font-size: 1em;
-    margin-top: calc(var(--baseline) / 2);
-    margin-bottom: calc(var(--baseline) / 2);
+    margin-top: calc(var(--baseline, 20px) / 2);
+    margin-bottom: calc(var(--baseline, 20px) / 2);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .capa_reset>h2 {
@@ -1279,14 +1279,14 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .hints {
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .hints h3 {
     padding: 9px;
     border-bottom: 1px solid #e3e3e3;
     background: #eee;
-    text-shadow: 0 1px 0 var(--white);
+    text-shadow: 0 1px 0 var(--white, #fff);
     font-size: 1em;
 }
 
@@ -1305,8 +1305,8 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .hints div header a {
     display: block;
     padding: 9px;
-    background: var(--gray-l6);
-    box-shadow: inset 0 0 0 1px var(--white);
+    background: var(--gray-l6, #f8f8f8);
+    box-shadow: inset 0 0 0 1px var(--white, #fff);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .hints div>section {
@@ -1329,11 +1329,11 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .test>section {
     position: relative;
-    margin-bottom: calc((var(--baseline) / 2));
-    padding: 9px 9px var(--baseline);
+    margin-bottom: calc((var(--baseline, 20px) / 2));
+    padding: 9px 9px var(--baseline, 20px);
     border: 1px solid #ddd;
     border-radius: 3px;
-    background: var(--white);
+    background: var(--white, #fff);
     box-shadow: inset 0 0 0 1px #eee;
 }
 
@@ -1353,8 +1353,8 @@
     left: 0;
     box-sizing: border-box;
     display: block;
-    padding: calc((var(--baseline) / 5));
-    background: var(--gray-l4);
+    padding: calc((var(--baseline, 20px) / 5));
+    background: var(--gray-l4, #e4e4e4);
     text-align: right;
     font-size: 1em;
 }
@@ -1376,8 +1376,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section {
-    padding-top: calc((var(--baseline) * 1.5));
-    padding-left: var(--baseline);
+    padding-top: calc((var(--baseline, 20px) * 1.5));
+    padding-left: var(--baseline, 20px);
     background-color: #fafafa;
     color: #2c2c2c;
     font-size: 1em;
@@ -1394,9 +1394,9 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors {
-    margin: calc((var(--baseline) / 4));
-    padding: calc((var(--baseline) / 2)) calc((var(--baseline) / 2)) calc((var(--baseline) / 2)) calc((var(--baseline) * 2));
-    background: url("var(--static-path)/images/incorrect-icon.png") center left no-repeat;
+    margin: calc((var(--baseline, 20px) / 4));
+    padding: calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) / 2)) calc((var(--baseline, 20px) * 2));
+    background: var(--icon-incorrect) center left no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-errors li {
@@ -1404,10 +1404,10 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output {
-    margin: calc(var(--baseline) / 4);
-    padding: var(--baseline) 0 calc((var(--baseline) * 0.75)) 50px;
+    margin: calc(var(--baseline, 20px) / 4);
+    padding: var(--baseline, 20px) 0 calc((var(--baseline, 20px) * 0.75)) 50px;
     border-top: 1px solid #ddd;
-    border-left: var(--baseline) solid #fafafa;
+    border-left: var(--baseline, 20px) solid #fafafa;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output h4 {
@@ -1420,7 +1420,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output dt {
-    margin-top: var(--baseline);
+    margin-top: var(--baseline, 20px);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-output dd {
@@ -1428,7 +1428,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct {
-    background: url("var(--static-path)/images/correct-icon.png") left 20px no-repeat;
+    background: var(--icon-correct) left 20px no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-correct .result-actual-output {
@@ -1436,7 +1436,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct {
-    background: url("var(--static-path)/images/partially-correct-icon.png") left 20px no-repeat;
+    background: var(--icon-partially-correct) left 20px no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-partially-correct .result-actual-output {
@@ -1444,7 +1444,7 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect {
-    background: url("var(--static-path)/images/incorrect-icon.png") left 20px no-repeat;
+    background: var(--icon-incorrect) left 20px no-repeat;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .result-incorrect .result-actual-output {
@@ -1452,8 +1452,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .external-grader-message section .longform .markup-text {
-    margin: calc((var(--baseline) / 4));
-    padding: var(--baseline) 0 15px 50px;
+    margin: calc((var(--baseline, 20px) / 4));
+    padding: var(--baseline, 20px) 0 15px 50px;
     border-top: 1px solid #ddd;
     border-left: 20px solid #fafafa;
 }
@@ -1467,19 +1467,19 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric tr {
-    margin: calc((var(--baseline) / 2)) 0;
+    margin: calc((var(--baseline, 20px) / 2)) 0;
     height: 100%;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric td {
-    margin: calc((var(--baseline) / 2)) 0;
-    padding: var(--baseline) 0;
+    margin: calc((var(--baseline, 20px) / 2)) 0;
+    padding: var(--baseline, 20px) 0;
     height: 100%;
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric th {
-    margin: calc((var(--baseline) / 4));
-    padding: calc((var(--baseline) / 4));
+    margin: calc((var(--baseline, 20px) / 4));
+    padding: calc((var(--baseline, 20px) / 4));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric label,
@@ -1487,12 +1487,12 @@
     position: relative;
     display: inline-block;
     margin: 3px;
-    padding: calc((var(--baseline) * 0.75));
+    padding: calc((var(--baseline, 20px) * 0.75));
     min-width: 50px;
     min-height: 50px;
     width: 150px;
     height: 100%;
-    background-color: var(--gray-l3);
+    background-color: var(--gray-l3, #c8c8c8);
     font-size: .9em;
 }
 
@@ -1500,7 +1500,7 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    margin: calc((var(--baseline) / 2));
+    margin: calc((var(--baseline, 20px) / 2));
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .rubric .selected-grade {
@@ -1519,14 +1519,14 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input {
     margin: 0 0 1em 0;
-    border: 1px solid var(--gray-l3);
+    border: 1px solid var(--gray-l3, #c8c8c8);
     border-radius: 1em;
     /* for debugging the input value field. enable the debug flag on the inputtype */
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .annotation-header {
     padding: .5em 1em;
-    border-bottom: 1px solid var(--gray-l3);
+    border-bottom: 1px solid var(--gray-l3, #c8c8c8);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .annotation-body {
@@ -1575,7 +1575,7 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input ul.tags li .tag {
     display: inline-block;
-    margin-left: calc((var(--baseline) * 2));
+    margin-left: calc((var(--baseline, 20px) * 2));
     border: 1px solid #666666;
 }
 
@@ -1608,9 +1608,9 @@
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value {
     margin: 1em 0;
     padding: 1em;
-    border: 1px solid var(--black);
+    border: 1px solid var(--black, #000);
     background-color: #999;
-    color: var(--white);
+    color: var(--white, #fff);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value input[type="text"] {
@@ -1618,8 +1618,8 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value pre {
-    background-color: var(--gray-l3);
-    color: var(--black);
+    background-color: var(--gray-l3, #c8c8c8);
+    color: var(--black, #000);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .debug-value::before {
@@ -1634,18 +1634,18 @@
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_correct input[type="text"],
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_correct input[type="text"] {
-    border-color: var(--correct);
+    border-color: var(--correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_partially-correct input[type="text"],
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_partially-correct input[type="text"] {
-    border-color: var(--partially-correct);
+    border-color: var(--partially-correct, #008100);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup label.choicetextgroup_show_correct::after,
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup section.choicetextgroup_show_correct::after {
-    margin-left: calc((var(--baseline) * 0.75));
-    content: url("var(--static-path)/images/correct-icon.png");
+    margin-left: calc((var(--baseline, 20px) * 0.75));
+    content: var(--icon-correct);
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .choicetextgroup span.mock_label {
@@ -1671,19 +1671,19 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .correct .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .incorrect .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .imageinput.capa_inputtype .partially-correct .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
@@ -1711,19 +1711,19 @@
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .correct .status-icon::after {
-    color: var(--correct);
+    color: var(--correct, #008100);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .incorrect .status-icon::after {
-    color: var(--incorrect);
+    color: var(--incorrect, #b20610);
     font-size: 1.2em;
     content: "";
 }
 
 .xmodule_display.xmodule_ProblemBlock div.problem .annotation-input .partially-correct .status-icon::after {
-    color: var(--partially-correct);
+    color: var(--partially-correct, #008100);
     font-size: 1.2em;
     content: "";
 }
@@ -1734,5 +1734,5 @@
 
 .xmodule_display.xmodule_ProblemBlock .problems-wrapper .loading-spinner {
     text-align: center;
-    color: var(--gray-d1);
+    color: var(--gray-d1, #5e5e5e);
 }

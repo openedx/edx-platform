@@ -6,10 +6,12 @@ Tests capa util
 
 import unittest
 
+import codejail.safe_exec
 import ddt
+from django.test.utils import TestContextDecorator
 from lxml import etree
 
-from xmodule.capa.tests.helpers import test_capa_system
+from xmodule.capa.tests.helpers import mock_capa_system
 from xmodule.capa.util import (
     compare_with_tolerance,
     contextualize_text,
@@ -25,7 +27,7 @@ class UtilTest(unittest.TestCase):
 
     def setUp(self):
         super(UtilTest, self).setUp()  # lint-amnesty, pylint: disable=super-with-arguments
-        self.system = test_capa_system()
+        self.system = mock_capa_system()
 
     def test_compare_with_tolerance(self):  # lint-amnesty, pylint: disable=too-many-statements
         # Test default tolerance '0.001%' (it is relative)
@@ -145,7 +147,7 @@ class UtilTest(unittest.TestCase):
         Test for markup removal with nh3.
         """
         assert remove_markup('The <mark>Truth</mark> is <em>Out There</em> & you need to <strong>find</strong> it') ==\
-               'The Truth is Out There &amp; you need to find it'
+            'The Truth is Out There &amp; you need to find it'
 
     @ddt.data(
         'When the root level failš the whole hierarchy won’t work anymore.',
@@ -167,3 +169,28 @@ class UtilTest(unittest.TestCase):
         expected_text = '$あなたあなたあなたあなた あなたhi'
         contextual_text = contextualize_text(text, context)
         assert expected_text == contextual_text
+
+
+class use_unsafe_codejail(TestContextDecorator):
+    """
+    Tell codejail to run in unsafe mode for the scope of the decorator.
+    Use this as a decorator on Django TestCase classes or methods.
+
+    This is needed because codejail has significant OS-level setup requirements
+    which we don't even attempt to fulfill for unit testing purposes. Running
+    tests in unsafe mode (that is, running code executions in-process, with no
+    sandboxing) is only safe because we control the contents of the unit tests.
+    It's not a perfect replica of how safe mode operates but it's generally good
+    enough for testing the integration and overall behavior.
+    """
+
+    def __init__(self):
+        self.old_be_unsafe = None
+        super().__init__()
+
+    def enable(self):
+        self.old_be_unsafe = codejail.safe_exec.ALWAYS_BE_UNSAFE
+        codejail.safe_exec.ALWAYS_BE_UNSAFE = True
+
+    def disable(self):
+        codejail.safe_exec.ALWAYS_BE_UNSAFE = self.old_be_unsafe

@@ -3,7 +3,7 @@ import logging
 import time
 
 import numpy as np
-from edxval.api import get_videos_for_course
+from edxval.api import get_course_videos_qset
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from scipy import stats
@@ -77,6 +77,11 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
                 * mode
 
     """
+    # TODO: ARCH-91
+    # This view is excluded from Swagger doc generation because it
+    # does not specify a serializer class.
+    swagger_schema = None
+
     @course_author_access_required
     def get(self, request, course_key):
         """
@@ -180,13 +185,11 @@ class CourseQualityView(DeveloperErrorViewMixin, GenericAPIView):
 
     def _videos_quality(self, course):  # lint-amnesty, pylint: disable=missing-function-docstring
         video_blocks_in_course = modulestore().get_items(course.id, qualifiers={'category': 'video'})
-        videos, __ = get_videos_for_course(course.id)
-        videos_in_val = list(videos)
-        video_durations = [video['duration'] for video in videos_in_val]
+        video_durations = [cv.video.duration for cv in get_course_videos_qset(course.id)]
 
         return dict(
             total_number=len(video_blocks_in_course),
-            num_mobile_encoded=len(videos_in_val),
+            num_mobile_encoded=len(video_durations),
             num_with_val_id=len([v for v in video_blocks_in_course if v.edx_video_id]),
             durations=self._stats_dict(video_durations),
         )

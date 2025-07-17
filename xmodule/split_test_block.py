@@ -419,9 +419,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
                 )
             )
             raise
-        else:
-            self.runtime.publish(self, 'xblock.split_test.child_render', {'child_id': child_id})
-            return Response()
+        self.runtime.publish(self, 'xblock.split_test.child_render', {'child_id': child_id})
+        return Response()
 
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'

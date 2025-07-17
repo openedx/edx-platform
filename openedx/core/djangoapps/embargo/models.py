@@ -662,6 +662,81 @@ class CourseAccessRuleHistory(models.Model):
         get_latest_by = 'timestamp'
 
 
+class GlobalRestrictedCountry(models.Model):
+    """
+    Model to restrict access to specific countries globally.
+    """
+    country = models.ForeignKey(
+        "Country",
+        help_text="The country to be restricted.",
+        on_delete=models.CASCADE,
+        unique=True
+    )
+
+    CACHE_KEY = "embargo.global.restricted_countries"
+
+    @classmethod
+    def get_countries(cls):
+        """
+        Retrieve the set of restricted country codes from the cache or refresh it if not available.
+
+        Returns:
+            set: A set of restricted country codes.
+        """
+        return cache.get_or_set(cls.CACHE_KEY, cls._fetch_restricted_countries)
+
+    @classmethod
+    def is_country_restricted(cls, country_code):
+        """
+        Check if the given country code is restricted.
+
+        Args:
+            country_code (str): The country code to check.
+
+        Returns:
+            bool: True if the country is restricted, False otherwise.
+        """
+        return country_code in cls.get_countries()
+
+    @classmethod
+    def _fetch_restricted_countries(cls):
+        """
+        Fetch the set of restricted country codes from the database.
+
+        Returns:
+            set: A set of restricted country codes.
+        """
+        return set(cls.objects.values_list("country__country", flat=True))
+
+    @classmethod
+    def update_cache(cls):
+        """
+        Update the cache with the latest restricted country codes.
+        """
+        cache.set(cls.CACHE_KEY, cls._fetch_restricted_countries())
+
+    def save(self, *args, **kwargs):
+        """
+        Override save method to update cache on insert/update.
+        """
+        super().save(*args, **kwargs)
+        self.update_cache()
+
+    def delete(self, *args, **kwargs):
+        """
+        Override delete method to update cache on deletion.
+        """
+        super().delete(*args, **kwargs)
+        self.update_cache()
+
+    def __str__(self):
+        return f"{self.country.country.name} ({self.country.country})"
+
+    class Meta:
+        verbose_name = "Global Restricted Country"
+        verbose_name_plural = "Global Restricted Countries"
+
+
 # Connect the signals to the receivers so we record a history
 # of changes to the course access rules.
 post_save.connect(CourseAccessRuleHistory.snapshot_post_save_receiver, sender=RestrictedCourse)

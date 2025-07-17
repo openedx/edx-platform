@@ -41,8 +41,7 @@ def update_credit_course_requirements(course_id):
     except (InvalidKeyError, ItemNotFoundError, InvalidCreditRequirements) as exc:
         LOGGER.error('Error on adding the requirements for course %s - %s', course_id, str(exc))
         raise update_credit_course_requirements.retry(args=[course_id], exc=exc)
-    else:
-        LOGGER.info('Requirements added for course %s', course_id)
+    LOGGER.info('Requirements added for course %s', course_id)
 
 
 def _get_course_credit_requirements(course_key):

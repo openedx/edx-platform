@@ -2,6 +2,7 @@
 Tests for the modulestore.django module
 """
 
+from pathlib import Path
 from unittest.mock import patch
 
 import django.utils.translation
@@ -23,19 +24,19 @@ def test_get_python_locale_with_atlas_oep58_translations(mock_modern_xblock):
     assert domain == 'django', 'Uses django domain when atlas locale is found.'
 
 
-@patch('xmodule.modulestore.django.resource_filename', return_value='/lib/my_legacy_xblock/translations')
+@patch('importlib.resources.files', return_value=Path('/lib/my_legacy_xblock'))
 def test_get_python_locale_with_bundled_translations(mock_modern_xblock):
     """
     Ensure that get_python_locale() falls back to XBlock internal translations if atlas translations weren't pulled.
 
     Pre-OEP-58 translations were stored in the `translations` directory of the XBlock which is
-    accessible via the `pkg_resources.resource_filename` function.
+    accessible via the `importlib.resources.files` function.
     """
     i18n_service = XBlockI18nService()
     block = mock_modern_xblock['legacy_xblock']
     domain, path = i18n_service.get_python_locale(block)
 
-    assert path == '/lib/my_legacy_xblock/translations', 'Backward compatible with pe-OEP-58.'
+    assert path == '/lib/my_legacy_xblock/translations', 'Backward compatible with pre-OEP-58.'
     assert domain == 'text', 'Use the legacy `text` domain for backward compatibility with old XBlocks.'
 
 

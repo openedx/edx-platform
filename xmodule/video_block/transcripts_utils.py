@@ -16,10 +16,12 @@ import requests
 import simplejson as json
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import get_language_info
 from lxml import etree
 from opaque_keys.edx.keys import UsageKeyV2
 from pysrt import SubRipFile, SubRipItem, SubRipTime
 from pysrt.srtexc import Error
+from opaque_keys.edx.locator import LibraryLocatorV2
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 from xmodule.contentstore.content import StaticContent
@@ -498,16 +500,17 @@ def manage_video_subtitles_save(item, user, old_metadata=None, generate_translat
                     remove_subs_from_store(video_id, item, lang)
 
         reraised_message = ''
-        for lang in new_langs:  # 3b
-            try:
-                generate_sjson_for_all_speeds(
-                    item,
-                    item.transcripts[lang],
-                    {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
-                    lang,
-                )
-            except TranscriptException:
-                pass
+        if not isinstance(item.usage_key.context_key, LibraryLocatorV2):
+            for lang in new_langs:  # 3b
+                try:
+                    generate_sjson_for_all_speeds(
+                        item,
+                        item.transcripts[lang],
+                        {speed: subs_id for subs_id, speed in youtube_speed_dict(item).items()},
+                        lang,
+                    )
+                except TranscriptException:
+                    pass
         if reraised_message:
             item.save_with_metadata(user)
             raise TranscriptException(reraised_message)
@@ -682,6 +685,18 @@ def convert_video_transcript(file_name, content, output_format):
     converted_transcript = Transcript.convert(content, input_format=input_format, output_format=output_format)
 
     return dict(filename=filename, content=converted_transcript)
+
+
+def clear_transcripts(block):
+    """
+    Deletes all transcripts of a video block from VAL
+    """
+    for language_code in block.transcripts.keys():
+        edxval_api.delete_video_transcript(
+            video_id=block.edx_video_id,
+            language_code=language_code,
+        )
+    block.transcripts = {}
 
 
 class Transcript:
@@ -869,21 +884,24 @@ class VideoTranscriptsMixin:
         """
         sub, other_lang = transcripts["sub"], transcripts["transcripts"]
 
-        # language in plugin selector exists as transcript
-        if dest_lang and dest_lang in other_lang.keys():
-            transcript_language = dest_lang
-        # language in plugin selector is english and empty transcripts or transcripts and sub exists
-        elif dest_lang and dest_lang == 'en' and (not other_lang or (other_lang and sub)):
-            transcript_language = 'en'
-        elif self.transcript_language in other_lang:
-            transcript_language = self.transcript_language
-        elif sub:
-            transcript_language = 'en'
-        elif len(other_lang) > 0:
-            transcript_language = sorted(other_lang)[0]
-        else:
-            transcript_language = 'en'
-        return transcript_language
+        if dest_lang:
+            resolved_transcript_dest_lang = resolve_language_code_to_transcript_code(transcripts, dest_lang)
+            if resolved_transcript_dest_lang:
+                return resolved_transcript_dest_lang
+            # language in plugin selector is english and empty transcripts or transcripts and sub exists
+            if dest_lang == 'en' and (not other_lang or (other_lang and sub)):
+                return 'en'
+
+        if self.transcript_language in other_lang:
+            return self.transcript_language
+
+        if sub:
+            return 'en'
+
+        if len(other_lang) > 0:
+            return sorted(other_lang)[0]
+
+        return 'en'
 
     def get_transcripts_info(self, is_bumper=False):
         """
@@ -1040,6 +1058,13 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     return transcript_content, transcript_name, Transcript.mime_types[output_format]
 
 
+def build_components_import_path(usage_key, file_path):
+    """
+    Build components import path
+    """
+    return f"components/{usage_key.block_type}/{usage_key.block_id}/{file_path}"
+
+
 def get_transcript_from_learning_core(video_block, language, output_format, transcripts_info):
     """
     Get video transcript from Learning Core (used for Content Libraries)
@@ -1178,3 +1203,77 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
             output_format=output_format,
             transcripts_info=transcripts_info
         )
+
+
+def resolve_language_code_to_transcript_code(transcripts, dest_lang):
+    """
+    Attempts to match the requested dest lang with the existing transcript languages
+    """
+    sub, other_lang = transcripts["sub"], transcripts["transcripts"]
+    # lang code exists in list of other transcript languages as-is
+    if dest_lang in other_lang:
+        return dest_lang
+
+    # Language codes can be base languages, 2-3 characters, or they can include a
+    # locale (`fr` for french, `fr-ca` for canadian french). Sometimes the part after the
+    # dash is capitalized, sometimes it is not. Check both variants.
+    dash_index = dest_lang.find('-')
+    if dash_index >= 0:
+        lowercase_dest_lang = dest_lang.lower()
+        if lowercase_dest_lang in other_lang:
+            log.debug("language code %s resolved to %s", dest_lang, lowercase_dest_lang)
+            return lowercase_dest_lang
+
+        generic_lang_code = lowercase_dest_lang[:dash_index]
+        uppercase_dest_lang = generic_lang_code + lowercase_dest_lang[dash_index:].upper()
+        if uppercase_dest_lang in other_lang:
+            log.debug("language code %s resolved to %s", dest_lang, uppercase_dest_lang)
+            return uppercase_dest_lang
+
+        if generic_lang_code in other_lang:
+            log.debug("language code %s resolved to generic %s", dest_lang, generic_lang_code)
+            return generic_lang_code
+
+
+def get_endonym_or_label(language_code):
+    """
+    Given a language code, attempt to look up the endonym, or local name, for that language
+    """
+
+    lowercase_code = language_code.lower()
+    # LANGUAGE_DICT is an edx-configured mapping of language codes to endonym. It's a bit more
+    # specific than the django utility, so try that first. All language codes in this dict will
+    # be lowercase
+    if local_name := settings.LANGUAGE_DICT.get(lowercase_code):
+        return local_name
+
+    # get_language_info attempts to look up language info in a hardcoded list in
+    # django.conf.translations. It will do automatic "generalizations", i.e. it doesn't
+    # have `es-419` so it then tries `es`. That's why we only do this after checking
+    # LANGUAGE_DICT
+    try:
+        lang_info = get_language_info(language_code)
+        return lang_info['name_local']
+    except KeyError:
+        pass
+
+    # Last place to look is in settings.ALL_LANGUAGES. Ideally we find the actual code,
+    # but also, check the 'generic' language. If even the generic language isn't found,
+    # something is wrong, so log an error and throw an exception.
+    first_dash_index = language_code.find('-')
+    generic_code = None if first_dash_index == -1 else language_code[:first_dash_index]
+    potential_generic_label = None
+    for code, language_label in settings.ALL_LANGUAGES:
+        # check for lowercase of the whole code, but as far as I can tell, the generic codes are
+        # always lowercase
+        if code in (language_code, lowercase_code):
+            return language_label
+        if generic_code and code == generic_code:
+            potential_generic_label = language_label
+        elif code > language_code:
+            break
+    if potential_generic_label:
+        return potential_generic_label
+
+    log.error("A label was requested for language code `%s` but the code is completely unknown", language_code)
+    raise NotFoundError(f"Unknown language `{language_code}`")

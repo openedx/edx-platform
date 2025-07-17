@@ -50,6 +50,10 @@ class StudioHomeSerializer(serializers.Serializer):
         child=serializers.CharField(),
         allow_empty=True
     )
+    allowed_organizations_for_libraries = serializers.ListSerializer(
+        child=serializers.CharField(),
+        allow_empty=True
+    )
     archived_courses = CourseCommonSerializer(required=False, many=True)
     can_access_advanced_settings = serializers.BooleanField()
     can_create_organizations = serializers.BooleanField()
@@ -62,7 +66,6 @@ class StudioHomeSerializer(serializers.Serializer):
     libraries_v2_enabled = serializers.BooleanField()
     taxonomies_enabled = serializers.BooleanField()
     taxonomy_list_mfe_url = serializers.CharField()
-    optimization_enabled = serializers.BooleanField()
     request_course_creator_url = serializers.CharField()
     rerun_creator_status = serializers.BooleanField()
     show_new_library_button = serializers.BooleanField()

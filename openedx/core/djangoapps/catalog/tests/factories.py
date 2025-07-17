@@ -290,3 +290,4 @@ class PathwayFactory(DictFactoryBase):
     org_name = factory.Faker('company')
     programs = factory.LazyFunction(partial(generate_instances, ProgramFactory))
     pathway_type = FuzzyChoice(path_type.value for path_type in PathwayType)
+    status = 'published'

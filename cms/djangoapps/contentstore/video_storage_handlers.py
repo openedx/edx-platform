@@ -724,7 +724,9 @@ def get_all_transcript_languages():
     third_party_transcription_languages.update(cielo_fidelity['PREMIUM']['languages'])
     third_party_transcription_languages.update(cielo_fidelity['PROFESSIONAL']['languages'])
 
-    all_languages_dict = dict(settings.ALL_LANGUAGES, **third_party_transcription_languages)
+    # combines ALL_LANGUAGES with additional languages that should be supported for transcripts
+    extended_all_languages = settings.ALL_LANGUAGES + settings.EXTENDED_VIDEO_TRANSCRIPT_LANGUAGES
+    all_languages_dict = dict(extended_all_languages, **third_party_transcription_languages)
     # Return combined system settings and 3rd party transcript languages.
     all_languages = []
     for key, value in sorted(all_languages_dict.items(), key=lambda k_v: k_v[1]):
@@ -995,9 +997,9 @@ def get_course_youtube_edx_video_ids(course_id):
             f"InvalidKeyError occurred while getting YouTube video IDs for course_id: {course_id}: {error}"
         )
         return JsonResponse({'error': invalid_key_error_msg}, status=500)
-    except Exception as error:
+    except (TypeError, AttributeError) as error:
         LOGGER.exception(
-            f"Unexpected error occurred while getting YouTube video IDs for course_id: {course_id}: {error}"
+            f"Error occurred while getting YouTube video IDs for course_id: {course_id}: {error}"
         )
         return JsonResponse({'error': unexpected_error_msg}, status=500)
 

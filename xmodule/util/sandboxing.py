@@ -7,6 +7,18 @@ from django.conf import settings
 DEFAULT_PYTHON_LIB_FILENAME = 'python_lib.zip'
 
 
+def course_code_library_asset_name():
+    """
+    Return the asset name to use for course code libraries, defaulting to python_lib.zip.
+    """
+    # .. setting_name: PYTHON_LIB_FILENAME
+    # .. setting_default: python_lib.zip
+    # .. setting_description: Name of the course file to make available to code in
+    #   custom Python-graded problems. By default, this file will not be downloadable
+    #   by learners.
+    return getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
+
+
 def can_execute_unsafe_code(course_id):
     """
     Determine if this course is allowed to run unsafe code.
@@ -34,7 +46,7 @@ def can_execute_unsafe_code(course_id):
 
 def get_python_lib_zip(contentstore, course_id):
     """Return the bytes of the course code library file, if it exists."""
-    python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
+    python_lib_filename = course_code_library_asset_name()
     asset_key = course_id.make_asset_key("asset", python_lib_filename)
     zip_lib = contentstore().find(asset_key, throw_on_not_found=False)
     if zip_lib is not None:
