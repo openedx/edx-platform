@@ -3,12 +3,13 @@ API for containers (Sections, Subsections, Units) in Content Libraries
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field as dataclass_field
 from datetime import datetime, timezone
 from enum import Enum
 import logging
 from uuid import uuid4
 
+from django.db.models import QuerySet
 from django.utils.text import slugify
 from opaque_keys.edx.locator import LibraryContainerLocator, LibraryLocatorV2, LibraryUsageLocatorV2
 from openedx_events.content_authoring.data import (
@@ -24,15 +25,16 @@ from openedx_events.content_authoring.signals import (
     LIBRARY_CONTAINER_UPDATED,
 )
 from openedx_learning.api import authoring as authoring_api
-from openedx_learning.api.authoring_models import Container, ContainerVersion, Component
+from openedx_learning.api.authoring_models import Container, ContainerVersion, Component, PublishableEntity
 from openedx.core.djangoapps.content_libraries.api.collections import library_collection_locator
+from openedx.core.djangoapps.content_libraries.api.block_metadata import LibraryXBlockMetadata
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 
 from openedx.core.djangoapps.xblock.api import get_component_from_usage_key
 
 from ..models import ContentLibrary
 from .exceptions import ContentLibraryContainerNotFound
-from .libraries import PublishableItem
+from .libraries import PublishableItem, library_component_usage_key
 from .block_metadata import LibraryXBlockMetadata
 from .. import tasks
 
@@ -41,6 +43,7 @@ __all__ = [
     # Models
     "ContainerMetadata",
     "ContainerType",
+    "ContainerHierarchy",
     # API methods
     "get_container",
     "create_container",
@@ -53,6 +56,7 @@ __all__ = [
     "update_container_children",
     "get_containers_contains_item",
     "publish_container_changes",
+    "get_library_object_hierarchy",
 ]
 
 log = logging.getLogger(__name__)
@@ -122,7 +126,7 @@ class ContainerMetadata(PublishableItem):
             container=container,
         )
         container_type = ContainerType(container_key.container_type)
-        published_by = ""
+        published_by = None
         if last_publish_log and last_publish_log.published_by:
             published_by = last_publish_log.published_by.username
 
@@ -728,3 +732,244 @@ def publish_container_changes(container_key: LibraryContainerLocator, user_id: i
     # Update the search index (and anything else) for the affected container + blocks
     # This is mostly synchronous but may complete some work asynchronously if there are a lot of changes.
     tasks.wait_for_post_publish_events(publish_log, library_key)
+
+
+@dataclass(frozen=True, kw_only=True)
+class ContainerHierarchyMember:
+    """
+    Represents an individual member of ContainerHierarchy which is ready to be serialized.
+    """
+    id: LibraryContainerLocator | LibraryUsageLocatorV2
+    display_name: str
+    has_unpublished_changes: bool
+    component: Component | None
+    container: Container | None
+
+    @classmethod
+    def create(
+        cls,
+        library_key: LibraryLocatorV2,
+        entity: Container | Component,
+    ) -> ContainerHierarchyMember:
+        """
+        Creates a ContainerHierarchyMember.
+
+        Arguments:
+        * library_key: required for generating a usage/locator key for the given entitity.
+        * entity: the Container or Component
+        """
+        if isinstance(entity, Component):
+            return ContainerHierarchyMember(
+                id=library_component_usage_key(library_key, entity),
+                display_name=entity.versioning.draft.title,
+                has_unpublished_changes=entity.versioning.has_unpublished_changes,
+                component=entity,
+                container=None,
+            )
+        assert isinstance(entity, Container)
+        return ContainerHierarchyMember(
+            id=library_container_locator(
+                library_key,
+                container=entity,
+            ),
+            display_name=entity.versioning.draft.title,
+            has_unpublished_changes=authoring_api.contains_unpublished_changes(entity.pk),
+            container=entity,
+            component=None,
+        )
+
+    @property
+    def entity(self) -> PublishableEntity:
+        """
+        Returns the PublishableEntity associated with this member.
+
+        Raises AssertError if there isn't a Component or Container set.
+        """
+        entity = self.component or self.container
+        assert entity
+        return entity.publishable_entity
+
+
+@dataclass(frozen=True, kw_only=True)
+class ContainerHierarchy:
+    """
+    Describes the full ancestry and descendents of a given library object.
+    """
+    sections: list[ContainerHierarchyMember] = dataclass_field(default_factory=list)
+    subsections: list[ContainerHierarchyMember] = dataclass_field(default_factory=list)
+    units: list[ContainerHierarchyMember] = dataclass_field(default_factory=list)
+    components: list[ContainerHierarchyMember] = dataclass_field(default_factory=list)
+    object_key: LibraryUsageLocatorV2 | LibraryContainerLocator
+
+    class Level(Enum):
+        """
+        Enumeratable levels contained by the ContainerHierarchy.
+        """
+        none = 0
+        components = 1
+        units = 2
+        subsections = 3
+        sections = 4
+
+        def __bool__(self) -> bool:
+            """
+            Level.none is False
+            All others are True.
+            """
+            return self != ContainerHierarchy.Level.none
+
+        @property
+        def parent(self) -> ContainerHierarchy.Level:
+            """
+            Returns the parent level above the given level,
+            or Level.none if this is already the top level.
+            """
+            if not self:
+                return self
+            try:
+                return ContainerHierarchy.Level(self.value + 1)
+            except ValueError:
+                return ContainerHierarchy.Level.none
+
+        @property
+        def child(self) -> ContainerHierarchy.Level:
+            """
+            Returns the name of the child field below the given level,
+            or None if level is already the lowest level.
+            """
+            if not self:
+                return self
+            try:
+                return ContainerHierarchy.Level(self.value - 1)
+            except ValueError:
+                return ContainerHierarchy.Level.none
+
+    def append(
+        self,
+        level: Level,
+        *items: Component | Container,
+    ) -> list[ContainerHierarchyMember]:
+        """
+        Appends the metadata for the given items to the given level of the hierarchy.
+        Returns the resulting list.
+
+        Arguments:
+        * level: a valid Level (not Level.none)
+        * ...list of Components or Containers to add to this level.
+        """
+        assert level
+        for item in items:
+            getattr(self, level.name).append(
+                ContainerHierarchyMember.create(
+                    self.object_key.context_key,
+                    item,
+                )
+            )
+
+        return getattr(self, level.name)
+
+    @classmethod
+    def create_from_library_object_key(
+        cls,
+        object_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
+    ):
+        """
+        Returns a ContainerHierarchy populated from the library object represented by the given object_key.
+        """
+        root_items: list[Component] | list[Container]
+        root_level: ContainerHierarchy.Level
+
+        if isinstance(object_key, LibraryUsageLocatorV2):
+            root_items = [get_component_from_usage_key(object_key)]
+            root_level = ContainerHierarchy.Level.components
+
+        elif isinstance(object_key, LibraryContainerLocator):
+            root_items = [_get_container_from_key(object_key)]
+            root_level = ContainerHierarchy.Level[f"{object_key.container_type}s"]
+
+        if not root_level:
+            raise TypeError(f"Unexpected '{object_key}': must be LibraryUsageLocatorv2 or LibraryContainerLocator")
+
+        # Fill in root level of hierarchy
+        hierarchy = cls(object_key=object_key)
+        root_members = hierarchy.append(root_level, *root_items)
+
+        # Fill in hierarchy up through parents
+        level = root_level
+        members = root_members
+        while level := level.parent:
+            items = list(_get_containers_with_entities(members).all())
+            members = hierarchy.append(level, *items)
+
+        # Fill in hierarchy down from root_level.
+        if root_level != cls.Level.components:  # Components have no children
+            level = root_level
+            members = root_members
+            while level := level.child:
+                children = _get_containers_children(level, members)
+                members = hierarchy.append(level, *children)
+
+        return hierarchy
+
+
+# TODO -- can these methods be moved inside ContainerHierarchy?
+def _get_containers_with_entities(
+    members: list[ContainerHierarchyMember],
+    *,
+    ignore_pinned=False,
+) -> QuerySet[Container]:
+    """
+    Find all draft containers that directly contain the given entities.
+
+    Args:
+        entities: iterable list or queryset of PublishableEntities.
+        ignore_pinned: if true, ignore any pinned references to the entity.
+    """
+    qs = Container.objects.none()
+    for member in members:
+        qs = qs.union(authoring_api.get_containers_with_entity(
+            member.entity.pk,
+            ignore_pinned=ignore_pinned,
+        ))
+    return qs
+
+
+def _get_containers_children(
+    level: ContainerHierarchy.Level,
+    members: list[ContainerHierarchyMember],
+    *,
+    published=False,
+) -> list[Component | Container]:
+    """
+    Find all components or containers directly contained by the given hierarchy members.
+
+    Args:
+        containers: iterable list or queryset of Containers of the same type.
+        published: `True` if we want the published version of the children, or
+            `False` for the draft version.
+    """
+    children: list[Component | Container] = []
+    for member in members:
+        container = member.container
+        assert container
+        for entry in authoring_api.get_entities_in_container(
+            container,
+            published=published,
+        ):
+            match level:
+                case ContainerHierarchy.Level.components:
+                    children.append(entry.entity_version.componentversion.component)
+                case _:
+                    children.append(entry.entity_version.containerversion.container)
+
+    return children
+# /TODO -- can these methods be moved inside ContainerHierarchy?
+
+
+def get_library_object_hierarchy(
+    object_key: LibraryUsageLocatorV2 | LibraryContainerLocator,
+) -> ContainerHierarchy:
+    """
+    Returns the full ancestry and descendents of the library object with the given object_key.
+    """
+    return ContainerHierarchy.create_from_library_object_key(object_key)
