@@ -26,7 +26,6 @@ class TestEnrollmentsNotificationSender(unittest.TestCase):
         self.user_id = '123'
         self.notification_sender = EnrollmentNotificationSender(self.course, self.user_id, self.expiry_date)
 
-
     @patch('openedx.core.djangoapps.enrollments.enrollments_notifications.USER_NOTIFICATION_REQUESTED.send_event')
     def test_send_audit_access_expiring_soon_notification(self, mock_send_notification):
         """
