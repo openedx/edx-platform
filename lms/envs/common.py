@@ -3378,7 +3378,6 @@ INSTALLED_APPS = [
     "openedx_learning.apps.authoring.sections",
 ]
 
-
 ######################### CSRF #########################################
 
 # Forwards-compatibility with Django 1.7
@@ -4258,6 +4257,14 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     ],
 }
 
+# .. setting_name: PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS
+# .. setting_default: ["year_of_birth"]
+# .. setting_description: List of private fields that will be hidden from the profile information report.
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2025-07-07
+# .. setting_tickets: https://github.com/openedx/edx-platform/pull/36688
+PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS = ["year_of_birth"]
+
 # The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
 ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
@@ -5084,6 +5091,16 @@ DISCUSSIONS_MFE_FEEDBACK_URL = None
 # .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
 EXAMS_DASHBOARD_MICROFRONTEND_URL = None
 
+# .. setting_name: DISCUSSION_SPAM_URLS
+# .. setting_default: []
+# .. setting_description: Urls to filter from discussion content to avoid spam
+DISCUSSION_SPAM_URLS = []
+
+# .. setting_name: CONTENT_FOR_SPAM_POSTS
+# .. setting_default: ""
+# .. setting_description: Content to replace spam posts with
+CONTENT_FOR_SPAM_POSTS = ""
+
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -5674,3 +5691,18 @@ USE_EXTRACTED_PROBLEM_BLOCK = False
 # .. toggle_creation_date: 2024-11-10
 # .. toggle_target_removal_date: 2025-06-01
 USE_EXTRACTED_VIDEO_BLOCK = False
+
+# .. setting_name: RECAPTCHA_PRIVATE_KEY
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha private key to use captcha feature in discussion app.
+RECAPTCHA_PRIVATE_KEY = ""
+
+# .. setting_name: RECAPTCHA_VERIFY_URL
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha verification api url to verify capthca tokens.
+RECAPTCHA_VERIFY_URL = ""
+
+# .. setting_name: RECAPTCHA_SITE_KEY
+# .. setting_default: empty string
+# .. setting_description: Add recaptcha site key to use captcha feature in discussion MFE.
+RECAPTCHA_SITE_KEY = ""

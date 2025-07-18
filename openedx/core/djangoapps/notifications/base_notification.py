@@ -61,7 +61,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': False,
         'email_cadence': EmailCadence.DAILY,
         'push': False,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}><{strong}>{username}</{strong}> posted <{strong}>{post_title}</{strong}></{p}>'),
         'grouped_content_template': _('<{p}><{strong}>{replier_name}</{strong}> and others started new discussions'
                                       '</{p}>'),
@@ -81,7 +81,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': False,
         'email_cadence': EmailCadence.DAILY,
         'push': False,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}><{strong}>{username}</{strong}> asked <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
@@ -131,7 +131,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': True,
         'email_cadence': EmailCadence.DAILY,
         'push': False,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<p><strong>{username}’s </strong> {content_type} has been reported <strong> {'
                               'content}</strong></p>'),
 
@@ -181,7 +181,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': False,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}><{strong}>{course_update_content}</{strong}></{p}>'),
         'content_context': {
             'course_update_content': 'Course update',
@@ -198,7 +198,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': False,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}>You have a new open response submission awaiting review for '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
         'grouped_content_template': _('<{p}>You have multiple submissions awaiting review for '
@@ -219,7 +219,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': True,
         'push': False,
         'email_cadence': EmailCadence.DAILY,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}>You have received {points_earned} out of {points_possible} on your assessment: '
                               '<{strong}>{ora_name}</{strong}></{p}>'),
         'content_context': {
@@ -239,7 +239,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': False,
         'email_cadence': EmailCadence.DAILY,
         'push': False,
-        'non_editable': [],
+        'non_editable': ['push'],
         'content_template': _('<{p}>Your instructor posted <{strong}>{post_title}</{strong}></{p}>'),
         'grouped_content_template': '',
         'content_context': {
