@@ -264,7 +264,7 @@ if core_toggles.ENTRANCE_EXAMS.is_enabled():
 # Enable Web/HTML Certificates
 if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
     from cms.djangoapps.contentstore.views.certificates import (
-        certificate_activation_handler,
+        CertificateActivationAPIView,
         signatory_detail_handler,
         certificates_detail_handler,
         certificates_list_handler
@@ -272,7 +272,7 @@ if settings.FEATURES.get('CERTIFICATES_HTML_VIEW'):
 
     urlpatterns += [
         re_path(fr'^certificates/activation/{settings.COURSE_KEY_PATTERN}/',
-                certificate_activation_handler,
+                CertificateActivationAPIView.as_view(),
                 name='certificate_activation_handler'),
         re_path(r'^certificates/{}/(?P<certificate_id>\d+)/signatories/(?P<signatory_id>\d+)?$'.format(
             settings.COURSE_KEY_PATTERN), signatory_detail_handler, name='signatory_detail_handler'),
