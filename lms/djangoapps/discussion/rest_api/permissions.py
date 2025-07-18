@@ -194,6 +194,9 @@ def can_take_action_on_spam(user, course_id):
         user: User object
         course_id: CourseKey or string of course_id
     """
+    if GlobalStaff().has_user(user):
+        return True
+
     if isinstance(course_id, str):
         course_id = CourseKey.from_string(course_id)
     org_id = course_id.org
@@ -205,20 +208,12 @@ def can_take_action_on_spam(user, course_id):
             course_id__in=course_ids,
         ).values_list('name', flat=True).distinct()
     )
-    is_user_staff = bool(user_roles & {
-        FORUM_ROLE_ADMINISTRATOR,
-        FORUM_ROLE_MODERATOR,
-    })
-    if is_user_staff is True:
+    if bool(user_roles & {FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR}):
         return True
 
     if CourseAccessRole.objects.filter(user=user, course_id__in=course_ids, role__in=["instructor", "staff"]).exists():
         return True
-
-    return (
-        GlobalStaff().has_user(user) or
-        user.is_staff
-    )
+    return False
 
 
 class IsAllowedToBulkDelete(permissions.BasePermission):
