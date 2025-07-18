@@ -110,6 +110,7 @@ class UserClipboard(models.Model):
     # previously copied items are not kept.
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     content = models.ForeignKey(StagedContent, on_delete=models.CASCADE)
+    # WIP: We need to change this type to support ContainerKeys
     source_usage_key = UsageKeyField(
         max_length=255,
         help_text=_("Original usage key/ID of the thing that is in the clipboard."),

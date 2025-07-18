@@ -376,7 +376,10 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> 
             store,
             user=request.user,
             slug_hint=user_clipboard.source_usage_key.block_id,
-            copied_from_block=str(user_clipboard.source_usage_key),
+            # WIP: Remove this
+            copied_from_block=(
+                str(user_clipboard.source_usage_key) if "fake" not in str(user_clipboard.source_usage_key) else None
+            ),
             copied_from_version_num=user_clipboard.content.version_num,
             tags=user_clipboard.content.tags,
         )
@@ -582,13 +585,13 @@ def _import_xml_node_to_parent(
 
     if not children_handled:
         for child_node in child_nodes:
-            child_copied_from = _get_usage_key_from_node(child_node, copied_from_block) if copied_from_block else None
+            child_copied_from = str(_get_usage_key_from_node(child_node, copied_from_block)) if copied_from_block else None
             _import_xml_node_to_parent(
                 child_node,
                 new_xblock,
                 store,
                 user=user,
-                copied_from_block=str(child_copied_from),
+                copied_from_block=child_copied_from,
                 tags=tags,
             )
 
