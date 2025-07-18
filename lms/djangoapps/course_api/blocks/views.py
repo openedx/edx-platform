@@ -330,12 +330,14 @@ class BlocksInCourseView(BlocksView):
 
                 if course_block.get('type') == 'course':
                     root = course_block['id']
+                else:
+                    root = str(course_usage_key)
         else:
             root = response.data['root']
             course_blocks = response.data['blocks']
 
         if not root:
-            raise ValueError(f"Unable to find course block in {course_key_string}")
+            raise ValidationError(f"Unable to find course block in '{course_key_string}'")
 
         recurse_mark_complete(root, course_blocks)
         return response
