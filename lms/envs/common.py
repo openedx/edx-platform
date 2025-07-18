@@ -4257,6 +4257,14 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
     ],
 }
 
+# .. setting_name: PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS
+# .. setting_default: ["year_of_birth"]
+# .. setting_description: List of private fields that will be hidden from the profile information report.
+# .. setting_use_cases: open_edx
+# .. setting_creation_date: 2025-07-07
+# .. setting_tickets: https://github.com/openedx/edx-platform/pull/36688
+PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS = ["year_of_birth"]
+
 # The list of all fields that are shared with other users using the bulk 'all_users' privacy setting
 ACCOUNT_VISIBILITY_CONFIGURATION["bulk_shareable_fields"] = (
     ACCOUNT_VISIBILITY_CONFIGURATION["public_fields"] + [
