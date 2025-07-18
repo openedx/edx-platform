@@ -92,6 +92,11 @@ class ContentStoreTestCase(ModuleStoreTestCase):
 
 
 @ddt
+@override_settings(
+    ENABLE_AUTHN_LOGIN_BLOCK_HIBP_POLICY=False,
+    ENABLE_AUTHN_LOGIN_NUDGE_HIBP_POLICY=False,
+    ENABLE_AUTHN_REGISTER_HIBP_POLICY=False,
+)
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
 
