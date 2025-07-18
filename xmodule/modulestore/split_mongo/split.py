@@ -432,6 +432,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             ids (list): A list of definition ids
         """
         definitions = []
+        print(ids)
         ids = set(ids)
 
         bulk_write_record = self._get_bulk_ops_record(course_key)
