@@ -2314,6 +2314,8 @@ def send_course_update_notification(course_key, content, user):
         app_name="updates",
         audience_filters={},
     )
+    # .. event_implemented_name: COURSE_NOTIFICATION_REQUESTED
+    # .. event_type: org.openedx.learning.course.notification.requested.v1
     COURSE_NOTIFICATION_REQUESTED.send_event(course_notification_data=notification_data)
 
 
