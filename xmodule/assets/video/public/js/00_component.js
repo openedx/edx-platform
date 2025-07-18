@@ -1,83 +1,81 @@
-(function(define) {
-    'use strict';
+'use strict';
 
-    define('video/00_component.js', [],
-        function() {
-            /**
-     * Creates a new object with the specified prototype object and properties.
-     * @param {Object} o The object which should be the prototype of the
-     * newly-created object.
-     * @private
-     * @throws {TypeError, Error}
-     * @return {Object}
-     */
-            var inherit = Object.create || (function() {
-                var F = function() {};
+import _ from 'underscore';
 
-                return function(o) {
-                    if (arguments.length > 1) {
-                        throw Error('Second argument not supported');
-                    }
-                    if (_.isNull(o) || _.isUndefined(o)) {
-                        throw Error('Cannot set a null [[Prototype]]');
-                    }
-                    if (!_.isObject(o)) {
-                        throw TypeError('Argument must be an object');
-                    }
 
-                    F.prototype = o;
+/**
+ * Creates a new object with the specified prototype object and properties.
+ * @param {Object} o The object which should be the prototype of the
+ * newly-created object.
+ * @private
+ * @throws {TypeError, Error}
+ * @return {Object}
+ */
+let inherit = Object.create || (function() {
+    let F = function() {};
 
-                    return new F();
-                };
-            }());
+    return function(o) {
+        if (arguments.length > 1) {
+            throw Error('Second argument not supported');
+        }
+        if (_.isNull(o) || _.isUndefined(o)) {
+            throw Error('Cannot set a null [[Prototype]]');
+        }
+        if (!_.isObject(o)) {
+            throw TypeError('Argument must be an object');
+        }
 
-            /**
-     * Component module.
-     * @exports video/00_component.js
-     * @constructor
-     * @return {jquery Promise}
-     */
-            var Component = function() {
-                if ($.isFunction(this.initialize)) {
-                    // eslint-disable-next-line prefer-spread
-                    return this.initialize.apply(this, arguments);
-                }
-            };
+        F.prototype = o;
 
-            /**
-     * Returns new constructor that inherits form the current constructor.
-     * @static
-     * @param {Object} protoProps The object containing which will be added to
-     * the prototype.
-     * @return {Object}
-     */
-            Component.extend = function(protoProps, staticProps) {
-                var Parent = this,
-                    Child = function() {
-                        if ($.isFunction(this.initialize)) {
-                            // eslint-disable-next-line prefer-spread
-                            return this.initialize.apply(this, arguments);
-                        }
-                    };
+        return new F();
+    };
+}());
 
-                // Inherit methods and properties from the Parent prototype.
-                Child.prototype = inherit(Parent.prototype);
-                Child.constructor = Parent;
-                // Provide access to parent's methods and properties
-                Child.__super__ = Parent.prototype;
+/**
+ * Component module.
+ * @exports video/00_component.js
+ * @constructor
+ * @return {jquery Promise}
+ */
+let Component = function() {
+    if ($.isFunction(this.initialize)) {
+        // eslint-disable-next-line prefer-spread
+        return this.initialize.apply(this, arguments);
+    }
+};
 
-                // Extends inherited methods and properties by methods/properties
-                // passed as argument.
-                if (protoProps) {
-                    $.extend(Child.prototype, protoProps);
-                }
+/**
+ * Returns new constructor that inherits form the current constructor.
+ * @static
+ * @param {Object} protoProps The object containing which will be added to
+ * the prototype.
+ * @return {Object}
+ */
+Component.extend = function(protoProps, staticProps) {
+    let Parent = this;
+    let Child = function() {
+        if ($.isFunction(this.initialize)) {
+            // eslint-disable-next-line prefer-spread
+            return this.initialize.apply(this, arguments);
+        }
+    };
 
-                // Inherit static methods and properties
-                $.extend(Child, Parent, staticProps);
+    // Inherit methods and properties from the Parent prototype.
+    Child.prototype = inherit(Parent.prototype);
+    Child.constructor = Parent;
+    // Provide access to parent's methods and properties
+    Child.__super__ = Parent.prototype;
 
-                return Child;
-            };
+    // Extends inherited methods and properties by methods/properties
+    // passed as argument.
+    if (protoProps) {
+        $.extend(Child.prototype, protoProps);
+    }
 
-            return Component;
-        });
-}(RequireJS.define));
+    // Inherit static methods and properties
+    $.extend(Child, Parent, staticProps);
+
+    return Child;
+};
+
+export default Component;
