@@ -1,70 +1,65 @@
-(function(define) {
-    'use strict';
+'use strict';
 
-    // VideoTranscriptDownloadHandler module.
-    define(
-        'video/035_video_accessible_menu.js', ['underscore'],
-        function(_) {
-            /**
-     * Video Download Transcript control module.
-     * @exports video/035_video_accessible_menu.js
-     * @constructor
-     * @param {jquery Element} element
-     * @param {Object} options
-     */
-            var VideoTranscriptDownloadHandler = function(element, options) {
-                if (!(this instanceof VideoTranscriptDownloadHandler)) {
-                    return new VideoTranscriptDownloadHandler(element, options);
-                }
+import _ from 'underscore';
 
-                _.bindAll(this, 'clickHandler');
+/**
+ * Video Download Transcript control module.
+ * @exports video/035_video_accessible_menu.js
+ * @constructor
+ * @param {jquery Element} element
+ * @param {Object} options
+ */
+let VideoTranscriptDownloadHandler = function(element, options) {
+    if (!(this instanceof VideoTranscriptDownloadHandler)) {
+        return new VideoTranscriptDownloadHandler(element, options);
+    }
 
-                this.container = element;
-                this.options = options || {};
+    _.bindAll(this, 'clickHandler');
 
-                if (this.container.find('.wrapper-downloads .wrapper-download-transcripts')) {
-                    this.initialize();
-                }
+    this.container = element;
+    this.options = options || {};
 
-                return false;
-            };
+    if (this.container.find('.wrapper-downloads .wrapper-download-transcripts')) {
+        this.initialize();
+    }
 
-            VideoTranscriptDownloadHandler.prototype = {
-                // Initializes the module.
-                initialize: function() {
-                    this.value = this.options.storage.getItem('transcript_download_format');
-                    this.el = this.container.find('.list-download-transcripts');
-                    this.el.on('click', '.btn-link', this.clickHandler);
-                },
+    return false;
+};
 
-                // Event handler. We delay link clicks until the file type is set
-                clickHandler: function(event) {
-                    var that = this,
-                        fileType,
-                        data,
-                        downloadUrl;
+VideoTranscriptDownloadHandler.prototype = {
+    // Initializes the module.
+    initialize: function() {
+        this.value = this.options.storage.getItem('transcript_download_format');
+        this.el = this.container.find('.list-download-transcripts');
+        this.el.on('click', '.btn-link', this.clickHandler);
+    },
 
-                    event.preventDefault();
+    // Event handler. We delay link clicks until the file type is set
+    clickHandler: function(event) {
+        let that = this;
+        let fileType;
+        let data;
+        let downloadUrl;
 
-                    fileType = $(event.target).data('value');
-                    data = {transcript_download_format: fileType};
-                    downloadUrl = $(event.target).attr('href');
+        event.preventDefault();
 
-                    $.ajax({
-                        url: this.options.saveStateUrl,
-                        type: 'POST',
-                        dataType: 'json',
-                        data: data,
-                        success: function() {
-                            that.options.storage.setItem('transcript_download_format', fileType);
-                        },
-                        complete: function() {
-                            document.location.href = downloadUrl;
-                        }
-                    });
-                }
-            };
+        fileType = $(event.target).data('value');
+        data = {transcript_download_format: fileType};
+        downloadUrl = $(event.target).attr('href');
 
-            return VideoTranscriptDownloadHandler;
+        $.ajax({
+            url: this.options.saveStateUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: data,
+            success: function() {
+                that.options.storage.setItem('transcript_download_format', fileType);
+            },
+            complete: function() {
+                document.location.href = downloadUrl;
+            }
         });
-}(RequireJS.define));
+    }
+};
+
+export default VideoTranscriptDownloadHandler;
