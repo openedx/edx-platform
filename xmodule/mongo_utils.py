@@ -6,7 +6,6 @@ Common MongoDB connection functions.
 import logging
 
 import pymongo
-from mongodb_proxy import MongoProxy
 from pymongo.read_preferences import (  # lint-amnesty, pylint: disable=unused-import
     ReadPreference,
     _MONGOS_MODES,
@@ -23,7 +22,7 @@ MONGO_READ_PREFERENCE_MAP = dict(zip(_MONGOS_MODES, _MODES))
 def connect_to_mongodb(
     db, host,
     port=27017, tz_aware=True, user=None, password=None,
-    retry_wait_time=0.1, proxy=True, **kwargs
+    retry_reads=True, **kwargs
 ):
     """
     Returns a MongoDB Database connection, optionally wrapped in a proxy. The proxy
@@ -62,6 +61,7 @@ def connect_to_mongodb(
         'port': port,
         'tz_aware': tz_aware,
         'document_class': dict,
+        'retryReads': retry_reads,
         **kwargs,
     }
 
@@ -69,14 +69,6 @@ def connect_to_mongodb(
         connection_params.update({'username': user, 'password': password, 'authSource': auth_source})
 
     mongo_conn = pymongo.MongoClient(**connection_params)
-
-    if proxy:
-        mongo_conn = MongoProxy(
-            mongo_conn[db],
-            wait_time=retry_wait_time
-        )
-        return mongo_conn
-
     return mongo_conn[db]
 
 
