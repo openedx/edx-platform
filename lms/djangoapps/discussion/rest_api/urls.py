@@ -8,6 +8,7 @@ from django.urls import include, path, re_path
 from rest_framework.routers import SimpleRouter
 
 from lms.djangoapps.discussion.rest_api.views import (
+    BulkDeleteUserPosts,
     CommentViewSet,
     CourseActivityStatsView,
     CourseDiscussionRolesAPIView,
@@ -86,6 +87,11 @@ urlpatterns = [
         fr"^v3/course_topics/{settings.COURSE_ID_PATTERN}",
         CourseTopicsViewV3.as_view(),
         name="course_topics_v3"
+    ),
+    re_path(
+        fr"^v1/bulk_delete_user_posts/{settings.COURSE_ID_PATTERN}",
+        BulkDeleteUserPosts.as_view(),
+        name="bulk_delete_user_posts"
     ),
     path('v1/', include(ROUTER.urls)),
 ]
