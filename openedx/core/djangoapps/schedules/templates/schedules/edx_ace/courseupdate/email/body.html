@@ -40,7 +40,9 @@
 <tr>
   <td>
     <p style="margin-top: 16px; color: #1F453D; font-family: Arial; font-size: 30px; font-weight: 700; line-height: 36px; margin-left: 30px;">
-        {% trans "We hope you're enjoying" as tmsg %}{{ tmsg | force_escape }} {{ course_name }}!
+        {% with tmsg=course_name %}
+            We hope you're enjoying {{ tmsg }}!
+        {% endwith %}
     </p>
     <p style="margin-top: 16px; color: #000000; font-family: Arial; font-size: 16px; font-weight: 400; line-height: 24px; margin-left: 30px;">
         {% filter force_escape %}
