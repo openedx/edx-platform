@@ -247,7 +247,7 @@ class _BuiltInVideoBlock(
         fragment = Fragment(self.get_html(context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
         add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
-        shim_xmodule_js(fragment, 'Video')
+        fragment.initialize_js('Video')
         return fragment
 
     def author_view(self, context):
@@ -280,8 +280,8 @@ class _BuiltInVideoBlock(
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
         add_css_to_fragment(fragment, 'VideoBlockDisplay.css')
-        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
-        shim_xmodule_js(fragment, 'Video')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockMain')
+        fragment.initialize_js('Video')
         return fragment
 
     def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
