@@ -2215,7 +2215,7 @@ class OverrideProblemScoreView(DeveloperErrorViewMixin, APIView):
         If the score override is successful, a 200 OK response is returned with the task status
         and the problem and student identifiers in the response payload.
         """
-        
+
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
             return HttpResponseBadRequest(reason=serializer_data.errors)
@@ -2230,13 +2230,24 @@ class OverrideProblemScoreView(DeveloperErrorViewMixin, APIView):
             usage_key = UsageKey.from_string(problem_to_reset).map_into_course(course_key)
             block = modulestore().get_item(usage_key)
         except InvalidKeyError:
-            return Response({"error": f"Unable to parse problem id {problem_to_reset}."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": f"Unable to parse problem id {problem_to_reset}."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         except ItemNotFoundError:
-            return Response({"error": f"Unable to find problem id {problem_to_reset}."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": f"Unable to find problem id {problem_to_reset}."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         if not has_access(request.user, "staff", block):
             return Response(
-                {"error": _(f"User {request.user.id} does not have permission to override scores for problem {problem_to_reset}.")},
+                {
+                    "error": _(
+                        f"User {request.user.id} does not have permission to"
+                        f" override scores for problem {problem_to_reset}."
+                    )
+                },
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -2258,7 +2269,6 @@ class OverrideProblemScoreView(DeveloperErrorViewMixin, APIView):
 
         response_payload['task'] = TASK_SUBMISSION_OK
         return Response(response_payload)
-
 
 
 @method_decorator(transaction.non_atomic_requests, name='dispatch')
