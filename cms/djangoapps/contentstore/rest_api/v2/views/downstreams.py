@@ -286,33 +286,29 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
         component_links = ComponentLink.summarize_by_downstream_context(downstream_context_key=course_key)
         container_links = ContainerLink.summarize_by_downstream_context(downstream_context_key=course_key)
 
-        def merge_link_lists():
+        merged = {}
+
+        def process_list(lst):
             """
-            Merge `component_links` and `container_links` by adding the values of
-            `ready_to_sync_count` and `total_count` of each library.
+            Process a list to merge it with values in `merged`
             """
-            merged = {}
+            for item in lst:
+                key = item["upstream_context_key"]
+                if key not in merged:
+                    merged[key] = item.copy()
+                else:
+                    merged[key]["ready_to_sync_count"] += item["ready_to_sync_count"]
+                    merged[key]["total_count"] += item["total_count"]
+                    if item["last_published_at"] > merged[key]["last_published_at"]:
+                        merged[key]["last_published_at"] = item["last_published_at"]
 
-            def process_list(lst):
-                """
-                Process a list to merge it with values in `merged`
-                """
-                for item in lst:
-                    key = item["upstream_context_key"]
-                    if key not in merged:
-                        merged[key] = item.copy()
-                    else:
-                        merged[key]["ready_to_sync_count"] += item["ready_to_sync_count"]
-                        merged[key]["total_count"] += item["total_count"]
-                        if item["last_published_at"] > merged[key]["last_published_at"]:
-                            merged[key]["last_published_at"] = item["last_published_at"]
 
-            process_list(component_links)
-            process_list(container_links)
+        # Merge `component_links` and `container_links` by adding the values of
+        # `ready_to_sync_count` and `total_count` of each library.
+        process_list(component_links)
+        process_list(container_links)
 
-            return list(merged.values())
-
-        links = merge_link_lists()
+        links = list(merged.values())
         serializer = PublishableEntityLinksSummarySerializer(links, many=True)
         return Response(serializer.data)
 
