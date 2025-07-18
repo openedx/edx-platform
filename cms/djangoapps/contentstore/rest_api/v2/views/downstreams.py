@@ -302,7 +302,6 @@ class DownstreamSummaryView(DeveloperErrorViewMixin, APIView):
                     if item["last_published_at"] > merged[key]["last_published_at"]:
                         merged[key]["last_published_at"] = item["last_published_at"]
 
-
         # Merge `component_links` and `container_links` by adding the values of
         # `ready_to_sync_count` and `total_count` of each library.
         process_list(component_links)
