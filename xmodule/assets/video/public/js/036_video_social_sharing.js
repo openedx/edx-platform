@@ -1,92 +1,85 @@
-(function(define) {
-    // eslint-disable-next-line lines-around-directive
-    'use strict';
+// eslint-disable-next-line lines-around-directive
+'use strict';
 
-    // VideoSocialSharingHandler module.
-    define(
-        'video/036_video_social_sharing.js', ['underscore'],
-        function(_) {
-            var VideoSocialSharingHandler;
+import _ from 'underscore';
 
-            /**
-             * Video Social Sharing control module.
-             * @exports video/036_video_social_sharing.js
-             * @constructor
-             * @param {jquery Element} element
-             * @param {Object} options
-             */
-            VideoSocialSharingHandler = function(element, options) {
-                if (!(this instanceof VideoSocialSharingHandler)) {
-                    return new VideoSocialSharingHandler(element, options);
-                }
 
-                _.bindAll(this, 'clickHandler');
-                _.bindAll(this, 'copyHandler');
-                _.bindAll(this, 'hideHandler');
-                _.bindAll(this, 'showHandler');
+/**
+ * Video Social Sharing control module.
+ * @exports video/036_video_social_sharing.js
+ * @constructor
+ * @param {jquery Element} element
+ * @param {Object} options
+ */
+let VideoSocialSharingHandler = function(element, options) {
+    if (!(this instanceof VideoSocialSharingHandler)) {
+        return new VideoSocialSharingHandler(element, options);
+    }
 
-                this.container = element;
+    _.bindAll(this, 'clickHandler');
+    _.bindAll(this, 'copyHandler');
+    _.bindAll(this, 'hideHandler');
+    _.bindAll(this, 'showHandler');
 
-                if (this.container.find('.wrapper-downloads .wrapper-social-share')) {
-                    this.initialize();
-                }
+    this.container = element;
 
-                return false;
-            };
+    if (this.container.find('.wrapper-downloads .wrapper-social-share')) {
+        this.initialize();
+    }
 
-            VideoSocialSharingHandler.prototype = {
+    return false;
+};
 
-                // Initializes the module.
-                initialize: function() {
-                    this.el = this.container.find('.wrapper-social-share');
-                    this.baseVideoUrl = this.el.data('url');
-                    this.course_id = this.container.data('courseId');
-                    this.block_id = this.container.data('blockId');
-                    this.el.on('click', '.social-share-link', this.clickHandler);
+VideoSocialSharingHandler.prototype = {
 
-                    this.closeBtn = this.el.find('.close-btn');
-                    this.toggleBtn = this.el.find('.social-toggle-btn');
-                    this.copyBtn = this.el.find('.public-video-copy-btn');
-                    this.shareContainer = this.el.find('.container-social-share');
-                    this.closeBtn.on('click', this.hideHandler);
-                    this.toggleBtn.on('click', this.showHandler);
-                    this.copyBtn.on('click', this.copyHandler);
-                },
+    // Initializes the module.
+    initialize: function() {
+        this.el = this.container.find('.wrapper-social-share');
+        this.baseVideoUrl = this.el.data('url');
+        this.course_id = this.container.data('courseId');
+        this.block_id = this.container.data('blockId');
+        this.el.on('click', '.social-share-link', this.clickHandler);
 
-                // Fire an analytics event on share button click.
-                clickHandler: function(event) {
-                    var self = this;
-                    var source = $(event.currentTarget).data('source');
-                    self.sendAnalyticsEvent(source);
-                },
+        this.closeBtn = this.el.find('.close-btn');
+        this.toggleBtn = this.el.find('.social-toggle-btn');
+        this.copyBtn = this.el.find('.public-video-copy-btn');
+        this.shareContainer = this.el.find('.container-social-share');
+        this.closeBtn.on('click', this.hideHandler);
+        this.toggleBtn.on('click', this.showHandler);
+        this.copyBtn.on('click', this.copyHandler);
+    },
 
-                hideHandler: function(event) {
-                    this.shareContainer.hide();
-                    this.toggleBtn.show();
-                },
+    // Fire an analytics event on share button click.
+    clickHandler: function(event) {
+        let source = $(event.currentTarget).data('source');
+        this.sendAnalyticsEvent(source);
+    },
 
-                showHandler: function(event) {
-                    this.shareContainer.show();
-                    this.toggleBtn.hide();
-                },
+    hideHandler: function(event) {
+        this.shareContainer.hide();
+        this.toggleBtn.show();
+    },
 
-                copyHandler: function(event) {
-                    navigator.clipboard.writeText(this.copyBtn.data('url'));
-                },
+    showHandler: function(event) {
+        this.shareContainer.show();
+        this.toggleBtn.hide();
+    },
 
-                // Send an analytics event for share button tracking.
-                sendAnalyticsEvent: function(source) {
-                    window.analytics.track(
-                        'edx.social.video.share_button.clicked',
-                        {
-                            source: source,
-                            video_block_id: this.container.data('blockId'),
-                            course_id: this.container.data('courseId'),
-                        }
-                    );
-                }
-            };
+    copyHandler: function(event) {
+        navigator.clipboard.writeText(this.copyBtn.data('url'));
+    },
 
-            return VideoSocialSharingHandler;
-        });
-}(RequireJS.define));
+    // Send an analytics event for share button tracking.
+    sendAnalyticsEvent: function(source) {
+        window.analytics.track(
+            'edx.social.video.share_button.clicked',
+            {
+                source,
+                video_block_id: this.container.data('blockId'),
+                course_id: this.container.data('courseId'),
+            }
+        );
+    }
+};
+
+export default VideoSocialSharingHandler;

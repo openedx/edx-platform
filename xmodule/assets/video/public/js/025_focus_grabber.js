@@ -25,111 +25,108 @@
  * ~ Zen saying
  */
 
-(function(requirejs, require, define) {
+
+
 // FocusGrabber module.
-    define(
-        'video/025_focus_grabber.js',
-        [],
-        function() {
-            return function(state) {
-                var dfd = $.Deferred();
+let FocusGrabber = function(state) {
+    let dfd = $.Deferred();
 
-                state.focusGrabber = {};
+    state.focusGrabber = {};
 
-                _makeFunctionsPublic(state);
-                _renderElements(state);
-                _bindHandlers(state);
+    _makeFunctionsPublic(state);
+    _renderElements(state);
+    _bindHandlers(state);
 
-                dfd.resolve();
-                return dfd.promise();
-            };
+    dfd.resolve();
+    return dfd.promise();
+};
 
-            // Private functions.
+// Private functions.
 
-            function _makeFunctionsPublic(state) {
-                var methodsDict = {
-                    disableFocusGrabber: disableFocusGrabber,
-                    enableFocusGrabber: enableFocusGrabber,
-                    onFocus: onFocus
-                };
+function _makeFunctionsPublic(state) {
+    let methodsDict = {
+        disableFocusGrabber: disableFocusGrabber,
+        enableFocusGrabber: enableFocusGrabber,
+        onFocus: onFocus
+    };
 
-                state.bindTo(methodsDict, state.focusGrabber, state);
-            }
+    state.bindTo(methodsDict, state.focusGrabber, state);
+}
 
-            function _renderElements(state) {
-                state.focusGrabber.elFirst = state.el.find('.focus_grabber.first');
-                state.focusGrabber.elLast = state.el.find('.focus_grabber.last');
+function _renderElements(state) {
+    state.focusGrabber.elFirst = state.el.find('.focus_grabber.first');
+    state.focusGrabber.elLast = state.el.find('.focus_grabber.last');
 
-                // From the start, the Focus Grabber must be disabled so that
-                // tabbing (switching focus) does not land the user on one of the
-                // placeholder elements (elFirst, elLast).
-                state.focusGrabber.disableFocusGrabber();
-            }
+    // From the start, the Focus Grabber must be disabled so that
+    // tabbing (switching focus) does not land the user on one of the
+    // placeholder elements (elFirst, elLast).
+    state.focusGrabber.disableFocusGrabber();
+}
 
-            function _bindHandlers(state) {
-                state.focusGrabber.elFirst.on('focus', state.focusGrabber.onFocus);
-                state.focusGrabber.elLast.on('focus', state.focusGrabber.onFocus);
+function _bindHandlers(state) {
+    state.focusGrabber.elFirst.on('focus', state.focusGrabber.onFocus);
+    state.focusGrabber.elLast.on('focus', state.focusGrabber.onFocus);
 
-                // When the video container element receives programmatic focus, then
-                // on un-focus ('blur' event) we should trigger a 'mousemove' event so
-                // as to reveal autohidden controls.
-                state.el.on('blur', function() {
-                    state.el.trigger('mousemove');
-                });
-            }
+    // When the video container element receives programmatic focus, then
+    // on un-focus ('blur' event) we should trigger a 'mousemove' event so
+    // as to reveal autohidden controls.
+    state.el.on('blur', function() {
+        state.el.trigger('mousemove');
+    });
+}
 
-            // Public functions.
+// Public functions.
 
-            function enableFocusGrabber() {
-                var tabIndex;
+function enableFocusGrabber() {
+    let tabIndex;
 
-                // When the Focus Grabber is being enabled, there are two different
-                // scenarios:
-                //
-                //     1.) Currently focused element was inside the video player.
-                //     2.) Currently focused element was somewhere else on the page.
-                //
-                // In the first case we must make sure that the video player doesn't
-                // loose focus, even though the controls are autohidden.
-                if ($(document.activeElement).parents().hasClass('video')) {
-                    tabIndex = -1;
-                } else {
-                    tabIndex = 0;
-                }
+    // When the Focus Grabber is being enabled, there are two different
+    // scenarios:
+    //
+    //     1.) Currently focused element was inside the video player.
+    //     2.) Currently focused element was somewhere else on the page.
+    //
+    // In the first case we must make sure that the video player doesn't
+    // loose focus, even though the controls are autohidden.
+    if ($(document.activeElement).parents().hasClass('video')) {
+        tabIndex = -1;
+    } else {
+        tabIndex = 0;
+    }
 
-                this.focusGrabber.elFirst.attr('tabindex', tabIndex);
-                this.focusGrabber.elLast.attr('tabindex', tabIndex);
+    this.focusGrabber.elFirst.attr('tabindex', tabIndex);
+    this.focusGrabber.elLast.attr('tabindex', tabIndex);
 
-                // Don't loose focus. We are inside video player on some control, but
-                // because we can't remain focused on a hidden element, we will shift
-                // focus to the main video element.
-                //
-                // Once the main element will receive the un-focus ('blur') event, a
-                // 'mousemove' event will be triggered, and the video controls will
-                // receive focus once again.
-                if (tabIndex === -1) {
-                    this.el.focus();
+    // Don't loose focus. We are inside video player on some control, but
+    // because we can't remain focused on a hidden element, we will shift
+    // focus to the main video element.
+    //
+    // Once the main element will receive the un-focus ('blur') event, a
+    // 'mousemove' event will be triggered, and the video controls will
+    // receive focus once again.
+    if (tabIndex === -1) {
+        this.el.focus();
 
-                    this.focusGrabber.elFirst.attr('tabindex', 0);
-                    this.focusGrabber.elLast.attr('tabindex', 0);
-                }
-            }
+        this.focusGrabber.elFirst.attr('tabindex', 0);
+        this.focusGrabber.elLast.attr('tabindex', 0);
+    }
+}
 
-            function disableFocusGrabber() {
-                // Only programmatic focusing on these elements will be available.
-                // We don't want the user to focus on them (for example with the 'Tab'
-                // key).
-                this.focusGrabber.elFirst.attr('tabindex', -1);
-                this.focusGrabber.elLast.attr('tabindex', -1);
-            }
+function disableFocusGrabber() {
+    // Only programmatic focusing on these elements will be available.
+    // We don't want the user to focus on them (for example with the 'Tab'
+    // key).
+    this.focusGrabber.elFirst.attr('tabindex', -1);
+    this.focusGrabber.elLast.attr('tabindex', -1);
+}
 
-            function onFocus(event, params) {
-                // Once the Focus Grabber placeholder elements will gain focus, we will
-                // trigger 'mousemove' event so that the autohidden controls will
-                // become visible.
-                this.el.trigger('mousemove');
+function onFocus(event, params) {
+    // Once the Focus Grabber placeholder elements will gain focus, we will
+    // trigger 'mousemove' event so that the autohidden controls will
+    // become visible.
+    this.el.trigger('mousemove');
 
-                this.focusGrabber.disableFocusGrabber();
-            }
-        });
-}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
+    this.focusGrabber.disableFocusGrabber();
+}
+
+export default FocusGrabber;
