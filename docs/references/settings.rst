@@ -6,13 +6,19 @@ This is the list of (non-toggle) Django settings defined in the ``common.py`` mo
 .. note::
     Toggle settings, which enable or disable a specific feature, are documented in the :ref:`feature toggles <featuretoggles>` section.
 
-LMS settings
+Platform-Wide Settings
+----------------------
+
+.. settings::
+    :folder_path: openedx/envs/common.py
+
+LMS Settings
 ------------
 
 .. settings::
     :folder_path: lms/envs/common.py
 
-CMS settings
+CMS Settings
 ------------
 
 .. settings::
