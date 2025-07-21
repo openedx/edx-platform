@@ -1177,7 +1177,9 @@ text-unidecode==1.3
 tinycss2==1.4.0
     # via bleach
 tomlkit==0.13.2
-    # via snowflake-connector-python
+    # via
+    #   openedx-learning
+    #   snowflake-connector-python
 tqdm==4.67.1
     # via
     #   nltk

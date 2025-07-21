@@ -1566,6 +1566,7 @@ tinycss2==1.4.0
 tomlkit==0.13.2
     # via
     #   -r requirements/edx/base.txt
+    #   openedx-learning
     #   pylint
     #   snowflake-connector-python
 tox==4.26.0
