@@ -37,6 +37,10 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <p><input type="button" name="list-may-enroll-csv" value="${_("Download a CSV of learners who can enroll")}" data-endpoint="${ section_data['get_students_who_may_enroll_url'] }" data-csv="true"></p>
 
+    <p>${_("Click to generate a CSV file that lists learners who are enrolled in the course but have not yet activated their account.")}</p>
+
+    <p><input type="button" name="list-learners-not-activated-csv" value="${_("Download a CSV of learners who have not activated their account")}" data-endpoint="${ section_data['get_inactive_enrolled_students_url'] }" data-csv="true"></p>
+
     <p>${_("Click to download a CSV of anonymized student IDs:")}</p>
     <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" ></p>
 

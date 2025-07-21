@@ -6,6 +6,7 @@ from openedx.core.djangoapps.django_comment_common.comment_client import models,
 from .thread import Thread
 from .utils import CommentClientRequestError, get_course_key
 from forum import api as forum_api
+from forum.backends.mongodb.comments import Comment as ForumComment
 
 
 class Comment(models.Model):
@@ -96,6 +97,37 @@ class Comment(models.Model):
         """
         soup = BeautifulSoup(self.body, 'html.parser')
         return soup.get_text()
+
+    @classmethod
+    def get_user_comment_count(cls, user_id, course_ids):
+        """
+        Returns comments and responses count of user in the given course_ids.
+        TODO: Add support for MySQL backend as well
+        """
+        query_params = {
+            "course_id": {"$in": course_ids},
+            "author_id": str(user_id),
+            "_type": "Comment"
+        }
+        return ForumComment()._collection.count_documents(query_params)  # pylint: disable=protected-access
+
+    @classmethod
+    def delete_user_comments(cls, user_id, course_ids):
+        """
+        Deletes comments and responses of user in the given course_ids.
+        TODO: Add support for MySQL backend as well
+        """
+        query_params = {
+            "course_id": {"$in": course_ids},
+            "author_id": str(user_id),
+        }
+        comments_deleted = 0
+        comments = ForumComment().get_list(**query_params)
+        for comment in comments:
+            comment_id = comment.get("_id")
+            if comment_id:
+                comments_deleted += ForumComment().delete(comment_id)
+        return comments_deleted
 
 
 def _url_for_thread_comments(thread_id):

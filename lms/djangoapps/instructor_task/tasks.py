@@ -30,7 +30,11 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches
 from lms.djangoapps.instructor_task.tasks_base import BaseInstructorTask
 from lms.djangoapps.instructor_task.tasks_helper.certs import generate_students_certificates
-from lms.djangoapps.instructor_task.tasks_helper.enrollments import upload_may_enroll_csv, upload_students_csv
+from lms.djangoapps.instructor_task.tasks_helper.enrollments import (
+    upload_inactive_enrolled_students_info_csv,
+    upload_may_enroll_csv,
+    upload_students_csv
+)
 from lms.djangoapps.instructor_task.tasks_helper.grades import CourseGradeReport, ProblemGradeReport, ProblemResponses
 from lms.djangoapps.instructor_task.tasks_helper.misc import (
     cohort_students_and_upload,
@@ -264,6 +268,20 @@ def calculate_may_enroll_csv(entry_id, xblock_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = gettext_noop('generated')
     task_fn = partial(upload_may_enroll_csv, xblock_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@shared_task(base=BaseInstructorTask)
+@set_code_owner_attribute
+def calculate_inactive_enrolled_students_info_csv(entry_id, xblock_instance_args):
+    """
+    Compute information about invited students who have not enrolled
+    in a given course yet and upload the CSV to an S3 bucket for
+    download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = gettext_noop('generated')
+    task_fn = partial(upload_inactive_enrolled_students_info_csv, xblock_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 

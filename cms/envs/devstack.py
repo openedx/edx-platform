@@ -350,6 +350,7 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX_TRIM': '/api/contentstore',
     'SERVERS': [
         {'url': AUTHORING_API_URL, 'description': 'Public'},
-        {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'Local'}
+        {'url': f'http://{CMS_BASE}', 'description': 'Local'},
+        {'url': f'http://{CMS_BASE}/api/contentstore', 'description': 'CMS-contentstore'}
     ],
 }

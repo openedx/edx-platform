@@ -31,6 +31,8 @@ def emit_course_access_role_added(user, course_id, org_key, role):
     """
     Emit an event to the event-bus when a CourseAccessRole is added
     """
+    # .. event_implemented_name: COURSE_ACCESS_ROLE_ADDED
+    # .. event_type: org.openedx.learning.user.course_access_role.added.v1
     COURSE_ACCESS_ROLE_ADDED.send_event(
         course_access_role_data=CourseAccessRoleData(
             user=UserData(
@@ -52,6 +54,8 @@ def emit_course_access_role_removed(user, course_id, org_key, role):
     """
     Emit an event to the event-bus when a CourseAccessRole is deleted
     """
+    # .. event_implemented_name: COURSE_ACCESS_ROLE_REMOVED
+    # .. event_type: org.openedx.learning.user.course_access_role.removed.v1
     COURSE_ACCESS_ROLE_REMOVED.send_event(
         course_access_role_data=CourseAccessRoleData(
             user=UserData(

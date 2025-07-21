@@ -205,6 +205,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'enable_in_context': True,
             'group_at_subsection': False,
             'provider': 'legacy',
+            "has_bulk_delete_privileges": False,
             'has_moderation_privileges': False,
             "is_course_staff": False,
             "is_course_admin": False,
@@ -214,7 +215,13 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'edit_reasons': [{'code': 'test-edit-reason', 'label': 'Test Edit Reason'}],
             'post_close_reasons': [{'code': 'test-close-reason', 'label': 'Test Close Reason'}],
             'show_discussions': True,
-            'is_notify_all_learners_enabled': False
+            'is_notify_all_learners_enabled': False,
+            'captcha_settings': {
+                'enabled': False,
+                'site_key': '',
+            },
+            "is_email_verified": True,
+            "only_verified_users_can_post": False
         }
 
     @ddt.data(

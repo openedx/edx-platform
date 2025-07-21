@@ -131,6 +131,8 @@ def emit_catalog_info_changed_signal(course_key: CourseKey):
     if SEND_CATALOG_INFO_SIGNAL.is_enabled():
         timestamp, catalog_info = _create_catalog_data_for_signal(course_key)
         if catalog_info is not None:
+            # .. event_implemented_name: COURSE_CATALOG_INFO_CHANGED
+            # .. event_type: org.openedx.content_authoring.course.catalog_info.changed.v1
             COURSE_CATALOG_INFO_CHANGED.send_event(time=timestamp, catalog_info=catalog_info)
 
 
