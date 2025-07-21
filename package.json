@@ -98,7 +98,7 @@
     "underscore.string": "3.3.6",
     "webpack": "^5.90.3",
     "webpack-bundle-tracker": "0.4.3",
-    "webpack-merge": "4.2.2",
+    "webpack-merge": "6.0.1",
     "which-country": "1.0.0"
   },
   "devDependencies": {
