@@ -81,11 +81,6 @@ from lms.djangoapps.course_home_api.toggles import course_home_mfe_progress_tab_
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.discussion.django_comment_client.utils import (
-    get_group_id_for_user,
-    get_group_name,
-    has_forum_access,
-)
 from lms.djangoapps.instructor import enrollment
 from lms.djangoapps.instructor.access import ROLES, allow_access, list_with_level, revoke_access, update_forum_role
 from lms.djangoapps.instructor.constants import INVOICE_KEY
@@ -108,25 +103,25 @@ from lms.djangoapps.instructor.views.serializer import (
     BlockDueDateSerializer,
     CertificateSerializer,
     CertificateStatusesSerializer,
+    ForumRoleNameSerializer,
     ListInstructorTaskInputSerializer,
     ModifyAccessSerializer,
     RoleNameSerializer,
     SendEmailSerializer,
+    ShowUnitExtensionsSerializer,
     ShowStudentExtensionSerializer,
     StudentAttemptsSerializer,
     UserSerializer,
     UniqueStudentIdentifierSerializer,
-    ProblemResetSerializer
+    ProblemResetSerializer,
+    UpdateForumRoleMembershipSerializer,
+    RescoreEntranceExamSerializer
 )
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.django_comment_common.models import (
     CourseDiscussionSettings,
-    FORUM_ROLE_ADMINISTRATOR,
-    FORUM_ROLE_COMMUNITY_TA,
-    FORUM_ROLE_GROUP_MODERATOR,
-    FORUM_ROLE_MODERATOR,
     Role,
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -138,11 +133,11 @@ from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.api.serializers import CourseKeyField
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
+    DashboardError,
     dump_block_extensions,
     dump_student_extensions,
     find_unit,
     get_student_from_identifier,
-    handle_dashboard_error,
     keep_field_private,
     parse_datetime,
     set_due_date_extension,
@@ -1278,66 +1273,77 @@ class ProblemResponseReportInitiate(DeveloperErrorViewMixin, APIView):
         )
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@require_course_permission(permissions.CAN_RESEARCH)
-def get_problem_responses(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetProblemResponses(DeveloperErrorViewMixin, APIView):
     """
     Initiate generation of a CSV file containing all student answers
     to a given problem.
-
-    **Example requests**
-
-        POST /courses/{course_id}/instructor/api/get_problem_responses {
-            "problem_location": "{usage_key1},{usage_key2},{usage_key3}""
-        }
-        POST /courses/{course_id}/instructor/api/get_problem_responses {
-            "problem_location": "{usage_key}",
-            "problem_types_filter": "problem"
-        }
-
-        **POST Parameters**
-
-        A POST request can include the following parameters:
-
-        * problem_location: A comma-separated list of usage keys for the blocks
-          to include in the report. If the location is a block that contains
-          other blocks, (such as the course, section, subsection, or unit blocks)
-          then all blocks under that block will be included in the report.
-        * problem_types_filter: Optional. A comma-separated list of block types
-          to include in the repot. If set, only blocks of the specified types will
-          be included in the report.
-
-        To get data on all the poll and survey blocks in a course, you could
-        POST the usage key of the course for `problem_location`, and
-        "poll, survey" as the value for `problem_types_filter`.
-
-
-    **Example Response:**
-    If initiation is successful (or generation task is already running):
-    ```json
-    {
-        "status": "The problem responses report is being created. ...",
-        "task_id": "4e49522f-31d9-431a-9cff-dd2a2bf4c85a"
-    }
-    ```
-
-    Responds with BadRequest if any of the provided problem locations are faulty.
     """
-    # A comma-separated list of problem locations
-    # The name of the POST parameter is `problem_location` (not pluralised) in
-    # order to preserve backwards compatibility with existing third-party
-    # scripts.
-    problem_locations = request.POST.get('problem_location', '').split(',')
-    # A comma-separated list of block types
-    problem_types_filter = request.POST.get('problem_types_filter')
-    return _get_problem_responses(
-        request,
-        course_id=course_id,
-        problem_locations=problem_locations,
-        problem_types_filter=problem_types_filter,
-    )
+
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Initiate generation of a CSV file containing all student answers
+        to a given problem.
+
+        **Example requests**
+
+            POST /courses/{course_id}/instructor/api/get_problem_responses {
+                "problem_location": "{usage_key1},{usage_key2},{usage_key3}""
+            }
+            POST /courses/{course_id}/instructor/api/get_problem_responses {
+                "problem_location": "{usage_key}",
+                "problem_types_filter": "problem"
+            }
+
+            **POST Parameters**
+
+            A POST request can include the following parameters:
+
+            * problem_location: A comma-separated list of usage keys for the blocks
+              to include in the report. If the location is a block that contains
+              other blocks, (such as the course, section, subsection, or unit blocks)
+              then all blocks under that block will be included in the report.
+            * problem_types_filter: Optional. A comma-separated list of block types
+              to include in the repot. If set, only blocks of the specified types will
+              be included in the report.
+
+            To get data on all the poll and survey blocks in a course, you could
+            POST the usage key of the course for `problem_location`, and
+            "poll, survey" as the value for `problem_types_filter`.
+
+
+        **Example Response:**
+        If initiation is successful (or generation task is already running):
+        ```json
+        {
+            "status": "The problem responses report is being created. ...",
+            "task_id": "4e49522f-31d9-431a-9cff-dd2a2bf4c85a"
+        }
+        ```
+
+        Responds with BadRequest if any of the provided problem locations are faulty.
+        """
+        # A comma-separated list of problem locations
+        # The name of the POST parameter is `problem_location` (not pluralised) in
+        # order to preserve backwards compatibility with existing third-party
+        # scripts.
+
+        problem_locations = request.POST.get('problem_location', '').split(',')
+        # A comma-separated list of block types
+        problem_types_filter = request.POST.get('problem_types_filter')
+
+        return _get_problem_responses(
+            request,
+            course_id=course_id,
+            problem_locations=problem_locations,
+            problem_types_filter=problem_types_filter,
+        )
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -1491,7 +1497,6 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
                 'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
                 'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
             ]
-        keep_field_private(query_features, 'year_of_birth')  # protected information
 
         # Provide human-friendly and translatable names for these features. These names
         # will be displayed in the table generated in data_download.js. It is not (yet)
@@ -1503,8 +1508,7 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'email': _('Email'),
             'language': _('Language'),
             'location': _('Location'),
-            #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683,
-            #  not to go in reports
+            'year_of_birth': _('Birth Year'),
             'gender': _('Gender'),
             'level_of_education': _('Level of Education'),
             'mailing_address': _('Mailing Address'),
@@ -1514,6 +1518,10 @@ class GetStudentsFeatures(DeveloperErrorViewMixin, APIView):
             'date_joined': _('Date Joined'),
             'external_user_key': _('External User Key'),
         }
+
+        for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
+            keep_field_private(query_features, field)
+            query_features_names.pop(field, None)
 
         if is_course_cohorted(course.id):
             # Translators: 'Cohort' refers to a group of students within a course.
@@ -1588,6 +1596,46 @@ class GetStudentsWhoMayEnroll(DeveloperErrorViewMixin, APIView):
 
     def get(self, request, *args, **kwargs):
         raise MethodNotAllowed('GET')
+
+
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class GetInactiveEnrolledStudents(DeveloperErrorViewMixin, APIView):
+    """
+    Initiate generation of a CSV file containing information about
+    students who are enrolled in a course but have inactive account.
+    """
+
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.CAN_RESEARCH
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(transaction.non_atomic_requests)
+    def post(self, request, course_id):
+        """
+        Initiate generation of a CSV file containing information about
+        students who are enrolled in a course but have inactive account.
+
+        Responds with JSON
+            {"status": "... status message ..."}
+        """
+        course_key = CourseKey.from_string(course_id)
+        query_features = ["email"]
+        report_type = _("inactive enrollment")
+        try:
+            task_api.submit_calculate_inactive_enrolled_students_csv(
+                request, course_key, query_features
+            )
+            success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+        except Exception as e:
+            raise self.api_error(
+                status.HTTP_400_BAD_REQUEST, str(e), "Requested task is already running"
+            )
+
+        return JsonResponse({"status": success_status})
+
+    def get(self, request, *args, **kwargs):
+        raise MethodNotAllowed("GET")
 
 
 def _cohorts_csv_validator(file_storage, file_to_validate):
@@ -2201,62 +2249,75 @@ def override_problem_score(request, course_id):  # lint-amnesty, pylint: disable
     return JsonResponse(response_payload)
 
 
-@transaction.non_atomic_requests
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.RESCORE_EXAMS)
-@common_exceptions_400
-def rescore_entrance_exam(request, course_id):
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class RescoreEntranceExamView(DeveloperErrorViewMixin, APIView):
     """
-    Starts a background process a students attempts counter for entrance exam.
+    Starts a background process for a student's attempts counter for entrance exam.
     Optionally deletes student state for a problem. Limited to instructor access.
 
-    Takes either of the following query parameters
-        - unique_student_identifier is an email or username
-        - all_students is a boolean
+    Takes either of the following parameters:
+        - unique_student_identifier: an email or username
+        - all_students: a boolean
 
     all_students and unique_student_identifier cannot both be present.
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_with_access(
-        request.user, 'staff', course_id, depth=None
-    )
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    permission_name = permissions.RESCORE_EXAMS
+    serializer_class = RescoreEntranceExamSerializer
 
-    student_identifier = request.POST.get('unique_student_identifier', None)
-    only_if_higher = request.POST.get('only_if_higher', None)
-    student = None
-    if student_identifier is not None:
-        student = get_student_from_identifier(student_identifier)
+    @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Initiates a Celery task to rescore the entrance exam for a student or all students.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
 
-    all_students = _get_boolean_param(request, 'all_students')
-
-    if not course.entrance_exam_id:
-        return HttpResponseBadRequest(
-            _("Course has no entrance exam section.")
+        course_id = CourseKey.from_string(course_id)
+        course = get_course_with_access(
+            request.user, 'staff', course_id, depth=None
         )
 
-    if all_students and student:
-        return HttpResponseBadRequest(
-            _("Cannot rescore with all_students and unique_student_identifier.")
+        if not course.entrance_exam_id:
+            return Response(
+                {"error": _("Course has no entrance exam section.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        student_identifier = data.get('unique_student_identifier')
+        only_if_higher = data.get('only_if_higher')
+        all_students = data.get('all_students', False)
+        student = None
+
+        if student_identifier:
+            student = get_student_from_identifier(student_identifier)
+
+        if all_students and student:
+            return Response(
+                {"error": _("Cannot rescore with all_students and unique_student_identifier.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
+        except InvalidKeyError:
+            return Response(
+                {"error": _("Course has no valid entrance exam section.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        response_payload = {
+            'student': student_identifier if student else _("All Students"),
+            'task': TASK_SUBMISSION_OK
+        }
+
+        task_api.submit_rescore_entrance_exam_for_student(
+            request, entrance_exam_key, student, only_if_higher,
         )
 
-    try:
-        entrance_exam_key = UsageKey.from_string(course.entrance_exam_id).map_into_course(course_id)
-    except InvalidKeyError:
-        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
-
-    response_payload = {}
-    if student:
-        response_payload['student'] = student_identifier
-    else:
-        response_payload['student'] = _("All Students")
-
-    task_api.submit_rescore_entrance_exam_for_student(
-        request, entrance_exam_key, student, only_if_higher,
-    )
-    response_payload['task'] = TASK_SUBMISSION_OK
-    return JsonResponse(response_payload)
+        return Response(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -2849,12 +2910,8 @@ class ProblemGradeReport(DeveloperErrorViewMixin, APIView):
         return JsonResponse({"status": success_status})
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.VIEW_FORUM_MEMBERS)
-@require_post_params('rolename')
-def list_forum_members(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ListForumMembers(APIView):
     """
     Lists forum members of a certain rolename.
     Limited to staff access.
@@ -2863,61 +2920,48 @@ def list_forum_members(request, course_id):
     Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
         which is limited to instructors.
 
-    Takes query parameter `rolename`.
     """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
-    has_forum_admin = has_forum_access(
-        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+    permission_classes = (
+        IsAuthenticated, permissions.InstructorPermission, permissions.ForumAdminRequiresInstructorAccess
     )
+    permission_name = permissions.VIEW_FORUM_MEMBERS
+    serializer_class = ForumRoleNameSerializer
 
-    rolename = request.POST.get('rolename')
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handle the POST request to list forum members with a certain role name for the given course.
 
-    # default roles require either (staff & forum admin) or (instructor)
-    if not (has_forum_admin or has_instructor_access):
-        return HttpResponseBadRequest(
-            "Operation requires staff & forum admin or instructor access"
+        Args:
+            request (HttpRequest): The request object containing the data sent by the client.
+            course_id (int): The ID of the course for which the role is being assigned or managed.
+
+        Returns:
+            Response: The Json constians lists of members.
+
+        Raises:
+            ValidationError: If the provided `rolename` is not valid according to the serializer.
+        """
+        course_id = CourseKey.from_string(course_id)
+        course_discussion_settings = CourseDiscussionSettings.get(course_id)
+
+        role_serializer = ForumRoleNameSerializer(
+            data=request.data,
+            context={
+                'course_discussion_settings': course_discussion_settings,
+                'course_id': course_id
+            }
         )
 
-    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-        return HttpResponseBadRequest("Operation requires instructor access.")
+        role_serializer.is_valid(raise_exception=True)
+        rolename = role_serializer.data['rolename']
 
-    # filter out unsupported for roles
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                        FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest(strip_tags(
-            f"Unrecognized rolename '{rolename}'."
-        ))
-
-    try:
-        role = Role.objects.get(name=rolename, course_id=course_id)
-        users = role.users.all().order_by('username')
-    except Role.DoesNotExist:
-        users = []
-
-    course_discussion_settings = CourseDiscussionSettings.get(course_id)
-
-    def extract_user_info(user):
-        """ Convert user to dict for json rendering. """
-        group_id = get_group_id_for_user(user, course_discussion_settings)
-        group_name = get_group_name(group_id, course_discussion_settings)
-
-        return {
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'group_name': group_name,
+        response_payload = {
+            'course_id': str(course_id),
+            rolename: role_serializer.data.get('users'),
+            'division_scheme': course_discussion_settings.division_scheme,
         }
-
-    response_payload = {
-        'course_id': str(course_id),
-        rolename: list(map(extract_user_info, users)),
-        'division_scheme': course_discussion_settings.division_scheme,
-    }
-    return JsonResponse(response_payload)
+        return JsonResponse(response_payload)
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
@@ -3012,71 +3056,71 @@ class SendEmail(DeveloperErrorViewMixin, APIView):
         return JsonResponse(response_payload)
 
 
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.EDIT_FORUM_ROLES)
-@require_post_params(
-    unique_student_identifier="email or username of user to change access",
-    rolename="the forum role",
-    action="'allow' or 'revoke'",
-)
-@common_exceptions_400
-def update_forum_role_membership(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class UpdateForumRoleMembership(APIView):
     """
-    Modify user's forum role.
+    Modify a user's forum role in a course.
 
-    The requesting user must be at least staff.
-    Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
-        which is limited to instructors.
-    No one can revoke an instructors FORUM_ROLE_ADMINISTRATOR status.
+    Permissions:
+    - Must be authenticated.
+    - Must be instructor or (staff + forum admin).
+    - Only instructors can grant FORUM_ROLE_ADMINISTRATOR.
 
-    Query parameters:
-    - `email` is the target users email
-    - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_GROUP_MODERATOR,
-        FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
-    - `action` is one of ['allow', 'revoke']
-    """
-    course_id = CourseKey.from_string(course_id)
-    course = get_course_by_id(course_id)
-    has_instructor_access = has_access(request.user, 'instructor', course)
-    has_forum_admin = has_forum_access(
-        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
-    )
-
-    unique_student_identifier = request.POST.get('unique_student_identifier')
-    rolename = request.POST.get('rolename')
-    action = request.POST.get('action')
-
-    # default roles require either (staff & forum admin) or (instructor)
-    if not (has_forum_admin or has_instructor_access):
-        return HttpResponseBadRequest(
-            "Operation requires staff & forum admin or instructor access"
-        )
-
-    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
-    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
-        return HttpResponseBadRequest("Operation requires instructor access.")
-
-    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_GROUP_MODERATOR,
-                        FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest(strip_tags(
-            f"Unrecognized rolename '{rolename}'."
-        ))
-
-    user = get_student_from_identifier(unique_student_identifier)
-    if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
-        CourseEnrollment.enroll(user, course_id)
-    try:
-        update_forum_role(course_id, user, rolename, action)
-    except Role.DoesNotExist:
-        return HttpResponseBadRequest("Role does not exist.")
-
-    response_payload = {
-        'course_id': str(course_id),
-        'action': action,
+    Request (POST body):
+    {
+        "unique_student_identifier": "user@example.com",
+        "rolename": "FORUM_ROLE_MODERATOR",
+        "action": "allow"  or "revoke"
     }
-    return JsonResponse(response_payload)
+
+    """
+    permission_classes = (
+        IsAuthenticated,
+        permissions.InstructorPermission,
+        permissions.ForumAdminRequiresInstructorAccess
+    )
+    permission_name = permissions.EDIT_FORUM_ROLES
+    serializer_class = UpdateForumRoleMembershipSerializer
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Handles role modification requests for a forum user.
+
+        Query parameters:
+        - `email` is the target users email
+        - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_GROUP_MODERATOR,
+            FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+        - `action` is one of ['allow', 'revoke']
+        """
+        course_id = CourseKey.from_string(course_id)
+        serializer_data = UpdateForumRoleMembershipSerializer(data=request.data)
+
+        if not serializer_data.is_valid():
+            return HttpResponseBadRequest(reason=serializer_data.errors)
+
+        user = serializer_data.validated_data.get('unique_student_identifier')
+        if not user:
+            return JsonResponse({'error': 'User does not exist.'}, status=400)
+
+        rolename = serializer_data.data['rolename']
+        action = serializer_data.data['action']
+
+        if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
+            CourseEnrollment.enroll(user, course_id)
+
+        try:
+            update_forum_role(course_id, user, rolename, action)
+        except Role.DoesNotExist:
+            return HttpResponseBadRequest("Role does not exist.")
+
+        return Response(
+            {
+                "course_id": str(course_id),
+                "action": action,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 @require_POST
@@ -3126,24 +3170,30 @@ class ChangeDueDate(APIView):
         """
         serializer_data = self.serializer_class(data=request.data)
         if not serializer_data.is_valid():
-            return HttpResponseBadRequest(reason=serializer_data.errors)
+            return JsonResponseBadRequest({'error': _('All fields must be filled out')})
 
         student = serializer_data.validated_data.get('student')
         if not student:
             response_payload = {
-                'error': f'Could not find student matching identifier: {request.data.get("student")}'
+                'error': _(
+                    'Could not find student matching identifier: {student}'
+                ).format(student=request.data.get("student"))
             }
-            return JsonResponse(response_payload)
+            return JsonResponse(response_payload, status=status.HTTP_404_NOT_FOUND)
+
+        due_datetime = serializer_data.validated_data.get('due_datetime')
+        try:
+            due_date = parse_datetime(due_datetime)
+        except DashboardError:
+            return JsonResponseBadRequest({'error': _('The extension due date and time format is incorrect')})
 
         course = get_course_by_id(CourseKey.from_string(course_id))
-
         unit = find_unit(course, serializer_data.validated_data.get('url'))
-        due_date = parse_datetime(serializer_data.validated_data.get('due_datetime'))
         reason = strip_tags(serializer_data.validated_data.get('reason', ''))
         try:
             set_due_date_extension(course, unit, student, due_date, request.user, reason=reason)
         except Exception as error:  # pylint: disable=broad-except
-            return JsonResponse({'error': str(error)}, status=400)
+            return JsonResponseBadRequest({'error': str(error)})
 
         return JsonResponse(_(
             'Successfully changed due date for student {0} for {1} '
@@ -3206,19 +3256,35 @@ class ResetDueDate(APIView):
             return JsonResponse({'error': str(error)}, status=400)
 
 
-@handle_dashboard_error
-@require_POST
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.GIVE_STUDENT_EXTENSION)
-@require_post_params('url')
-def show_unit_extensions(request, course_id):
+@method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
+class ShowUnitExtensionsView(APIView):
     """
-    Shows all of the students which have due date extensions for the given unit.
+    API view to retrieve a list of students who have due date extensions
+    for a specific unit in a course.
     """
-    course = get_course_by_id(CourseKey.from_string(course_id))
-    unit = find_unit(course, request.POST.get('url'))
-    return JsonResponse(dump_block_extensions(course, unit))
+    permission_classes = (IsAuthenticated, permissions.InstructorPermission)
+    serializer_class = ShowUnitExtensionsSerializer
+    permission_name = permissions.GIVE_STUDENT_EXTENSION
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, course_id):
+        """
+        Shows all of the students which have due date extensions for the given unit.
+        """
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        url = serializer.validated_data['url']
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_by_id(course_key)
+
+        try:
+            unit = find_unit(course, url)
+            data = dump_block_extensions(course, unit)
+            return Response(data)
+
+        except DashboardError as error:
+            return error.response()
 
 
 @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True), name='dispatch')
