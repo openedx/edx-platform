@@ -205,6 +205,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
             'enable_in_context': True,
             'group_at_subsection': False,
             'provider': 'legacy',
+            "has_bulk_delete_privileges": False,
             'has_moderation_privileges': False,
             "is_course_staff": False,
             "is_course_admin": False,
@@ -219,6 +220,8 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
                 'enabled': False,
                 'site_key': '',
             },
+            "is_email_verified": True,
+            "only_verified_users_can_post": False
         }
 
     @ddt.data(
