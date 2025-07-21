@@ -394,6 +394,8 @@ DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
 ################### FRONTEND APPLICATION DISCUSSIONS FEEDBACK URL###################
 DISCUSSIONS_MFE_FEEDBACK_URL = None
 
+DISCUSSION_SPAM_URLS = []
+
 ############## Docker based devstack settings #######################
 
 FEATURES.update({
@@ -467,19 +469,19 @@ DCS_SESSION_COOKIE_SAMESITE_FORCE_ALL = True
 # If you want to enable theming in devstack, uncomment this section and add any relevant
 # theme directories to COMPREHENSIVE_THEME_DIRS
 
-# We have to import the private method here because production.py calls
-# derive_settings('lms.envs.production') which runs _make_mako_template_dirs with
+# We have to import the make_mako_template_dirs method here because production.py calls
+# derive_settings('lms.envs.production') which runs make_mako_template_dirs with
 # the settings from production, which doesn't include these theming settings. Thus,
 # the templating engine is unable to find the themed templates because they don't exist
 # in it's path. Re-calling derive_settings doesn't work because the settings was already
 # changed from a function to a list, and it can't be derived again.
 
-# from .common import _make_mako_template_dirs
+# from openedx.envs.common import make_mako_template_dirs
 # ENABLE_COMPREHENSIVE_THEMING = True
 # COMPREHENSIVE_THEME_DIRS = [
 #     "/edx/app/edxapp/edx-platform/themes/"
 # ]
-# TEMPLATES[1]["DIRS"] = _make_mako_template_dirs
+# TEMPLATES[1]["DIRS"] = make_mako_template_dirs
 # derive_settings(__name__)
 
 # Uncomment the lines below if you'd like to see SQL statements in your devstack LMS log.

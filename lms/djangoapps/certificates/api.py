@@ -299,6 +299,15 @@ def certificate_downloadable_status(student, course_key):
         response_data["earned_but_not_available"] = True
         response_data["certificate_available_date"] = course_overview.certificate_available_date
 
+    if (
+        not certificates_viewable_for_course(course_overview)
+        and not CertificateStatuses.is_passing_status(current_status["status"])
+        and display_behavior_is_valid
+        and course_overview.certificate_available_date
+    ):
+        response_data["not_earned_but_available_date"] = True
+        response_data["certificate_available_date"] = course_overview.certificate_available_date
+
     may_view_certificate = _should_certificate_be_visible(
         course_overview.certificates_display_behavior,
         course_overview.certificates_show_before_end,

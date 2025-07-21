@@ -2909,7 +2909,7 @@ class TestComponentTemplates(CourseTestCase):
 
         self.templates = get_component_templates(self.course)
 
-        self.default_advanced_modules_titles = [
+        self.default_advanced_modules_titles = sorted([
             "Google Calendar",
             "Google Document",
             "LTI Consumer",
@@ -2917,7 +2917,7 @@ class TestComponentTemplates(CourseTestCase):
             "Content Experiment",
             "Survey",
             "Word cloud",
-        ]
+        ])
 
     def get_templates_of_type(self, template_type):
         """

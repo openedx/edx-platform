@@ -20,7 +20,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext as _
 from edx_django_utils.plugins import pluggable_override
-from openedx.core.djangoapps.content_libraries.api import LibraryXBlockMetadata
+from openedx.core.djangoapps.content_libraries.api import ContainerMetadata, ContainerType, LibraryXBlockMetadata
 from openedx.core.djangoapps.content_tagging.api import get_object_tag_counts
 from edx_proctoring.api import (
     does_backend_support_onboarding,
@@ -533,6 +533,7 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
     Handle syncing library content for given xblock depending on its upstream type.
     It can sync unit containers and lower level xblocks.
     """
+    # CHECK: Sync library content for given xblock depending on its upstream type.
     link = UpstreamLink.get_for_block(downstream)
     upstream_key = link.upstream_key
     if isinstance(upstream_key, LibraryUsageLocatorV2):
@@ -548,28 +549,54 @@ def sync_library_content(downstream: XBlock, request, store) -> StaticFileNotice
             notices = []
             # Store final children keys to update order of components in unit
             children = []
+
             for i, upstream_child in enumerate(upstream_children):
-                assert isinstance(upstream_child, LibraryXBlockMetadata)  # for now we only support units
-                if upstream_child.usage_key not in downstream_children_keys:
+                if isinstance(upstream_child, LibraryXBlockMetadata):
+                    upstream_key = upstream_child.usage_key
+                    block_type = upstream_child.usage_key.block_type
+                elif isinstance(upstream_child, ContainerMetadata):
+                    upstream_key = upstream_child.container_key
+                    match upstream_child.container_type:
+                        case ContainerType.Unit:
+                            block_type = "vertical"
+                        case ContainerType.Subsection:
+                            block_type = "sequential"
+                        case _:
+                            # We don't support other container types for now.
+                            log.error(
+                                "Unexpected upstream child container type: %s",
+                                upstream_child.container_type,
+                            )
+                            continue
+                else:
+                    log.error(
+                        "Unexpected type of upstream child: %s",
+                        type(upstream_child),
+                    )
+                    continue
+
+                if upstream_key not in downstream_children_keys:
                     # This upstream_child is new, create it.
                     downstream_child = store.create_child(
                         parent_usage_key=downstream.usage_key,
                         position=i,
                         user_id=request.user.id,
-                        block_type=upstream_child.usage_key.block_type,
+                        block_type=block_type,
                         # TODO: Can we generate a unique but friendly block_id, perhaps using upstream block_id
-                        block_id=f"{upstream_child.usage_key.block_type}{uuid4().hex[:8]}",
+                        block_id=f"{block_type}{uuid4().hex[:8]}",
                         fields={
-                            "upstream": str(upstream_child.usage_key),
+                            "upstream": str(upstream_key),
                         },
                     )
                 else:
-                    downstream_child_old_index = downstream_children_keys.index(upstream_child.usage_key)
+                    downstream_child_old_index = downstream_children_keys.index(upstream_key)
                     downstream_child = downstream_children[downstream_child_old_index]
 
-                result = sync_library_content(downstream=downstream_child, request=request, store=store)
                 children.append(downstream_child.usage_key)
+
+                result = sync_library_content(downstream=downstream_child, request=request, store=store)
                 notices.append(result)
+
             for child in downstream_children:
                 if child.usage_key not in children:
                     # This downstream block was added, or deleted from upstream block.
@@ -634,6 +661,7 @@ def _create_block(request):
                 status=400,
             )
 
+    # CHECK: Add container to course
     created_block = create_xblock(
         parent_locator=parent_locator,
         user=request.user,

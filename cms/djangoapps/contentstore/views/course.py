@@ -22,6 +22,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiRequest, OpenApiResponse
 from edx_django_utils.monitoring import function_trace
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -1712,6 +1713,37 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             )
 
 
+@extend_schema(
+    summary="Bulk enable/disable discussions for all units in a course.",
+    description="Enable or disable discussions for all verticals in the specified course.",
+    request=OpenApiRequest(
+        request={
+            "type": "object",
+            "properties": {"discussion_enabled": {"type": "boolean"}},
+            "required": ["discussion_enabled"],
+        }
+    ),
+    responses={
+        200: OpenApiResponse(
+            response={
+                "type": "object",
+                "properties": {"units_updated_and_republished": {"type": "integer"}},
+            }
+        ),
+        400: OpenApiResponse(description="Bad request"),
+        403: OpenApiResponse(description="Permission denied"),
+    },
+    methods=["PUT"],
+    parameters=[
+        OpenApiParameter(
+            name="course_key_string",
+            description="Course key string",
+            required=True,
+            type=str,
+            location=OpenApiParameter.PATH,
+        )
+    ],
+)
 @api_view(['PUT'])
 @view_auth_classes()
 @expect_json

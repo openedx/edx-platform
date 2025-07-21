@@ -93,6 +93,9 @@ def send_events_after_publish(publish_log_pk: int, library_key_str: str) -> None
             usage_key = api.library_component_usage_key(library_key, record.entity.component)
             # Note that this item may be newly created, updated, or even deleted - but all we care about for this event
             # is that the published version is now different. Only for draft changes do we send differentiated events.
+
+            # .. event_implemented_name: LIBRARY_BLOCK_PUBLISHED
+            # .. event_type: org.openedx.content_authoring.library_block.published.v1
             LIBRARY_BLOCK_PUBLISHED.send_event(
                 library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key)
             )
@@ -112,6 +115,8 @@ def send_events_after_publish(publish_log_pk: int, library_key_str: str) -> None
             )
 
     for container_key in affected_containers:
+        # .. event_implemented_name: LIBRARY_CONTAINER_PUBLISHED
+        # .. event_type: org.openedx.content_authoring.content_library.container.published.v1
         LIBRARY_CONTAINER_PUBLISHED.send_event(
             library_container=LibraryContainerData(container_key=container_key)
         )
@@ -177,6 +182,15 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
                 event = LIBRARY_BLOCK_DELETED
             elif is_undeleted:
                 event = LIBRARY_BLOCK_CREATED
+
+            # .. event_implemented_name: LIBRARY_BLOCK_UPDATED
+            # .. event_type: org.openedx.content_authoring.library_block.updated.v1
+
+            # .. event_implemented_name: LIBRARY_BLOCK_DELETED
+            # .. event_type: org.openedx.content_authoring.library_block.deleted.v1
+
+            # .. event_implemented_name: LIBRARY_BLOCK_CREATED
+            # .. event_type: org.openedx.content_authoring.library_block.created.v1
             event.send_event(library_block=LibraryBlockData(library_key=library_key, usage_key=usage_key))
             # If any containers contain this component, their child list / component count may need to be updated
             # e.g. if this was a newly created component in the container and is now deleted, or this was deleted and
@@ -211,6 +225,8 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
             affected_collection_keys.add(collection_key)
 
     for container_key in deleted_container_keys:
+        # .. event_implemented_name: LIBRARY_CONTAINER_DELETED
+        # .. event_type: org.openedx.content_authoring.content_library.container.deleted.v1
         LIBRARY_CONTAINER_DELETED.send_event(
             library_container=LibraryContainerData(container_key=container_key)
         )
@@ -218,16 +234,22 @@ def send_events_after_revert(draft_change_log_id: int, library_key_str: str) -> 
         created_container_keys.discard(container_key)
 
     for container_key in created_container_keys:
+        # .. event_implemented_name: LIBRARY_CONTAINER_CREATED
+        # .. event_type: org.openedx.content_authoring.content_library.container.created.v1
         LIBRARY_CONTAINER_CREATED.send_event(
             library_container=LibraryContainerData(container_key=container_key)
         )
 
     for container_key in updated_container_keys:
+        # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(container_key=container_key)
         )
 
     for collection_key in affected_collection_keys:
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(collection_key=collection_key)
         )

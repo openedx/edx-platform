@@ -22,20 +22,15 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.client import MULTIPART_CONTENT
+from django.test.utils import override_settings
 from django.urls import reverse as django_reverse
 from django.utils.translation import gettext as _
-from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from edx_toggles.toggles.testutils import override_waffle_flag
+from edx_when.api import get_dates_for_course, get_overrides_for_user, set_date_for_block
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import UsageKey
 from pytz import UTC
 from testfixtures import LogCapture
-from xmodule.fields import Date
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase, SharedModuleStoreTestCase,
-)
-from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
@@ -59,21 +54,21 @@ from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseDataResearcherRole,
     CourseFinanceAdminRole,
-    CourseInstructorRole,
+    CourseInstructorRole
 )
 from common.djangoapps.student.tests.factories import (
     BetaTesterFactory,
+    CourseAccessRoleFactory,
     CourseEnrollmentFactory,
     GlobalStaffFactory,
     InstructorFactory,
     StaffFactory,
     UserFactory
 )
+
 from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseEmail, CourseEmailTemplate
 from lms.djangoapps.certificates.data import CertificateStatuses
-from lms.djangoapps.certificates.tests.factories import (
-    GeneratedCertificateFactory
-)
+from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
@@ -95,17 +90,26 @@ from lms.djangoapps.instructor_task.models import InstructorTask, InstructorTask
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_date_signals.handlers import extract_dates
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohorted
-from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.oauth_dispatch import jwt as jwt_api
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.core.lib.xblock_utils import grade_histogram
 from openedx.features.course_experience import RELATIVE_DATES_FLAG
+from xmodule.fields import Date
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_SPLIT_MODULESTORE,
+    ModuleStoreTestCase,
+    SharedModuleStoreTestCase
+)
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
 
 from .test_tools import msk_from_problem_urlname
 
@@ -2259,6 +2263,7 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
         self.other_instructor = InstructorFactory(course_key=self.course.id)
         self.other_staff = StaffFactory(course_key=self.course.id)
         self.other_user = UserFactory()
+        self.list_forum_members_url = reverse('list_forum_members', kwargs={'course_id': str(self.course.id)})
 
     def test_modify_access_noparams(self):
         """ Test missing all query parameters. """
@@ -2455,8 +2460,11 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
 
     def assert_update_forum_role_membership(self, current_user, identifier, rolename, action):
         """
-        Test update forum role membership.
-        Get unique_student_identifier, rolename and action and update forum role.
+        default roles require either (staff & forum admin) or (instructor)
+        User should be forum-admin and staff to access this endpoint.
+
+        But if request rolename is  FORUM_ROLE_ADMINISTRATOR, then user must also have
+        instructor-level access to proceed.
         """
         url = reverse('update_forum_role_membership', kwargs={'course_id': str(self.course.id)})
         response = self.client.post(
@@ -2489,6 +2497,113 @@ class TestInstructorAPILevelsAccess(SharedModuleStoreTestCase, LoginEnrollmentTe
             assert CourseEnrollment.is_enrolled(user, self.course.id)
             self.assert_update_forum_role_membership(user, user.email, rolename, "revoke")
             CourseEnrollment.unenroll(user, self.course.id)
+
+    def create_forum_roles(self, role_name, user):
+        """
+        DRY Utility method for adding roles.
+        """
+        role, __ = Role.objects.get_or_create(
+            course_id=self.course.id,
+            name=role_name
+        )
+        role.users.add(user)
+
+    def access_list_forum(self, user):
+        """
+        Utility method for adding forums rules and hitting the url.
+        """
+        for role_name in ["Group Moderator", "Moderator", "Community TA", "Administrator"]:
+            self.create_forum_roles(role_name, user)
+            return self.client.post(self.list_forum_members_url, {'rolename': role_name})
+
+    def test_staff_without_forum_admin_access(self):
+        """
+        Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
+        Allowed Role is either (staff & forum admin) or (instructor).
+
+        In this test case user has staff permissions but his forum admin role is missing.
+        """
+        self.client.logout()
+        self.client.login(username=self.other_user.username, password=self.TEST_PASSWORD)
+        role_name = "staff"
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=self.other_user,
+            role=role_name,
+            org=self.course.id.org
+        )
+
+        response = self.access_list_forum(self.other_user)
+        assert response.status_code == 403
+
+        if role_name in ["Administrator"]:
+            # if the rolename is `Administrator` then user must need `Administrator` access.
+            assert (response.__dict__['data'].get('detail') ==
+                    "Operation requires instructor access.")
+        else:
+            assert (response.__dict__['data'].get('detail') ==
+                    "Operation requires staff & forum admin or instructor access")
+
+    def test_staff_with_forum_admin_access(self):
+        """
+        Test to ensure that an error is raised if the given rolename lacks the appropriate permissions.
+        Allowed Role is either (staff & forum admin) or (instructor)
+
+        In this test case user has staff permissions and forum admin role also.
+        """
+        self.client.logout()
+        self.client.login(username=self.other_user.username, password=self.TEST_PASSWORD)
+
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=self.other_user,
+            role="staff",
+            org=self.course.id.org
+        )
+
+        # make user staff and administrator
+        self.create_forum_roles('Administrator', self.other_user)
+        response = self.access_list_forum(self.other_user)
+        assert response.status_code == 200
+        data = json.loads(response.content.decode('utf-8'))
+        assert data['course_id'] == str(self.course.id)
+
+    def test_staff_with_forum_admin_access_with_oauth(self):
+        """
+        Verify the endpoint using JWT authentication.
+        """
+        self.client.logout()
+        dot_application = ApplicationFactory(user=self.other_user, authorization_grant_type='password')
+        access_token = AccessTokenFactory(user=self.other_user, application=dot_application)
+        oauth_adapter = DOTAdapter()
+        token_dict = {
+            'access_token': access_token,
+            'scope': 'email profile',
+        }
+        jwt_token = jwt_api.create_jwt_from_token(token_dict, oauth_adapter, use_asymmetric_key=True)
+        headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + jwt_token
+        }
+        response = self.client.post(
+            self.list_forum_members_url,
+            data={'rolename': 'Moderator'},
+            **headers
+        )
+        # JWT authentication works but it has no permissions.
+        assert response.status_code == 403
+
+        # add user as course staff.
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=self.other_user,
+            role="staff",
+            org=self.course.id.org
+        )
+
+        # add user as forum admin.
+        self.create_forum_roles('Administrator', self.other_user)
+        response = self.client.post(self.list_forum_members_url, data={'rolename': 'Moderator'}, **headers)
+        assert response.status_code == 200
 
 
 @ddt.ddt
@@ -2626,6 +2741,63 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             assert student_json['city'] == student.profile.city
             assert student_json['country'] == ''
 
+    def test_get_students_features_private_fields(self):
+        """
+        Test that the get_students_features does not return the private fields
+        if they are by default in the `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting.
+        """
+        url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+        response = self.client.post(url, {})
+        res_json = json.loads(response.content.decode("utf-8"))
+
+        assert "students" in res_json
+        for student in res_json["students"]:
+            for field in settings.PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS:
+                assert field not in student
+
+    def test_get_students_features_private_fields_with_custom_config(self):
+        """
+        Test that the get_students_features does not return the private custom
+        fields set in the `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting.
+        """
+        private_fields = ["email", "location", "gender"]
+
+        with override_settings(PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS=private_fields):
+            url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+            response = self.client.post(url, {})
+            res_json = json.loads(response.content.decode("utf-8"))
+
+            assert "students" in res_json
+            for student in res_json["students"]:
+                for field in private_fields:
+                    assert field not in student
+
+    @override_settings(PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS=[])
+    def test_get_students_features_private_fields_empty(self):
+        """
+        Test that the get_students_features returns all the fields if the
+        `PROFILE_INFORMATION_REPORT_PRIVATE_FIELDS` setting is empty.
+        """
+        custom_config = {
+            "student_profile_download_fields": [
+                "id",
+                "username",
+                "email",
+                "language",
+                "year_of_birth",
+            ]
+        }
+
+        with with_site_configuration_context(configuration=custom_config):
+            url = reverse("get_students_features", kwargs={"course_id": str(self.course.id)})
+            response = self.client.post(url, {})
+            res_json = json.loads(response.content.decode("utf-8"))
+
+            assert "students" in res_json
+            for student in res_json["students"]:
+                for field in custom_config["student_profile_download_fields"]:
+                    assert field in student
+
     @ddt.data(True, False)
     def test_get_students_features_cohorted(self, is_cohorted):
         """
@@ -2686,6 +2858,16 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                 assert student_json['external_user_key'] == external_key_dict[student.username]
             else:
                 assert student_json['external_user_key'] == ''
+
+    def test_get_students_features_without_permissions(self):
+        """ Test that get_students_features returns 403 without credentials. """
+
+        # removed both roles from courses for instructor
+        CourseDataResearcherRole(self.course.id).remove_users(self.instructor)
+        CourseInstructorRole(self.course.id).remove_users(self.instructor)
+        url = reverse('get_students_features', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {})
+        assert response.status_code == 403
 
     def test_get_students_who_may_enroll(self):
         """
@@ -4222,6 +4404,36 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         })
         assert response.status_code == 400, response.content
         assert get_extended_due(self.course, self.week3, self.user1) is None
+
+    def test_change_to_invalid_username(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': 'invalid_username',
+            'url': str(self.week1.location),
+            'due_datetime': '12/30/2026 02:00'
+        })
+        assert response.status_code == 404, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
+
+    def test_change_to_invalid_due_date_format(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': str(self.week1.location),
+            'due_datetime': '12/30/2kkk 00:00:00'
+        })
+        assert response.status_code == 400, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
+
+    def test_change_with_blank_fields(self):
+        url = reverse('change_due_date', kwargs={'course_id': str(self.course.id)})
+        response = self.client.post(url, {
+            'student': '',
+            'url': '',
+            'due_datetime': ''
+        })
+        assert response.status_code == 400, response.content
+        assert get_extended_due(self.course, self.week1, self.user1) is None
 
     @override_waffle_flag(RELATIVE_DATES_FLAG, active=True)
     def test_reset_date(self):
