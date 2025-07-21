@@ -16,10 +16,14 @@ from cms.lib.xblock.upstream_sync import BadUpstream, UpstreamLink
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers as xblock_view_handlers
 from opaque_keys.edx.keys import ContainerKey, UsageKey
+from opaque_keys.edx.locator import LibraryLocatorV2
 from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.auth import add_users
+from common.djangoapps.student.roles import CourseStaffRole
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory
+from openedx.core.djangoapps.content_libraries import api as lib_api
 
 from .. import downstreams as downstreams_views
 
@@ -57,6 +61,7 @@ class _BaseDownstreamViewTestMixin:
         """
         Create a simple course with one unit and two videos, one of which is linked to an "upstream".
         """
+        # pylint: disable=too-many-statements
         super().setUp()
         self.now = datetime.now(timezone.utc)
         freezer = freeze_time(self.now)
@@ -69,6 +74,9 @@ class _BaseDownstreamViewTestMixin:
             defaults={"name": "Content Libraries Tachyon Exploration & Survey Team"},
         )
         self.superuser = UserFactory(username="superuser", password="password", is_staff=True, is_superuser=True)
+        self.simple_user = UserFactory(username="simple_user", password="password")
+        self.course_user = UserFactory(username="course_user", password="password")
+        self.lib_user = UserFactory(username="lib_user", password="password")
         self.client.login(username=self.superuser.username, password="password")
 
         self.library_title = "Test Library 1"
@@ -77,6 +85,8 @@ class _BaseDownstreamViewTestMixin:
             title=self.library_title,
             description="Testing XBlocks"
         )["id"]
+        self.library_key = LibraryLocatorV2.from_string(self.library_id)
+        lib_api.set_library_user_permissions(self.library_key, self.lib_user, access_level="read")
         self.html_lib_id = self._add_block_to_library(self.library_id, "html", "html-baz")["id"]
         self.video_lib_id = self._add_block_to_library(self.library_id, "video", "video-baz")["id"]
         self.unit_id = self._create_container(self.library_id, "unit", "unit-1", "Unit 1")["id"]
@@ -89,6 +99,7 @@ class _BaseDownstreamViewTestMixin:
         self._publish_container(self.section_id)
         self.mock_upstream_link = f"{settings.COURSE_AUTHORING_MICROFRONTEND_URL}/library/{self.library_id}/components?usageKey={self.video_lib_id}"  # pylint: disable=line-too-long  # noqa: E501
         self.course = CourseFactory.create()
+        add_users(self.superuser, CourseStaffRole(self.course.id), self.course_user)
         chapter = BlockFactory.create(category='chapter', parent=self.course)
         sequential = BlockFactory.create(category='sequential', parent=chapter)
         unit = BlockFactory.create(category='vertical', parent=sequential)
@@ -503,7 +514,7 @@ class GetUpstreamViewTest(
         """
         Returns all links for given course
         """
-        self.client.login(username="superuser", password="password")
+        self.client.login(username="course_user", password="password")
         response = self.call_api(course_id=self.course.id)
         assert response.status_code == 200
         data = response.json()
@@ -588,11 +599,16 @@ class GetUpstreamViewTest(
         self.assertListEqual(data["results"], expected)
         self.assertEqual(data["count"], 5)
 
+    def test_permission_denied_with_course_filter(self):
+        self.client.login(username="simple_user", password="password")
+        response = self.call_api(course_id=self.course.id)
+        assert response.status_code == 403
+
     def test_200_component_downstreams_for_a_course(self):
         """
         Returns all component links for given course
         """
-        self.client.login(username="superuser", password="password")
+        self.client.login(username="course_user", password="password")
         response = self.call_api(
             course_id=self.course.id,
             item_type='components',
@@ -639,7 +655,7 @@ class GetUpstreamViewTest(
         """
         Returns all container links for given course
         """
-        self.client.login(username="superuser", password="password")
+        self.client.login(username="course_user", password="password")
         response = self.call_api(
             course_id=self.course.id,
             item_type='containers',
@@ -717,11 +733,16 @@ class GetUpstreamViewTest(
         self.assertTrue(all(o["ready_to_sync"] for o in data["results"]))
         self.assertEqual(data["count"], expected_count)
 
+    def test_permission_denied_without_filter(self):
+        self.client.login(username="simple_user", password="password")
+        response = self.call_api()
+        assert response.status_code == 403
+
     def test_200_component_downstream_context_list(self):
         """
         Returns all entity downstream links for given component
         """
-        self.client.login(username="superuser", password="password")
+        self.client.login(username="lib_user", password="password")
         response = self.call_api(upstream_key=self.video_lib_id)
         assert response.status_code == 200
         data = response.json()
@@ -734,7 +755,7 @@ class GetUpstreamViewTest(
         """
         Returns all entity downstream links for given container
         """
-        self.client.login(username="superuser", password="password")
+        self.client.login(username="lib_user", password="password")
         response = self.call_api(upstream_key=self.unit_id)
         assert response.status_code == 200
         data = response.json()
