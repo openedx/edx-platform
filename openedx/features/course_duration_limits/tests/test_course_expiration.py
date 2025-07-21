@@ -42,12 +42,16 @@ from openedx.features.course_experience.tests.views.helpers import add_course_mo
 
 
 # pylint: disable=no-member
-@patch('openedx.core.djangoapps.catalog.models.CatalogIntegration.is_enabled', return_value=True)
 @ddt.ddt
 class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
     def setUp(self):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.catalog_patch = patch(
+            'openedx.core.djangoapps.catalog.models.CatalogIntegration.is_enabled',
+            return_value=True
+        )
+        self.catalog_patch.start()
         self.course = CourseFactory(
             start=now() - timedelta(weeks=10),
         )
@@ -74,6 +78,7 @@ class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
         add_course_mode(self.course)
 
     def tearDown(self):
+        self.catalog_patch.stop()
         CourseEnrollment.unenroll(self.user, self.course.id)
         super().tearDown()  # lint-amnesty, pylint: disable=super-with-arguments
 
