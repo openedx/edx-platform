@@ -1005,7 +1005,7 @@ openedx-filters==2.1.0
     #   ora2
 openedx-forum==0.3.0
     # via -r requirements/edx/base.txt
-openedx-learning==0.26.0
+openedx-learning==0.27.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
