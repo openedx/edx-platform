@@ -548,6 +548,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "provider": "legacy",
                 "allow_anonymous": True,
                 "allow_anonymous_to_peers": False,
+                "has_bulk_delete_privileges": False,
                 "has_moderation_privileges": False,
                 'is_course_admin': False,
                 'is_course_staff': False,
@@ -562,6 +563,8 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                     'enabled': False,
                     'site_key': '',
                 },
+                "is_email_verified": True,
+                "only_verified_users_can_post": False
             }
         )
 

@@ -750,7 +750,7 @@ edx-drf-extensions==10.6.0
     #   edxval
     #   enterprise-integrated-channels
     #   openedx-learning
-edx-enterprise==6.2.10
+edx-enterprise==6.2.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -879,7 +879,7 @@ enmerkar-underscore==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-enterprise-integrated-channels==0.1.9
+enterprise-integrated-channels==0.1.11
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1405,10 +1405,6 @@ openedx-learning==0.26.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-mongodbproxy==0.3.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 optimizely-sdk==5.2.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1654,7 +1650,6 @@ pymongo==4.4.0
     #   event-tracking
     #   mongoengine
     #   openedx-forum
-    #   openedx-mongodbproxy
 pynacl==1.5.0
     # via
     #   -r requirements/edx/doc.txt
