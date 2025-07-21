@@ -76,7 +76,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         if not xml_data:
             return "Please set the template for this custom tag."
         xmltree = etree.fromstring(xml_data)
-        if 'impl' in xmltree.attrib:
+        if 'impl' in xmltree.attrib and xmltree.attrib['impl']:
             template_name = xmltree.attrib['impl']
         else:
             # VS[compat]  backwards compatibility with old nested customtag structure
