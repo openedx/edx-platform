@@ -89,7 +89,7 @@ from django.contrib.auth.models import User  # pylint: disable=imported-auth-use
 from edx_rest_framework_extensions.paginators import DefaultPagination
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryContainerLocator
+from opaque_keys.edx.locator import LibraryUsageLocatorV2, LibraryContainerLocator, LibraryLocatorV2
 from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
 from rest_framework.fields import BooleanField
 from rest_framework.request import Request
@@ -162,6 +162,7 @@ class DownstreamListPaginator(DefaultPagination):
         })
         return response
 
+
 @view_auth_classes()
 class DownstreamListView(DeveloperErrorViewMixin, APIView):
     """
@@ -204,7 +205,7 @@ class DownstreamListView(DeveloperErrorViewMixin, APIView):
                 # Verify that the user has permission to view the library that contains
                 # the upstream component
                 lib_api.require_permission_for_library_key(
-                    upstream_usage_key.context_key,
+                    LibraryLocatorV2.from_string(str(upstream_usage_key.context_key)),
                     request.user,
                     permission=lib_api.permissions.CAN_VIEW_THIS_CONTENT_LIBRARY,
                 )
