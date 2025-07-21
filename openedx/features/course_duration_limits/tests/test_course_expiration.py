@@ -4,6 +4,7 @@ Contains tests to verify correctness of course expiration functionality
 
 from datetime import timedelta
 from unittest import mock
+from unittest.mock import patch
 
 import ddt
 from django.conf import settings
@@ -41,6 +42,7 @@ from openedx.features.course_experience.tests.views.helpers import add_course_mo
 
 
 # pylint: disable=no-member
+@patch('openedx.core.djangoapps.catalog.models.CatalogIntegration.is_enabled', return_value=True)
 @ddt.ddt
 class CourseExpirationTestCase(ModuleStoreTestCase, MasqueradeMixin):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""

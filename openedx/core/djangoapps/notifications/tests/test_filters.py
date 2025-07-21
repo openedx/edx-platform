@@ -3,6 +3,7 @@ Test for the NotificationFilter class.
 """
 from datetime import timedelta
 from unittest import mock
+from unittest.mock import patch
 
 import ddt
 from django.utils.timezone import now
@@ -37,6 +38,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
+@patch('openedx.core.djangoapps.catalog.models.CatalogIntegration.is_enabled', return_value=True)
 @ddt.ddt
 class CourseExpirationTestCase(ModuleStoreTestCase):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
