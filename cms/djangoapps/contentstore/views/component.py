@@ -494,6 +494,11 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
             course_advanced_keys
         )
     if advanced_component_templates['templates']:
+        # Advanced component templates should be sorted alphabetically by display name.
+        advanced_component_templates['templates'] = sorted(
+            advanced_component_templates['templates'],
+            key=lambda x: x.get('display_name')
+        )
         component_templates.append(advanced_component_templates)
 
     return component_templates
