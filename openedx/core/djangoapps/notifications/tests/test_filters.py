@@ -38,13 +38,18 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@patch('openedx.core.djangoapps.catalog.models.CatalogIntegration.is_enabled', return_value=True)
 @ddt.ddt
 class CourseExpirationTestCase(ModuleStoreTestCase):
     """Tests to verify the get_user_course_expiration_date function is working correctly"""
 
     def setUp(self):
         super().setUp()  # lint-amnesty, pylint: disable=super-with-arguments
+        self.catalog_patch = patch(
+            'openedx.core.djangoapps.catalog.models.CatalogIntegration.is_enabled',
+            return_value=True
+        )
+        self.catalog_patch.start()
+
         self.course = CourseFactory(
             start=now() - timedelta(weeks=10),
         )
@@ -59,6 +64,10 @@ class CourseExpirationTestCase(ModuleStoreTestCase):
         expired_audit = CourseEnrollment.enroll(self.user, self.course.id, CourseMode.AUDIT)
         expired_audit.created = now() - timedelta(weeks=6)
         expired_audit.save()
+
+    def tearDown(self):
+        self.catalog_patch.stop()
+        super().tearDown()
 
     @mock.patch("openedx.core.djangoapps.course_date_signals.utils.get_course_run_details")
     def test_audit_expired_filter_with_no_role(
