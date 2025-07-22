@@ -174,7 +174,9 @@ module.exports = Merge.smart({
                 AjaxPrefix: 'ajax_prefix',
                 // This is used by some XModules/XBlocks, which don't have
                 // any other way to declare that dependency.
-                $script: 'scriptjs'
+                $script: 'scriptjs',
+                React: 'react',
+                ReactDOM: 'react-dom',
             }),
             new DieHardPlugin(),
         ],
@@ -253,6 +255,13 @@ module.exports = Merge.smart({
                 {
                     test: /\.(woff2?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
                     loader: 'file-loader'
+                },
+                {
+                    test: /\.(png|jpe?g|gif)$/i,
+                    type: 'asset/resource',
+                    generator: {
+                        filename: 'images/[path][name][ext]'
+                    }
                 },
                 {
                     test: /\.svg$/,
@@ -624,7 +633,8 @@ module.exports = Merge.smart({
                 'backbone.associations': 'backbone-associations/backbone-associations-min',
                 squire: 'Squire',
                 tinymce: 'tinymce',
-
+                react: path.resolve(__dirname, '/node_modules/react'),
+                'react-dom': path.resolve(__dirname, '/node_modules/react-dom'),
                 // See sinon/webpack interaction weirdness:
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
                 // (I've tried every other suggestion solution on that page, this
