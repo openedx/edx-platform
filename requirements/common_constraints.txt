@@ -16,7 +16,7 @@
 #  this file from Github directly. It does not require packaging in edx-lint.
 
 # using LTS django version
-Django<5.0
+
 
 # elasticsearch>=7.14.0 includes breaking changes in it which caused issues in discovery upgrade process.
 # elastic search changelog: https://www.elastic.co/guide/en/enterprise-search/master/release-notes-7.14.0.html
@@ -31,4 +31,4 @@ pip<24.3
 
 # Cause: https://github.com/openedx/edx-lint/issues/475
 # This can be unpinned once https://github.com/openedx/edx-lint/issues/476 has been resolved.
-urllib3<2.3.0
+
