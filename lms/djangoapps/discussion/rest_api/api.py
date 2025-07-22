@@ -35,7 +35,7 @@ from common.djangoapps.student.roles import (
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.views import is_privileged_user
 from openedx.core.djangoapps.discussions.models import (
     DiscussionsConfiguration,
@@ -385,7 +385,7 @@ def get_course(request, course_key, check_tab=True):
             'site_key': settings.RECAPTCHA_SITE_KEY,
         },
         "is_email_verified": request.user.is_active,
-        "only_verified_users_can_post": False,
+        "only_verified_users_can_post": ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key),
     }
 
 

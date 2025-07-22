@@ -20,7 +20,7 @@ from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE
+from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.rest_api.utils import get_usernames_from_search_string
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -1064,6 +1064,7 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
         assert vertical_keys == expected_non_courseware_keys
 
 
+@ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'thread_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -1138,6 +1139,41 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 400
         response_data = json.loads(response.content.decode('utf-8'))
         assert response_data == expected_response_data
+
+    @ddt.data(
+        (False, False, status.HTTP_200_OK),
+        (False, True, status.HTTP_400_BAD_REQUEST),
+        (True, False, status.HTTP_200_OK),
+        (True, True, status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_creation_for_non_verified_user(self, email_verified, only_verified_user_can_post, response_status):
+        """
+        Tests posts cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and user email is unverified.
+        """
+        with override_waffle_flag(ONLY_VERIFIED_USERS_CAN_POST, only_verified_user_can_post):
+            self.user.is_active = email_verified
+            self.user.save()
+            self.register_get_user_response(self.user)
+            cs_thread = make_minimal_cs_thread({
+                "id": "test_thread",
+                "username": self.user.username,
+                "read": True,
+            })
+            self.register_post_thread_response(cs_thread)
+            request_data = {
+                "course_id": str(self.course.id),
+                "topic_id": "test_topic",
+                "type": "discussion",
+                "title": "Test Title",
+                "raw_body": "# Test \n This is a very long body but will not be truncated for the preview.",
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == response_status
 
 
 @httpretty.activate
@@ -2019,6 +2055,7 @@ class CommentViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         assert response.status_code == 404
 
 
+@ddt.ddt
 @httpretty.activate
 @disable_signal(api, 'comment_created')
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -2133,6 +2170,69 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             content_type="application/json"
         )
         assert response.status_code == 403
+
+    @ddt.data(
+        (False, False, status.HTTP_200_OK),
+        (False, True, status.HTTP_400_BAD_REQUEST),
+        (True, False, status.HTTP_200_OK),
+        (True, True, status.HTTP_200_OK),
+    )
+    @ddt.unpack
+    def test_creation_for_non_verified_user(self, email_verified, only_verified_user_can_post, response_status):
+        """
+        Tests comments/replies cannot be created if ONLY_VERIFIED_USERS_CAN_POST is enabled and
+        user email is unverified.
+        """
+        with override_waffle_flag(ONLY_VERIFIED_USERS_CAN_POST, only_verified_user_can_post):
+            self.user.is_active = email_verified
+            self.user.save()
+            self.register_get_user_response(self.user)
+            self.register_thread()
+            self.register_comment()
+            request_data = {
+                "thread_id": "test_thread",
+                "raw_body": "Test body",
+            }
+            expected_response_data = {
+                "id": "test_comment",
+                "thread_id": "test_thread",
+                "parent_id": None,
+                "author": self.user.username,
+                "author_label": None,
+                "created_at": "1970-01-01T00:00:00Z",
+                "updated_at": "1970-01-01T00:00:00Z",
+                "raw_body": "Test body",
+                "rendered_body": "<p>Test body</p>",
+                "endorsed": False,
+                "endorsed_by": None,
+                "endorsed_by_label": None,
+                "endorsed_at": None,
+                "abuse_flagged": False,
+                "abuse_flagged_any_user": None,
+                "voted": False,
+                "vote_count": 0,
+                "children": [],
+                "editable_fields": ["abuse_flagged", "anonymous", "raw_body"],
+                "child_count": 0,
+                "can_delete": True,
+                "anonymous": False,
+                "anonymous_to_peers": False,
+                "last_edit": None,
+                "edit_by_label": None,
+                "profile_image": {
+                    "has_image": False,
+                    "image_url_full": "http://testserver/static/default_500.png",
+                    "image_url_large": "http://testserver/static/default_120.png",
+                    "image_url_medium": "http://testserver/static/default_50.png",
+                    "image_url_small": "http://testserver/static/default_30.png",
+                },
+            }
+            response = self.client.post(
+                self.url,
+                json.dumps(request_data),
+                content_type="application/json"
+            )
+            assert response.status_code == response_status
 
 
 @httpretty.activate

@@ -29,6 +29,7 @@ from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete
 from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
+from lms.djangoapps.discussion.toggles import ONLY_VERIFIED_USERS_CAN_POST
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
@@ -671,13 +672,19 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         """
         if not request.data.get("course_id"):
             raise ValidationError({"course_id": ["This field is required."]})
-        if is_captcha_enabled(CourseKey.from_string(request.data.get("course_id"))):
+        course_key_str = request.data.get("course_id")
+        course_key = CourseKey.from_string(course_key_str)
+        if is_captcha_enabled(course_key):
             captcha_token = request.data.get('captcha_token')
             if not captcha_token:
                 raise ValidationError({'captcha_token': 'This field is required.'})
 
             if not verify_recaptcha_token(captcha_token):
                 return Response({'error': 'CAPTCHA verification failed.'}, status=400)
+
+        if ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key) and not request.user.is_active:
+            raise ValidationError({"detail": "Only verified users can post in discussions."})
+
         data = request.data.copy()
         data.pop('captcha_token', None)
         return Response(create_thread(request, data))
@@ -1037,14 +1044,20 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
         """
         if not request.data.get("thread_id"):
             raise ValidationError({"thread_id": ["This field is required."]})
-        course_id = get_course_id_from_thread_id(request.data["thread_id"])
-        if is_captcha_enabled(CourseKey.from_string(course_id)):
+        course_key_str = get_course_id_from_thread_id(request.data["thread_id"])
+        course_key = CourseKey.from_string(course_key_str)
+
+        if is_captcha_enabled(course_key):
             captcha_token = request.data.get('captcha_token')
             if not captcha_token:
                 raise ValidationError({'captcha_token': 'This field is required.'})
 
             if not verify_recaptcha_token(captcha_token):
                 return Response({'error': 'CAPTCHA verification failed.'}, status=400)
+
+        if ONLY_VERIFIED_USERS_CAN_POST.is_enabled(course_key) and not request.user.is_active:
+            raise ValidationError({"detail": "Only verified users can post in discussions."})
+
         data = request.data.copy()
         data.pop('captcha_token', None)
         return Response(create_comment(request, data))
