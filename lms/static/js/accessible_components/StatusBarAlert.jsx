@@ -4,7 +4,7 @@ Wrapper for React/Paragon accessible status bar
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {StatusAlert} from '@edx/paragon/static';
+import {Alert} from '@openedx/paragon';
 
 // eslint-disable-next-line import/prefer-default-export
 export class StatusAlertRenderer {
@@ -19,14 +19,14 @@ export class StatusAlertRenderer {
       but are made explicit in the case of a upstream change to defaults
       */
             ReactDOM.render(
-                <StatusAlert
-                    alertType="warning"
+                <Alert
+                    variant="warning"
                     dismissible
-                    open
-                    dialog={message}
-                    dismissable
+                    show
                     onClose={() => this.shiftFocus(afterselector)}
-                />,
+                >
+                    {message}
+                </Alert>,
                 document.querySelector(selector)
             );
         }

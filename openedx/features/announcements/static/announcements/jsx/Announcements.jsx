@@ -2,7 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import {Button} from '@edx/paragon';
+import {Button} from '@openedx/paragon';
 import $ from 'jquery';
 
 class AnnouncementSkipLink extends React.Component {
@@ -95,10 +95,11 @@ class AnnouncementList extends React.Component {
             var prev_button = (
                 <div>
                     <Button
-                        className={['announcement-button', 'prev']}
+                        className="announcement-button prev"
                         onClick={() => this.renderPrevPage()}
-                        label="← previous"
-                    />
+                    >
+                        ← previous
+                    </Button>
                     <span className="sr-only">{this.state.start_index + ' - ' + this.state.end_index + ') of ' + this.state.count}</span>
                 </div>
             );
@@ -107,10 +108,11 @@ class AnnouncementList extends React.Component {
             var next_button = (
                 <div>
                     <Button
-                        className={['announcement-button', 'next']}
+                        className="announcement-button next"
                         onClick={() => this.renderNextPage()}
-                        label="next →"
-                    />
+                    >
+                        next →
+                    </Button>
                     <span className="sr-only">{this.state.start_index + ' - ' + this.state.end_index + ') of ' + this.state.count}</span>
                 </div>
             );

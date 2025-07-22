@@ -1,7 +1,7 @@
 /* globals gettext */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon, StatusAlert } from '@edx/paragon/static';
+import { Button, Icon, Alert } from '@openedx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import StudentAccountDeletionModal from './StudentAccountDeletionModal';
 
@@ -120,33 +120,33 @@ export class StudentAccountDeletion extends React.Component {
                 />
                 <Button
                     id="delete-account-btn"
-                    className={['btn-outline-primary']}
+                    variant="outline-primary"
                     disabled={showError}
-                    label={gettext('Delete My Account')}
-                    inputRef={(input) => { this.modalTrigger = input; }}
+                    ref={(input) => { this.modalTrigger = input; }}
                     onClick={this.loadDeletionModal}
-                />
+                >
+                    {gettext('Delete My Account')}
+                </Button>
                 {showError
           && (
-              <StatusAlert
-                  dialog={(
-                      <div className="modal-alert">
-                          <div className="icon-wrapper">
-                              <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
-                          </div>
-                          <div className="alert-content">
-                              {socialAuthConnected && isActive
+              <Alert
+                  variant="danger"
+                  dismissible={false}
+                  show
+              >
+                  <div className="modal-alert">
+                      <div className="icon-wrapper">
+                          <Icon src="fa fa-exclamation-circle" id="delete-confirmation-body-error-icon" />
+                      </div>
+                      <div className="alert-content">
+                          {socialAuthConnected && isActive
                     // eslint-disable-next-line react/no-danger
                     && <p dangerouslySetInnerHTML={{ __html: socialAuthError }} />}
-                              {/* eslint-disable-next-line react/no-danger */}
-                              {!isActive && <p dangerouslySetInnerHTML={{ __html: activationError }} /> }
-                          </div>
+                          {/* eslint-disable-next-line react/no-danger */}
+                          {!isActive && <p dangerouslySetInnerHTML={{ __html: activationError }} /> }
                       </div>
-                  )}
-                  alertType="danger"
-                  dismissible={false}
-                  open
-              />
+                  </div>
+              </Alert>
           )}
                 {deletionModalOpen && (
                     <StudentAccountDeletionModal

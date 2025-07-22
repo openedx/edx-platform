@@ -1,19 +1,19 @@
 /* global gettext */
-import { Button, Icon } from '@edx/paragon';
+import { Button, Icon } from '@openedx/paragon';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React from 'react';
 
 const RightIcon = (
     <Icon
-        className={['fa', 'fa-arrow-right']}
+        src="fa fa-arrow-right"
         screenReaderText={gettext('View child items')}
     />
 );
 
 const UpIcon = (
     <Icon
-        className={['fa', 'fa-arrow-up']}
+        src="fa fa-arrow-up"
         screenReaderText={gettext('Navigate up')}
     />
 );
@@ -45,16 +45,18 @@ export const BlockList = ({
                 className={classNames(`block-type-${block.type}`, { selected: block.id === selectedBlock })}
             >
                 <Button
-                    className={['block-name']}
+                    className="block-name"
                     onClick={() => onSelectBlock(block.id)}
-                    label={block.display_name}
-                />
+                >
+                    {block.display_name}
+                </Button>
                 {block.children
         && (
             <Button
                 onClick={() => onChangeRoot(block.id)}
-                label={RightIcon}
-            />
+            >
+                {RightIcon}
+            </Button>
         )}
             </li>
         ))}
@@ -83,8 +85,9 @@ export const BlockBrowser = ({
             <Button
                 disabled={!blocks.parent}
                 onClick={() => blocks.parent && onChangeRoot(blocks.parent)}
-                label={UpIcon}
-            />
+            >
+                {UpIcon}
+            </Button>
             <span className="title">
                 {gettext('Browsing')} {gettext(BLOCK_TYPE_NAME[blocks.type])} &quot;
                 <a

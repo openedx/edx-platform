@@ -1,5 +1,5 @@
 /* global gettext */
-import { Icon } from '@edx/paragon';
+import { Icon } from '@openedx/paragon';
 import classNames from 'classnames';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
@@ -11,7 +11,7 @@ const ReportStatus = ({
     const progressMessage = (
         <div className="msg progress">
             {gettext('Your report is being generated...')}
-            <Icon hidden className={['fa', 'fa-refresh', 'fa-spin', 'fa-fw']} />
+            <Icon hidden src="fa fa-refresh fa-spin fa-fw" />
         </div>
     );
 
@@ -21,7 +21,7 @@ const ReportStatus = ({
             {reportPath
       && (
           <a href={reportPath}>
-              <Icon hidden className={['fa', 'fa-link']} />
+              <Icon hidden src="fa fa-link" />
               {gettext('View Report')}
           </a>
       )}

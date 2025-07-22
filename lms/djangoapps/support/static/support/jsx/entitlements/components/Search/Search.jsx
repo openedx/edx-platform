@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, InputText } from '@edx/paragon';
+import { Button, Form, InputGroup } from '@openedx/paragon';
 import PropTypes from 'prop-types';
 
 class Search extends React.Component {
@@ -17,23 +17,33 @@ class Search extends React.Component {
         this.props.fetchEntitlements(this.state.username);
     }
 
-    handleUsernameChange(username) {
-        this.setState({ username });
+    handleUsernameChange(event) {
+        this.setState({ username: event.target.value });
     }
 
     render() {
         return (
             <form onSubmit={this.handleSubmit} className="col-md-3 search-form">
-                <InputText
-                    name="username"
-                    label="Search by Username"
-                    className="search-field"
-                    value={this.state.username}
-                    onChange={this.handleUsernameChange}
-                    inputGroupAppend={
-                        <Button className={['btn', 'btn-primary', 'ml-2', 'search-button']} label="Search" type="submit" />
-                    }
-                />
+                <Form.Group>
+                    <Form.Label>Search by Username</Form.Label>
+                    <InputGroup>
+                        <Form.Control
+                            name="username"
+                            className="search-field"
+                            value={this.state.username}
+                            onChange={this.handleUsernameChange}
+                        />
+                        <InputGroup.Append>
+                            <Button 
+                                variant="primary" 
+                                className="ml-2 search-button" 
+                                type="submit"
+                            >
+                                Search
+                            </Button>
+                        </InputGroup.Append>
+                    </InputGroup>
+                </Form.Group>
             </form>
         );
     }

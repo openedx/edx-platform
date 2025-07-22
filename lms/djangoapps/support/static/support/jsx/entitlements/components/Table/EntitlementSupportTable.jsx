@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
-import { Button, Hyperlink, Table } from '@edx/paragon';
+import { Button, Hyperlink, DataTable } from '@openedx/paragon';
 
 const entitlementColumns = [
     {
@@ -60,16 +60,17 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) => en
         />,
         button: <Button
             disabled={!enrollmentCourseRun}
-            className={['btn', 'btn-primary']}
-            label="Reissue"
+            variant="primary"
             onClick={() => openReissueForm(entitlement)}
-        />,
+        >
+            Reissue
+        </Button>,
     });
 });
 
 // eslint-disable-next-line react/function-component-definition
 const EntitlementSupportTable = props => (
-    <Table
+    <DataTable
         data={parseEntitlementData(props.entitlements, props.ecommerceUrl, props.openReissueForm)}
         columns={entitlementColumns}
     />
