@@ -23,9 +23,12 @@ from rest_framework.viewsets import ViewSet
 
 from xmodule.modulestore.django import modulestore
 
+from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
+from lms.djangoapps.discussion.rest_api.permissions import IsAllowedToBulkDelete
+from lms.djangoapps.discussion.rest_api.tasks import delete_course_post_for_user
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
 from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
 from lms.djangoapps.instructor.access import update_forum_role
@@ -34,6 +37,8 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration,
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
+from openedx.core.djangoapps.django_comment_common.comment_client.thread import Thread
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
@@ -1042,7 +1047,7 @@ class CommentViewSet(DeveloperErrorViewMixin, ViewSet):
                 return Response({'error': 'CAPTCHA verification failed.'}, status=400)
         data = request.data.copy()
         data.pop('captcha_token', None)
-        return Response(create_comment(request, request.data))
+        return Response(create_comment(request, data))
 
     def destroy(self, request, comment_id):
         """
@@ -1515,3 +1520,62 @@ class CourseDiscussionRolesAPIView(DeveloperErrorViewMixin, APIView):
         context = {'course_discussion_settings': CourseDiscussionSettings.get(course_id)}
         serializer = DiscussionRolesListSerializer(data, context=context)
         return Response(serializer.data)
+
+
+class BulkDeleteUserPosts(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+        A privileged user that can delete all posts and comments made by a user.
+        It returns expected number of comments and threads that will be deleted
+
+    **Example Requests**:
+        POST /api/discussion/v1/bulk_delete_user_posts/{course_id}
+        Query Parameters:
+            username: The username of the user whose posts are to be deleted
+            course_id: Course id for which posts are to be removed
+            execute: If True, runs deletion task
+            course_or_org: If 'course', deletes posts in the course, if 'org', deletes posts in all courses of the org
+
+    **Example Response**:
+        Empty string
+    """
+
+    authentication_classes = (
+        JwtAuthentication, BearerAuthentication, SessionAuthentication,
+    )
+    permission_classes = (permissions.IsAuthenticated, IsAllowedToBulkDelete)
+
+    def post(self, request, course_id):
+        """
+        Implements the delete user posts endpoint.
+        TODO: Add support for MySQLBackend as well
+        """
+        username = request.GET.get("username", None)
+        execute_task = request.GET.get("execute", "false").lower() == "true"
+        if (not username) or (not course_id):
+            raise BadRequest("username and course_id are required.")
+        course_or_org = request.GET.get("course_or_org", "course")
+        if course_or_org not in ["course", "org"]:
+            raise BadRequest("course_or_org must be either 'course' or 'org'.")
+
+        user = get_object_or_404(User, username=username)
+        course_ids = [course_id]
+        if course_or_org == "org":
+            org_id = CourseKey.from_string(course_id).org
+            course_ids = [
+                str(c_id)
+                for c_id in CourseEnrollment.objects.filter(user=request.user).values_list('course_id', flat=True)
+                if c_id.org == org_id
+            ]
+
+        comment_count = Comment.get_user_comment_count(user.id, course_ids)
+        thread_count = Thread.get_user_threads_count(user.id, course_ids)
+
+        if execute_task:
+            delete_course_post_for_user.apply_async(
+                args=(user.id, username, course_ids),
+            )
+        return Response(
+            {"comment_count": comment_count, "thread_count": thread_count},
+            status=status.HTTP_202_ACCEPTED
+        )
