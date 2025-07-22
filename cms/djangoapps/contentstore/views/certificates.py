@@ -54,6 +54,7 @@ from xmodule.modulestore import EdxJSONEncoder  # lint-amnesty, pylint: disable=
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from cms.djangoapps.contentstore.views.serializers import CertificateActivationSerializer
+from cms.djangoapps.contentstore.views.permissions import HasStudioWriteAccess
 
 
 from ..exceptions import AssetNotFoundException
@@ -369,12 +370,26 @@ class Certificate:
         return self._certificate_data
 
 
-class CertificateActivationAPIView(DeveloperErrorViewMixin, APIView):
+class ModulestoreMixin:
+    """
+    Mixin to provide a get_modulestore() method for views.
+    Makes it easier to override or patch in tests.
+    """
+    def get_modulestore(self):
+        return modulestore()
+
+
+class CertificateActivationAPIView(
+    DeveloperErrorViewMixin,
+    ModulestoreMixin,
+    APIView
+):
     """
     View for activating or deactivating course certificates.
     This view allows instructors to toggle the activation state of course certificates.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasStudioWriteAccess]
+    serializer_class = CertificateActivationSerializer
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, course_key_string):
@@ -385,17 +400,9 @@ class CertificateActivationAPIView(DeveloperErrorViewMixin, APIView):
             json: is_active. update the activation state of certificate
         """
         course_key = CourseKey.from_string(course_key_string)
-        serializer = CertificateActivationSerializer(data=request.data)
+        course = self.get_modulestore().get_course(course_key, depth=0)
 
-        store = modulestore()
-        try:
-            course = _get_course_and_check_access(course_key, request.user)
-        except PermissionDenied:
-            return Response(
-                {"error": _(f"PermissionDenied: Failed in authenticating {request.user}")},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
+        serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -407,7 +414,7 @@ class CertificateActivationAPIView(DeveloperErrorViewMixin, APIView):
             certificate['is_active'] = is_active
             break
 
-        store.update_item(course, request.user.id)
+        self.get_modulestore().update_item(course, request.user.id)
         cert_event_type = 'activated' if is_active else 'deactivated'
         CertificateManager.track_event(cert_event_type, {
             'course_id': str(course.id),
