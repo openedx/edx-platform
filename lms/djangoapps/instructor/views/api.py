@@ -2241,12 +2241,16 @@ class OverrideProblemScoreView(DeveloperErrorViewMixin, APIView):
             )
 
         if not has_access(request.user, "staff", block):
-            err_msg = (
-                f"User {request.user.id} does not have permission to "
-                f"override scores for problem {problem_to_reset}."
-            )
             return Response(
-                {"error": _(err_msg)},
+                {
+                    "error": _(
+                        "User {user_id} does not have permission to "
+                        "override scores for problem {problem_to_reset}."
+                    ).format(
+                        user_id=request.user.id,
+                        problem_to_reset=problem_to_reset
+                    )
+                },
                 status=status.HTTP_403_FORBIDDEN
             )
 
