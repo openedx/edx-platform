@@ -593,6 +593,8 @@ class RegistrationView(APIView):
             data['username'] = get_auto_generated_username(data)
 
         try:
+            # .. filter_implemented_name: StudentRegistrationRequested
+            # .. filter_type: org.openedx.learning.student.registration.requested.v1
             data = StudentRegistrationRequested.run_filter(form_data=data)
         except StudentRegistrationRequested.PreventRegistration as exc:
             errors = {

@@ -122,7 +122,6 @@ openedx-filters                     # Open edX Filters from Hooks Extension Fram
 openedx-forum                       # Open edX forum v2 application
 # TODO -- https://github.com/openedx/openedx-learning/pull/333
 git+https://github.com/openedx/openedx-learning.git@refs/pull/333/head#egg=openedx-learning
-openedx-mongodbproxy
 openedx-django-wiki
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app

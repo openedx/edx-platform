@@ -287,6 +287,8 @@ def create_container(
         case _:
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_CREATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.created.v1
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
@@ -352,6 +354,8 @@ def update_container(
             raise NotImplementedError(f"Library does not support {container_type} yet")
 
     # Send event related to the updated container
+    # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
@@ -361,6 +365,8 @@ def update_container(
     # Send events related to the containers that contains the updated container.
     # This is to update the children display names used in the section/subsection previews.
     for affected_container in affected_containers:
+        # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 container_key=affected_container.container_key,
@@ -370,6 +376,8 @@ def update_container(
     # All subsections under a section have section key in index that needs to be updated.
     # So if parent section name has been changed, it needs to be reflected in sections key of children
     for child in children:
+        # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             content_object=ContentObjectChangedData(
                 object_id=str(getattr(child, child_key_name)),
@@ -404,6 +412,8 @@ def delete_container(
     )
     authoring_api.soft_delete_draft(container.pk)
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_DELETED
+    # .. event_type: org.openedx.content_authoring.content_library.container.deleted.v1
     LIBRARY_CONTAINER_DELETED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
@@ -415,6 +425,8 @@ def delete_container(
     #
     # To delete the container on collections
     for collection in affected_collections:
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 collection_key=library_collection_locator(
@@ -427,6 +439,8 @@ def delete_container(
     # Send events related to the containers that contains the updated container.
     # This is to update the children display names used in the section/subsection previews.
     for affected_container in affected_containers:
+        # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 container_key=affected_container.container_key,
@@ -441,6 +455,8 @@ def delete_container(
     # All subsections under a section have section key in index that needs to be updated.
     # So if parent section is deleted, it needs to be removed from sections key of children
     for child in children:
+        # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             content_object=ContentObjectChangedData(
                 object_id=str(getattr(child, key_name)),
@@ -470,6 +486,8 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
         published=False,
     )
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_CREATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.created.v1
     LIBRARY_CONTAINER_CREATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
@@ -481,6 +499,8 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
         # Update parent key data in index. Eg. `sections` key in index for subsection
         content_changes.append(str(affected_containers[0].container_type.value) + "s")
     # Add tags, collections and parent data back to index
+    # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+    # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
     CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
         content_object=ContentObjectChangedData(
             object_id=str(container_key),
@@ -493,6 +513,8 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     #
     # To restore the container on collections
     for collection in affected_collections:
+        # .. event_implemented_name: LIBRARY_COLLECTION_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.collection.updated.v1
         LIBRARY_COLLECTION_UPDATED.send_event(
             library_collection=LibraryCollectionData(
                 collection_key=library_collection_locator(
@@ -504,6 +526,8 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     # Send events related to the containers that contains the updated container.
     # This is to update the children display names used in the section/subsection previews.
     for affected_container in affected_containers:
+        # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+        # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
         LIBRARY_CONTAINER_UPDATED.send_event(
             library_container=LibraryContainerData(
                 container_key=affected_container.container_key,
@@ -517,6 +541,8 @@ def restore_container(container_key: LibraryContainerLocator) -> None:
     # All subsections under a section have section key in index that needs to be updated.
     # Should restore removed parent section in sections key of children subsections
     for child in children:
+        # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+        # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
         CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
             content_object=ContentObjectChangedData(
                 object_id=str(getattr(child, key_name)),
@@ -601,6 +627,8 @@ def update_container_children(
             )
 
             for key in children_ids:
+                # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+                # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
                 CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
                     content_object=ContentObjectChangedData(
                         object_id=str(key),
@@ -618,6 +646,8 @@ def update_container_children(
             )
 
             for key in children_ids:
+                # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+                # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
                 CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
                     content_object=ContentObjectChangedData(
                         object_id=str(key),
@@ -635,6 +665,8 @@ def update_container_children(
             )
 
             for key in children_ids:
+                # .. event_implemented_name: CONTENT_OBJECT_ASSOCIATIONS_CHANGED
+                # .. event_type: org.openedx.content_authoring.content.object.associations.changed.v1
                 CONTENT_OBJECT_ASSOCIATIONS_CHANGED.send_event(
                     content_object=ContentObjectChangedData(
                         object_id=str(key),
@@ -644,6 +676,8 @@ def update_container_children(
         case _:
             raise ValueError(f"Invalid container type: {container_type}")
 
+    # .. event_implemented_name: LIBRARY_CONTAINER_UPDATED
+    # .. event_type: org.openedx.content_authoring.content_library.container.updated.v1
     LIBRARY_CONTAINER_UPDATED.send_event(
         library_container=LibraryContainerData(
             container_key=container_key,
